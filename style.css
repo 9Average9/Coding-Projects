@@ -1,0 +1,47 @@
+body{
+  background-color: rgb(119, 111, 111);
+}
+
+header{
+  text-align: center;
+  font-size: 4rem;
+  font-weight: bold;
+  font-family: Helvetica, sans-serif;
+}
+
+.container{
+  text-align: center;
+  margin-top: 15%;
+}
+
+#input{
+border-radius: 10px;
+border: none;
+margin-bottom: 20px;
+padding: 22px;
+font-size: x-large;
+}
+
+button{
+  border: none;
+  border-radius: 50%;
+  padding: 30px;
+  margin: 3px;
+  font-size: large;
+  cursor: pointer;
+}
+
+#equal{
+  background-color: rgb(26, 191, 136);
+  border-radius: 10px;
+  padding: 18px;
+  font-size: xx-large;
+}
+
+#clear{
+  background-color: rgb(59, 98, 99);
+}
+
+#operators{
+  background-color: cadetblue;
+}

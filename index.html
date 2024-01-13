@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <link rel="stylesheet" href="style.css">
+ 
+</head>
+<body>
+  <header>Calculator</header>
+ <div class="container">
+<input type="text" id="input" disabled>
+<button onclick="calculate()" id="equal">=</button><br>
+<button onclick="appendToInput(1)">1</button>
+<button onclick="appendToInput(2)">2</button>
+<button onclick="appendToInput(3)">3</button>
+<button onclick="appendToInput('+')" id="operators">+</button><br>
+<button onclick="appendToInput(4)">4</button>
+<button onclick="appendToInput(5)">5</button>
+<button onclick="appendToInput(6)">6</button>
+<button onclick="appendToInput('-')" id="operators">-</button><br>
+<button onclick="appendToInput(7)">7</button>
+<button onclick="appendToInput(8)">8</button>
+<button onclick="appendToInput(9)">9</button>
+<button onclick="appendToInput('/')" id="operators">/</button><br>
+<button onclick="appendToInput(0)">0</button>
+<button onclick="appendToInput('.')" id="operators">.</button>
+<button onclick="appendToInput('*')" id="operators">*</button>
+<button onclick="clearInput()" id="clear">C</button>
+</div> 
+
+<script src="code.js"></script>
+</body>
+</html>
