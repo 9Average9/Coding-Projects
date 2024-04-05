@@ -16,6 +16,21 @@ function calculate(){
   var checkInput = /^[0-9]+([+\-*/][0-9]+)?$/;
 
 
+if(checkInput.test(input)){
+  let result = eval(input);
+userInput.value = result;
+try{
+if(result != undefined && isFinite(result)){
+userInput = result;
+}
 
+
+}catch(error){
+input = 'enter a valid expression'
+}
+
+}else{
+  userInput.value = 'enter a valid expression';
+}
 
 }
