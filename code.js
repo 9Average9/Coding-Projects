@@ -13,7 +13,7 @@ function clearInput(){
 function calculate(){
   let userInput = document.getElementById('input');
   let input = userInput.value.trim();
-  var checkInput = /^[0-9]+([+\-*/][0-9]+)?$/;
+
 
 
 if(checkInput.test(input)){
