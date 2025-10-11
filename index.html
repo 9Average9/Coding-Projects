@@ -99,12 +99,18 @@
     box-shadow: 0 8px 22px rgba(255,255,255,.16), 0 0 22px var(--styleHue);
   }
   /* Random pops more */
-  #random{
-    background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.10));
-    box-shadow: 0 8px 22px rgba(255,255,255,.14), 0 0 18px color-mix(in srgb, var(--styleHue) 65%, transparent);
-    outline:0;
-  }
-  #random:active{ transform:translateY(1px) scale(.99); }
+ #random{
+  background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.12));
+  color:#0c0c0c;
+  font-weight:900;
+  text-shadow:0 1px 2px rgba(255,255,255,.6);
+  border:1px solid color-mix(in srgb, var(--styleHue) 70%, #ffffff 20%);
+  box-shadow:
+    0 0 12px rgba(255,255,255,.35),
+    0 0 26px color-mix(in srgb, var(--styleHue) 85%, transparent),
+    0 0 50px color-mix(in srgb, var(--styleHue) 70%, transparent);
+}
+#random:active{ transform:translateY(1px) scale(.98); }
 
   /* Tips toggle (bottom of card) */
   .tipsToggleWrap{ display:flex; justify-content:center; margin-top:10px; }
@@ -150,9 +156,11 @@
     display:grid; place-items:center; cursor:pointer; justify-self:end;
   }
   .tipsBody{
-    padding:12px 14px 56px; /* extra bottom space for tags */
-    max-height:calc(100% - 58px); overflow:auto
-  }
+  padding:12px 14px 120px; /* more space at the bottom */
+  max-height:calc(100% - 58px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
   details{ background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px 10px; margin:8px 0; }
   summary{ cursor:pointer; font-weight:800; outline:none; }
 
