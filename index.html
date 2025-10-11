@@ -3,32 +3,43 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-<title>Demon Slayer Journey — Menu Preview</title>
+<title>Demon Slayer Journey — Menu (Sakura)</title>
+
+<!-- Google Fonts (unique vibes per style) -->
+<link href="https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Audiowide&family=Bebas+Neue&family=Cinzel:wght@600;800&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@700&family=Courgette&family=M+PLUS+Rounded+1c:wght@700&family=Noto+Serif+JP:wght@700&family=Orbitron:wght@700&family=Oswald:wght@600&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+
 <style>
   :root{
     --bg1:#0b0f19; --bg2:#05070b; --grid:#20283a; --ink:#e7eef7;
     --card:rgba(255,255,255,.06); --glass:rgba(255,255,255,.08);
+    --styleFont: 'Noto Serif JP', serif;
   }
-  html,body{height:100%;margin:0;overflow:hidden;background:
-    radial-gradient(1200px 800px at 50% 30%, var(--bg1), var(--bg2) 60%, #03060c 100%);
-    color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  html,body{
+    height:100%; margin:0; overflow:hidden;
+    background: radial-gradient(1200px 800px at 50% 30%, var(--bg1), var(--bg2) 60%, #03060c 100%);
+    color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  }
+
+  /* Sakura background canvas (behind everything) */
+  #sakuraCanvas{position:fixed; inset:0; z-index:-1;}
+
   .bgGrid:before{
-    content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.18;
     background:
-      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/48px 48px,
-      linear-gradient(90deg,var(--grid) 1px, transparent 1px) 0 0/48px 48px;
-    mask:radial-gradient( farthest-side at 50% 30%, rgba(0,0,0,.6), transparent 70%);
+      radial-gradient(60% 40% at 50% 20%, rgba(255,255,255,.04), transparent 60%),
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/56px 56px,
+      linear-gradient(90deg,var(--grid) 1px, transparent 1px) 0 0/56px 56px;
+    mask:radial-gradient( farthest-side at 50% 30%, rgba(0,0,0,.65), transparent 70%);
   }
 
   /* 3D Title */
-  .wrap{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;place-items:center;gap:10px;padding:16px}
+  .wrap{position:fixed; inset:0; display:grid; grid-template-rows:auto 1fr auto; place-items:center; gap:10px; padding:16px}
   .title{
-    font-weight:900;letter-spacing:.5px;line-height:1; text-align:center;
+    font-weight:900; letter-spacing:.5px; line-height:1; text-align:center;
     font-size: clamp(28px, 6vw, 64px);
-    color:#fff;
     background:linear-gradient(180deg,#fff, #d4dbff 60%, #aab7ff);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    position:relative; text-transform:uppercase;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-transform:uppercase;
     text-shadow:
       0 1px 0 #c9d2ff, 0 2px 0 #b7c2ff, 0 3px 0 #a6b4ff,
       0 4px 0 #95a6ff, 0 5px 0 #8598ff, 0 6px 10px rgba(0,0,0,.45);
@@ -36,11 +47,11 @@
 
   /* Carousel shell */
   .carousel{
-    width:min(820px,92vw); margin-top:10px;
+    width:min(860px,92vw); margin-top:10px;
     display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
   }
   .nav{
-    width:56px;height:56px;border-radius:50%;display:grid;place-items:center;
+    width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
     background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.1);
     cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
     font-size:28px; font-weight:900; line-height:0; transition:transform .08s ease;
@@ -49,48 +60,44 @@
 
   .card{
     position:relative; min-height: 320px;
-    border-radius:16px; padding:18px; overflow:hidden;
+    border-radius:18px; padding:20px; overflow:hidden;
     background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
     border:1px solid rgba(255,255,255,.12);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 24px rgba(0,0,0,.35);
-    display:grid; grid-template-rows:auto auto 1fr auto; gap:8px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 14px 28px rgba(0,0,0,.35);
+    display:grid; grid-template-rows:auto auto 1fr auto; gap:10px;
   }
   .aura{
-    position:absolute; inset:-30%; filter:blur(42px); opacity:.18; pointer-events:none;
+    position:absolute; inset:-30%; filter:blur(46px); opacity:.20; pointer-events:none;
     background: var(--aura,#35b3ff);
-    animation:auraPulse 5s ease-in-out infinite;
+    animation:auraPulse 6s ease-in-out infinite;
   }
-  @keyframes auraPulse{
-    0%,100%{ opacity:.14; transform:scale(1)}
-    50%{ opacity:.22; transform:scale(1.05)}
-  }
+  @keyframes auraPulse{ 0%,100%{opacity:.14; transform:scale(1)} 50%{opacity:.24; transform:scale(1.06)} }
+
   /* Flame-only flicker overlay */
   .flame::after{
     content:""; position:absolute; inset:-20% -40% auto -40%; height:60%;
     background:
       conic-gradient(from 180deg,
-        rgba(255,200,120,.5), rgba(255,130,60,.45), rgba(255,65,45,.5), rgba(255,130,60,.45), rgba(255,200,120,.5));
-    filter:blur(36px) saturate(120%); opacity:.28; pointer-events:none;
-    animation:flame 2.2s ease-in-out infinite;
-    mix-blend-mode:screen;
+        rgba(255,200,120,.55), rgba(255,130,60,.45), rgba(255,65,45,.5),
+        rgba(255,130,60,.45), rgba(255,200,120,.55));
+    filter:blur(36px) saturate(120%); opacity:.3; pointer-events:none;
+    animation:flame 2.2s ease-in-out infinite; mix-blend-mode:screen;
   }
-  @keyframes flame{
-    0%,100%{transform:translateY(0) rotate(0deg) scale(1)}
-    50%{transform:translateY(-6px) rotate(3deg) scale(1.04)}
-  }
+  @keyframes flame{ 0%,100%{transform:translateY(0) rotate(0deg) scale(1)} 50%{transform:translateY(-6px) rotate(3deg) scale(1.04)} }
 
   .name{
     text-align:center; font-weight:900; letter-spacing:.3px;
-    font-size: clamp(18px, 3.5vw, 28px);
+    font-size: clamp(20px, 3.6vw, 30px);
+    font-family: var(--styleFont);
   }
   .desc{ margin-top:2px; text-align:center; opacity:.95; font-size:15px; }
 
   .list{margin:6px 0 0 0; padding-left:18px; line-height:1.6; opacity:.95}
   .list li{ margin:4px 0; }
-  .muted{ opacity:.85; }
+  .muted{ opacity:.88; }
 
   .cta{
-    display:flex; gap:10px; align-items:center; justify-content:center; margin-top:6px;
+    display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px;
   }
   .btn{
     padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
@@ -101,11 +108,36 @@
   .btn.primary{ background: var(--btnGrad,#35b3ff); color:#06121c; border-color: rgba(255,255,255,.3); }
   .btn:active{ transform:translateY(1px); }
 
-  .note{opacity:.7; font-size:12px; margin-top:10px; text-align:center}
+  /* Tips & Forms panel */
+  .tips{
+    width:min(860px,92vw);
+    margin: 10px auto 8px auto;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    backdrop-filter: blur(6px);
+    padding:10px 12px;
+    max-height: 34vh;
+    overflow:auto;
+  }
+  .tips h3{
+    margin:4px 0 8px 0; text-align:center; font-size:16px; letter-spacing:.3px; opacity:.95;
+  }
+  details{
+    background: rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; padding:8px 10px; margin:8px 0;
+  }
+  summary{ cursor:pointer; font-weight:700; outline:none; }
+  .tag{
+    display:inline-block; font-size:11px; padding:2px 8px; margin:4px 6px 0 0;
+    border:1px solid rgba(255,255,255,.18); border-radius:999px; opacity:.9;
+  }
 </style>
 </head>
 <body>
+<canvas id="sakuraCanvas"></canvas>
 <div class="bgGrid"></div>
+
 <div class="wrap" id="app">
   <div class="title">Demon Slayer Journey</div>
 
@@ -114,12 +146,9 @@
 
     <div class="card" id="card">
       <div class="aura" id="aura"></div>
-
       <div class="name" id="name">—</div>
       <div class="desc" id="desc">—</div>
-
       <ul class="list" id="traits"></ul>
-
       <div class="cta">
         <button class="btn" id="random">Random</button>
         <button class="btn primary" id="select">Select</button>
@@ -129,33 +158,170 @@
     <div class="nav" id="next" aria-label="Next">›</div>
   </div>
 
-  <div class="note">Preview only — “Select” will just confirm for now.</div>
+  <!-- Tips & Forms (scrollable, updates per style) -->
+  <div class="tips" id="tipsPanel">
+    <h3>Tips & Forms</h3>
+    <div id="tipsContent"></div>
+  </div>
 </div>
 
 <script>
 (() => {
-  // Data (power/forms moved into the traits list for sleekness)
+  // ====== Styles + unique fonts (set via CSS var --styleFont)
+  // Font options loaded above:
+  // Water: 'M PLUS Rounded 1c'  | Flame: 'Bebas Neue' | Thunder: 'Orbitron'
+  // Wind: 'Oswald'              | Stone: 'Cinzel'     | Mist: 'Noto Serif JP'
+  // Love: 'Courgette'           | Serpent: 'Cormorant Garamond'
+  // Sound: 'Audiowide'          | Beast: 'Anton'      | Insect: 'Rajdhani'
+  // Moon: 'Cinzel Decorative'   | Sun: 'Cinzel'
   const styles = [
-    {key:'Water',   hue:'#55b7ff', forms:11, power:'Balanced',   desc:'Fluid, adaptive strikes. Great control, consistent DPS.', traits:['Power: Balanced','Forms: 11','Good defense & spacing','Wide arcs','Reliable crowd control'], first:'Water Surface Slash'},
-    {key:'Flame',   hue:'#ff6a4f', forms:9,  power:'High',       desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.', traits:['Power: High','Forms: 9','High damage','Good AoE','Straightforward timing'], first:'Unknowing Fire', aura:'flame'},
-    {key:'Thunder', hue:'#ffd24a', forms:6,  power:'High',       desc:'Lightning-fast burst dashes that delete targets.', traits:['Power: High','Forms: 6','Extreme speed','Burst mobility','Precise windows'], first:'Thunderclap & Flash'},
-    {key:'Wind',    hue:'#7ce37f', forms:9,  power:'High',       desc:'Bladed gales with aggressive coverage and pushback.', traits:['Power: High','Forms: 9','Push & peel','Good coverage'], first:'Dust Whirl Cutter'},
-    {key:'Stone',   hue:'#c7c2a1', forms:5,  power:'High',       desc:'Immovable force. Slow swings with huge knockback.', traits:['Power: High','Forms: 5','Big stagger','Tanky feel'], first:'Boulder Swing'},
-    {key:'Mist',    hue:'#cfe8ff', forms:7,  power:'Moderate',   desc:'Deceptive movement and vanish windows to reposition.', traits:['Power: Moderate','Forms: 7','Evasive tools','Brief invis','Ambush angles'], first:'Obscuring Clouds'},
-    {key:'Love',    hue:'#ff9ccf', forms:6,  power:'Moderate',   desc:'Whip-like reach and flurries; fast multi-hits.', traits:['Power: Moderate','Forms: 6','Rapid hits','Great reach'], first:'Shivers of First Love'},
-    {key:'Serpent', hue:'#9ddaa8', forms:5,  power:'Moderate',   desc:'Curving paths that slip around guards to strike.', traits:['Power: Moderate','Forms: 5','Curved arcs','Angle mixups'], first:'Serpent Slash'},
-    {key:'Sound',   hue:'#a880ff', forms:5,  power:'Moderate',   desc:'Explosive beats and brief stuns to control crowds.', traits:['Power: Moderate','Forms: 5','Radial bursts','Stun chance'], first:'Roar'},
-    {key:'Beast',   hue:'#8bd0b1', forms:7,  power:'Above Avg',  desc:'Wild twin-blade assaults with constant pressure.', traits:['Power: Above Avg','Forms: 7','Double slashes','Relentless'], first:'First Fang: Pierce'},
-    {key:'Insect',  hue:'#b7ffb7', forms:6,  power:'Situational',desc:'Precision thrusts and toxins; lighter raw damage.', traits:['Power: Situational','Forms: 6','DoT potential','High mobility'], first:'Bee Sting Dance'},
-    {key:'Moon',    hue:'#c0b7ff', forms:16, power:'Very High',  desc:'Crescent blades carve space at range; lethal crescents.', traits:['Power: Very High','Forms: 16','Range control','Orbiting cuts'], first:'Calamitous Eddy'},
-    {key:'Sun',     hue:'#ff8a3d', forms:13, power:'Strongest',  desc:'The original form—overwhelming damage and coverage.', traits:['Power: Strongest','Forms: 13','Top damage','Versatile'], first:'Dance of the Fire God'}
+    {
+      key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
+      desc:'Fluid, adaptive strikes. Great control and consistent damage.',
+      traits:['Power: Balanced','Forms: 11','Good defense & spacing','Wide arcs','Reliable crowd control'],
+      forms:[
+        {n:1, name:'Water Surface Slash', tags:['AoE','Wide Arc']},
+        {n:2, name:'Water Wheel', tags:['AoE','Knockback']},
+        {n:3, name:'Flowing Dance', tags:['Mobility']},
+        {n:4, name:'Striking Tide', tags:['Multi-hit']},
+        {n:5, name:'Blessed Rain', tags:['Finisher']},
+        {n:6, name:'Whirlpool', tags:['AoE','Pull']},
+        {n:7, name:'Drop Ripple Thrust', tags:['Single Target']},
+        {n:8, name:'Waterfall Basin', tags:['AoE','Knockdown']},
+        {n:9, name:'Splashing Water Flow', tags:['Mobility','Evasion']},
+        {n:10,name:'Constant Flux', tags:['Ramp-up','Multi-hit']},
+        {n:11,name:'Dead Calm', tags:['AoE','Freeze 4s','High Damage','Screen-wide']}
+      ]
+    },
+    {
+      key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
+      desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
+      traits:['Power: High','Forms: 9','High damage','Good AoE','Straightforward timing'],
+      forms:[
+        {n:1,name:'Unknowing Fire', tags:['Burst','Single Target']},
+        {n:2,name:'Rising Scorching Sun', tags:['Anti-air','Knockback']},
+        {n:3,name:'Blazing Universe', tags:['AoE','Impact']},
+        {n:4,name:'Blooming Flame Undulation', tags:['AoE','Sustain']},
+        {n:5,name:'Flame Tiger', tags:['AoE','Multi-hit']},
+        {n:6,name:'Flame Dance', tags:['Combo','Mobility']},
+        {n:7,name:'Rengoku', tags:['Ultimate','Line AoE','Burn DoT']}
+      ]
+    },
+    {
+      key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
+      desc:'Lightning-fast burst dashes that delete targets.',
+      traits:['Power: High','Forms: 6','Extreme speed','Burst mobility'],
+      forms:[
+        {n:1,name:'Thunderclap & Flash', tags:['Dash','Single Target','Burst']},
+        {n:2,name:'Six Fold', tags:['Dash','Multi-hit']},
+        {n:3,name:'Eight Fold', tags:['Dash','Multi-hit']},
+        {n:4,name:'God Speed', tags:['Dash','Speed Buff','Burst']}
+      ]
+    },
+    {
+      key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
+      desc:'Bladed gales with aggressive coverage and pushback.',
+      traits:['Power: High','Forms: 9','Push & peel','Good coverage'],
+      forms:[
+        {n:1,name:'Dust Whirl Cutter', tags:['AoE','Knockback']},
+        {n:2,name:'Claws-Purifying Wind', tags:['Multi-hit','Bleed?']},
+        {n:3,name:'Clean Storm Wind Tree', tags:['Large AoE']},
+        {n:4,name:'Rising Dust Storm', tags:['AoE','Juggle']}
+      ]
+    },
+    {
+      key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
+      desc:'Immovable force. Slow swings with huge knockback.',
+      traits:['Power: High','Forms: 5','Big stagger','Tanky feel'],
+      forms:[
+        {n:1,name:'Boulder Swing', tags:['Single Target','Knockback']},
+        {n:2,name:'Wheel of Justice', tags:['AoE','Armor']},
+        {n:3,name:'Stone Skin', tags:['Defense','Stagger Resist']}
+      ]
+    },
+    {
+      key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
+      desc:'Deceptive movement and vanish windows to reposition.',
+      traits:['Power: Moderate','Forms: 7','Evasive tools','Brief invis'],
+      forms:[
+        {n:1,name:'Obscuring Clouds', tags:['Invisibility','Mobility']},
+        {n:2,name:'Shifting Fog', tags:['Evasion','Confuse']},
+        {n:3,name:'Sea of Clouds', tags:['AoE','Slow']}
+      ]
+    },
+    {
+      key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
+      desc:'Whip-like reach and flurries; fast multi-hits.',
+      traits:['Power: Moderate','Forms: 6','Rapid hits','Great reach'],
+      forms:[
+        {n:1,name:'Shivers of First Love', tags:['Multi-hit','Reach']},
+        {n:2,name:'Love Pangs', tags:['Stun','Multi-hit']}
+      ]
+    },
+    {
+      key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
+      desc:'Curving paths that slip around guards to strike.',
+      traits:['Power: Moderate','Forms: 5','Curved arcs','Angle mixups'],
+      forms:[
+        {n:1,name:'Serpent Slash', tags:['Curved Arc','Single Target']},
+        {n:2,name:'Coiling Serpent', tags:['Bind','Stun']}
+      ]
+    },
+    {
+      key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
+      desc:'Explosive beats and brief stuns to control crowds.',
+      traits:['Power: Moderate','Forms: 5','Radial bursts','Stun chance'],
+      forms:[
+        {n:1,name:'Roar', tags:['AoE','Stun']},
+        {n:2,name:'Resounding Slashes', tags:['AoE','Multi-hit']}
+      ]
+    },
+    {
+      key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
+      desc:'Wild twin-blade assaults with constant pressure.',
+      traits:['Power: Above Avg','Forms: 7','Double slashes','Relentless'],
+      forms:[
+        {n:1,name:'First Fang: Pierce', tags:['Single Target','Armor Pierce']},
+        {n:2,name:'Second Fang: Rip', tags:['Multi-hit','Close Range']}
+      ]
+    },
+    {
+      key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
+      desc:'Precision thrusts and toxins; lighter raw damage.',
+      traits:['Power: Situational','Forms: 6','DoT potential','High mobility'],
+      forms:[
+        {n:1,name:'Bee Sting Dance', tags:['Single Target','Poison DoT']},
+        {n:2,name:'Dragonfly Waltz', tags:['Multi-hit','Poison DoT']}
+      ]
+    },
+    {
+      key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
+      desc:'Crescent blades carve space at range; lethal crescents.',
+      traits:['Power: Very High','Forms: 16','Range control','Orbiting cuts'],
+      forms:[
+        {n:1,name:'Calamitous Eddy', tags:['AoE','Orbiting']},
+        {n:2,name:'Crescent Waltz', tags:['Range','Multi-hit']}
+      ]
+    },
+    {
+      key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
+      desc:'The original form—overwhelming damage and coverage.',
+      traits:['Power: Strongest','Forms: 13','Top damage','Versatile'],
+      forms:[
+        {n:1,name:'Dance of the Fire God', tags:['Line AoE','Burst','Burn DoT (light)']},
+        {n:2,name:'Clear Blue Sky', tags:['AoE','Spin']},
+        {n:3,name:'Raging Sun', tags:['AoE','Knockback']}
+      ]
+    },
   ];
 
+  // Elements
   const nameEl = document.getElementById('name');
   const descEl = document.getElementById('desc');
   const traitsEl = document.getElementById('traits');
   const auraEl = document.getElementById('aura');
   const cardEl = document.getElementById('card');
+  const tipsContent = document.getElementById('tipsContent');
 
   const prev = document.getElementById('prev');
   const next = document.getElementById('next');
@@ -164,21 +330,77 @@
 
   let idx = 0;
 
+  function renderForms(style){
+    // Build accordion with a summary + tags legend and a list per form
+    const tagLegend = `
+      <div style="margin:6px 0 10px 0; font-size:12px; opacity:.85;">
+        <span class="tag">AoE</span>
+        <span class="tag">Single Target</span>
+        <span class="tag">Knockback</span>
+        <span class="tag">Stun</span>
+        <span class="tag">Freeze</span>
+        <span class="tag">Poison DoT</span>
+        <span class="tag">Burn DoT</span>
+        <span class="tag">Mobility</span>
+        <span class="tag">Multi-hit</span>
+      </div>
+    `;
+
+    const formsList = style.forms.map(f=>{
+      const tags = (f.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+      return `<li style="margin:6px 0 10px 0;">
+        <b>Form ${f.n} — ${f.name}</b><br/>
+        ${tags}
+      </li>`;
+    }).join('');
+
+    const block = `
+      <details open>
+        <summary>${style.key} Breathing — Forms & Tags</summary>
+        ${tagLegend}
+        <ol style="margin:6px 0 0 18px; padding:0;">
+          ${formsList}
+        </ol>
+      </details>
+    `;
+
+    const general = `
+      <details>
+        <summary>General Tips</summary>
+        <ul style="margin:6px 0 0 18px; line-height:1.6;">
+          <li>Forms unlock as you level; stronger styles (e.g., Sun/Moon) still feel stronger.</li>
+          <li>Some forms apply control (Stun/Freeze/Knockback); others focus on damage or mobility.</li>
+          <li><b>Water 11: Dead Calm</b> — <i>Freeze all demons for 4 seconds</i> and deal high AoE damage across the screen.</li>
+          <li><b>Poison DoT</b> (Insect) lasts longer and deals more total damage than <b>Burn DoT</b> (Flame), which is shorter/lighter.</li>
+        </ul>
+      </details>
+    `;
+
+    tipsContent.innerHTML = block + general;
+  }
+
   function render(i){
     const s = styles[i];
+    // Card UI
     nameEl.textContent = `${s.key} Breathing`;
+    nameEl.style.fontFamily = s.font;
     descEl.textContent = s.desc;
-    // Build list with power/forms included
-    const list = [...s.traits, `First Form/Technique: ${s.first}`];
+
+    // Traits list (includes sleek Power / Forms)
+    const list = [...s.traits];
     traitsEl.innerHTML = list.map(t=>`<li class="muted">${t}</li>`).join('');
 
+    // Auras & colors
     auraEl.style.setProperty('--aura', s.hue);
     cardEl.style.setProperty('--btnGrad', s.hue);
+    cardEl.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.04), 0 14px 28px ${s.hue}33`;
+    if(s.key==='Flame'){ cardEl.classList.add('flame'); } else { cardEl.classList.remove('flame'); }
 
-    if(s.aura === 'flame'){ cardEl.classList.add('flame'); }
-    else{ cardEl.classList.remove('flame'); }
+    // Font var for other optional areas
+    document.documentElement.style.setProperty('--styleFont', s.font);
 
-    cardEl.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 24px ${s.hue}33, 0 0 0 3px transparent`;
+    // Tips panel updates
+    renderForms(s);
   }
 
   prev.addEventListener('click', ()=>{ idx = (idx-1+styles.length)%styles.length; render(idx); });
@@ -186,17 +408,64 @@
   selectBtn.addEventListener('click', ()=> alert(`Selected: ${styles[idx].key} Breathing (menu preview only)`));
   randBtn.addEventListener('click', ()=>{ idx = Math.floor(Math.random()*styles.length); render(idx); });
 
-  // Swipe
+  // Swipe (mobile)
   let sx=0, sy=0, swiping=false;
   cardEl.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; swiping=true; }, {passive:true});
   cardEl.addEventListener('touchend', e=>{
     if(!swiping) return; swiping=false;
     const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){
-      if(dx<0) next.click(); else prev.click();
-    }
+    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ (dx<0? next: prev).click(); }
   }, {passive:true});
 
+  // Sakura petals background (lightweight)
+  const sakura = document.getElementById('sakuraCanvas');
+  const sctx = sakura.getContext('2d');
+  function resize(){ sakura.width = innerWidth; sakura.height = innerHeight; }
+  addEventListener('resize', resize, {passive:true}); resize();
+
+  const petals = Array.from({length: 40}, ()=>({
+    x: Math.random()*innerWidth,
+    y: Math.random()*innerHeight,
+    r: 6+Math.random()*8,
+    dx: -0.3 + Math.random()*0.6,
+    dy: 0.5 + Math.random()*1.2,
+    rot: Math.random()*Math.PI*2,
+    dr: -0.02 + Math.random()*0.04,
+    tint: `rgba(${200+Math.floor(Math.random()*40)}, ${120+Math.floor(Math.random()*40)}, ${160+Math.floor(Math.random()*60)}, ${0.25+Math.random()*0.3})`
+  }));
+
+  function drawPetal(p){
+    sctx.save();
+    sctx.translate(p.x, p.y);
+    sctx.rotate(p.rot);
+    sctx.scale(1, 0.7);
+    sctx.beginPath();
+    sctx.moveTo(0, -p.r*0.6);
+    sctx.quadraticCurveTo(p.r, -p.r, 0, p.r);
+    sctx.quadraticCurveTo(-p.r, -p.r, 0, -p.r*0.6);
+    sctx.fillStyle = p.tint;
+    sctx.fill();
+    sctx.restore();
+  }
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(0.033, (now-last)/1000); last = now;
+    sctx.clearRect(0,0,sakura.width,sakura.height);
+    petals.forEach(p=>{
+      p.x += p.dx*(1+0.2*Math.sin(now/7000));
+      p.y += p.dy;
+      p.rot += p.dr;
+      if(p.y > innerHeight+20) { p.y = -20; p.x = Math.random()*innerWidth; }
+      if(p.x < -20) p.x = innerWidth+20;
+      if(p.x > innerWidth+20) p.x = -20;
+      drawPetal(p);
+    });
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Initial render
   render(idx);
 })();
 </script>
