@@ -273,6 +273,83 @@
 <!-- Tag info popup (hidden by default) -->
 <div class="tagInfo" id="tagInfo"></div>
 
+
+<!-- ====== UI STRUCTURE ====== -->
+<div id="topHUD">
+  <div id="playerRankLevel"></div>
+</div>
+
+<!-- Your existing breathing-style swipe/selection UI goes here -->
+<div id="breathingSelectArea">
+  <!-- cards ... -->
+</div>
+
+<button id="startBtn" class="start-btn" disabled>START</button>
+
+<!-- Loadout Modal (opens after START) -->
+<div id="loadoutModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Your Loadout</h2>
+    <div class="meta-row">
+      <div class="meta">
+        <div><strong>Rank:</strong> <span id="modalRank"></span></div>
+        <div><strong>Level:</strong> <span id="modalLevel"></span></div>
+      </div>
+      <div class="meta">
+        <div><strong>Breathing:</strong> <span id="modalBreathing"></span></div>
+        <div><strong>Theme:</strong> <span id="modalTheme"></span></div>
+      </div>
+    </div>
+
+    <div id="statBars"></div>
+
+    <div class="weapon-row">
+      <label for="weaponSelect"><strong>Sword Type:</strong></label>
+      <select id="weaponSelect"></select>
+    </div>
+
+    <div class="attack-info">
+      <div><strong>Basic Attack:</strong> <span id="attackName">Basic Slash</span></div>
+      <div><strong>Base Damage:</strong> <span id="attackDamage">10</span></div>
+      <div><strong>Attack Speed:</strong> <span id="attackSpeed">Fast</span></div>
+      <div><strong>Trait:</strong> <span id="attackTrait">Default Nichirin</span></div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="confirmLoadout">Confirm Loadout</button>
+      <button id="closeLoadout">Back</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  #topHUD{display:flex;justify-content:center;margin:8px 0;font-family:sans-serif}
+  #playerRankLevel{padding:6px 12px;border:1px solid #999;border-radius:8px;background:#111;color:#fff}
+  .start-btn{
+    position:fixed;left:50%;transform:translateX(-50%);bottom:16px;
+    padding:14px 28px;font-size:20px;border:none;border-radius:12px;
+    background:#b30000;color:#fff;opacity:.6;cursor:not-allowed;box-shadow:0 4px 0 #5a0000;
+  }
+  .start-btn.enabled{opacity:1;cursor:pointer;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,0,0,.6)}70%{box-shadow:0 0 0 12px rgba(255,0,0,0)}100%{box-shadow:0 0 0 0 rgba(255,0,0,0)}}
+  .modal.hidden{display:none}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+  .modal-content{width:min(800px,90vw);background:#0f0f14;color:#eee;border:1px solid #333;border-radius:12px;padding:16px}
+  .meta-row{display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
+  .meta div{margin:2px 0}
+  .weapon-row{margin:10px 0}
+  #statBars{display:grid;gap:8px;margin:12px 0}
+  .bar{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:8px}
+  .bar-label{opacity:.85}
+  .bar-fill{height:12px;background:#222;border:1px solid #333;border-radius:8px;overflow:hidden}
+  .bar-fill > div{height:100%;background:linear-gradient(to right,#57b,#9cf);width:0%}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+</style>
+
+
+
+
+
 <script>
 (() => {
   // ---------- Styles data ----------
@@ -714,6 +791,214 @@
   // Initial render
   render(idx);
 })();
+
+
+// ====== DATA & STATE ======
+const PlayerState = {
+  level: 1,
+  xp: 0,
+  selectedBreathing: null,   // set by your swipe/selection UI
+  selectedWeaponId: 'nichirin',
+  baseStats: { strength: 50, speed: 50, defense: 50, focus: 50 }, // player base (you)
+};
+
+const RankThresholds = [
+  { level: 1,  rank: 'Mizunoto' },
+  { level: 5,  rank: 'Mizunoe' },
+  { level: 10, rank: 'Kanoto' },
+  { level: 15, rank: 'Kanoe' },
+  { level: 20, rank: 'Tsuchinoto' },
+  { level: 25, rank: 'Tsuchinoe' },
+  { level: 30, rank: 'Hinoto' },
+  { level: 35, rank: 'Hinoe' },
+  { level: 40, rank: 'Kinoto' },
+  { level: 45, rank: 'Kinoe' },
+  { level: 50, rank: 'Hashira' }, // top
+];
+
+const BreathingStyles = {
+  Water:  { theme: 'cool-blue',  bonus: { strength: 0,  speed: 10, defense: 0,  focus: 5 } },
+  Flame:  { theme: 'ember-gold', bonus: { strength: 10, speed: 0,  defense: 5,  focus: -5 } },
+  Wind:   { theme: 'jade-mint',  bonus: { strength: 5,  speed: 10, defense: 0,  focus: -10 } },
+  Stone:  { theme: 'slate-gray', bonus: { strength: 15, speed: -5, defense: 10, focus: 0 } },
+  Sound:  { theme: 'vivid-mag',  bonus: { strength: 0,  speed: 15, defense: 0,  focus: -5 } },
+  Thunder:{ theme: 'neon-yellow',bonus: { strength: -5, speed: 20, defense: -5, focus: 0 } },
+  Mist:   { theme: 'pale-cyan',  bonus: { strength: -5, speed: 5,  defense: 0,  focus: 15 } },
+  Beast:  { theme: 'wild-teal',  bonus: { strength: 12, speed: 5,  defense: -5, focus: -2 } },
+};
+
+const Weapons = {
+  nichirin:   { name: 'Nichirin Sword', baseDamage: 10, speed: 'Fast',   trait: 'Default Nichirin', attackName: 'Basic Slash' },
+  spikedball: { name: 'Spiked Ball & Chain', baseDamage: 15, speed: 'Slow',   trait: 'High knockback', attackName: 'Heavy Smash' },
+  scythe:     { name: 'Scythe', baseDamage: 20, speed: 'Very Slow', trait: 'Wide swing arc', attackName: 'Grim Arc' },
+  whip:       { name: 'Whip Blade', baseDamage: 7,  speed: 'Fast',   trait: 'Chains hits', attackName: 'Lash Combo' },
+  dual:       { name: 'Dual Blades', baseDamage: 8,  speed: 'Very Fast', trait: 'Two-hit combo', attackName: 'Twin Flourish' },
+};
+
+// ====== UTILS ======
+function computeRank(level){
+  let current = RankThresholds[0].rank;
+  for (const r of RankThresholds){
+    if (level >= r.level) current = r.rank;
+  }
+  return current;
+}
+
+function mergeStats(base, bonus){
+  return {
+    strength: Math.max(1, base.strength + (bonus.strength||0)),
+    speed:    Math.max(1, base.speed    + (bonus.speed||0)),
+    defense:  Math.max(1, base.defense  + (bonus.defense||0)),
+    focus:    Math.max(1, base.focus    + (bonus.focus||0)),
+  };
+}
+
+// Clamp to 0–100 for bars
+function pct(v){ return Math.max(0, Math.min(100, v)); }
+
+// ====== RENDER TOP HUD (Rank/Level always visible) ======
+const hud = document.getElementById('playerRankLevel');
+function renderTopHUD(){
+  hud.textContent = `Rank: ${computeRank(PlayerState.level)} | Level: ${PlayerState.level}`;
+}
+renderTopHUD();
+
+// ====== START BUTTON ENABLED WHEN BREATHING SELECTED ======
+const startBtn = document.getElementById('startBtn');
+function updateStartBtn(){
+  if (PlayerState.selectedBreathing){
+    startBtn.disabled = false;
+    startBtn.classList.add('enabled');
+  } else {
+    startBtn.disabled = true;
+    startBtn.classList.remove('enabled');
+  }
+}
+
+// Call this from your swipe/cards code whenever a breathing style is picked:
+function onBreathingSelected(name){
+  PlayerState.selectedBreathing = name;   // e.g., "Stone"
+  updateStartBtn();
+  // Optional: glow right/left cards etc. (you already added)
+}
+
+// ====== LOADOUT MODAL ======
+const modal = document.getElementById('loadoutModal');
+const modalRank   = document.getElementById('modalRank');
+const modalLevel  = document.getElementById('modalLevel');
+const modalBreath = document.getElementById('modalBreathing');
+const modalTheme  = document.getElementById('modalTheme');
+const statBars    = document.getElementById('statBars');
+const weaponSel   = document.getElementById('weaponSelect');
+const attackName  = document.getElementById('attackName');
+const attackDmg   = document.getElementById('attackDamage');
+const attackSpd   = document.getElementById('attackSpeed');
+const attackTrait = document.getElementById('attackTrait');
+
+function fillWeaponDropdown(){
+  weaponSel.innerHTML = '';
+  Object.entries(Weapons).forEach(([id,w])=>{
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = w.name;
+    if (id === PlayerState.selectedWeaponId) opt.selected = true;
+    weaponSel.appendChild(opt);
+  });
+}
+
+function renderWeaponInfo(){
+  const w = Weapons[PlayerState.selectedWeaponId];
+  attackName.textContent  = w.attackName;
+  attackDmg.textContent   = w.baseDamage;
+  attackSpd.textContent   = w.speed;
+  attackTrait.textContent = w.trait;
+}
+
+function renderStatBars(finalStats){
+  statBars.innerHTML = '';
+  const entries = [
+    ['Strength', finalStats.strength],
+    ['Speed',    finalStats.speed],
+    ['Defense',  finalStats.defense],
+    ['Focus',    finalStats.focus],
+  ];
+  for (const [label, value] of entries){
+    const row = document.createElement('div'); row.className='bar';
+    const l   = document.createElement('div'); l.className='bar-label'; l.textContent = label+':';
+    const fill= document.createElement('div'); fill.className='bar-fill';
+    const inner = document.createElement('div'); inner.style.width = pct(value)+'%';
+    const num = document.createElement('div'); num.textContent = value;
+    fill.appendChild(inner);
+    row.appendChild(l); row.appendChild(fill); row.appendChild(num);
+    statBars.appendChild(row);
+  }
+}
+
+function openLoadout(){
+  const level = PlayerState.level;
+  const rank  = computeRank(level);
+  const bName = PlayerState.selectedBreathing;
+  const bMeta = BreathingStyles[bName] || { theme:'default', bonus:{} };
+  const final = mergeStats(PlayerState.baseStats, bMeta.bonus);
+
+  modalRank.textContent   = rank;
+  modalLevel.textContent  = level;
+  modalBreath.textContent = bName;
+  modalTheme.textContent  = bMeta.theme;
+
+  renderStatBars(final);
+  fillWeaponDropdown();
+  renderWeaponInfo();
+
+  modal.classList.remove('hidden');
+}
+
+function closeLoadout(){
+  modal.classList.add('hidden');
+}
+
+startBtn.addEventListener('click', ()=>{
+  if (!PlayerState.selectedBreathing) return;
+  openLoadout();
+});
+
+document.getElementById('closeLoadout').addEventListener('click', closeLoadout);
+
+weaponSel.addEventListener('change', (e)=>{
+  PlayerState.selectedWeaponId = e.target.value;
+  renderWeaponInfo();
+});
+
+// ====== CONFIRM TO ENTER GAME ======
+document.getElementById('confirmLoadout').addEventListener('click', ()=>{
+  // Persist selection if you want:
+  // localStorage.setItem('lastBreathing', PlayerState.selectedBreathing);
+  // localStorage.setItem('lastWeapon', PlayerState.selectedWeaponId);
+
+  // Continue into gameplay scene with PlayerState.selectedBreathing & selectedWeaponId
+  // and computed final stats. Example:
+  const chosenBreathing = PlayerState.selectedBreathing;
+  const style = BreathingStyles[chosenBreathing];
+  const finalStats = mergeStats(PlayerState.baseStats, style?.bonus || {});
+  const weapon = Weapons[PlayerState.selectedWeaponId];
+
+  // Hook these into your combat systems:
+  // initLevel({ playerStats: finalStats, weapon, breathing: chosenBreathing, level: PlayerState.level, rank: computeRank(PlayerState.level) });
+
+  closeLoadout();
+  // transitionToGame();
+});
+
+// ====== OPTIONAL: If you want first level == corp level visual right away ======
+// Already handled by renderTopHUD() since Rank is computed directly from PlayerState.level.
+// When you level up anywhere in your code, just call:
+function onPlayerLevelUp(newLevel){
+  PlayerState.level = newLevel;
+  renderTopHUD();
+}
+
+
+
 </script>
 </body>
 </html>
