@@ -3,30 +3,28 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-<title>Demon Slayer Journey — Menu (Sakura + Overlay Tips)</title>
+<title>Demon Slayer Journey — Menu (Sakura + Tags Info)</title>
 
 <!-- Fonts (exaggerated style headings) -->
 <link href="https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Audiowide&family=Bebas+Neue&family=Cinzel:wght@800&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@700&family=Courgette&family=M+PLUS+Rounded+1c:wght@800&family=Noto+Serif+JP:wght@900&family=Orbitron:wght@800&family=Oswald:wght@700&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --bg1:#0b0f19; --bg2:#05070b; --ink:#e7eef7;
+    --bg1:#11182b; --bg2:#0b1020; --bg3:#1a1028; --ink:#e7eef7;
     --styleFont:'Noto Serif JP',serif; --styleHue:#55b7ff;
   }
   html,body{
     height:100%; margin:0; overflow:hidden;
-    background: radial-gradient(1200px 800px at 50% 30%, var(--bg1), var(--bg2) 60%, #03060c 100%);
+    /* soft anime-y gradient (not black) */
+    background:
+      radial-gradient(1200px 900px at 70% 10%, #2a284a, transparent 70%),
+      radial-gradient(900px 700px at 20% 20%, #2a394f, transparent 70%),
+      linear-gradient(180deg, var(--bg1), var(--bg2) 50%, var(--bg3));
     color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   }
 
-  /* Sakura background (stronger/clearer) */
+  /* Sakura background */
   #sakuraCanvas{position:fixed; inset:0; z-index:-1}
-  .bgAura{position:fixed; inset:0; pointer-events:none; z-index:-2;
-    background:
-      radial-gradient(60% 40% at 50% 20%, rgba(255,255,255,.05), transparent 60%),
-      radial-gradient(40% 30% at 20% 10%, rgba(255,180,220,.05), transparent 60%),
-      radial-gradient(45% 35% at 80% 15%, rgba(180,200,255,.05), transparent 60%);
-  }
 
   /* Title */
   .wrap{position:fixed; inset:0; display:grid; grid-template-rows:auto 1fr auto; place-items:center; gap:12px; padding:16px}
@@ -47,46 +45,53 @@
   }
   .nav{
     width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
-    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
     cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
     font-size:28px; font-weight:900; line-height:0; transition:transform .08s ease, background .2s ease;
   }
   .nav:active{ transform:scale(.96); }
-  .nav:hover{ background:rgba(255,255,255,.16); }
+  .nav:hover{ background:rgba(255,255,255,.18); }
 
   /* Card */
   .stage{ position:relative; }
   .card{
-    position:relative; min-height: 330px;
-    border-radius:18px; padding:20px; overflow:hidden;
-    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-    border:1px solid rgba(255,255,255,.16);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 16px 32px rgba(0,0,0,.4);
-    display:grid; grid-template-rows:auto auto 1fr auto; gap:10px;
+    position:relative; min-height: 360px;
+    border-radius:18px; padding:18px 20px; overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 16px 36px rgba(0,0,0,.45);
+    display:grid; grid-template-rows:auto auto auto 1fr auto; gap:8px;
   }
   .aura{
-    position:absolute; inset:-30%; filter:blur(46px); opacity:.22; pointer-events:none;
+    position:absolute; inset:-30%; filter:blur(50px); opacity:.25; pointer-events:none;
     background: var(--styleHue);
     animation:auraPulse 6s ease-in-out infinite;
   }
-  @keyframes auraPulse{ 0%,100%{opacity:.16; transform:scale(1)} 50%{opacity:.26; transform:scale(1.06)} }
-  .flame::after{
-    content:""; position:absolute; inset:-20% -40% auto -40%; height:60%;
-    background: conic-gradient(from 180deg, rgba(255,200,120,.55), rgba(255,130,60,.45), rgba(255,65,45,.5), rgba(255,130,60,.45), rgba(255,200,120,.55));
-    filter:blur(36px) saturate(120%); opacity:.3; pointer-events:none; animation:flame 2.2s ease-in-out infinite; mix-blend-mode:screen;
-  }
-  @keyframes flame{ 0%,100%{transform:translateY(0) rotate(0deg) scale(1)} 50%{transform:translateY(-6px) rotate(3deg) scale(1.04)} }
+  @keyframes auraPulse{ 0%,100%{opacity:.18; transform:scale(1)} 50%{opacity:.28; transform:scale(1.06)} }
 
   /* Exaggerated style header */
   .name{
     text-align:center; font-weight:900; letter-spacing:1.2px;
-    font-size: clamp(22px, 4.2vw, 34px);
-    text-transform:uppercase;
-    font-family: var(--styleFont);
+    font-size: clamp(22px, 4.2vw, 36px);
+    text-transform:uppercase; font-family: var(--styleFont);
     text-shadow: 0 2px 10px color-mix(in srgb, var(--styleHue) 60%, transparent);
   }
-  .desc{ margin-top:2px; text-align:center; opacity:.96; font-size:16px; }
 
+  /* Tips button directly under name */
+  .tipsInline{
+    display:flex; justify-content:center; margin-top:2px;
+  }
+  .tipsInlineBtn{
+    padding:10px 18px; border-radius:999px; border:1px solid color-mix(in srgb, var(--styleHue) 50%, #ffffff 20%);
+    background:
+      radial-gradient(circle at 30% -40%, rgba(255,255,255,.4), transparent 55%),
+      linear-gradient(180deg, color-mix(in srgb, var(--styleHue) 88%, #ffffff 0%), color-mix(in srgb, var(--styleHue) 52%, #000 0%));
+    color:#0c1220; font-weight:900; letter-spacing:.4px;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--styleHue) 50%, transparent);
+    cursor:pointer; -webkit-tap-highlight-color: transparent;
+  }
+
+  .desc{ margin-top:4px; text-align:center; opacity:.96; font-size:15px; font-weight:600; letter-spacing:.2px }
   .list{margin:6px 0 0 0; padding-left:18px; line-height:1.6; opacity:.95}
   .list li{ margin:4px 0; }
   .muted{ opacity:.88; }
@@ -101,18 +106,12 @@
   .btn.primary{ background: var(--btnGrad,#35b3ff); color:#06121c; border-color: rgba(255,255,255,.35); }
   .btn:active{ transform:translateY(1px); }
 
-  /* Tips overlay (opens over card) */
-  .tipsToggleWrap{ display:flex; justify-content:center; margin-top:10px; }
-  .tipsToggle{
-    padding:10px 16px; border-radius:999px; border:1px solid rgba(255,255,255,.22);
-    background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
-    font-weight:800; cursor:pointer; color:#06121c;
-  }
+  /* Tips overlay (covers card when open) */
   .tipsPanel{
     position:absolute; left:0; right:0; top:0; margin:auto;
     width:100%; height:0;
     overflow:hidden; border-radius:18px;
-    background: rgba(10,14,22,.92);
+    background: rgba(12,16,26,.94);
     border:1px solid rgba(255,255,255,.18);
     box-shadow: 0 16px 36px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.05);
     transform-origin: top center;
@@ -124,22 +123,34 @@
     display:flex; align-items:center; justify-content:space-between; gap:8px;
     padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+    font-weight:800; letter-spacing:.3px;
   }
-  .tipsTitle{ font-weight:900; letter-spacing:.4px }
-  .closeBtn{ padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.12); color:#e7eef7; font-weight:800; cursor:pointer; }
+  .xBtn{
+    width:38px; height:38px; border-radius:10px; border:1px solid rgba(255,255,255,.26);
+    background:rgba(255,255,255,.14); color:#e7eef7; font-weight:900; font-size:20px; line-height:0;
+    display:grid; place-items:center; cursor:pointer;
+  }
   .tipsBody{ padding:12px 14px; max-height:calc(100% - 54px); overflow:auto }
-  .tag{ display:inline-block; font-size:11px; padding:2px 8px; margin:4px 6px 0 0; border:1px solid rgba(255,255,255,.22); border-radius:999px; opacity:.95; }
+  .tag{
+    display:inline-block; font-size:11px; padding:2px 8px; margin:4px 6px 0 0;
+    border:1px solid rgba(255,255,255,.22); border-radius:999px; opacity:.95; cursor:pointer;
+  }
   details{ background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px 10px; margin:8px 0; }
   summary{ cursor:pointer; font-weight:800; outline:none; }
 
-  @media (max-width:480px){
-    .nav{ width:48px; height:48px; }
-    .card{ min-height: 320px; }
+  /* Small tag info popup */
+  .tagInfo{
+    position:fixed; left:50%; transform:translateX(-50%);
+    bottom:16px; max-width:min(520px, 92vw);
+    background:rgba(20,26,38,.95); color:#e7eef7;
+    border:1px solid rgba(255,255,255,.18); border-radius:12px;
+    box-shadow:0 10px 24px rgba(0,0,0,.45);
+    padding:10px 12px; font-size:13px; line-height:1.5; display:none; z-index:50;
   }
+  .tagInfo.show{ display:block; }
 </style>
 </head>
 <body>
-<div class="bgAura"></div>
 <canvas id="sakuraCanvas"></canvas>
 
 <div class="wrap" id="app">
@@ -151,27 +162,31 @@
     <div class="stage">
       <div class="card" id="card">
         <div class="aura" id="aura"></div>
+
+        <!-- Centered name -->
         <div class="name" id="name">—</div>
+
+        <!-- Tips button directly below name -->
+        <div class="tipsInline">
+          <button class="tipsInlineBtn" id="tipsToggle">Tips & Forms</button>
+        </div>
+
         <div class="desc" id="desc">—</div>
         <ul class="list" id="traits"></ul>
+
         <div class="cta">
           <button class="btn" id="random">Random</button>
           <button class="btn primary" id="select">Select</button>
         </div>
 
-        <!-- Tips overlay (covers card when open) -->
+        <!-- Overlay that covers the card when open -->
         <div class="tipsPanel" id="tipsPanel">
           <div class="tipsHeader">
-            <div class="tipsTitle" id="tipsTitle">Tips & Forms</div>
-            <button class="closeBtn" id="tipsClose">Close</button>
+            <div id="tipsTitle">Tips & Forms</div>
+            <button class="xBtn" id="tipsClose">×</button>
           </div>
           <div class="tipsBody" id="tipsContent"></div>
         </div>
-      </div>
-
-      <!-- Toggle sits under the card -->
-      <div class="tipsToggleWrap">
-        <button class="tipsToggle" id="tipsToggle">Tips & Forms</button>
       </div>
     </div>
 
@@ -179,14 +194,17 @@
   </div>
 </div>
 
+<!-- Tag info popup -->
+<div class="tagInfo" id="tagInfo"></div>
+
 <script>
 (() => {
-  // ------- Style data (same as before, trimmed for brevity — add more forms later)
+  // ------- Style data (tags are only listed on forms where they apply)
   const styles = [
     {
       key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
       desc:'Fluid, adaptive strikes. Great control and consistent damage.',
-      traits:['Power: Balanced','Forms: 11','Good defense & spacing','Wide arcs','Reliable crowd control'],
+      traits:['Power: Balanced','Forms: 11','Wide arcs','Reliable crowd control'],
       forms:[
         {n:1, name:'Water Surface Slash', tags:['AoE','Wide Arc']},
         {n:2, name:'Water Wheel', tags:['AoE','Knockback']},
@@ -198,13 +216,13 @@
         {n:8, name:'Waterfall Basin', tags:['AoE','Knockdown']},
         {n:9, name:'Splashing Water Flow', tags:['Mobility','Evasion']},
         {n:10,name:'Constant Flux', tags:['Ramp-up','Multi-hit']},
-        {n:11,name:'Dead Calm', tags:['AoE','Freeze 4s','High Damage','Screen-wide']}
+        {n:11,name:'Dead Calm', tags:['AoE','Freeze','High Damage','Screen-wide']}
       ]
     },
     {
       key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
       desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
-      traits:['Power: High','Forms: 9','High damage','Good AoE','Straightforward timing'],
+      traits:['Power: High','Forms: 9','High damage','Good AoE'],
       forms:[
         {n:1,name:'Unknowing Fire', tags:['Burst','Single Target']},
         {n:2,name:'Rising Scorching Sun', tags:['Anti-air','Knockback']},
@@ -212,13 +230,13 @@
         {n:4,name:'Blooming Flame Undulation', tags:['AoE','Sustain']},
         {n:5,name:'Flame Tiger', tags:['AoE','Multi-hit']},
         {n:6,name:'Flame Dance', tags:['Combo','Mobility']},
-        {n:7,name:'Rengoku', tags:['Ultimate','Line AoE','Burn DoT (light)']}
-      ],
-      aura:'flame'
+        {n:7,name:'Rengoku', tags:['Line AoE','Burn DoT','Ultimate']}
+      ]
     },
-    { key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
+    {
+      key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
       desc:'Lightning-fast burst dashes that delete targets.',
-      traits:['Power: High','Forms: 6','Extreme speed','Burst mobility'],
+      traits:['Power: High','Forms: 6','Extreme speed'],
       forms:[
         {n:1,name:'Thunderclap & Flash', tags:['Dash','Single Target','Burst']},
         {n:2,name:'Six Fold', tags:['Dash','Multi-hit']},
@@ -226,92 +244,138 @@
         {n:4,name:'God Speed', tags:['Dash','Speed Buff','Burst']}
       ]
     },
-    { key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
+    {
+      key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
       desc:'Bladed gales with aggressive coverage and pushback.',
-      traits:['Power: High','Forms: 9','Push & peel','Good coverage'],
+      traits:['Power: High','Forms: 9','Push & peel'],
       forms:[
         {n:1,name:'Dust Whirl Cutter', tags:['AoE','Knockback']},
-        {n:2,name:'Claws-Purifying Wind', tags:['Multi-hit','Bleed?']},
+        {n:2,name:'Claws-Purifying Wind', tags:['Multi-hit']},
         {n:3,name:'Clean Storm Wind Tree', tags:['Large AoE']},
         {n:4,name:'Rising Dust Storm', tags:['AoE','Juggle']}
       ]
     },
-    { key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
+    {
+      key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
       desc:'Immovable force. Slow swings with huge knockback.',
-      traits:['Power: High','Forms: 5','Big stagger','Tanky feel'],
+      traits:['Power: High','Forms: 5','Big stagger'],
       forms:[
         {n:1,name:'Boulder Swing', tags:['Single Target','Knockback']},
         {n:2,name:'Wheel of Justice', tags:['AoE','Armor']},
         {n:3,name:'Stone Skin', tags:['Defense','Stagger Resist']}
       ]
     },
-    { key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
+    {
+      key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
       desc:'Deceptive movement and vanish windows to reposition.',
-      traits:['Power: Moderate','Forms: 7','Evasive tools','Brief invis'],
+      traits:['Power: Moderate','Forms: 7','Evasive'],
       forms:[
         {n:1,name:'Obscuring Clouds', tags:['Invisibility','Mobility']},
         {n:2,name:'Shifting Fog', tags:['Evasion','Confuse']},
         {n:3,name:'Sea of Clouds', tags:['AoE','Slow']}
       ]
     },
-    { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
+    {
+      key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
       desc:'Whip-like reach and flurries; fast multi-hits.',
-      traits:['Power: Moderate','Forms: 6','Rapid hits','Great reach'],
+      traits:['Power: Moderate','Forms: 6','Great reach'],
       forms:[
         {n:1,name:'Shivers of First Love', tags:['Multi-hit','Reach']},
         {n:2,name:'Love Pangs', tags:['Stun','Multi-hit']}
       ]
     },
-    { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
+    {
+      key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
       desc:'Curving paths that slip around guards to strike.',
-      traits:['Power: Moderate','Forms: 5','Curved arcs','Angle mixups'],
+      traits:['Power: Moderate','Forms: 5','Curved arcs'],
       forms:[
         {n:1,name:'Serpent Slash', tags:['Curved Arc','Single Target']},
         {n:2,name:'Coiling Serpent', tags:['Bind','Stun']}
       ]
     },
-    { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
+    {
+      key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
       desc:'Explosive beats and brief stuns to control crowds.',
-      traits:['Power: Moderate','Forms: 5','Radial bursts','Stun chance'],
+      traits:['Power: Moderate','Forms: 5','Radial bursts'],
       forms:[
         {n:1,name:'Roar', tags:['AoE','Stun']},
         {n:2,name:'Resounding Slashes', tags:['AoE','Multi-hit']}
       ]
     },
-    { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
+    {
+      key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
       desc:'Wild twin-blade assaults with constant pressure.',
-      traits:['Power: Above Avg','Forms: 7','Double slashes','Relentless'],
+      traits:['Power: Above Avg','Forms: 7','Relentless'],
       forms:[
         {n:1,name:'First Fang: Pierce', tags:['Single Target','Armor Pierce']},
         {n:2,name:'Second Fang: Rip', tags:['Multi-hit','Close Range']}
       ]
     },
-    { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
+    {
+      key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
       desc:'Precision thrusts and toxins; lighter raw damage.',
-      traits:['Power: Situational','Forms: 6','DoT potential','High mobility'],
+      traits:['Power: Situational','Forms: 6','DoT potential'],
       forms:[
         {n:1,name:'Bee Sting Dance', tags:['Single Target','Poison DoT']},
         {n:2,name:'Dragonfly Waltz', tags:['Multi-hit','Poison DoT']}
       ]
     },
-    { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
+    {
+      key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
       desc:'Crescent blades carve space at range; lethal crescents.',
-      traits:['Power: Very High','Forms: 16','Range control','Orbiting cuts'],
+      traits:['Power: Very High','Forms: 16','Range control'],
       forms:[
         {n:1,name:'Calamitous Eddy', tags:['AoE','Orbiting']},
         {n:2,name:'Crescent Waltz', tags:['Range','Multi-hit']}
       ]
     },
-    { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
+    {
+      key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
       desc:'The original form—overwhelming damage and coverage.',
-      traits:['Power: Strongest','Forms: 13','Top damage','Versatile'],
+      traits:['Power: Strongest','Forms: 13','Versatile'],
       forms:[
-        {n:1,name:'Dance of the Fire God', tags:['Line AoE','Burst','Burn DoT (light)']},
+        {n:1,name:'Dance of the Fire God', tags:['Line AoE','Burst','Burn DoT']},
         {n:2,name:'Clear Blue Sky', tags:['AoE','Spin']},
         {n:3,name:'Raging Sun', tags:['AoE','Knockback']}
       ]
     },
   ];
+
+  // Tag descriptions (shown when you tap a tag)
+  const TAG_INFO = {
+    'AoE':'Area of Effect — hits multiple enemies in a radius, cone, or line.',
+    'Single Target':'Focused damage to one enemy; usually higher per-hit damage.',
+    'Knockback':'Pushes enemies away. Higher-form versions push farther.',
+    'Knockdown':'Slams enemies to the ground briefly.',
+    'Stun':'Temporarily prevents enemies from acting.',
+    'Freeze':'Stops enemies entirely for a short duration.',
+    'Poison DoT':'Damage-over-time that stacks or lasts longer than Burn.',
+    'Burn DoT':'Shorter damage-over-time; lighter than Poison but applies fast.',
+    'Mobility':'Reposition or dash-like movement during the attack.',
+    'Dash':'High-speed travel during the strike; often grants brief i-frames.',
+    'Multi-hit':'Several rapid hits in one form.',
+    'Pull':'Draws enemies inward.',
+    'Evasion':'Improves dodge or grants brief intangibility.',
+    'Speed Buff':'Temporarily increases movement/attack speed.',
+    'Combo':'Chains easily into further attacks.',
+    'Impact':'Heavy hit with brief stagger.',
+    'Ramp-up':'Damage increases the longer the attack persists.',
+    'Armor':'Reduces incoming damage during the form.',
+    'Defense':'General mitigation or guard-like effects.',
+    'Stagger Resist':'Harder to interrupt while attacking.',
+    'Bind':'Restricts enemy movement briefly.',
+    'Curved Arc':'Attacks follow a bending path to hit around defenses.',
+    'Orbiting':'Projectiles or blades circle the user.',
+    'Line AoE':'Long narrow strike hitting everything along a path',
+    'Ultimate':'Signature high-power technique with long cooldown',
+    'Screen-wide':'Large radius covering most of the arena',
+    'Anti-air':'Effective vs airborne targets',
+    'Juggle':'Launches or keeps targets in air',
+    'Close Range':'Very short reach; high risk/reward',
+    'Reach':'Longer-than-normal range',
+    'High Damage':'Significantly more damage than basic forms',
+    'Wide Arc':'Large sweeping angle in front'
+  };
 
   // Elements
   const nameEl = document.getElementById('name');
@@ -324,6 +388,7 @@
   const tipsTitle = document.getElementById('tipsTitle');
   const tipsToggle = document.getElementById('tipsToggle');
   const tipsClose = document.getElementById('tipsClose');
+  const tagInfoBox = document.getElementById('tagInfo');
 
   const prev = document.getElementById('prev');
   const next = document.getElementById('next');
@@ -335,19 +400,13 @@
   function renderForms(style){
     const legend = `
       <div style="margin:6px 0 10px 0; font-size:12px; opacity:.85;">
-        <span class="tag">AoE</span>
-        <span class="tag">Single Target</span>
-        <span class="tag">Knockback</span>
-        <span class="tag">Stun</span>
-        <span class="tag">Freeze</span>
-        <span class="tag">Poison DoT</span>
-        <span class="tag">Burn DoT</span>
-        <span class="tag">Mobility</span>
-        <span class="tag">Multi-hit</span>
+        ${Object.keys(TAG_INFO).slice(0,9).map(k=>`<span class="tag" data-tag="${k}">${k}</span>`).join('')}
       </div>`;
     const items = style.forms.map(f=>{
-      const tags=(f.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
-      return `<li style="margin:6px 0 10px 0;"><b>Form ${f.n} — ${f.name}</b><br/>${tags}</li>`;
+      const tags=(f.tags||[]).map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
+      return `<li style="margin:6px 0 10px 0;">
+        <b>Form ${f.n} — ${f.name}</b><br/>${tags}
+      </li>`;
     }).join('');
     tipsContent.innerHTML =
       `<details open>
@@ -356,11 +415,11 @@
          <ol style="margin:6px 0 0 18px; padding:0;">${items}</ol>
        </details>
        <details>
-         <summary>General Tips</summary>
+         <summary>General Notes</summary>
          <ul style="margin:6px 0 0 18px; line-height:1.6;">
            <li>Stronger styles (Sun/Moon) remain stronger by design; we can balance later.</li>
-           <li><b>Water 11: Dead Calm</b> — Freeze all demons for <b>4s</b> and deal high, screen-wide AoE damage.</li>
-           <li><b>Poison DoT</b> (Insect) lasts longer and deals more total damage than <b>Burn DoT</b> (Flame), which is shorter/lighter.</li>
+           <li><b>Water 11: Dead Calm</b> — Freeze all enemies for <b>4s</b> and deal high, screen-wide AoE damage.</li>
+           <li><b>Poison DoT</b> (Insect) lasts longer and deals more total damage than <b>Burn DoT</b> (Flame).</li>
          </ul>
        </details>`;
   }
@@ -373,13 +432,18 @@
     document.documentElement.style.setProperty('--styleFont', s.font);
     document.documentElement.style.setProperty('--styleHue', s.hue);
 
+    // Colorize buttons per style
+    document.querySelector('.tipsInlineBtn').style.boxShadow = `0 6px 18px ${s.hue}55`;
+    document.querySelector('.tipsInlineBtn').style.background = `
+      radial-gradient(circle at 30% -40%, rgba(255,255,255,.4), transparent 55%),
+      linear-gradient(180deg, ${s.hue}, color-mix(in srgb, ${s.hue} 55%, #000 0%))`;
+
     descEl.textContent = s.desc;
     traitsEl.innerHTML = s.traits.map(t=>`<li class="muted">${t}</li>`).join('');
 
     auraEl.style.setProperty('--styleHue', s.hue);
     cardEl.style.setProperty('--btnGrad', s.hue);
-    cardEl.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.05), 0 16px 32px ${s.hue}33`;
-    cardEl.classList.toggle('flame', s.key==='Flame');
+    cardEl.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.06), 0 16px 36px ${s.hue}33`;
 
     tipsTitle.textContent = `${s.key} — Tips & Forms`;
     renderForms(s);
@@ -406,7 +470,21 @@
   tipsToggle.addEventListener('click', ()=> toggleTips());
   tipsClose.addEventListener('click', ()=> toggleTips(false));
 
-  // Sakura petals (more visible)
+  // Tag info popup
+  function showTagInfo(tag){
+    const text = TAG_INFO[tag] || tag;
+    tagInfoBox.textContent = `${tag}: ${text}`;
+    tagInfoBox.classList.add('show');
+    clearTimeout(showTagInfo._t);
+    showTagInfo._t = setTimeout(()=> tagInfoBox.classList.remove('show'), 2800);
+  }
+  tipsContent.addEventListener('click', (e)=>{
+    const t = e.target.closest('.tag'); if(!t) return;
+    const tag = t.getAttribute('data-tag');
+    if(tag) showTagInfo(tag);
+  });
+
+  // Sakura petals
   const sakura = document.getElementById('sakuraCanvas');
   const sctx = sakura.getContext('2d');
   function resize(){ sakura.width = innerWidth; sakura.height = innerHeight; }
@@ -415,7 +493,7 @@
   const petals = Array.from({length: 70}, ()=>({
     x: Math.random()*innerWidth,
     y: Math.random()*innerHeight,
-    r: 6+Math.random()*10,
+    r: 7+Math.random()*10,
     dx: -0.25 + Math.random()*0.5,
     dy: 0.6 + Math.random()*1.2,
     rot: Math.random()*Math.PI*2,
