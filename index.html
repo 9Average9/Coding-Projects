@@ -475,8 +475,21 @@
   const tipsClose = document.getElementById('tipsClose');
   const tagInfoBox = document.getElementById('tagInfo');
   const randBtn = document.getElementById('random');
-
+  const selectBtn = document.getElementById('select');
   let idx = 0;
+
+
+  // Select: confirm pick with a small toast (reuses the tagInfo bubble)
+selectBtn.addEventListener('click', () => {
+  const s = styles[idx];
+  tagInfoBox.textContent = `Selected: ${s.key} Breathing`;
+  tagInfoBox.classList.add('show');
+  clearTimeout(selectBtn._t);
+  selectBtn._t = setTimeout(() => tagInfoBox.classList.remove('show'), 2000);
+});
+
+
+
 
   // Build overlay content — ONLY per-form tags
   function renderForms(style){
