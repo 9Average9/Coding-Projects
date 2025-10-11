@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=3, user-scalable=yes"/>
-<title>Demon Slayer Journey — Menu (Misty Moon, Forms Swap)</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Demon Slayer Journey — Menu (Swipe + Peeks)</title>
 
 <!-- Headline / style fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700&family=Noto+Serif+JP:wght@900&family=M+PLUS+Rounded+1c:wght@800&family=Bebas+Neue&family=Orbitron:wght@800&family=Oswald:wght@700&family=Cormorant+Garamond:wght@700&family=Courgette&family=Anton:wght@400&family=Rajdhani:wght@700&family=Audiowide&display=swap" rel="stylesheet">
@@ -13,21 +14,21 @@
     --ink:#e7eef7;
     --styleFont:'Noto Serif JP', serif;
     --styleHue:#55b7ff;
+    --prevHue:#446bff;
+    --nextHue:#ff8a3d;
   }
   html,body{
-  height:100%; margin:0; overflow:hidden; color:var(--ink);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  background:#0b1020; /* dark, non-distracting */
-    touch-action: manipulation;  /* disables double-tap zoom */
-  -ms-touch-action: manipulation;
-}
+    height:100%; margin:0; overflow:hidden; color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background:#0b1020; /* dark base; sky canvas on top */
+    touch-action: manipulation; /* blocks iOS smart double-tap zoom */
+  }
 
-/* put the starry sky behind everything */
-#sky{ position:fixed; inset:0; z-index:-2 }
+  /* Sky & mist canvases */
+  #sky{position:fixed; inset:0; z-index:-2}
+  #mist{position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.65}
 
-/* keep mist above the sky, below content */
-#mist{ position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.65 }
-  /* Header title (closer to book vibe) */
+  /* Title */
   .wrap{position:fixed; inset:0; display:grid; grid-template-rows:auto 1fr auto; place-items:center; gap:12px; padding:16px}
   .title{
     font-family:'Cinzel', serif;
@@ -44,28 +45,35 @@
     filter: drop-shadow(0 12px 28px rgba(0,0,0,.48));
   }
 
-  /* Carousel */
+  /* Carousel without arrows (center column only) */
   .carousel{
     width:min(880px,92vw);
-    display:grid; grid-template-columns:80px 1fr 80px; align-items:center; gap:12px;
+    display:grid; grid-template-columns:1fr; align-items:center; gap:12px;
   }
 
-  /* Bigger, non-circular arrows, centered */
-  .nav{
-    width:100%; height:86px; border-radius:14px;
-    display:grid; place-items:center;
-    background:rgba(255,255,255,.10);
-    border:1px solid rgba(255,255,255,.22);
-    backdrop-filter: blur(6px);
-    cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
-    font-size:42px; font-weight:900; line-height:0;
-    transition:transform .08s ease, background .2s ease;
+  .stage{
+    position:relative;
+    /* peeking room so side glows are visible */
+    padding-inline: 42px; /* space for peeks */
   }
-  .nav:active{ transform:scale(.98); }
-  .nav:hover{ background:rgba(255,255,255,.16); }
+
+  /* Peeking “cards” (left/right edges) */
+  .peek{
+    position:absolute; top:10px; bottom:10px; width:38px;
+    border-radius:14px;
+    filter: blur(0.3px);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 0 18px rgba(0,0,0,.5);
+    opacity:.8; pointer-events:none;
+  }
+  .peek.left{ left:0; background: linear-gradient(180deg, color-mix(in srgb, var(--prevHue) 35%, #ffffff 0%), rgba(255,255,255,.06)); }
+  .peek.right{ right:0; background: linear-gradient(180deg, color-mix(in srgb, var(--nextHue) 35%, #ffffff 0%), rgba(255,255,255,.06)); }
+  .peekGlow{
+    position:absolute; inset:-20px; border-radius:18px; filter:blur(24px); opacity:.28;
+    background: var(--nextHue);
+  }
+  .peek.left .peekGlow{ background: var(--prevHue); }
 
   /* Card */
-  .stage{ position:relative; }
   .card{
     position:relative; min-height: 395px;
     border-radius:20px; padding:18px 20px; overflow:hidden;
@@ -94,7 +102,7 @@
   .list li{ margin:4px 0; }
   .muted{ opacity:.88; }
 
-  /* CTA row now: [Forms] [Select]  (Random moved below the card) */
+  /* CTA row inside card: [Forms] [Select] */
   .cta{ display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px; }
   .btn{
     padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.22);
@@ -107,7 +115,7 @@
     box-shadow: 0 8px 22px rgba(255,255,255,.16), 0 0 22px var(--styleHue);
   }
 
-  /* Random now BELOW the card — make it pop and readable */
+  /* Random below the card */
   .belowCard{ display:flex; justify-content:center; margin-top:12px; }
   #random{
     background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.12));
@@ -176,8 +184,8 @@
   .tagInfo.show{ display:block; }
 
   @media (max-width:480px){
-    .carousel{ grid-template-columns:64px 1fr 64px; }
-    .nav{ height:72px; font-size:36px; }
+    .stage{ padding-inline: 36px; }
+    .peek{ width:30px; }
     .card{ min-height: 375px; }
   }
 </style>
@@ -190,9 +198,10 @@
   <div class="title">Demon Slayer Journey</div>
 
   <div class="carousel">
-    <div class="nav" id="prev" aria-label="Previous">‹</div>
+    <div class="stage" id="stage">
+      <!-- peeking edges -->
+      <div class="peek left"><div class="peekGlow"></div></div>
 
-    <div class="stage">
       <div class="card" id="card">
         <div class="aura" id="aura"></div>
 
@@ -200,7 +209,7 @@
         <div class="desc" id="desc">—</div>
         <ul class="list" id="traits"></ul>
 
-        <!-- CTA now has Forms + Select -->
+        <!-- CTA: Forms + Select -->
         <div class="cta">
           <button class="btn" id="formsBtn">Forms</button>
           <button class="btn primary" id="select">Select</button>
@@ -220,13 +229,13 @@
         </div>
       </div>
 
-      <!-- Random moved below the card (where old Tips toggle was) -->
-      <div class="belowCard">
-        <button class="btn" id="random">Random</button>
-      </div>
+      <!-- right peek -->
+      <div class="peek right"><div class="peekGlow"></div></div>
     </div>
 
-    <div class="nav" id="next" aria-label="Next">›</div>
+    <div class="belowCard">
+      <button class="btn" id="random">Random</button>
+    </div>
   </div>
 </div>
 
@@ -235,11 +244,9 @@
 
 <script>
 (() => {
-  // ---------- Canon form lists with per-form tags (names from source material; tags = game design) ----------
+  // ---------- Styles data (same as before) ----------
   const styles = [
-    // WATER — 11
-    {
-      key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
+    { key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
       desc:'Fluid, adaptive strikes. Great control and consistent damage.',
       traits:['Power: Balanced','Forms: 11','Wide arcs','Reliable crowd control'],
       forms:[
@@ -254,11 +261,8 @@
         {n:9, name:'Splashing Water Flow', tags:['Mobility','Evasion']},
         {n:10,name:'Constant Flux', tags:['Ramp-up','Multi-hit']},
         {n:11,name:'Dead Calm', tags:['AoE','Freeze','High Damage','Screen-wide']}
-      ]
-    },
-    // FLAME — 9
-    {
-      key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
+      ]},
+    { key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
       desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
       traits:['Power: High','Forms: 9','High damage','Good AoE'],
       forms:[
@@ -271,11 +275,8 @@
         {n:7,name:'Rengoku (Ninth Form)', tags:['Line AoE','Burn DoT','Ultimate']},
         {n:8,name:'(Extra) — Variant/Anime Move', tags:['—']},
         {n:9,name:'(Extra) — Variant/Anime Move', tags:['—']}
-      ]
-    },
-    // THUNDER — 6
-    {
-      key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
+      ]},
+    { key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
       desc:'Lightning-fast burst dashes that delete targets.',
       traits:['Power: High','Forms: 6','Extreme speed'],
       forms:[
@@ -285,11 +286,8 @@
         {n:4,name:'Distant Thunder', tags:['Line AoE']},
         {n:5,name:'Heat Lightning', tags:['Ranged','Single Target']},
         {n:6,name:'God Speed', tags:['Dash','Speed Buff','Burst']}
-      ]
-    },
-    // WIND — 9
-    {
-      key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
+      ]},
+    { key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
       desc:'Bladed gales with aggressive coverage and pushback.',
       traits:['Power: High','Forms: 9','Push & peel'],
       forms:[
@@ -302,11 +300,8 @@
         {n:7,name:'Primary Gale Slash', tags:['Line AoE']},
         {n:8,name:'Idaten Typhoon', tags:['AoE','Knockback']},
         {n:9,name:'Gale—Sudden Gusts', tags:['Multi-hit','Mobility']}
-      ]
-    },
-    // STONE — 5
-    {
-      key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
+      ]},
+    { key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
       desc:'Immovable force. Slow swings with huge knockback.',
       traits:['Power: High','Forms: 5','Big stagger'],
       forms:[
@@ -315,11 +310,8 @@
         {n:3,name:'Stone Skin', tags:['Defense','Stagger Resist']},
         {n:4,name:'Volcanic Rock, Rapid Conquest', tags:['AoE','Multi-hit']},
         {n:5,name:'Arcs of Justice', tags:['Multi-hit','Impact']}
-      ]
-    },
-    // MIST — 7
-    {
-      key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
+      ]},
+    { key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
       desc:'Deceptive movement and vanish windows to reposition.',
       traits:['Power: Moderate','Forms: 7','Evasive'],
       forms:[
@@ -330,11 +322,8 @@
         {n:5,name:'Sea of Clouds and Haze', tags:['AoE','Multi-hit']},
         {n:6,name:'Peaks of Unfathomable Loneliness', tags:['Burst','Single Target']},
         {n:7,name:'Obscuring Clouds', tags:['Invisibility','Mobility']}
-      ]
-    },
-    // LOVE — 6
-    {
-      key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
+      ]},
+    { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
       desc:'Whip-like reach and flurries; fast multi-hits.',
       traits:['Power: Moderate','Forms: 6','Great reach'],
       forms:[
@@ -344,11 +333,8 @@
         {n:4,name:'(Unlisted variant)', tags:['—']},
         {n:5,name:'Swaying Love • Wildclaw', tags:['Multi-hit','Mobility']},
         {n:6,name:'Cat-Legged Winds of Love', tags:['Reach','Multi-hit']}
-      ]
-    },
-    // SERPENT — 5
-    {
-      key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
+      ]},
+    { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
       desc:'Curving paths that slip around guards to strike.',
       traits:['Power: Moderate','Forms: 5','Curved arcs'],
       forms:[
@@ -357,11 +343,8 @@
         {n:3,name:'Coil Choke', tags:['Bind','Stun']},
         {n:4,name:'Twin-Headed Reptile', tags:['Multi-hit']},
         {n:5,name:'Slithering Serpent', tags:['Mobility','Curved Arc']}
-      ]
-    },
-    // SOUND — 5 (some forms unlisted canonically)
-    {
-      key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
+      ]},
+    { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
       desc:'Explosive beats and brief stuns to control crowds.',
       traits:['Power: Moderate','Forms: 5','Radial bursts'],
       forms:[
@@ -370,11 +353,8 @@
         {n:3,name:'(Unknown Third Form)', tags:['—']},
         {n:4,name:'Constant Resounding Slashes', tags:['AoE','Defensive']},
         {n:5,name:'String Performance', tags:['AoE','Mobile']}
-      ]
-    },
-    // BEAST — many "fangs"
-    {
-      key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
+      ]},
+    { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
       desc:'Wild twin-blade assaults with constant pressure.',
       traits:['Power: Above Avg','Many “Fang” forms','Relentless'],
       forms:[
@@ -390,11 +370,8 @@
         {n:10,name:'Tenth Fang: Whirling Fangs', tags:['Spin','AoE']},
         {n:11,name:'Eleventh Fang: Sudden Throwing Strike', tags:['Ranged']},
         {n:12,name:'Twelfth Fang: Leaping Thrust', tags:['Leap','Single Target']}
-      ]
-    },
-    // INSECT — 4
-    {
-      key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
+      ]},
+    { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
       desc:'Precision thrusts and toxins; lighter raw damage.',
       traits:['Power: Situational','Forms: 4','DoT potential'],
       forms:[
@@ -402,11 +379,8 @@
         {n:2,name:'Dance of the Bee Sting: True Flutter', tags:['Single Target','Poison DoT']},
         {n:3,name:'Dance of the Dragonfly: Compound Eye Hexagon', tags:['Multi-hit','Poison DoT']},
         {n:4,name:'Dance of the Centipede: Hundred-Legged Zigzag', tags:['Mobility','Poison DoT']}
-      ]
-    },
-    // MOON — 16
-    {
-      key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
+      ]},
+    { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
       desc:'Crescent blades carve space at range; lethal crescents.',
       traits:['Power: Very High','Forms: 16','Range control'],
       forms:[
@@ -426,11 +400,8 @@
         {n:14,name:'Moon—Crest of the Night', tags:['Range']},
         {n:15,name:'Loathsome Moon, Smoldering', tags:['Burn DoT']},
         {n:16,name:'Moonbow, Half Moon', tags:['Massive AoE']}
-      ]
-    },
-    // SUN — 13
-    {
-      key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
+      ]},
+    { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
       desc:'The original form—overwhelming damage and coverage.',
       traits:['Power: Strongest','Forms: 13','Versatile'],
       forms:[
@@ -447,8 +418,7 @@
         {n:11,name:'Dragon Sun Halo Head Dance', tags:['Orbiting','Multi-hit']},
         {n:12,name:'Flame Dance', tags:['Combo','AoE']},
         {n:13,name:'Thirteenth Form', tags:['Ultimate','Sustain']}
-      ]
-    },
+      ]}
   ];
 
   const TAG_INFO = {
@@ -497,16 +467,13 @@
   const traitsEl = document.getElementById('traits');
   const auraEl = document.getElementById('aura');
   const cardEl = document.getElementById('card');
+  const stageEl = document.getElementById('stage');
   const tipsPanel = document.getElementById('tipsPanel');
   const tipsContent = document.getElementById('tipsContent');
   const tipsTitle = document.getElementById('tipsTitle');
   const formsBtn = document.getElementById('formsBtn');
   const tipsClose = document.getElementById('tipsClose');
   const tagInfoBox = document.getElementById('tagInfo');
-
-  const prev = document.getElementById('prev');
-  const next = document.getElementById('next');
-  const selectBtn = document.getElementById('select');
   const randBtn = document.getElementById('random');
 
   let idx = 0;
@@ -525,6 +492,13 @@
          <summary>${style.key} Forms</summary>
          <ol style="margin:6px 0 0 18px; padding:0;">${formsList}</ol>
        </details>`;
+  }
+
+  function updatePeeks() {
+    const prevIdx = (idx-1+styles.length)%styles.length;
+    const nextIdx = (idx+1)%styles.length;
+    document.documentElement.style.setProperty('--prevHue', styles[prevIdx].hue);
+    document.documentElement.style.setProperty('--nextHue', styles[nextIdx].hue);
   }
 
   function render(i){
@@ -553,12 +527,47 @@
 
     randBtn.style.boxShadow = `0 8px 22px rgba(255,255,255,.14), 0 0 18px ${s.hue}66`;
     randBtn.style.borderColor = `color-mix(in srgb, ${s.hue} 60%, #ffffff 10%)`;
+
+    updatePeeks();
   }
 
-  prev.addEventListener('click', ()=>{ idx=(idx-1+styles.length)%styles.length; render(idx); });
-  next.addEventListener('click', ()=>{ idx=(idx+1)%styles.length; render(idx); });
-  selectBtn.addEventListener('click', ()=> alert(`Selected: ${styles[idx].key} Breathing (menu preview only)`));
-  randBtn.addEventListener('click', ()=>{ idx=Math.floor(Math.random()*styles.length); render(idx); });
+  // Swipe-only navigation (disabled when Forms is open)
+  let touchX=0, touchY=0, dragging=false, moved=false;
+
+  function swipeStart(x,y){
+    if (tipsPanel.classList.contains('open')) return; // block when forms open
+    touchX=x; touchY=y; dragging=true; moved=false;
+  }
+  function swipeMove(x,y){
+    if(!dragging) return;
+    const dx=x-touchX, dy=y-touchY;
+    // only react to mostly-horizontal
+    if (!moved && Math.abs(dx)>12 && Math.abs(dx)>Math.abs(dy)) moved=true;
+  }
+  function swipeEnd(x,y){
+    if(!dragging) return; dragging=false;
+    const dx=x-touchX, dy=y-touchY;
+    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){
+      if(dx<0){ idx=(idx+1)%styles.length; render(idx); }
+      else { idx=(idx-1+styles.length)%styles.length; render(idx); }
+    }
+  }
+
+  // Touch
+  stageEl.addEventListener('touchstart', e=>{
+    const t=e.changedTouches[0]; swipeStart(t.clientX, t.clientY);
+  }, {passive:true});
+  stageEl.addEventListener('touchmove', e=>{
+    const t=e.changedTouches[0]; swipeMove(t.clientX, t.clientY);
+  }, {passive:true});
+  stageEl.addEventListener('touchend', e=>{
+    const t=e.changedTouches[0]; swipeEnd(t.clientX, t.clientY);
+  }, {passive:true});
+
+  // Mouse drag (desktop)
+  stageEl.addEventListener('mousedown', e=>{ swipeStart(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', e=>{ swipeMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', e=>{ swipeEnd(e.clientX, e.clientY); });
 
   // Forms overlay toggle
   function toggleForms(open){
@@ -581,59 +590,73 @@
     if(tag) showTagInfo(tag);
   });
 
-  // ---------- Gentle moving mist over the background image ----------
- const sky = document.getElementById('sky');
-const ctx = sky.getContext('2d');
-
-const mist = document.getElementById('mist');
-const mctx = mist.getContext('2d');
-
-
-
+  // ---------- Dark sky with subtle moon ----------
+  const sky = document.getElementById('sky');
+  const ctx = sky.getContext('2d');
+  const mist = document.getElementById('mist');
+  const mctx = mist.getContext('2d');
 
   function resize(){
-  sky.width = innerWidth;  sky.height = innerHeight;
-  mist.width = innerWidth; mist.height = innerHeight;
-  drawStaticSky();
-}
-addEventListener('resize', resize, {passive:true});
-resize();
-
-function drawStaticSky(){
-  const w = sky.width, h = sky.height;
-
-  // deep night gradient (darker than before)
-  const g = ctx.createLinearGradient(0,0,0,h);
-  g.addColorStop(0, '#0f1530');
-  g.addColorStop(0.55,'#0b1126');
-  g.addColorStop(1, '#080e1e');
-  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-
-  // sparse, soft stars
-  ctx.save();
-  for(let i=0;i<140;i++){
-    const x = Math.random()*w, y = Math.random()*h*0.88, r = Math.random()*1.3;
-    ctx.fillStyle = `rgba(230,236,255,${0.35+Math.random()*0.35})`;
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    sky.width = innerWidth;  sky.height = innerHeight;
+    mist.width = innerWidth; mist.height = innerHeight;
+    drawStaticSky();
   }
-  ctx.restore();
+  addEventListener('resize', resize, {passive:true});
+  resize();
 
-  // subtle moon (smaller & dimmer so text pops)
-  const mx = w*0.82, my = h*0.18, mr = Math.min(w,h)*0.08;
-  const mg = ctx.createRadialGradient(mx-mr*0.28,my-mr*0.28,mr*0.12, mx,my,mr);
-  mg.addColorStop(0,'#ffffff');
-  mg.addColorStop(0.35,'#e6ebff');
-  mg.addColorStop(0.8,'rgba(200,210,255,0.22)');
-  mg.addColorStop(1,'rgba(180,200,255,0.06)');
-  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
+  function drawStaticSky(){
+    const w = sky.width, h = sky.height;
 
-  // very faint halo
-  for(let i=1;i<=3;i++){
-    ctx.beginPath(); ctx.arc(mx,my,mr+i*12,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(190,205,255,${0.025*(4-i)})`;
-    ctx.lineWidth=8; ctx.stroke();
+    // deep night gradient
+    const g = ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0, '#0f1530');
+    g.addColorStop(0.55,'#0b1126');
+    g.addColorStop(1, '#080e1e');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+
+    // stars
+    ctx.save();
+    for(let i=0;i<140;i++){
+      const x = Math.random()*w, y = Math.random()*h*0.88, r = Math.random()*1.3;
+      ctx.fillStyle = `rgba(230,236,255,${0.35+Math.random()*0.35})`;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+
+    // subtle moon
+    const mx = w*0.82, my = h*0.18, mr = Math.min(w,h)*0.08;
+    const mg = ctx.createRadialGradient(mx-mr*0.28,my-mr*0.28,mr*0.12, mx,my,mr);
+    mg.addColorStop(0,'#ffffff');
+    mg.addColorStop(0.35,'#e6ebff');
+    mg.addColorStop(0.8,'rgba(200,210,255,0.22)');
+    mg.addColorStop(1,'rgba(180,200,255,0.06)');
+    ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
+
+    // faint halo
+    for(let i=1;i<=3;i++){
+      ctx.beginPath(); ctx.arc(mx,my,mr+i*12,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(190,205,255,${0.025*(4-i)})`;
+      ctx.lineWidth=8; ctx.stroke();
+    }
   }
-}
+
+  // gentle moving mist layers
+  function mistLoop(now){
+    const w=mist.width, h=mist.height;
+    mctx.clearRect(0,0,w,h);
+    mctx.globalCompositeOperation='lighter';
+    for(let layer=0; layer<3; layer++){
+      const y = (now/20000 + layer*0.15)%1;
+      const grad = mctx.createLinearGradient(0,h*y,0,h*y + h*0.35);
+      const alpha = 0.06 + layer*0.03;
+      grad.addColorStop(0, `rgba(180,190,220,${alpha})`);
+      grad.addColorStop(1, `rgba(180,190,220,0)`);
+      mctx.fillStyle = grad;
+      mctx.fillRect(0, h*y, w, h*0.4);
+    }
+    requestAnimationFrame(mistLoop);
+  }
+  requestAnimationFrame(mistLoop);
 
   // Initial render
   render(idx);
