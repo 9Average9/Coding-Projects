@@ -882,6 +882,61 @@ function startBattle(loadout){
     }
   }, true); // capture=true helps when tags sit inside <details>
 })();
+
+/* === Fix tags → big centered overlay (self-contained) === */
+(function fixTagOverlay(){
+  // Ensure veil element exists
+  let veil = document.getElementById('veil');
+  if (!veil) {
+    veil = document.createElement('div');
+    veil.id = 'veil';
+    veil.className = 'veil';
+    veil.hidden = true;
+    document.body.appendChild(veil);
+  }
+
+  // Ensure a global showToast exists (fallback if not exposed by your IIFE)
+  if (typeof window.showToast !== 'function') {
+    window.showToast = function(text, ms=2200){
+      const toast = document.getElementById('tagInfo');
+      if (!toast) return;
+      toast.textContent = text;
+      toast.classList.add('show');
+      veil.hidden = false;
+      clearTimeout(window.showToast._t);
+      if (ms > 0) window.showToast._t = setTimeout(closeToast, ms);
+    };
+  }
+
+  // Global closer (used by both implementations)
+  function closeToast(){
+    const toast = document.getElementById('tagInfo');
+    if (!toast) return;
+    toast.classList.remove('show');
+    veil.hidden = true;
+  }
+
+  // Click anywhere to close
+  veil.addEventListener('click', closeToast);
+  document.getElementById('tagInfo')?.addEventListener('click', closeToast);
+
+  // Make TAG_INFO accessible if your earlier code kept it scoped
+  // (No overwrite if you already exposed it)
+  if (!('TAG_INFO' in window)) {
+    window.TAG_INFO = {}; // fallback; still shows the tag name even without description
+  }
+
+  // Robust document-level delegation for tag bubbles
+  document.addEventListener('click', function(e){
+    const el = e.target.closest('.tag');
+    if (!el) return;
+    const key  = el.getAttribute('data-tag') || el.textContent.trim();
+    const info = (window.TAG_INFO && window.TAG_INFO[key]) || key;
+    window.showToast(`${key}: ${info}`, 2200);
+  });
+})();
+
+
 </script>
 </body>
 </html>
