@@ -143,20 +143,27 @@
   .tag:active{ transform: translateY(1px); }
   .tag:hover{ border-color: rgba(255,255,255,.45); box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 6px 16px rgba(0,0,0,.32); }
 
-  /* ===== Top-center toast (over EVERYTHING) ===== */
-  .tagInfo{
-    position:fixed; left:50%; transform:translateX(-50%); top:16px;
-    max-width:min(640px, 92vw);
-    background:rgba(10,14,22,.92);
-    color:#e7eef7;
-    border:1px solid rgba(255,255,255,.22);
-    border-radius:12px;
-    box-shadow:0 16px 36px rgba(0,0,0,.55), 0 0 0 2px rgba(0,0,0,.15) inset;
-    padding:12px 14px; font-size:14px; line-height:1.5;
-    display:none; z-index:var(--toastZ);
-    backdrop-filter: blur(4px);
-  }
-  .tagInfo.show{ display:block; }
+  /* ===== Big centered overlay for tags / selection ===== */
+.tagInfo{
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(720px, 92vw);
+  background:rgba(10,14,22,.96);
+  color:#e7eef7;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:16px;
+  box-shadow:0 24px 64px rgba(0,0,0,.65), 0 0 0 2px rgba(0,0,0,.18) inset;
+  padding:18px 20px; font-size:16px; line-height:1.6;
+  display:none; z-index:var(--toastZ);
+  backdrop-filter: blur(6px);
+}
+.tagInfo.show{ display:block; }
+
+/* Dim the world behind the overlay */
+.veil{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.5);
+  z-index:calc(var(--toastZ) - 1);
+}
 
   /* Onboarding hint */
   .onboard{ position:absolute; left:0; right:0; top:0; bottom:0; margin:auto; display:grid; place-items:center; z-index:3; background:rgba(6,10,18,.72); border:1px solid rgba(255,255,255,.14); border-radius:18px; opacity:1; transition: opacity .4s ease; }
@@ -278,6 +285,8 @@
 
 <!-- Top-center toast -->
 <div class="tagInfo" id="tagInfo"></div>
+
+<div id="veil" class="veil" hidden></div>
 
 <!-- Big Start button -->
 <button id="startBtn" disabled>START</button>
@@ -533,19 +542,33 @@
   formsBtn.addEventListener('click', ()=> toggleForms());
   tipsClose.addEventListener('click', ()=> toggleForms(false));
 
-  // Tag info toast (top-center)
-  function showToast(text, ms=2200){
-    toast.textContent = text;
-    toast.classList.add('show');
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toast.classList.remove('show'), ms);
+// Big centered modal toast used for tag info and "Selected: ..."
+function showToast(text, ms=2200){
+  const toast = document.getElementById('tagInfo');
+  const veil  = document.getElementById('veil');
+  if (!toast || !veil) return;
+
+  toast.textContent = text;
+  toast.classList.add('show');
+  veil.hidden = false;
+
+  clearTimeout(showToast._t);
+  if (ms > 0) {
+    showToast._t = setTimeout(closeToast, ms);
   }
-  tipsContent.addEventListener('click', (e)=>{
-    const t = e.target.closest('.tag'); if(!t) return;
-    const tag = t.getAttribute('data-tag');
-    const info = TAG_INFO[tag] || tag;
-    showToast(`${tag}: ${info}`);
-  });
+}
+
+function closeToast(){
+  const toast = document.getElementById('tagInfo');
+  const veil  = document.getElementById('veil');
+  if (!toast || !veil) return;
+  toast.classList.remove('show');
+  veil.hidden = true;
+}
+
+// Close on tap/click anywhere
+document.getElementById('veil')?.addEventListener('click', closeToast);
+document.getElementById('tagInfo')?.addEventListener('click', closeToast);
 
   // Select → set breathing; toast at top center
   selectBtn.addEventListener('click', () => {
