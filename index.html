@@ -12,7 +12,6 @@
   html,body{height:100%;margin:0;overflow:hidden;background:
     radial-gradient(1200px 800px at 50% 30%, var(--bg1), var(--bg2) 60%, #03060c 100%);
     color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  /* Very light grid for depth */
   .bgGrid:before{
     content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
     background:
@@ -22,7 +21,7 @@
   }
 
   /* 3D Title */
-  .wrap{position:fixed;inset:0;display:grid;grid-template-rows:auto auto 1fr;place-items:center;gap:10px;padding:16px}
+  .wrap{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;place-items:center;gap:10px;padding:16px}
   .title{
     font-weight:900;letter-spacing:.5px;line-height:1; text-align:center;
     font-size: clamp(28px, 6vw, 64px);
@@ -30,12 +29,10 @@
     background:linear-gradient(180deg,#fff, #d4dbff 60%, #aab7ff);
     -webkit-background-clip:text;background-clip:text;color:transparent;
     position:relative; text-transform:uppercase;
-    /* faux extrude */
     text-shadow:
       0 1px 0 #c9d2ff, 0 2px 0 #b7c2ff, 0 3px 0 #a6b4ff,
       0 4px 0 #95a6ff, 0 5px 0 #8598ff, 0 6px 10px rgba(0,0,0,.45);
   }
-  .subtitle{opacity:.9; font-size: clamp(14px, 2.5vw, 18px); margin-top:2px}
 
   /* Carousel shell */
   .carousel{
@@ -49,12 +46,14 @@
     font-size:28px; font-weight:900; line-height:0; transition:transform .08s ease;
   }
   .nav:active{ transform:scale(.96); }
+
   .card{
-    position:relative; min-height: 280px;
+    position:relative; min-height: 320px;
     border-radius:16px; padding:18px; overflow:hidden;
     background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
     border:1px solid rgba(255,255,255,.12);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 24px rgba(0,0,0,.35);
+    display:grid; grid-template-rows:auto auto 1fr auto; gap:8px;
   }
   .aura{
     position:absolute; inset:-30%; filter:blur(42px); opacity:.18; pointer-events:none;
@@ -80,27 +79,28 @@
     50%{transform:translateY(-6px) rotate(3deg) scale(1.04)}
   }
 
-  .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .name{font-size: clamp(18px, 3.2vw, 28px); font-weight:800}
-  .meta{display:flex;gap:8px}
-  .chip{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12)}
-  .body{margin-top:10px; font-size:15px; opacity:.95}
-  .list{margin:10px 0 0 0; padding-left:16px; line-height:1.6; opacity:.95}
-  .first{margin-top:12px; font-size:14px; opacity:.9}
+  .name{
+    text-align:center; font-weight:900; letter-spacing:.3px;
+    font-size: clamp(18px, 3.5vw, 28px);
+  }
+  .desc{ margin-top:2px; text-align:center; opacity:.95; font-size:15px; }
+
+  .list{margin:6px 0 0 0; padding-left:18px; line-height:1.6; opacity:.95}
+  .list li{ margin:4px 0; }
+  .muted{ opacity:.85; }
+
   .cta{
-    display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-top:14px;
+    display:flex; gap:10px; align-items:center; justify-content:center; margin-top:6px;
   }
   .btn{
-    padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
     font-weight:800; cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
     background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
-    color:#0c1220;
-    text-shadow:0 1px 0 rgba(255,255,255,.5);
+    color:#0c1220; text-shadow:0 1px 0 rgba(255,255,255,.5);
   }
   .btn.primary{ background: var(--btnGrad,#35b3ff); color:#06121c; border-color: rgba(255,255,255,.3); }
   .btn:active{ transform:translateY(1px); }
 
-  /* Footer note */
   .note{opacity:.7; font-size:12px; margin-top:10px; text-align:center}
 </style>
 </head>
@@ -108,23 +108,18 @@
 <div class="bgGrid"></div>
 <div class="wrap" id="app">
   <div class="title">Demon Slayer Journey</div>
-  <div class="subtitle">Select Breathing Type</div>
 
   <div class="carousel">
     <div class="nav" id="prev" aria-label="Previous">‹</div>
 
     <div class="card" id="card">
       <div class="aura" id="aura"></div>
-      <div class="head">
-        <div class="name" id="name">—</div>
-        <div class="meta">
-          <div class="chip" id="forms">Forms: —</div>
-          <div class="chip" id="power">Power: —</div>
-        </div>
-      </div>
-      <div class="body" id="desc">—</div>
+
+      <div class="name" id="name">—</div>
+      <div class="desc" id="desc">—</div>
+
       <ul class="list" id="traits"></ul>
-      <div class="first" id="first">First Form/Technique: —</div>
+
       <div class="cta">
         <button class="btn" id="random">Random</button>
         <button class="btn primary" id="select">Select</button>
@@ -139,30 +134,26 @@
 
 <script>
 (() => {
-  // Minimal style data for the menu preview (tweak copy as you like)
+  // Data (power/forms moved into the traits list for sleekness)
   const styles = [
-    {key:'Water',   hue:'#55b7ff', forms:11, power:'Balanced', desc:'Fluid, adaptive strikes. Great control, consistent DPS.', traits:['Good defense & spacing','Wide arcs','Reliable crowd control'], first:'Water Surface Slash'},
-    {key:'Flame',   hue:'#ff6a4f', forms:9,  power:'High',     desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.', traits:['High damage','Good AoE','Straightforward timing'], first:'Unknowing Fire', aura:'flame'},
-    {key:'Thunder', hue:'#ffd24a', forms:6,  power:'High',     desc:'Lightning-fast burst dashes that delete targets.', traits:['Extreme speed','Burst mobility','Precise windows'], first:'Thunderclap & Flash'},
-    {key:'Wind',    hue:'#7ce37f', forms:9,  power:'High',     desc:'Bladed gales with aggressive coverage and pushback.', traits:['High DPS','Push & peel','Good coverage'], first:'Dust Whirl Cutter'},
-    {key:'Stone',   hue:'#c7c2a1', forms:5,  power:'High',     desc:'Immovable force. Slow swings with huge knockback.', traits:['Tanky feel','Big stagger','Commitment required'], first:'Boulder Swing'},
-    {key:'Mist',    hue:'#cfe8ff', forms:7,  power:'Moderate', desc:'Deceptive movement and vanish windows to reposition.', traits:['Evasive','Brief invis','Ambush angles'], first:'Obscuring Clouds'},
-    {key:'Love',    hue:'#ff9ccf', forms:6,  power:'Moderate', desc:'Whip-like reach and flurries; fast multi-hits.', traits:['Rapid hits','Great reach','Fragile timing'], first:'Shivers of First Love'},
-    {key:'Serpent', hue:'#9ddaa8', forms:5,  power:'Moderate', desc:'Curving paths that slip around guards to strike.', traits:['Curved arcs','Angle mixups','Punishes sidestep'], first:'Serpent Slash'},
-    {key:'Sound',   hue:'#a880ff', forms:5,  power:'Moderate', desc:'Explosive beats and brief stuns to control crowds.', traits:['Radial bursts','Stun chance','Rhythm-based'], first:'Roar'},
-    {key:'Beast',   hue:'#8bd0b1', forms:7,  power:'Above Avg',desc:'Wild twin-blade assaults with constant pressure.', traits:['Double slashes','Relentless','Close range'], first:'First Fang: Pierce'},
-    {key:'Insect',  hue:'#b7ffb7', forms:6,  power:'Situational',desc:'Precision thrusts and toxins; lighter raw damage.', traits:['DoT potential','High mobility','Requires aim'], first:'Bee Sting Dance'},
-    {key:'Moon',    hue:'#c0b7ff', forms:16, power:'Very High',desc:'Crescent blades carve space at range; lethal crescents.', traits:['Range control','Orbiting cuts','Steep mastery'], first:'Calamitous Eddy'},
-    {key:'Sun',     hue:'#ff8a3d', forms:13, power:'Strongest', desc:'The original form—overwhelming damage and coverage.', traits:['Top damage','Versatile','Shortest end-lag'], first:'Dance of the Fire God'}
+    {key:'Water',   hue:'#55b7ff', forms:11, power:'Balanced',   desc:'Fluid, adaptive strikes. Great control, consistent DPS.', traits:['Power: Balanced','Forms: 11','Good defense & spacing','Wide arcs','Reliable crowd control'], first:'Water Surface Slash'},
+    {key:'Flame',   hue:'#ff6a4f', forms:9,  power:'High',       desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.', traits:['Power: High','Forms: 9','High damage','Good AoE','Straightforward timing'], first:'Unknowing Fire', aura:'flame'},
+    {key:'Thunder', hue:'#ffd24a', forms:6,  power:'High',       desc:'Lightning-fast burst dashes that delete targets.', traits:['Power: High','Forms: 6','Extreme speed','Burst mobility','Precise windows'], first:'Thunderclap & Flash'},
+    {key:'Wind',    hue:'#7ce37f', forms:9,  power:'High',       desc:'Bladed gales with aggressive coverage and pushback.', traits:['Power: High','Forms: 9','Push & peel','Good coverage'], first:'Dust Whirl Cutter'},
+    {key:'Stone',   hue:'#c7c2a1', forms:5,  power:'High',       desc:'Immovable force. Slow swings with huge knockback.', traits:['Power: High','Forms: 5','Big stagger','Tanky feel'], first:'Boulder Swing'},
+    {key:'Mist',    hue:'#cfe8ff', forms:7,  power:'Moderate',   desc:'Deceptive movement and vanish windows to reposition.', traits:['Power: Moderate','Forms: 7','Evasive tools','Brief invis','Ambush angles'], first:'Obscuring Clouds'},
+    {key:'Love',    hue:'#ff9ccf', forms:6,  power:'Moderate',   desc:'Whip-like reach and flurries; fast multi-hits.', traits:['Power: Moderate','Forms: 6','Rapid hits','Great reach'], first:'Shivers of First Love'},
+    {key:'Serpent', hue:'#9ddaa8', forms:5,  power:'Moderate',   desc:'Curving paths that slip around guards to strike.', traits:['Power: Moderate','Forms: 5','Curved arcs','Angle mixups'], first:'Serpent Slash'},
+    {key:'Sound',   hue:'#a880ff', forms:5,  power:'Moderate',   desc:'Explosive beats and brief stuns to control crowds.', traits:['Power: Moderate','Forms: 5','Radial bursts','Stun chance'], first:'Roar'},
+    {key:'Beast',   hue:'#8bd0b1', forms:7,  power:'Above Avg',  desc:'Wild twin-blade assaults with constant pressure.', traits:['Power: Above Avg','Forms: 7','Double slashes','Relentless'], first:'First Fang: Pierce'},
+    {key:'Insect',  hue:'#b7ffb7', forms:6,  power:'Situational',desc:'Precision thrusts and toxins; lighter raw damage.', traits:['Power: Situational','Forms: 6','DoT potential','High mobility'], first:'Bee Sting Dance'},
+    {key:'Moon',    hue:'#c0b7ff', forms:16, power:'Very High',  desc:'Crescent blades carve space at range; lethal crescents.', traits:['Power: Very High','Forms: 16','Range control','Orbiting cuts'], first:'Calamitous Eddy'},
+    {key:'Sun',     hue:'#ff8a3d', forms:13, power:'Strongest',  desc:'The original form—overwhelming damage and coverage.', traits:['Power: Strongest','Forms: 13','Top damage','Versatile'], first:'Dance of the Fire God'}
   ];
 
-  // Elements
   const nameEl = document.getElementById('name');
-  const formsEl = document.getElementById('forms');
-  const powerEl = document.getElementById('power');
   const descEl = document.getElementById('desc');
   const traitsEl = document.getElementById('traits');
-  const firstEl = document.getElementById('first');
   const auraEl = document.getElementById('aura');
   const cardEl = document.getElementById('card');
 
@@ -176,33 +167,26 @@
   function render(i){
     const s = styles[i];
     nameEl.textContent = `${s.key} Breathing`;
-    formsEl.textContent = `Forms: ${s.forms}`;
-    powerEl.textContent = `Power: ${s.power}`;
     descEl.textContent = s.desc;
-    firstEl.textContent = `First Form/Technique: ${s.first}`;
-    traitsEl.innerHTML = s.traits.map(t=>`<li>${t}</li>`).join('');
+    // Build list with power/forms included
+    const list = [...s.traits, `First Form/Technique: ${s.first}`];
+    traitsEl.innerHTML = list.map(t=>`<li class="muted">${t}</li>`).join('');
+
     auraEl.style.setProperty('--aura', s.hue);
     cardEl.style.setProperty('--btnGrad', s.hue);
 
-    // flame overlay toggle just for Flame
     if(s.aura === 'flame'){ cardEl.classList.add('flame'); }
     else{ cardEl.classList.remove('flame'); }
 
-    // Subtle background tint shift
-    document.documentElement.style.setProperty('--bg1', '#0b0f19');
-    document.documentElement.style.setProperty('--bg2', '#05070b');
-    document.body.style.background = `radial-gradient(1200px 800px at 50% 30%, var(--bg1), var(--bg2) 60%, #03060c 100%)`;
-    // Also lightly glow the card
     cardEl.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 24px ${s.hue}33, 0 0 0 3px transparent`;
   }
-  function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 
   prev.addEventListener('click', ()=>{ idx = (idx-1+styles.length)%styles.length; render(idx); });
   next.addEventListener('click', ()=>{ idx = (idx+1)%styles.length; render(idx); });
   selectBtn.addEventListener('click', ()=> alert(`Selected: ${styles[idx].key} Breathing (menu preview only)`));
   randBtn.addEventListener('click', ()=>{ idx = Math.floor(Math.random()*styles.length); render(idx); });
 
-  // Swipe for mobile (simple)
+  // Swipe
   let sx=0, sy=0, swiping=false;
   cardEl.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; swiping=true; }, {passive:true});
   cardEl.addEventListener('touchend', e=>{
