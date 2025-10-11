@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>Demon Slayer Journey — Menu (Swipe + Peeks)</title>
+<title>Demon Slayer Journey — Menu (Swipe + Peeks + Onboard)</title>
 
 <!-- Headline / style fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700&family=Noto+Serif+JP:wght@900&family=M+PLUS+Rounded+1c:wght@800&family=Bebas+Neue&family=Orbitron:wght@800&family=Oswald:wght@700&family=Cormorant+Garamond:wght@700&family=Courgette&family=Anton:wght@400&family=Rajdhani:wght@700&family=Audiowide&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@
     filter: drop-shadow(0 12px 28px rgba(0,0,0,.48));
   }
 
-  /* Carousel without arrows (center column only) */
+  /* Carousel (no arrows) */
   .carousel{
     width:min(880px,92vw);
     display:grid; grid-template-columns:1fr; align-items:center; gap:12px;
@@ -57,18 +57,30 @@
     padding-inline: 42px; /* space for peeks */
   }
 
-  /* Peeking “cards” (left/right edges) */
+  /* Peeking “cards” (left/right edges) – slimmer & card-like */
   .peek{
-    position:absolute; top:10px; bottom:10px; width:38px;
-    border-radius:14px;
-    filter: blur(0.3px);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 0 18px rgba(0,0,0,.5);
-    opacity:.8; pointer-events:none;
+    position:absolute; top:12px; bottom:12px; width:28px;
+    border-radius:10px; overflow:hidden;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 8px 20px rgba(0,0,0,.4);
+    opacity:.9; pointer-events:none;
   }
-  .peek.left{ left:0; background: linear-gradient(180deg, color-mix(in srgb, var(--prevHue) 35%, #ffffff 0%), rgba(255,255,255,.06)); }
-  .peek.right{ right:0; background: linear-gradient(180deg, color-mix(in srgb, var(--nextHue) 35%, #ffffff 0%), rgba(255,255,255,.06)); }
+  .peek.left{
+    left:0;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--prevHue) 35%, #ffffff 0%), rgba(255,255,255,.05));
+  }
+  .peek.right{
+    right:0;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--nextHue) 35%, #ffffff 0%), rgba(255,255,255,.05));
+  }
+  .peekEdge{
+    position:absolute; inset:0; border-radius:10px;
+    border:1px solid rgba(255,255,255,.16);
+    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+  }
   .peekGlow{
-    position:absolute; inset:-20px; border-radius:18px; filter:blur(24px); opacity:.28;
+    position:absolute; inset:-26px; border-radius:14px; filter:blur(26px); opacity:.30;
     background: var(--nextHue);
   }
   .peek.left .peekGlow{ background: var(--prevHue); }
@@ -102,7 +114,7 @@
   .list li{ margin:4px 0; }
   .muted{ opacity:.88; }
 
-  /* CTA row inside card: [Forms] [Select] */
+  /* CTA inside card: [Forms] [Select] */
   .cta{ display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px; }
   .btn{
     padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.22);
@@ -114,21 +126,6 @@
     background: var(--btnGrad,#35b3ff); color:#06121c; border-color: rgba(255,255,255,.35);
     box-shadow: 0 8px 22px rgba(255,255,255,.16), 0 0 22px var(--styleHue);
   }
-
-  /* Random below the card */
-  .belowCard{ display:flex; justify-content:center; margin-top:12px; }
-  #random{
-    background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.12));
-    color:#0c0c0c; font-weight:900;
-    text-shadow:0 1px 2px rgba(255,255,255,.6);
-    border:1px solid color-mix(in srgb, var(--styleHue) 70%, #ffffff 20%);
-    box-shadow:
-      0 0 12px rgba(255,255,255,.35),
-      0 0 26px color-mix(in srgb, var(--styleHue) 85%, transparent),
-      0 0 50px color-mix(in srgb, var(--styleHue) 70%, transparent);
-      
-  }
-  #random:active{ transform:translateY(1px) scale(.98); }
 
   /* Forms overlay (covers card) */
   .tipsPanel{
@@ -184,9 +181,37 @@
   }
   .tagInfo.show{ display:block; }
 
+  /* Onboarding overlay (covers cards only) */
+  .onboard{
+    position:absolute; left:0; right:0; top:0; bottom:0; margin:auto;
+    display:grid; place-items:center; z-index:3;
+    background:rgba(6,10,18,.72);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:18px;
+    opacity:1; transition: opacity .4s ease;
+  }
+  .onboard.fadeOut{ opacity:0; pointer-events:none; }
+  .onboardBox{
+    text-align:center; padding:16px 18px;
+  }
+  .onboardTitle{
+    font-family:'Cinzel', serif; font-weight:900; letter-spacing:.6px;
+    font-size: clamp(20px, 4.6vw, 32px);
+    text-transform:uppercase;
+    text-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 22px rgba(180,200,255,.2);
+  }
+  .onboardSub{ opacity:.9; margin-top:6px; }
+  .onboardClose{
+    position:absolute; right:10px; top:10px;
+    width:36px; height:36px; border-radius:10px;
+    border:1px solid rgba(255,255,255,.22);
+    background:rgba(255,255,255,.14); color:#e7eef7;
+    display:grid; place-items:center; font-weight:900; cursor:pointer;
+  }
+
   @media (max-width:480px){
     .stage{ padding-inline: 36px; }
-    .peek{ width:30px; }
+    .peek{ width:24px; }
     .card{ min-height: 375px; }
   }
 </style>
@@ -201,7 +226,7 @@
   <div class="carousel">
     <div class="stage" id="stage">
       <!-- peeking edges -->
-      <div class="peek left"><div class="peekGlow"></div></div>
+      <div class="peek left"><div class="peekGlow"></div><div class="peekEdge"></div></div>
 
       <div class="card" id="card">
         <div class="aura" id="aura"></div>
@@ -216,7 +241,7 @@
           <button class="btn primary" id="select">Select</button>
         </div>
 
-        <!-- Overlay that covers the card when open -->
+        <!-- Forms Overlay -->
         <div class="tipsPanel" id="tipsPanel">
           <div class="tipsHeader">
             <div></div>
@@ -231,11 +256,16 @@
       </div>
 
       <!-- right peek -->
-      <div class="peek right"><div class="peekGlow"></div></div>
-    </div>
+      <div class="peek right"><div class="peekGlow"></div><div class="peekEdge"></div></div>
 
-    <div class="belowCard">
-    
+      <!-- Onboarding hint (covers cards; fades away) -->
+      <div class="onboard" id="onboard">
+        <button class="onboardClose" id="onboardClose">×</button>
+        <div class="onboardBox">
+          <div class="onboardTitle">Swipe to select a breathing style to master</div>
+          <div class="onboardSub">Drag left or right to browse styles</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -245,7 +275,7 @@
 
 <script>
 (() => {
-  // ---------- Styles data (same as before) ----------
+  // ---------- Styles data ----------
   const styles = [
     { key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
       desc:'Fluid, adaptive strikes. Great control and consistent damage.',
@@ -475,24 +505,12 @@
   const formsBtn = document.getElementById('formsBtn');
   const tipsClose = document.getElementById('tipsClose');
   const tagInfoBox = document.getElementById('tagInfo');
-  const randBtn = document.getElementById('random');
   const selectBtn = document.getElementById('select');
+  const onboard = document.getElementById('onboard');
+  const onboardClose = document.getElementById('onboardClose');
+
   let idx = 0;
 
-
-  // Select: confirm pick with a small toast (reuses the tagInfo bubble)
-selectBtn.addEventListener('click', () => {
-  const s = styles[idx];
-  tagInfoBox.textContent = `Selected: ${s.key} Breathing`;
-  tagInfoBox.classList.add('show');
-  clearTimeout(selectBtn._t);
-  selectBtn._t = setTimeout(() => tagInfoBox.classList.remove('show'), 2000);
-});
-
-
-
-
-  // Build overlay content — ONLY per-form tags
   function renderForms(style){
     const formsList = style.forms.map(f=>{
       const tags=(f.tags||[]).map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
@@ -532,15 +550,12 @@ selectBtn.addEventListener('click', () => {
     tipsTitle.textContent = `${s.key} Breathing`;
     renderForms(s);
 
-    // Per-style glow tints for buttons
+    // Per-style tint for Forms button
     formsBtn.style.boxShadow = `0 6px 22px ${s.hue}55`;
     formsBtn.style.borderColor = s.hue;
     formsBtn.style.background = `
       radial-gradient(circle at 30% -40%, rgba(255,255,255,.4), transparent 55%),
       linear-gradient(180deg, ${s.hue}, color-mix(in srgb, ${s.hue} 55%, #000 0%))`;
-
-    randBtn.style.boxShadow = `0 8px 22px rgba(255,255,255,.14), 0 0 18px ${s.hue}66`;
-    randBtn.style.borderColor = `color-mix(in srgb, ${s.hue} 60%, #ffffff 10%)`;
 
     updatePeeks();
   }
@@ -548,14 +563,20 @@ selectBtn.addEventListener('click', () => {
   // Swipe-only navigation (disabled when Forms is open)
   let touchX=0, touchY=0, dragging=false, moved=false;
 
+  function dismissOnboard(){
+    if(!onboard) return;
+    onboard.classList.add('fadeOut');
+    setTimeout(()=> onboard.style.display='none', 400);
+  }
+
   function swipeStart(x,y){
     if (tipsPanel.classList.contains('open')) return; // block when forms open
     touchX=x; touchY=y; dragging=true; moved=false;
+    dismissOnboard();
   }
   function swipeMove(x,y){
     if(!dragging) return;
     const dx=x-touchX, dy=y-touchY;
-    // only react to mostly-horizontal
     if (!moved && Math.abs(dx)>12 && Math.abs(dx)>Math.abs(dy)) moved=true;
   }
   function swipeEnd(x,y){
@@ -602,6 +623,15 @@ selectBtn.addEventListener('click', () => {
     const t = e.target.closest('.tag'); if(!t) return;
     const tag = t.getAttribute('data-tag');
     if(tag) showTagInfo(tag);
+  });
+
+  // Select → simple toast for now
+  selectBtn.addEventListener('click', () => {
+    const s = styles[idx];
+    tagInfoBox.textContent = `Selected: ${s.key} Breathing`;
+    tagInfoBox.classList.add('show');
+    clearTimeout(selectBtn._t);
+    selectBtn._t = setTimeout(() => tagInfoBox.classList.remove('show'), 2000);
   });
 
   // ---------- Dark sky with subtle moon ----------
@@ -671,6 +701,15 @@ selectBtn.addEventListener('click', () => {
     requestAnimationFrame(mistLoop);
   }
   requestAnimationFrame(mistLoop);
+
+  // Onboarding: auto-fade after delay, or close on X / first swipe
+  function showOnboard(){
+    if(!onboard) return;
+    // auto fade after 4 seconds
+    setTimeout(dismissOnboard, 4000);
+  }
+  onboardClose.addEventListener('click', dismissOnboard);
+  showOnboard();
 
   // Initial render
   render(idx);
