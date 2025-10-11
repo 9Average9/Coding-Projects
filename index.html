@@ -573,7 +573,71 @@ const TAG_INFO = {
   'Range':               'Enhanced effective distance for your hits.'
 };
 
+/* === TAG DESCRIPTIONS: extend + normalize + bulletproof click === */
+(function(){
+  // 1) Make TAG_INFO global and extend it with missing keys
+  window.TAG_INFO = window.TAG_INFO || (typeof TAG_INFO !== 'undefined' ? TAG_INFO : {});
+  Object.assign(window.TAG_INFO, {
+    // Missing/extra tags your forms use
+    'Control':     'Crowd control — push, pull, stun, slow, or otherwise disrupt enemy actions.',
+    'Large AoE':   'Covers a larger area than standard AoE — great for groups and lane control.',
+    'Backstab':    'Bonus damage or guard bypass when striking from behind.',
+    'Leap':        'A quick vault or lunge to engage, escape, or reposition before striking.',
+    // Keep "Defense" definition explicit so "Defensive" can map to it
+    'Defense':     'General mitigation or guard-like effect that reduces incoming damage.'
+  });
 
+  // 2) Canonicalize common variants/typos to your TAG_INFO keys
+  const CANON = {
+    'mobile':               'Mobility',
+    'defensive':            'Defense',
+    'large aoe':            'Large AoE',
+    'speed buff':           'Speed Boost',
+    'burn dot':             'Fire DoT (Spreads)',
+    'fire dot':             'Fire DoT (Spreads)',
+    'poison dot':           'Poison DoT (High)',
+    'back stab':            'Backstab',
+    // safety for spacing/typo variants
+    'multi hit':            'Multi-hit',
+    'line aoe':             'Line AoE'
+  };
+  function canonKey(raw){
+    if (!raw) return '';
+    const low = String(raw).trim().toLowerCase().replace(/\s+/g, ' ');
+    return CANON[low] || String(raw).trim();
+  }
+
+  // 3) Normalize existing tag DOM nodes so future clicks use canonical keys
+  function normalizeDomTags(){
+    document.querySelectorAll('.tag').forEach(tag=>{
+      const raw = tag.getAttribute('data-tag') || tag.textContent;
+      const key = canonKey(raw);
+      tag.setAttribute('data-tag', key);
+      tag.title = key; // handy tooltip + debug
+    });
+  }
+  normalizeDomTags();
+  // Re-run after your forms open/refresh (in case they re-render)
+  document.getElementById('formsBtn')?.addEventListener('click', ()=>setTimeout(normalizeDomTags,0));
+  document.getElementById('tipsClose')?.addEventListener('click', ()=>setTimeout(normalizeDomTags,0));
+
+  // 4) Single, high-priority handler to show the big center popup
+  document.addEventListener('click', function(e){
+    const el = e.target.closest('.tag');
+    if (!el) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation(); // beat older handlers
+
+    const key  = canonKey(el.getAttribute('data-tag') || el.textContent);
+    const desc = window.TAG_INFO[key];
+
+    if (typeof window.showToast === 'function') {
+      window.showToast(`${key}: ${desc || '(no description found)'}`, 2600);
+    }
+    if (!desc) console.warn('[TAG_INFO] Missing description for:', key);
+  }, true);
+})();
 
   // ---------- Elements ----------
   const nameEl = document.getElementById('name');
