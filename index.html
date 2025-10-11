@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-<title>Demon Slayer Journey — Menu (Misty Moon)</title>
+<title>Demon Slayer Journey — Menu (Misty Moon, Forms Swap)</title>
 
 <!-- Headline / style fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700&family=Noto+Serif+JP:wght@900&family=M+PLUS+Rounded+1c:wght@800&family=Bebas+Neue&family=Orbitron:wght@800&family=Oswald:wght@700&family=Cormorant+Garamond:wght@700&family=Courgette&family=Anton:wght@400&family=Rajdhani:wght@700&family=Audiowide&display=swap" rel="stylesheet">
@@ -17,11 +17,12 @@
   html,body{
     height:100%; margin:0; overflow:hidden; color:var(--ink);
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    background:#0b1020;
+    /* Misty night sky with moon — SVG image embedded as background */
+    background:
+      url("data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080' viewBox='0 0 1920 1080'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='%230c1430'/><stop offset='50%' stop-color='%230a1028'/><stop offset='100%' stop-color='%23070c1d'/></linearGradient><radialGradient id='moon' cx='82%' cy='22%' r='12%'><stop offset='0%' stop-color='white'/><stop offset='40%' stop-color='%23e6eaff'/><stop offset='80%' stop-color='rgba(200,210,255,0.4)'/><stop offset='100%' stop-color='rgba(180,200,255,0.1)'/></radialGradient></defs><rect width='100%' height='100%' fill='url(%23g)'/><circle cx='1574' cy='238' r='130' fill='url(%23moon)' opacity='0.96'/><!-- subtle halo rings -->"+Array.from({length:5},(_,i)=>`<circle cx='1574' cy='238' r='${130+(i+1)*18}' fill='none' stroke='rgba(200,210,255,${0.17-(i*0.03)})' stroke-width='14' />`).join('')+"<!-- stars -->"+Array.from({length:220},()=>{const x=Math.floor(Math.random()*1920),y=Math.floor(Math.random()*900+40),r=(Math.random()*1.6+0.2).toFixed(2),a=(Math.random()*0.6+0.4).toFixed(2);return `<circle cx='${x}' cy='${y}' r='${r}' fill='rgba(230,235,255,${a})'/>`;}).join('')+"</svg>") center/cover no-repeat fixed;
   }
 
-  /* Night-sky layers */
-  #sky{position:fixed; inset:0; z-index:-2}
+  /* Single mist canvas on top */
   #mist{position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.65}
 
   /* Header title (closer to book vibe) */
@@ -44,17 +45,22 @@
   /* Carousel */
   .carousel{
     width:min(880px,92vw);
-    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
+    display:grid; grid-template-columns:80px 1fr 80px; align-items:center; gap:12px;
   }
+
+  /* Bigger, non-circular arrows, centered */
   .nav{
-    width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
-    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
+    width:100%; height:86px; border-radius:14px;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.22);
     backdrop-filter: blur(6px);
     cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
-    font-size:28px; font-weight:900; line-height:0; transition:transform .08s ease, background .2s ease;
+    font-size:42px; font-weight:900; line-height:0;
+    transition:transform .08s ease, background .2s ease;
   }
-  .nav:active{ transform:scale(.96); }
-  .nav:hover{ background:rgba(255,255,255,.18); }
+  .nav:active{ transform:scale(.98); }
+  .nav:hover{ background:rgba(255,255,255,.16); }
 
   /* Card */
   .stage{ position:relative; }
@@ -74,7 +80,6 @@
   }
   @keyframes auraPulse{ 0%,100%{opacity:.2; transform:scale(1)} 50%{opacity:.3; transform:scale(1.06)} }
 
-  /* Style header */
   .name{
     text-align:center; font-weight:900; letter-spacing:1.2px;
     font-size: clamp(22px, 4.2vw, 36px);
@@ -87,6 +92,7 @@
   .list li{ margin:4px 0; }
   .muted{ opacity:.88; }
 
+  /* CTA row now: [Forms] [Select]  (Random moved below the card) */
   .cta{ display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px; }
   .btn{
     padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.22);
@@ -98,35 +104,22 @@
     background: var(--btnGrad,#35b3ff); color:#06121c; border-color: rgba(255,255,255,.35);
     box-shadow: 0 8px 22px rgba(255,255,255,.16), 0 0 22px var(--styleHue);
   }
-  /* Random pops more */
- #random{
-  background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.12));
-  color:#0c0c0c;
-  font-weight:900;
-  text-shadow:0 1px 2px rgba(255,255,255,.6);
-  border:1px solid color-mix(in srgb, var(--styleHue) 70%, #ffffff 20%);
-  box-shadow:
-    0 0 12px rgba(255,255,255,.35),
-    0 0 26px color-mix(in srgb, var(--styleHue) 85%, transparent),
-    0 0 50px color-mix(in srgb, var(--styleHue) 70%, transparent);
-}
-#random:active{ transform:translateY(1px) scale(.98); }
 
-  /* Tips toggle (bottom of card) */
-  .tipsToggleWrap{ display:flex; justify-content:center; margin-top:10px; }
-  .tipsToggle{
-    padding:10px 18px; border-radius:999px;
-    border:1px solid color-mix(in srgb, var(--styleHue) 55%, #ffffff 15%);
-    background:
-      radial-gradient(circle at 30% -40%, rgba(255,255,255,.4), transparent 55%),
-      linear-gradient(180deg, color-mix(in srgb, var(--styleHue) 90%, #ffffff 0%), color-mix(in srgb, var(--styleHue) 55%, #000 0%));
-    color:#0c1220; font-weight:900; letter-spacing:.4px;
-    box-shadow: 0 6px 22px color-mix(in srgb, var(--styleHue) 60%, transparent);
-    cursor:pointer; -webkit-tap-highlight-color: transparent;
+  /* Random now BELOW the card — make it pop and readable */
+  .belowCard{ display:flex; justify-content:center; margin-top:12px; }
+  #random{
+    background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.12));
+    color:#0c0c0c; font-weight:900;
+    text-shadow:0 1px 2px rgba(255,255,255,.6);
+    border:1px solid color-mix(in srgb, var(--styleHue) 70%, #ffffff 20%);
+    box-shadow:
+      0 0 12px rgba(255,255,255,.35),
+      0 0 26px color-mix(in srgb, var(--styleHue) 85%, transparent),
+      0 0 50px color-mix(in srgb, var(--styleHue) 70%, transparent);
   }
-  .tipsToggle:active{ transform:translateY(1px) scale(.99); }
+  #random:active{ transform:translateY(1px) scale(.98); }
 
-  /* Tips overlay (covers card). Centered header + X on right */
+  /* Forms overlay (covers card) */
   .tipsPanel{
     position:absolute; left:0; right:0; top:0; margin:auto;
     width:100%; height:0;
@@ -156,11 +149,10 @@
     display:grid; place-items:center; cursor:pointer; justify-self:end;
   }
   .tipsBody{
-  padding:12px 14px 120px; /* more space at the bottom */
-  max-height:calc(100% - 58px);
-  overflow-y:auto;
-  overscroll-behavior:contain;
-}
+    padding:12px 14px 140px; /* extra bottom space to see last tags clearly */
+    max-height:calc(100% - 58px); overflow:auto;
+    overscroll-behavior:contain;
+  }
   details{ background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px 10px; margin:8px 0; }
   summary{ cursor:pointer; font-weight:800; outline:none; }
 
@@ -182,13 +174,13 @@
   .tagInfo.show{ display:block; }
 
   @media (max-width:480px){
-    .nav{ width:48px; height:48px; }
+    .carousel{ grid-template-columns:64px 1fr 64px; }
+    .nav{ height:72px; font-size:36px; }
     .card{ min-height: 375px; }
   }
 </style>
 </head>
 <body>
-<canvas id="sky"></canvas>
 <canvas id="mist"></canvas>
 
 <div class="wrap" id="app">
@@ -205,8 +197,9 @@
         <div class="desc" id="desc">—</div>
         <ul class="list" id="traits"></ul>
 
+        <!-- CTA now has Forms + Select -->
         <div class="cta">
-          <button class="btn" id="random">Random</button>
+          <button class="btn" id="formsBtn">Forms</button>
           <button class="btn primary" id="select">Select</button>
         </div>
 
@@ -216,7 +209,7 @@
             <div></div>
             <div>
               <div class="tipsName" id="tipsTitle">—</div>
-              <div class="tipsSub">Tips & Forms</div>
+              <div class="tipsSub">Forms</div>
             </div>
             <button class="xBtn" id="tipsClose">×</button>
           </div>
@@ -224,9 +217,9 @@
         </div>
       </div>
 
-      <!-- Toggle (bottom of card) -->
-      <div class="tipsToggleWrap">
-        <button class="tipsToggle" id="tipsToggle">Tips & Forms</button>
+      <!-- Random moved below the card (where old Tips toggle was) -->
+      <div class="belowCard">
+        <button class="btn" id="random">Random</button>
       </div>
     </div>
 
@@ -363,7 +356,7 @@
         {n:5,name:'Slithering Serpent', tags:['Mobility','Curved Arc']}
       ]
     },
-    // SOUND — 5 (2 & 3 unknown canonically)
+    // SOUND — 5 (some forms unlisted canonically)
     {
       key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
       desc:'Explosive beats and brief stuns to control crowds.',
@@ -455,7 +448,6 @@
     },
   ];
 
-  // Tag descriptions
   const TAG_INFO = {
     'AoE':'Area of Effect — hits multiple enemies in a radius, cone, or line.',
     'Single Target':'Focused damage to one enemy; usually higher per-hit damage.',
@@ -505,7 +497,7 @@
   const tipsPanel = document.getElementById('tipsPanel');
   const tipsContent = document.getElementById('tipsContent');
   const tipsTitle = document.getElementById('tipsTitle');
-  const tipsToggle = document.getElementById('tipsToggle');
+  const formsBtn = document.getElementById('formsBtn');
   const tipsClose = document.getElementById('tipsClose');
   const tagInfoBox = document.getElementById('tagInfo');
 
@@ -516,7 +508,7 @@
 
   let idx = 0;
 
-  // Build overlay content — ONLY per-form tags, no general notes
+  // Build overlay content — ONLY per-form tags
   function renderForms(style){
     const formsList = style.forms.map(f=>{
       const tags=(f.tags||[]).map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
@@ -534,7 +526,6 @@
 
   function render(i){
     const s = styles[i];
-    // Name + vibe
     nameEl.textContent = `${s.key} Breathing`;
     nameEl.style.fontFamily = s.font;
     document.documentElement.style.setProperty('--styleFont', s.font);
@@ -550,18 +541,15 @@
     tipsTitle.textContent = `${s.key} Breathing`;
     renderForms(s);
 
-    // colorize Tips button per style
-    const tbtn = document.getElementById('tipsToggle');
-    tbtn.style.boxShadow = `0 6px 22px ${s.hue}55`;
-    tbtn.style.borderColor = s.hue;
-    tbtn.style.background = `
+    // Per-style glow tints for buttons
+    formsBtn.style.boxShadow = `0 6px 22px ${s.hue}55`;
+    formsBtn.style.borderColor = s.hue;
+    formsBtn.style.background = `
       radial-gradient(circle at 30% -40%, rgba(255,255,255,.4), transparent 55%),
       linear-gradient(180deg, ${s.hue}, color-mix(in srgb, ${s.hue} 55%, #000 0%))`;
 
-    // Random glow tint
-    const rbtn = document.getElementById('random');
-    rbtn.style.boxShadow = `0 8px 22px rgba(255,255,255,.14), 0 0 18px ${s.hue}66`;
-    rbtn.style.borderColor = `color-mix(in srgb, ${s.hue} 60%, #ffffff 10%)`;
+    randBtn.style.boxShadow = `0 8px 22px rgba(255,255,255,.14), 0 0 18px ${s.hue}66`;
+    randBtn.style.borderColor = `color-mix(in srgb, ${s.hue} 60%, #ffffff 10%)`;
   }
 
   prev.addEventListener('click', ()=>{ idx=(idx-1+styles.length)%styles.length; render(idx); });
@@ -569,23 +557,14 @@
   selectBtn.addEventListener('click', ()=> alert(`Selected: ${styles[idx].key} Breathing (menu preview only)`));
   randBtn.addEventListener('click', ()=>{ idx=Math.floor(Math.random()*styles.length); render(idx); });
 
-  // Swipe (mobile)
-  let sx=0, sy=0, swiping=false;
-  cardEl.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; swiping=true; }, {passive:true});
-  cardEl.addEventListener('touchend', e=>{
-    if(!swiping) return; swiping=false;
-    const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ (dx<0? next: prev).click(); }
-  }, {passive:true});
-
-  // Tips overlay toggle
-  function toggleTips(open){
+  // Forms overlay toggle
+  function toggleForms(open){
     tipsPanel.classList.toggle('open', open ?? !tipsPanel.classList.contains('open'));
   }
-  tipsToggle.addEventListener('click', ()=> toggleTips());
-  tipsClose.addEventListener('click', ()=> toggleTips(false));
+  formsBtn.addEventListener('click', ()=> toggleForms());
+  tipsClose.addEventListener('click', ()=> toggleForms(false));
 
-  // Tag info popup (bottom-center)
+  // Tag info popup (bottom-center, auto-hide)
   function showTagInfo(tag){
     const text = TAG_INFO[tag] || tag;
     tagInfoBox.textContent = `${tag}: ${text}`;
@@ -599,52 +578,15 @@
     if(tag) showTagInfo(tag);
   });
 
-  // ---------- Misty night sky with big glowing moon ----------
-  const sky = document.getElementById('sky');
-  const ctx = sky.getContext('2d');
+  // ---------- Gentle moving mist over the background image ----------
   const mist = document.getElementById('mist');
   const mctx = mist.getContext('2d');
 
   function resize(){
-    sky.width = innerWidth; sky.height = innerHeight;
     mist.width = innerWidth; mist.height = innerHeight;
-    drawStaticSky();
   }
   addEventListener('resize', resize, {passive:true}); resize();
 
-  function drawStaticSky(){
-    const w=sky.width, h=sky.height;
-    // gradient sky
-    const g = ctx.createLinearGradient(0,0,0,h);
-    g.addColorStop(0, '#101638');
-    g.addColorStop(.5,'#0c1230');
-    g.addColorStop(1, '#0a1022');
-    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-
-    // stars
-    for(let i=0;i<180;i++){
-      const x=Math.random()*w, y=Math.random()*h*0.85, r=Math.random()*1.6;
-      ctx.fillStyle = `rgba(${220+Math.random()*35},${230+Math.random()*25},255,${0.55+Math.random()*0.45})`;
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-    }
-
-    // MOON — larger & brighter
-    const mx = w*0.82, my = h*0.18, mr = Math.min(w,h)*0.10; // 10% of min dimension
-    const mg = ctx.createRadialGradient(mx-mr*0.35,my-mr*0.35,mr*0.15, mx,my,mr);
-    mg.addColorStop(0,'#ffffff');
-    mg.addColorStop(0.35,'#e8efff');
-    mg.addColorStop(0.75,'rgba(210,220,255,0.35)');
-    mg.addColorStop(1,'rgba(200,210,255,0.06)');
-    ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
-
-    // halo rings
-    for(let i=1;i<=5;i++){
-      ctx.beginPath(); ctx.arc(mx,my,mr+i*12,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(200,210,255,${0.03*(6-i)})`; ctx.lineWidth=10; ctx.stroke();
-    }
-  }
-
-  // gentle moving mist layers
   function mistLoop(now){
     const w=mist.width, h=mist.height;
     mctx.clearRect(0,0,w,h);
