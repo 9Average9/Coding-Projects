@@ -3,93 +3,125 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-<title>Top-Down Arena Fighter</title>
+<title>Demon Slayer — Breathing Awakening (v0.3)</title>
 <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-    background: radial-gradient(1200px 800px at 70% 20%, #0f1420, #080b12 60%, #05070b 100%);
-    color: #e7eef7;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    overflow: hidden;
+  :root{
+    --bg1:#0f1420; --bg2:#080b12; --grid:#2b344a; --ui:#e7eef7;
+    --glass: rgba(20,28,40,.28); --glass2: rgba(20,28,40,.22);
   }
-  #ui {
-    position: fixed; inset: 0; pointer-events: none;
+  html, body { height:100%; margin:0; overflow:hidden; background: radial-gradient(1200px 800px at 70% 20%, var(--bg1), var(--bg2) 60%, #05070b 100%); color:var(--ui); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+  canvas { display:block; width:100vw; height:100vh; }
+
+  /* HUD */
+  #ui{ position:fixed; inset:0; pointer-events:none; }
+  .hud{
+    position:absolute; left:12px; top:10px; display:flex; gap:10px; align-items:center;
+    backdrop-filter: blur(6px); background: var(--glass); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.06); pointer-events:none;
   }
-  .hud {
-    position: absolute; left: 16px; top: 12px; display: flex; gap: 10px; align-items: center;
-    backdrop-filter: blur(6px); background: rgba(20,28,40,.28); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.06);
+  .bar{ width:160px; height:10px; background: rgba(255,255,255,.08); border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,.05); }
+  .bar>i{ display:block; height:100%; background: linear-gradient(90deg, #67d480, #35b3ff); width:100%; }
+  .score{
+    position:absolute; right:12px; top:10px; backdrop-filter: blur(6px); background: var(--glass); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.06);
   }
-  .hud span { opacity: .9; }
-  .bar {
-    width: 160px; height: 10px; background: rgba(255,255,255,.08); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,.05);
+  .meta{
+    position:absolute; left:50%; transform:translateX(-50%); top:10px; display:flex; gap:10px; align-items:center;
+    backdrop-filter: blur(6px); background: var(--glass); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.06);
   }
-  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, #67d480, #35b3ff); width: 100%; }
-  .score {
-    position: absolute; right: 16px; top: 12px;
-    backdrop-filter: blur(6px); background: rgba(20,28,40,.28); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.06);
+  .pill{ padding:2px 8px; border-radius:999px; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.06); font-size:12px; }
+
+  /* Bottom stats & form */
+  .dock{
+    position:absolute; left:12px; bottom:12px; display:flex; gap:10px; align-items:center;
+    backdrop-filter: blur(6px); background: var(--glass); padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.06);
+    pointer-events:auto;
   }
-  .tip {
-    position: absolute; left: 50%; transform: translateX(-50%);
-    top: 16px; font-size: 14px; opacity: .85; text-align: center;
-    backdrop-filter: blur(6px); background: rgba(20,28,40,.22); padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.06);
-    transition: opacity .6s ease;
+  .dock .stat{ display:flex; align-items:center; gap:6px; }
+  .dock .btn{ padding:2px 8px; border-radius:8px; background:#35b3ff; color:#071018; font-weight:700; border:none; pointer-events:auto; }
+  .formBtn{
+    position:absolute; right:12px; bottom:12px; width:84px; height:84px; border-radius:50%;
+    display:grid; place-items:center; font-weight:800; border:2px solid rgba(255,255,255,.25); pointer-events:auto;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.25), rgba(255,255,255,.08));
+    text-shadow: 0 1px 4px rgba(0,0,0,.6);
   }
-  .fade { opacity: 0; }
-  canvas { display: block; width: 100vw; height: 100vh; }
-  /* Mobile controls */
-  #touchLayer { position: fixed; inset: 0; touch-action: none; }
-  .stick {
-    position: absolute; left: 20px; bottom: 20px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(6px); pointer-events: auto;
+  .coolbar{ position:absolute; inset:0; border-radius:50%; box-shadow: inset 0 0 0 6px rgba(0,0,0,.25); }
+  .coolmask{ position:absolute; inset:6px; border-radius:50%; display:grid; place-items:center; }
+  .disabled{ filter:grayscale(1) brightness(.7); opacity:.8 }
+
+  /* Touch-anywhere joystick */
+  #touchLayer{ position:fixed; inset:0; touch-action:none; pointer-events:auto; }
+  .joyRoot{ position:absolute; width:160px; height:160px; margin:-80px 0 0 -80px; border-radius:50%; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(6px); display:none; }
+  .joyNub{ position:absolute; left:50%; top:50%; width:70px; height:70px; transform:translate(-50%,-50%); border-radius:50%; background: rgba(255,255,255,.22); border:1px solid rgba(255,255,255,.10); }
+
+  /* Overlays */
+  .tip{ position:absolute; left:50%; transform:translateX(-50%); top:46px; font-size:13px; opacity:.9; text-align:center; backdrop-filter: blur(6px); background: var(--glass2); padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.06); transition:opacity .6s ease; }
+  .fade{ opacity:0 }
+
+  .over{ position:absolute; inset:0; display:grid; place-items:center; background: rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .5s ease; }
+  .over.show{ opacity:1; pointer-events:auto; }
+  .card{ background: rgba(18,24,34,.9); border:1px solid rgba(255,255,255,.08); padding:20px 22px; border-radius:14px; text-align:center; min-width:280px; }
+
+  /* Start menu */
+  #start{ position:fixed; inset:0; display:grid; grid-template-rows:auto 1fr auto; background: radial-gradient(1200px 800px at 50% 30%, #0b0f19, #05070b); }
+  .title{ text-align:center; margin-top:26px; }
+  .title h1{ margin:0; letter-spacing:.5px; }
+  .subtitle{ opacity:.8; margin-top:6px; }
+  .styles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; padding:18px; max-width:1000px; margin:12px auto 24px auto; width:95%; }
+  .styleBtn{
+    border-radius:14px; padding:14px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
+    display:flex; flex-direction:column; gap:6px; cursor:pointer; position:relative; overflow:hidden;
   }
-  .stick .nub {
-    position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; transform: translate(-50%, -50%);
-    border-radius: 50%; background: rgba(255,255,255,.20); border: 1px solid rgba(255,255,255,.1);
-  }
-  .btn {
-    position: absolute; right: 24px; bottom: 28px; width: 74px; height: 74px; border-radius: 50%;
-    background: rgba(53,179,255,.25); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(6px);
-    pointer-events: auto; display: grid; place-items: center; font-weight: 700;
-  }
-  .btn.attack { right: 24px; bottom: 28px; }
-  .btn.dash { right: 110px; bottom: 76px; background: rgba(103,212,128,.25); }
-  .small { font-size: 12px; opacity: .85; }
-  /* Game over overlay */
-  .over {
-    position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.35);
-    opacity: 0; pointer-events: none; transition: opacity .5s ease;
-  }
-  .over.show { opacity: 1; pointer-events: auto; }
-  .card {
-    background: rgba(18,24,34,.9); border: 1px solid rgba(255,255,255,.08); padding: 20px 22px; border-radius: 14px;
-    text-align: center; min-width: 260px;
-  }
-  .btnp {
-    margin-top: 12px; background: #35b3ff; color: #071018; border: none; font-weight: 700;
-    border-radius: 999px; padding: 10px 16px; cursor: pointer;
-  }
-  @media (pointer:fine) and (hover:hover) {
-    #touchLayer, .stick, .btn { display: none; }
+  .styleBtn:hover{ outline:2px solid rgba(255,255,255,.16); }
+  .glow{ position:absolute; inset:-40%; filter:blur(40px); opacity:.20; }
+  .row{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .badge{ font-size:12px; padding:2px 8px; border-radius:999px; background: rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.07); }
+  .mini{ font-size:12px; opacity:.9; }
+
+  @media (pointer:fine) and (hover:hover){
+    #touchLayer{ display:none; }
   }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 
+<!-- START MENU -->
+<div id="start">
+  <div class="title">
+    <h1>Demon Slayer — Breathing Awakening</h1>
+    <div class="subtitle">Choose your Breathing Style</div>
+  </div>
+  <div id="styleGrid" class="styles"></div>
+  <div style="text-align:center; opacity:.8; margin-bottom:14px;">Tip: on mobile, <b>press & hold anywhere</b> then move your thumb — you’ll move and auto-slash in that direction.</div>
+</div>
+
+<!-- HUD -->
 <div id="ui">
   <div class="hud">
-    <span>HP</span>
-    <div class="bar"><i id="hpFill" style="width:100%"></i></div>
-    <span style="margin-left:8px;">Dash</span>
-    <div class="bar" style="width:110px"><i id="dashFill" style="width:100%"></i></div>
-    <span style="margin-left:8px;">ATK</span>
-    <div class="bar" style="width:110px"><i id="atkFill" style="width:100%"></i></div>
+    <span>HP</span><div class="bar"><i id="hpFill" style="width:100%"></i></div>
+    <span style="margin-left:8px;">Dash</span><div class="bar" style="width:110px"><i id="dashFill" style="width:100%"></i></div>
+    <span style="margin-left:8px;">ATK</span><div class="bar" style="width:110px"><i id="atkFill" style="width:100%"></i></div>
   </div>
-  <div class="score"><b>Score:</b> <span id="score">0</span></div>
+
+  <div class="meta">
+    <span class="pill">Style: <b id="styleName">—</b></span>
+    <span class="pill">Lvl <b id="lvl">1</b></span>
+    <span class="pill">XP <b id="xp">0</b>/<b id="xpTo">10</b></span>
+    <span class="pill">SP <b id="sp">1</b></span>
+    <span class="pill">Wave <b id="wave">1</b></span>
+  </div>
+
+  <div class="dock" id="dock">
+    <div class="stat">STR <button class="btn" id="addStr">+1</button><span id="valStr">1</span></div>
+    <div class="stat">SPD <button class="btn" id="addSpd">+1</button><span id="valSpd">1</span></div>
+    <div class="stat">AGI <button class="btn" id="addAgi">+1</button><span id="valAgi">1</span></div>
+    <div class="stat">BRTH <button class="btn" id="addBre">+1</button><span id="valBre">1</span></div>
+  </div>
+
+  <div id="formBtn" class="formBtn disabled" title="Breathing Form"><div class="coolbar"></div><div class="coolmask"><div id="formLabel">FORM</div></div></div>
+
   <div class="tip" id="tip">
-    PC: WASD move, Mouse aim & Left-Click attack, Shift to dash. <span class="small">Survive & score!</span><br/>
-    Mobile: use joystick, tap ⚔ for attack, ⚡ for dash.
+    PC: WASD move, Mouse aim & Left-Click attack, Shift dash. <span style="opacity:.85">Use Breathing form with the round button (or press Q).</span><br/>
+    Mobile: <b>Press & hold anywhere</b>, move thumb to move — auto-slashes toward your thumb. Tap the big circle to use your Form.
   </div>
 
   <div class="over" id="over">
@@ -100,10 +132,9 @@
     </div>
   </div>
 
+  <!-- Touch-anywhere joystick -->
   <div id="touchLayer">
-    <div class="stick" id="stick"><div class="nub" id="nub"></div></div>
-    <div class="btn attack" id="btnAtk">⚔</div>
-    <div class="btn dash" id="btnDash">⚡</div>
+    <div id="joy" class="joyRoot"><div class="joyNub" id="joyNub"></div></div>
   </div>
 </div>
 
@@ -111,487 +142,677 @@
 (() => {
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d');
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
+  function resize(){ canvas.width = Math.floor(innerWidth*DPR); canvas.height = Math.floor(innerHeight*DPR); ctx.setTransform(DPR,0,0,DPR,0,0); }
+  addEventListener('resize', resize, {passive:true}); resize();
+
+  // ======= UI refs
   const hpFill = document.getElementById('hpFill');
   const dashFill = document.getElementById('dashFill');
   const atkFill = document.getElementById('atkFill');
-  const scoreEl = document.getElementById('score');
   const tipEl = document.getElementById('tip');
   const overEl = document.getElementById('over');
   const overScoreEl = document.getElementById('overScore');
   const restartBtn = document.getElementById('restart');
+  const styleNameEl = document.getElementById('styleName');
+  const lvlEl = document.getElementById('lvl');
+  const xpEl = document.getElementById('xp');
+  const xpToEl = document.getElementById('xpTo');
+  const spEl = document.getElementById('sp');
+  const waveEl = document.getElementById('wave');
+  const formBtn = document.getElementById('formBtn');
+  const formLabel = document.getElementById('formLabel');
 
-  const DPR = Math.min(2, window.devicePixelRatio || 1);
-  function resize() {
-    canvas.width = Math.floor(innerWidth * DPR);
-    canvas.height = Math.floor(innerHeight * DPR);
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  }
-  addEventListener('resize', resize, { passive: true }); resize();
+  const valStr = document.getElementById('valStr');
+  const valSpd = document.getElementById('valSpd');
+  const valAgi = document.getElementById('valAgi');
+  const valBre = document.getElementById('valBre');
+  const addStr = document.getElementById('addStr');
+  const addSpd = document.getElementById('addSpd');
+  const addAgi = document.getElementById('addAgi');
+  const addBre = document.getElementById('addBre');
 
-  // Utils
-  const rand = (a,b) => Math.random()*(b-a)+a;
-  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
-  const dist2 = (ax,ay,bx,by)=> (ax-bx)*(ax-bx)+(ay-by)*(ay-by);
-  const TAU = Math.PI*2;
+  // Start menu
+  const start = document.getElementById('start');
+  const styleGrid = document.getElementById('styleGrid');
 
-  // Input
-  const keys = new Set();
-  const mouse = { x: innerWidth/2, y: innerHeight/2, down:false };
-  addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-  addEventListener('mousedown', ()=> mouse.down = true);
-  addEventListener('mouseup', ()=> mouse.down = false);
-  addEventListener('blur', ()=> keys.clear());
-  addEventListener('keydown', e => {
-    if (['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
+  // Touch joystick
+  const touchLayer = document.getElementById('touchLayer');
+  const joy = document.getElementById('joy');
+  const joyNub = document.getElementById('joyNub');
+
+  // ======= Utils
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const rand=(a,b)=>Math.random()*(b-a)+a;
+  const dist2=(ax,ay,bx,by)=> (ax-bx)*(ax-bx)+(ay-by)*(ay-by);
+  const TAU=Math.PI*2;
+
+  // ======= Input
+  const keys=new Set();
+  const mouse={x:innerWidth/2,y:innerHeight/2,down:false};
+  addEventListener('mousemove', e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+  addEventListener('mousedown', ()=> mouse.down=true);
+  addEventListener('mouseup', ()=> mouse.down=false);
+  addEventListener('keydown', e=>{
+    if(['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyQ'].includes(e.code)) e.preventDefault();
     keys.add(e.code);
-  }, { passive:false });
-  addEventListener('keyup', e => keys.delete(e.code));
+  }, {passive:false});
+  addEventListener('keyup', e=> keys.delete(e.code));
+  addEventListener('blur', ()=> keys.clear());
 
-  // Touch controls
-  const stick = document.getElementById('stick');
-  const nub = document.getElementById('nub');
-  const btnAtk = document.getElementById('btnAtk');
-  const btnDash = document.getElementById('btnDash');
-  let joy = {active:false, dx:0, dy:0, id:null};
-  const stickRect = ()=> stick.getBoundingClientRect();
-  function joyStart(e) {
-    for (const t of e.changedTouches) {
-      const r = stickRect();
-      if (t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom) {
-        if (joy.active) continue;
-        joy.active = true; joy.id = t.identifier; joy.dx = 0; joy.dy = 0;
-        nub.style.transform = 'translate(-50%, -50%)';
-      }
+  // Touch-anywhere joystick
+  const thumb={active:false,id:null,ox:0,oy:0,x:0,y:0,dx:0,dy:0,mag:0};
+  const JOY_MAX=58;
+  function showJoy(x,y){ joy.style.display='block'; joy.style.left=x+'px'; joy.style.top=y+'px'; joyNub.style.transform='translate(-50%,-50%)'; }
+  function hideJoy(){ joy.style.display='none'; }
+  touchLayer.addEventListener('touchstart', e=>{
+    for(const t of e.changedTouches){
+      if(thumb.active) continue;
+      thumb.active=true; thumb.id=t.identifier; thumb.ox=thumb.x=t.clientX; thumb.oy=thumb.y=t.clientY; thumb.dx=thumb.dy=0; thumb.mag=0;
+      showJoy(thumb.ox, thumb.oy);
+    }
+  }, {passive:true});
+  function onMove(e){
+    if(!thumb.active) return;
+    for(const t of e.changedTouches){
+      if(t.identifier!==thumb.id) continue;
+      thumb.x=t.clientX; thumb.y=t.clientY;
+      let dx=thumb.x-thumb.ox, dy=thumb.y-thumb.oy;
+      const mag=Math.hypot(dx,dy);
+      const m=mag>0?Math.min(JOY_MAX,mag):0;
+      if(mag>JOY_MAX){ dx*=JOY_MAX/mag; dy*=JOY_MAX/mag; }
+      thumb.dx = m? (dx/JOY_MAX):0; thumb.dy = m?(dy/JOY_MAX):0; thumb.mag=m/JOY_MAX;
+      joyNub.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
     }
   }
-  function joyMove(e) {
-    if (!joy.active) return;
-    for (const t of e.changedTouches) {
-      if (t.identifier !== joy.id) continue;
-      const r = stickRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top + r.height/2;
-      let dx = t.clientX - cx;
-      let dy = t.clientY - cy;
-      const mag = Math.hypot(dx,dy);
-      const max = 46;
-      if (mag > max) { dx *= max/mag; dy *= max/mag; }
-      nub.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-      joy.dx = dx/max; joy.dy = dy/max;
+  touchLayer.addEventListener('touchmove', onMove, {passive:true});
+  function endTouch(e){
+    for(const t of e.changedTouches){
+      if(t.identifier===thumb.id){ thumb.active=false; thumb.id=null; thumb.dx=thumb.dy=thumb.mag=0; hideJoy(); }
     }
   }
-  function joyEnd(e) {
-    for (const t of e.changedTouches) {
-      if (t.identifier === joy.id) {
-        joy.active = false; joy.dx = joy.dy = 0; joy.id = null;
-        nub.style.transform = 'translate(-50%, -50%)';
-      }
-    }
+  touchLayer.addEventListener('touchend', endTouch, {passive:true});
+  touchLayer.addEventListener('touchcancel', endTouch, {passive:true});
+
+  // ======= Breathing styles data (strength tiers & unique vibes)
+  // Note: multipliers reflect relative power (Sun strongest). We'll polish later.
+  const Styles = [
+    { key:'Water',  hue:'#55b7ff', mult:1.05, forms:11, form1:'Water Surface Slash', cdBase:5.0 },
+    { key:'Flame',  hue:'#ff624d', mult:1.20, forms:9,  form1:'Unknowing Fire', cdBase:6.0 },
+    { key:'Thunder',hue:'#ffd148', mult:1.10, forms:6,  form1:'Thunderclap & Flash', cdBase:4.8 },
+    { key:'Wind',   hue:'#7ce37f', mult:1.12, forms:9,  form1:'Dust Whirl Cutter', cdBase:5.5 },
+    { key:'Stone',  hue:'#c7c2a1', mult:1.15, forms:5,  form1:'Boulder Swing', cdBase:6.5 },
+    { key:'Mist',   hue:'#cfe8ff', mult:0.98, forms:7,  form1:'Obscuring Clouds', cdBase:4.6 },
+    { key:'Love',   hue:'#ff9ccf', mult:0.95, forms:6,  form1:'Shiver of First Love', cdBase:4.4 },
+    { key:'Serpent',hue:'#9ddaa8', mult:1.00, forms:5,  form1:'Serpent Slash', cdBase:5.0 },
+    { key:'Sound',  hue:'#a880ff', mult:1.04, forms:5,  form1:'Roar', cdBase:5.2 },
+    { key:'Beast',  hue:'#8bd0b1', mult:1.06, forms:7,  form1:'Fang Assault', cdBase:4.9 },
+    { key:'Insect', hue:'#b7ffb7', mult:0.90, forms:6,  form1:'Bee Sting Dance', cdBase:4.0 },
+    { key:'Moon',   hue:'#c0b7ff', mult:1.28, forms:16, form1:'Calamitous Eddy', cdBase:5.8 },
+    { key:'Sun',    hue:'#ff8a3d', mult:1.40, forms:13, form1:'Dance of the Fire God', cdBase:5.2 },
+  ];
+
+  // Build start-screen buttons
+  function makeStyleButtons(){
+    styleGrid.innerHTML='';
+    Styles.forEach(s=>{
+      const btn=document.createElement('button');
+      btn.className='styleBtn';
+      btn.innerHTML=`
+        <div class="glow" style="background:${s.hue};"></div>
+        <div class="row"><b>${s.key} Breathing</b><span class="badge">${s.forms} forms</span></div>
+        <div class="mini">Power ×${s.mult.toFixed(2)} · Base CD ${s.cdBase.toFixed(1)}s</div>
+      `;
+      btn.style.boxShadow = `0 0 24px 0 ${s.hue}22 inset`;
+      btn.addEventListener('click', ()=> startGameWithStyle(s));
+      styleGrid.appendChild(btn);
+    });
   }
-  addEventListener('touchstart', e => { joyStart(e); }, { passive:true });
-  addEventListener('touchmove', e => { joyMove(e); }, { passive:true });
-  addEventListener('touchend', e => { joyEnd(e); }, { passive:true });
-  addEventListener('touchcancel', e => { joyEnd(e); }, { passive:true });
+  makeStyleButtons();
 
-  let mobileAttackQueued = false;
-  let mobileDashQueued = false;
-  btnAtk?.addEventListener('touchstart', ()=> { mobileAttackQueued = true; }, { passive:true });
-  btnDash?.addEventListener('touchstart', ()=> { mobileDashQueued = true; }, { passive:true });
-
-  // Game state
+  // ======= Game state
   const state = {
-    running: true,
-    score: 0,
-    t: 0,
-    difficulty: 1,
+    running:false,
+    t:0,
+    score:0,
+    wave:1,
+    toSpawn:0,
+    style:null,
   };
 
-  class Particle {
-    constructor(x,y, vx,vy, life, color) {
-      this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.life=life; this.max=life; this.color=color;
-      this.r = rand(1.5,3);
-    }
-    step(dt) {
-      this.life -= dt;
-      this.x += this.vx*dt; this.y += this.vy*dt;
-      this.vx *= (1-2*dt); this.vy *= (1-2*dt);
-      return this.life > 0;
-    }
-    draw(ctx) {
-      ctx.globalAlpha = clamp(this.life/this.max, 0, 1);
-      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, TAU);
-      ctx.fillStyle = this.color; ctx.fill();
-      ctx.globalAlpha = 1;
-    }
+  // Player, entities
+  let player, enemies=[], slashes=[], parts=[];
+  let spawnCooldown = 0;
+
+  // Particles
+  class Particle{
+    constructor(x,y,vx,vy,life,color){ this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.life=life; this.max=life; this.color=color; this.r=rand(1.5,3); }
+    step(dt){ this.life-=dt; this.x+=this.vx*dt; this.y+=this.vy*dt; this.vx*=(1-2*dt); this.vy*=(1-2*dt); return this.life>0; }
+    draw(ctx){ ctx.globalAlpha = clamp(this.life/this.max,0,1); ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,TAU); ctx.fillStyle=this.color; ctx.fill(); ctx.globalAlpha=1; }
   }
 
-  class Slash {
-    // short arc attack in front of player
-    constructor(owner, angle) {
-      this.owner = owner;
-      this.angle = angle;
-      this.time = 0;
-      this.duration = 0.18;
-      this.radius = 56;
-      this.hit = new Set();
-    }
-    step(dt) { this.time += dt; return this.time < this.duration; }
-    draw(ctx) {
-      const p = this.owner;
-      const a0 = this.angle - 0.8 + (this.time/this.duration)*1.6;
-      const a1 = a0 + 0.8;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.beginPath();
-      ctx.arc(0, 0, this.radius, a0, a1);
-      ctx.lineWidth = 14;
-      ctx.strokeStyle = 'rgba(255,255,255,.12)';
-      ctx.stroke();
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = '#35b3ff';
-      ctx.stroke();
+  class Slash{
+    constructor(owner, angle, color){ this.owner=owner; this.angle=angle; this.time=0; this.duration=0.18; this.radius=56; this.hit=new Set(); this.color=color||'#35b3ff'; }
+    step(dt){ this.time+=dt; return this.time<this.duration; }
+    draw(ctx){
+      const p=this.owner;
+      const a0=this.angle-0.8 + (this.time/this.duration)*1.6;
+      const a1=a0+0.8;
+      ctx.save(); ctx.translate(p.x,p.y);
+      ctx.beginPath(); ctx.arc(0,0,this.radius,a0,a1);
+      ctx.lineWidth=14; ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.stroke();
+      ctx.lineWidth=6; ctx.strokeStyle=this.color; ctx.stroke();
       ctx.restore();
     }
-    hits(e) {
-      if (this.hit.has(e)) return false;
-      // simple sector check by angle & distance
-      const dx = e.x - this.owner.x, dy = e.y - this.owner.y;
-      const d2 = dx*dx + dy*dy;
-      if (d2 > (this.radius+e.r)*(this.radius+e.r)) return false;
-      const ang = Math.atan2(dy, dx);
-      const swingCenter = this.angle;
-      let diff = Math.atan2(Math.sin(ang - swingCenter), Math.cos(ang - swingCenter));
-      const within = Math.abs(diff) < 0.6;
-      if (within) { this.hit.add(e); return true; }
+    hits(e){
+      if(this.hit.has(e)) return false;
+      const dx=e.x-this.owner.x, dy=e.y-this.owner.y;
+      const d2=dx*dx+dy*dy; if(d2>(this.radius+e.r)*(this.radius+e.r)) return false;
+      const ang=Math.atan2(dy,dx);
+      const diff=Math.atan2(Math.sin(ang-this.angle), Math.cos(ang-this.angle));
+      const within=Math.abs(diff)<0.6;
+      if(within){ this.hit.add(e); return true; }
       return false;
     }
   }
 
-  class Player {
-    constructor() {
-      this.x = innerWidth/2; this.y = innerHeight/2;
-      this.vx = 0; this.vy = 0;
-      this.speed = 220;
-      this.r = 14;
-      this.hp = 100; this.hpMax = 100;
-      this.inv = 0; // invulnerability
-      this.atkCd = 0;
-      this.dashCd = 0;
-      this.dashing = 0;
-      this.facing = 0;
+  class Player{
+    constructor(){
+      this.x=innerWidth/2; this.y=innerHeight/2; this.vx=0; this.vy=0; this.r=14;
+      this.hpMax=100; this.hp=100;
+      this.inv=0; this.dashing=0; this.dashCd=0; this.facing=0;
+
+      // Progression
+      this.level=1; this.exp=0; this.expTo=10; this.skill=1;
+      this.stats={ str:1, spd:1, agi:1, bre:1 };
+      this.formsUnlocked=1; // start with Form 1
+      this.formCd=0; // current cooldown
+      this.formCdBase=5.0; // set by style
+      this.formName='Form 1';
+
+      // Attack cadence
+      this.baseSpeed=220;
+      this.baseAtkCd=0.35;
+      this.atkCd=0;
     }
-    get alive() { return this.hp > 0; }
-    damage(n) {
-      if (this.inv > 0 || this.dashing>0) return;
-      this.hp = Math.max(0, this.hp - n);
-      this.inv = 0.6;
-      // burst particles
-      for (let i=0;i<10;i++) parts.push(new Particle(this.x, this.y, rand(-180,180), rand(-180,180), rand(.2,.5), '#ff5370'));
-      if (!this.alive) gameOver();
-    }
-    attackAngle() {
-      // mouse-aim when pointer is available; else last facing
-      const dx = mouse.x - this.x, dy = mouse.y - this.y;
-      const angMouse = Math.atan2(dy, dx);
-      return isFinite(angMouse) ? angMouse : this.facing;
-    }
-    tryAttack() {
-      if (this.atkCd > 0) return;
-      slashes.push(new Slash(this, this.attackAngle()));
-      this.atkCd = 0.35;
-      // particles
-      for (let i=0;i<14;i++) parts.push(new Particle(this.x, this.y, Math.cos(this.attackAngle()+rand(-.7,.7))*rand(120,260), Math.sin(this.attackAngle()+rand(-.7,.7))*rand(120,260), rand(.1,.25), '#c6e4ff'));
-    }
-    tryDash() {
-      if (this.dashCd>0 || this.dashing>0) return;
-      const dir = this.moveDir();
-      if (dir[0]===0 && dir[1]===0) return;
-      this.vx = dir[0]*520; this.vy = dir[1]*520;
-      this.dashing = 0.18; this.dashCd = 1.1;
-      for (let i=0;i<18;i++) parts.push(new Particle(this.x, this.y, -this.vx*rand(.5,1.2), -this.vy*rand(.5,1.2), rand(.08,.18), '#9bfcc2'));
-    }
-    moveDir() {
+    get alive(){ return this.hp>0; }
+    moveDir(){
       let dx=0,dy=0;
-      if (keys.has('KeyW')||keys.has('ArrowUp')) dy-=1;
-      if (keys.has('KeyS')||keys.has('ArrowDown')) dy+=1;
-      if (keys.has('KeyA')||keys.has('ArrowLeft')) dx-=1;
-      if (keys.has('KeyD')||keys.has('ArrowRight')) dx+=1;
-      if (joy.active) { dx += joy.dx; dy += joy.dy; }
-      const m = Math.hypot(dx,dy)||1;
-      return [dx/m, dy/m];
+      if(keys.has('KeyW')||keys.has('ArrowUp')) dy-=1;
+      if(keys.has('KeyS')||keys.has('ArrowDown')) dy+=1;
+      if(keys.has('KeyA')||keys.has('ArrowLeft')) dx-=1;
+      if(keys.has('KeyD')||keys.has('ArrowRight')) dx+=1;
+      if(thumb.active){ dx=thumb.dx; dy=thumb.dy; }
+      const m=Math.hypot(dx,dy)||1; return [dx/m, dy/m];
     }
-    step(dt) {
-      if (!this.alive) return;
-      if (this.inv>0) this.inv -= dt;
-      if (this.atkCd>0) this.atkCd -= dt;
-      if (this.dashCd>0) this.dashCd -= dt;
-      if (this.dashing>0) this.dashing -= dt;
+    damage(n){
+      if(this.inv>0||this.dashing>0) return;
+      this.hp=Math.max(0,this.hp-n); this.inv=0.6;
+      for(let i=0;i<10;i++) parts.push(new Particle(this.x,this.y,rand(-180,180),rand(-180,180),rand(.2,.5),'#ff5370'));
+      if(!this.alive) gameOver();
+    }
+    addXP(n){
+      this.exp += n;
+      while(this.exp >= this.expTo){
+        this.exp -= this.expTo;
+        this.level++; this.skill++; // +1 skill point per level
+        // every 5 levels: prompt for unlock next form or +10 SP
+        if(this.level % 5 === 0){
+          setTimeout(()=> specialLevelChoice(), 10);
+        }
+        // scale next requirement (gentle curve)
+        this.expTo = Math.floor(this.expTo * 1.25 + 5);
+        updateMeta();
+      }
+    }
+    spendPoint(which){
+      if(this.skill<=0) return;
+      if(which==='str') this.stats.str++;
+      if(which==='spd') this.stats.spd++;
+      if(which==='agi') this.stats.agi++;
+      if(which==='bre') this.stats.bre++;
+      this.skill--;
+      updateMeta();
+    }
+    attackAngle(){
+      if(thumb.active && (Math.abs(thumb.dx)+Math.abs(thumb.dy))>0.01) return Math.atan2(thumb.dy, thumb.dx);
+      const dx=mouse.x-this.x, dy=mouse.y-this.y;
+      const ang=Math.atan2(dy,dx);
+      return isFinite(ang)? ang : this.facing;
+    }
+    tryBasicAttack(){
+      const cd = this.baseAtkCd / (1 + (this.stats.agi-1)*0.15);
+      if(this.atkCd>0) return;
+      const ang=this.attackAngle();
+      slashes.push(new Slash(this, ang, state.style.hue));
+      this.atkCd = cd;
+      // particles
+      for(let i=0;i<12;i++) parts.push(new Particle(this.x,this.y, Math.cos(ang+rand(-.7,.7))*rand(120,260), Math.sin(ang+rand(-.7,.7))*rand(120,260), rand(.1,.25), state.style.hue));
+    }
+    tryDash(){
+      if(this.dashCd>0 || this.dashing>0) return;
+      const [dx,dy]=this.moveDir(); if(dx===0&&dy===0) return;
+      this.vx=dx*520; this.vy=dy*520; this.dashing=.18; this.dashCd=1.1;
+      for(let i=0;i<18;i++) parts.push(new Particle(this.x,this.y,-this.vx*rand(.5,1.2),-this.vy*rand(.5,1.2),rand(.08,.18),'#9bfcc2'));
+    }
+    canUseForm(){ return this.formsUnlocked>0 && this.formCd<=0; }
+    useForm(){
+      if(!this.canUseForm()) return;
 
-      // input
-      const [dx, dy] = this.moveDir();
+      // which form? for now: use highest unlocked; we’ll add selection later
+      const formIndex = this.formsUnlocked; // 1..N, simple
+      doFormEffect(state.style.key, formIndex, this);
+
+      // cooldown: base reduced by Breathing
+      const base = state.style.cdBase || 5.0;
+      const shorten = 1 / (1 + (this.stats.bre-1)*0.18);
+      this.formCd = Math.max(1.2, base * shorten);
+
+      updateFormButton();
+    }
+    step(dt){
+      if(this.inv>0) this.inv-=dt;
+      if(this.atkCd>0) this.atkCd-=dt;
+      if(this.dashCd>0) this.dashCd-=dt;
+      if(this.dashing>0) this.dashing-=dt;
+      if(this.formCd>0) { this.formCd-=dt; if(this.formCd<0) this.formCd=0; }
+
+      // Movement
+      const [dx,dy]=this.moveDir();
+      const speed = this.baseSpeed * (1 + (this.stats.spd-1)*0.12);
       const base = this.dashing>0 ? 0 : 1;
-      this.vx += dx*this.speed*base*dt*6;
-      this.vy += dy*this.speed*base*dt*6;
-
-      // friction
+      this.vx += dx*speed*base*dt*6;
+      this.vy += dy*speed*base*dt*6;
       const fr = this.dashing>0 ? 0.6 : 8;
-      this.vx *= (1 - fr*dt);
-      this.vy *= (1 - fr*dt);
-
-      // position
-      this.x += this.vx*dt;
-      this.y += this.vy*dt;
-
-      // clamp to screen
+      this.vx*=(1-fr*dt); this.vy*=(1-fr*dt);
+      this.x += this.vx*dt; this.y += this.vy*dt;
       this.x = clamp(this.x, this.r+2, innerWidth-this.r-2);
       this.y = clamp(this.y, this.r+2, innerHeight-this.r-2);
 
-      // facing
-      const ang = Math.atan2(mouse.y - this.y, mouse.x - this.x);
-      if (isFinite(ang)) this.facing = ang;
+      // Facing
+      if(thumb.active && (Math.abs(dx)+Math.abs(dy))>0.001) this.facing = Math.atan2(dy,dx);
+      else {
+        const ang = Math.atan2(mouse.y-this.y, mouse.x-this.x);
+        if(isFinite(ang)) this.facing = ang;
+      }
 
-      // Actions
-      if (mouse.down || mobileAttackQueued) { this.tryAttack(); mobileAttackQueued=false; }
-      if (keys.has('ShiftLeft') || keys.has('ShiftRight') || mobileDashQueued) { this.tryDash(); mobileDashQueued=false; }
+      // Auto attack on mobile while moving
+      const moving = thumb.active ? (thumb.mag>0.05) : (dx||dy);
+      if(thumb.active && moving && this.atkCd<=0) this.tryBasicAttack();
+      if(mouse.down) this.tryBasicAttack();
 
-      // UI bars
+      // HUD bars
       hpFill.style.width = `${(this.hp/this.hpMax)*100|0}%`;
       dashFill.style.width = `${clamp(1 - this.dashCd/1.1,0,1)*100|0}%`;
-      atkFill.style.width = `${clamp(1 - this.atkCd/0.35,0,1)*100|0}%`;
+      const cdPct = clamp(1 - this.atkCd/this.baseAtkCd, 0, 1);
+      atkFill.style.width = `${(cdPct*100)|0}%`;
     }
-    draw(ctx) {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-
-      // dash trail-ish shadow
-      if (this.dashing>0) {
-        ctx.globalAlpha = .25;
-        ctx.beginPath(); ctx.arc(0,0,this.r+6,0,TAU); ctx.fillStyle = '#9bfcc2'; ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-
+    draw(ctx){
+      ctx.save(); ctx.translate(this.x,this.y);
+      // breathing aura tint
+      ctx.globalAlpha=.15; ctx.beginPath(); ctx.arc(0,0,this.r+10,0,TAU); ctx.fillStyle=state.style.hue; ctx.fill(); ctx.globalAlpha=1;
+      // dash halo
+      if(this.dashing>0){ ctx.globalAlpha=.25; ctx.beginPath(); ctx.arc(0,0,this.r+6,0,TAU); ctx.fillStyle='#9bfcc2'; ctx.fill(); ctx.globalAlpha=1; }
       // body
-      ctx.beginPath(); ctx.arc(0,0,this.r,0,TAU);
-      ctx.fillStyle = this.inv>0 ? '#ffadad' : '#e7eef7';
-      ctx.fill();
-
-      // visor
+      ctx.beginPath(); ctx.arc(0,0,this.r,0,TAU); ctx.fillStyle= this.inv>0? '#ffadad' : '#e7eef7'; ctx.fill();
+      // visor + blade
       ctx.rotate(this.facing);
-      ctx.beginPath();
-      ctx.arc(8, -4, 4, 0, TAU);
-      ctx.arc(8, 4, 4, 0, TAU);
-      ctx.fillStyle = '#35b3ff';
-      ctx.fill();
-
-      // blade (for flavor)
-      ctx.fillStyle = '#c6e4ff';
-      ctx.fillRect(12, -2, 16, 4);
-
+      ctx.beginPath(); ctx.arc(8,-4,4,0,TAU); ctx.arc(8,4,4,0,TAU); ctx.fillStyle=state.style.hue; ctx.fill();
+      ctx.fillStyle=state.style.hue; ctx.fillRect(12,-2,16,4);
       ctx.restore();
     }
   }
 
-  class Enemy {
-    constructor(x,y, tier=1) {
-      this.x=x; this.y=y;
-      this.vx=0; this.vy=0;
-      this.baseSpeed = rand(60, 90) * (1 + 0.06*tier);
+  class Enemy{
+    constructor(x,y,tier=1, elite=false){
+      this.x=x; this.y=y; this.vx=0; this.vy=0;
+      const speedBase = elite? 110 : 80;
+      this.baseSpeed = rand(speedBase-15, speedBase+15) * (1 + 0.06*tier);
       this.speed = this.baseSpeed;
-      this.r = 12 + 2*tier;
-      this.hp = 20 + 10*tier;
-      this.touchDmg = 10 + 4*tier;
-      this.knock = 0; // knockback timer
-      this.dead = false;
-      this.tint = tier>=3 ? '#f0b' : tier===2 ? '#ffc658' : '#ff6666';
-      this.tier = tier;
+      this.r = (elite? 18:12) + 2*tier;
+      this.hp = (elite? 160:20) + (elite? 40:10)*tier + state.wave*4;
+      this.touchDmg = (elite? 18:10) + 4*tier;
+      this.knock=0; this.dead=false; this.elite=elite;
+      this.tint = elite? '#c04dff' : (tier>=3 ? '#f0b' : tier===2 ? '#ffc658' : '#ff6666');
+      this.freeze=0; // used by Water 11
     }
-    step(dt, player) {
-      if (this.dead) return;
-      const dx = player.x - this.x, dy = player.y - this.y;
-      const m = Math.hypot(dx,dy) || 1;
-      const ux = dx/m, uy = dy/m;
-
-      if (this.knock>0) {
-        this.knock -= dt;
-        this.vx *= (1-4*dt); this.vy *= (1-4*dt);
-      } else {
-        this.vx += ux*this.speed*dt*2;
-        this.vy += uy*this.speed*dt*2;
-        this.vx *= (1-6*dt); this.vy *= (1-6*dt);
-      }
-
-      this.x += this.vx*dt; this.y += this.vy*dt;
-
-      // collide with player
-      const r = this.r + player.r;
-      if (dist2(this.x,this.y, player.x,player.y) < r*r) {
+    step(dt, player){
+      if(this.dead) return;
+      if(this.freeze>0){ this.freeze-=dt; return; }
+      const dx=player.x-this.x, dy=player.y-this.y, m=Math.hypot(dx,dy)||1, ux=dx/m, uy=dy/m;
+      if(this.knock>0){ this.knock-=dt; this.vx*=(1-4*dt); this.vy*=(1-4*dt); }
+      else { this.vx+=ux*this.speed*dt*2; this.vy+=uy*this.speed*dt*2; this.vx*=(1-6*dt); this.vy*=(1-6*dt); }
+      this.x+=this.vx*dt; this.y+=this.vy*dt;
+      const r=this.r+player.r;
+      if(dist2(this.x,this.y, player.x,player.y) < r*r){
         player.damage(this.touchDmg);
-        // bounce away a bit
-        const bx = (this.x - player.x) || rand(-1,1);
-        const by = (this.y - player.y) || rand(-1,1);
-        const bm = Math.hypot(bx,by) || 1;
-        this.vx += (bx/bm)*220; this.vy += (by/bm)*220;
-        this.knock = .12;
+        const bx=(this.x-player.x)||rand(-1,1), by=(this.y-player.y)||rand(-1,1), bm=Math.hypot(bx,by)||1;
+        this.vx+=(bx/bm)*220; this.vy+=(by/bm)*220; this.knock=.12;
       }
     }
-    get hitbox() { return {x:this.x, y:this.y, r:this.r}; }
-    strike(dmg, srcAngle) {
-      if (this.dead) return;
+    strike(dmg, ang){
+      if(this.dead) return;
       this.hp -= dmg;
-      // knockback
-      this.vx += Math.cos(srcAngle)*220;
-      this.vy += Math.sin(srcAngle)*220;
-      this.knock = .18;
-      // blood particles
-      for (let i=0;i<10;i++) parts.push(new Particle(this.x, this.y, Math.cos(srcAngle+rand(-.9,.9))*rand(120,240), Math.sin(srcAngle+rand(-.9,.9))*rand(120,240), rand(.1,.3), this.tint));
-      if (this.hp<=0) {
-        this.dead = true;
-        state.score += (5 + 5*this.tier);
-        scoreEl.textContent = state.score|0;
-        for (let i=0;i<18;i++) parts.push(new Particle(this.x, this.y, rand(-200,200), rand(-200,200), rand(.15,.35), this.tint));
+      this.vx += Math.cos(ang)*220; this.vy += Math.sin(ang)*220; this.knock=.18;
+      for(let i=0;i<10;i++) parts.push(new Particle(this.x,this.y, Math.cos(ang+rand(-.9,.9))*rand(120,240), Math.sin(ang+rand(-.9,.9))*rand(120,240), rand(.1,.3), this.tint));
+      if(this.hp<=0){
+        this.dead=true;
+        state.score += (this.elite? 40: (5 + 5*(this.r>15?2:1)));
+        player.addXP(this.elite? 6 : 2);
+        for(let i=0;i<18;i++) parts.push(new Particle(this.x,this.y,rand(-200,200),rand(-200,200),rand(.15,.35),this.tint));
       }
     }
-    draw(ctx) {
-      if (this.dead) return;
-      ctx.save();
-      ctx.translate(this.x, this.y);
+    draw(ctx){
+      if(this.dead) return;
+      ctx.save(); ctx.translate(this.x,this.y);
       ctx.beginPath(); ctx.arc(0,0,this.r,0,TAU);
-      ctx.fillStyle = this.tint; ctx.globalAlpha = .9; ctx.fill(); ctx.globalAlpha = 1;
-      // eye
-      ctx.beginPath(); ctx.arc(0,0,3,0,TAU);
-      ctx.fillStyle = '#1d2130'; ctx.fill();
+      ctx.fillStyle=this.tint; ctx.globalAlpha = this.freeze>0 ? .4 : .9; ctx.fill(); ctx.globalAlpha=1;
+      ctx.beginPath(); ctx.arc(0,0,3,0,TAU); ctx.fillStyle='#1d2130'; ctx.fill();
       ctx.restore();
     }
   }
 
-  // Entities
-  let player, enemies, slashes, parts, spawnTimer, waveScale;
-
-  function reset() {
-    state.running = true;
-    state.score = 0; scoreEl.textContent = '0';
-    state.t = 0;
-    state.difficulty = 1;
-    player = new Player();
-    enemies = [];
-    slashes = [];
-    parts = [];
-    spawnTimer = 0;
-    waveScale = 1;
-    overEl.classList.remove('show');
-    tipEl.classList.remove('fade');
-    setTimeout(()=> tipEl.classList.add('fade'), 4000);
+  // ======= Breathing Forms (Form 1 for each style + Water 11 special)
+  function baseBreathingDamage(){
+    // Base scales by style power * Strength stat
+    return 30 * state.style.mult * (1 + (player.stats.str-1)*0.22);
+  }
+  function basicSlashDamage(){
+    return 18 * state.style.mult * (1 + (player.stats.str-1)*0.18);
   }
 
-  function gameOver() {
-    state.running = false;
+  function doFormEffect(styleKey, idx, p){
+    const dmg = baseBreathingDamage();
+
+    // Style-specific Form 1s (color effect only for now, unique behavior basics)
+    if(idx===1){
+      switch(styleKey){
+        case 'Water':  form_Water1(p, dmg); break;
+        case 'Flame':  form_Flame1(p, dmg*1.2); break;
+        case 'Thunder':form_Thunder1(p, dmg*0.9); break; // fast dash
+        case 'Wind':   form_Wind1(p, dmg); break;
+        case 'Stone':  form_Stone1(p, dmg*1.15); break;
+        case 'Mist':   form_Mist1(p, dmg*0.7); break;
+        case 'Love':   form_Love1(p, dmg*0.75); break;
+        case 'Serpent':form_Serpent1(p, dmg); break;
+        case 'Sound':  form_Sound1(p, dmg); break;
+        case 'Beast':  form_Beast1(p, dmg); break;
+        case 'Insect': form_Insect1(p, dmg*0.6); break; // light DoT idea later
+        case 'Moon':   form_Moon1(p, dmg*1.25); break;
+        case 'Sun':    form_Sun1(p, dmg*1.4); break;
+      }
+    } else {
+      // Placeholder: higher forms slightly stronger (we’ll add unique logic per form later)
+      radialBurst(p.x,p.y, 110 + idx*6, dmg * (1 + idx*0.08), state.style.hue);
+    }
+  }
+
+  // Visual helpers
+  function radialBurst(x,y, radius, dmg, color){
+    // damage all enemies in radius
+    enemies.forEach(e=>{
+      const d2=dist2(x,y,e.x,e.y);
+      if(!e.dead && d2 < (radius+e.r)*(radius+e.r)){
+        const ang=Math.atan2(e.y-y, e.x-x);
+        e.strike(dmg, ang);
+      }
+    });
+    // particles ring
+    for(let i=0;i<40;i++){
+      const a=Math.random()*TAU;
+      parts.push(new Particle(x,y, Math.cos(a)*rand(60,220), Math.sin(a)*rand(60,220), rand(.12,.35), color));
+    }
+  }
+
+  // === Form 1 implementations (simple, color only visuals for now)
+  function form_Water1(p, dmg){
+    // Wide blue arc sweep in front
+    const ang = p.attackAngle();
+    slashes.push(new Slash(p, ang, state.style.hue));
+    // slightly bigger radius hit
+    enemies.forEach(e=>{
+      const dx=e.x-p.x, dy=e.y-p.y, a=Math.atan2(dy,dx);
+      const diff=Math.atan2(Math.sin(a-ang), Math.cos(a-ang));
+      const within=Math.abs(diff)<0.9;
+      const d2=dx*dx+dy*dy;
+      if(within && d2< (80+e.r)*(80+e.r)) e.strike(dmg, ang);
+    });
+  }
+  function form_Flame1(p,dmg){ radialBurst(p.x,p.y, 90, dmg, state.style.hue); }
+  function form_Thunder1(p,dmg){
+    // quick dash strike in facing direction
+    const ang=p.attackAngle();
+    p.vx = Math.cos(ang)*800; p.vy = Math.sin(ang)*800; p.dashing = .12; p.dashCd=.5;
+    enemies.forEach(e=>{
+      const d2=dist2(p.x,p.y,e.x,e.y);
+      if(d2 < (110+e.r)*(110+e.r)) e.strike(dmg, ang);
+    });
+  }
+  function form_Wind1(p,dmg){ radialBurst(p.x,p.y, 110, dmg, state.style.hue); }
+  function form_Stone1(p,dmg){ radialBurst(p.x,p.y, 80, dmg*1.1, state.style.hue); }
+  function form_Mist1(p,dmg){
+    // brief "vanish": enemies ignore for 0.8s; light poke
+    p.inv = Math.max(p.inv, 0.8); radialBurst(p.x,p.y, 70, dmg*0.7, state.style.hue);
+  }
+  function form_Love1(p,dmg){ radialBurst(p.x,p.y, 75, dmg*0.8, state.style.hue); }
+  function form_Serpent1(p,dmg){ radialBurst(p.x,p.y, 95, dmg, state.style.hue); }
+  function form_Sound1(p,dmg){
+    // small stun: apply freeze to enemies very briefly (0.3s)
+    enemies.forEach(e=>{ const d2=dist2(p.x,p.y,e.x,e.y); if(d2<(120+e.r)*(120+e.r)) { e.strike(dmg*0.9, Math.atan2(e.y-p.y,e.x-p.x)); e.freeze = Math.max(e.freeze, 0.3); } });
+    radialBurst(p.x,p.y, 120, dmg*0.9, state.style.hue);
+  }
+  function form_Beast1(p,dmg){ // double quick slash
+    const ang=p.attackAngle(); slashes.push(new Slash(p, ang, state.style.hue)); setTimeout(()=> slashes.push(new Slash(p, ang+0.25, state.style.hue)), 100);
+    enemies.forEach(e=>{ const d2=dist2(p.x,p.y,e.x,e.y); if(d2<(90+e.r)*(90+e.r)) e.strike(dmg, ang); });
+  }
+  function form_Insect1(p,dmg){ radialBurst(p.x,p.y, 65, dmg*0.6, state.style.hue); /* DoT later */ }
+  function form_Moon1(p,dmg){ radialBurst(p.x,p.y, 125, dmg*1.1, state.style.hue); }
+  function form_Sun1(p,dmg){ radialBurst(p.x,p.y, 140, dmg*1.2, state.style.hue); }
+
+  // === Water Form 11: Dead Calm (unlockable when formsUnlocked >= 11)
+  function waterDeadCalm(p){
+    const dmg = baseBreathingDamage()*1.6;
+    // Freeze all demons for 1s and deal heavy damage pulse
+    enemies.forEach(e=>{
+      if(!e.dead){ e.freeze = Math.max(e.freeze, 1.0); e.strike(dmg, Math.atan2(e.y-p.y, e.x-p.x)); }
+    });
+    // Blue calm aura burst
+    radialBurst(p.x,p.y, 160, 0, state.style.hue);
+    // brief invulnerability while "calm"
+    p.inv = Math.max(p.inv, 1.0);
+  }
+
+  // ======= Waves
+  function startWave(n){
+    state.wave = n;
+    waveEl.textContent = state.wave;
+    // amount to spawn scales
+    state.toSpawn = 6 + (n-1)*2;
+    spawnCooldown = 0;
+    // Every 10th wave, force an elite at start
+    if(n % 10 === 0){
+      spawnEnemy(true);
+      state.toSpawn = Math.max(0, state.toSpawn-1);
+    }
+    // Every 15th wave — placeholder for Lower Moon boss (we’ll add a real boss entity later)
+    // if(n % 15 === 0){ /* spawnLowerMoonBoss(n); */ }
+  }
+
+  function spawnEnemy(elite=false){
+    const edge=(Math.random()*4)|0, pad=20;
+    let x,y;
+    if(edge===0){ x=rand(pad,innerWidth-pad); y=-pad; }
+    if(edge===2){ x=rand(pad,innerWidth-pad); y=innerHeight+pad; }
+    if(edge===1){ x=innerWidth+pad; y=rand(pad,innerHeight-pad); }
+    if(edge===3){ x=-pad; y=rand(pad,innerHeight-pad); }
+    const r=Math.random(); let tier=1;
+    if(r<0.25) tier=2; if(r<0.1) tier=3;
+    enemies.push(new Enemy(x,y,tier, elite));
+  }
+
+  // ======= Flow
+  function startGameWithStyle(style){
+    state.style = style;
+    document.documentElement.style.setProperty('--bg1', '#0f1420');
+    document.documentElement.style.setProperty('--bg2', '#080b12');
+    styleNameEl.textContent = style.key;
+    formBtn.style.boxShadow = `0 0 20px ${style.hue}80, inset 0 0 20px ${style.hue}55`;
+    formBtn.style.borderColor = `${style.hue}aa`;
+    formLabel.textContent = 'FORM';
+
+    start.style.display='none';
+    tipEl.classList.remove('fade'); setTimeout(()=> tipEl.classList.add('fade'), 4500);
+
+    reset(style);
+  }
+
+  function reset(style){
+    state.running=true; state.t=0; state.score=0; enemies=[]; slashes=[]; parts=[];
+    player = new Player();
+    player.baseSpeed = 220;
+    player.baseAtkCd = 0.35;
+    player.skill = 1;
+    player.formCd = 0;
+    player.formsUnlocked = 1;
+    player.formName = `${style.key} • ${style.form1}`;
+    player.formCdBase = style.cdBase;
+
+    updateMeta();
+    startWave(1);
+    requestAnimationFrame(loop);
+  }
+
+  function updateMeta(){
+    lvlEl.textContent = player.level;
+    xpEl.textContent = player.exp|0;
+    xpToEl.textContent = player.expTo|0;
+    spEl.textContent = player.skill|0;
+    valStr.textContent = player.stats.str;
+    valSpd.textContent = player.stats.spd;
+    valAgi.textContent = player.stats.agi;
+    valBre.textContent = player.stats.bre;
+    updateFormButton();
+  }
+
+  function updateFormButton(){
+    const pct = 1 - clamp(player.formCd / (state.style.cdBase || 5.0), 0, 1);
+    formBtn.classList.toggle('disabled', !player.canUseForm());
+    formLabel.textContent = player.formsUnlocked>=11 && state.style.key==='Water' ? 'DEAD' : 'FORM';
+    // draw radial cooldown
+    formBtn.style.background = `conic-gradient(${state.style.hue} 0 ${pct*360}deg, rgba(255,255,255,.08) ${pct*360}deg 360deg)`;
+  }
+
+  function gameOver(){
+    state.running=false;
     overScoreEl.textContent = state.score|0;
     overEl.classList.add('show');
   }
 
-  restartBtn.addEventListener('click', reset);
+  restartBtn.addEventListener('click', ()=>{
+    overEl.classList.remove('show');
+    start.style.display='grid';
+  });
 
-  function spawnEnemy() {
-    const edge = Math.floor(Math.random()*4); // 0 top, 1 right, 2 bottom, 3 left
-    let x,y;
-    const pad = 20;
-    if (edge===0) { x = rand(pad, innerWidth-pad); y = -pad; }
-    if (edge===2) { x = rand(pad, innerWidth-pad); y = innerHeight+pad; }
-    if (edge===1) { x = innerWidth+pad; y = rand(pad, innerHeight-pad); }
-    if (edge===3) { x = -pad; y = rand(pad, innerHeight-pad); }
-    // tier based on difficulty
-    const r = Math.random();
-    const d = state.difficulty;
-    let tier = 1;
-    if (r < Math.min(0.15*d, 0.35)) tier = 3;
-    else if (r < Math.min(0.4*d, 0.6)) tier = 2;
-    enemies.push(new Enemy(x,y,tier));
+  // Stat buttons
+  function trySpend(which){
+    if(player.skill<=0) return;
+    player.spendPoint(which);
+  }
+  addStr.onclick=()=> trySpend('str');
+  addSpd.onclick=()=> trySpend('spd');
+  addAgi.onclick=()=> trySpend('agi');
+  addBre.onclick=()=> trySpend('bre');
+
+  // Form button
+  formBtn.addEventListener('click', ()=>{
+    if(!state.running || !player.alive) return;
+    if(player.formsUnlocked>=11 && state.style.key==='Water'){ // Dead Calm override
+      if(player.canUseForm()){ waterDeadCalm(player); player.formCd = Math.max(3.5, (state.style.cdBase||5.0) * 0.9); updateFormButton(); }
+    } else {
+      player.useForm();
+    }
+  });
+  // Keyboard Q = form
+  addEventListener('keydown', e=>{
+    if(e.code==='KeyQ'){
+      if(player?.alive){
+        if(player.formsUnlocked>=11 && state.style.key==='Water'){
+          if(player.canUseForm()){ waterDeadCalm(player); player.formCd = Math.max(3.5, (state.style.cdBase||5.0) * 0.9); updateFormButton(); }
+        } else player.useForm();
+      }
+    }
+    if(e.code==='Space') player?.tryBasicAttack();
+    if(e.code==='ShiftLeft'||e.code==='ShiftRight') player?.tryDash();
+  });
+
+  // Level 5/10/etc choice overlay (simple prompt for now)
+  function specialLevelChoice(){
+    if(!state.running) return;
+    const wantForm = confirm(`Level ${player.level}! Choose:\n\nOK = Unlock next Form\nCancel = +10 Skill Points`);
+    if(wantForm){
+      // unlock next form (up to style max)
+      player.formsUnlocked = Math.min(player.formsUnlocked+1, state.style.forms);
+      alert(`Unlocked Form ${player.formsUnlocked}!`);
+    } else {
+      player.skill += 10;
+      alert(`Gained +10 Skill Points!`);
+    }
+    updateMeta();
   }
 
-  // Main loop
-  let last = performance.now();
-  function loop(now) {
-    const dt = Math.min(0.033, (now - last)/1000); last = now;
+  // ======= Main loop & draw
+  let last=performance.now();
+  function loop(now){
+    const dt=Math.min(0.033, (now-last)/1000); last=now; if(!state.running) return;
     state.t += dt;
 
-    // ramp difficulty slowly
-    state.difficulty = 1 + Math.min(2.5, state.t/45);
-
-    // spawn
-    spawnTimer -= dt;
-    const targetSpawn = clamp(0.9 - (state.t/40), 0.25, 0.9) / state.difficulty;
-    if (spawnTimer <= 0 && state.running) {
-      spawnEnemy();
-      spawnTimer = targetSpawn;
+    // Wave spawn logic
+    spawnCooldown -= dt;
+    if(spawnCooldown<=0 && state.toSpawn>0){
+      spawnEnemy(false);
+      state.toSpawn--;
+      spawnCooldown = 0.25; // spawn rate
+    }
+    // Advance wave when all enemies cleared and nothing left to spawn
+    if(state.toSpawn<=0 && enemies.every(e=>e.dead)){
+      startWave(state.wave+1);
     }
 
-    // update
-    if (state.running) {
-      player.step(dt);
-      enemies = enemies.filter(e => { e.step(dt, player); return !e.dead; });
-      slashes = slashes.filter(s => s.step(dt));
-      parts = parts.filter(p => p.step(dt));
+    // Update
+    player.step(dt);
+    enemies = enemies.filter(e=>{ e.step(dt,player); return !e.dead || true; });
+    slashes = slashes.filter(s=> s.step(dt));
+    parts = parts.filter(p=> p.step(dt));
 
-      // slash collisions
-      for (const s of slashes) {
-        for (const e of enemies) {
-          if (e.dead) continue;
-          if (s.hits(e)) {
-            e.strike(18, s.angle);
-          }
+    // Collisions (basic attack)
+    for(const s of slashes){
+      for(const e of enemies){
+        if(e.dead) continue;
+        if(s.hits(e)){
+          const dmg = basicSlashDamage();
+          e.strike(dmg, s.angle);
         }
       }
     }
 
-    // draw
+    // Draw
     ctx.clearRect(0,0,innerWidth,innerHeight);
-
-    // floor grid
     drawGrid(ctx);
-
-    // entities
-    parts.forEach(p => p.draw(ctx));
-    enemies.forEach(e => e.draw(ctx));
-    slashes.forEach(s => s.draw(ctx));
+    parts.forEach(p=>p.draw(ctx));
+    enemies.forEach(e=>e.draw(ctx));
+    slashes.forEach(s=>s.draw(ctx));
     player.draw(ctx);
 
     requestAnimationFrame(loop);
   }
 
-  function drawGrid(ctx) {
-    const cell = 48;
-    const offX = (state.t*20)%cell, offY = (state.t*12)%cell;
-    ctx.save();
-    ctx.globalAlpha = .18;
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#2b344a';
-    for (let x = -cell; x < innerWidth+cell; x += cell) {
-      ctx.beginPath();
-      ctx.moveTo(x+offX, 0);
-      ctx.lineTo(x+offX, innerHeight);
-      ctx.stroke();
-    }
-    for (let y = -cell; y < innerHeight+cell; y += cell) {
-      ctx.beginPath();
-      ctx.moveTo(0, y+offY);
-      ctx.lineTo(innerWidth, y+offY);
-      ctx.stroke();
-    }
+  function drawGrid(ctx){
+    const cell=48, offX=(state.t*20)%cell, offY=(state.t*12)%cell;
+    ctx.save(); ctx.globalAlpha=.18; ctx.lineWidth=1; ctx.strokeStyle='#2b344a';
+    for(let x=-cell; x<innerWidth+cell; x+=cell){ ctx.beginPath(); ctx.moveTo(x+offX,0); ctx.lineTo(x+offX,innerHeight); ctx.stroke(); }
+    for(let y=-cell; y<innerHeight+cell; y+=cell){ ctx.beginPath(); ctx.moveTo(0,y+offY); ctx.lineTo(innerWidth,y+offY); ctx.stroke(); }
     ctx.restore();
   }
-
-  // keyboard actions
-  addEventListener('keydown', e => {
-    if (!player?.alive) return;
-    if (e.code === 'Space') player.tryAttack();
-    if (e.code === 'ShiftLeft' || e.code==='ShiftRight') player.tryDash();
-  });
-
-  // mouse click -> attack already handled via mouse.down
-
-  // Start
-  reset();
-  requestAnimationFrame(loop);
 })();
 </script>
 </body>
