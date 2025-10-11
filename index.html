@@ -332,70 +332,249 @@
 <script>
 (() => {
   /* ========== Styles data (with hues) ========== */
-  const styles = [
-    { key:'Water',   hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
-      desc:'Fluid, adaptive strikes. Great control and consistent damage.',
-      traits:['Power: Balanced','Forms: 11','Wide arcs','Reliable crowd control'],
-      forms:[
-        {n:1, name:'Water Surface Slash', tags:['AoE','Wide Arc']},
-        {n:2, name:'Water Wheel', tags:['AoE','Knockback']},
-        {n:3, name:'Flowing Dance', tags:['Mobility']},
-        {n:4, name:'Striking Tide', tags:['Multi-hit']},
-        {n:5, name:'Blessed Rain After the Drought', tags:['Finisher']},
-        {n:6, name:'Whirlpool', tags:['AoE','Pull']},
-        {n:7, name:'Drop Ripple Thrust', tags:['Single Target']},
-        {n:8, name:'Waterfall Basin', tags:['AoE','Knockdown']},
-        {n:9, name:'Splashing Water Flow', tags:['Mobility','Evasion']},
-        {n:10,name:'Constant Flux', tags:['Ramp-up','Multi-hit']},
-        {n:11,name:'Dead Calm', tags:['AoE','Freeze','High Damage','Screen-wide']}
-      ]},
-    { key:'Flame',   hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
-      desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
-      traits:['Power: High','Forms: 9','High damage','Good AoE'],
-      forms:[{n:1,name:'Unknowing Fire', tags:['Burst','Single Target']}, {n:2,name:'Rising Scorching Sun', tags:['Anti-air','Knockback']},
-             {n:3,name:'Blazing Universe', tags:['AoE','Impact']}, {n:4,name:'Blooming Flame Undulation', tags:['AoE','Sustain']},
-             {n:5,name:'Flame Tiger', tags:['AoE','Multi-hit']}, {n:6,name:'Flame Dance', tags:['Combo','Mobility']},
-             {n:7,name:'Rengoku (Ninth Form)', tags:['Line AoE','Burn DoT','Ultimate']}]},
-    { key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
-      desc:'Lightning-fast burst dashes that delete targets.',
-      traits:['Power: High','Forms: 6','Extreme speed'],
-      forms:[{n:1,name:'Thunderclap & Flash', tags:['Dash','Single Target','Burst']},
-             {n:2,name:'Rice Spirit', tags:['Multi-hit']}, {n:3,name:'Thunder Swarm', tags:['Multi-hit','AoE']},
-             {n:4,name:'Distant Thunder', tags:['Line AoE']}, {n:5,name:'Heat Lightning', tags:['Ranged','Single Target']},
-             {n:6,name:'God Speed', tags:['Dash','Speed Buff','Burst']}]},
-    { key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
-      desc:'Bladed gales with aggressive coverage and pushback.',
-      traits:['Power: High','Forms: 9','Push & peel'],
-      forms:[{n:1,name:'Dust Whirlwind Cutter', tags:['AoE','Knockback']},
-             {n:2,name:'Claws—Purifying Wind', tags:['Multi-hit']},
-             {n:3,name:'Clean Storm Wind Tree', tags:['Large AoE']},
-             {n:4,name:'Rising Dust Storm', tags:['AoE','Juggle']},
-             {n:5,name:'Cold Mountain Wind', tags:['Slow','Single Target']},
-             {n:6,name:'Black Wind Mountain Mist', tags:['AoE','Blind']},
-             {n:7,name:'Primary Gale Slash', tags:['Line AoE']},
-             {n:8,name:'Idaten Typhoon', tags:['AoE','Knockback']},
-             {n:9,name:'Gale—Sudden Gusts', tags:['Multi-hit','Mobility']}]},
-    { key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
-      desc:'Immovable force. Slow swings with huge knockback.',
-      traits:['Power: High','Forms: 5','Big stagger'],
-      forms:[{n:1,name:'Serpentinite Bipolar', tags:['AoE','Control']},{n:2,name:'Upper Smash', tags:['Anti-air','Knockback']},
-             {n:3,name:'Stone Skin', tags:['Defense','Stagger Resist']},{n:4,name:'Volcanic Rock, Rapid Conquest', tags:['AoE','Multi-hit']},
-             {n:5,name:'Arcs of Justice', tags:['Multi-hit','Impact']}]},
-    { key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
-      desc:'Deceptive movement and vanish windows to reposition.',
-      traits:['Power: Moderate','Forms: 7','Evasive'],
-      forms:[{n:1,name:'Low Clouds, Distant Haze', tags:['Mobility','Evasion']}, {n:2,name:'Eight-Layered Mist', tags:['Multi-hit']},
-             {n:3,name:'Scattering Mist Splash', tags:['AoE','Projectile Guard']}, {n:4,name:'Shifting Flow Slash', tags:['Dash','Single Target']},
-             {n:5,name:'Sea of Clouds and Haze', tags:['AoE','Multi-hit']}, {n:6,name:'Peaks of Unfathomable Loneliness', tags:['Burst','Single Target']},
-             {n:7,name:'Obscuring Clouds', tags:['Invisibility','Mobility']}]},
-    { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive", desc:'Whip-like reach and flurries; fast multi-hits.', traits:['Power: Moderate','Forms: 6','Great reach'], forms:[]},
-    { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif", desc:'Curving paths that slip around guards to strike.', traits:['Power: Moderate','Forms: 5','Curved arcs'], forms:[]},
-    { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive", desc:'Explosive beats and brief stuns to control crowds.', traits:['Power: Moderate','Forms: 5','Radial bursts'], forms:[]},
-    { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif", desc:'Wild twin-blade assaults with constant pressure.', traits:['Power: Above Avg','Relentless'], forms:[]},
-    { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif", desc:'Precision thrusts and toxins; lighter raw damage.', traits:['Power: Situational','DoT potential'], forms:[]},
-    { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive", desc:'Crescent blades carve space at range; lethal crescents.', traits:['Power: Very High','Range control'], forms:[]},
-    { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif", desc:'The original form—overwhelming damage and coverage.', traits:['Power: Strongest','Versatile'], forms:[]}
-  ];
+ /* ===================== STYLES (FULL FORMS + TAGS) ===================== */
+const styles = [
+  { key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
+    desc:'Fluid, adaptive strikes. Great control and consistent damage.',
+    traits:['Power: Balanced','Forms: 11','Wide arcs','Reliable crowd control'],
+    forms:[
+      {n:1,  name:'Water Surface Slash',                  tags:['Single Target','Wide Arc']},
+      {n:2,  name:'Water Wheel',                          tags:['AoE','Knockback','Chain']},
+      {n:3,  name:'Flowing Dance',                        tags:['Mobility','Dash','Speed Boost']},
+      {n:4,  name:'Striking Tide',                        tags:['Multi-hit','Chain']},
+      {n:5,  name:'Blessed Rain After the Drought',       tags:['Single Target','Finisher']},
+      {n:6,  name:'Whirlpool',                            tags:['AoE','Pull','Chain']},
+      {n:7,  name:'Drop Ripple Thrust',                   tags:['Single Target','Pierce']},
+      {n:8,  name:'Waterfall Basin',                      tags:['AoE','Knockdown']},
+      {n:9,  name:'Splashing Water Flow',                 tags:['Mobility','Evasion']},
+      {n:10, name:'Constant Flux',                        tags:['Ramp-up','Multi-hit','Chain']},
+      {n:11, name:'Dead Calm',                            tags:['AoE','Time Slow','Screen-wide']}
+    ]},
+
+  { key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
+    desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
+    traits:['Power: High','Forms: 9','High damage','Good AoE'],
+    forms:[
+      {n:1, name:'Unknowing Fire',                        tags:['Burst','Single Target']},
+      {n:2, name:'Rising Scorching Sun',                  tags:['Anti-air','Knockback']},
+      {n:3, name:'Blazing Universe',                      tags:['AoE','Impact','Fire DoT (Spreads)']},
+      {n:4, name:'Blooming Flame Undulation',             tags:['AoE','Sustain','Fire DoT (Spreads)','Chain']},
+      {n:5, name:'Flame Tiger',                           tags:['AoE','Multi-hit','Fire DoT (Spreads)']},
+      {n:6, name:'Flame Dance',                           tags:['Combo','Mobility','Chain']},
+      {n:7, name:'Rengoku (Ninth Form)',                  tags:['Line AoE','Ultimate','Fire DoT (Spreads)']},
+      {n:8, name:'Ember Wreath (Variant)',                tags:['AoE','DoT','Fire DoT (Spreads)']},
+      {n:9, name:'Cinder Rush (Variant)',                 tags:['Dash','Burst','Fire DoT (Spreads)']}
+    ]},
+
+  { key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
+    desc:'Lightning-fast burst dashes that delete targets.',
+    traits:['Power: High','Forms: 6','Extreme speed'],
+    forms:[
+      {n:1, name:'Thunderclap & Flash',                   tags:['Dash','Single Target','Burst','Speed Boost']},
+      {n:2, name:'Rice Spirit',                           tags:['Multi-hit','Chain']},
+      {n:3, name:'Thunder Swarm',                         tags:['Multi-hit','AoE','Chain']},
+      {n:4, name:'Distant Thunder',                       tags:['Line AoE','Pierce']},
+      {n:5, name:'Heat Lightning',                        tags:['Ranged','Single Target','DoT']},
+      {n:6, name:'God Speed',                             tags:['Dash','Burst','Speed Boost']}
+    ]},
+
+  { key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
+    desc:'Bladed gales with aggressive coverage and pushback.',
+    traits:['Power: High','Forms: 9','Push & peel'],
+    forms:[
+      {n:1, name:'Dust Whirlwind Cutter',                 tags:['AoE','Knockback','Wide Arc']},
+      {n:2, name:'Claws—Purifying Wind',                  tags:['Multi-hit','Chain']},
+      {n:3, name:'Clean Storm Wind Tree',                 tags:['Large AoE','Knockback']},
+      {n:4, name:'Rising Dust Storm',                     tags:['AoE','Juggle','Chain']},
+      {n:5, name:'Cold Mountain Wind',                    tags:['Single Target','Time Slow']},
+      {n:6, name:'Black Wind Mountain Mist',              tags:['AoE','Blind']},
+      {n:7, name:'Primary Gale Slash',                    tags:['Line AoE','Pierce']},
+      {n:8, name:'Idaten Typhoon',                        tags:['AoE','Knockback','Chain']},
+      {n:9, name:'Gale—Sudden Gusts',                     tags:['Multi-hit','Mobility','Speed Boost']}
+    ]},
+
+  { key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
+    desc:'Immovable force. Slow swings with huge knockback.',
+    traits:['Power: High','Forms: 5','Big stagger'],
+    forms:[
+      {n:1, name:'Serpentinite Bipolar',                  tags:['AoE','Control','Knockback']},
+      {n:2, name:'Upper Smash',                           tags:['Anti-air','Knockback']},
+      {n:3, name:'Stone Skin',                            tags:['Defense','Armor']},
+      {n:4, name:'Volcanic Rock, Rapid Conquest',         tags:['AoE','Multi-hit','Impact']},
+      {n:5, name:'Arcs of Justice',                       tags:['Multi-hit','Impact','Pierce']}
+    ]},
+
+  { key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
+    desc:'Deceptive movement and vanish windows to reposition.',
+    traits:['Power: Moderate','Forms: 7','Evasive'],
+    forms:[
+      {n:1, name:'Low Clouds, Distant Haze',              tags:['Mobility','Evasion','Time Slow']},
+      {n:2, name:'Eight-Layered Mist',                    tags:['Multi-hit','Chain']},
+      {n:3, name:'Scattering Mist Splash',                tags:['AoE','Projectile Guard']},
+      {n:4, name:'Shifting Flow Slash',                   tags:['Dash','Single Target','Pierce']},
+      {n:5, name:'Sea of Clouds and Haze',                tags:['AoE','Multi-hit','Blind']},
+      {n:6, name:'Peaks of Unfathomable Loneliness',      tags:['Burst','Single Target','Pierce']},
+      {n:7, name:'Obscuring Clouds',                      tags:['Invisibility','Mobility','Time Slow']}
+    ]},
+
+  { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
+    desc:'Whip-like reach and flurries; fast multi-hits.',
+    traits:['Power: Moderate','Forms: 6','Great reach'],
+    forms:[
+      {n:1, name:'Shivers of First Love',                 tags:['Multi-hit','Reach','Chain']},
+      {n:2, name:'Love Pangs',                            tags:['Stun','Multi-hit']},
+      {n:3, name:'Catlove Shower',                        tags:['AoE','Multi-hit','Chain']},
+      {n:4, name:'Fluttering Hearts (Variant)',           tags:['Speed Boost','Mobility']},
+      {n:5, name:'Swaying Love • Wildclaw',               tags:['Multi-hit','Mobility','Reach']},
+      {n:6, name:'Cat-Legged Winds of Love',              tags:['Reach','Multi-hit','Chain']}
+    ]},
+
+  { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
+    desc:'Curving paths that slip around guards to strike.',
+    traits:['Power: Moderate','Forms: 5','Curved arcs'],
+    forms:[
+      {n:1, name:'Winding Serpent Slash',                 tags:['Curved Arc','Single Target','Chain']},
+      {n:2, name:'Venom Fangs of the Narrow Head',        tags:['Backstab','Single Target','Pierce']},
+      {n:3, name:'Coil Choke',                            tags:['Bind','Stun']},
+      {n:4, name:'Twin-Headed Reptile',                   tags:['Multi-hit','Chain']},
+      {n:5, name:'Slithering Serpent',                    tags:['Mobility','Curved Arc','Speed Boost']}
+    ]},
+
+  { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
+    desc:'Explosive beats and brief stuns to control crowds.',
+    traits:['Power: Moderate','Forms: 5','Radial bursts'],
+    forms:[
+      {n:1, name:'Roar',                                  tags:['AoE','Stun']},
+      {n:2, name:'Resounding Volley (Variant)',           tags:['AoE','Chain']},
+      {n:3, name:'Echo Burst (Variant)',                  tags:['AoE','Time Slow']},
+      {n:4, name:'Constant Resounding Slashes',           tags:['AoE','Defensive','Chain']},
+      {n:5, name:'String Performance',                     tags:['AoE','Mobile','Stun']}
+    ]},
+
+  { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
+    desc:'Wild twin-blade assaults with constant pressure.',
+    traits:['Power: Above Avg','Many “Fang” forms','Relentless'],
+    forms:[
+      {n:1,  name:'First Fang: Pierce',                   tags:['Single Target','Pierce']},
+      {n:2,  name:'Second Fang: Slice',                   tags:['Multi-hit','Close Range','Chain']},
+      {n:3,  name:'Third Fang: Devour',                   tags:['Multi-hit','Chain']},
+      {n:4,  name:"Fourth Fang: Slice 'n' Dice",          tags:['Multi-hit','Chain']},
+      {n:5,  name:'Fifth Fang: Crazy Cutting',            tags:['Multi-hit','Spin','AoE','Chain']},
+      {n:6,  name:'Sixth Fang: Palisade Bite',            tags:['Bind','Multi-hit']},
+      {n:7,  name:'Seventh Form: Spatial Awareness',      tags:['Reveal','Utility']},
+      {n:8,  name:'Eighth Fang: Explosive Rush',          tags:['Dash','Burst','Speed Boost']},
+      {n:9,  name:'Ninth Fang: Extending Bendy Slash',    tags:['Reach','Pierce']},
+      {n:10, name:'Tenth Fang: Whirling Fangs',           tags:['Spin','AoE','Chain']},
+      {n:11, name:'Eleventh Fang: Sudden Throwing Strike',tags:['Ranged','Pierce']},
+      {n:12, name:'Twelfth Fang: Leaping Thrust',         tags:['Leap','Single Target','Pierce']}
+    ]},
+
+  { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
+    desc:'Precision thrusts and toxins; lighter raw damage.',
+    traits:['Power: Situational','Forms: 4','DoT potential'],
+    forms:[
+      {n:1, name:'Butterfly Dance: Caprice',              tags:['Multi-hit','Poison DoT (High)','Chain']},
+      {n:2, name:'Bee Sting: True Flutter',               tags:['Single Target','Poison DoT (High)','Pierce']},
+      {n:3, name:'Dragonfly: Compound Eye Hexagon',       tags:['Multi-hit','Poison DoT (High)','AoE']},
+      {n:4, name:'Centipede: Hundred-Legged Zigzag',      tags:['Mobility','Poison DoT (High)','Dash']}
+    ]},
+
+  { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
+    desc:'Crescent blades carve space at range; lethal crescents.',
+    traits:['Power: Very High','Forms: 16','Range control'],
+    forms:[
+      {n:1,  name:'Dark Moon, Evening Palace',            tags:['AoE','Orbiting','Chain']},
+      {n:2,  name:'Pearl Flower Moongazing',              tags:['Line AoE','Pierce']},
+      {n:3,  name:'Loathsome Moon, Chains',               tags:['Multi-hit','Bind','Chain']},
+      {n:4,  name:'Moon-Through-Willow',                  tags:['Curved Arc','Pierce']},
+      {n:5,  name:'Moon Spirit Calamitous Eddy',          tags:['AoE','Orbiting','Ramp-up']},
+      {n:6,  name:'Perpetual Night, Lonely Moon—Incessant',tags:['Multi-hit','Sustain','Chain']},
+      {n:7,  name:'Mirror of Misfortune, Moonlit',        tags:['Line AoE','Pierce']},
+      {n:8,  name:'Moon-Dragon Ringtail',                 tags:['AoE','Chain']},
+      {n:9,  name:'Waning Moonswaths',                    tags:['Multi-hit','Chain']},
+      {n:10, name:'Drilling Slashes, Moon Through Bamboo',tags:['Pierce','Line AoE']},
+      {n:11, name:'Moonlit—Illusory Copies',              tags:['Afterimage','Time Slow']},
+      {n:12, name:'Mirror of Misfortune—Calamity',        tags:['AoE','Impact']},
+      {n:13, name:'Moonbow, Half Moon: Rising',           tags:['AoE','Ramp-up']},
+      {n:14, name:'Moon—Crest of the Night',              tags:['Range','Pierce']},
+      {n:15, name:'Loathsome Moon, Smoldering',           tags:['Burn DoT (Spreads)','DoT']},
+      {n:16, name:'Moonbow, Half Moon',                   tags:['Massive AoE','Ultimate']}
+    ]},
+
+  { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
+    desc:'The original form—overwhelming damage and coverage.',
+    traits:['Power: Strongest','Forms: 13','Versatile'],
+    forms:[
+      {n:1,  name:'Dance',                                tags:['Line AoE','Burst','Burn DoT (Spreads)']},
+      {n:2,  name:'Clear Blue Sky',                       tags:['AoE','Spin','Chain']},
+      {n:3,  name:'Raging Sun',                           tags:['AoE','Knockback','Burn DoT (Spreads)']},
+      {n:4,  name:'Fake Rainbow',                         tags:['Evasion','Afterimage','Time Slow']},
+      {n:5,  name:'Fire Wheel',                           tags:['AoE','Mobility','Burn DoT (Spreads)']},
+      {n:6,  name:'Burning Bones, Summer Sun',            tags:['Defense','AoE','Burn DoT (Spreads)']},
+      {n:7,  name:'Sunflower Thrust',                     tags:['Single Target','Pierce']},
+      {n:8,  name:'Solar Heat Haze',                      tags:['Blind','Heat','Time Slow']},
+      {n:9,  name:'Setting Sun Transformation',           tags:['Mobility','AoE','Speed Boost']},
+      {n:10, name:'Beneficent Radiance',                  tags:['Resolve','Defense']},
+      {n:11, name:'Dragon Sun Halo Head Dance',           tags:['Orbiting','Multi-hit','AoE']},
+      {n:12, name:'Flame Dance',                          tags:['Combo','AoE','Chain']},
+      {n:13, name:'Thirteenth Form',                      tags:['Ultimate','Sustain','Ramp-up']}
+    ]}
+];
+
+/* ===================== TAG INFO (FRIENDLY DESCRIPTIONS) ===================== */
+const TAG_INFO = {
+  // Your requested new tags
+  'AoE':                 'Area of Effect — hits multiple enemies or covers a wide area.',
+  'DoT':                 'Damage over time — applies damage that ticks after the hit.',
+  'Pierce':              'Piercing damage — ignores part of enemy defense or guard.',
+  'Single Target':       'Focused strike — best for isolating and deleting one enemy.',
+  'Speed Boost':         'Temporarily increases movement/attack speed.',
+  'Time Slow':           'Slows enemies or their projectiles in a small area/time window.',
+  'Poison DoT (High)':   'Potent poison — higher DoT than fire; stacks lightly on repeated hits.',
+  'Fire DoT (Spreads)':  'Lingering flames — lower DoT than poison but can spread to nearby demons.',
+  'Chain':               'Chaining hits — follow-ups or arcs can link to new targets.',
+  // Legacy/kept tags so previous content still works
+  'Wide Arc':            'Large sweeping angle in front of you.',
+  'Knockback':           'Sends enemies flying backward; great for peel.',
+  'Knockdown':           'Slams targets to the ground, briefly disabling them.',
+  'Mobility':            'Moves you during the attack to reposition or chase.',
+  'Dash':                'Very quick burst of movement; may include brief i-frames.',
+  'Multi-hit':           'Several rapid hits in one form.',
+  'Pull':                'Draws enemies inward toward the center.',
+  'Evasion':             'Brief intangibility window; slip through danger.',
+  'Combo':               'Easy to follow up into other actions or forms.',
+  'Impact':              'Heavy stagger on hit; interrupts enemies.',
+  'Ramp-up':             'Damage grows the longer the move persists.',
+  'Armor':               'Reduces damage taken while the move is active.',
+  'Defense':             'General damage reduction or guard-like effect.',
+  'Stagger Resist':      'Harder to interrupt mid-move.',
+  'Bind':                'Restricts enemy movement temporarily.',
+  'Curved Arc':          'Curving path that slips around guards.',
+  'Orbiting':            'Blades or projectiles circle you and hit nearby enemies.',
+  'Line AoE':            'Long, narrow path damaging anything it passes through.',
+  'Ultimate':            'Signature high-power technique with a long cooldown.',
+  'Screen-wide':         'Huge radius covering most of the arena.',
+  'Anti-air':            'Extra effective against airborne targets.',
+  'Juggle':              'Launches or keeps targets suspended for follow-ups.',
+  'Close Range':         'Very short reach; high risk/high reward.',
+  'Reach':               'Longer-than-normal range for safer hits.',
+  'Blind':               'Obscures enemy vision or senses.',
+  'Afterimage':          'Creates copies that confuse targeting.',
+  'Reveal':              'Highlights enemies through fog/terrain.',
+  'Ranged':              'Effective at a distance.',
+  'Heat':                'Applies a mirage-like distortion; pairs well with Slow.',
+  'Sustain':             'Stays out longer than most moves; keeps pressure.',
+  'Resolve':             'Brief willpower surge — small regen or resist.',
+  'Projectile Guard':    'Deflects or negates oncoming projectiles.',
+  'Utility':             'Provides awareness or informational advantage.',
+  'Spin':                'Rotating motion for multi-hits around you.',
+  'Finisher':            'Safer ender with bonus damage on low-health foes.',
+  'Massive AoE':         'Truly huge area; near screen-wide coverage.',
+  'Range':               'Enhanced effective distance for your hits.'
+};
+
+// Expose for the overlay handler
+window.TAG_INFO = TAG_INFO;
 
   const TAG_INFO = {
     'AoE':'Area of Effect — hits multiple enemies in a radius, cone, or line.',
