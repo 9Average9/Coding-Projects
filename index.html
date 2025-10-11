@@ -863,6 +863,25 @@ function startBattle(loadout){
   t.classList.add('show');
   setTimeout(()=> t.classList.remove('show'), 2000);
 }
+
+/* === Fix: make tag bubbles open the big centered overlay === */
+(function attachGlobalTagHandler(){
+  // Use document-level delegation so it works even after re-rendering forms
+  document.addEventListener('click', function(e){
+    const el = e.target.closest('.tag');
+    if (!el) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const key  = el.getAttribute('data-tag') || el.textContent.trim();
+    const info = (window.TAG_INFO && TAG_INFO[key]) || key;
+
+    // Use the same big modal overlay the Select button uses
+    if (typeof showToast === 'function') {
+      showToast(`${key}: ${info}`, 2200); // auto-hide after 2.2s (tap anywhere to close)
+    }
+  }, true); // capture=true helps when tags sit inside <details>
+})();
 </script>
 </body>
 </html>
