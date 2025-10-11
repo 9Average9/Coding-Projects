@@ -16,9 +16,13 @@
     --styleHue:#55b7ff;
     --prevHue:#446bff;
     --nextHue:#ff8a3d;
+
     --hudZ: 60;
     --btnZ: 200;
     --modalZ: 1000;
+    --toastZ: 5000;
+
+    --loadout-accent: #55b7ff; /* set dynamically from selected breathing */
   }
   html,body{
     height:100%; margin:0; overflow:hidden; color:var(--ink);
@@ -50,10 +54,10 @@
     filter: drop-shadow(0 12px 28px rgba(0,0,0,.48));
   }
 
-  /* ===== Rank/Level HUD (moved here; sits under title, above cards) ===== */
+  /* ===== Rank/Level HUD (under title, above cards) ===== */
   #topHUD{
     position:relative; z-index:var(--hudZ); display:flex; justify-content:center; width:100%;
-    pointer-events:none; /* do not block card swipes */
+    pointer-events:none;
   }
   #playerRankLevel{
     pointer-events:none;
@@ -61,16 +65,12 @@
     box-shadow:0 2px 10px rgba(0,0,0,.35);
   }
 
-  /* Carousel (no arrows) */
+  /* Carousel */
   .carousel{
     width:min(880px,92vw);
     display:grid; grid-template-columns:1fr; align-items:center; gap:12px;
   }
-
-  .stage{
-    position:relative;
-    padding-inline: 42px; /* peeking room */
-  }
+  .stage{ position:relative; padding-inline: 42px; }
 
   /* Peeking edges */
   .peek{
@@ -79,14 +79,8 @@
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 8px 20px rgba(0,0,0,.4);
     opacity:.9; pointer-events:none;
   }
-  .peek.left{
-    left:0;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--prevHue) 35%, #ffffff 0%), rgba(255,255,255,.05));
-  }
-  .peek.right{
-    right:0;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--nextHue) 35%, #ffffff 0%), rgba(255,255,255,.05));
-  }
+  .peek.left{ left:0; background: linear-gradient(180deg, color-mix(in srgb, var(--prevHue) 35%, #ffffff 0%), rgba(255,255,255,.05)); }
+  .peek.right{ right:0; background: linear-gradient(180deg, color-mix(in srgb, var(--nextHue) 35%, #ffffff 0%), rgba(255,255,255,.05)); }
   .peekEdge{ position:absolute; inset:0; border-radius:10px; border:1px solid rgba(255,255,255,.16); background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)); }
   .peekGlow{ position:absolute; inset:-26px; border-radius:14px; filter:blur(26px); opacity:.30; background: var(--nextHue); }
   .peek.left .peekGlow{ background: var(--prevHue); }
@@ -115,6 +109,7 @@
   .list li{ margin:4px 0; }
   .muted{ opacity:.88; }
 
+  /* CTA */
   .cta{ display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px; }
   .btn{
     padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.22);
@@ -136,8 +131,31 @@
   .xBtn{ width:38px; height:38px; border-radius:10px; border:1px solid rgba(255,255,255,.26); background:rgba(255,255,255,.14); color:#e7eef7; font-weight:900; font-size:20px; line-height:0; display:grid; place-items:center; cursor:pointer; justify-self:end; }
   .tipsBody{ padding:12px 14px 140px; max-height:calc(100% - 58px); overflow:auto; overscroll-behavior:contain; }
 
-  /* Tag info popup */
-  .tagInfo{ position:fixed; left:50%; transform:translateX(-50%); bottom:16px; max-width:min(520px, 92vw); background:rgba(20,26,38,.95); color:#e7eef7; border:1px solid rgba(255,255,255,.18); border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,.45); padding:10px 12px; font-size:13px; line-height:1.5; display:none; z-index:80; }
+  /* ===== Tag bubbles (pressable) ===== */
+  .tag{
+    display:inline-block; font-size:12px; padding:4px 10px; margin:6px 8px 0 0;
+    border:1px solid rgba(255,255,255,.28); border-radius:9999px; cursor:pointer;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 4px 12px rgba(0,0,0,.25);
+    transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .tag:active{ transform: translateY(1px); }
+  .tag:hover{ border-color: rgba(255,255,255,.45); box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 6px 16px rgba(0,0,0,.32); }
+
+  /* ===== Top-center toast (over EVERYTHING) ===== */
+  .tagInfo{
+    position:fixed; left:50%; transform:translateX(-50%); top:16px;
+    max-width:min(640px, 92vw);
+    background:rgba(10,14,22,.92);
+    color:#e7eef7;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:12px;
+    box-shadow:0 16px 36px rgba(0,0,0,.55), 0 0 0 2px rgba(0,0,0,.15) inset;
+    padding:12px 14px; font-size:14px; line-height:1.5;
+    display:none; z-index:var(--toastZ);
+    backdrop-filter: blur(4px);
+  }
   .tagInfo.show{ display:block; }
 
   /* Onboarding hint */
@@ -163,29 +181,34 @@
     100%{ box-shadow:0 0 0 0 rgba(255,0,0,0), 0 8px 18px rgba(0,0,0,.35)}
   }
 
-  /* ===== Loadout Modal ===== */
+  /* ===== Loadout Modal (accented by --loadout-accent) ===== */
   .modal.hidden{ display:none }
   .modal{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:var(--modalZ); backdrop-filter: blur(1px); }
-  .modal-content{ width:min(900px,92vw); background:#0f0f14; color:#eee; border:1px solid #333; border-radius:12px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.5) }
+  .modal-content{
+    width:min(900px,92vw); color:#eee; border-radius:12px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.5);
+    background:#0f0f14;
+    border:1px solid color-mix(in srgb, var(--loadout-accent) 60%, #222 40%);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--loadout-accent) 24%, transparent), 0 18px 38px rgba(0,0,0,.55);
+  }
   .meta-row{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:8px }
-  .meta{ background:#15151d; border:1px solid #2a2a36; border-radius:10px; padding:10px }
+  .meta{ background:#15151d; border:1px solid color-mix(in srgb, var(--loadout-accent) 26%, #2a2a36 74%); border-radius:10px; padding:10px }
   .meta div{ margin:2px 0 }
   #statBars{ display:grid; gap:8px; margin:12px 0 }
   .bar{ display:grid; grid-template-columns:110px 1fr auto; align-items:center; gap:8px }
   .bar-fill{ height:12px; background:#222; border:1px solid #333; border-radius:8px; overflow:hidden }
-  .bar-fill>div{ height:100%; background:linear-gradient(to right,#57b,#9cf); width:0% }
+  .bar-fill>div{ height:100%; background:linear-gradient(to right, color-mix(in srgb, var(--loadout-accent) 60%, #57b), color-mix(in srgb, var(--loadout-accent) 30%, #9cf)); width:0% }
   .bar-label{ opacity:.85 }
 
   .weapon-wrap{ display:grid; gap:8px; margin:8px 0 2px; grid-template-columns:32px 1fr 32px; align-items:center }
-  .weapon-btn{ width:32px; height:32px; border-radius:8px; border:1px solid #3a3a48; background:#171721; color:#fff; cursor:pointer; display:grid; place-items:center }
+  .weapon-btn{ width:32px; height:32px; border-radius:8px; border:1px solid color-mix(in srgb, var(--loadout-accent) 30%, #3a3a48 70%); background:#171721; color:#fff; cursor:pointer; display:grid; place-items:center }
   .weapon-btn:active{ transform:scale(.98) }
-  .weapon-view{ border:1px solid #2a2a36; border-radius:10px; padding:10px; background:#14141e; display:grid; gap:6px; justify-items:center; text-align:center }
+  .weapon-view{ border:1px solid color-mix(in srgb, var(--loadout-accent) 26%, #2a2a36 74%); border-radius:10px; padding:10px; background:#14141e; display:grid; gap:6px; justify-items:center; text-align:center }
   .weapon-name{ font-weight:800 }
   .attack-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100% }
   .attack-item{ background:#191925; border:1px solid #2a2a36; border-radius:8px; padding:8px; font-size:14px }
 
   .modal-actions{ display:flex; gap:10px; justify-content:space-between; margin-top:12px }
-  .btn.primary{ background:#0f6; border-color:#0a4; color:#041; font-weight:800 }
+  .btn.primary{ background:#0f6; border:1px solid #0a4; color:#041; font-weight:800; border-radius:10px }
   .btn.secondary{ background:#222; border:1px solid #3a3a48; border-radius:10px; color:#fff }
 
   @media (max-width:640px){
@@ -204,7 +227,7 @@
 <div class="wrap" id="app">
   <div class="title">Demon Slayer Journey</div>
 
-  <!-- ✅ HUD moved here -->
+  <!-- HUD -->
   <div id="topHUD"><div id="playerRankLevel">Rank: — | Level: —</div></div>
 
   <div class="carousel">
@@ -253,13 +276,13 @@
   </div>
 </div>
 
-<!-- Tag info popup -->
+<!-- Top-center toast -->
 <div class="tagInfo" id="tagInfo"></div>
 
 <!-- Big Start button -->
 <button id="startBtn" disabled>START</button>
 
-<!-- Loadout Modal (weapon swiper + back/battle) -->
+<!-- Loadout Modal -->
 <div id="loadoutModal" class="modal hidden" aria-hidden="true">
   <div class="modal-content" role="dialog" aria-modal="true">
     <h2 style="margin-top:0">Your Loadout</h2>
@@ -271,7 +294,6 @@
       </div>
       <div class="meta">
         <div><strong>Breathing:</strong> <span id="modalBreathing"></span></div>
-        <div><strong>Theme:</strong> <span id="modalTheme"></span></div>
       </div>
     </div>
 
@@ -300,9 +322,9 @@
 
 <script>
 (() => {
-  /* ========== Your existing styles data (unchanged) ========== */
+  /* ========== Styles data (with hues) ========== */
   const styles = [
-    { key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
+    { key:'Water',   hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
       desc:'Fluid, adaptive strikes. Great control and consistent damage.',
       traits:['Power: Balanced','Forms: 11','Wide arcs','Reliable crowd control'],
       forms:[
@@ -318,163 +340,52 @@
         {n:10,name:'Constant Flux', tags:['Ramp-up','Multi-hit']},
         {n:11,name:'Dead Calm', tags:['AoE','Freeze','High Damage','Screen-wide']}
       ]},
-    { key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
+    { key:'Flame',   hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
       desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
       traits:['Power: High','Forms: 9','High damage','Good AoE'],
-      forms:[
-        {n:1,name:'Unknowing Fire', tags:['Burst','Single Target']},
-        {n:2,name:'Rising Scorching Sun', tags:['Anti-air','Knockback']},
-        {n:3,name:'Blazing Universe', tags:['AoE','Impact']},
-        {n:4,name:'Blooming Flame Undulation', tags:['AoE','Sustain']},
-        {n:5,name:'Flame Tiger', tags:['AoE','Multi-hit']},
-        {n:6,name:'Flame Dance', tags:['Combo','Mobility']},
-        {n:7,name:'Rengoku (Ninth Form)', tags:['Line AoE','Burn DoT','Ultimate']},
-        {n:8,name:'(Extra) — Variant/Anime Move', tags:['—']},
-        {n:9,name:'(Extra) — Variant/Anime Move', tags:['—']}
-      ]},
+      forms:[{n:1,name:'Unknowing Fire', tags:['Burst','Single Target']}, {n:2,name:'Rising Scorching Sun', tags:['Anti-air','Knockback']},
+             {n:3,name:'Blazing Universe', tags:['AoE','Impact']}, {n:4,name:'Blooming Flame Undulation', tags:['AoE','Sustain']},
+             {n:5,name:'Flame Tiger', tags:['AoE','Multi-hit']}, {n:6,name:'Flame Dance', tags:['Combo','Mobility']},
+             {n:7,name:'Rengoku (Ninth Form)', tags:['Line AoE','Burn DoT','Ultimate']}]},
     { key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
       desc:'Lightning-fast burst dashes that delete targets.',
       traits:['Power: High','Forms: 6','Extreme speed'],
-      forms:[
-        {n:1,name:'Thunderclap & Flash', tags:['Dash','Single Target','Burst']},
-        {n:2,name:'Rice Spirit', tags:['Multi-hit']},
-        {n:3,name:'Thunder Swarm', tags:['Multi-hit','AoE']},
-        {n:4,name:'Distant Thunder', tags:['Line AoE']},
-        {n:5,name:'Heat Lightning', tags:['Ranged','Single Target']},
-        {n:6,name:'God Speed', tags:['Dash','Speed Buff','Burst']}
-      ]},
+      forms:[{n:1,name:'Thunderclap & Flash', tags:['Dash','Single Target','Burst']},
+             {n:2,name:'Rice Spirit', tags:['Multi-hit']}, {n:3,name:'Thunder Swarm', tags:['Multi-hit','AoE']},
+             {n:4,name:'Distant Thunder', tags:['Line AoE']}, {n:5,name:'Heat Lightning', tags:['Ranged','Single Target']},
+             {n:6,name:'God Speed', tags:['Dash','Speed Buff','Burst']}]},
     { key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
       desc:'Bladed gales with aggressive coverage and pushback.',
       traits:['Power: High','Forms: 9','Push & peel'],
-      forms:[
-        {n:1,name:'Dust Whirlwind Cutter', tags:['AoE','Knockback']},
-        {n:2,name:'Claws—Purifying Wind', tags:['Multi-hit']},
-        {n:3,name:'Clean Storm Wind Tree', tags:['Large AoE']},
-        {n:4,name:'Rising Dust Storm', tags:['AoE','Juggle']},
-        {n:5,name:'Cold Mountain Wind', tags:['Slow','Single Target']},
-        {n:6,name:'Black Wind Mountain Mist', tags:['AoE','Blind']},
-        {n:7,name:'Primary Gale Slash', tags:['Line AoE']},
-        {n:8,name:'Idaten Typhoon', tags:['AoE','Knockback']},
-        {n:9,name:'Gale—Sudden Gusts', tags:['Multi-hit','Mobility']}
-      ]},
+      forms:[{n:1,name:'Dust Whirlwind Cutter', tags:['AoE','Knockback']},
+             {n:2,name:'Claws—Purifying Wind', tags:['Multi-hit']},
+             {n:3,name:'Clean Storm Wind Tree', tags:['Large AoE']},
+             {n:4,name:'Rising Dust Storm', tags:['AoE','Juggle']},
+             {n:5,name:'Cold Mountain Wind', tags:['Slow','Single Target']},
+             {n:6,name:'Black Wind Mountain Mist', tags:['AoE','Blind']},
+             {n:7,name:'Primary Gale Slash', tags:['Line AoE']},
+             {n:8,name:'Idaten Typhoon', tags:['AoE','Knockback']},
+             {n:9,name:'Gale—Sudden Gusts', tags:['Multi-hit','Mobility']}]},
     { key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
       desc:'Immovable force. Slow swings with huge knockback.',
       traits:['Power: High','Forms: 5','Big stagger'],
-      forms:[
-        {n:1,name:'Serpentinite Bipolar', tags:['AoE','Control']},
-        {n:2,name:'Upper Smash', tags:['Anti-air','Knockback']},
-        {n:3,name:'Stone Skin', tags:['Defense','Stagger Resist']},
-        {n:4,name:'Volcanic Rock, Rapid Conquest', tags:['AoE','Multi-hit']},
-        {n:5,name:'Arcs of Justice', tags:['Multi-hit','Impact']}
-      ]},
+      forms:[{n:1,name:'Serpentinite Bipolar', tags:['AoE','Control']},{n:2,name:'Upper Smash', tags:['Anti-air','Knockback']},
+             {n:3,name:'Stone Skin', tags:['Defense','Stagger Resist']},{n:4,name:'Volcanic Rock, Rapid Conquest', tags:['AoE','Multi-hit']},
+             {n:5,name:'Arcs of Justice', tags:['Multi-hit','Impact']}]},
     { key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
       desc:'Deceptive movement and vanish windows to reposition.',
       traits:['Power: Moderate','Forms: 7','Evasive'],
-      forms:[
-        {n:1,name:'Low Clouds, Distant Haze', tags:['Mobility','Evasion']},
-        {n:2,name:'Eight-Layered Mist', tags:['Multi-hit']},
-        {n:3,name:'Scattering Mist Splash', tags:['AoE','Projectile Guard']},
-        {n:4,name:'Shifting Flow Slash', tags:['Dash','Single Target']},
-        {n:5,name:'Sea of Clouds and Haze', tags:['AoE','Multi-hit']},
-        {n:6,name:'Peaks of Unfathomable Loneliness', tags:['Burst','Single Target']},
-        {n:7,name:'Obscuring Clouds', tags:['Invisibility','Mobility']}
-      ]},
-    { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
-      desc:'Whip-like reach and flurries; fast multi-hits.',
-      traits:['Power: Moderate','Forms: 6','Great reach'],
-      forms:[
-        {n:1,name:'Shivers of First Love', tags:['Multi-hit','Reach']},
-        {n:2,name:'Love Pangs', tags:['Stun','Multi-hit']},
-        {n:3,name:'Catlove Shower', tags:['AoE','Multi-hit']},
-        {n:4,name:'(Unlisted variant)', tags:['—']},
-        {n:5,name:'Swaying Love • Wildclaw', tags:['Multi-hit','Mobility']},
-        {n:6,name:'Cat-Legged Winds of Love', tags:['Reach','Multi-hit']}
-      ]},
-    { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
-      desc:'Curving paths that slip around guards to strike.',
-      traits:['Power: Moderate','Forms: 5','Curved arcs'],
-      forms:[
-        {n:1,name:'Winding Serpent Slash', tags:['Curved Arc','Single Target']},
-        {n:2,name:'Venom Fangs of the Narrow Head', tags:['Backstab','Single Target']},
-        {n:3,name:'Coil Choke', tags:['Bind','Stun']},
-        {n:4,name:'Twin-Headed Reptile', tags:['Multi-hit']},
-        {n:5,name:'Slithering Serpent', tags:['Mobility','Curved Arc']}
-      ]},
-    { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
-      desc:'Explosive beats and brief stuns to control crowds.',
-      traits:['Power: Moderate','Forms: 5','Radial bursts'],
-      forms:[
-        {n:1,name:'Roar', tags:['AoE','Stun']},
-        {n:2,name:'(Unknown Second Form)', tags:['—']},
-        {n:3,name:'(Unknown Third Form)', tags:['—']},
-        {n:4,name:'Constant Resounding Slashes', tags:['AoE','Defensive']},
-        {n:5,name:'String Performance', tags:['AoE','Mobile']}
-      ]},
-    { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
-      desc:'Wild twin-blade assaults with constant pressure.',
-      traits:['Power: Above Avg','Many “Fang” forms','Relentless'],
-      forms:[
-        {n:1,name:'First Fang: Pierce', tags:['Single Target','Armor Pierce']},
-        {n:2,name:'Second Fang: Slice', tags:['Multi-hit','Close Range']},
-        {n:3,name:'Third Fang: Devour', tags:['Multi-hit']},
-        {n:4,name:"Fourth Fang: Slice 'n' Dice", tags:['Multi-hit']},
-        {n:5,name:'Fifth Fang: Crazy Cutting', tags:['Multi-hit','Spin']},
-        {n:6,name:'Sixth Fang: Palisade Bite', tags:['Bind','Multi-hit']},
-        {n:7,name:'Seventh Form: Spatial Awareness', tags:['Reveal','Utility']},
-        {n:8,name:'Eighth Fang: Explosive Rush', tags:['Dash','Burst']},
-        {n:9,name:'Ninth Fang: Extending Bendy Slash', tags:['Reach']},
-        {n:10,name:'Tenth Fang: Whirling Fangs', tags:['Spin','AoE']},
-        {n:11,name:'Eleventh Fang: Sudden Throwing Strike', tags:['Ranged']},
-        {n:12,name:'Twelfth Fang: Leaping Thrust', tags:['Leap','Single Target']}
-      ]},
-    { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
-      desc:'Precision thrusts and toxins; lighter raw damage.',
-      traits:['Power: Situational','Forms: 4','DoT potential'],
-      forms:[
-        {n:1,name:'Butterfly Dance: Caprice', tags:['Multi-hit','Poison DoT']},
-        {n:2,name:'Dance of the Bee Sting: True Flutter', tags:['Single Target','Poison DoT']},
-        {n:3,name:'Dance of the Dragonfly: Compound Eye Hexagon', tags:['Multi-hit','Poison DoT']},
-        {n:4,name:'Dance of the Centipede: Hundred-Legged Zigzag', tags:['Mobility','Poison DoT']}
-      ]},
-    { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
-      desc:'Crescent blades carve space at range; lethal crescents.',
-      traits:['Power: Very High','Forms: 16','Range control'],
-      forms:[
-        {n:1,name:'Dark Moon, Evening Palace', tags:['AoE','Orbiting']},
-        {n:2,name:'Pearl Flower Moongazing', tags:['Line AoE']},
-        {n:3,name:'Loathsome Moon, Chains', tags:['Multi-hit','Bind']},
-        {n:4,name:'Moon-Through-Willow', tags:['Curved Arc']},
-        {n:5,name:'Moon Spirit Calamitous Eddy', tags:['AoE','Orbiting']},
-        {n:6,name:'Perpetual Night, Lonely Moon—Incessant', tags:['Multi-hit','Sustain']},
-        {n:7,name:'Mirror of Misfortune, Moonlit', tags:['Line AoE']},
-        {n:8,name:'Moon-Dragon Ringtail', tags:['AoE']},
-        {n:9,name:'Waning Moonswaths', tags:['Multi-hit']},
-        {n:10,name:'Drilling Slashes, Moon Through Bamboo Leaves', tags:['Pierce','Line AoE']},
-        {n:11,name:'Moonlit—Illusory Copies', tags:['Afterimages']},
-        {n:12,name:'Mirror of Misfortune, Moonlit—Calamity', tags:['AoE']},
-        {n:13,name:'Moonbow, Half Moon: Rising', tags:['AoE']},
-        {n:14,name:'Moon—Crest of the Night', tags:['Range']},
-        {n:15,name:'Loathsome Moon, Smoldering', tags:['Burn DoT']},
-        {n:16,name:'Moonbow, Half Moon', tags:['Massive AoE']}
-      ]},
-    { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
-      desc:'The original form—overwhelming damage and coverage.',
-      traits:['Power: Strongest','Forms: 13','Versatile'],
-      forms:[
-        {n:1,name:'Dance', tags:['Line AoE','Burst','Burn DoT']},
-        {n:2,name:'Clear Blue Sky', tags:['AoE','Spin']},
-        {n:3,name:'Raging Sun', tags:['AoE','Knockback']},
-        {n:4,name:'Fake Rainbow', tags:['Evasion','Afterimage']},
-        {n:5,name:'Fire Wheel', tags:['AoE','Mobility']},
-        {n:6,name:'Burning Bones, Summer Sun', tags:['Defense','AoE']},
-        {n:7,name:'Sunflower Thrust', tags:['Single Target','Pierce']},
-        {n:8,name:'Solar Heat Haze', tags:['Blind','Heat']},
-        {n:9,name:'Setting Sun Transformation', tags:['Mobility','AoE']},
-        {n:10,name:'Beneficent Radiance', tags:['Resolve']},
-        {n:11,name:'Dragon Sun Halo Head Dance', tags:['Orbiting','Multi-hit']},
-        {n:12,name:'Flame Dance', tags:['Combo','AoE']},
-        {n:13,name:'Thirteenth Form', tags:['Ultimate','Sustain']}
-      ]}
+      forms:[{n:1,name:'Low Clouds, Distant Haze', tags:['Mobility','Evasion']}, {n:2,name:'Eight-Layered Mist', tags:['Multi-hit']},
+             {n:3,name:'Scattering Mist Splash', tags:['AoE','Projectile Guard']}, {n:4,name:'Shifting Flow Slash', tags:['Dash','Single Target']},
+             {n:5,name:'Sea of Clouds and Haze', tags:['AoE','Multi-hit']}, {n:6,name:'Peaks of Unfathomable Loneliness', tags:['Burst','Single Target']},
+             {n:7,name:'Obscuring Clouds', tags:['Invisibility','Mobility']}]},
+    { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive", desc:'Whip-like reach and flurries; fast multi-hits.', traits:['Power: Moderate','Forms: 6','Great reach'], forms:[]},
+    { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif", desc:'Curving paths that slip around guards to strike.', traits:['Power: Moderate','Forms: 5','Curved arcs'], forms:[]},
+    { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive", desc:'Explosive beats and brief stuns to control crowds.', traits:['Power: Moderate','Forms: 5','Radial bursts'], forms:[]},
+    { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif", desc:'Wild twin-blade assaults with constant pressure.', traits:['Power: Above Avg','Relentless'], forms:[]},
+    { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif", desc:'Precision thrusts and toxins; lighter raw damage.', traits:['Power: Situational','DoT potential'], forms:[]},
+    { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive", desc:'Crescent blades carve space at range; lethal crescents.', traits:['Power: Very High','Range control'], forms:[]},
+    { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif", desc:'The original form—overwhelming damage and coverage.', traits:['Power: Strongest','Versatile'], forms:[]}
   ];
 
   const TAG_INFO = {
@@ -529,7 +440,7 @@
   const tipsTitle = document.getElementById('tipsTitle');
   const formsBtn = document.getElementById('formsBtn');
   const tipsClose = document.getElementById('tipsClose');
-  const tagInfoBox = document.getElementById('tagInfo');
+  const toast = document.getElementById('tagInfo'); // top-center toast
   const selectBtn = document.getElementById('select');
   const onboard = document.getElementById('onboard');
   const onboardClose = document.getElementById('onboardClose');
@@ -537,7 +448,7 @@
   let idx = 0;
 
   function renderForms(style){
-    const formsList = style.forms.map(f=>{
+    const formsList = (style.forms||[]).map(f=>{
       const tags=(f.tags||[]).map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
       return `<li style="margin:6px 0 10px 0;">
         <b>Form ${f.n} — ${f.name}</b><br/>${tags}
@@ -607,20 +518,13 @@
   }
 
   // Touch
-  stageEl.addEventListener('touchstart', e=>{
-    const t=e.changedTouches[0]; swipeStart(t.clientX, t.clientY);
-  }, {passive:true});
-  stageEl.addEventListener('touchmove', e=>{
-    const t=e.changedTouches[0]; swipeMove(t.clientX, t.clientY);
-  }, {passive:true});
-  stageEl.addEventListener('touchend', e=>{
-    const t=e.changedTouches[0]; swipeEnd(t.clientX, t.clientY);
-  }, {passive:true});
-
-  // Mouse drag
+  stageEl.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; swipeStart(t.clientX, t.clientY); }, {passive:true});
+  stageEl.addEventListener('touchmove',  e=>{ const t=e.changedTouches[0]; swipeMove(t.clientX, t.clientY); }, {passive:true});
+  stageEl.addEventListener('touchend',   e=>{ const t=e.changedTouches[0]; swipeEnd(t.clientX, t.clientY); }, {passive:true});
+  // Mouse
   stageEl.addEventListener('mousedown', e=>{ swipeStart(e.clientX, e.clientY); });
-  window.addEventListener('mousemove', e=>{ swipeMove(e.clientX, e.clientY); });
-  window.addEventListener('mouseup', e=>{ swipeEnd(e.clientX, e.clientY); });
+  window.addEventListener('mousemove',  e=>{ swipeMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup',    e=>{ swipeEnd(e.clientX, e.clientY); });
 
   // Forms overlay toggle
   function toggleForms(open){
@@ -629,31 +533,28 @@
   formsBtn.addEventListener('click', ()=> toggleForms());
   tipsClose.addEventListener('click', ()=> toggleForms(false));
 
-  // Tag info popup
-  function showTagInfo(tag){
-    const text = TAG_INFO[tag] || tag;
-    tagInfoBox.textContent = `${tag}: ${text}`;
-    tagInfoBox.classList.add('show');
-    clearTimeout(showTagInfo._t);
-    showTagInfo._t = setTimeout(()=> tagInfoBox.classList.remove('show'), 2600);
+  // Tag info toast (top-center)
+  function showToast(text, ms=2200){
+    toast.textContent = text;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> toast.classList.remove('show'), ms);
   }
   tipsContent.addEventListener('click', (e)=>{
     const t = e.target.closest('.tag'); if(!t) return;
     const tag = t.getAttribute('data-tag');
-    if(tag) showTagInfo(tag);
+    const info = TAG_INFO[tag] || tag;
+    showToast(`${tag}: ${info}`);
   });
 
-  // ✅ Select → set breathing and enable Start
+  // Select → set breathing; toast at top center
   selectBtn.addEventListener('click', () => {
     const s = styles[idx];
-    if (window.onBreathingSelected) window.onBreathingSelected(s.key);
-    tagInfoBox.textContent = `Selected: ${s.key} Breathing`;
-    tagInfoBox.classList.add('show');
-    clearTimeout(selectBtn._t);
-    selectBtn._t = setTimeout(() => tagInfoBox.classList.remove('show'), 1600);
+    if (window.onBreathingSelected) window.onBreathingSelected(s.key, s.hue);
+    showToast(`Selected: ${s.key} Breathing`);
   });
 
-  // Sky/mist (unchanged)
+  // Sky/mist (background)
   const sky = document.getElementById('sky');
   const ctx = sky.getContext('2d');
   const mist = document.getElementById('mist');
@@ -700,11 +601,13 @@
   }
   requestAnimationFrame(mistLoop);
 
-  // Onboarding X
   onboardClose.addEventListener('click', dismissOnboard);
 
   // Initial render
   render(idx);
+
+  // expose style lookup for loadout theming
+  window.__getStyleMeta = (name)=> styles.find(s=>s.key===name) || null;
 })(); // end IIFE
 
 
@@ -732,19 +635,19 @@ const RankThresholds = [
 ];
 
 const BreathingBonuses = {
-  Water:  { theme: 'cool-blue',  bonus: { strength: 0,  speed: 10, defense: 0,  focus: 5 } },
-  Flame:  { theme: 'ember-gold', bonus: { strength: 10, speed: 0,  defense: 5,  focus: -5 } },
-  Wind:   { theme: 'jade-mint',  bonus: { strength: 5,  speed: 10, defense: 0,  focus: -10 } },
-  Stone:  { theme: 'slate-gray', bonus: { strength: 15, speed: -5, defense: 10, focus: 0 } },
-  Sound:  { theme: 'vivid-mag',  bonus: { strength: 0,  speed: 15, defense: 0,  focus: -5 } },
-  Thunder:{ theme: 'neon-yellow',bonus: { strength: -5, speed: 20, defense: -5, focus: 0 } },
-  Mist:   { theme: 'pale-cyan',  bonus: { strength: -5, speed: 5,  defense: 0,  focus: 15 } },
-  Beast:  { theme: 'wild-teal',  bonus: { strength: 12, speed: 5,  defense: -5, focus: -2 } },
-  Love:   { theme: 'pink',       bonus: { strength: -2, speed: 8,  defense: -2, focus: 6 } },
-  Serpent:{ theme: 'emerald',    bonus: { strength: 2,  speed: 6,  defense: 0,  focus: 4 } },
-  Insect: { theme: 'mint',       bonus: { strength: -4, speed: 10, defense: -2, focus: 8 } },
-  Moon:   { theme: 'violet',     bonus: { strength: 14, speed: 6,  defense: 4,  focus: 2 } },
-  Sun:    { theme: 'sun',        bonus: { strength: 16, speed: 8,  defense: 6,  focus: 4 } },
+  Water:  { bonus: { strength: 0,  speed: 10, defense: 0,  focus: 5 } },
+  Flame:  { bonus: { strength: 10, speed: 0,  defense: 5,  focus: -5 } },
+  Wind:   { bonus: { strength: 5,  speed: 10, defense: 0,  focus: -10 } },
+  Stone:  { bonus: { strength: 15, speed: -5, defense: 10, focus: 0 } },
+  Sound:  { bonus: { strength: 0,  speed: 15, defense: 0,  focus: -5 } },
+  Thunder:{ bonus: { strength: -5, speed: 20, defense: -5, focus: 0 } },
+  Mist:   { bonus: { strength: -5, speed: 5,  defense: 0,  focus: 15 } },
+  Beast:  { bonus: { strength: 12, speed: 5,  defense: -5, focus: -2 } },
+  Love:   { bonus: { strength: -2, speed: 8,  defense: -2, focus: 6 } },
+  Serpent:{ bonus: { strength: 2,  speed: 6,  defense: 0,  focus: 4 } },
+  Insect: { bonus: { strength: -4, speed: 10, defense: -2, focus: 8 } },
+  Moon:   { bonus: { strength: 14, speed: 6,  defense: 4,  focus: 2 } },
+  Sun:    { bonus: { strength: 16, speed: 8,  defense: 6,  focus: 4 } },
 };
 
 const Weapons = [
@@ -754,6 +657,15 @@ const Weapons = [
   { id:'whip',       name:'Whip Blade',          baseDamage:7,  speed:'Fast',     trait:'Chains hits',       attackName:'Lash Combo' },
   { id:'dual',       name:'Dual Blades',         baseDamage:8,  speed:'Very Fast',trait:'Two-hit combo',     attackName:'Twin Flourish' },
 ];
+
+/* Per-weapon stat tweaks (LIVE effect while swiping) */
+const WeaponStatMods = {
+  nichirin:   { strength:  0, speed:  0,  defense:  0, focus:  0 },
+  spikedball: { strength:  6, speed: -8,  defense:  2, focus: -2 },
+  scythe:     { strength: 10, speed: -12, defense:  0, focus: -4 },
+  whip:       { strength: -4, speed:  8,  defense: -2, focus:  3 },
+  dual:       { strength: -2, speed: 10,  defense: -2, focus:  1 },
+};
 
 /* Helpers */
 function computeRank(level){
@@ -784,10 +696,13 @@ function updateStartBtn(){
   startBtn.classList.toggle('enabled', enabled);
 }
 
-/* Exposed for the Select button to call */
-window.onBreathingSelected = function(name){
+/* Select hook (also sets hue for loadout theming) */
+window.onBreathingSelected = function(name, hue){
   PlayerState.selectedBreathing = name;   // e.g., "Stone"
   updateStartBtn();
+  const styleMeta = window.__getStyleMeta?.(name);
+  const accent = hue || styleMeta?.hue || '#55b7ff';
+  document.documentElement.style.setProperty('--loadout-accent', accent);
 };
 
 /* ===== Loadout Modal + Weapon Swiper ===== */
@@ -795,7 +710,6 @@ const modal = document.getElementById('loadoutModal');
 const modalRank   = document.getElementById('modalRank');
 const modalLevel  = document.getElementById('modalLevel');
 const modalBreath = document.getElementById('modalBreathing');
-const modalTheme  = document.getElementById('modalTheme');
 const statBars    = document.getElementById('statBars');
 
 const weaponPrev  = document.getElementById('weaponPrev');
@@ -809,7 +723,10 @@ const attackTrait = document.getElementById('attackTrait');
 
 function computeFinalStats(){
   const b = BreathingBonuses[PlayerState.selectedBreathing]?.bonus || {};
-  return mergeStats(PlayerState.baseStats, b);
+  const w = Weapons[PlayerState.selectedWeaponIndex];
+  const wm = (w && WeaponStatMods[w.id]) ? WeaponStatMods[w.id] : {};
+  const withBreathing = mergeStats(PlayerState.baseStats, b);
+  return mergeStats(withBreathing, wm);
 }
 function renderStatBars(finalStats){
   statBars.innerHTML = '';
@@ -838,19 +755,22 @@ function renderWeapon(){
   attackDmg.textContent  = w.baseDamage;
   attackSpd.textContent  = w.speed;
   attackTrait.textContent= w.trait;
+  // LIVE: re-compute stats whenever weapon changes
+  renderStatBars(computeFinalStats());
 }
 
 function openLoadout(){
   modalRank.textContent   = computeRank(PlayerState.level);
   modalLevel.textContent  = PlayerState.level;
   modalBreath.textContent = PlayerState.selectedBreathing;
-  modalTheme.textContent  = (BreathingBonuses[PlayerState.selectedBreathing]||{}).theme || '—';
 
-  renderStatBars(computeFinalStats());
+  // Set accent color for loadout from selected breathing
+  const styleMeta = window.__getStyleMeta?.(PlayerState.selectedBreathing);
+  const accent = styleMeta?.hue || '#55b7ff';
+  document.documentElement.style.setProperty('--loadout-accent', accent);
 
-  PlayerState.selectedWeaponIndex = PlayerState.selectedWeaponIndex % Weapons.length;
-  renderWeapon();
-
+  // Render once
+  renderWeapon(); // also updates stats
   modal.classList.remove('hidden');
   modal.setAttribute('aria-hidden','false');
   document.body.style.overflow = 'hidden';
@@ -911,43 +831,15 @@ document.getElementById('battleBtn').addEventListener('click', ()=>{
   }, {passive:false});
 })();
 
-/* Example hook */
+/* Example battle hook */
 function startBattle(loadout){
   console.log('Starting battle with:', loadout);
-  alert(`Battle start!\nBreathing: ${loadout.breathing}\nWeapon: ${loadout.weapon.name}`);
+  // You can remove this alert once you hook your scene transition
+  const t = document.getElementById('tagInfo');
+  t.textContent = `Battle start — ${loadout.breathing} + ${loadout.weapon.name}`;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2000);
 }
-
-/* === Weapon stat modifiers: 1-block drop-in patch === */
-(function () {
-  if (!window.Weapons || !window.PlayerState || !window.mergeStats) return;
-
-  // 1) Small per-weapon stat tweaks (edit these numbers if you want)
-  const WeaponStatMods = {
-    nichirin:   { strength:  0, speed:  0,  defense:  0, focus:  0 },
-    spikedball: { strength:  6, speed: -8,  defense:  2, focus: -2 },
-    scythe:     { strength: 10, speed: -12, defense:  0, focus: -4 },
-    whip:       { strength: -4, speed:  8,  defense: -2, focus:  3 },
-    dual:       { strength: -2, speed: 10,  defense: -2, focus:  1 },
-  };
-
-  // 2) Override computeFinalStats to include weapon mods (on top of breathing)
-  const _computeFinalStats = window.computeFinalStats;
-  window.computeFinalStats = function () {
-    const b = (window.BreathingBonuses?.[PlayerState.selectedBreathing]?.bonus) || {};
-    const w = Weapons[PlayerState.selectedWeaponIndex];
-    const wm = (w && WeaponStatMods[w.id]) ? WeaponStatMods[w.id] : {};
-    const withBreathing = mergeStats(PlayerState.baseStats, b);
-    return mergeStats(withBreathing, wm);
-  };
-
-  // 3) Wrap renderWeapon so stats auto-refresh whenever weapon changes
-  const _renderWeapon = window.renderWeapon;
-  window.renderWeapon = function () {
-    if (typeof _renderWeapon === 'function') _renderWeapon();
-    try { renderStatBars(computeFinalStats()); } catch (_) {}
-  };
-})();
-
 </script>
 </body>
 </html>
