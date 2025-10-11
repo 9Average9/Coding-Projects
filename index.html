@@ -916,6 +916,38 @@ function startBattle(loadout){
   console.log('Starting battle with:', loadout);
   alert(`Battle start!\nBreathing: ${loadout.breathing}\nWeapon: ${loadout.weapon.name}`);
 }
+
+/* === Weapon stat modifiers: 1-block drop-in patch === */
+(function () {
+  if (!window.Weapons || !window.PlayerState || !window.mergeStats) return;
+
+  // 1) Small per-weapon stat tweaks (edit these numbers if you want)
+  const WeaponStatMods = {
+    nichirin:   { strength:  0, speed:  0,  defense:  0, focus:  0 },
+    spikedball: { strength:  6, speed: -8,  defense:  2, focus: -2 },
+    scythe:     { strength: 10, speed: -12, defense:  0, focus: -4 },
+    whip:       { strength: -4, speed:  8,  defense: -2, focus:  3 },
+    dual:       { strength: -2, speed: 10,  defense: -2, focus:  1 },
+  };
+
+  // 2) Override computeFinalStats to include weapon mods (on top of breathing)
+  const _computeFinalStats = window.computeFinalStats;
+  window.computeFinalStats = function () {
+    const b = (window.BreathingBonuses?.[PlayerState.selectedBreathing]?.bonus) || {};
+    const w = Weapons[PlayerState.selectedWeaponIndex];
+    const wm = (w && WeaponStatMods[w.id]) ? WeaponStatMods[w.id] : {};
+    const withBreathing = mergeStats(PlayerState.baseStats, b);
+    return mergeStats(withBreathing, wm);
+  };
+
+  // 3) Wrap renderWeapon so stats auto-refresh whenever weapon changes
+  const _renderWeapon = window.renderWeapon;
+  window.renderWeapon = function () {
+    if (typeof _renderWeapon === 'function') _renderWeapon();
+    try { renderStatBars(computeFinalStats()); } catch (_) {}
+  };
+})();
+
 </script>
 </body>
 </html>
