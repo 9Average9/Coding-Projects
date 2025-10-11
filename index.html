@@ -1074,6 +1074,77 @@ function startBattle(loadout){
   });
 })();
 
+/* === Tag popup: always show full description (single source of truth) === */
+(function fixTagDescriptions(){
+  // 1) Promote any local TAG_INFO to window and never overwrite if already set
+  if (typeof window.TAG_INFO === 'undefined') {
+    // If a local TAG_INFO exists in this scope, use it; otherwise keep {}
+    try { if (typeof TAG_INFO !== 'undefined') window.TAG_INFO = TAG_INFO; }
+    catch(_) { window.TAG_INFO = window.TAG_INFO || {}; }
+  }
+
+  // 2) Ensure veil exists (used by the modal)
+  let veil = document.getElementById('veil');
+  if (!veil) {
+    veil = document.createElement('div');
+    veil.id = 'veil';
+    veil.className = 'veil';
+    veil.hidden = true;
+    document.body.appendChild(veil);
+  }
+
+  // 3) Upgrade showToast to Title + body layout (non-breaking)
+  window.showToast = window.showToast || function(){}; // keep signature
+  const _origShowToast = window.showToast;
+  window.showToast = function(msg, ms=2200){
+    const toast = document.getElementById('tagInfo');
+    if (!toast) return _origShowToast?.(msg, ms);
+
+    // Split "Title: Body" (if provided)
+    let title = '', body = String(msg || '');
+    const i = body.indexOf(':');
+    if (i > 0) { title = body.slice(0, i).trim(); body = body.slice(i+1).trim(); }
+
+    toast.innerHTML = title
+      ? `<div style="font-weight:900;font-size:18px;margin-bottom:6px">${title}</div>
+         <div style="opacity:.92;line-height:1.5">${body}</div>`
+      : `<div style="opacity:.92;line-height:1.5">${body}</div>`;
+
+    toast.classList.add('show');
+    veil.hidden = false;
+
+    clearTimeout(window.showToast._t);
+    if (ms > 0) {
+      window.showToast._t = setTimeout(()=>{
+        toast.classList.remove('show');
+        veil.hidden = true;
+      }, ms);
+    }
+  };
+
+  // 4) High-priority, one-stop handler so older listeners can’t interfere
+  document.addEventListener('click', function onTagClick(e){
+    const tagEl = e.target.closest('.tag');
+    if (!tagEl) return;
+
+    // Prevent any previous tag listeners from running
+    e.stopImmediatePropagation();
+    e.preventDefault();
+
+    const key = tagEl.getAttribute('data-tag') || tagEl.textContent.trim();
+    const desc = (window.TAG_INFO && window.TAG_INFO[key]) || ''; // empty if missing
+
+    if (desc) {
+      window.showToast(`${key}: ${desc}`, 2400);
+    } else {
+      // Fallback: show the key but flag missing description so you can spot it
+      window.showToast(`${key}: (no description found)`, 1800);
+      // Optional: console hint to catch typos/mismatched keys
+      console.warn('[TAG_INFO] Missing description for:', key);
+    }
+  }, true); // capture=true makes this run before other handlers
+})();
+
 
 </script>
 </body>
