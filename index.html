@@ -1,1215 +1,183 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>Demon Slayer Journey — Menu (Swipe + Loadout)</title>
-
-<!-- Headline / style fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cinzel+Decorative:wght@700&family=Noto+Serif+JP:wght@900&family=M+PLUS+Rounded+1c:wght@800&family=Bebas+Neue&family=Orbitron:wght@800&family=Oswald:wght@700&family=Cormorant+Garamond:wght@700&family=Courgette&family=Anton:wght@400&family=Rajdhani:wght@700&family=Audiowide&display=swap" rel="stylesheet">
-
-<style>
-  :root{
-    --ink:#e7eef7;
-    --styleFont:'Noto Serif JP', serif;
-    --styleHue:#55b7ff;
-    --prevHue:#446bff;
-    --nextHue:#ff8a3d;
-
-    --hudZ: 60;
-    --btnZ: 200;
-    --modalZ: 1000;
-    --toastZ: 5000;
-
-    --loadout-accent: #55b7ff; /* set dynamically from selected breathing */
-  }
-  html,body{
-    height:100%; margin:0; overflow:hidden; color:var(--ink);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    background:#0b1020;
-    touch-action: manipulation; /* blocks iOS smart double-tap zoom */
-  }
-
-  /* Sky & mist canvases */
-  #sky{position:fixed; inset:0; z-index:-2}
-  #mist{position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.65}
-
-  /* Wrapper grid */
-  .wrap{position:fixed; inset:0; display:grid; grid-template-rows:auto auto 1fr auto; place-items:center; gap:8px; padding:16px}
-
-  /* Title */
-  .title{
-    font-family:'Cinzel', serif;
-    font-weight:900; letter-spacing:.9px; text-transform:uppercase;
-    font-size: clamp(34px, 7vw, 84px); line-height:1; text-align:center;
-    color:#fafbfd;
-    text-shadow:
-      0 1px 0 #f2f3ff,
-      0 2px 0 #e2e5fb,
-      0 3px 0 #cfd4f4,
-      0 4px 0 #bbc2ec,
-      0 10px 22px rgba(0,0,0,.58),
-      0 0 44px rgba(180,200,255,.45);
-    filter: drop-shadow(0 12px 28px rgba(0,0,0,.48));
-  }
-
-  /* ===== Rank/Level HUD (under title, above cards) ===== */
-  #topHUD{
-    position:relative; z-index:var(--hudZ); display:flex; justify-content:center; width:100%;
-    pointer-events:none;
-  }
-  #playerRankLevel{
-    pointer-events:none;
-    padding:6px 12px; border:1px solid #999; border-radius:8px; background:#111; color:#fff; font-weight:700;
-    box-shadow:0 2px 10px rgba(0,0,0,.35);
-  }
-
-  /* Carousel */
-  .carousel{
-    width:min(880px,92vw);
-    display:grid; grid-template-columns:1fr; align-items:center; gap:12px;
-  }
-  .stage{ position:relative; padding-inline: 42px; }
-
-  /* Peeking edges */
-  .peek{
-    position:absolute; top:12px; bottom:12px; width:28px;
-    border-radius:10px; overflow:hidden;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 8px 20px rgba(0,0,0,.4);
-    opacity:.9; pointer-events:none;
-  }
-  .peek.left{ left:0; background: linear-gradient(180deg, color-mix(in srgb, var(--prevHue) 35%, #ffffff 0%), rgba(255,255,255,.05)); }
-  .peek.right{ right:0; background: linear-gradient(180deg, color-mix(in srgb, var(--nextHue) 35%, #ffffff 0%), rgba(255,255,255,.05)); }
-  .peekEdge{ position:absolute; inset:0; border-radius:10px; border:1px solid rgba(255,255,255,.16); background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)); }
-  .peekGlow{ position:absolute; inset:-26px; border-radius:14px; filter:blur(26px); opacity:.30; background: var(--nextHue); }
-  .peek.left .peekGlow{ background: var(--prevHue); }
-
-  /* Card */
-  .card{
-    position:relative; min-height: 395px;
-    border-radius:20px; padding:18px 20px; overflow:hidden;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-    border:1px solid rgba(255,255,255,.18);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 18px 38px rgba(0,0,0,.5);
-    display:grid; grid-template-rows:auto auto 1fr auto; gap:8px;
-    backdrop-filter: blur(3px);
-  }
-  .aura{ position:absolute; inset:-30%; filter:blur(56px); opacity:.28; pointer-events:none; background: var(--styleHue); animation:auraPulse 6s ease-in-out infinite; }
-  @keyframes auraPulse{ 0%,100%{opacity:.2; transform:scale(1)} 50%{opacity:.3; transform:scale(1.06)} }
-
-  .name{
-    text-align:center; font-weight:900; letter-spacing:1.2px;
-    font-size: clamp(22px, 4.2vw, 36px);
-    text-transform:uppercase; font-family: var(--styleFont);
-    text-shadow: 0 2px 10px color-mix(in srgb, var(--styleHue) 55%, transparent);
-  }
-  .desc{ margin-top:2px; text-align:center; opacity:.96; font-size:15px; font-weight:600; letter-spacing:.2px }
-  .list{margin:6px 0 0 0; padding-left:18px; line-height:1.6; opacity:.95}
-  .list li{ margin:4px 0; }
-  .muted{ opacity:.88; }
-
-  /* CTA */
-  .cta{ display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px; }
-  .btn{
-    padding:10px 16px; border-radius:10px; border:1px solid rgba(255,255,255,.22);
-    font-weight:800; cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
-    background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
-    color:#0c1220; text-shadow:0 1px 0 rgba(255,255,255,.5);
-  }
-  .btn.primary{
-    background: var(--btnGrad,#35b3ff); color:#06121c; border-color: rgba(255,255,255,.35);
-    box-shadow: 0 8px 22px rgba(255,255,255,.16), 0 0 22px var(--styleHue);
-  }
-
-  /* Forms overlay */
-  .tipsPanel{ position:absolute; left:0; right:0; top:0; margin:auto; width:100%; height:0; overflow:hidden; border-radius:20px; background: rgba(12,16,26,.94); border:1px solid rgba(255,255,255,.18); box-shadow: 0 16px 36px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.05); transform-origin: top center; transition: height .28s ease, opacity .28s ease; opacity:0; }
-  .tipsPanel.open{ height:100%; opacity:1; }
-  .tipsHeader{ padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)); display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:6px; }
-  .tipsName{ text-align:center; font-weight:900; letter-spacing:.5px; font-family: var(--styleFont); }
-  .tipsSub{ text-align:center; font-size:12px; opacity:.8; margin-top:-2px; }
-  .xBtn{ width:38px; height:38px; border-radius:10px; border:1px solid rgba(255,255,255,.26); background:rgba(255,255,255,.14); color:#e7eef7; font-weight:900; font-size:20px; line-height:0; display:grid; place-items:center; cursor:pointer; justify-self:end; }
-  .tipsBody{ padding:12px 14px 140px; max-height:calc(100% - 58px); overflow:auto; overscroll-behavior:contain; }
-
-  /* ===== Tag bubbles (pressable) ===== */
-  .tag{
-    display:inline-block; font-size:12px; padding:4px 10px; margin:6px 8px 0 0;
-    border:1px solid rgba(255,255,255,.28); border-radius:9999px; cursor:pointer;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 4px 12px rgba(0,0,0,.25);
-    transition: transform .08s ease, box-shadow .12s ease, border-color .12s ease;
-  }
-  .tag:active{ transform: translateY(1px); }
-  .tag:hover{ border-color: rgba(255,255,255,.45); box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 6px 16px rgba(0,0,0,.32); }
-
-  /* ===== Big centered overlay for tags / selection ===== */
-.tagInfo{
-  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:min(720px, 92vw);
-  background:rgba(10,14,22,.96);
-  color:#e7eef7;
-  border:1px solid rgba(255,255,255,.28);
-  border-radius:16px;
-  box-shadow:0 24px 64px rgba(0,0,0,.65), 0 0 0 2px rgba(0,0,0,.18) inset;
-  padding:18px 20px; font-size:16px; line-height:1.6;
-  display:none; z-index:var(--toastZ);
-  backdrop-filter: blur(6px);
-}
-.tagInfo.show{ display:block; }
-
-/* Dim the world behind the overlay */
-.veil{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.5);
-  z-index:calc(var(--toastZ) - 1);
-}
-
-  /* Onboarding hint */
-  .onboard{ position:absolute; left:0; right:0; top:0; bottom:0; margin:auto; display:grid; place-items:center; z-index:3; background:rgba(6,10,18,.72); border:1px solid rgba(255,255,255,.14); border-radius:18px; opacity:1; transition: opacity .4s ease; }
-  .onboard.fadeOut{ opacity:0; pointer-events:none; }
-  .onboardBox{ text-align:center; padding:16px 18px; }
-  .onboardTitle{ font-family:'Cinzel', serif; font-weight:900; letter-spacing:.6px; font-size: clamp(20px, 4.6vw, 32px); text-transform:uppercase; text-shadow: 0 8px 22px rgba(0,0,0,.5), 0 0 22px rgba(180,200,255,.2); }
-  .onboardSub{ opacity:.9; margin-top:6px; }
-  .onboardClose{ position:absolute; right:10px; top:10px; width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.14); color:#e7eef7; display:grid; place-items:center; font-weight:900; cursor:pointer; }
-
-  /* ===== Big red Start button ===== */
-  #startBtn{
-    position:fixed; left:50%; transform:translateX(-50%); bottom:16px;
-    padding:14px 28px; font-size:20px; border:none; border-radius:12px;
-    background:#b30000; color:#fff; opacity:.6; cursor:not-allowed;
-    box-shadow:0 4px 0 #5a0000, 0 8px 18px rgba(0,0,0,.35);
-    z-index:var(--btnZ); -webkit-tap-highlight-color:transparent; touch-action:manipulation;
-  }
-  #startBtn.enabled{ opacity:1; cursor:pointer; animation:pulse 1.5s infinite }
-  @keyframes pulse{
-    0%{ box-shadow:0 0 0 0 rgba(255,0,0,.55), 0 8px 18px rgba(0,0,0,.35) }
-    70%{ box-shadow:0 0 0 12px rgba(255,0,0,0), 0 8px 18px rgba(0,0,0,.35)}
-    100%{ box-shadow:0 0 0 0 rgba(255,0,0,0), 0 8px 18px rgba(0,0,0,.35)}
-  }
-
-  /* ===== Loadout Modal (accented by --loadout-accent) ===== */
-  .modal.hidden{ display:none }
-  .modal{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:var(--modalZ); backdrop-filter: blur(1px); }
-  .modal-content{
-    width:min(900px,92vw); color:#eee; border-radius:12px; padding:16px; box-shadow:0 12px 32px rgba(0,0,0,.5);
-    background:#0f0f14;
-    border:1px solid color-mix(in srgb, var(--loadout-accent) 60%, #222 40%);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--loadout-accent) 24%, transparent), 0 18px 38px rgba(0,0,0,.55);
-  }
-  .meta-row{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:8px }
-  .meta{ background:#15151d; border:1px solid color-mix(in srgb, var(--loadout-accent) 26%, #2a2a36 74%); border-radius:10px; padding:10px }
-  .meta div{ margin:2px 0 }
-  #statBars{ display:grid; gap:8px; margin:12px 0 }
-  .bar{ display:grid; grid-template-columns:110px 1fr auto; align-items:center; gap:8px }
-  .bar-fill{ height:12px; background:#222; border:1px solid #333; border-radius:8px; overflow:hidden }
-  .bar-fill>div{ height:100%; background:linear-gradient(to right, color-mix(in srgb, var(--loadout-accent) 60%, #57b), color-mix(in srgb, var(--loadout-accent) 30%, #9cf)); width:0% }
-  .bar-label{ opacity:.85 }
-
-  .weapon-wrap{ display:grid; gap:8px; margin:8px 0 2px; grid-template-columns:32px 1fr 32px; align-items:center }
-  .weapon-btn{ width:32px; height:32px; border-radius:8px; border:1px solid color-mix(in srgb, var(--loadout-accent) 30%, #3a3a48 70%); background:#171721; color:#fff; cursor:pointer; display:grid; place-items:center }
-  .weapon-btn:active{ transform:scale(.98) }
-  .weapon-view{ border:1px solid color-mix(in srgb, var(--loadout-accent) 26%, #2a2a36 74%); border-radius:10px; padding:10px; background:#14141e; display:grid; gap:6px; justify-items:center; text-align:center }
-  .weapon-name{ font-weight:800 }
-  .attack-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100% }
-  .attack-item{ background:#191925; border:1px solid #2a2a36; border-radius:8px; padding:8px; font-size:14px }
-
-  .modal-actions{ display:flex; gap:10px; justify-content:space-between; margin-top:12px }
-  .btn.primary{ background:#0f6; border:1px solid #0a4; color:#041; font-weight:800; border-radius:10px }
-  .btn.secondary{ background:#222; border:1px solid #3a3a48; border-radius:10px; color:#fff }
-
-  @media (max-width:640px){
-    .stage{ padding-inline: 36px; }
-    .peek{ width:24px; }
-    .card{ min-height: 375px; }
-    .meta-row{ grid-template-columns:1fr }
-    .attack-grid{ grid-template-columns:repeat(2,1fr) }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NT Greek Vocab Trainer</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
-<canvas id="sky"></canvas>
-<canvas id="mist"></canvas>
+  <main class="app">
+    <header class="header">
+      <h1>NT Greek Vocab Trainer</h1>
+      <p>Learn and test common New Testament Greek words.</p>
+    </header>
 
-<div class="wrap" id="app">
-  <div class="title">Demon Slayer Journey</div>
+    <section id="homeScreen" class="screen active">
+      <div class="nav-bar">
+        <div></div>
+        <div class="nav-title">Home</div>
+        <button class="icon-btn" onclick="showSettings()">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
+      </div>
 
-  <!-- HUD -->
-  <div id="topHUD"><div id="playerRankLevel">Rank: — | Level: —</div></div>
+      <button class="main-btn" onclick="showLearnMenu()">Learn</button>
+      <button class="main-btn" onclick="showTestMenu()">Test</button>
+      <button class="main-btn secondary" onclick="showProgress()">Progress</button>
+    </section>
 
-  <div class="carousel">
-    <div class="stage" id="stage">
-      <!-- peeking edges -->
-      <div class="peek left"><div class="peekGlow"></div><div class="peekEdge"></div></div>
+    <section id="learnMenu" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showHome()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="nav-title">Learn</div>
+        <div></div>
+      </div>
 
-      <div class="card" id="card">
-        <div class="aura" id="aura"></div>
+      <div id="learnChapterList" class="chapter-grid"></div>
+      <button class="main-btn" onclick="startLearning()">Start Learning</button>
+    </section>
 
-        <div class="name" id="name">—</div>
-        <div class="desc" id="desc">—</div>
-        <ul class="list" id="traits"></ul>
+    <section id="learnScreen" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showLearnMenu()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="nav-title" id="learnProgress"></div>
+        <div></div>
+      </div>
 
-        <div class="cta">
-          <button class="btn" id="formsBtn">Forms</button>
-          <button class="btn primary" id="select">Select</button>
-        </div>
+      <div id="swipeHint" class="swipe-hint">swipe left →</div>
 
-        <!-- Forms Overlay -->
-        <div class="tipsPanel" id="tipsPanel">
-          <div class="tipsHeader">
-            <div></div>
-            <div>
-              <div class="tipsName" id="tipsTitle">—</div>
-              <div class="tipsSub">Forms</div>
-            </div>
-            <button class="xBtn" id="tipsClose">×</button>
+      <div id="learnCard" class="flashcard" onclick="flipCard()">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div id="learnGreek" class="greek-word"></div>
+            <div class="tap-hint">tap to reveal</div>
           </div>
-          <div class="tipsBody" id="tipsContent"></div>
+          <div class="card-face card-back">
+            <div id="learnMeaning" class="meaning"></div>
+          </div>
         </div>
       </div>
 
-      <!-- right peek -->
-      <div class="peek right"><div class="peekGlow"></div><div class="peekEdge"></div></div>
-
-      <!-- Onboarding hint -->
-      <div class="onboard" id="onboard">
-        <button class="onboardClose" id="onboardClose">×</button>
-        <div class="onboardBox">
-          <div class="onboardTitle">Swipe to select a breathing style to master</div>
-          <div class="onboardSub">Drag left or right to browse styles</div>
-        </div>
+      <div class="nav-buttons">
+        <button class="main-btn" onclick="prevLearnCard()">Previous</button>
+        <button class="main-btn" onclick="nextLearnCard()">Next</button>
       </div>
-    </div>
+    </section>
+
+    <section id="testMenu" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showHome()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="nav-title">Test</div>
+        <div></div>
+      </div>
+
+      <label class="label">Number of words</label>
+      <input id="testAmount" type="number" min="1" value="10" />
+
+      <label class="checkbox-row">
+        <input id="focusMode" type="checkbox" />
+        Focus Mode: only weak words
+      </label>
+
+      <h3>Choose chapters</h3>
+      <div id="testChapterList" class="chapter-grid"></div>
+
+      <button class="main-btn" onclick="startTest()">Start Test</button>
+    </section>
+
+    <section id="testScreen" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showTestMenu()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="nav-title" id="testProgress"></div>
+        <div></div>
+      </div>
+
+      <div class="test-card">
+        <div id="testGreek" class="greek-word"></div>
+        <input id="answerInput" type="text" placeholder="Type the meaning..." />
+        <button class="main-btn" onclick="submitAnswer()">Submit</button>
+        <div id="feedback" class="feedback"></div>
+      </div>
+    </section>
+
+    <section id="resultsScreen" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showHome()">
+          <span class="material-symbols-outlined">home</span>
+        </button>
+        <div class="nav-title">Results</div>
+        <div></div>
+      </div>
+
+      <h2>Test Results</h2>
+      <div id="scoreResult" class="score"></div>
+      <div id="missedWords"></div>
+
+      <button class="main-btn" onclick="showTestMenu()">Take Another Test</button>
+      <button class="main-btn secondary" onclick="studyMissedWords()">Study Missed Words</button>
+    </section>
+
+    <section id="progressScreen" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showHome()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="nav-title">Progress</div>
+        <div></div>
+      </div>
+
+      <div id="progressStats"></div>
+    </section>
+
+    <section id="settingsScreen" class="screen">
+      <div class="nav-bar">
+        <button class="icon-btn" onclick="showHome()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="nav-title">Settings</div>
+        <div></div>
+      </div>
+  <div class="settings-card">
+      <h3>Appearance</h3>
+
+     <label class="toggle-row">
+    <span>Dark Mode</span>
+    <label class="switch">
+  <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
+  <span class="slider"></span>
+</label>
+      </label>
+      </div>
+     <div class="settings-card">
+  <button class="collapse-btn" onclick="toggleResetSection()">
+    Reset Test Data
+  </button>
+
+  <div id="resetContent" class="collapse-content">
+    <p>
+      This will permanently delete your saved test scores, progress stats,
+      and weak-word tracking. Your vocabulary list will not be affected.
+    </p>
+
+    <button class="danger-btn" onclick="resetTestData()">
+      Confirm Reset
+    </button>
   </div>
 </div>
-
-<!-- Top-center toast -->
-<div class="tagInfo" id="tagInfo"></div>
-
-<div id="veil" class="veil" hidden></div>
-
-<!-- Big Start button -->
-<button id="startBtn" disabled>START</button>
-
-<!-- Loadout Modal -->
-<div id="loadoutModal" class="modal hidden" aria-hidden="true">
-  <div class="modal-content" role="dialog" aria-modal="true">
-    <h2 style="margin-top:0">Your Loadout</h2>
-
-    <div class="meta-row">
-      <div class="meta">
-        <div><strong>Rank:</strong> <span id="modalRank"></span></div>
-        <div><strong>Level:</strong> <span id="modalLevel"></span></div>
-      </div>
-      <div class="meta">
-        <div><strong>Breathing:</strong> <span id="modalBreathing"></span></div>
-      </div>
-    </div>
-
-    <div id="statBars"></div>
-
-    <div class="weapon-wrap">
-      <button id="weaponPrev" class="weapon-btn" aria-label="Previous Weapon">‹</button>
-      <div id="weaponView" class="weapon-view">
-        <div class="weapon-name" id="weaponName">—</div>
-        <div class="attack-grid">
-          <div class="attack-item"><strong>Attack:</strong> <span id="attackName">—</span></div>
-          <div class="attack-item"><strong>Damage:</strong> <span id="attackDamage">—</span></div>
-          <div class="attack-item"><strong>Speed:</strong> <span id="attackSpeed">—</span></div>
-          <div class="attack-item"><strong>Trait:</strong> <span id="attackTrait">—</span></div>
-        </div>
-      </div>
-      <button id="weaponNext" class="weapon-btn" aria-label="Next Weapon">›</button>
-    </div>
-
-    <div class="modal-actions">
-      <button id="backToBreathing" class="btn secondary">Back</button>
-      <button id="battleBtn" class="btn primary">Battle</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(() => {
-  /* ========== Styles data (with hues) ========== */
- /* ===================== STYLES (FULL FORMS + TAGS) ===================== */
-const styles = [
-  { key:'Water', hue:'#55b7ff', font:"'M PLUS Rounded 1c', sans-serif",
-    desc:'Fluid, adaptive strikes. Great control and consistent damage.',
-    traits:['Power: Balanced','Forms: 11','Wide arcs','Reliable crowd control'],
-    forms:[
-      {n:1,  name:'Water Surface Slash',                  tags:['Single Target','Wide Arc']},
-      {n:2,  name:'Water Wheel',                          tags:['AoE','Knockback','Chain']},
-      {n:3,  name:'Flowing Dance',                        tags:['Mobility','Dash','Speed Boost']},
-      {n:4,  name:'Striking Tide',                        tags:['Multi-hit','Chain']},
-      {n:5,  name:'Blessed Rain After the Drought',       tags:['Single Target','Finisher']},
-      {n:6,  name:'Whirlpool',                            tags:['AoE','Pull','Chain']},
-      {n:7,  name:'Drop Ripple Thrust',                   tags:['Single Target','Pierce']},
-      {n:8,  name:'Waterfall Basin',                      tags:['AoE','Knockdown']},
-      {n:9,  name:'Splashing Water Flow',                 tags:['Mobility','Evasion']},
-      {n:10, name:'Constant Flux',                        tags:['Ramp-up','Multi-hit','Chain']},
-      {n:11, name:'Dead Calm',                            tags:['AoE','Time Slow','Screen-wide']}
-    ]},
-
-  { key:'Flame', hue:'#ff6a4f', font:"'Bebas Neue', sans-serif",
-    desc:'Heavy, decisive cuts. Fewer forms but big burst and AoE.',
-    traits:['Power: High','Forms: 9','High damage','Good AoE'],
-    forms:[
-      {n:1, name:'Unknowing Fire',                        tags:['Burst','Single Target']},
-      {n:2, name:'Rising Scorching Sun',                  tags:['Anti-air','Knockback']},
-      {n:3, name:'Blazing Universe',                      tags:['AoE','Impact','Fire DoT (Spreads)']},
-      {n:4, name:'Blooming Flame Undulation',             tags:['AoE','Sustain','Fire DoT (Spreads)','Chain']},
-      {n:5, name:'Flame Tiger',                           tags:['AoE','Multi-hit','Fire DoT (Spreads)']},
-      {n:6, name:'Flame Dance',                           tags:['Combo','Mobility','Chain']},
-      {n:7, name:'Rengoku (Ninth Form)',                  tags:['Line AoE','Ultimate','Fire DoT (Spreads)']},
-      {n:8, name:'Ember Wreath (Variant)',                tags:['AoE','DoT','Fire DoT (Spreads)']},
-      {n:9, name:'Cinder Rush (Variant)',                 tags:['Dash','Burst','Fire DoT (Spreads)']}
-    ]},
-
-  { key:'Thunder', hue:'#ffd24a', font:"'Orbitron', sans-serif",
-    desc:'Lightning-fast burst dashes that delete targets.',
-    traits:['Power: High','Forms: 6','Extreme speed'],
-    forms:[
-      {n:1, name:'Thunderclap & Flash',                   tags:['Dash','Single Target','Burst','Speed Boost']},
-      {n:2, name:'Rice Spirit',                           tags:['Multi-hit','Chain']},
-      {n:3, name:'Thunder Swarm',                         tags:['Multi-hit','AoE','Chain']},
-      {n:4, name:'Distant Thunder',                       tags:['Line AoE','Pierce']},
-      {n:5, name:'Heat Lightning',                        tags:['Ranged','Single Target','DoT']},
-      {n:6, name:'God Speed',                             tags:['Dash','Burst','Speed Boost']}
-    ]},
-
-  { key:'Wind', hue:'#7ce37f', font:"'Oswald', sans-serif",
-    desc:'Bladed gales with aggressive coverage and pushback.',
-    traits:['Power: High','Forms: 9','Push & peel'],
-    forms:[
-      {n:1, name:'Dust Whirlwind Cutter',                 tags:['AoE','Knockback','Wide Arc']},
-      {n:2, name:'Claws—Purifying Wind',                  tags:['Multi-hit','Chain']},
-      {n:3, name:'Clean Storm Wind Tree',                 tags:['Large AoE','Knockback']},
-      {n:4, name:'Rising Dust Storm',                     tags:['AoE','Juggle','Chain']},
-      {n:5, name:'Cold Mountain Wind',                    tags:['Single Target','Time Slow']},
-      {n:6, name:'Black Wind Mountain Mist',              tags:['AoE','Blind']},
-      {n:7, name:'Primary Gale Slash',                    tags:['Line AoE','Pierce']},
-      {n:8, name:'Idaten Typhoon',                        tags:['AoE','Knockback','Chain']},
-      {n:9, name:'Gale—Sudden Gusts',                     tags:['Multi-hit','Mobility','Speed Boost']}
-    ]},
-
-  { key:'Stone', hue:'#c7c2a1', font:"'Cinzel', serif",
-    desc:'Immovable force. Slow swings with huge knockback.',
-    traits:['Power: High','Forms: 5','Big stagger'],
-    forms:[
-      {n:1, name:'Serpentinite Bipolar',                  tags:['AoE','Control','Knockback']},
-      {n:2, name:'Upper Smash',                           tags:['Anti-air','Knockback']},
-      {n:3, name:'Stone Skin',                            tags:['Defense','Armor']},
-      {n:4, name:'Volcanic Rock, Rapid Conquest',         tags:['AoE','Multi-hit','Impact']},
-      {n:5, name:'Arcs of Justice',                       tags:['Multi-hit','Impact','Pierce']}
-    ]},
-
-  { key:'Mist', hue:'#cfe8ff', font:"'Noto Serif JP', serif",
-    desc:'Deceptive movement and vanish windows to reposition.',
-    traits:['Power: Moderate','Forms: 7','Evasive'],
-    forms:[
-      {n:1, name:'Low Clouds, Distant Haze',              tags:['Mobility','Evasion','Time Slow']},
-      {n:2, name:'Eight-Layered Mist',                    tags:['Multi-hit','Chain']},
-      {n:3, name:'Scattering Mist Splash',                tags:['AoE','Projectile Guard']},
-      {n:4, name:'Shifting Flow Slash',                   tags:['Dash','Single Target','Pierce']},
-      {n:5, name:'Sea of Clouds and Haze',                tags:['AoE','Multi-hit','Blind']},
-      {n:6, name:'Peaks of Unfathomable Loneliness',      tags:['Burst','Single Target','Pierce']},
-      {n:7, name:'Obscuring Clouds',                      tags:['Invisibility','Mobility','Time Slow']}
-    ]},
-
-  { key:'Love', hue:'#ff9ccf', font:"'Courgette', cursive",
-    desc:'Whip-like reach and flurries; fast multi-hits.',
-    traits:['Power: Moderate','Forms: 6','Great reach'],
-    forms:[
-      {n:1, name:'Shivers of First Love',                 tags:['Multi-hit','Reach','Chain']},
-      {n:2, name:'Love Pangs',                            tags:['Stun','Multi-hit']},
-      {n:3, name:'Catlove Shower',                        tags:['AoE','Multi-hit','Chain']},
-      {n:4, name:'Fluttering Hearts (Variant)',           tags:['Speed Boost','Mobility']},
-      {n:5, name:'Swaying Love • Wildclaw',               tags:['Multi-hit','Mobility','Reach']},
-      {n:6, name:'Cat-Legged Winds of Love',              tags:['Reach','Multi-hit','Chain']}
-    ]},
-
-  { key:'Serpent', hue:'#9ddaa8', font:"'Cormorant Garamond', serif",
-    desc:'Curving paths that slip around guards to strike.',
-    traits:['Power: Moderate','Forms: 5','Curved arcs'],
-    forms:[
-      {n:1, name:'Winding Serpent Slash',                 tags:['Curved Arc','Single Target','Chain']},
-      {n:2, name:'Venom Fangs of the Narrow Head',        tags:['Backstab','Single Target','Pierce']},
-      {n:3, name:'Coil Choke',                            tags:['Bind','Stun']},
-      {n:4, name:'Twin-Headed Reptile',                   tags:['Multi-hit','Chain']},
-      {n:5, name:'Slithering Serpent',                    tags:['Mobility','Curved Arc','Speed Boost']}
-    ]},
-
-  { key:'Sound', hue:'#a880ff', font:"'Audiowide', cursive",
-    desc:'Explosive beats and brief stuns to control crowds.',
-    traits:['Power: Moderate','Forms: 5','Radial bursts'],
-    forms:[
-      {n:1, name:'Roar',                                  tags:['AoE','Stun']},
-      {n:2, name:'Resounding Volley (Variant)',           tags:['AoE','Chain']},
-      {n:3, name:'Echo Burst (Variant)',                  tags:['AoE','Time Slow']},
-      {n:4, name:'Constant Resounding Slashes',           tags:['AoE','Defensive','Chain']},
-      {n:5, name:'String Performance',                     tags:['AoE','Mobile','Stun']}
-    ]},
-
-  { key:'Beast', hue:'#8bd0b1', font:"'Anton', sans-serif",
-    desc:'Wild twin-blade assaults with constant pressure.',
-    traits:['Power: Above Avg','Many “Fang” forms','Relentless'],
-    forms:[
-      {n:1,  name:'First Fang: Pierce',                   tags:['Single Target','Pierce']},
-      {n:2,  name:'Second Fang: Slice',                   tags:['Multi-hit','Close Range','Chain']},
-      {n:3,  name:'Third Fang: Devour',                   tags:['Multi-hit','Chain']},
-      {n:4,  name:"Fourth Fang: Slice 'n' Dice",          tags:['Multi-hit','Chain']},
-      {n:5,  name:'Fifth Fang: Crazy Cutting',            tags:['Multi-hit','Spin','AoE','Chain']},
-      {n:6,  name:'Sixth Fang: Palisade Bite',            tags:['Bind','Multi-hit']},
-      {n:7,  name:'Seventh Form: Spatial Awareness',      tags:['Reveal','Utility']},
-      {n:8,  name:'Eighth Fang: Explosive Rush',          tags:['Dash','Burst','Speed Boost']},
-      {n:9,  name:'Ninth Fang: Extending Bendy Slash',    tags:['Reach','Pierce']},
-      {n:10, name:'Tenth Fang: Whirling Fangs',           tags:['Spin','AoE','Chain']},
-      {n:11, name:'Eleventh Fang: Sudden Throwing Strike',tags:['Ranged','Pierce']},
-      {n:12, name:'Twelfth Fang: Leaping Thrust',         tags:['Leap','Single Target','Pierce']}
-    ]},
-
-  { key:'Insect', hue:'#b7ffb7', font:"'Rajdhani', sans-serif",
-    desc:'Precision thrusts and toxins; lighter raw damage.',
-    traits:['Power: Situational','Forms: 4','DoT potential'],
-    forms:[
-      {n:1, name:'Butterfly Dance: Caprice',              tags:['Multi-hit','Poison DoT (High)','Chain']},
-      {n:2, name:'Bee Sting: True Flutter',               tags:['Single Target','Poison DoT (High)','Pierce']},
-      {n:3, name:'Dragonfly: Compound Eye Hexagon',       tags:['Multi-hit','Poison DoT (High)','AoE']},
-      {n:4, name:'Centipede: Hundred-Legged Zigzag',      tags:['Mobility','Poison DoT (High)','Dash']}
-    ]},
-
-  { key:'Moon', hue:'#c0b7ff', font:"'Cinzel Decorative', cursive",
-    desc:'Crescent blades carve space at range; lethal crescents.',
-    traits:['Power: Very High','Forms: 16','Range control'],
-    forms:[
-      {n:1,  name:'Dark Moon, Evening Palace',            tags:['AoE','Orbiting','Chain']},
-      {n:2,  name:'Pearl Flower Moongazing',              tags:['Line AoE','Pierce']},
-      {n:3,  name:'Loathsome Moon, Chains',               tags:['Multi-hit','Bind','Chain']},
-      {n:4,  name:'Moon-Through-Willow',                  tags:['Curved Arc','Pierce']},
-      {n:5,  name:'Moon Spirit Calamitous Eddy',          tags:['AoE','Orbiting','Ramp-up']},
-      {n:6,  name:'Perpetual Night, Lonely Moon—Incessant',tags:['Multi-hit','Sustain','Chain']},
-      {n:7,  name:'Mirror of Misfortune, Moonlit',        tags:['Line AoE','Pierce']},
-      {n:8,  name:'Moon-Dragon Ringtail',                 tags:['AoE','Chain']},
-      {n:9,  name:'Waning Moonswaths',                    tags:['Multi-hit','Chain']},
-      {n:10, name:'Drilling Slashes, Moon Through Bamboo',tags:['Pierce','Line AoE']},
-      {n:11, name:'Moonlit—Illusory Copies',              tags:['Afterimage','Time Slow']},
-      {n:12, name:'Mirror of Misfortune—Calamity',        tags:['AoE','Impact']},
-      {n:13, name:'Moonbow, Half Moon: Rising',           tags:['AoE','Ramp-up']},
-      {n:14, name:'Moon—Crest of the Night',              tags:['Range','Pierce']},
-      {n:15, name:'Loathsome Moon, Smoldering',           tags:['Burn DoT (Spreads)','DoT']},
-      {n:16, name:'Moonbow, Half Moon',                   tags:['Massive AoE','Ultimate']}
-    ]},
-
-  { key:'Sun', hue:'#ff8a3d', font:"'Cinzel', serif",
-    desc:'The original form—overwhelming damage and coverage.',
-    traits:['Power: Strongest','Forms: 13','Versatile'],
-    forms:[
-      {n:1,  name:'Dance',                                tags:['Line AoE','Burst','Burn DoT (Spreads)']},
-      {n:2,  name:'Clear Blue Sky',                       tags:['AoE','Spin','Chain']},
-      {n:3,  name:'Raging Sun',                           tags:['AoE','Knockback','Burn DoT (Spreads)']},
-      {n:4,  name:'Fake Rainbow',                         tags:['Evasion','Afterimage','Time Slow']},
-      {n:5,  name:'Fire Wheel',                           tags:['AoE','Mobility','Burn DoT (Spreads)']},
-      {n:6,  name:'Burning Bones, Summer Sun',            tags:['Defense','AoE','Burn DoT (Spreads)']},
-      {n:7,  name:'Sunflower Thrust',                     tags:['Single Target','Pierce']},
-      {n:8,  name:'Solar Heat Haze',                      tags:['Blind','Heat','Time Slow']},
-      {n:9,  name:'Setting Sun Transformation',           tags:['Mobility','AoE','Speed Boost']},
-      {n:10, name:'Beneficent Radiance',                  tags:['Resolve','Defense']},
-      {n:11, name:'Dragon Sun Halo Head Dance',           tags:['Orbiting','Multi-hit','AoE']},
-      {n:12, name:'Flame Dance',                          tags:['Combo','AoE','Chain']},
-      {n:13, name:'Thirteenth Form',                      tags:['Ultimate','Sustain','Ramp-up']}
-    ]}
-];
-
-/* ===================== TAG INFO (FRIENDLY DESCRIPTIONS) ===================== */
-const TAG_INFO = {
-  // Your requested new tags
-  'AoE':                 'Area of Effect — hits multiple enemies or covers a wide area.',
-  'DoT':                 'Damage over time — applies damage that ticks after the hit.',
-  'Pierce':              'Piercing damage — ignores part of enemy defense or guard.',
-  'Single Target':       'Focused strike — best for isolating and deleting one enemy.',
-  'Speed Boost':         'Temporarily increases movement/attack speed.',
-  'Time Slow':           'Slows enemies or their projectiles in a small area/time window.',
-  'Poison DoT (High)':   'Potent poison — higher DoT than fire; stacks lightly on repeated hits.',
-  'Fire DoT (Spreads)':  'Lingering flames — lower DoT than poison but can spread to nearby demons.',
-  'Chain':               'Chaining hits — follow-ups or arcs can link to new targets.',
-  // Legacy/kept tags so previous content still works
-  'Wide Arc':            'Large sweeping angle in front of you.',
-  'Knockback':           'Sends enemies flying backward; great for peel.',
-  'Knockdown':           'Slams targets to the ground, briefly disabling them.',
-  'Mobility':            'Moves you during the attack to reposition or chase.',
-  'Dash':                'Very quick burst of movement; may include brief i-frames.',
-  'Multi-hit':           'Several rapid hits in one form.',
-  'Pull':                'Draws enemies inward toward the center.',
-  'Evasion':             'Brief intangibility window; slip through danger.',
-  'Combo':               'Easy to follow up into other actions or forms.',
-  'Impact':              'Heavy stagger on hit; interrupts enemies.',
-  'Ramp-up':             'Damage grows the longer the move persists.',
-  'Armor':               'Reduces damage taken while the move is active.',
-  'Defense':             'General damage reduction or guard-like effect.',
-  'Stagger Resist':      'Harder to interrupt mid-move.',
-  'Bind':                'Restricts enemy movement temporarily.',
-  'Curved Arc':          'Curving path that slips around guards.',
-  'Orbiting':            'Blades or projectiles circle you and hit nearby enemies.',
-  'Line AoE':            'Long, narrow path damaging anything it passes through.',
-  'Ultimate':            'Signature high-power technique with a long cooldown.',
-  'Screen-wide':         'Huge radius covering most of the arena.',
-  'Anti-air':            'Extra effective against airborne targets.',
-  'Juggle':              'Launches or keeps targets suspended for follow-ups.',
-  'Close Range':         'Very short reach; high risk/high reward.',
-  'Reach':               'Longer-than-normal range for safer hits.',
-  'Blind':               'Obscures enemy vision or senses.',
-  'Afterimage':          'Creates copies that confuse targeting.',
-  'Reveal':              'Highlights enemies through fog/terrain.',
-  'Ranged':              'Effective at a distance.',
-  'Heat':                'Applies a mirage-like distortion; pairs well with Slow.',
-  'Sustain':             'Stays out longer than most moves; keeps pressure.',
-  'Resolve':             'Brief willpower surge — small regen or resist.',
-  'Projectile Guard':    'Deflects or negates oncoming projectiles.',
-  'Utility':             'Provides awareness or informational advantage.',
-  'Spin':                'Rotating motion for multi-hits around you.',
-  'Finisher':            'Safer ender with bonus damage on low-health foes.',
-  'Massive AoE':         'Truly huge area; near screen-wide coverage.',
-  'Range':               'Enhanced effective distance for your hits.'
-};
-
-/* === TAG DESCRIPTIONS: extend + normalize + bulletproof click === */
-(function(){
-  // 1) Make TAG_INFO global and extend it with missing keys
-  window.TAG_INFO = window.TAG_INFO || (typeof TAG_INFO !== 'undefined' ? TAG_INFO : {});
-  Object.assign(window.TAG_INFO, {
-    // Missing/extra tags your forms use
-    'Control':     'Crowd control — push, pull, stun, slow, or otherwise disrupt enemy actions.',
-    'Large AoE':   'Covers a larger area than standard AoE — great for groups and lane control.',
-    'Backstab':    'Bonus damage or guard bypass when striking from behind.',
-    'Leap':        'A quick vault or lunge to engage, escape, or reposition before striking.',
-    // Keep "Defense" definition explicit so "Defensive" can map to it
-    'Defense':     'General mitigation or guard-like effect that reduces incoming damage.'
-  });
-
-  // 2) Canonicalize common variants/typos to your TAG_INFO keys
-  const CANON = {
-    'mobile':               'Mobility',
-    'defensive':            'Defense',
-    'large aoe':            'Large AoE',
-    'speed buff':           'Speed Boost',
-    'burn dot':             'Fire DoT (Spreads)',
-    'fire dot':             'Fire DoT (Spreads)',
-    'poison dot':           'Poison DoT (High)',
-    'back stab':            'Backstab',
-    // safety for spacing/typo variants
-    'multi hit':            'Multi-hit',
-    'line aoe':             'Line AoE'
-  };
-  function canonKey(raw){
-    if (!raw) return '';
-    const low = String(raw).trim().toLowerCase().replace(/\s+/g, ' ');
-    return CANON[low] || String(raw).trim();
-  }
-
-  // 3) Normalize existing tag DOM nodes so future clicks use canonical keys
-  function normalizeDomTags(){
-    document.querySelectorAll('.tag').forEach(tag=>{
-      const raw = tag.getAttribute('data-tag') || tag.textContent;
-      const key = canonKey(raw);
-      tag.setAttribute('data-tag', key);
-      tag.title = key; // handy tooltip + debug
-    });
-  }
-  normalizeDomTags();
-  // Re-run after your forms open/refresh (in case they re-render)
-  document.getElementById('formsBtn')?.addEventListener('click', ()=>setTimeout(normalizeDomTags,0));
-  document.getElementById('tipsClose')?.addEventListener('click', ()=>setTimeout(normalizeDomTags,0));
-
-  // 4) Single, high-priority handler to show the big center popup
-  document.addEventListener('click', function(e){
-    const el = e.target.closest('.tag');
-    if (!el) return;
-
-    e.preventDefault();
-    e.stopImmediatePropagation(); // beat older handlers
-
-    const key  = canonKey(el.getAttribute('data-tag') || el.textContent);
-    const desc = window.TAG_INFO[key];
-
-    if (typeof window.showToast === 'function') {
-      window.showToast(`${key}: ${desc || '(no description found)'}`, 2600);
-    }
-    if (!desc) console.warn('[TAG_INFO] Missing description for:', key);
-  }, true);
-})();
-
-  // ---------- Elements ----------
-  const nameEl = document.getElementById('name');
-  const descEl = document.getElementById('desc');
-  const traitsEl = document.getElementById('traits');
-  const auraEl = document.getElementById('aura');
-  const cardEl = document.getElementById('card');
-  const stageEl = document.getElementById('stage');
-  const tipsPanel = document.getElementById('tipsPanel');
-  const tipsContent = document.getElementById('tipsContent');
-  const tipsTitle = document.getElementById('tipsTitle');
-  const formsBtn = document.getElementById('formsBtn');
-  const tipsClose = document.getElementById('tipsClose');
-  const toast = document.getElementById('tagInfo'); // top-center toast
-  const selectBtn = document.getElementById('select');
-  const onboard = document.getElementById('onboard');
-  const onboardClose = document.getElementById('onboardClose');
-
-  let idx = 0;
-
-  function renderForms(style){
-    const formsList = (style.forms||[]).map(f=>{
-      const tags=(f.tags||[]).map(t=>`<span class="tag" data-tag="${t}">${t}</span>`).join('');
-      return `<li style="margin:6px 0 10px 0;">
-        <b>Form ${f.n} — ${f.name}</b><br/>${tags}
-      </li>`;
-    }).join('');
-
-    tipsContent.innerHTML =
-      `<details open>
-         <summary>${style.key} Forms</summary>
-         <ol style="margin:6px 0 0 18px; padding:0;">${formsList}</ol>
-       </details>`;
-  }
-
-  function updatePeeks() {
-    const prevIdx = (idx-1+styles.length)%styles.length;
-    const nextIdx = (idx+1)%styles.length;
-    document.documentElement.style.setProperty('--prevHue', styles[prevIdx].hue);
-    document.documentElement.style.setProperty('--nextHue', styles[nextIdx].hue);
-  }
-
-  function render(i){
-    const s = styles[i];
-    nameEl.textContent = `${s.key} Breathing`;
-    nameEl.style.fontFamily = s.font;
-    document.documentElement.style.setProperty('--styleFont', s.font);
-    document.documentElement.style.setProperty('--styleHue', s.hue);
-
-    descEl.textContent = s.desc;
-    traitsEl.innerHTML = s.traits.map(t=>`<li class="muted">${t}</li>`).join('');
-
-    auraEl.style.setProperty('--styleHue', s.hue);
-    cardEl.style.setProperty('--btnGrad', s.hue);
-    cardEl.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.06), 0 18px 38px ${s.hue}33`;
-
-    tipsTitle.textContent = `${s.key} Breathing`;
-    renderForms(s);
-
-    updatePeeks();
-  }
-
-  // Swipe navigation
-  let touchX=0, touchY=0, dragging=false, moved=false;
-
-  function dismissOnboard(){
-    if(!onboard) return;
-    onboard.classList.add('fadeOut');
-    setTimeout(()=> onboard.style.display='none', 400);
-  }
-
-  function swipeStart(x,y){
-    if (tipsPanel.classList.contains('open')) return;
-    touchX=x; touchY=y; dragging=true; moved=false;
-    dismissOnboard();
-  }
-  function swipeMove(x,y){
-    if(!dragging) return;
-    const dx=x-touchX, dy=y-touchY;
-    if (!moved && Math.abs(dx)>12 && Math.abs(dx)>Math.abs(dy)) moved=true;
-  }
-  function swipeEnd(x,y){
-    if(!dragging) return; dragging=false;
-    const dx=x-touchX, dy=y-touchY;
-    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){
-      if(dx<0){ idx=(idx+1)%styles.length; render(idx); }
-      else { idx=(idx-1+styles.length)%styles.length; render(idx); }
-    }
-  }
-
-  // Touch
-  stageEl.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; swipeStart(t.clientX, t.clientY); }, {passive:true});
-  stageEl.addEventListener('touchmove',  e=>{ const t=e.changedTouches[0]; swipeMove(t.clientX, t.clientY); }, {passive:true});
-  stageEl.addEventListener('touchend',   e=>{ const t=e.changedTouches[0]; swipeEnd(t.clientX, t.clientY); }, {passive:true});
-  // Mouse
-  stageEl.addEventListener('mousedown', e=>{ swipeStart(e.clientX, e.clientY); });
-  window.addEventListener('mousemove',  e=>{ swipeMove(e.clientX, e.clientY); });
-  window.addEventListener('mouseup',    e=>{ swipeEnd(e.clientX, e.clientY); });
-
-  // Forms overlay toggle
-  function toggleForms(open){
-    tipsPanel.classList.toggle('open', open ?? !tipsPanel.classList.contains('open'));
-  }
-  formsBtn.addEventListener('click', ()=> toggleForms());
-  tipsClose.addEventListener('click', ()=> toggleForms(false));
-
-// Big centered modal toast used for tag info and "Selected: ..."
-function showToast(text, ms=2200){
-  const toast = document.getElementById('tagInfo');
-  const veil  = document.getElementById('veil');
-  if (!toast || !veil) return;
-
-  toast.textContent = text;
-  toast.classList.add('show');
-  veil.hidden = false;
-
-  clearTimeout(showToast._t);
-  if (ms > 0) {
-    showToast._t = setTimeout(closeToast, ms);
-  }
-}
-
-function closeToast(){
-  const toast = document.getElementById('tagInfo');
-  const veil  = document.getElementById('veil');
-  if (!toast || !veil) return;
-  toast.classList.remove('show');
-  veil.hidden = true;
-}
-
-// Close on tap/click anywhere
-document.getElementById('veil')?.addEventListener('click', closeToast);
-document.getElementById('tagInfo')?.addEventListener('click', closeToast);
-
-  // Select → set breathing; toast at top center
-  selectBtn.addEventListener('click', () => {
-    const s = styles[idx];
-    if (window.onBreathingSelected) window.onBreathingSelected(s.key, s.hue);
-    showToast(`Selected: ${s.key} Breathing`);
-  });
-
-  // Sky/mist (background)
-  const sky = document.getElementById('sky');
-  const ctx = sky.getContext('2d');
-  const mist = document.getElementById('mist');
-  const mctx = mist.getContext('2d');
-  function resize(){ sky.width = innerWidth;  sky.height = innerHeight; mist.width = innerWidth; mist.height = innerHeight; drawStaticSky(); }
-  addEventListener('resize', resize, {passive:true});
-  resize();
-  function drawStaticSky(){
-    const w = sky.width, h = sky.height;
-    const g = ctx.createLinearGradient(0,0,0,h);
-    g.addColorStop(0, '#0f1530'); g.addColorStop(0.55,'#0b1126'); g.addColorStop(1, '#080e1e');
-    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-    ctx.save();
-    for(let i=0;i<140;i++){
-      const x = Math.random()*w, y = Math.random()*h*0.88, r = Math.random()*1.3;
-      ctx.fillStyle = `rgba(230,236,255,${0.35+Math.random()*0.35})`;
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-    }
-    ctx.restore();
-    const mx = w*0.82, my = h*0.18, mr = Math.min(w,h)*0.08;
-    const mg = ctx.createRadialGradient(mx-mr*0.28,my-mr*0.28,mr*0.12, mx,my,mr);
-    mg.addColorStop(0,'#ffffff'); mg.addColorStop(0.35,'#e6ebff'); mg.addColorStop(0.8,'rgba(200,210,255,0.22)'); mg.addColorStop(1,'rgba(180,200,255,0.06)');
-    ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
-    for(let i=1;i<=3;i++){
-      ctx.beginPath(); ctx.arc(mx,my,mr+i*12,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(190,205,255,${0.025*(4-i)})`;
-      ctx.lineWidth=8; ctx.stroke();
-    }
-  }
-  function mistLoop(now){
-    const w=mist.width, h=mist.height;
-    mctx.clearRect(0,0,w,h);
-    mctx.globalCompositeOperation='lighter';
-    for(let layer=0; layer<3; layer++){
-      const y = (now/20000 + layer*0.15)%1;
-      const grad = mctx.createLinearGradient(0,h*y,0,h*y + h*0.35);
-      const alpha = 0.06 + layer*0.03;
-      grad.addColorStop(0, `rgba(180,190,220,${alpha})`);
-      grad.addColorStop(1, `rgba(180,190,220,0)`);
-      mctx.fillStyle = grad;
-      mctx.fillRect(0, h*y, w, h*0.4);
-    }
-    requestAnimationFrame(mistLoop);
-  }
-  requestAnimationFrame(mistLoop);
-
-  onboardClose.addEventListener('click', dismissOnboard);
-
-  // Initial render
-  render(idx);
-
-  // expose style lookup for loadout theming
-  window.__getStyleMeta = (name)=> styles.find(s=>s.key===name) || null;
-})(); // end IIFE
-
-
-/* ================== PLAYER / RANK / LOADOUT ================== */
-const PlayerState = {
-  level: 1,
-  xp: 0,
-  selectedBreathing: null,   // set by selection
-  selectedWeaponIndex: 0,
-  baseStats: { strength: 50, speed: 50, defense: 50, focus: 50 },
-};
-
-const RankThresholds = [
-  { level: 1,  rank: 'Mizunoto' },
-  { level: 5,  rank: 'Mizunoe' },
-  { level: 10, rank: 'Kanoto' },
-  { level: 15, rank: 'Kanoe' },
-  { level: 20, rank: 'Tsuchinoto' },
-  { level: 25, rank: 'Tsuchinoe' },
-  { level: 30, rank: 'Hinoto' },
-  { level: 35, rank: 'Hinoe' },
-  { level: 40, rank: 'Kinoto' },
-  { level: 45, rank: 'Kinoe' },
-  { level: 50, rank: 'Hashira' },
-];
-
-const BreathingBonuses = {
-  Water:  { bonus: { strength: 0,  speed: 10, defense: 0,  focus: 5 } },
-  Flame:  { bonus: { strength: 10, speed: 0,  defense: 5,  focus: -5 } },
-  Wind:   { bonus: { strength: 5,  speed: 10, defense: 0,  focus: -10 } },
-  Stone:  { bonus: { strength: 15, speed: -5, defense: 10, focus: 0 } },
-  Sound:  { bonus: { strength: 0,  speed: 15, defense: 0,  focus: -5 } },
-  Thunder:{ bonus: { strength: -5, speed: 20, defense: -5, focus: 0 } },
-  Mist:   { bonus: { strength: -5, speed: 5,  defense: 0,  focus: 15 } },
-  Beast:  { bonus: { strength: 12, speed: 5,  defense: -5, focus: -2 } },
-  Love:   { bonus: { strength: -2, speed: 8,  defense: -2, focus: 6 } },
-  Serpent:{ bonus: { strength: 2,  speed: 6,  defense: 0,  focus: 4 } },
-  Insect: { bonus: { strength: -4, speed: 10, defense: -2, focus: 8 } },
-  Moon:   { bonus: { strength: 14, speed: 6,  defense: 4,  focus: 2 } },
-  Sun:    { bonus: { strength: 16, speed: 8,  defense: 6,  focus: 4 } },
-};
-
-const Weapons = [
-  { id:'nichirin',   name:'Nichirin Sword',      baseDamage:10, speed:'Fast',     trait:'Default Nichirin',  attackName:'Basic Slash' },
-  { id:'spikedball', name:'Spiked Ball & Chain', baseDamage:15, speed:'Slow',     trait:'High knockback',    attackName:'Heavy Smash' },
-  { id:'scythe',     name:'Scythe',              baseDamage:20, speed:'Very Slow',trait:'Wide swing arc',    attackName:'Grim Arc' },
-  { id:'whip',       name:'Whip Blade',          baseDamage:7,  speed:'Fast',     trait:'Chains hits',       attackName:'Lash Combo' },
-  { id:'dual',       name:'Dual Blades',         baseDamage:8,  speed:'Very Fast',trait:'Two-hit combo',     attackName:'Twin Flourish' },
-];
-
-/* Per-weapon stat tweaks (LIVE effect while swiping) */
-const WeaponStatMods = {
-  nichirin:   { strength:  0, speed:  0,  defense:  0, focus:  0 },
-  spikedball: { strength:  6, speed: -8,  defense:  2, focus: -2 },
-  scythe:     { strength: 10, speed: -12, defense:  0, focus: -4 },
-  whip:       { strength: -4, speed:  8,  defense: -2, focus:  3 },
-  dual:       { strength: -2, speed: 10,  defense: -2, focus:  1 },
-};
-
-/* Helpers */
-function computeRank(level){
-  let current = RankThresholds[0].rank;
-  for (const r of RankThresholds) if (level >= r.level) current = r.rank;
-  return current;
-}
-function mergeStats(base, bonus){
-  return {
-    strength: Math.max(1, base.strength + (bonus.strength||0)),
-    speed:    Math.max(1, base.speed    + (bonus.speed||0)),
-    defense:  Math.max(1, base.defense  + (bonus.defense||0)),
-    focus:    Math.max(1, base.focus    + (bonus.focus||0)),
-  };
-}
-function pct(v){ return Math.max(0, Math.min(100, v)); }
-
-/* HUD */
-const hud = document.getElementById('playerRankLevel');
-function renderTopHUD(){ hud.textContent = `Rank: ${computeRank(PlayerState.level)} | Level: ${PlayerState.level}`; }
-renderTopHUD();
-
-/* Start button enable */
-const startBtn = document.getElementById('startBtn');
-function updateStartBtn(){
-  const enabled = !!PlayerState.selectedBreathing;
-  startBtn.disabled = !enabled;
-  startBtn.classList.toggle('enabled', enabled);
-}
-
-/* Select hook (also sets hue for loadout theming) */
-window.onBreathingSelected = function(name, hue){
-  PlayerState.selectedBreathing = name;   // e.g., "Stone"
-  updateStartBtn();
-  const styleMeta = window.__getStyleMeta?.(name);
-  const accent = hue || styleMeta?.hue || '#55b7ff';
-  document.documentElement.style.setProperty('--loadout-accent', accent);
-};
-
-/* ===== Loadout Modal + Weapon Swiper ===== */
-const modal = document.getElementById('loadoutModal');
-const modalRank   = document.getElementById('modalRank');
-const modalLevel  = document.getElementById('modalLevel');
-const modalBreath = document.getElementById('modalBreathing');
-const statBars    = document.getElementById('statBars');
-
-const weaponPrev  = document.getElementById('weaponPrev');
-const weaponNext  = document.getElementById('weaponNext');
-const weaponView  = document.getElementById('weaponView');
-const weaponName  = document.getElementById('weaponName');
-const attackName  = document.getElementById('attackName');
-const attackDmg   = document.getElementById('attackDamage');
-const attackSpd   = document.getElementById('attackSpeed');
-const attackTrait = document.getElementById('attackTrait');
-
-function computeFinalStats(){
-  const b = BreathingBonuses[PlayerState.selectedBreathing]?.bonus || {};
-  const w = Weapons[PlayerState.selectedWeaponIndex];
-  const wm = (w && WeaponStatMods[w.id]) ? WeaponStatMods[w.id] : {};
-  const withBreathing = mergeStats(PlayerState.baseStats, b);
-  return mergeStats(withBreathing, wm);
-}
-function renderStatBars(finalStats){
-  statBars.innerHTML = '';
-  const entries = [
-    ['Strength', finalStats.strength],
-    ['Speed',    finalStats.speed],
-    ['Defense',  finalStats.defense],
-    ['Focus',    finalStats.focus],
-  ];
-  for (const [label, value] of entries){
-    const row = document.createElement('div'); row.className='bar';
-    const l   = document.createElement('div'); l.className='bar-label'; l.textContent = label+':';
-    const fill= document.createElement('div'); fill.className='bar-fill';
-    const inner = document.createElement('div'); inner.style.width = pct(value)+'%';
-    const num = document.createElement('div'); num.textContent = value;
-    fill.appendChild(inner);
-    row.appendChild(l); row.appendChild(fill); row.appendChild(num);
-    statBars.appendChild(row);
-  }
-}
-
-function renderWeapon(){
-  const w = Weapons[PlayerState.selectedWeaponIndex];
-  weaponName.textContent = w.name;
-  attackName.textContent = w.attackName;
-  attackDmg.textContent  = w.baseDamage;
-  attackSpd.textContent  = w.speed;
-  attackTrait.textContent= w.trait;
-  // LIVE: re-compute stats whenever weapon changes
-  renderStatBars(computeFinalStats());
-}
-
-function openLoadout(){
-  modalRank.textContent   = computeRank(PlayerState.level);
-  modalLevel.textContent  = PlayerState.level;
-  modalBreath.textContent = PlayerState.selectedBreathing;
-
-  // Set accent color for loadout from selected breathing
-  const styleMeta = window.__getStyleMeta?.(PlayerState.selectedBreathing);
-  const accent = styleMeta?.hue || '#55b7ff';
-  document.documentElement.style.setProperty('--loadout-accent', accent);
-
-  // Render once
-  renderWeapon(); // also updates stats
-  modal.classList.remove('hidden');
-  modal.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-}
-function closeLoadout(){
-  modal.classList.add('hidden');
-  modal.setAttribute('aria-hidden','true');
-  document.body.style.overflow = '';
-}
-
-/* Start → open loadout */
-startBtn.addEventListener('click', ()=>{
-  if (!PlayerState.selectedBreathing) return;
-  openLoadout();
-});
-
-/* Weapon arrows */
-weaponPrev.addEventListener('click', ()=>{
-  PlayerState.selectedWeaponIndex = (PlayerState.selectedWeaponIndex - 1 + Weapons.length) % Weapons.length;
-  renderWeapon();
-});
-weaponNext.addEventListener('click', ()=>{
-  PlayerState.selectedWeaponIndex = (PlayerState.selectedWeaponIndex + 1) % Weapons.length;
-  renderWeapon();
-});
-
-/* Touch swipe on weapon view */
-(function setupWeaponSwipe(el){
-  let sx=0, dx=0, sw=false;
-  el.addEventListener('touchstart', e=>{ if(!e.touches[0])return; sx=e.touches[0].clientX; sw=true; }, {passive:true});
-  el.addEventListener('touchmove',  e=>{ if(!sw||!e.touches[0])return; dx=e.touches[0].clientX - sx; }, {passive:true});
-  el.addEventListener('touchend',   ()=>{ if(!sw) return; sw=false; if(Math.abs(dx)>40) { PlayerState.selectedWeaponIndex = (PlayerState.selectedWeaponIndex + (dx<0?+1:-1) + Weapons.length)%Weapons.length; renderWeapon(); } dx=0; }, {passive:true});
-})(weaponView);
-
-/* Back / Battle */
-document.getElementById('backToBreathing').addEventListener('click', closeLoadout);
-
-document.getElementById('battleBtn').addEventListener('click', ()=>{
-  const payload = {
-    level: PlayerState.level,
-    rank: computeRank(PlayerState.level),
-    breathing: PlayerState.selectedBreathing,
-    stats: computeFinalStats(),
-    weapon: Weapons[PlayerState.selectedWeaponIndex],
-  };
-  // TODO: replace with your real game start
-  startBattle(payload);
-  closeLoadout();
-});
-
-/* iOS double-tap zoom guard (extra) */
-(function preventDoubleTapZoom(){
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function(e){
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) e.preventDefault();
-    lastTouchEnd = now;
-  }, {passive:false});
-})();
-
-/* Example battle hook */
-function startBattle(loadout){
-  console.log('Starting battle with:', loadout);
-  // You can remove this alert once you hook your scene transition
-  const t = document.getElementById('tagInfo');
-  t.textContent = `Battle start — ${loadout.breathing} + ${loadout.weapon.name}`;
-  t.classList.add('show');
-  setTimeout(()=> t.classList.remove('show'), 2000);
-}
-
-/* === Fix: make tag bubbles open the big centered overlay === */
-(function attachGlobalTagHandler(){
-  // Use document-level delegation so it works even after re-rendering forms
-  document.addEventListener('click', function(e){
-    const el = e.target.closest('.tag');
-    if (!el) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const key  = el.getAttribute('data-tag') || el.textContent.trim();
-    const info = (window.TAG_INFO && TAG_INFO[key]) || key;
-
-    // Use the same big modal overlay the Select button uses
-    if (typeof showToast === 'function') {
-      showToast(`${key}: ${info}`, 2200); // auto-hide after 2.2s (tap anywhere to close)
-    }
-  }, true); // capture=true helps when tags sit inside <details>
-})();
-
-/* === Fix tags → big centered overlay (self-contained) === */
-(function fixTagOverlay(){
-  // Ensure veil element exists
-  let veil = document.getElementById('veil');
-  if (!veil) {
-    veil = document.createElement('div');
-    veil.id = 'veil';
-    veil.className = 'veil';
-    veil.hidden = true;
-    document.body.appendChild(veil);
-  }
-
-  // Ensure a global showToast exists (fallback if not exposed by your IIFE)
-  if (typeof window.showToast !== 'function') {
-    window.showToast = function(text, ms=2200){
-      const toast = document.getElementById('tagInfo');
-      if (!toast) return;
-      toast.textContent = text;
-      toast.classList.add('show');
-      veil.hidden = false;
-      clearTimeout(window.showToast._t);
-      if (ms > 0) window.showToast._t = setTimeout(closeToast, ms);
-    };
-  }
-
-  // Global closer (used by both implementations)
-  function closeToast(){
-    const toast = document.getElementById('tagInfo');
-    if (!toast) return;
-    toast.classList.remove('show');
-    veil.hidden = true;
-  }
-
-  // Click anywhere to close
-  veil.addEventListener('click', closeToast);
-  document.getElementById('tagInfo')?.addEventListener('click', closeToast);
-
-  // Make TAG_INFO accessible if your earlier code kept it scoped
-  // (No overwrite if you already exposed it)
-  if (!('TAG_INFO' in window)) {
-    window.TAG_INFO = {}; // fallback; still shows the tag name even without description
-  }
-
-  // Robust document-level delegation for tag bubbles
-  document.addEventListener('click', function(e){
-    const el = e.target.closest('.tag');
-    if (!el) return;
-    const key  = el.getAttribute('data-tag') || el.textContent.trim();
-    const info = (window.TAG_INFO && window.TAG_INFO[key]) || key;
-    window.showToast(`${key}: ${info}`, 2200);
-  });
-})();
-
-/* === Tag popup: always show full description (single source of truth) === */
-(function fixTagDescriptions(){
-  // 1) Promote any local TAG_INFO to window and never overwrite if already set
-  if (typeof window.TAG_INFO === 'undefined') {
-    // If a local TAG_INFO exists in this scope, use it; otherwise keep {}
-    try { if (typeof TAG_INFO !== 'undefined') window.TAG_INFO = TAG_INFO; }
-    catch(_) { window.TAG_INFO = window.TAG_INFO || {}; }
-  }
-
-  // 2) Ensure veil exists (used by the modal)
-  let veil = document.getElementById('veil');
-  if (!veil) {
-    veil = document.createElement('div');
-    veil.id = 'veil';
-    veil.className = 'veil';
-    veil.hidden = true;
-    document.body.appendChild(veil);
-  }
-
-  // 3) Upgrade showToast to Title + body layout (non-breaking)
-  window.showToast = window.showToast || function(){}; // keep signature
-  const _origShowToast = window.showToast;
-  window.showToast = function(msg, ms=2200){
-    const toast = document.getElementById('tagInfo');
-    if (!toast) return _origShowToast?.(msg, ms);
-
-    // Split "Title: Body" (if provided)
-    let title = '', body = String(msg || '');
-    const i = body.indexOf(':');
-    if (i > 0) { title = body.slice(0, i).trim(); body = body.slice(i+1).trim(); }
-
-    toast.innerHTML = title
-      ? `<div style="font-weight:900;font-size:18px;margin-bottom:6px">${title}</div>
-         <div style="opacity:.92;line-height:1.5">${body}</div>`
-      : `<div style="opacity:.92;line-height:1.5">${body}</div>`;
-
-    toast.classList.add('show');
-    veil.hidden = false;
-
-    clearTimeout(window.showToast._t);
-    if (ms > 0) {
-      window.showToast._t = setTimeout(()=>{
-        toast.classList.remove('show');
-        veil.hidden = true;
-      }, ms);
-    }
-  };
-
-  // 4) High-priority, one-stop handler so older listeners can’t interfere
-  document.addEventListener('click', function onTagClick(e){
-    const tagEl = e.target.closest('.tag');
-    if (!tagEl) return;
-
-    // Prevent any previous tag listeners from running
-    e.stopImmediatePropagation();
-    e.preventDefault();
-
-    const key = tagEl.getAttribute('data-tag') || tagEl.textContent.trim();
-    const desc = (window.TAG_INFO && window.TAG_INFO[key]) || ''; // empty if missing
-
-    if (desc) {
-      window.showToast(`${key}: ${desc}`, 2400);
-    } else {
-      // Fallback: show the key but flag missing description so you can spot it
-      window.showToast(`${key}: (no description found)`, 1800);
-      // Optional: console hint to catch typos/mismatched keys
-      console.warn('[TAG_INFO] Missing description for:', key);
-    }
-  }, true); // capture=true makes this run before other handlers
-})();
-
-
-</script>
+    </section>
+  </main>
+
+  <script src="vocab.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
