@@ -572,3 +572,106 @@ body.dark .slider:before {
 body.dark .helper-text {
   color: #cbd5e1;
 }
+
+.chapter-actions {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.small-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d3c4a3;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #243447;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.small-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+body.dark .small-btn {
+  background: rgba(31, 41, 55, 0.85);
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 252, 242, 0.98);
+  border: 1px solid #d6c49a;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  padding: 28px;
+  animation: modalPop 0.18s ease;
+}
+
+.modal-card h2 {
+  margin-top: 0;
+  color: #243447;
+}
+
+.modal-card p {
+  color: #5f6c7b;
+  line-height: 1.55;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  border: none;
+  background: transparent;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #243447;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+body.dark .modal-card {
+  background: rgba(31, 41, 55, 0.98);
+  border-color: #4b5563;
+}
+
+body.dark .modal-card h2,
+body.dark .modal-close {
+  color: #f3f4f6;
+}
+
+body.dark .modal-card p {
+  color: #cbd5e1;
+}
