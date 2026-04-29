@@ -15,13 +15,17 @@
     </header>
 
     <section id="homeScreen" class="screen active">
-      <div class="nav-bar">
-        <div></div>
-        <div class="nav-title">Home</div>
-        <button class="icon-btn" onclick="showSettings()">
-          <span class="material-symbols-outlined">settings</span>
-        </button>
-      </div>
+     <div class="nav-bar">
+  <button class="icon-btn" onclick="showInfoModal()">
+    <span class="material-symbols-outlined">info</span>
+  </button>
+
+  <div class="nav-title">Home</div>
+
+  <button class="icon-btn" onclick="showSettings()">
+    <span class="material-symbols-outlined">settings</span>
+  </button>
+</div>
 
       <button class="main-btn" onclick="showLearnMenu()">Learn</button>
       <button class="main-btn" onclick="showTestMenu()">Test</button>
@@ -29,13 +33,21 @@
     </section>
 
     <section id="learnMenu" class="screen">
-      <div class="nav-bar">
-        <button class="icon-btn" onclick="showHome()">
-          <span class="material-symbols-outlined">arrow_back</span>
-        </button>
-        <div class="nav-title">Learn</div>
-        <div></div>
-      </div>
+     <div class="nav-bar">
+  <button class="icon-btn" onclick="showHome()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+
+  <div class="nav-title">Learn</div>
+
+  <button class="icon-btn" onclick="showLearnInfoModal()">
+    <span class="material-symbols-outlined">info</span>
+  </button>
+</div>
+<div class="chapter-actions">
+  <button class="small-btn" onclick="setAllChapters('learnChapter', true)">Select All</button>
+  <button class="small-btn" onclick="setAllChapters('learnChapter', false)">Unselect All</button>
+</div>
 
       <div id="learnChapterList" class="chapter-grid"></div>
       <button class="main-btn" onclick="startLearning()">Start Learning</button>
@@ -96,6 +108,10 @@
 </p>
 
       <h3>Choose chapters</h3>
+      <div class="chapter-actions">
+  <button class="small-btn" onclick="setAllChapters('testChapter', true)">Select All</button>
+  <button class="small-btn" onclick="setAllChapters('testChapter', false)">Unselect All</button>
+</div>
       <div id="testChapterList" class="chapter-grid"></div>
 
       <button class="main-btn" onclick="startTest()">Start Test</button>
@@ -183,6 +199,57 @@
   </div>
 </div>
     </section>
+
+    <div id="infoModal" class="modal-overlay" onclick="closeInfoModal(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="hideInfoModal()">×</button>
+
+    <h2>About This App</h2>
+
+    <p>
+      NT Greek Vocab Trainer helps you learn and review common New Testament
+      Greek vocabulary by chapter according to Bill Mounce's "Basics of biblical Greek".
+    </p>
+
+    <p>
+      Use <strong>Learn</strong> to study flashcards, <strong>Test</strong> to
+      quiz yourself, and <strong>Progress</strong> to see your recent scores and
+      most missed words.
+    </p>
+
+    <p>
+      Focus Mode tests the words you struggle with most, helping you review
+      weaker vocabulary more intentionally.
+    </p>
+  </div>
+</div>
+
+
+<div id="learnInfoModal" class="modal-overlay" onclick="closeLearnInfoModal(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="hideLearnInfoModal()">×</button>
+
+    <h2>Why Learn These Words?</h2>
+
+    <p>
+      This app includes over 300 common New Testament Greek words.
+      Together, these words appear so often that they make up a large portion
+      of the Greek New Testament. (Over 80%)
+    </p>
+
+    <p>
+      Even before learning every grammar rule, recognizing common Greek words
+      can help you read more carefully, notice repeated ideas, and better
+      understand how biblical passages are being communicated.
+    </p>
+
+    <p>
+      The goal is not to replace serious Greek study, but to give you a strong
+      vocabulary foundation so the New Testament feels less unfamiliar as you
+      continue learning.
+    </p>
+  </div>
+</div>
   </main>
 
   <script src="vocab.js"></script>
