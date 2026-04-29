@@ -562,3 +562,13 @@ body.dark .switch input:checked + .slider {
 body.dark .slider:before {
   background: #f9fafb;
 }
+.helper-text {
+  margin-top: -4px;
+  margin-bottom: 18px;
+  color: #5f6c7b;
+  font-size: 0.9rem;
+}
+
+body.dark .helper-text {
+  color: #cbd5e1;
+}
