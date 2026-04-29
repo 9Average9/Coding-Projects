@@ -69,6 +69,19 @@ function getSelectedChapters(name) {
     .map(input => Number(input.value));
 }
 
+function setAllChapters(name, checked) {
+  const inputs = document.querySelectorAll(`input[name="${name}"]`);
+
+  inputs.forEach(input => {
+    input.checked = checked;
+
+    const label = input.closest("label");
+    if (label) {
+      label.classList.toggle("selected", checked);
+    }
+  });
+}
+
 function showLearnMenu() {
   buildChapterCheckboxes("learnChapterList", "learnChapter");
   showScreen("learnMenu");
@@ -492,4 +505,36 @@ window.addEventListener("load", () => {
 function toggleResetSection() {
   const el = document.getElementById("resetContent");
   el.classList.toggle("open");
+}
+
+function showInfoModal() {
+  const modal = document.getElementById("infoModal");
+  if (modal) modal.classList.add("open");
+}
+
+function hideInfoModal() {
+  const modal = document.getElementById("infoModal");
+  if (modal) modal.classList.remove("open");
+}
+
+function closeInfoModal(event) {
+  if (event.target.id === "infoModal") {
+    hideInfoModal();
+  }
+}
+
+function showLearnInfoModal() {
+  const modal = document.getElementById("learnInfoModal");
+  if (modal) modal.classList.add("open");
+}
+
+function hideLearnInfoModal() {
+  const modal = document.getElementById("learnInfoModal");
+  if (modal) modal.classList.remove("open");
+}
+
+function closeLearnInfoModal(event) {
+  if (event.target.id === "learnInfoModal") {
+    hideLearnInfoModal();
+  }
 }
