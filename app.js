@@ -5,6 +5,7 @@ let testIndex = 0;
 let testCorrect = 0;
 let missedWords = [];
 let answered = false;
+let currentTestSaved = false;
 
 const screens = [
   "homeScreen",
@@ -19,9 +20,12 @@ const screens = [
 
 function showScreen(id) {
   screens.forEach(screen => {
-    document.getElementById(screen).classList.remove("active");
+    const el = document.getElementById(screen);
+    if (el) el.classList.remove("active");
   });
-  document.getElementById(id).classList.add("active");
+
+  const target = document.getElementById(id);
+  if (target) target.classList.add("active");
 }
 
 function showHome() {
@@ -71,9 +75,13 @@ function showLearnMenu() {
 }
 
 function startLearning(customWords = null) {
-  const chapters = getSelectedChapters("learnChapter");
+  if (customWords) {
+    learnWords = customWords;
+  } else {
+    const chapters = getSelectedChapters("learnChapter");
+    learnWords = VOCAB.filter(word => chapters.includes(word.chapter));
+  }
 
-  learnWords = customWords || VOCAB.filter(word => chapters.includes(word.chapter));
   learnIndex = 0;
 
   if (learnWords.length === 0) {
@@ -84,7 +92,6 @@ function startLearning(customWords = null) {
   showScreen("learnScreen");
   renderLearnCard();
 }
-
 function renderLearnCard() {
   const word = learnWords[learnIndex];
 
@@ -171,11 +178,16 @@ function startTest() {
     return;
   }
 
+  if (focusMode) {
+  testWords = pool.slice(0, Math.min(amount, pool.length));
+} else {
   testWords = shuffle(pool).slice(0, Math.min(amount, pool.length));
+}
   testIndex = 0;
-  testCorrect = 0;
-  missedWords = [];
-  answered = false;
+testCorrect = 0;
+missedWords = [];
+answered = false;
+currentTestSaved = false;
 
   showScreen("testScreen");
   renderTestWord();
@@ -243,6 +255,9 @@ document.getElementById("answerInput").addEventListener("keydown", e => {
 });
 
 function finishTest() {
+   if (currentTestSaved) return;
+  currentTestSaved = true;
+
   saveTestScore(testCorrect, testWords.length);
 
   document.getElementById("scoreResult").textContent =
@@ -338,13 +353,15 @@ function updateWordStats(wordId, wasCorrect) {
 }
 
 function saveTestScore(correct, total) {
+  if (!total || total <= 0) return;
+
   const stats = getStats();
 
   stats.tests.push({
-    correct,
-    total,
+    correct: Number(correct),
+    total: Number(total),
     percent: Math.round((correct / total) * 100),
-    date: new Date().toLocaleDateString()
+    date: new Date().toLocaleString()
   });
 
   saveStats(stats);
@@ -353,16 +370,33 @@ function saveTestScore(correct, total) {
 function getWeakWords(pool) {
   const stats = getStats();
 
-  return pool.filter(word => {
-    const wordStats = stats.words[word.id];
+  return pool
+    .map(word => {
+      const wordStats = stats.words[word.id];
+      if (!wordStats) return null;
 
-    if (!wordStats) return false;
+      const attempts = wordStats.correct + wordStats.wrong;
+      if (attempts === 0) return null;
 
-    const attempts = wordStats.correct + wordStats.wrong;
-    const accuracy = wordStats.correct / attempts;
+      const accuracy = wordStats.correct / attempts;
+      const isWeak = wordStats.wrong >= 2 || accuracy < 0.7;
 
-    return wordStats.wrong >= 2 || accuracy < 0.7;
-  });
+      if (!isWeak) return null;
+
+      return {
+        ...word,
+        weakScore: calculateWeakScore(wordStats.correct, wordStats.wrong)
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.weakScore - a.weakScore);
+}
+
+function calculateWeakScore(correct, wrong) {
+  const attempts = correct + wrong;
+  const accuracy = attempts === 0 ? 1 : correct / attempts;
+
+  return wrong * 2 + (1 - accuracy) * 5;
 }
 
 function showProgress() {
@@ -382,18 +416,21 @@ function showProgress() {
     stats.tests.reduce((sum, t) => sum + t.percent, 0) / totalTests
   );
 
-  const hardest = Object.entries(stats.words)
-    .map(([id, stat]) => {
-      const word = VOCAB.find(w => w.id === Number(id));
-      return {
-        word,
-        wrong: stat.wrong,
-        correct: stat.correct
-      };
-    })
-    .filter(item => item.word && item.wrong > 0)
-    .sort((a, b) => b.wrong - a.wrong)
-    .slice(0, 10);
+ const hardest = Object.entries(stats.words)
+  .map(([id, stat]) => {
+    const word = VOCAB.find(w => w && w.id === Number(id));
+
+    if (!word) return null;
+
+    return {
+      word,
+      wrong: stat.wrong || 0,
+      correct: stat.correct || 0
+    };
+  })
+  .filter(item => item && item.wrong > 0)
+  .sort((a, b) => b.wrong - a.wrong)
+  .slice(0, 10);
 
   container.innerHTML = `
     <p><strong>Total tests:</strong> ${totalTests}</p>
