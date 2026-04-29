@@ -82,10 +82,18 @@
       <label class="label">Number of words</label>
       <input id="testAmount" type="number" min="1" value="10" />
 
-      <label class="checkbox-row">
-        <input id="focusMode" type="checkbox" />
-        Focus Mode: only weak words
-      </label>
+      <div class="toggle-row">
+  <span>Focus Mode</span>
+
+  <label class="switch">
+    <input id="focusMode" type="checkbox" />
+    <span class="slider"></span>
+  </label>
+</div>
+
+<p class="helper-text">
+  Tests only the words you struggle with most.
+</p>
 
       <h3>Choose chapters</h3>
       <div id="testChapterList" class="chapter-grid"></div>
