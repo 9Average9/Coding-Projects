@@ -28,8 +28,9 @@
 </div>
 
       <button class="main-btn" onclick="showLearnMenu()">Learn</button>
-      <button class="main-btn" onclick="showTestMenu()">Test</button>
-      <button class="main-btn secondary" onclick="showProgress()">Progress</button>
+<button class="main-btn" onclick="showTranslateMenu()">Translate</button>
+<button class="main-btn" onclick="showTestMenu()">Test</button>
+<button class="main-btn secondary" onclick="showProgress()">Progress</button>
     </section>
 
     <section id="learnMenu" class="screen">
@@ -81,6 +82,81 @@
         <button class="main-btn" onclick="nextLearnCard()">Next</button>
       </div>
     </section>
+
+<section id="translateMenu" class="screen">
+  <div class="nav-bar">
+    <button class="icon-btn" onclick="showHome()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="nav-title">Translate</div>
+    <button class="icon-btn" onclick="showTranslateInfoModal()">
+      <span class="material-symbols-outlined">info</span>
+    </button>
+  </div>
+
+  <p class="helper-text">
+    Choose chapters to practice short Greek sentences using vocabulary from that chapter and earlier chapters.
+  </p>
+
+  <h3>Choose chapters</h3>
+
+  <div class="chapter-actions">
+    <button class="small-btn" onclick="setAllChapters('translateChapter', true)">Select All</button>
+    <button class="small-btn" onclick="setAllChapters('translateChapter', false)">Unselect All</button>
+  </div>
+
+  <div id="translateChapterList" class="chapter-grid"></div>
+
+  <button class="main-btn" onclick="startTranslatePractice()">Start Translating</button>
+</section>
+
+<section id="translateScreen" class="screen">
+  <div class="nav-bar">
+    <button class="icon-btn" onclick="showTranslateMenu()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="nav-title" id="translateProgress"></div>
+    <div></div>
+  </div>
+
+  <div class="translate-card">
+    <div class="translate-label">Greek sentence</div>
+    <div id="translateGreek" class="translate-greek"></div>
+
+    <label class="label">Your translation</label>
+    <textarea id="translateInput" class="translate-input" placeholder="Type what you think it means..."></textarea>
+
+    <button id="revealTranslateBtn" class="main-btn" onclick="revealTranslation()">Reveal Answer</button>
+
+    <div id="translationReveal" class="translation-reveal">
+      <div class="compare-box">
+        <div class="compare-label">Your translation</div>
+        <div id="userTranslationText"></div>
+      </div>
+
+      <div class="compare-box suggested">
+        <div class="compare-label">Suggested translation</div>
+        <div id="suggestedTranslationText"></div>
+      </div>
+
+<div id="translationGradeButtons" class="translation-grade-buttons">
+  <button class="grade-btn got" onclick="gradeTranslation('got')">Got it</button>
+  <button class="grade-btn almost" onclick="gradeTranslation('almost')">Almost</button>
+  <button class="grade-btn missed" onclick="gradeTranslation('missed')">Missed it</button>
+</div>
+
+<div id="translationGradeSaved" class="grade-saved"></div>
+
+      <button id="explainTranslateBtn" class="main-btn secondary" onclick="toggleTranslationExplanation()">
+        Explain
+      </button>
+
+      <div id="translationExplanation" class="translation-explanation"></div>
+
+      <button class="main-btn" onclick="nextTranslateSentence()">Next Sentence</button>
+    </div>
+  </div>
+</section>
 
     <section id="testMenu" class="screen">
       <div class="nav-bar">
@@ -197,6 +273,24 @@
       Confirm Reset
     </button>
   </div>
+  
+</div>
+
+<div class="settings-card">
+  <button class="collapse-btn" onclick="toggleTranslationResetSection()">
+    Reset Translation Data
+  </button>
+
+  <div id="translationResetContent" class="collapse-content">
+    <p>
+      This will permanently delete your saved translation progress,
+      including all "got it", "almost", and "missed it" data.
+    </p>
+
+    <button class="danger-btn" onclick="resetTranslationData()">
+      Confirm Reset
+    </button>
+  </div>
 </div>
     </section>
 
@@ -250,8 +344,35 @@
     </p>
   </div>
 </div>
+
+<div id="translateInfoModal" class="modal-overlay" onclick="closeTranslateInfoModal(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="hideTranslateInfoModal()">×</button>
+
+    <h2>Translation Practice</h2>
+
+    <p>
+      This section gives you short Greek practice sentences based on the chapters you select.
+    </p>
+
+    <p>
+      It does not auto-grade your translation. Instead, you type your best attempt,
+      reveal the suggested translation, and compare your answer for yourself.
+    </p>
+
+    <p>
+      Use the Explain button to see why the sentence is translated the way it is.
+    </p>
+  </div>
+</div>
+
+
   </main>
 
+  <script src="vocab.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
   <script src="vocab.js"></script>
   <script src="app.js"></script>
 </body>
