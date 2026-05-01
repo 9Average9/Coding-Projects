@@ -506,7 +506,7 @@ body.dark .danger-btn {
 }
 
 .collapse-content.open {
-  max-height: 200px;
+  max-height: 600px;
   margin-top: 12px;
 }
 
@@ -673,5 +673,345 @@ body.dark .modal-close {
 }
 
 body.dark .modal-card p {
+  color: #cbd5e1;
+}
+
+.translate-card {
+  background: rgba(255, 252, 242, 0.95);
+  border: 1px solid #d6c49a;
+  border-radius: 24px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  padding: 24px;
+}
+
+.translate-label,
+.compare-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7b6f55;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.translate-greek {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2933;
+  margin-bottom: 20px;
+  line-height: 1.35;
+}
+
+.translate-input {
+  width: 100%;
+  min-height: 110px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #c8b894;
+  font-size: 1rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.translation-reveal {
+  display: none;
+  margin-top: 20px;
+}
+
+.translation-reveal.open {
+  display: block;
+}
+
+.compare-box {
+  background: rgba(255,255,255,0.75);
+  border: 1px solid #d6c49a;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.compare-box.suggested {
+  background: rgba(36, 52, 71, 0.08);
+}
+
+.translation-explanation {
+  display: none;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid #d6c49a;
+}
+
+.translation-explanation.open {
+  display: block;
+}
+
+.translation-explanation h3 {
+  margin-top: 0;
+}
+
+.structure-pill {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #243447;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.word-breakdown {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.breakdown-row {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.8);
+}
+
+.breakdown-row strong {
+  font-size: 1.1rem;
+  color: #243447;
+}
+
+.breakdown-row span {
+  font-weight: 600;
+}
+
+.breakdown-row small {
+  color: #5f6c7b;
+  line-height: 1.4;
+}
+
+body.dark .translate-card {
+  background: rgba(31, 41, 55, 0.96);
+  border-color: #4b5563;
+}
+
+body.dark .translate-greek {
+  color: #f9fafb;
+}
+
+body.dark .translate-label,
+body.dark .compare-label {
+  color: #cbd5e1;
+}
+
+body.dark .translate-input {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+body.dark .compare-box,
+body.dark .translation-explanation,
+body.dark .breakdown-row {
+  background: rgba(17, 24, 39, 0.75);
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark .compare-box.suggested {
+  background: rgba(214, 196, 154, 0.12);
+}
+
+body.dark .breakdown-row strong {
+  color: #f9fafb;
+}
+
+body.dark .breakdown-row small {
+  color: #cbd5e1;
+}
+
+body.dark .structure-pill {
+  background: #d6c49a;
+  color: #1f2933;
+}
+
+.translation-grade-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.grade-btn {
+  padding: 12px 10px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.grade-btn.got {
+  background: #15803d;
+}
+
+.grade-btn.almost {
+  background: #b7791f;
+}
+
+.grade-btn.missed {
+  background: #b91c1c;
+}
+
+.grade-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.grade-saved {
+  font-weight: 700;
+  color: #15803d;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+body.dark .grade-saved {
+  color: #86efac;
+}
+
+.progress-collapse-btn {
+  margin-top: 14px;
+  background: #243447;
+  color: white;
+  text-align: left;
+  font-size: 1.05rem;
+}
+
+.progress-collapse-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.progress-collapse-content.open {
+  max-height: 3000px;
+  margin-bottom: 16px;
+}
+
+body.dark .progress-collapse-btn {
+  background: #334155;
+  color: #f8fafc;
+}
+.progress-collapse-btn {
+  margin-top: 14px;
+  background: #243447;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.05rem;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.progress-collapse-btn:hover {
+  opacity: 0.9;
+}
+
+.progress-collapse-btn .arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.progress-collapse-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.progress-collapse-content.open {
+  max-height: 3000px;
+  margin-bottom: 16px;
+}
+/* Reset Test Data card */
+.settings-card .collapse-btn {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid #d3c4a3;
+  color: #243447;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 1rem;
+  text-align: left;
+  transition: all 0.2s ease;
+   text-align: center;
+}
+
+.settings-card .collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.settings-card #resetContent {
+  text-align: left;
+}
+
+.settings-card #resetContent p {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #d3c4a3;
+  border-radius: 14px;
+  padding: 14px;
+  margin: 14px 0;
+}
+
+.settings-card .danger-btn {
+  background: #8f1d2c;
+  border: 1px solid #7f1d1d;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(143, 29, 44, 0.18);
+}
+
+.settings-card .danger-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Dark mode reset styling */
+body.dark .settings-card .collapse-btn {
+  background: rgba(31, 41, 55, 0.9);
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark .settings-card .collapse-btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+}
+
+body.dark .settings-card #resetContent p {
+  background: rgba(17, 24, 39, 0.75);
+  border-color: #4b5563;
+  color: #cbd5e1;
+}
+
+body.dark .settings-card .danger-btn {
+  background: #be123c;
+  border-color: #881337;
+  color: white;
+  box-shadow: 0 6px 14px rgba(190, 18, 60, 0.22);
+}
+/* Make BOTH reset sections match */
+.settings-card .collapse-content p {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #d3c4a3;
+  border-radius: 14px;
+  padding: 14px;
+  margin: 14px 0;
+}
+
+/* Dark mode match */
+body.dark .settings-card .collapse-content p {
+  background: rgba(17, 24, 39, 0.75);
+  border-color: #4b5563;
   color: #cbd5e1;
 }
