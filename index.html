@@ -27,10 +27,25 @@
   </button>
 </div>
 
-      <button class="main-btn" onclick="showLearnMenu()">Learn</button>
-<button class="main-btn" onclick="showTranslateMenu()">Translate</button>
-<button class="main-btn" onclick="showTestMenu()">Test</button>
-<button class="main-btn secondary" onclick="showProgress()">Progress</button>
+     <button class="main-btn home-action" onclick="showLearnMenu()">
+  <span class="material-symbols-outlined">school</span>
+  <span>Learn</span>
+</button>
+
+<button class="main-btn home-action" onclick="showTranslateMenu()">
+  <span class="material-symbols-outlined">edit_note</span>
+  <span>Translate</span>
+</button>
+
+<button class="main-btn home-action" onclick="showTestMenu()">
+  <span class="material-symbols-outlined">quiz</span>
+  <span>Test</span>
+</button>
+
+<button class="main-btn secondary home-action" onclick="showProgress()">
+  <span class="material-symbols-outlined">trending_up</span>
+  <span>Progress</span>
+</button>
     </section>
 
     <section id="learnMenu" class="screen">
@@ -45,6 +60,8 @@
     <span class="material-symbols-outlined">info</span>
   </button>
 </div>
+
+<h3>Choose chapters</h3>
 <div class="chapter-actions">
   <button class="small-btn" onclick="setAllChapters('learnChapter', true)">Select All</button>
   <button class="small-btn" onclick="setAllChapters('learnChapter', false)">Unselect All</button>
@@ -164,6 +181,10 @@
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Test</div>
+
+<button class="icon-btn" onclick="showKnownWordsModal()">
+  <span class="material-symbols-outlined">check_circle</span>
+</button>
         <div></div>
       </div>
 
@@ -206,6 +227,9 @@
         <div id="testGreek" class="greek-word"></div>
         <input id="answerInput" type="text" placeholder="Type the meaning..." />
         <button class="main-btn" onclick="submitAnswer()">Submit</button>
+        <button class="main-btn secondary" onclick="markWordAsKnown()">
+  I know this word
+</button>
         <div id="feedback" class="feedback"></div>
       </div>
     </section>
@@ -247,17 +271,39 @@
         <div class="nav-title">Settings</div>
         <div></div>
       </div>
-  <div class="settings-card">
-      <h3>Appearance</h3>
+ <div class="settings-card">
+  <h3>Appearance</h3>
 
-     <label class="toggle-row">
+  <div class="toggle-row">
     <span>Dark Mode</span>
+
     <label class="switch">
-  <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
-  <span class="slider"></span>
-</label>
-      </label>
-      </div>
+      <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="theme-settings">
+  <h4>Custom Theme</h4>
+
+  <div class="color-row">
+  <span>Background Color</span>
+  <input type="color" id="primaryColorPicker" value="#efe4c8" onchange="updateThemeColors()" />
+</div>
+
+  <div class="color-row">
+  <span>Button Color</span>
+  <input type="color" id="secondaryColorPicker" value="#243447" onchange="updateThemeColors()" />
+</div>
+
+<div class="color-row">
+  <span>Font Color</span>
+  <input type="color" id="fontColorPicker" value="#1f2933" onchange="updateThemeColors()" />
+</div>
+
+  <button class="small-btn" onclick="resetThemeColors()">Reset Theme</button>
+</div>
+</div>
      <div class="settings-card">
   <button class="collapse-btn" onclick="toggleResetSection()">
     Reset Test Data
@@ -294,6 +340,10 @@
 </div>
     </section>
 
+
+
+
+    
     <div id="infoModal" class="modal-overlay" onclick="closeInfoModal(event)">
   <div class="modal-card">
     <button class="modal-close" onclick="hideInfoModal()">×</button>
@@ -305,11 +355,11 @@
       Greek vocabulary by chapter according to Bill Mounce's "Basics of biblical Greek".
     </p>
 
-    <p>
-      Use <strong>Learn</strong> to study flashcards, <strong>Test</strong> to
-      quiz yourself, and <strong>Progress</strong> to see your recent scores and
-      most missed words.
-    </p>
+   <p>
+  Use <strong>Learn</strong> to study flashcards, <strong>Translate</strong> to
+  practice short Greek sentences, <strong>Test</strong> to quiz yourself, and
+  <strong>Progress</strong> to see your scores, weak words, and translation progress.
+</p>
 
     <p>
       Focus Mode tests the words you struggle with most, helping you review
@@ -366,13 +416,17 @@
   </div>
 </div>
 
+<div id="knownWordsModal" class="modal-overlay" onclick="closeKnownWordsModal(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="hideKnownWordsModal()">×</button>
 
+    <h2>Known Words</h2>
+
+    <div id="knownWordsContent"></div>
+  </div>
+</div>
   </main>
 
-  <script src="vocab.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
   <script src="vocab.js"></script>
   <script src="app.js"></script>
 </body>
