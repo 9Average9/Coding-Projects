@@ -6,7 +6,7 @@ let testCorrect = 0;
 let missedWords = [];
 let answered = false;
 let currentTestSaved = false;
-
+let knownWords = JSON.parse(localStorage.getItem("knownWords")) || [];
 let currentTranslateSentence = null;
 let translationProgress =
   JSON.parse(localStorage.getItem("translationProgress")) || {};
@@ -7884,7 +7884,7 @@ function buildChapterCheckboxes(containerId, name) {
 
     label.innerHTML = `
       <input type="checkbox" name="${name}" value="${chapter}" />
-      Ch. ${chapter}
+       ${chapter}
     `;
 
     const input = label.querySelector("input");
@@ -8011,32 +8011,42 @@ function startTest() {
   const chapters = getSelectedChapters("testChapter");
   const focusMode = document.getElementById("focusMode").checked;
 
-  let pool = VOCAB.filter(word => chapters.includes(word.chapter));
-
-  if (focusMode) {
-    const weakWords = getWeakWords(pool);
-    if (weakWords.length === 0) {
-      alert("You do not have weak words yet. Take a normal test first.");
-      return;
-    }
-    pool = weakWords;
-  }
-
-  if (pool.length === 0) {
+  if (chapters.length === 0) {
     alert("Choose at least one chapter.");
     return;
   }
 
+  let pool = VOCAB.filter(word => chapters.includes(word.chapter));
+
+  pool = pool.filter(word => !knownWords.includes(word.id));
+
+  if (pool.length === 0) {
+    alert("No words left to test — you've marked all selected chapter words as known.");
+    return;
+  }
+
   if (focusMode) {
-  testWords = pool.slice(0, Math.min(amount, pool.length));
-} else {
-  testWords = shuffle(pool).slice(0, Math.min(amount, pool.length));
-}
+    const weakWords = getWeakWords(pool);
+
+    if (weakWords.length === 0) {
+      alert("You do not have weak words yet. Take a normal test first.");
+      return;
+    }
+
+    pool = weakWords;
+  }
+
+  if (focusMode) {
+    testWords = pool.slice(0, Math.min(amount, pool.length));
+  } else {
+    testWords = shuffle(pool).slice(0, Math.min(amount, pool.length));
+  }
+
   testIndex = 0;
-testCorrect = 0;
-missedWords = [];
-answered = false;
-currentTestSaved = false;
+  testCorrect = 0;
+  missedWords = [];
+  answered = false;
+  currentTestSaved = false;
 
   showScreen("testScreen");
   renderTestWord();
@@ -8382,14 +8392,17 @@ function showSettings() {
 
 function resetTestData() {
   const confirmed = confirm(
-    "Are you sure?\n\nThis will permanently reset all test scores, progress stats, and weak-word tracking. This cannot be undone."
+    "Are you sure?\n\nThis will permanently reset all test scores, progress stats, weak-word tracking, and known words. This cannot be undone."
   );
 
   if (!confirmed) return;
 
   localStorage.removeItem("greekVocabStats");
+  localStorage.removeItem("knownWords");
 
-  alert("Test data has been reset.");
+  knownWords = [];
+
+  alert("Test data and known words have been reset.");
   showHome();
 }
 function toggleDarkMode() {
@@ -8399,6 +8412,56 @@ function toggleDarkMode() {
   localStorage.setItem("darkMode", isDark);
 }
 
+function applyThemeColors(primary, secondary, font) {
+  document.documentElement.style.setProperty("--primary-color", primary);
+  document.documentElement.style.setProperty("--primary-light", lightenColor(primary, 35));
+  document.documentElement.style.setProperty("--secondary-color", secondary);
+  document.documentElement.style.setProperty("--font-color", font);
+}
+
+function updateThemeColors() {
+  const primary = document.getElementById("primaryColorPicker").value;
+  const secondary = document.getElementById("secondaryColorPicker").value;
+  const font = document.getElementById("fontColorPicker").value;
+
+  applyThemeColors(primary, secondary, font);
+
+  localStorage.setItem("primaryColor", primary);
+  localStorage.setItem("secondaryColor", secondary);
+  localStorage.setItem("fontColor", font);
+}
+
+function resetThemeColors() {
+  const defaultPrimary = "#efe4c8";
+  const defaultSecondary = "#243447";
+  const defaultFont = "#1f2933";
+
+  localStorage.removeItem("primaryColor");
+  localStorage.removeItem("secondaryColor");
+  localStorage.removeItem("fontColor");
+
+  applyThemeColors(defaultPrimary, defaultSecondary, defaultFont);
+
+  document.getElementById("primaryColorPicker").value = defaultPrimary;
+  document.getElementById("secondaryColorPicker").value = defaultSecondary;
+  document.getElementById("fontColorPicker").value = defaultFont;
+}
+
+function lightenColor(hex, percent) {
+  const num = parseInt(hex.replace("#", ""), 16);
+
+  let r = (num >> 16) + percent;
+  let g = ((num >> 8) & 255) + percent;
+  let b = (num & 255) + percent;
+
+  r = Math.min(255, r);
+  g = Math.min(255, g);
+  b = Math.min(255, b);
+
+  return "#" + (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0");
+}
+
+
 // load saved preference
 window.addEventListener("load", () => {
   const saved = localStorage.getItem("darkMode") === "true";
@@ -8406,6 +8469,16 @@ window.addEventListener("load", () => {
 
   const toggle = document.getElementById("darkModeToggle");
   if (toggle) toggle.checked = saved;
+
+  const savedPrimary = localStorage.getItem("primaryColor") || "#efe4c8";
+const savedSecondary = localStorage.getItem("secondaryColor") || "#243447";
+const savedFont = localStorage.getItem("fontColor") || "#1f2933";
+
+applyThemeColors(savedPrimary, savedSecondary, savedFont);
+
+document.getElementById("primaryColorPicker").value = savedPrimary;
+document.getElementById("secondaryColorPicker").value = savedSecondary;
+document.getElementById("fontColorPicker").value = savedFont;
 });
 
 function toggleResetSection() {
@@ -8659,4 +8732,87 @@ function resetTranslationData() {
   if (section) section.classList.remove("open");
 
   alert("Translation progress has been reset.");
+}
+function markWordAsKnown() {
+  const currentWord = testWords[testIndex];
+
+  if (!currentWord) return;
+
+  if (!knownWords.includes(currentWord.id)) {
+    knownWords.push(currentWord.id);
+    localStorage.setItem("knownWords", JSON.stringify(knownWords));
+  }
+
+  nextTestWord(); // skip it immediately
+}
+function updateKnownButton() {
+  const currentWord = testWords[testIndex];
+  const btn = document.getElementById("knownBtn");
+
+  if (!btn || !currentWord) return;
+
+  btn.textContent = knownWords.includes(currentWord.id)
+    ? "Marked as Known ✓"
+    : "I know this word";
+}
+function showKnownWordsModal() {
+  const content = document.getElementById("knownWordsContent");
+
+  if (knownWords.length === 0) {
+    content.innerHTML = `
+      <p>
+        When you mark a word as <strong>I know this word</strong>, it will be removed
+        from future tests so you can focus on words you still need to practice.
+      </p>
+
+      <p>
+        Once you mark words as known, they will appear here.
+      </p>
+    `;
+  } else {
+    content.innerHTML = knownWords
+      .map(id => VOCAB.find(word => word.id === id))
+      .filter(Boolean)
+      .map(word => `
+        <div class="known-word-row">
+          <div>
+            <strong>${word.greek}</strong><br>
+            <span>${word.meaning}</span>
+          </div>
+
+          <button class="known-remove-btn" onclick="removeKnownWord('${word.id}')">
+            ×
+          </button>
+        </div>
+      `)
+      .join("");
+  }
+
+  document.getElementById("knownWordsModal").classList.add("open");
+}
+
+function hideKnownWordsModal() {
+  document.getElementById("knownWordsModal").classList.remove("open");
+}
+
+function closeKnownWordsModal(event) {
+  if (event.target.id === "knownWordsModal") {
+    hideKnownWordsModal();
+  }
+}
+
+function removeKnownWord(wordId) {
+  knownWords = knownWords.filter(id => String(id) !== String(wordId));
+  localStorage.setItem("knownWords", JSON.stringify(knownWords));
+  showKnownWordsModal();
+}
+
+function hideKnownWordsModal() {
+  document.getElementById("knownWordsModal").classList.remove("open");
+}
+
+function closeKnownWordsModal(event) {
+  if (event.target.id === "knownWordsModal") {
+    hideKnownWordsModal();
+  }
 }
