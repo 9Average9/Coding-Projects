@@ -8,6 +8,7 @@
   --primary-light: #f8f3e7;
   --secondary-color: #243447;
   --font-color: #1f2933;
+  --btn-text-color: white;
 }
 body {
   margin: 0;
@@ -17,7 +18,7 @@ body {
 }
 
 .app {
-  max-width: 720px;
+  max-width: 900px;
   margin: 0 auto;
   min-height: 100vh;
   padding: 24px;
@@ -57,7 +58,7 @@ body {
   border: none;
   border-radius: 14px;
   background: var(--secondary-color);
-  color: white;
+  color: var(--btn-text-color);
   font-size: 1rem;
   cursor: pointer;
 }
@@ -73,7 +74,7 @@ body {
 
 .text-btn {
   background: transparent;
-  color: #243447;
+  color: var(--font-color);
   text-decoration: underline;
   width: auto;
   padding: 8px;
@@ -341,7 +342,7 @@ input[type="text"] {
 /* Icon styling */
 .material-symbols-outlined {
   font-size: 22px;
-  color: #243447;
+  color: var(--font-color);
 }
 .screen.active {
   display: block;
@@ -597,7 +598,7 @@ body.dark .helper-text {
   border: 1px solid #d3c4a3;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.7);
-  color: #243447;
+  color: var(--font-color);
   font-weight: 600;
   cursor: pointer;
 }
@@ -642,7 +643,7 @@ body.dark .small-btn {
 
 .modal-card h2 {
   margin-top: 0;
-  color: #243447;
+  color: var(--font-color);
 }
 
 .modal-card p {
@@ -659,7 +660,7 @@ body.dark .small-btn {
   font-size: 1.8rem;
   line-height: 1;
   cursor: pointer;
-  color: #243447;
+  color: var(--font-color);
 }
 
 @keyframes modalPop {
@@ -791,7 +792,7 @@ body.dark .modal-card p {
 
 .breakdown-row strong {
   font-size: 1.1rem;
-  color: #243447;
+  color: var(--font-color);
 }
 
 .breakdown-row span {
@@ -892,13 +893,7 @@ body.dark .grade-saved {
   color: #86efac;
 }
 
-.progress-collapse-btn {
-  margin-top: 14px;
-  background: #243447;
-  color: white;
-  text-align: left;
-  font-size: 1.05rem;
-}
+
 
 .collapse-content {
   display: none;
@@ -917,7 +912,7 @@ body.dark .progress-collapse-btn {
 .progress-collapse-btn {
   margin-top: 14px;
   background: #243447;
-  color: white;
+  color: var(--font-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -950,7 +945,7 @@ body.dark .progress-collapse-btn {
 .settings-card .collapse-btn {
   background: rgba(255, 255, 255, 0.65);
   border: 1px solid #d3c4a3;
-  color: #243447;
+  color: var(--font-color);
   border-radius: 14px;
   padding: 14px 16px;
   font-size: 1rem;
@@ -1112,4 +1107,505 @@ body.dark .known-word-row {
 
 body.dark .known-remove-btn {
   background: #be123c;
+}
+.learn-content {
+  margin-top: 16px;
+}
+
+.learn-lesson {
+  display: none;
+}
+
+.learn-lesson.active {
+  display: block;
+}
+
+.learn-side-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 50;
+}
+
+.learn-side-overlay.open {
+  display: block;
+}
+
+.learn-side-menu {
+  position: fixed;
+  top: 0;
+  right: -290px;
+  width: 280px;
+  height: 100vh;
+  background: rgba(255, 252, 242, 0.98);
+  border-left: 1px solid #d6c49a;
+  box-shadow: -8px 0 24px rgba(0,0,0,0.18);
+  z-index: 60;
+  padding: 20px;
+  transition: right 0.22s ease;
+}
+
+.learn-side-menu.open {
+  right: 0;
+}
+
+.side-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.learn-side-menu button:not(.modal-close) {
+  width: 100%;
+  display: block;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #d6c49a;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.75);
+  color: var(--font-color);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+body.dark .learn-side-menu {
+  background: rgba(31, 41, 55, 0.98);
+  border-color: #4b5563;
+}
+
+body.dark .learn-side-menu button:not(.modal-close) {
+  background: rgba(17, 24, 39, 0.85);
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+.learn-hint {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--font-color);
+  opacity: 0.6;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+@keyframes menuHint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+.menu-hint {
+  animation: menuHint 1.2s ease-in-out 3;
+}
+.learn-welcome {
+ background: var(--primary-light);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  color: var(--font-color);
+}
+
+
+.learn-welcome-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 24px;
+  background: color-mix(in srgb, var(--secondary-color) 35%, transparent);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+}
+
+.learn-welcome-overlay.open {
+  display: flex;
+}
+
+.learn-welcome-modal {
+  width: min(100%, 420px);
+  background: var(--primary-light);
+  color: var(--font-color);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 25%, transparent);
+  border-radius: 22px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+
+.learn-welcome-modal p {
+  line-height: 1.5;
+}
+.learn-dashboard {
+  text-align: center;
+  padding: 10px 0 4px;
+  color: var(--font-color);
+}
+
+.learn-dashboard p {
+  opacity: 0.75;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.learn-path-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.learn-path-grid button {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--font-color) 25%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--secondary-color) 85%, white);
+  color: var(--btn-text-color);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  column-gap: 12px;
+  row-gap: 3px;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+}
+
+.learn-path-grid button .material-symbols-outlined {
+  grid-row: span 2;
+  color: inherit;
+  opacity: 0.85;
+}
+
+.learn-path-grid strong {
+  font-size: 1rem;
+}
+
+.learn-path-grid small {
+  opacity: 0.7;
+}
+.learn-lesson {
+  display: none;
+}
+
+.learn-lesson.active {
+  display: block;
+  animation: lessonPageIn 0.22s ease;
+}
+
+.lesson-module {
+  background: var(--primary-light);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 20%, transparent);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+}
+
+.lesson-kicker {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--font-color);
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.lesson-lead {
+  font-size: 1.05rem;
+  line-height: 1.55;
+  opacity: 0.9;
+}
+
+.lesson-section {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.lesson-section h3 {
+  margin-top: 0;
+}
+
+.lesson-back-btn {
+  margin-bottom: 14px;
+  border: none;
+  background: transparent;
+  color: var(--font-color);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes lessonPageIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+body.dark .lesson-module {
+  background: rgba(31, 41, 55, 0.96);
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark .lesson-section {
+  background: rgba(17, 24, 39, 0.75);
+  border-color: #4b5563;
+}
+.lesson-module h2 {
+  background: var(--font-color);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: inline-block;
+}
+/* Global font-color cleanup */
+.header p,
+.text-btn,
+.material-symbols-outlined,
+.helper-text,
+.settings-card p,
+.modal-card h2,
+.modal-card p,
+.modal-close,
+.small-btn,
+.translate-label,
+.compare-label,
+.translate-greek,
+.breakdown-row strong,
+.breakdown-row small,
+.settings-card .collapse-btn,
+.settings-card .collapse-content p,
+.learn-side-menu button:not(.modal-close),
+.learn-welcome,
+.learn-welcome-modal,
+.learn-dashboard,
+.lesson-module,
+.lesson-lead,
+.lesson-section,
+.lesson-section h3 {
+  color: var(--font-color);
+}
+
+/* Main/home/learn buttons use button text color */
+.main-btn,
+.learn-path-grid button {
+  color: var(--btn-text-color);
+}
+
+/* Icons inside those buttons follow the button text */
+.main-btn .material-symbols-outlined,
+.learn-path-grid button .material-symbols-outlined {
+  color: inherit;
+}
+
+/* Keep lesson kicker inverted */
+.lesson-kicker {
+  background: var(--font-color);
+  color: var(--primary-color);
+}
+
+/* Module title inverted too */
+.lesson-module h2 {
+  background: var(--font-color);
+  color: var(--primary-color);
+}
+
+/* 🔥 FORCE dark mode text override */
+body.dark {
+  --font-color: #f3f4f6;
+  --btn-text-color: #f8fafc;
+}
+body.dark .learn-welcome-modal {
+  background: rgba(31, 41, 55, 0.98);
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+body.dark .learn-welcome-modal p {
+  color: #cbd5e1;
+}
+.lesson-block hr {
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  margin: 14px 0;
+}
+
+.highlight {
+  background: rgba(36, 52, 71, 0.08);
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.mini-example {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+body.dark .highlight {
+  background: rgba(255,255,255,0.08);
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;      /* 👈 prevents squeeze on small screens */
+}
+
+.answer-text {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  font-weight: 600;
+  color: var(--font-color);
+  min-width: 60px;
+}
+
+.answer-text.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.lesson-interactive {
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 16px;
+
+  background: rgba(36, 52, 71, 0.08);
+  border: 1px solid rgba(36, 52, 71, 0.15);
+
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+body.dark .lesson-interactive {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+.lesson-interactive strong {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 6px;
+}
+
+.lesson-interactive::before {
+  content: "";
+  display: block;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+  margin: -16px -16px 12px -16px;
+
+  background: var(--secondary-color);
+}
+.lesson-module {
+  background: rgba(255, 252, 242, 0.92);
+  border: 1px solid rgba(36, 52, 71, 0.14);
+  border-radius: 26px;
+  padding: 24px;
+  box-shadow: 0 16px 35px rgba(0,0,0,0.12);
+}
+
+.lesson-kicker {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--secondary-color);
+  color: var(--btn-text-color) !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.lesson-module h2 {
+  font-size: 1.8rem;
+  margin: 4px 0 10px;
+}
+
+.lesson-lead {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(36, 52, 71, 0.14);
+}
+
+.lesson-block {
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(36, 52, 71, 0.12);
+  border-radius: 18px;
+  margin: 14px 0;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+.lesson-block-header {
+  padding: 16px;
+  font-weight: 800;
+  font-size: 1.02rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lesson-block-header::after {
+  content: "expand_more";
+  font-family: "Material Symbols Outlined";
+  font-size: 24px;
+  transition: transform 0.2s ease;
+}
+
+.lesson-block.open .lesson-block-header::after {
+  transform: rotate(180deg);
+}
+
+.lesson-block-content {
+  display: none;
+  overflow: visible;
+  padding: 0 16px;
+}
+
+.lesson-block.open .lesson-block-content {
+  display: block;
+  padding: 0 16px 18px;
+}
+body.dark .lesson-module {
+  background: rgba(31, 41, 55, 0.96);
+  border-color: #4b5563;
+  box-shadow: 0 16px 35px rgba(0,0,0,0.45);
+}
+
+body.dark .lesson-block {
+  background: rgba(17, 24, 39, 0.72);
+  border-color: rgba(255,255,255,0.12);
+}
+
+body.dark .lesson-lead {
+  border-bottom-color: rgba(255,255,255,0.12);
+}#newLearnMenu.screen.active {
+  padding: 12px;
+}
+
+.lesson-module {
+  padding: 20px;
+}
+
+.lesson-block {
+  margin-left: -4px;
+  margin-right: -4px;
 }
