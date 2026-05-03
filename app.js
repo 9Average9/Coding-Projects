@@ -12,7 +12,7 @@ let translationProgress =
   JSON.parse(localStorage.getItem("translationProgress")) || {};
 
 let translationGradedThisSentence = false;
-
+let currentLearnLesson = null;
 
 const PRACTICE_SENTENCES = [
  {
@@ -7843,6 +7843,7 @@ let currentSentence = null;
 
 const screens = [
   "homeScreen",
+  "newLearnMenu",
   "learnMenu",
   "learnScreen",
   "translateMenu",
@@ -7855,6 +7856,8 @@ const screens = [
 ];
 
 function showScreen(id) {
+  closeLearnSideMenu();
+
   screens.forEach(screen => {
     const el = document.getElementById(screen);
     if (el) el.classList.remove("active");
@@ -7867,6 +7870,7 @@ function showScreen(id) {
 function showHome() {
   showScreen("homeScreen");
 }
+
 
 function getChapters() {
   return [...new Set(VOCAB
@@ -8426,6 +8430,8 @@ function updateThemeColors() {
 
   applyThemeColors(primary, secondary, font);
 
+document.documentElement.style.setProperty("--btn-text-color", font);
+
   localStorage.setItem("primaryColor", primary);
   localStorage.setItem("secondaryColor", secondary);
   localStorage.setItem("fontColor", font);
@@ -8441,6 +8447,8 @@ function resetThemeColors() {
   localStorage.removeItem("fontColor");
 
   applyThemeColors(defaultPrimary, defaultSecondary, defaultFont);
+
+  document.documentElement.style.setProperty("--btn-text-color", "white");
 
   document.getElementById("primaryColorPicker").value = defaultPrimary;
   document.getElementById("secondaryColorPicker").value = defaultSecondary;
@@ -8475,7 +8483,9 @@ const savedSecondary = localStorage.getItem("secondaryColor") || "#243447";
 const savedFont = localStorage.getItem("fontColor") || "#1f2933";
 
 applyThemeColors(savedPrimary, savedSecondary, savedFont);
-
+if (localStorage.getItem("fontColor")) {
+  document.documentElement.style.setProperty("--btn-text-color", savedFont);
+}
 document.getElementById("primaryColorPicker").value = savedPrimary;
 document.getElementById("secondaryColorPicker").value = savedSecondary;
 document.getElementById("fontColorPicker").value = savedFont;
@@ -8815,4 +8825,138 @@ function closeKnownWordsModal(event) {
   if (event.target.id === "knownWordsModal") {
     hideKnownWordsModal();
   }
+}
+
+
+
+
+const learnLessonTitles = {
+  history: "NT Greek Overview",
+  alphabet: "Greek Alphabet",
+  pronunciation: "Pronunciation",
+  nouns: "Noun System",
+  cases: "Case Endings",
+  howToRead: "How to Read Greek"
+};
+
+function toggleLearnSideMenu(event) {
+  if (event) event.stopPropagation();
+
+  const menu = document.getElementById("learnSideMenu");
+  const overlay = document.getElementById("learnSideOverlay");
+
+  menu.classList.toggle("open");
+  overlay.classList.toggle("open");
+}
+
+function closeLearnSideMenu() {
+  const menu = document.getElementById("learnSideMenu");
+  const overlay = document.getElementById("learnSideOverlay");
+
+  if (menu) menu.classList.remove("open");
+  if (overlay) overlay.classList.remove("open");
+}
+
+function showLearnLesson(lesson) {
+  const dashboard = document.getElementById("learnDashboard");
+
+  if (dashboard) dashboard.style.display = "none";
+
+  document.querySelectorAll(".learn-lesson").forEach(section => {
+    section.classList.remove("active");
+  });
+
+  const lessonSection = document.getElementById(lesson + "Lesson");
+
+  if (!lessonSection) {
+    console.warn("Missing lesson section:", lesson + "Lesson");
+    return;
+  }
+
+  lessonSection.classList.add("active");
+  currentLearnLesson = lesson;
+
+  const title = document.getElementById("learnLessonTitle");
+  if (title) title.textContent = learnLessonTitles[lesson] || "Learn";
+
+  closeLearnSideMenu();
+}
+
+  setTimeout(() => {
+  const menuBtn = document.getElementById('learnMenuBtn');
+  if (menuBtn) {
+    menuBtn.classList.add('menu-hint');
+  }
+}, 500);
+
+function showNewLearnMenu() {
+  
+  showScreen("newLearnMenu");
+
+  const overlay = document.getElementById("learnWelcomeOverlay");
+
+  if (overlay && localStorage.getItem("hasSeenLearnWelcome") !== "true") {
+    overlay.classList.add("open");
+  }
+}
+
+function closeLearnWelcome() {
+  localStorage.setItem("hasSeenLearnWelcome", "true");
+
+  const overlay = document.getElementById("learnWelcomeOverlay");
+  if (overlay) overlay.classList.remove("open");
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const hasSeenHomeIntro = localStorage.getItem("hasSeenHomeIntro");
+
+  if (!hasSeenHomeIntro) {
+    showInfoModal();
+    localStorage.setItem("hasSeenHomeIntro", "true");
+  }
+});
+function showLearnInfo() {
+  const overlay = document.getElementById("learnWelcomeOverlay");
+  if (overlay) {
+    overlay.classList.add("open");
+  }
+}
+function showLearnDashboard() {
+  const dashboard = document.getElementById("learnDashboard");
+
+  document.querySelectorAll(".learn-lesson").forEach(section => {
+    section.classList.remove("active");
+  });
+
+  if (dashboard) dashboard.style.display = "block";
+
+  currentLearnLesson = null;
+
+  const title = document.getElementById("learnLessonTitle");
+  if (title) title.textContent = "Learn";
+}
+function handleLearnBack() {
+  if (currentLearnLesson) {
+    showLearnDashboard();
+  } else {
+    showHome();
+  }
+}
+
+function revealAnswer(btn) {
+  event.stopPropagation(); // prevent lesson block toggle
+  const answer = btn.nextElementSibling;
+  answer.classList.add("visible");
+}
+function toggleLessonBlock(block) {
+  block.classList.toggle("open");
+}
+
+function revealAnswer(event, btn) {
+  event.stopPropagation();
+
+  const answer = btn.nextElementSibling;
+  answer.classList.add("visible");
+
+  btn.textContent = "Revealed";
+  btn.disabled = true;
 }
