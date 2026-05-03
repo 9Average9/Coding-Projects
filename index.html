@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NT Greek Vocab Trainer</title>
-  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="stylesheet" href="style.css?v=24" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
@@ -27,10 +27,16 @@
   </button>
 </div>
 
-     <button class="main-btn home-action" onclick="showLearnMenu()">
-  <span class="material-symbols-outlined">school</span>
+<button class="main-btn home-action" onclick="showNewLearnMenu()">
+  <span class="material-symbols-outlined">psychology</span>
   <span>Learn</span>
 </button>
+
+    <button class="main-btn home-action" onclick="showLearnMenu()">
+  <span class="material-symbols-outlined">school</span>
+  <span>Vocab</span>
+</button>
+
 
 <button class="main-btn home-action" onclick="showTranslateMenu()">
   <span class="material-symbols-outlined">edit_note</span>
@@ -47,14 +53,481 @@
   <span>Progress</span>
 </button>
     </section>
+ <section id="newLearnMenu" class="screen">
+  <div class="nav-bar">
 
+    
+    <button class="icon-btn" onclick="handleLearnBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+
+    <div class="nav-title" id="learnLessonTitle">Learn</div>
+    <button class="icon-btn" onclick="showLearnInfo()">
+  <span class="material-symbols-outlined">info</span>
+</button>
+<!--
+   <button id="learnMenuBtn" class="icon-btn" onclick="toggleLearnSideMenu(event)" aria-label="Open lesson menu" title="Lessons">
+  <span class="material-symbols-outlined">menu</span>
+</button>-->
+  </div>
+
+
+
+  <div id="learnDashboard" class="learn-content">
+
+
+
+  <!-- 👇 ADD THIS BLOCK -->
+  <div class="learn-path-grid">
+
+ <button onclick="showLearnLesson('history')">
+    <span class="material-symbols-outlined">history_edu</span>
+    <strong>NT Greek Overview</strong>
+    <small>Context and purpose of Koine Greek</small>
+  </button>
+
+  <button onclick="showLearnLesson('alphabet')">
+    <span class="material-symbols-outlined">abc</span>
+    <strong>Greek Alphabet</strong>
+    <small>Learn letters, names, and recognition</small>
+  </button>
+
+  <button onclick="showLearnLesson('pronunciation')">
+    <span class="material-symbols-outlined">record_voice_over</span>
+    <strong>Pronunciation</strong>
+    <small>Learn consistent sounds</small>
+  </button>
+
+  <button onclick="showLearnLesson('nouns')">
+    <span class="material-symbols-outlined">category</span>
+    <strong>Noun System</strong>
+    <small>How Greek words carry meaning</small>
+  </button>
+
+  <button onclick="showLearnLesson('cases')">
+    <span class="material-symbols-outlined">table_chart</span>
+    <strong>Case Endings</strong>
+    <small>Recognize patterns and forms</small>
+  </button>
+
+  <button onclick="showLearnLesson('howToRead')">
+    <span class="material-symbols-outlined">menu_book</span>
+    <strong>How to Read Greek</strong>
+    <small>Step-by-step sentence approach</small>
+  </button>
+
+ 
+
+</div>
+  </div>
+</div>
+    <div id="historyLesson" class="learn-lesson">
+  
+
+  <div class="lesson-module">
+  <div class="lesson-kicker">Module 1</div>
+  <h2>NT Greek Overview</h2>
+
+  <p class="lesson-lead">
+  The New Testament was written in <strong>Koine Greek</strong> — the common, everyday language of the Roman world.
+  <br><br>
+  This means it was written to be understood, not hidden behind complexity.
+</p>
+
+ <div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🌍 What is Koine Greek?
+  </div>
+
+  <div class="lesson-block-content">
+
+    <p>
+      <strong>Koine Greek</strong> (κοινή) means <em>"common"</em> Greek.
+    </p>
+
+    <p>
+      It was the everyday language spoken across the Mediterranean world during the time of the New Testament.
+    </p>
+<p>
+  Before Koine Greek, there were different forms of Greek used in different regions. Koine developed as a shared form of Greek that many different people could understand.
+</p>
+
+<p>
+  That matters because the New Testament was not written in a private religious code. It was written in a real historical language used for communication, travel, trade, letters, and public life.
+</p>
+
+<p class="highlight">
+  In other words, God chose a common language to communicate truth clearly across many nations and cultures.
+</p>
+    <hr>
+
+    <h4>📜 Where did it come from?</h4>
+    <p>
+      After the conquests of <strong>Alexander the Great</strong>, Greek spread across a massive empire.
+    </p>
+    <p>
+      As different regions adopted it, the language became simplified and standardized—forming what we now call <strong>Koine Greek</strong>.
+    </p>
+
+    <hr>
+
+    <h4>🗣️ Who used it?</h4>
+    <p>
+      Everyone.
+    </p>
+    <ul>
+      <li>Merchants</li>
+      <li>Government officials</li>
+      <li>Writers</li>
+      <li>Ordinary people</li>
+    </ul>
+<p>
+  A person did not have to be a philosopher, scholar, or religious expert to understand Koine Greek. It was the language of ordinary communication.
+</p>
+
+<p>
+  That does not mean every part of the New Testament is easy, but it does mean the language itself was not designed to be unreachable.
+</p>
+    <p>
+      This is HUGE:
+    </p>
+
+    <p class="highlight">
+      The New Testament was not written in an elite language — it was written in the language people already understood.
+    </p>
+
+    <hr>
+
+    <h4>📖 Why was the NT written in Greek?</h4>
+    <p>
+      Because Greek was the <strong>global language</strong> of the time—like English is today.
+    </p>
+
+    <p>
+      If the message of Jesus was going to spread quickly and clearly, Greek was the best possible language to use.
+    </p>
+
+    <hr>
+
+    <h4>⚡ What makes Koine Greek unique?</h4>
+    <ul>
+      <li>Very <strong>structured</strong> (endings matter)</li>
+      <li>More <strong>precise</strong> than English</li>
+      <li>Word order is more <strong>flexible</strong></li>
+    </ul>
+
+    <p>
+      Instead of relying on word order like English…
+    </p>
+
+    <p class="mini-example">
+      Greek uses <strong>endings</strong> to show meaning.
+    </p>
+
+    <hr>
+
+    <h4>🧠 What this means for YOU</h4>
+    <p>
+      You are learning to read the New Testament closer to how it was originally written and understood.
+    </p>
+
+    <p class="highlight">
+      Not to become a scholar — but to recognize meaning the authors intentionally put there.
+    </p>
+
+    <div class="lesson-interactive">
+  <p><strong>Knowledge check:</strong></p>
+  <p>What does “Koine” mean?</p>
+
+  <div class="answer-row">
+    <button class="small-btn" type="button" onclick="revealAnswer(event, this)">
+  Show Answer
+</button>
+
+    <span class="answer-text">common</span>
+  </div>
+</div>
+  </div>
+  
+</div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    ✍️ What did it look like?
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      The earliest Greek manuscripts were written in <strong>all capital letters</strong>, with no spaces or punctuation.
+    </p>
+
+    <p class="greek-example">
+      ΕΝΑΡΧΗΗΝΟΛΟΓΟΣ
+    </p>
+
+    <p>
+      That means readers had to recognize words by familiarity, context, and repeated exposure.
+    </p>
+
+    <p class="highlight">
+      Later copies added spacing, punctuation, accents, and lowercase letters to make reading easier.
+    </p>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🔥 Why this matters
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      Greek lets you see repeated words, sentence structure, emphasis, and connections that can be harder to notice in English.
+    </p>
+
+    <p>
+      Translations are good and useful, but they sometimes smooth out details so the sentence sounds natural in English.
+    </p>
+
+    <p class="highlight">
+      Learning Greek helps you slow down and notice what the author actually wrote.
+    </p>
+
+    <ul>
+      <li>Repeated words and themes</li>
+      <li>Connections between ideas</li>
+      <li>Emphasis in word order</li>
+      <li>Important grammatical patterns</li>
+    </ul>
+
+    <p class="highlight">
+  You are not unlocking a hidden code — you are learning to see clearly what was already written to be understood.
+</p>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🎯 Your goal
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      Your goal is not to master everything overnight.
+    </p>
+
+    <p>
+      You are learning to recognize the building blocks of New Testament Greek one step at a time.
+    </p>
+
+    <ul>
+      <li>Recognize common words</li>
+      <li>Notice repeated patterns</li>
+      <li>Understand basic sentence structure</li>
+      <li>Read simple Greek with growing confidence</li>
+    </ul>
+
+    <p class="highlight">
+      Think of this app as training your eyes before overwhelming your brain.
+    </p>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    ⚡ Quick facts
+  </div>
+
+  <div class="lesson-block-content">
+    <ul>
+      <li>The New Testament was written in Koine Greek.</li>
+      <li>Koine means “common.”</li>
+      <li>Greek spread widely after Alexander the Great.</li>
+      <li>It became a shared language across much of the ancient world.</li>
+      <li>The earliest manuscripts looked very different from modern printed Greek texts.</li>
+      <li>A small number of common words appear very frequently in the New Testament.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🧠 Big takeaway
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      The New Testament was written in a real language used by real people in history.
+    </p>
+
+    <p>
+      Greek was common enough to spread clearly, but structured enough to communicate meaning with precision.
+    </p>
+
+    <p class="highlight">
+      That means studying Greek is not about finding hidden meanings. It is about seeing more clearly what is already there.
+    </p>
+
+    <div class="lesson-interactive">
+      <p><strong>Knowledge Check:</strong></p>
+      <p>
+  What is the main takeaway of this lesson about Koine Greek?
+</p>
+
+      <button class="small-btn" type="button" onclick="revealAnswer(event, this)">
+  Show Answer
+</button>
+
+        <span class="answer-text">It was a common, real-world language used to clearly communicate truth — not a hidden or elite system.</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<div id="alphabetLesson" class="learn-lesson">
+ 
+
+  <div class="lesson-module">
+    <div class="lesson-kicker">Module 2</div>
+    <h2>Greek Alphabet</h2>
+
+    <p class="lesson-lead">
+      Greek uses a different alphabet, but it is consistent and learnable.
+    </p>
+
+    <div class="lesson-section">
+      <h3>What to focus on</h3>
+      <p>
+        Learn to recognize each letter visually first. Sound comes after recognition.
+      </p>
+    </div>
+
+    <div class="lesson-section">
+      <h3>Encouragement</h3>
+      <p>
+        You will start recognizing letters faster than you expect—consistency matters more than speed.
+      </p>
+    </div>
+  </div>
+</div><div id="pronunciationLesson" class="learn-lesson">
+  
+
+  <div class="lesson-module">
+    <div class="lesson-kicker">Module 3</div>
+    <h2>Pronunciation</h2>
+
+    <p class="lesson-lead">
+      Greek pronunciation is consistent, which helps your brain recognize words faster.
+    </p>
+
+    <div class="lesson-section">
+      <h3>Key idea</h3>
+      <p>
+        Each letter or combination has a stable sound—unlike English.
+      </p>
+    </div>
+
+    <div class="lesson-section">
+      <h3>Why it helps</h3>
+      <p>
+        Saying words out loud improves memory and recognition speed.
+      </p>
+    </div>
+  </div>
+</div><div id="nounsLesson" class="learn-lesson">
+  
+
+  <div class="lesson-module">
+    <div class="lesson-kicker">Module 4</div>
+    <h2>Noun System</h2>
+
+    <p class="lesson-lead">
+      Greek nouns change form depending on their role in the sentence.
+    </p>
+
+    <div class="lesson-section">
+      <h3>Main idea</h3>
+      <p>
+        Endings carry meaning, not just word order.
+      </p>
+    </div>
+
+    <div class="lesson-section">
+      <h3>Why it matters</h3>
+      <p>
+        You can understand sentences even when the word order changes.
+      </p>
+    </div>
+  </div>
+</div><div id="casesLesson" class="learn-lesson">
+ 
+
+  <div class="lesson-module">
+    <div class="lesson-kicker">Module 5</div>
+    <h2>Case Endings</h2>
+
+    <p class="lesson-lead">
+      Cases show how a word functions in a sentence.
+    </p>
+
+    <div class="lesson-section">
+      <h3>Examples</h3>
+      <p>
+        Subject, object, possession, and location are all shown through endings.
+      </p>
+    </div>
+
+    <div class="lesson-section">
+      <h3>Big takeaway</h3>
+      <p>
+        Meaning is built into the word itself, not just position.
+      </p>
+    </div>
+  </div>
+</div><div id="howToReadLesson" class="learn-lesson">
+  
+
+  <div class="lesson-module">
+    <div class="lesson-kicker">Module 6</div>
+    <h2>How to Read Greek</h2>
+
+    <p class="lesson-lead">
+      Reading Greek is about recognizing structure, not translating word by word blindly.
+    </p>
+
+    <div class="lesson-section">
+      <h3>Step 1</h3>
+      <p>
+        Find the main verb.
+      </p>
+    </div>
+
+    <div class="lesson-section">
+      <h3>Step 2</h3>
+      <p>
+        Identify the subject and objects using endings.
+      </p>
+    </div>
+
+    <div class="lesson-section">
+      <h3>Step 3</h3>
+      <p>
+        Put it together into natural English.
+      </p>
+    </div>
+  </div>
+</div>
+    
+  </div>
+</section>
     <section id="learnMenu" class="screen">
      <div class="nav-bar">
-  <button class="icon-btn" onclick="showHome()">
+  <button class="icon-btn" onclick="handleLearnBack()">
     <span class="material-symbols-outlined">arrow_back</span>
   </button>
 
-  <div class="nav-title">Learn</div>
+  <div class="nav-title">Vocab</div>
 
   <button class="icon-btn" onclick="showLearnInfoModal()">
     <span class="material-symbols-outlined">info</span>
@@ -68,7 +541,7 @@
 </div>
 
       <div id="learnChapterList" class="chapter-grid"></div>
-      <button class="main-btn" onclick="startLearning()">Start Learning</button>
+      <button class="main-btn" onclick="startLearning()">Start Vocab</button>
     </section>
 
     <section id="learnScreen" class="screen">
@@ -100,9 +573,11 @@
       </div>
     </section>
 
+
+   
 <section id="translateMenu" class="screen">
   <div class="nav-bar">
-    <button class="icon-btn" onclick="showHome()">
+    <button class="icon-btn" onclick="handleLearnBack()">
       <span class="material-symbols-outlined">arrow_back</span>
     </button>
     <div class="nav-title">Translate</div>
@@ -177,7 +652,7 @@
 
     <section id="testMenu" class="screen">
       <div class="nav-bar">
-        <button class="icon-btn" onclick="showHome()">
+        <button class="icon-btn" onclick="handleLearnBack()">
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Test</div>
@@ -236,7 +711,7 @@
 
     <section id="resultsScreen" class="screen">
       <div class="nav-bar">
-        <button class="icon-btn" onclick="showHome()">
+        <button class="icon-btn" onclick="handleLearnBack()">
           <span class="material-symbols-outlined">home</span>
         </button>
         <div class="nav-title">Results</div>
@@ -253,7 +728,7 @@
 
     <section id="progressScreen" class="screen">
       <div class="nav-bar">
-        <button class="icon-btn" onclick="showHome()">
+        <button class="icon-btn" onclick="handleLearnBack()">
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Progress</div>
@@ -265,7 +740,7 @@
 
     <section id="settingsScreen" class="screen">
       <div class="nav-bar">
-        <button class="icon-btn" onclick="showHome()">
+        <button class="icon-btn" onclick="handleLearnBack()">
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Settings</div>
@@ -356,9 +831,9 @@
     </p>
 
    <p>
-  Use <strong>Learn</strong> to study flashcards, <strong>Translate</strong> to
-  practice short Greek sentences, <strong>Test</strong> to quiz yourself, and
-  <strong>Progress</strong> to see your scores, weak words, and translation progress.
+ Use <strong>Vocab</strong> to study flashcards, <strong>Learn</strong> to study the basics,
+<strong>Translate</strong> to practice short Greek sentences, <strong>Test</strong> to quiz yourself,
+and <strong>Progress</strong> to see your scores, weak words, and translation progress.
 </p>
 
     <p>
@@ -425,9 +900,44 @@
     <div id="knownWordsContent"></div>
   </div>
 </div>
+
+ <div id="learnSideOverlay" class="learn-side-overlay" onclick="event.stopPropagation(); closeLearnSideMenu();"></div>
+
+  <aside id="learnSideMenu" class="learn-side-menu">
+    <div class="side-menu-header">
+      <h3>Learn Menu</h3>
+      <button class="modal-close" onclick="closeLearnSideMenu()">×</button>
+    </div>
+
+    <button onclick="showLearnLesson('alphabet')">Greek Alphabet</button>
+    <button onclick="showLearnLesson('pronunciation')">Pronunciation</button>
+    <button onclick="showLearnLesson('consistency')">Why Pronunciation Matters</button>
+    <button onclick="showLearnLesson('history')">NT Greek Overview</button>
+    <button onclick="showLearnLesson('nouns')">Noun System</button>
+    <button onclick="showLearnLesson('cases')">Case Endings</button>
+  </aside>
+
+   <div id="learnWelcomeOverlay" class="learn-welcome-overlay">
+  <div class="learn-welcome-modal">
+    <h2>Welcome to Learn</h2>
+
+    <p>
+      This section teaches the basics of New Testament Greek so you are ready
+      to use Vocab, Test, and Translate more effectively.
+    </p>
+
+    <p>
+  Choose a lesson below to begin building your understanding of New Testament Greek.
+</p>
+
+    <button class="main-btn" onclick="closeLearnWelcome()">
+      Start Learning
+    </button>
+  </div>
+</div>
   </main>
 
   <script src="vocab.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=24"></script>
 </body>
 </html>
