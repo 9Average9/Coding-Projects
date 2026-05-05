@@ -14,6 +14,22 @@ let translationProgress =
 let translationGradedThisSentence = false;
 let currentLearnLesson = null;
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  const hint = document.getElementById("alphabetViewHint");
+
+  if (hint && localStorage.getItem("hasOpenedAlphabetReference") === "true") {
+    hint.classList.add("hidden");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const hint = document.getElementById("soundViewHint");
+
+  if (hint && localStorage.getItem("hasOpenedSoundReference") === "true") {
+    hint.classList.add("hidden");
+  }
+});
 const PRACTICE_SENTENCES = [
  {
   id: "ch4-001",
@@ -7883,17 +7899,17 @@ function buildChapterCheckboxes(containerId, name) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
 
-  getChapters().forEach(chapter => {
+  getChapters().forEach((chapter, index) => {
+    const displayChapter = index + 1;
     const label = document.createElement("label");
 
     label.innerHTML = `
       <input type="checkbox" name="${name}" value="${chapter}" />
-       ${chapter}
+      ${displayChapter}
     `;
 
     const input = label.querySelector("input");
 
-    // set initial selected state
     if (input.checked) label.classList.add("selected");
 
     input.addEventListener("change", () => {
@@ -8346,7 +8362,7 @@ function showProgress() {
  html += `
   </div>
 
-  <button class="collapse-btn progress-collapse-btn" onclick="toggleProgressSection('translationProgressSection')">
+  <button class="collapse-btn progress-collapse-btn" onclick="toggleProgressSection('translationProgressSection', this)">
     Translations
       <span class="arrow">▼</span>
   </button>
@@ -8948,7 +8964,24 @@ function revealAnswer(btn) {
   answer.classList.add("visible");
 }
 function toggleLessonBlock(block) {
+  const lesson = block.closest(".learn-lesson");
+
+  if (!lesson) {
+    block.classList.toggle("open");
+    return;
+  }
+
+  lesson.querySelectorAll(".lesson-block").forEach(otherBlock => {
+    if (otherBlock !== block) {
+      otherBlock.classList.remove("open");
+    }
+  });
+
   block.classList.toggle("open");
+
+if (block.classList.contains("open")) {
+  block.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 }
 
 function revealAnswer(event, btn) {
@@ -8959,4 +8992,53 @@ function revealAnswer(event, btn) {
 
   btn.textContent = "Revealed";
   btn.disabled = true;
+}
+function toggleAlphabetReference(event) {
+  event.stopPropagation();
+
+  const reference = document.getElementById("alphabetReference");
+  if (!reference) return;
+
+  reference.classList.toggle("open");
+}
+function showAlphabetModal(event) {
+  if (event) event.stopPropagation();
+
+  document.getElementById("alphabetModal").classList.add("open");
+
+  localStorage.setItem("hasOpenedAlphabetReference", "true");
+
+  const hint = document.getElementById("alphabetViewHint");
+  if (hint) hint.classList.add("hidden");
+}
+
+function hideAlphabetModal() {
+  document.getElementById("alphabetModal").classList.remove("open");
+}
+
+function closeAlphabetModal(event) {
+  if (event.target.id === "alphabetModal") {
+    hideAlphabetModal();
+  }
+}
+
+function showSoundModal(event) {
+  if (event) event.stopPropagation();
+
+  document.getElementById("soundModal").classList.add("open");
+
+  localStorage.setItem("hasOpenedSoundReference", "true");
+
+  const hint = document.getElementById("soundViewHint");
+  if (hint) hint.classList.add("hidden");
+}
+
+function hideSoundModal() {
+  document.getElementById("soundModal").classList.remove("open");
+}
+
+function closeSoundModal(event) {
+  if (event.target.id === "soundModal") {
+    hideSoundModal();
+  }
 }
