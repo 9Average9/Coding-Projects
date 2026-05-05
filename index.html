@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Basic Greek</title>
-  <link rel="stylesheet" href="style.css?v=24" />
+  <link rel="stylesheet" href="style.css?v=25" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
   <main class="app">
     <header class="header">
-      <h1>Basic Greek</h1>
-      <p>Learn the Basics of Biblical Greek</p>
+      <h1>Basic Greek Trainer</h1>
+<p>Learn the basics of New Testament Greek step by step.</p>
     </header>
 
     <section id="homeScreen" class="screen active">
@@ -28,8 +28,8 @@
 </div>
 
 <button class="main-btn home-action" onclick="showNewLearnMenu()">
-  <span class="material-symbols-outlined">psychology</span>
-  <span>Learn</span>
+  <span class="material-symbols-outlined">menu_book</span>
+  <span>Lessons</span>
 </button>
 
     <button class="main-btn home-action" onclick="showLearnMenu()">
@@ -61,7 +61,7 @@
       <span class="material-symbols-outlined">arrow_back</span>
     </button>
 
-    <div class="nav-title" id="learnLessonTitle">Learn</div>
+    <div class="nav-title" id="learnLessonTitle">Lessons</div>
     <button class="icon-btn" onclick="showLearnInfo()">
   <span class="material-symbols-outlined">info</span>
 </button>
@@ -80,43 +80,77 @@
   <!-- 👇 ADD THIS BLOCK -->
   <div class="learn-path-grid">
 
- <button onclick="showLearnLesson('history')">
-    <span class="material-symbols-outlined">history_edu</span>
-    <strong>NT Greek Overview</strong>
-    <small>Context and purpose of Koine Greek</small>
+  <button onclick="showLearnLesson('history')">
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">1</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+
+    <div class="lesson-text">
+      <strong>NT Greek Overview</strong>
+      <small>Context and purpose of Koine Greek</small>
+    </div>
   </button>
 
   <button onclick="showLearnLesson('alphabet')">
-    <span class="material-symbols-outlined">abc</span>
-    <strong>Greek Alphabet</strong>
-    <small>Learn letters, names, and recognition</small>
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">2</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+
+    <div class="lesson-text">
+      <strong>Greek Alphabet</strong>
+      <small>Letters, names, sounds, and recognition</small>
+    </div>
   </button>
 
   <button onclick="showLearnLesson('pronunciation')">
-    <span class="material-symbols-outlined">record_voice_over</span>
-    <strong>Pronunciation</strong>
-    <small>Learn consistent sounds</small>
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">3</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+
+    <div class="lesson-text">
+      <strong>Pronunciation</strong>
+      <small>Learn consistent Greek sounds</small>
+    </div>
   </button>
 
   <button onclick="showLearnLesson('nouns')">
-    <span class="material-symbols-outlined">category</span>
-    <strong>Noun System</strong>
-    <small>How Greek words carry meaning</small>
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">4</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+
+    <div class="lesson-text">
+      <strong>Noun System</strong>
+      <small>How Greek words carry meaning</small>
+    </div>
   </button>
 
   <button onclick="showLearnLesson('cases')">
-    <span class="material-symbols-outlined">table_chart</span>
-    <strong>Case Endings</strong>
-    <small>Recognize patterns and forms</small>
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">5</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+
+    <div class="lesson-text">
+      <strong>Case Endings</strong>
+      <small>Recognize patterns and forms</small>
+    </div>
   </button>
 
   <button onclick="showLearnLesson('howToRead')">
-    <span class="material-symbols-outlined">menu_book</span>
-    <strong>How to Read Greek</strong>
-    <small>Step-by-step sentence approach</small>
-  </button>
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">6</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
 
- 
+    <div class="lesson-text">
+      <strong>How to Read Greek</strong>
+      <small>Step-by-step sentence approach</small>
+    </div>
+  </button>
 
 </div>
   </div>
@@ -125,7 +159,7 @@
   
 
   <div class="lesson-module">
-  <div class="lesson-kicker">Module 1</div>
+  <div class="lesson-kicker">Lesson 1</div>
   <h2>NT Greek Overview</h2>
 
   <p class="lesson-lead">
@@ -386,60 +420,544 @@
 </div>
 </div>
 <div id="alphabetLesson" class="learn-lesson">
- 
-
   <div class="lesson-module">
-    <div class="lesson-kicker">Module 2</div>
-    <h2>Greek Alphabet</h2>
+
+    <div class="lesson-header alphabet-header">
+      <div>
+        <div class="lesson-kicker">Lesson 2</div>
+        <h2>Greek Alphabet</h2>
+      </div>
+
+      <div class="alphabet-ref-wrap">
+  <button class="alphabet-ref-btn" type="button" onclick="showAlphabetModal(event)">
+    Ω
+  </button>
+
+  <div id="alphabetViewHint" class="alphabet-view-hint">
+    ↑ View ↑
+  </div>
+</div>
+    </div>
+
+    
 
     <p class="lesson-lead">
       Greek uses a different alphabet, but it is consistent and learnable.
+      The goal is not to master every detail instantly. The goal is to recognize the letters well enough that Greek words stop looking intimidating.
     </p>
 
-    <div class="lesson-section">
-      <h3>What to focus on</h3>
-      <p>
-        Learn to recognize each letter visually first. Sound comes after recognition.
-      </p>
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🎯 Your goal
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          By the end of this module, you should be able to look at Greek letters and begin connecting three things:
+        </p>
+
+        <ul>
+          <li>What the letter looks like</li>
+          <li>What the letter is called</li>
+          <li>What sound it usually makes</li>
+        </ul>
+
+        <p class="highlight">
+          Recognition comes first. Do not worry about perfect pronunciation yet.
+        </p>
+      </div>
     </div>
 
-    <div class="lesson-section">
-      <h3>Encouragement</h3>
-      <p>
-        You will start recognizing letters faster than you expect—consistency matters more than speed.
-      </p>
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        ⚡ Quick facts
+      </div>
+
+      <div class="lesson-block-content">
+        <ul>
+          <li>The Greek alphabet has 24 letters.</li>
+          <li>Some letters look familiar.</li>
+          <li>Some letters look familiar but make a different sound.</li>
+          <li>Some letters look completely new.</li>
+          <li>Greek also has a final form of sigma: <strong>ς</strong>.</li>
+        </ul>
+
+        <p class="highlight">
+          You do not need to memorize everything in one sitting. Repeated exposure is what makes the letters stick.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        ✅ Letters that feel familiar
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          These letters are a good place to start because they look fairly familiar to English readers.
+        </p>
+
+        <div class="letter-grid">
+          <div class="letter-card"><strong>α</strong><span>Alpha</span><small>“a” as in father</small></div>
+          <div class="letter-card"><strong>β</strong><span>Beta</span><small>“b” as in Bible</small></div>
+          <div class="letter-card"><strong>ε</strong><span>Epsilon</span><small>“e” as in met</small></div>
+          <div class="letter-card"><strong>ι</strong><span>Iota</span><small>“i” as in machine</small></div>
+          <div class="letter-card"><strong>κ</strong><span>Kappa</span><small>“k” as in king</small></div>
+          <div class="letter-card"><strong>μ</strong><span>Mu</span><small>“m” as in man</small></div>
+          <div class="letter-card"><strong>ν</strong><span>Nu</span><small>“n” as in no</small></div>
+          <div class="letter-card"><strong>ο</strong><span>Omicron</span><small>“o” as in not</small></div>
+          <div class="letter-card"><strong>τ</strong><span>Tau</span><small>“t” as in time</small></div>
+        </div>
+
+        <p class="highlight">
+          These letters give you a quick win. You already have some visual anchors.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        ⚠️ Letters that can trick you
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          These letters may look familiar, but they do not always make the sound an English speaker expects.
+        </p>
+
+        <div class="letter-grid">
+          <div class="letter-card"><strong>η</strong><span>Eta</span><small>“ay” as in obey</small></div>
+          <div class="letter-card"><strong>ρ</strong><span>Rho</span><small>“r” as in road</small></div>
+          <div class="letter-card"><strong>υ</strong><span>Upsilon</span><small>“u/oo” sound</small></div>
+          <div class="letter-card"><strong>χ</strong><span>Chi</span><small>“ch/kh” sound</small></div>
+          <div class="letter-card"><strong>ω</strong><span>Omega</span><small>long “o” as in tone</small></div>
+        </div>
+
+        <p class="highlight">
+          Do not trust the English-looking shape too quickly. Learn the Greek name and sound.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🧩 Letters that look new
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          These letters may look strange at first, but they become familiar through repetition.
+        </p>
+
+        <div class="letter-grid">
+          <div class="letter-card"><strong>γ</strong><span>Gamma</span><small>“g” as in God</small></div>
+          <div class="letter-card"><strong>δ</strong><span>Delta</span><small>“d” as in day</small></div>
+          <div class="letter-card"><strong>ζ</strong><span>Zeta</span><small>“z” as in zoo</small></div>
+          <div class="letter-card"><strong>θ</strong><span>Theta</span><small>“th” as in thing</small></div>
+          <div class="letter-card"><strong>λ</strong><span>Lambda</span><small>“l” as in light</small></div>
+          <div class="letter-card"><strong>ξ</strong><span>Xi</span><small>“x” as in ax</small></div>
+          <div class="letter-card"><strong>π</strong><span>Pi</span><small>“p” as in peace</small></div>
+          <div class="letter-card"><strong>σ/ς</strong><span>Sigma</span><small>“s” as in see</small></div>
+          <div class="letter-card"><strong>φ</strong><span>Phi</span><small>“ph/f” as in phone</small></div>
+          <div class="letter-card"><strong>ψ</strong><span>Psi</span><small>“ps” as in lips</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        👀 Recognition practice
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          Try to name the letter before pressing “Show Answer.”
+        </p>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">λ</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Lambda — “l” sound, like l in light.</span>
+          </div>
+        </div>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">θ</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Theta — “th” sound, like th in thing.</span>
+          </div>
+        </div>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">ρ</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Rho — “r” sound, like r in road.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🔤 See letters inside words
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          You do not need to translate these yet. Just notice that the words are made from letters you are learning.
+        </p>
+
+        <div class="word-preview-grid">
+          <div><strong>λόγος</strong><span>lambda + omicron + gamma + omicron + sigma</span></div>
+          <div><strong>θεός</strong><span>theta + epsilon + omicron + sigma</span></div>
+          <div><strong>ζωή</strong><span>zeta + omega + eta</span></div>
+        </div>
+
+        <p class="highlight">
+          This is the point: Greek words stop being random symbols and start becoming recognizable patterns.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🧠 Big takeaway
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          The Greek alphabet may look intimidating at first, but it is learnable.
+        </p>
+
+        <p>
+          Start by recognizing the shape, name, and basic sound of each letter.
+        </p>
+
+        <p class="highlight">
+          You are not trying to become fluent overnight. You are training your eyes to recognize Greek.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="pronunciationLesson" class="learn-lesson">
+  <div class="lesson-module">
+    <div class="lesson-header alphabet-header">
+
+  <div>
+    <div class="lesson-kicker">Lesson 3</div>
+    <h2>Pronunciation</h2>
+  </div>
+
+  <div class="alphabet-ref-wrap">
+    <button class="alphabet-ref-btn" type="button" onclick="showSoundModal(event)">
+      Ω
+    </button>
+
+    <div id="soundViewHint" class="alphabet-view-hint">
+      ↑View↑
     </div>
   </div>
-</div><div id="pronunciationLesson" class="learn-lesson">
-  
 
-  <div class="lesson-module">
-    <div class="lesson-kicker">Module 3</div>
-    <h2>Pronunciation</h2>
+</div>
 
     <p class="lesson-lead">
-      Greek pronunciation is consistent, which helps your brain recognize words faster.
+      This lesson helps you lock in the alphabet correctly. The goal is to recognize each Greek letter, know its name, and connect it to the right sound.
     </p>
 
-    <div class="lesson-section">
-      <h3>Key idea</h3>
-      <p>
-        Each letter or combination has a stable sound—unlike English.
-      </p>
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🎯 Your goal
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          Before moving deeper into Greek, you want the alphabet to feel familiar.
+        </p>
+
+        <ul>
+          <li>Know what each letter looks like</li>
+          <li>Know the letter name</li>
+          <li>Know the basic sound it makes</li>
+          <li>Be able to say simple Greek words out loud</li>
+        </ul>
+
+        <p class="highlight">
+          This is the bridge between seeing Greek symbols and actually reading Greek words.
+        </p>
+      </div>
     </div>
 
-    <div class="lesson-section">
-      <h3>Why it helps</h3>
-      <p>
-        Saying words out loud improves memory and recognition speed.
-      </p>
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🗣️ Why pronunciation matters
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          Pronunciation is not about sounding impressive. It helps your brain remember what it sees.
+        </p>
+
+        <p>
+          When you can see a word, say it, and hear it in your mind, the word becomes easier to recognize later.
+        </p>
+
+        <p class="highlight">
+          Saying Greek words out loud strengthens recognition, memory, and confidence.
+        </p>
+      </div>
     </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🔤 Vowel sounds
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          These are the main vowel sounds to get familiar with first.
+        </p>
+
+        <div class="letter-grid">
+          <div class="letter-card"><strong>α</strong><span>Alpha</span><small>“a” as in father</small></div>
+          <div class="letter-card"><strong>ε</strong><span>Epsilon</span><small>“e” as in met</small></div>
+          <div class="letter-card"><strong>η</strong><span>Eta</span><small>“ay” as in obey</small></div>
+          <div class="letter-card"><strong>ι</strong><span>Iota</span><small>“i” as in machine</small></div>
+          <div class="letter-card"><strong>ο</strong><span>Omicron</span><small>short “o” as in not</small></div>
+          <div class="letter-card"><strong>υ</strong><span>Upsilon</span><small>“u/oo” sound</small></div>
+          <div class="letter-card"><strong>ω</strong><span>Omega</span><small>long “o” as in tone</small></div>
+        </div>
+
+        <p class="highlight">
+          Pay close attention to ο and ω. They both make an “o” sound, but ω is the longer form.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        ⚠️ Tricky letters
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          These are the letters most likely to trick English readers.
+        </p>
+
+        <div class="letter-grid">
+          <div class="letter-card"><strong>η</strong><span>Eta</span><small>looks like n, sounds like “ay”</small></div>
+          <div class="letter-card"><strong>ρ</strong><span>Rho</span><small>looks like p, sounds like “r”</small></div>
+          <div class="letter-card"><strong>χ</strong><span>Chi</span><small>“ch/kh” sound</small></div>
+          <div class="letter-card"><strong>θ</strong><span>Theta</span><small>“th” as in thing</small></div>
+          <div class="letter-card"><strong>ξ</strong><span>Xi</span><small>“x” as in ax</small></div>
+          <div class="letter-card"><strong>ψ</strong><span>Psi</span><small>“ps” as in lips</small></div>
+          <div class="letter-card"><strong>σ/ς</strong><span>Sigma</span><small>“s” as in see</small></div>
+        </div>
+
+        <p class="highlight">
+          Do not guess based on English shape. Learn the Greek letter for what it is.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🧠 Final sigma
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          Sigma has two lowercase forms:
+        </p>
+
+        <div class="letter-grid">
+          <div class="letter-card"><strong>σ</strong><span>Sigma</span><small>used at the beginning or middle of a word</small></div>
+          <div class="letter-card"><strong>ς</strong><span>Final Sigma</span><small>used at the end of a word</small></div>
+        </div>
+
+        <p class="mini-example">
+          λόγος
+        </p>
+
+        <p>
+          The last letter is <strong>ς</strong> because sigma is at the end of the word.
+        </p>
+
+        <p class="highlight">
+          σ and ς are the same letter. The shape changes depending on where it appears.
+        </p>
+      </div>
+    </div>
+
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    📚 Full alphabet sound chart
   </div>
-</div><div id="nounsLesson" class="learn-lesson">
+
+  <div class="lesson-block-content">
+    <p>
+      Use this chart to review every letter name and its basic sound before practicing with words.
+    </p>
+
+    <div class="letter-grid">
+      <div class="letter-card"><strong>α</strong><span>Alpha</span><small>“a” as in father</small></div>
+      <div class="letter-card"><strong>β</strong><span>Beta</span><small>“b” as in Bible</small></div>
+      <div class="letter-card"><strong>γ</strong><span>Gamma</span><small>“g” as in God</small></div>
+      <div class="letter-card"><strong>δ</strong><span>Delta</span><small>“d” as in day</small></div>
+      <div class="letter-card"><strong>ε</strong><span>Epsilon</span><small>“e” as in met</small></div>
+      <div class="letter-card"><strong>ζ</strong><span>Zeta</span><small>“z” as in zoo</small></div>
+      <div class="letter-card"><strong>η</strong><span>Eta</span><small>“ay” as in obey</small></div>
+      <div class="letter-card"><strong>θ</strong><span>Theta</span><small>“th” as in thing</small></div>
+      <div class="letter-card"><strong>ι</strong><span>Iota</span><small>“i” as in machine</small></div>
+      <div class="letter-card"><strong>κ</strong><span>Kappa</span><small>“k” as in king</small></div>
+      <div class="letter-card"><strong>λ</strong><span>Lambda</span><small>“l” as in light</small></div>
+      <div class="letter-card"><strong>μ</strong><span>Mu</span><small>“m” as in man</small></div>
+      <div class="letter-card"><strong>ν</strong><span>Nu</span><small>“n” as in no</small></div>
+      <div class="letter-card"><strong>ξ</strong><span>Xi</span><small>“x” as in ax</small></div>
+      <div class="letter-card"><strong>ο</strong><span>Omicron</span><small>short “o” as in not</small></div>
+      <div class="letter-card"><strong>π</strong><span>Pi</span><small>“p” as in peace</small></div>
+      <div class="letter-card"><strong>ρ</strong><span>Rho</span><small>“r” as in road</small></div>
+      <div class="letter-card"><strong>σ/ς</strong><span>Sigma</span><small>“s” as in see</small></div>
+      <div class="letter-card"><strong>τ</strong><span>Tau</span><small>“t” as in time</small></div>
+      <div class="letter-card"><strong>υ</strong><span>Upsilon</span><small>“u/oo” sound</small></div>
+      <div class="letter-card"><strong>φ</strong><span>Phi</span><small>“f” as in phone</small></div>
+      <div class="letter-card"><strong>χ</strong><span>Chi</span><small>“kh/ch” sound</small></div>
+      <div class="letter-card"><strong>ψ</strong><span>Psi</span><small>“ps” as in lips</small></div>
+      <div class="letter-card"><strong>ω</strong><span>Omega</span><small>long “o” as in tone</small></div>
+    </div>
+
+    <p class="highlight">
+      This is the main review section. If these names and sounds feel familiar, you are ready to practice reading words.
+    </p>
+  </div>
+</div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        👀 Pronunciation checks
+      </div>
+
+      <div class="lesson-block-content">
+        <p class="mini-example">
+          Say the name and sound before revealing the answer.
+        </p>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">η</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Eta — “ay” sound, like in “obey.”</span>
+          </div>
+        </div>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">ρ</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Rho — “r” sound, like in “road” even though it looks like “p.”</span>
+          </div>
+        </div>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">θ</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Theta — “th” sound, like th in “thing.”</span>
+          </div>
+        </div>
+
+        <div class="lesson-interactive">
+          <p><strong>Knowledge check:</strong></p>
+          <p class="practice-letter">ς</p>
+
+          <div class="answer-row">
+            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+            <span class="answer-text">Final Sigma — same letter as σ, used at the end of a word.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🔊 Practice with words
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          Try saying these slowly. Do not worry about speed yet.
+        </p>
+
+        <div class="word-preview-grid">
+          <div>
+            <strong>λόγος</strong>
+            <span>lo-gos — notice lambda, omicron, gamma, omicron, final sigma</span>
+          </div>
+
+          <div>
+            <strong>θεός</strong>
+            <span>the-os — notice theta, epsilon, omicron, final sigma</span>
+          </div>
+
+          <div>
+            <strong>ζωή</strong>
+            <span>zo-ay — notice zeta, omega, eta</span>
+          </div>
+        </div>
+
+        <p class="highlight">
+          The more you say the words, the less strange they will look.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        🧠 Big takeaway
+      </div>
+
+      <div class="lesson-block-content">
+        <p>
+          Pronunciation helps turn Greek from symbols into readable words.
+        </p>
+
+        <p>
+          Before rushing ahead, make sure you can recognize the letters, say their names, and connect them to their basic sounds.
+        </p>
+
+        <p class="highlight">
+          If the alphabet is solid, the rest of Greek becomes much less intimidating.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="nounsLesson" class="learn-lesson">
   
 
   <div class="lesson-module">
-    <div class="lesson-kicker">Module 4</div>
+    <div class="lesson-kicker">Lesson 4</div>
     <h2>Noun System</h2>
 
     <p class="lesson-lead">
@@ -464,7 +982,7 @@
  
 
   <div class="lesson-module">
-    <div class="lesson-kicker">Module 5</div>
+    <div class="lesson-kicker">Lesson 5</div>
     <h2>Case Endings</h2>
 
     <p class="lesson-lead">
@@ -489,7 +1007,7 @@
   
 
   <div class="lesson-module">
-    <div class="lesson-kicker">Module 6</div>
+    <div class="lesson-kicker">Lesson 6</div>
     <h2>How to Read Greek</h2>
 
     <p class="lesson-lead">
@@ -819,27 +1337,60 @@
 
 
     
-    <div id="infoModal" class="modal-overlay" onclick="closeInfoModal(event)">
-  <div class="modal-card">
+  <div id="infoModal" class="modal-overlay" onclick="closeInfoModal(event)">
+  <div class="modal-card welcome-card">
     <button class="modal-close" onclick="hideInfoModal()">×</button>
 
-    <h2>About This App</h2>
+    <div class="welcome-icon">
+      <span class="material-symbols-outlined">auto_stories</span>
+    </div>
 
-    <p>
-      NT Greek Vocab Trainer helps you learn and review common New Testament
-      Greek vocabulary by chapter according to Bill Mounce's "Basics of biblical Greek".
+    <h2>Welcome to Basic Greek</h2>
+
+    <p class="welcome-lead">
+      This app is designed for someone who knows little or nothing about Greek.
+      You do not need to start with grammar charts, textbooks, or memorizing everything at once.
     </p>
 
-   <p>
- Use <strong>Vocab</strong> to study flashcards, <strong>Learn</strong> to study the basics,
-<strong>Translate</strong> to practice short Greek sentences, <strong>Test</strong> to quiz yourself,
-and <strong>Progress</strong> to see your scores, weak words, and translation progress.
-</p>
-
     <p>
-      Focus Mode tests the words you struggle with most, helping you review
-      weaker vocabulary more intentionally.
+      The goal is simple: learn the basic building blocks of Greek so you can recognize words,
+      understand simple patterns, and begin using the flashcards, translation practice, and tests with confidence. For the purpose of enriching your understanding of scripture.
     </p>
+
+    <div class="welcome-route">
+      <div>
+        <strong>Lessons</strong>
+        <span>Start here. Learn the alphabet, pronunciation, basic grammar ideas, and how Greek works.</span>
+      </div>
+
+      <div>
+        <strong>Vocab</strong>
+        <span>Practice common Greek words with flashcards and build recognition through repetition.</span>
+      </div>
+
+      <div>
+        <strong>Translate</strong>
+        <span>Try short Greek phrases and sentences using words you are learning.</span>
+      </div>
+
+      <div>
+        <strong>Test</strong>
+        <span>Quiz yourself on selected chapter's vocabulary and mark words you already know.</span>
+      </div>
+
+      <div>
+        <strong>Progress</strong>
+        <span>Track your test scores, weak words, known words, and translation practice.</span>
+      </div>
+    </div>
+
+    <p class="welcome-highlight">
+      Best path: start with <strong>Learn</strong>, then use <strong>Vocab</strong>, <strong>Translate</strong>, and <strong>Test</strong> to reinforce what you learned.
+    </p>
+
+    <button class="main-btn welcome-start-btn" onclick="hideInfoModal()">
+      Start Learning
+    </button>
   </div>
 </div>
 
@@ -919,25 +1470,119 @@ and <strong>Progress</strong> to see your scores, weak words, and translation pr
 
    <div id="learnWelcomeOverlay" class="learn-welcome-overlay">
   <div class="learn-welcome-modal">
-    <h2>Welcome to Learn</h2>
+    <h2>Lessons — Step by Step 👋</h2>
 
-    <p>
-      This section teaches the basics of New Testament Greek so you are ready
-      to use Vocab, Test, and Translate more effectively.
-    </p>
-
-    <p>
-  Choose a lesson below to begin building your understanding of New Testament Greek.
+<p class="welcome-lead">
+  This section walks you through the basics of Greek in a simple, structured way.
 </p>
 
-    <button class="main-btn" onclick="closeLearnWelcome()">
-      Start Learning
-    </button>
+<div class="welcome-route">
+
+  <div>
+    <strong>📘 Lessons are built in order</strong>
+    <span>Start at the top and move down. Each module builds on the one before it.</span>
+  </div>
+
+  <div>
+    <strong>🧠 Focus on understanding</strong>
+    <span>You don’t need to memorize everything. The goal is to recognize and understand what you’re seeing.</span>
+  </div>
+
+  <div>
+    <strong>⚡ Learn in small sections</strong>
+    <span>Open one part at a time, read it, then move on. Keep it simple and steady.</span>
+  </div>
+
+</div>
+
+<div class="welcome-highlight">
+  Start with the first lesson and work your way forward. That’s all you need to do.
+</div>
+
+<button class="main-btn welcome-start-btn" onclick="closeLearnWelcome()">
+  Start Lesson 1
+</button>
+  </div>
+</div>
+
+
+
+<div id="alphabetModal" class="modal-overlay" onclick="closeAlphabetModal(event)">
+  <div class="modal-card alphabet-modal-card">
+    <button class="modal-close" onclick="hideAlphabetModal()">×</button>
+
+    <h2>Greek Alphabet</h2>
+    <p>Quick reference for letter shapes and names.</p>
+
+    <div class="alphabet-reference-grid">
+      <div><strong>α</strong><span>Alpha</span></div>
+      <div><strong>β</strong><span>Beta</span></div>
+      <div><strong>γ</strong><span>Gamma</span></div>
+      <div><strong>δ</strong><span>Delta</span></div>
+      <div><strong>ε</strong><span>Epsilon</span></div>
+      <div><strong>ζ</strong><span>Zeta</span></div>
+      <div><strong>η</strong><span>Eta</span></div>
+      <div><strong>θ</strong><span>Theta</span></div>
+      <div><strong>ι</strong><span>Iota</span></div>
+      <div><strong>κ</strong><span>Kappa</span></div>
+      <div><strong>λ</strong><span>Lambda</span></div>
+      <div><strong>μ</strong><span>Mu</span></div>
+      <div><strong>ν</strong><span>Nu</span></div>
+      <div><strong>ξ</strong><span>Xi</span></div>
+      <div><strong>ο</strong><span>Omicron</span></div>
+      <div><strong>π</strong><span>Pi</span></div>
+      <div><strong>ρ</strong><span>Rho</span></div>
+      <div><strong>σ/ς</strong><span>Sigma</span></div>
+      <div><strong>τ</strong><span>Tau</span></div>
+      <div><strong>υ</strong><span>Upsilon</span></div>
+      <div><strong>φ</strong><span>Phi</span></div>
+      <div><strong>χ</strong><span>Chi</span></div>
+      <div><strong>ψ</strong><span>Psi</span></div>
+      <div><strong>ω</strong><span>Omega</span></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="soundModal" class="modal-overlay" onclick="closeSoundModal(event)">
+  <div class="modal-card alphabet-modal-card">
+    <button class="modal-close" onclick="hideSoundModal()">×</button>
+
+    <h2>Greek Sounds</h2>
+    <p>Quick reference for how each letter sounds.</p>
+
+    <div class="alphabet-reference-grid">
+      <div><strong>α</strong><span>“a” as in father</span></div>
+      <div><strong>β</strong><span>“b” as in Bible</span></div>
+      <div><strong>γ</strong><span>“g” as in God</span></div>
+      <div><strong>δ</strong><span>“d” as in day</span></div>
+      <div><strong>ε</strong><span>“e” as in met</span></div>
+      <div><strong>ζ</strong><span>“z” as in zoo</span></div>
+      <div><strong>η</strong><span>“ay” as in obey</span></div>
+      <div><strong>θ</strong><span>“th” as in thing</span></div>
+      <div><strong>ι</strong><span>“i” as in machine</span></div>
+      <div><strong>κ</strong><span>“k” as in king</span></div>
+      <div><strong>λ</strong><span>“l” as in light</span></div>
+      <div><strong>μ</strong><span>“m” as in man</span></div>
+      <div><strong>ν</strong><span>“n” as in no</span></div>
+      <div><strong>ξ</strong><span>“x” as in ax</span></div>
+      <div><strong>ο</strong><span>short “o” as in not</span></div>
+      <div><strong>π</strong><span>“p” as in peace</span></div>
+      <div><strong>ρ</strong><span>“r” as in road</span></div>
+      <div><strong>σ/ς</strong><span>“s” as in see</span></div>
+      <div><strong>τ</strong><span>“t” as in time</span></div>
+      <div><strong>υ</strong><span>“u/oo” sound</span></div>
+      <div><strong>φ</strong><span>“f” as in phone</span></div>
+      <div><strong>χ</strong><span>“kh/ch” sound</span></div>
+      <div><strong>ψ</strong><span>“ps” as in lips</span></div>
+      <div><strong>ω</strong><span>long “o” as in tone</span></div>
+    </div>
   </div>
 </div>
   </main>
 
   <script src="vocab.js"></script>
-  <script src="app.js?v=24"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>
