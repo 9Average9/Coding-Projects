@@ -26,6 +26,20 @@ document.addEventListener("DOMContentLoaded", () => {
     hint.classList.add("hidden");
   }
 });
+document.addEventListener("DOMContentLoaded", () => {
+  updatePracticeToolLocks();
+});
+const REQUIRED_LESSONS = [
+  "history",
+  "alphabet",
+  "pronunciation",
+  "nouns",
+  "cases",
+  "howToRead"
+];
+
+let practiceToolsUnlocked =
+  localStorage.getItem("practiceToolsUnlocked") === "true";
 
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("soundViewHint");
@@ -9087,10 +9101,24 @@ function updateCompleteLessonButton(lessonId) {
 function completeLesson(lessonId) {
   if (!hasOpenedAllLessonBlocks(lessonId)) return;
 
+  const wasAlreadyAllComplete = allRequiredLessonsCompleted();
+
   completedLessons[lessonId] = true;
   localStorage.setItem("completedLessons", JSON.stringify(completedLessons));
 
   updateLessonCompletionUI();
+  updatePracticeToolLocks();
+
+  const nowAllComplete = allRequiredLessonsCompleted();
+
+  if (!wasAlreadyAllComplete && nowAllComplete) {
+    practiceToolsUnlocked = true;
+    localStorage.setItem("practiceToolsUnlocked", "true");
+    updatePracticeToolLocks();
+    showAllLessonsCompleteModal();
+    return;
+  }
+
   showLessonCompleteModal(lessonId);
 }
 
@@ -9164,6 +9192,8 @@ function toggleAlphabetReference(event) {
 function showAlphabetModal(event) {
   if (event) event.stopPropagation();
 
+  currentAlphabetPage = 0;
+  changeAlphabetPage(0);
   document.getElementById("alphabetModal").classList.add("open");
 
   localStorage.setItem("hasOpenedAlphabetReference", "true");
@@ -9308,12 +9338,301 @@ function updateLessonTopBar(lesson) {
     action.title = "Sound Reference";
     action.onclick = showSoundModal;
   } else if (lesson === "nouns") {
-    action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
-    action.title = "Cheat Sheet";
-    action.onclick = showNounCheatSheet;
-  } else {
+  action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+  action.title = "Cheat Sheet";
+  action.onclick = showNounCheatSheet;
+} else if (lesson === "cases") {
+  action.innerHTML = `<span class="material-symbols-outlined">table_chart</span>`;
+  action.title = "Paradigms";
+  action.onclick = openParadigmModal;
+} else {
     action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
     action.title = "Info";
     action.onclick = showLearnInfo;
+  }
+}
+
+function openCaseChartModal(event) {
+  event.stopPropagation();
+  document.getElementById("caseChartModal").classList.add("open");
+}
+
+function closeCaseChartModal() {
+  document.getElementById("caseChartModal").classList.remove("open");
+}
+
+let currentParadigmPage = 0;
+
+const paradigmTitles = [
+  "Case Ending Chart",
+  "Article Paradigm",
+  "λόγος Full Paradigm"
+];
+
+function openParadigmModal(event) {
+  if (event) event.stopPropagation();
+  currentParadigmPage = 0;
+  updateParadigmPage();
+  document.getElementById("paradigmModal").classList.add("open");
+}
+
+function closeParadigmModal() {
+  document.getElementById("paradigmModal").classList.remove("open");
+}
+
+function changeParadigmPage(direction) {
+  currentParadigmPage += direction;
+
+  if (currentParadigmPage < 0) currentParadigmPage = 2;
+  if (currentParadigmPage > 2) currentParadigmPage = 0;
+
+  updateParadigmPage();
+}
+
+function updateParadigmPage() {
+  document.querySelectorAll(".paradigm-page").forEach((page, index) => {
+    page.classList.toggle("active", index === currentParadigmPage);
+  });
+
+  const title = document.getElementById("paradigmModalTitle");
+  if (title) title.textContent = paradigmTitles[currentParadigmPage];
+
+  const dots = document.getElementById("paradigmPageDots");
+  if (dots) {
+    dots.textContent = ["○", "○", "○"]
+      .map((dot, index) => index === currentParadigmPage ? "●" : dot)
+      .join(" ");
+  }
+}
+
+let currentAlphabetPage = 0;
+
+function changeAlphabetPage(direction) {
+  currentAlphabetPage += direction;
+
+  if (currentAlphabetPage < 0) currentAlphabetPage = 1;
+  if (currentAlphabetPage > 1) currentAlphabetPage = 0;
+
+  document.querySelectorAll("#alphabetModal .alphabet-page").forEach((page, index) => {
+    page.classList.toggle("active", index === currentAlphabetPage);
+  });
+
+  const dots = document.getElementById("alphabetPageDots");
+  if (dots) {
+    dots.textContent = currentAlphabetPage === 0 ? "● ○" : "○ ●";
+  }
+
+  const title = document.getElementById("alphabetModalTitle");
+  const subtitle = document.getElementById("alphabetModalSubtitle");
+
+  if (title) title.textContent = currentAlphabetPage === 0 ? "Greek Alphabet" : "Greek Diphthongs";
+  if (subtitle) {
+    subtitle.textContent =
+      currentAlphabetPage === 0
+        ? "Quick reference for letter shapes and names."
+        : "Quick reference for vowel pairs that make one sound.";
+  }
+}
+
+let currentAlphabetPageL3 = 0;
+
+function showAlphabetModalLesson3() {
+  currentAlphabetPageL3 = 0;
+  updateAlphabetPageL3();
+  document.getElementById("alphabetModalLesson3").classList.add("open");
+}
+
+function hideAlphabetModalLesson3() {
+  document.getElementById("alphabetModalLesson3").classList.remove("open");
+}
+
+function closeAlphabetModalLesson3(e) {
+  if (e.target.id === "alphabetModalLesson3") {
+    hideAlphabetModalLesson3();
+  }
+}
+
+function changeAlphabetPageL3(direction) {
+  currentAlphabetPageL3 += direction;
+
+  if (currentAlphabetPageL3 < 0) currentAlphabetPageL3 = 1;
+  if (currentAlphabetPageL3 > 1) currentAlphabetPageL3 = 0;
+
+  updateAlphabetPageL3();
+}
+
+function updateAlphabetPageL3() {
+  document.querySelectorAll(".alphabet-page-l3").forEach((page, index) => {
+    page.classList.toggle("active", index === currentAlphabetPageL3);
+  });
+
+  document.getElementById("alphabetDotsL3").textContent =
+    currentAlphabetPageL3 === 0 ? "● ○" : "○ ●";
+
+  document.getElementById("alphabetModalTitleL3").textContent =
+    currentAlphabetPageL3 === 0 ? "Greek Alphabet" : "Greek Diphthongs";
+
+  document.getElementById("alphabetModalSubtitleL3").textContent =
+    currentAlphabetPageL3 === 0
+      ? "Quick reference for letter shapes and names."
+      : "Vowel pairs that form one sound.";
+}
+
+function allRequiredLessonsCompleted() {
+  return REQUIRED_LESSONS.every(lessonId => completedLessons[lessonId] === true);
+}
+
+function arePracticeToolsUnlocked() {
+  return practiceToolsUnlocked || allRequiredLessonsCompleted();
+}
+
+function tryOpenLockedFeature(feature) {
+  if (!arePracticeToolsUnlocked()) {
+    shakeLockedButton(feature);
+    showLockedFeatureModal();
+    return;
+  }
+
+  const btnMap = {
+    vocab: "vocabHomeBtn",
+    translate: "translateHomeBtn",
+    test: "testHomeBtn"
+  };
+
+  const btnId = btnMap[feature];
+  localStorage.setItem(`openedUnlocked_${btnId}`, "true");
+  updatePracticeToolLocks();
+
+  if (feature === "vocab") showLearnMenu();
+  if (feature === "translate") showTranslateMenu();
+  if (feature === "test") showTestMenu();
+}
+
+function shakeLockedButton(feature) {
+  const btnMap = {
+    vocab: "vocabHomeBtn",
+    translate: "translateHomeBtn",
+    test: "testHomeBtn"
+  };
+
+  const btn = document.getElementById(btnMap[feature]);
+  if (!btn) return;
+
+  btn.classList.remove("lock-shake");
+  void btn.offsetWidth;
+  btn.classList.add("lock-shake");
+
+  setTimeout(() => {
+    btn.classList.remove("lock-shake");
+  }, 500);
+}
+
+function showLockedFeatureModal() {
+  const modal = document.getElementById("lockedFeatureModal");
+  const lock = modal?.querySelector(".big-lock");
+
+  if (!modal) return;
+
+updateLockedModalProgress();
+
+  modal.classList.add("open");
+
+  if (lock) {
+    lock.classList.remove("lock-shake");
+    void lock.offsetWidth;
+    lock.classList.add("lock-shake");
+  }
+
+  
+}
+
+function hideLockedFeatureModal() {
+  document.getElementById("lockedFeatureModal")?.classList.remove("open");
+}
+
+function closeLockedFeatureModal(event) {
+  if (event.target.id === "lockedFeatureModal") {
+    hideLockedFeatureModal();
+  }
+}
+
+function unlockPracticeToolsManually() {
+  const modal = document.getElementById("lockedFeatureModal");
+  const lock = modal?.querySelector(".big-lock");
+
+  if (lock) {
+    lock.classList.remove("lock-shake");
+    lock.classList.add("break-open");
+  }
+
+  setTimeout(() => {
+    practiceToolsUnlocked = true;
+    localStorage.setItem("practiceToolsUnlocked", "true");
+
+    hideLockedFeatureModal();
+    updatePracticeToolLocks();
+
+    if (lock) lock.classList.remove("break-open");
+  }, 650);
+}
+
+function updatePracticeToolLocks() {
+  const unlocked = arePracticeToolsUnlocked();
+
+  ["vocabHomeBtn", "translateHomeBtn", "testHomeBtn"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    btn.classList.toggle("unlocked", unlocked);
+
+    const icon = btn.querySelector(".lock-icon");
+   if (icon) {
+  const openedKey = `openedUnlocked_${id}`;
+  const alreadyOpened = localStorage.getItem(openedKey) === "true";
+
+  if (unlocked && alreadyOpened) {
+    icon.style.display = "none";
+  } else {
+    icon.style.display = "";
+    icon.textContent = unlocked ? "lock_open" : "lock";
+  }
+}
+  });
+}
+
+function showAllLessonsCompleteModal() {
+  const modal = document.getElementById("allLessonsCompleteModal");
+  if (modal) modal.classList.add("open");
+}
+
+function hideAllLessonsCompleteModal() {
+  document.getElementById("allLessonsCompleteModal")?.classList.remove("open");
+}
+
+function closeAllLessonsCompleteModal(event) {
+  if (event.target.id === "allLessonsCompleteModal") {
+    hideAllLessonsCompleteModal();
+  }
+}
+function updateLockedModalProgress() {
+  const completedCount = REQUIRED_LESSONS.filter(
+    lessonId => completedLessons[lessonId] === true
+  ).length;
+
+  const progressPercent = Math.round(
+    (completedCount / REQUIRED_LESSONS.length) * 100
+  );
+
+  const progressAngle = progressPercent * 3.6;
+
+  const lock = document.querySelector("#lockedFeatureModal .progress-lock");
+  const text = document.getElementById("lessonUnlockProgressText");
+
+  if (lock) {
+    lock.style.setProperty("--lesson-progress-angle", `${progressAngle}deg`);
+  }
+
+  if (text) {
+    text.textContent = `Progress ${progressPercent}%`;
   }
 }
