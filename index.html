@@ -32,19 +32,18 @@
   <span>Lessons</span>
 </button>
 
-    <button class="main-btn home-action" onclick="showLearnMenu()">
-  <span class="material-symbols-outlined">school</span>
+  <button id="vocabHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
+  <span class="material-symbols-outlined lock-icon">lock</span>
   <span>Vocab</span>
 </button>
 
-
-<button class="main-btn home-action" onclick="showTranslateMenu()">
-  <span class="material-symbols-outlined">edit_note</span>
+<button id="translateHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
+  <span class="material-symbols-outlined lock-icon">lock</span>
   <span>Translate</span>
 </button>
 
-<button class="main-btn home-action" onclick="showTestMenu()">
-  <span class="material-symbols-outlined">quiz</span>
+<button id="testHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('test')">
+  <span class="material-symbols-outlined lock-icon">lock</span>
   <span>Test</span>
 </button>
 
@@ -393,38 +392,65 @@
   </div>
 </div>
 
-<div class="lesson-block" onclick="toggleLessonBlock(this)">
-  <div class="lesson-block-header">
-    🧠 Big takeaway
+<div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    ⭐ Big Takeaway
   </div>
 
   <div class="lesson-block-content">
-    <p>
-      The New Testament was written in a real language used by real people in history.
-    </p>
-
-    <p>
-      Greek was common enough to spread clearly, but structured enough to communicate meaning with precision.
-    </p>
 
     <p class="highlight">
-      That means studying Greek is not about finding hidden meanings. It is about seeing more clearly what is already there.
+      The New Testament was written in Koine Greek — the common language of the people.
     </p>
 
+    <div class="takeaway-box">
+
+      <div class="takeaway-step">
+        <strong>1. Koine means “common”</strong>
+        <span>Greek was widely understood across the Roman world.</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>2. The NT was written to communicate</strong>
+        <span>It was not written as a hidden religious code for elites.</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>3. Greek gives structure</strong>
+        <span>Endings, repeated words, and patterns help show meaning.</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>4. Your goal is recognition</strong>
+        <span>You are training your eyes to notice what the authors wrote.</span>
+      </div>
+
+    </div>
+
+    <p class="highlight">
+      You are not learning Greek to find secret meanings — you are learning to better see what is already there.
+    </p>
+
+    <hr>
+
     <div class="lesson-interactive">
-      <p><strong>Knowledge Check:</strong></p>
-      <p>
-  What is the main takeaway of this lesson about Koine Greek?
-</p>
+      <p class="check-title"><strong>Final check</strong></p>
 
-      <button class="small-btn" type="button" onclick="revealAnswer(event, this)">
-  Show Answer
-</button>
+      <div class="check-card">
+        <div class="check-prompt">What kind of Greek was the New Testament written in?</div>
 
-        <span class="answer-text">It was a common, real-world language used to clearly communicate truth — not a hidden or elite system.</span>
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          <strong>Koine Greek</strong> — the common, everyday Greek used across much of the ancient world.
+        </div>
       </div>
     </div>
+
   </div>
+</div>
 
   <div class="complete-lesson-box">
   <p data-complete-message="history">
@@ -937,6 +963,231 @@
       </div>
     </div>
 
+<div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    🔗 Diphthongs
+  </div>
+
+  <div class="lesson-block-content">
+
+    <p>
+      A <strong>diphthong</strong> is two vowels joined together to make one sound.
+    </p>
+
+    <p class="highlight">
+      Read the two vowels together, not as two separate sounds.
+    </p>
+
+    <div class="mark-grid">
+      <div class="mark-card"><strong class="greek-text">αι</strong><span>ai</span><small>like “eye”</small></div>
+      <div class="mark-card"><strong class="greek-text">ει</strong><span>ei</span><small>like “eight”</small></div>
+      <div class="mark-card"><strong class="greek-text">οι</strong><span>oi</span><small>like “oil”</small></div>
+      <div class="mark-card"><strong class="greek-text">αυ</strong><span>au</span><small>like “ow” in cow</small></div>
+      <div class="mark-card"><strong class="greek-text">ου</strong><span>ou</span><small>like “oo” in food</small></div>
+      <div class="mark-card"><strong class="greek-text">υι</strong><span>ui</span><small>like “wee”</small></div>
+      <div class="mark-card"><strong class="greek-text">ευ</strong><span>eu</span><small>like “eh-oo” blended</small></div>
+      <div class="mark-card"><strong class="greek-text">ηυ</strong><span>ēu</span><small>rare; blended ē + u</small></div>
+    </div>
+
+    <p class="highlight">
+      Diphthongs matter because breathing marks go over the second vowel when a word starts with one.
+    </p>
+
+  </div>
+</div>
+
+<div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    📖 Reading Marks in Greek
+  </div>
+
+  <div class="lesson-block-content">
+
+    <p>
+      Greek has a few marks that help you read the text clearly.
+    </p>
+
+    <p class="highlight">
+      For now, do not worry about mastering every rule. Just learn to recognize what the marks are.
+    </p>
+
+    <hr>
+
+    <h4>✍️ Greek punctuation</h4>
+
+    <div class="mark-grid">
+      <div class="mark-card">
+        <strong>,</strong>
+        <span>comma</span>
+        <small>Works like an English comma.</small>
+      </div>
+
+      <div class="mark-card">
+        <strong>.</strong>
+        <span>period</span>
+        <small>Works like an English period.</small>
+      </div>
+
+      <div class="mark-card">
+        <strong>·</strong>
+        <span>raised dot</span>
+        <small>Often works like a semicolon or colon.</small>
+      </div>
+
+      <div class="mark-card">
+        <strong>;</strong>
+        <span>question mark</span>
+        <small>Greek uses a semicolon shape for questions.</small>
+      </div>
+    </div>
+
+    <p class="mini-example">
+      The most important one to remember: <strong>;</strong> means “?”
+    </p>
+
+   <hr>
+
+<h4>💨 Breathing marks</h4>
+
+<p>
+  Breathing marks affect <strong>pronunciation only</strong>. They do not change the meaning of the word.
+</p>
+
+<p>
+  They appear on words that begin with a <strong>vowel</strong> or <strong>rho</strong> (<span class="greek-text">ρ</span>).
+</p>
+
+<div class="mark-grid">
+  <div class="mark-card">
+    <strong class="greek-text">ἀ</strong>
+    <span>smooth breathing</span>
+    <small>No “h” sound.</small>
+  </div>
+
+  <div class="mark-card">
+    <strong class="greek-text">ἁ</strong>
+    <span>rough breathing</span>
+    <small>Add an “h” sound.</small>
+  </div>
+</div>
+
+<div class="reading-example-box">
+  <div>
+    <span class="greek-text">ἀγάπη</span>
+    <small>smooth breathing → agapē</small>
+  </div>
+
+  <div>
+    <span class="greek-text">ἁμαρτία</span>
+    <small>rough breathing → hamartia</small>
+  </div>
+
+  <div>
+    <span class="greek-text">ῥαββί</span>
+    <small>rho with rough breathing → rhabbi</small>
+  </div>
+</div>
+
+<p class="highlight">
+  Smooth = no h. Rough = h.
+</p>
+
+<hr>
+
+<h4>🔗 Breathing marks with diphthongs</h4>
+
+<p>
+  A <strong>diphthong</strong> is two vowels working together to make one sound.
+</p>
+
+<p>
+  When a word begins with a diphthong, the breathing mark goes on the <strong>second vowel</strong>, not the first.
+</p>
+
+<div class="reading-example-box">
+  <div>
+    <span class="greek-text">αὐτός</span>
+    <small>breathing mark is over υ, the second vowel</small>
+  </div>
+
+  <div>
+    <span class="greek-text">οἶκος</span>
+    <small>breathing mark is over ι, the second vowel</small>
+  </div>
+
+  <div>
+    <span class="greek-text">εἰμί</span>
+    <small>breathing mark is over ι, the second vowel</small>
+  </div>
+</div>
+
+<p class="highlight">
+  If two vowels begin the word as a diphthong, look at the second vowel for the breathing mark.
+</p>
+
+<hr>
+
+<h4>🎵 Accent marks</h4>
+
+<p>
+  Greek also uses accent marks. These affect <strong>pronunciation only</strong> for now.
+</p>
+
+<p>
+  They help show where the voice is stressed, but they do not change the basic meaning of the vocabulary word.
+</p>
+
+<div class="mark-grid">
+  <div class="mark-card">
+    <strong class="greek-text">ά</strong>
+    <span>acute</span>
+    <small>Rising/stressed accent.</small>
+  </div>
+
+  <div class="mark-card">
+    <strong class="greek-text">ὰ</strong>
+    <span>grave</span>
+    <small>Lowered accent.</small>
+  </div>
+
+  <div class="mark-card">
+    <strong class="greek-text">ᾶ</strong>
+    <span>circumflex</span>
+    <small>Rising/falling accent.</small>
+  </div>
+</div>
+
+<p class="highlight">
+  Do not let accents slow you down. Recognize them first; master the details later.
+</p>
+
+    <p>
+      In beginning Greek, accents are mostly there to help pronunciation and recognition.
+    </p>
+
+    <p class="highlight">
+      Do not let accents slow you down. Recognize them first; master the details later.
+    </p>
+
+    <div class="lesson-interactive">
+      <p class="check-title"><strong>Knowledge check</strong></p>
+
+      <div class="check-card">
+        <div class="check-prompt">What does this mark mean in Greek?</div>
+        <div class="check-greek">;</div>
+
+        <button class="small-btn reveal-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          It is a <strong>question mark</strong> in Greek.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
     <div class="lesson-block" onclick="toggleLessonBlock(this)">
       <div class="lesson-block-header">
         🧠 Big takeaway
@@ -2106,10 +2357,7 @@
         <div class="ending-cell">ην</div>
         <div class="ending-cell">ον</div>
 
-        <div class="chart-divider">plural forms</div>
-        <div class="chart-divider"></div>
-        <div class="chart-divider"></div>
-        <div class="chart-divider"></div>
+       <div class="chart-divider full-row">plural forms</div>
 
         <div class="chart-row-label">nom pl<br><small>subject, many</small></div>
         <div class="ending-cell">οι</div>
@@ -2179,255 +2427,847 @@
   </div>
 </div>
 
-    <div class="lesson-block" onclick="toggleLessonBlock(this)">
-      <div class="lesson-block-header">🔍 Paradigm with Real Words</div>
-      <div class="lesson-block-content">
-        <p>
-          Now here is the same chart with real words added so you can see the stem plus ending.
-        </p>
+  <div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    📜 Paradigm with Real Words
+  </div>
 
-        <p>
-          We will use:
-        </p>
+  <div class="lesson-block-content">
 
-        <ul>
-          <li><strong>λόγος</strong> = word/saying, masculine</li>
-          <li><strong>γραφή</strong> = writing/Scripture, feminine</li>
-          <li><strong>ἔργον</strong> = work/deed, neuter</li>
-        </ul>
+    <p>
+      Now we will take the same endings chart and attach those endings to real Greek words.
+    </p>
 
-        <div class="paradigm-table">
-          <div><strong>Case</strong></div>
-          <div><strong>Masc.</strong></div>
-          <div><strong>Fem.</strong></div>
-          <div><strong>Neut.</strong></div>
+    <p class="highlight">
+      This is where the paradigm starts to make sense: stem + ending = full noun form.
+    </p>
 
-          <div>nom sg</div>
-          <div>λόγος<br><small>λογ + ος</small></div>
-          <div>γραφή<br><small>γραφ + η</small></div>
-          <div>ἔργον<br><small>ἐργ + ον</small></div>
+    <div class="mini-vocab-note">
+      <strong>Words used in this chart:</strong><br>
+      <span class="greek-text">λόγος</span> = word / saying, masculine<br>
+      <span class="greek-text">γραφή</span> = writing / Scripture, feminine<br>
+      <span class="greek-text">ἔργον</span> = work / deed, neuter
+    </div>
 
-          <div>gen sg</div>
-          <div>λόγου<br><small>λογ + ου</small></div>
-          <div>γραφῆς<br><small>γραφ + ης</small></div>
-          <div>ἔργου<br><small>ἐργ + ου</small></div>
+    <div class="read-chart-box">
+      <p>
+        Watch for the same pattern:
+      </p>
 
-          <div>dat sg</div>
-          <div>λόγῳ<br><small>λογ + ῳ</small></div>
-          <div>γραφῇ<br><small>γραφ + ῃ</small></div>
-          <div>ἔργῳ<br><small>ἐργ + ῳ</small></div>
+      <p class="mini-example">
+        stem + ending → full word form
+      </p>
 
-          <div>acc sg</div>
-          <div>λόγον<br><small>λογ + ον</small></div>
-          <div>γραφήν<br><small>γραφ + ην</small></div>
-          <div>ἔργον<br><small>ἐργ + ον</small></div>
+      <p>
+        The stem keeps the basic meaning. The ending changes to show case, number, and gender.
+      </p>
+    </div>
 
-          <div>nom pl</div>
-          <div>λόγοι<br><small>λογ + οι</small></div>
-          <div>γραφαί<br><small>γραφ + αι</small></div>
-          <div>ἔργα<br><small>ἐργ + α</small></div>
+    <div class="case-chart-wrap">
+      <div class="case-chart-title">Real Word Paradigm</div>
 
-          <div>gen pl</div>
-          <div>λόγων<br><small>λογ + ων</small></div>
-          <div>γραφῶν<br><small>γραφ + ων</small></div>
-          <div>ἔργων<br><small>ἐργ + ων</small></div>
+      <div class="case-ending-chart word-paradigm-chart">
+        <div class="chart-head">case + number</div>
+        <div class="chart-head">masculine</div>
+        <div class="chart-head">feminine</div>
+        <div class="chart-head">neuter</div>
 
-          <div>dat pl</div>
-          <div>λόγοις<br><small>λογ + οις</small></div>
-          <div>γραφαῖς<br><small>γραφ + αις</small></div>
-          <div>ἔργοις<br><small>ἐργ + οις</small></div>
-
-          <div>acc pl</div>
-          <div>λόγους<br><small>λογ + ους</small></div>
-          <div>γραφάς<br><small>γραφ + ας</small></div>
-          <div>ἔργα<br><small>ἐργ + α</small></div>
+        <div class="chart-row-label">nom sg<br><small>subject, one</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγος</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">ος</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφή</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">η</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργον</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">ον</span></small>
         </div>
 
-        <p class="highlight">
-          This is the point: the stem stays recognizable, while the ending changes.
-        </p>
+        <div class="chart-row-label">gen sg<br><small>of, one</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγου</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">ου</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφῆς</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">ης</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργου</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">ου</span></small>
+        </div>
 
-        <div class="lesson-interactive">
-          <p><strong>Knowledge check:</strong></p>
-          <p>In <strong>γραφαῖς</strong>, what is the stem and what is the ending?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Stem: <strong>γραφ</strong>. Ending: <strong>αις</strong>. It is feminine dative plural.</span>
-          </div>
+        <div class="chart-row-label">dat sg<br><small>in/to/with, one</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγῳ</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">ῳ</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφῇ</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">ῃ</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργῳ</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">ῳ</span></small>
+        </div>
+
+        <div class="chart-row-label">acc sg<br><small>object, one</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγον</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">ον</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφήν</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">ην</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργον</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">ον</span></small>
+        </div>
+
+        <div class="chart-divider full-row">plural forms</div>
+
+        <div class="chart-row-label">nom pl<br><small>subject, many</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγοι</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">οι</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφαί</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">αι</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργα</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">α</span></small>
+        </div>
+
+        <div class="chart-row-label">gen pl<br><small>of, many</small></div>
+        <div class="word-form-cell shared-ending">
+          <span class="greek-text">λόγων</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">ων</span></small>
+        </div>
+        <div class="word-form-cell shared-ending">
+          <span class="greek-text">γραφῶν</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">ων</span></small>
+        </div>
+        <div class="word-form-cell shared-ending">
+          <span class="greek-text">ἔργων</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">ων</span></small>
+        </div>
+
+        <div class="chart-row-label">dat pl<br><small>in/to/with, many</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγοις</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">οις</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφαῖς</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">αις</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργοις</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">οις</span></small>
+        </div>
+
+        <div class="chart-row-label">acc pl<br><small>object, many</small></div>
+        <div class="word-form-cell">
+          <span class="greek-text">λόγους</span>
+          <small><span class="stem-piece">λογ</span> + <span class="ending-piece">ους</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">γραφάς</span>
+          <small><span class="stem-piece">γραφ</span> + <span class="ending-piece">ας</span></small>
+        </div>
+        <div class="word-form-cell">
+          <span class="greek-text">ἔργα</span>
+          <small><span class="stem-piece">ἐργ</span> + <span class="ending-piece">α</span></small>
         </div>
       </div>
     </div>
 
-    <div class="lesson-block" onclick="toggleLessonBlock(this)">
-      <div class="lesson-block-header">🧩 How to Use the Chart</div>
-      <div class="lesson-block-content">
-        <p>
-          When you see a noun, do not panic. Work backward.
-        </p>
+    <p class="highlight">
+      This is the point: the stem stays recognizable, while the ending changes.
+    </p>
 
-        <ol>
-          <li>Find the stem.</li>
-          <li>Look at the ending.</li>
-          <li>Match the ending to the chart.</li>
-          <li>Identify case, gender, and number.</li>
-          <li>Translate according to context.</li>
-        </ol>
+    <div class="lesson-interactive">
+      <p class="check-title"><strong>Knowledge check</strong></p>
 
-        <div class="challenge-card">
-          <p class="greek-example">λόγοις</p>
-          <p><strong>Step 1:</strong> Stem = λογ</p>
-          <p><strong>Step 2:</strong> Ending = οις</p>
-          <p><strong>Step 3:</strong> οις = masculine/neuter dative plural</p>
-          <p><strong>Basic idea:</strong> to/for/in/with words</p>
-        </div>
+      <div class="check-card">
+        <div class="check-prompt">Look at this form:</div>
+        <div class="check-greek greek-text">γραφαῖς</div>
 
-        <div class="lesson-interactive">
-          <p><strong>Knowledge check:</strong></p>
-          <p>Look at <strong>λόγοις</strong>. What ending do you see?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">The ending is <strong>οις</strong>, which points to dative plural in this pattern.</span>
-          </div>
+        <p>What is the stem, ending, and form?</p>
+
+        <button class="small-btn reveal-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          stem: <span class="stem-piece">γραφ</span><br>
+          ending: <span class="ending-piece">αις</span><br>
+          form: <strong>feminine dative plural</strong>
         </div>
       </div>
     </div>
 
-    <div class="lesson-block" onclick="toggleLessonBlock(this)">
-      <div class="lesson-block-header">⚠️ Some Forms Look the Same</div>
-      <div class="lesson-block-content">
-        <p>
-          Some Greek forms look identical even though they may have different labels.
-        </p>
+  </div>
+</div>
 
-        <p>
-          For example:
-        </p>
+   <div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    🧠 How to Use the Chart
+  </div>
 
-        <div class="paradigm-table">
-          <div><strong>Form</strong></div>
-          <div><strong>Could Be</strong></div>
+  <div class="lesson-block-content">
 
-          <div>ἔργον</div>
-          <div>neuter nominative singular or neuter accusative singular</div>
+    <p>
+      When you see a Greek noun, don’t try to memorize everything at once.
+      Instead, follow a simple process.
+    </p>
 
-          <div>ἔργα</div>
-          <div>neuter nominative plural or neuter accusative plural</div>
+    <div class="process-box">
 
-          <div>λόγον</div>
-          <div>masculine accusative singular</div>
-        </div>
+      <div class="process-step">
+        <strong>1. Look at the ending</strong>
+        <span class="greek-text">λόγους → -ους</span>
+      </div>
 
-        <p>
-          This is why context matters.
-          The chart helps you narrow things down, but the sentence tells you how the form is being used.
-        </p>
+      <div class="process-step">
+        <strong>2. Find it in the chart</strong>
+        <span>-ους → accusative plural masculine</span>
+      </div>
 
-        <p class="highlight">
-          Do not be surprised when one form can fit more than one category.
-        </p>
+      <div class="process-step">
+        <strong>3. Identify the job</strong>
+        <span>accusative → object</span>
+      </div>
 
-        <div class="lesson-interactive">
-          <p><strong>Knowledge check:</strong></p>
-          <p>Look at <strong>ἔργον</strong>. Why can it be tricky?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Because neuter nominative singular and neuter accusative singular look the same: <strong>ον</strong>.</span>
-          </div>
+      <div class="process-step">
+        <strong>4. Recognize the stem</strong>
+        <span class="greek-text">λογ → word</span>
+      </div>
+
+    </div>
+
+    <p class="highlight">
+      Ending → chart → case → meaning
+    </p>
+
+    <div class="read-chart-box">
+      <p class="greek-text">λόγους</p>
+
+      <p>
+        ending: <span class="ending-piece">ους</span><br>
+        → accusative plural masculine<br>
+        → “words” as the object
+      </p>
+    </div>
+
+    <p>
+      You are not memorizing randomly.
+      You are learning how to move from the ending to the meaning.
+    </p>
+
+    <div class="lesson-interactive">
+      <p class="check-title"><strong>Knowledge check</strong></p>
+
+      <div class="check-card">
+        <div class="check-prompt">Use the chart:</div>
+        <div class="check-greek greek-text">λόγοις</div>
+
+        <p>What do you know about this form?</p>
+
+        <button class="small-btn reveal-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          ending: <span class="ending-piece">οις</span><br>
+          form: <strong>dative plural masculine</strong><br>
+          idea: to / for / in / with words
         </div>
       </div>
     </div>
 
-    <div class="lesson-block" onclick="toggleLessonBlock(this)">
-      <div class="lesson-block-header">📖 Articles Help You Confirm</div>
-      <div class="lesson-block-content">
-        <p>
-          Articles usually agree with the noun they belong to in case, gender, and number.
-        </p>
+  </div>
+</div>
 
-        <p>
-          That means the article can help confirm what you are seeing.
-        </p>
+   <div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    ⚠️ Some Forms Look the Same
+  </div>
 
-        <div class="paradigm-table">
-          <div><strong>Phrase</strong></div>
-          <div><strong>What It Shows</strong></div>
+  <div class="lesson-block-content">
 
-          <div>ὁ λόγος</div>
-          <div>masculine nominative singular</div>
+    <p>
+      Not every Greek form is unique. Sometimes different forms look exactly the same.
+    </p>
 
-          <div>τὸν λόγον</div>
-          <div>masculine accusative singular</div>
+    <p class="highlight">
+      The ending gives you strong clues, but you still need context.
+    </p>
 
-          <div>τῇ γραφῇ</div>
-          <div>feminine dative singular</div>
+    <div class="confusion-box">
 
-          <div>τὰ ἔργα</div>
-          <div>neuter nominative/accusative plural</div>
+      <div class="confusion-row">
+        <div class="greek-text">ἔργον</div>
+        <div>
+          nominative singular <br>
+          accusative singular
         </div>
+      </div>
 
-        <p>
-          The noun ending matters, but the article often gives you another clue.
-        </p>
+      <div class="confusion-row">
+        <div class="greek-text">ἔργα</div>
+        <div>
+          nominative plural <br>
+          accusative plural
+        </div>
+      </div>
 
-        <p class="highlight">
-          Article + noun together usually make identification much easier.
-        </p>
+    </div>
 
-        <div class="lesson-interactive">
-          <p><strong>Knowledge check:</strong></p>
-          <p>In <strong>τῇ γραφῇ</strong>, what case, gender, and number do you see?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text"><strong>Feminine dative singular</strong>. Both τῇ and γραφῇ point that direction.</span>
-          </div>
+    <p>
+      These are both <strong>neuter</strong> forms.
+    </p>
+
+    <p class="highlight">
+      Neuter rule: nominative and accusative are always the same.
+    </p>
+
+    <hr>
+
+    <h4>🧠 A very helpful shortcut</h4>
+
+    <div class="shortcut-box">
+      <p class="greek-text">-ων</p>
+      <p>
+        This ending is <strong>always genitive plural</strong>.
+      </p>
+    </div>
+
+    <p>
+      That means if you see:
+    </p>
+
+    <div class="mini-case-line">
+      <span class="greek-text">λόγων</span>
+      <small>“of words”</small>
+    </div>
+
+    <div class="mini-case-line">
+      <span class="greek-text">γραφῶν</span>
+      <small>“of writings”</small>
+    </div>
+
+    <div class="mini-case-line">
+      <span class="greek-text">ἔργων</span>
+      <small>“of works”</small>
+    </div>
+
+    <p class="highlight">
+      You don’t have to guess — it is genitive plural every time.
+    </p>
+
+    <hr>
+
+    <h4>🔍 How to handle identical forms</h4>
+
+    <p>
+      When two forms look the same, use these clues:
+    </p>
+
+    <div class="process-box">
+
+      <div class="process-step">
+        <strong>1. Look at the article</strong>
+        <span class="greek-text">τὰ ἔργα</span>
+      </div>
+
+      <div class="process-step">
+        <strong>2. Look at the verb</strong>
+        <span>is it acting or receiving?</span>
+      </div>
+
+      <div class="process-step">
+        <strong>3. Look at the sentence</strong>
+        <span>what makes sense here?</span>
+      </div>
+
+    </div>
+
+    <p>
+      Greek gives you structure, but meaning still comes from context.
+    </p>
+
+    <p class="highlight">
+      The chart gives possibilities — the sentence gives the answer.
+    </p>
+
+    <div class="lesson-interactive">
+      <p class="check-title"><strong>Knowledge check</strong></p>
+
+      <div class="check-card">
+        <div class="check-prompt">Look at this form:</div>
+        <div class="check-greek greek-text">ἔργα</div>
+
+        <p>What forms could this be?</p>
+
+        <button class="small-btn reveal-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          nominative plural <br>
+          accusative plural <br><br>
+          (neuter forms look the same)
         </div>
       </div>
     </div>
 
-    <div class="lesson-block" onclick="toggleLessonBlock(this)">
-      <div class="lesson-block-header">🎮 Practice: Identify the Form</div>
-      <div class="lesson-block-content">
-        <p>
-          For each one, look for the ending first.
-        </p>
+  </div>
+</div>
 
-        <div class="challenge-card">
-          <p class="greek-example">λόγους</p>
-          <p><strong>Question:</strong> What is the stem, ending, and form?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Stem: <strong>λογ</strong>. Ending: <strong>ους</strong>. Form: masculine accusative plural.</span>
-          </div>
-        </div>
+    <div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    ✅ Articles Help You Confirm
+  </div>
 
-        <div class="challenge-card">
-          <p class="greek-example">γραφῆς</p>
-          <p><strong>Question:</strong> What is the stem, ending, and form?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Stem: <strong>γραφ</strong>. Ending: <strong>ης</strong>. Form: feminine genitive singular.</span>
-          </div>
-        </div>
+  <div class="lesson-block-content">
 
-        <div class="challenge-card">
-          <p class="greek-example">ἔργοις</p>
-          <p><strong>Question:</strong> What is the stem, ending, and form?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Stem: <strong>ἐργ</strong>. Ending: <strong>οις</strong>. Form: neuter dative plural.</span>
-          </div>
-        </div>
+    <p>
+      Greek articles (like “the”) match the noun they belong to.
+    </p>
 
-        <div class="challenge-card">
-          <p class="greek-example">γραφαί</p>
-          <p><strong>Question:</strong> What is the stem, ending, and form?</p>
-          <div class="answer-row">
-            <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Stem: <strong>γραφ</strong>. Ending: <strong>αι</strong>. Form: feminine nominative plural.</span>
-          </div>
+    <div class="article-definition-box">
+  <p>
+    Greek only has a <strong>definite article</strong> — it always means <strong>“the.”</strong>
+  </p>
+
+  <p>
+    English can use:
+  </p>
+
+  <ul>
+    <li><strong>the word</strong> (definite)</li>
+    <li><strong>a word</strong> (indefinite)</li>
+    <li><strong>word</strong> (no article)</li>
+  </ul>
+
+  <p>
+    Greek does not have a separate word for “a” or “an.”
+  </p>
+
+  <p class="mini-example">
+    <span class="greek-text">λόγος</span> can mean “a word” or “the word,” depending on context.
+  </p>
+
+  <p class="highlight">
+    The Greek article always means “the,” but English translation may vary.
+  </p>
+</div>
+
+<p>
+  If there is no article, the noun is often understood as “a” in English.
+</p>
+
+    <p class="highlight">
+      The article and the noun will always match in <strong>case</strong>, <strong>number</strong>, and <strong>gender</strong>.
+    </p>
+
+    <p>
+      That means you often get <strong>two clues instead of one</strong>.
+    </p>
+
+    <div class="article-match-box">
+
+      <div class="mini-case-line">
+        <span class="greek-text">ὁ λόγος</span>
+        <small>
+          <span class="ending-piece">ὁ</span> + <span class="ending-piece">ος</span><br>
+          nominative singular masculine → subject
+        </small>
+      </div>
+
+      <div class="mini-case-line">
+        <span class="greek-text">τὸν λόγον</span>
+        <small>
+          <span class="ending-piece">τὸν</span> + <span class="ending-piece">ον</span><br>
+          accusative singular masculine → object
+        </small>
+      </div>
+
+    </div>
+
+    <p class="highlight">
+      If you recognize the article, you can often identify the noun instantly.
+    </p>
+
+    <hr>
+
+    <h4>📊 The Article Paradigm (Memorize This)</h4>
+
+    <p>
+      The article is one of the most important patterns to memorize.
+    </p>
+
+    <p class="highlight">
+      If you know the article, you can recognize case, number, and gender much faster.
+    </p>
+
+    <div class="case-chart-wrap">
+      <div class="case-chart-title">Greek Article (ὁ, ἡ, τό)</div>
+
+      <div class="case-ending-chart">
+
+        <div class="chart-head">case + number</div>
+        <div class="chart-head">masculine</div>
+        <div class="chart-head">feminine</div>
+        <div class="chart-head">neuter</div>
+
+        <div class="chart-row-label">nom sg</div>
+        <div class="ending-cell greek-text">ὁ</div>
+        <div class="ending-cell greek-text">ἡ</div>
+        <div class="ending-cell greek-text">τό</div>
+
+        <div class="chart-row-label">gen sg</div>
+        <div class="ending-cell greek-text">τοῦ</div>
+        <div class="ending-cell greek-text">τῆς</div>
+        <div class="ending-cell greek-text">τοῦ</div>
+
+        <div class="chart-row-label">dat sg</div>
+        <div class="ending-cell greek-text">τῷ</div>
+        <div class="ending-cell greek-text">τῇ</div>
+        <div class="ending-cell greek-text">τῷ</div>
+
+        <div class="chart-row-label">acc sg</div>
+        <div class="ending-cell greek-text">τόν</div>
+        <div class="ending-cell greek-text">τήν</div>
+        <div class="ending-cell greek-text">τό</div>
+
+        <div class="chart-divider full-row">plural forms</div>
+
+        <div class="chart-row-label">nom pl</div>
+        <div class="ending-cell greek-text">οἱ</div>
+        <div class="ending-cell greek-text">αἱ</div>
+        <div class="ending-cell greek-text">τά</div>
+
+        <div class="chart-row-label">gen pl</div>
+        <div class="ending-cell greek-text">τῶν</div>
+        <div class="ending-cell greek-text">τῶν</div>
+        <div class="ending-cell greek-text">τῶν</div>
+
+        <div class="chart-row-label">dat pl</div>
+        <div class="ending-cell greek-text">τοῖς</div>
+        <div class="ending-cell greek-text">ταῖς</div>
+        <div class="ending-cell greek-text">τοῖς</div>
+
+        <div class="chart-row-label">acc pl</div>
+        <div class="ending-cell greek-text">τούς</div>
+        <div class="ending-cell greek-text">τάς</div>
+        <div class="ending-cell greek-text">τά</div>
+
+      </div>
+    </div>
+
+    <p>
+      Notice how consistent this is:
+    </p>
+
+    <ul>
+      <li><strong>τοῦ / τῆς / τοῦ</strong> → genitive singular</li>
+      <li><strong>τῶν</strong> → genitive plural (all genders)</li>
+      <li><strong>τό / τά</strong> → neuter nominative & accusative</li>
+    </ul>
+
+    <p class="highlight">
+      The article often makes it easier to recognize forms than the noun endings themselves.
+    </p>
+
+    <hr>
+
+    <h4>🧠 Why memorize the article?</h4>
+
+    <div class="process-box">
+
+      <div class="process-step">
+        <strong>Faster recognition</strong>
+        <span>you see τῶν → instantly genitive plural</span>
+      </div>
+
+      <div class="process-step">
+        <strong>Double confirmation</strong>
+        <span>article + noun both point to the same form</span>
+      </div>
+
+      <div class="process-step">
+        <strong>Helps with unfamiliar words</strong>
+        <span>even if you don’t know the noun</span>
+      </div>
+
+    </div>
+
+    <p class="highlight">
+      Many students learn to recognize Greek primarily through the article first.
+    </p>
+
+    <div class="lesson-interactive">
+      <p class="check-title"><strong>Knowledge check</strong></p>
+
+      <div class="check-card">
+        <div class="check-prompt">Look at this form:</div>
+        <div class="check-greek greek-text">τῶν λόγων</div>
+
+        <p>What does the article tell you?</p>
+
+        <button class="small-btn reveal-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          <span class="ending-piece">τῶν</span><br><br>
+          genitive plural (all genders)<br>
+          → “of words”
         </div>
       </div>
     </div>
+
+  </div>
+</div>
+
+    <div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    🎮 Practice: Read the Form
+  </div>
+
+  <div class="lesson-block-content">
+
+    <p>
+      Now you will practice using the chart the same way every time.
+    </p>
+
+    <p class="highlight">
+      Look at the ending → find it in the chart → identify case, number, and gender.
+    </p>
+
+<p>
+  When this lesson asks for the <strong>form</strong>, it means you are identifying three things:
+</p>
+
+<div class="triple-box">
+  <div class="triple-item">
+    <strong>case</strong>
+    <span>job</span>
+  </div>
+
+  <div class="triple-item">
+    <strong>number</strong>
+    <span>one or many</span>
+  </div>
+
+  <div class="triple-item">
+    <strong>gender</strong>
+    <span>masc / fem / neut</span>
+  </div>
+</div>
+
+<p class="mini-example">
+  Example: <span class="greek-text">λόγους</span> = <strong>accusative plural masculine</strong>
+</p>
+
+    <hr>
+
+    <h4>🔹 Step 1: Identify the ending</h4>
+<button class="small-btn chart-help-btn" type="button" onclick="openCaseChartModal(event)">
+  Open Case Ending Chart
+</button>
+    <div class="practice-grid">
+
+      <div class="check-card">
+        <div class="check-greek greek-text">λόγον</div>
+        <p>What is the ending?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          <span class="ending-piece">ον</span>
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">γραφῆς</div>
+        <p>What is the ending?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          <span class="ending-piece">ης</span>
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">λόγοις</div>
+        <p>What is the ending?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          <span class="ending-piece">οις</span>
+        </div>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <h4>🔹 Step 2: Identify the form</h4>
+<button class="small-btn chart-help-btn" type="button" onclick="openCaseChartModal(event)">
+  Open Case Ending Chart
+</button>
+    <div class="practice-grid">
+
+      <div class="check-card">
+        <div class="check-greek greek-text">λόγους</div>
+        <p>What is the form?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          <span class="ending-piece">ους</span><br>
+          masculine accusative plural
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">γραφήν</div>
+        <p>What is the form?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          <span class="ending-piece">ην</span><br>
+          feminine accusative singular
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">λόγων</div>
+        <p>What is the form?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          <span class="ending-piece">ων</span><br>
+          genitive plural (all genders)
+        </div>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <h4>🔹 Step 3: Use the article</h4>
+<button class="small-btn chart-help-btn" type="button" onclick="openCaseChartModal(event)">
+  Open Case Ending Chart
+</button>
+    <div class="practice-grid">
+
+      <div class="check-card">
+        <div class="check-greek greek-text">τὸν λόγον</div>
+        <p>What does the article confirm?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          accusative singular masculine<br>
+          → object
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">τῶν λόγων</div>
+        <p>What does the article tell you instantly?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          genitive plural (all genders)<br>
+          → “of words”
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">τῇ γραφῇ</div>
+        <p>What is the form?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          feminine dative singular<br>
+          → to/for/in the writing
+        </div>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <h4>🔹 Step 4: Full recognition</h4>
+<button class="small-btn chart-help-btn" type="button" onclick="openCaseChartModal(event)">
+  Open Case Ending Chart
+</button>
+    <div class="practice-grid">
+
+      <div class="check-card">
+        <div class="check-greek greek-text">λόγοι</div>
+        <p>Identify everything you can</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          stem: <span class="stem-piece">λογ</span><br>
+          ending: <span class="ending-piece">οι</span><br>
+          form: nominative plural masculine<br>
+          → subject, “words”
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">ἔργα</div>
+        <p>What are the possibilities?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          neuter nominative plural<br>
+          OR neuter accusative plural
+        </div>
+      </div>
+
+      <div class="check-card">
+        <div class="check-greek greek-text">γραφῶν</div>
+        <p>What is this form?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">Show Answer</button>
+
+        <div class="check-answer">
+          stem: <span class="stem-piece">γραφ</span><br>
+          ending: <span class="ending-piece">ων</span><br>
+          genitive plural
+        </div>
+      </div>
+
+    </div>
+
+    <p class="highlight">
+      The goal is not speed yet — it is consistency. Follow the same process every time.
+    </p>
+
+  </div>
+</div>
 
     <div class="lesson-block" onclick="toggleLessonBlock(this)">
       <div class="lesson-block-header">🧠 Big Takeaway</div>
@@ -2450,10 +3290,10 @@
 
         <div class="lesson-interactive">
           <p><strong>Final check:</strong></p>
-          <p>In <strong>τὰ ἔργα</strong>, what is the stem, ending, and form?</p>
+          <p>In <h2>τὰ ἔργα</h2> what is the stem, ending, and form?</p>
           <div class="answer-row">
             <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
-            <span class="answer-text">Stem: <strong>ἐργ</strong>. Ending: <strong>α</strong>. Form: neuter nominative or accusative plural. The article τὰ confirms neuter plural.</span>
+            <span class="answer-text"><h4>Stem: ἐργ</h4> <h4>Ending: α</h4> <strong>Form:</strong> neuter nominative or accusative plural. The article τὰ confirms neuter plural.</span>
           </div>
         </div>
       </div>
@@ -2488,10 +3328,53 @@
     </p>
 
     <div class="lesson-section">
-      <h3>Step 1</h3>
-      <p>
-        Find the main verb.
-      </p>
+     <p class="lesson-lead">
+  This lesson will teach you how to slowly work through a Greek sentence step by step.
+</p>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🔍 Reading Greek Step by Step
+  </div>
+
+  <div class="lesson-block-content">
+
+    <p>
+      Do not try to instantly understand an entire sentence.
+    </p>
+
+    <p>
+      Greek is usually read best one piece at a time:
+    </p>
+
+    <ul>
+      <li>Find the main verb</li>
+      <li>Find the subject</li>
+      <li>Look for objects or phrases</li>
+      <li>Notice endings and patterns</li>
+    </ul>
+
+    <p class="highlight">
+      Greek becomes much easier when you slow down and follow a consistent process.
+    </p>
+
+  </div>
+</div>
+
+<div class="complete-lesson-box">
+  <p data-complete-message="howToRead">
+    Open every lesson section before completing this lesson.
+  </p>
+
+  <button
+    class="complete-lesson-btn"
+    data-complete-lesson="howToRead"
+    onclick="completeLesson('howToRead')"
+    disabled
+  >
+    Complete Lesson
+  </button>
+</div>
     </div>
 
     <div class="lesson-section">
@@ -2890,9 +3773,7 @@
       </div>
     </div>
 
-    <p class="welcome-highlight">
-      Best path: start with <strong>Learn</strong>, then use <strong>Vocab</strong>, <strong>Translate</strong>, and <strong>Test</strong> to reinforce what you learned.
-    </p>
+    
 
     <button class="main-btn welcome-start-btn" onclick="hideInfoModal()">
       Start Learning
@@ -3046,10 +3927,42 @@
       <div><strong>ψ</strong><span>Psi</span></div>
       <div><strong>ω</strong><span>Omega</span></div>
     </div>
+
+
+
   </div>
 </div>
 
+<div id="alphabetModalLesson3" class="modal-overlay" onclick="closeAlphabetModalLesson3(event)">
+  <div class="modal-card alphabet-modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideAlphabetModalLesson3()">×</button>
 
+    <h2 id="alphabetModalTitleL3">Greek Alphabet</h2>
+    <p id="alphabetModalSubtitleL3">Quick reference for letter shapes and names.</p>
+
+    <!-- PAGE 1 -->
+    <div class="alphabet-page-l3 active" data-alpha-page="0">
+      <div class="alphabet-reference-grid">
+        <!-- SAME letters again -->
+      </div>
+    </div>
+
+    <!-- PAGE 2 -->
+ 
+
+    <div class="alphabet-ref-nav">
+      <button class="icon-btn" onclick="changeAlphabetPageL3(-1)">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+
+      <div id="alphabetDotsL3">● ○</div>
+
+      <button class="icon-btn" onclick="changeAlphabetPageL3(1)">
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <div id="soundModal" class="modal-overlay" onclick="closeSoundModal(event)">
   <div class="modal-card alphabet-modal-card">
@@ -3083,7 +3996,31 @@
       <div><strong>χ</strong><span>“kh/ch” sound</span></div>
       <div><strong>ψ</strong><span>“ps” as in lips</span></div>
       <div><strong>ω</strong><span>long “o” as in tone</span></div>
+
+        
+      <div class="mini-vocab-note">
+        <strong>Diphthongs</strong> are two vowels that make one sound.
+        <br><br>
+        Not every vowel pair is a diphthong — only these:
+      </div>
+
+      <div class="mark-grid">
+        <div class="mark-card"><strong class="greek-text">αι</strong><span>ai</span><small>like “eye”</small></div>
+        <div class="mark-card"><strong class="greek-text">ει</strong><span>ei</span><small>like “eight”</small></div>
+        <div class="mark-card"><strong class="greek-text">οι</strong><span>oi</span><small>like “oil”</small></div>
+        <div class="mark-card"><strong class="greek-text">αυ</strong><span>au</span><small>like “ow”</small></div>
+        <div class="mark-card"><strong class="greek-text">ου</strong><span>ou</span><small>like “oo”</small></div>
+        <div class="mark-card"><strong class="greek-text">υι</strong><span>ui</span><small>like “wee”</small></div>
+        <div class="mark-card"><strong class="greek-text">ευ</strong><span>eu</span><small>almost like "ew" or the "oo" in ooze</small></div>
+        <div class="mark-card"><strong class="greek-text">ηυ</strong><span>ēu</span><small>rare</small></div>
+      </div>
+
+      <p class="highlight">
+        If a word begins with a diphthong, breathing and accent marks go on the second vowel.
+      </p>
+    
     </div>
+    
   </div>
 </div>
 
@@ -3116,6 +4053,296 @@
   </div>
 </div>
 
+
+<div id="caseChartModal" class="modal-overlay">
+  <div class="modal-card case-chart-modal-card">
+    <button class="modal-close" onclick="closeCaseChartModal()">×</button>
+
+    <h2>Case Ending Chart</h2>
+
+    <div class="case-ending-chart modal-case-chart">
+      <div class="chart-head">case + number</div>
+      <div class="chart-head">masc</div>
+      <div class="chart-head">fem</div>
+      <div class="chart-head">neut</div>
+
+      <div class="chart-row-label">nom sg</div>
+      <div class="ending-cell">ος</div>
+      <div class="ending-cell">η</div>
+      <div class="ending-cell">ον</div>
+
+      <div class="chart-row-label">gen sg</div>
+      <div class="ending-cell">ου</div>
+      <div class="ending-cell">ης</div>
+      <div class="ending-cell">ου</div>
+
+      <div class="chart-row-label">dat sg</div>
+      <div class="ending-cell">ῳ</div>
+      <div class="ending-cell">ῃ</div>
+      <div class="ending-cell">ῳ</div>
+
+      <div class="chart-row-label">acc sg</div>
+      <div class="ending-cell">ον</div>
+      <div class="ending-cell">ην</div>
+      <div class="ending-cell">ον</div>
+
+      <div class="chart-divider full-row">plural forms</div>
+
+      <div class="chart-row-label">nom pl</div>
+      <div class="ending-cell">οι</div>
+      <div class="ending-cell">αι</div>
+      <div class="ending-cell">α</div>
+
+      <div class="chart-row-label">gen pl</div>
+      <div class="ending-cell shared-ending">ων</div>
+      <div class="ending-cell shared-ending">ων</div>
+      <div class="ending-cell shared-ending">ων</div>
+
+      <div class="chart-row-label">dat pl</div>
+      <div class="ending-cell">οις</div>
+      <div class="ending-cell">αις</div>
+      <div class="ending-cell">οις</div>
+
+      <div class="chart-row-label">acc pl</div>
+      <div class="ending-cell">ους</div>
+      <div class="ending-cell">ας</div>
+      <div class="ending-cell">α</div>
+    </div>
+  </div>
+</div>
+
+
+<div id="paradigmModal" class="modal-overlay">
+  <div class="modal-card case-chart-modal-card paradigm-modal-card">
+    <button class="modal-close" onclick="closeParadigmModal()">×</button>
+
+    <h2 id="paradigmModalTitle">Case Ending Chart</h2>
+
+    <div class="paradigm-page active" data-paradigm-page="0">
+      <div class="case-ending-chart modal-case-chart">
+        <div class="chart-head">case + number</div>
+        <div class="chart-head">masc</div>
+        <div class="chart-head">fem</div>
+        <div class="chart-head">neut</div>
+
+        <div class="chart-row-label">nom sg</div>
+        <div class="ending-cell">ος</div>
+        <div class="ending-cell">η</div>
+        <div class="ending-cell">ον</div>
+
+        <div class="chart-row-label">gen sg</div>
+        <div class="ending-cell">ου</div>
+        <div class="ending-cell">ης</div>
+        <div class="ending-cell">ου</div>
+
+        <div class="chart-row-label">dat sg</div>
+        <div class="ending-cell">ῳ</div>
+        <div class="ending-cell">ῃ</div>
+        <div class="ending-cell">ῳ</div>
+
+        <div class="chart-row-label">acc sg</div>
+        <div class="ending-cell">ον</div>
+        <div class="ending-cell">ην</div>
+        <div class="ending-cell">ον</div>
+
+        <div class="chart-divider full-row">plural forms</div>
+
+        <div class="chart-row-label">nom pl</div>
+        <div class="ending-cell">οι</div>
+        <div class="ending-cell">αι</div>
+        <div class="ending-cell">α</div>
+
+        <div class="chart-row-label">gen pl</div>
+        <div class="ending-cell shared-ending">ων</div>
+        <div class="ending-cell shared-ending">ων</div>
+        <div class="ending-cell shared-ending">ων</div>
+
+        <div class="chart-row-label">dat pl</div>
+        <div class="ending-cell">οις</div>
+        <div class="ending-cell">αις</div>
+        <div class="ending-cell">οις</div>
+
+        <div class="chart-row-label">acc pl</div>
+        <div class="ending-cell">ους</div>
+        <div class="ending-cell">ας</div>
+        <div class="ending-cell">α</div>
+      </div>
+    </div>
+
+    <div class="paradigm-page" data-paradigm-page="1">
+      <div class="case-ending-chart modal-case-chart">
+        <div class="chart-head">case + number</div>
+        <div class="chart-head">masc</div>
+        <div class="chart-head">fem</div>
+        <div class="chart-head">neut</div>
+
+        <div class="chart-row-label">nom sg</div>
+        <div class="ending-cell greek-text">ὁ</div>
+        <div class="ending-cell greek-text">ἡ</div>
+        <div class="ending-cell greek-text">τό</div>
+
+        <div class="chart-row-label">gen sg</div>
+        <div class="ending-cell greek-text">τοῦ</div>
+        <div class="ending-cell greek-text">τῆς</div>
+        <div class="ending-cell greek-text">τοῦ</div>
+
+        <div class="chart-row-label">dat sg</div>
+        <div class="ending-cell greek-text">τῷ</div>
+        <div class="ending-cell greek-text">τῇ</div>
+        <div class="ending-cell greek-text">τῷ</div>
+
+        <div class="chart-row-label">acc sg</div>
+        <div class="ending-cell greek-text">τόν</div>
+        <div class="ending-cell greek-text">τήν</div>
+        <div class="ending-cell greek-text">τό</div>
+
+        <div class="chart-divider full-row">plural forms</div>
+
+        <div class="chart-row-label">nom pl</div>
+        <div class="ending-cell greek-text">οἱ</div>
+        <div class="ending-cell greek-text">αἱ</div>
+        <div class="ending-cell greek-text">τά</div>
+
+        <div class="chart-row-label">gen pl</div>
+        <div class="ending-cell greek-text shared-ending">τῶν</div>
+        <div class="ending-cell greek-text shared-ending">τῶν</div>
+        <div class="ending-cell greek-text shared-ending">τῶν</div>
+
+        <div class="chart-row-label">dat pl</div>
+        <div class="ending-cell greek-text">τοῖς</div>
+        <div class="ending-cell greek-text">ταῖς</div>
+        <div class="ending-cell greek-text">τοῖς</div>
+
+        <div class="chart-row-label">acc pl</div>
+        <div class="ending-cell greek-text">τούς</div>
+        <div class="ending-cell greek-text">τάς</div>
+        <div class="ending-cell greek-text">τά</div>
+      </div>
+    </div>
+
+    <div class="paradigm-page" data-paradigm-page="2">
+      <p class="mini-vocab-note">
+        <span class="greek-text">λόγος</span> = word / saying
+      </p>
+
+      <div class="case-ending-chart modal-case-chart logos-chart">
+        <div class="chart-head">case + number</div>
+        <div class="chart-head">article</div>
+        <div class="chart-head">word</div>
+        <div class="chart-head">stem + ending</div>
+
+        <div class="chart-row-label">nom sg</div>
+        <div class="ending-cell greek-text">ὁ</div>
+        <div class="ending-cell greek-text">λόγος</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">ος</span></div>
+
+        <div class="chart-row-label">gen sg</div>
+        <div class="ending-cell greek-text">τοῦ</div>
+        <div class="ending-cell greek-text">λόγου</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">ου</span></div>
+
+        <div class="chart-row-label">dat sg</div>
+        <div class="ending-cell greek-text">τῷ</div>
+        <div class="ending-cell greek-text">λόγῳ</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">ῳ</span></div>
+
+        <div class="chart-row-label">acc sg</div>
+        <div class="ending-cell greek-text">τόν</div>
+        <div class="ending-cell greek-text">λόγον</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">ον</span></div>
+
+        <div class="chart-divider full-row">plural forms</div>
+
+        <div class="chart-row-label">nom pl</div>
+        <div class="ending-cell greek-text">οἱ</div>
+        <div class="ending-cell greek-text">λόγοι</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">οι</span></div>
+
+        <div class="chart-row-label">gen pl</div>
+        <div class="ending-cell greek-text shared-ending">τῶν</div>
+        <div class="ending-cell greek-text shared-ending">λόγων</div>
+        <div class="ending-cell shared-ending"><span class="stem-piece">λογ</span> + <span class="ending-piece">ων</span></div>
+
+        <div class="chart-row-label">dat pl</div>
+        <div class="ending-cell greek-text">τοῖς</div>
+        <div class="ending-cell greek-text">λόγοις</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">οις</span></div>
+
+        <div class="chart-row-label">acc pl</div>
+        <div class="ending-cell greek-text">τούς</div>
+        <div class="ending-cell greek-text">λόγους</div>
+        <div class="ending-cell"><span class="stem-piece">λογ</span> + <span class="ending-piece">ους</span></div>
+      </div>
+    </div>
+
+    <div class="paradigm-nav">
+      <button class="icon-btn paradigm-arrow" type="button" onclick="changeParadigmPage(-1)">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+
+      <div id="paradigmPageDots" class="paradigm-dots">● ○ ○</div>
+
+      <button class="icon-btn paradigm-arrow" type="button" onclick="changeParadigmPage(1)">
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div id="lockedFeatureModal" class="modal-overlay" onclick="closeLockedFeatureModal(event)">
+  <div class="modal-card locked-modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideLockedFeatureModal()">×</button>
+
+   <div class="lock-progress-wrap">
+  <div class="big-lock progress-lock">
+    <span class="material-symbols-outlined">lock</span>
+  </div>
+
+  <div id="lessonUnlockProgressText" class="lesson-unlock-progress-text">
+    Progress 0%
+  </div>
+</div>
+
+    <h2>Practice Tools Locked</h2>
+
+    <p>
+      Complete all the lessons first to unlock Vocab, Translation Practice, and Tests.
+    </p>
+
+    <p>
+      The lessons are designed to give you the basics before you start memorizing words and practicing translation.
+    </p>
+
+    <button class="main-btn" onclick="showNewLearnMenu(); hideLockedFeatureModal();">
+      Go to Lessons
+    </button>
+
+    <button class="text-btn unlock-now-btn" onclick="unlockPracticeToolsManually()">
+      Already know the basics? Unlock the rest now.
+    </button>
+  </div>
+</div>
+
+<div id="allLessonsCompleteModal" class="modal-overlay" onclick="closeAllLessonsCompleteModal(event)">
+  <div class="modal-card complete-unlock-card" onclick="event.stopPropagation()">
+    <div class="party-burst">🎉</div>
+
+    <h2>Congratulations!</h2>
+
+    <p>
+      You completed all the lessons. You are now ready to start putting everything into practice.
+    </p>
+
+    <p>
+      Vocab, Translation Practice, and Tests are now unlocked.
+    </p>
+
+    <button class="main-btn" onclick="hideAllLessonsCompleteModal()">
+      Start Practicing
+    </button>
+  </div>
+</div>
   </main>
 
   <script src="vocab.js"></script>
