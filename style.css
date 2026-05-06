@@ -4693,3 +4693,80 @@ body.dark .progress-lock::before {
 body.dark .lesson-unlock-progress-text {
   color: #f3f4f6;
 }
+#lockedFeatureModal .modal-card {
+  width: min(100%, 390px);
+  padding: clamp(16px, 3vw, 22px);
+}
+
+#lockedFeatureModal h2 {
+  font-size: clamp(1.15rem, 4vw, 1.4rem);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+#lockedFeatureModal p {
+  font-size: clamp(0.84rem, 3vw, 0.95rem);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+#lockedFeatureModal .big-lock {
+  width: clamp(58px, 16vw, 68px);
+  height: clamp(58px, 16vw, 68px);
+  margin-bottom: 8px;
+}
+
+#lockedFeatureModal .big-lock .material-symbols-outlined {
+  font-size: clamp(30px, 8vw, 36px);
+}
+
+#lockedFeatureModal .lesson-unlock-progress-text {
+  font-size: clamp(0.78rem, 2.8vw, 0.9rem);
+  margin-top: 4px;
+}
+
+#lockedFeatureModal .main-btn {
+  padding: 11px 14px;
+  margin-top: 8px;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+}
+
+#lockedFeatureModal .unlock-now-btn {
+  font-size: clamp(0.78rem, 2.8vw, 0.9rem);
+  margin-top: 6px;
+  line-height: 1.3;
+}
+
+@media (max-height: 700px) {
+  #lockedFeatureModal .modal-card {
+    padding: 16px;
+  }
+
+  #lockedFeatureModal p {
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  #lockedFeatureModal .big-lock {
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  #lockedFeatureModal .modal-card {
+    padding: 14px;
+  }
+
+  #lockedFeatureModal h2 {
+    font-size: 1.05rem;
+  }
+
+  #lockedFeatureModal p {
+    font-size: 0.8rem;
+  }
+
+  #lockedFeatureModal .main-btn {
+    padding: 10px 12px;
+    font-size: 0.88rem;
+  }
+}
