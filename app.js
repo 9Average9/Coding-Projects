@@ -13,7 +13,11 @@ let translationProgress =
 
 let translationGradedThisSentence = false;
 let currentLearnLesson = null;
+let completedLessons =
+  JSON.parse(localStorage.getItem("completedLessons")) || {};
 
+let openedLessonBlocks =
+  JSON.parse(localStorage.getItem("openedLessonBlocks")) || {};
 
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
@@ -8505,6 +8509,7 @@ if (localStorage.getItem("fontColor")) {
 document.getElementById("primaryColorPicker").value = savedPrimary;
 document.getElementById("secondaryColorPicker").value = savedSecondary;
 document.getElementById("fontColorPicker").value = savedFont;
+updateLessonCompletionUI();
 });
 
 function toggleResetSection() {
@@ -8759,6 +8764,11 @@ function resetTranslationData() {
 
   alert("Translation progress has been reset.");
 }
+
+function toggleLessonResetSection() {
+  document.getElementById("lessonResetContent").classList.toggle("open");
+}
+
 function markWordAsKnown() {
   const currentWord = testWords[testIndex];
 
@@ -8892,8 +8902,10 @@ function showLearnLesson(lesson) {
   lessonSection.classList.add("active");
   currentLearnLesson = lesson;
 
-  const title = document.getElementById("learnLessonTitle");
-  if (title) title.textContent = learnLessonTitles[lesson] || "Learn";
+  updateLessonTopBar(lesson);
+
+  restoreOpenedLessonBlocks(lessonSection, lesson);
+  updateCompleteLessonButton(lesson);
 
   closeLearnSideMenu();
 }
@@ -8938,6 +8950,8 @@ function showLearnInfo() {
 }
 function showLearnDashboard() {
   const dashboard = document.getElementById("learnDashboard");
+  const title = document.getElementById("learnLessonTitle");
+  const action = document.getElementById("learnTopAction");
 
   document.querySelectorAll(".learn-lesson").forEach(section => {
     section.classList.remove("active");
@@ -8947,8 +8961,13 @@ function showLearnDashboard() {
 
   currentLearnLesson = null;
 
-  const title = document.getElementById("learnLessonTitle");
-  if (title) title.textContent = "Learn";
+  if (title) title.textContent = "Lessons";
+
+  if (action) {
+    action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
+    action.title = "Info";
+    action.onclick = showLearnInfo;
+  }
 }
 function handleLearnBack() {
   if (currentLearnLesson) {
@@ -8971,27 +8990,168 @@ function toggleLessonBlock(block) {
     return;
   }
 
+  const wasAlreadyOpen = block.classList.contains("open");
+
   lesson.querySelectorAll(".lesson-block").forEach(otherBlock => {
-    if (otherBlock !== block) {
+    if (otherBlock !== block && otherBlock.classList.contains("open")) {
       otherBlock.classList.remove("open");
+      markLessonBlockOpened(lesson, otherBlock);
     }
   });
 
   block.classList.toggle("open");
 
-if (block.classList.contains("open")) {
-  block.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Mark it as opened immediately the first time they open it
+  if (block.classList.contains("open")) {
+    markLessonBlockOpened(lesson, block);
+    block.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // If they manually close it, keep it marked too
+  if (wasAlreadyOpen) {
+    markLessonBlockOpened(lesson, block);
+  }
+
+  updateCompleteLessonButton(getLessonIdFromSection(lesson));
 }
+function getLessonIdFromSection(lessonSection) {
+  return lessonSection.id.replace("Lesson", "");
 }
+
+function markLessonBlockOpened(lessonSection, block) {
+  const lessonId = getLessonIdFromSection(lessonSection);
+  const blocks = Array.from(lessonSection.querySelectorAll(".lesson-block"));
+  const blockIndex = blocks.indexOf(block);
+
+  if (blockIndex === -1) return;
+
+  // 👇 THIS makes the checkmark appear immediately
+  block.classList.add("visited");
+
+  if (!openedLessonBlocks[lessonId]) {
+    openedLessonBlocks[lessonId] = [];
+  }
+
+  if (!openedLessonBlocks[lessonId].includes(blockIndex)) {
+    openedLessonBlocks[lessonId].push(blockIndex);
+  }
+
+  localStorage.setItem("openedLessonBlocks", JSON.stringify(openedLessonBlocks));
+
+  updateCompleteLessonButton(lessonId);
+}
+
+function restoreOpenedLessonBlocks(lessonSection, lessonId) {
+  const opened = openedLessonBlocks[lessonId] || [];
+
+  lessonSection.querySelectorAll(".lesson-block").forEach((block, index) => {
+    if (opened.includes(index)) {
+      block.classList.add("visited");
+    }
+  });
+}
+
+function hasOpenedAllLessonBlocks(lessonId) {
+  const lessonSection = document.getElementById(lessonId + "Lesson");
+  if (!lessonSection) return false;
+
+  const totalBlocks = lessonSection.querySelectorAll(".lesson-block").length;
+  const openedCount = openedLessonBlocks[lessonId]?.length || 0;
+
+  return totalBlocks > 0 && openedCount >= totalBlocks;
+}
+
+function updateCompleteLessonButton(lessonId) {
+  const btn = document.querySelector(`[data-complete-lesson="${lessonId}"]`);
+  const message = document.querySelector(`[data-complete-message="${lessonId}"]`);
+
+  if (!btn) return;
+
+  const ready = hasOpenedAllLessonBlocks(lessonId);
+  const completed = completedLessons[lessonId] === true;
+
+  btn.disabled = !ready || completed;
+
+  if (completed) {
+    btn.textContent = "Lesson Completed ✓";
+    if (message) message.textContent = "Nice work — this lesson is marked complete.";
+  } else if (ready) {
+    btn.textContent = "Complete Lesson";
+    if (message) message.textContent = "You opened every section. You can complete the lesson now.";
+  } else {
+    btn.textContent = "Complete Lesson";
+    if (message) message.textContent = "Open every lesson section before completing this lesson.";
+  }
+}
+
+function completeLesson(lessonId) {
+  if (!hasOpenedAllLessonBlocks(lessonId)) return;
+
+  completedLessons[lessonId] = true;
+  localStorage.setItem("completedLessons", JSON.stringify(completedLessons));
+
+  updateLessonCompletionUI();
+  showLessonCompleteModal(lessonId);
+}
+
+function updateLessonCompletionUI() {
+  document.querySelectorAll("[data-lesson-status]").forEach(status => {
+    const lessonId = status.dataset.lessonStatus;
+    const isCompleted = completedLessons[lessonId] === true;
+
+    status.innerHTML = isCompleted
+      ? `<span class="lesson-check">✓</span> Completed`
+      : `<span class="lesson-not-complete">○</span> Not completed`;
+
+    status.classList.toggle("completed", isCompleted);
+  });
+}
+
+function resetLessonData() {
+  const confirmed = confirm(
+    "Are you sure?\n\nThis will reset all lesson completion data and opened lesson sections. This cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  localStorage.removeItem("completedLessons");
+  localStorage.removeItem("openedLessonBlocks");
+
+  completedLessons = {};
+  openedLessonBlocks = {};
+
+  document.querySelectorAll(".lesson-block").forEach(block => {
+    block.classList.remove("visited", "open");
+  });
+
+  updateLessonCompletionUI();
+
+  alert("Lesson data has been reset.");
+  showHome();
+}
+
 
 function revealAnswer(event, btn) {
   event.stopPropagation();
 
-  const answer = btn.nextElementSibling;
-  answer.classList.add("visible");
+  // New Lesson 5 card-style checks
+  const card = btn.closest(".check-card");
+  if (card) {
+    card.classList.add("revealed");
+    btn.textContent = "Revealed";
+    btn.disabled = true;
+    return;
+  }
 
-  btn.textContent = "Revealed";
-  btn.disabled = true;
+  // Normal older lesson answer rows
+  const answerRow = btn.closest(".answer-row");
+  const answer = answerRow ? answerRow.querySelector(".answer-text") : btn.nextElementSibling;
+
+  if (answer) {
+    answer.classList.add("visible");
+    btn.textContent = "Revealed";
+    btn.disabled = true;
+  }
 }
 function toggleAlphabetReference(event) {
   event.stopPropagation();
@@ -9040,5 +9200,120 @@ function hideSoundModal() {
 function closeSoundModal(event) {
   if (event.target.id === "soundModal") {
     hideSoundModal();
+  }
+}
+
+function showLessonCompleteModal(lessonId) {
+  const modal = document.getElementById("lessonCompleteModal");
+  const nextBtn = document.getElementById("nextLessonBtn");
+
+  modal.classList.add("active");
+
+  nextBtn.onclick = () => {
+    hideLessonCompleteModal();
+    showLearnDashboard();
+  };
+}
+
+function hideLessonCompleteModal() {
+  document.getElementById("lessonCompleteModal").classList.remove("active");
+}
+
+function showLessonCheatSheet(title, content) {
+  document.getElementById("lessonCheatTitle").textContent = title;
+  document.getElementById("lessonCheatContent").innerHTML = content;
+  document.getElementById("lessonCheatModal").classList.add("open");
+}
+
+function hideLessonCheatSheet() {
+  document.getElementById("lessonCheatModal").classList.remove("open");
+}
+
+function closeLessonCheatSheet(event) {
+  if (event.target.id === "lessonCheatModal") {
+    hideLessonCheatSheet();
+  }
+}
+
+function showOverviewCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 1 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        This is a quick reference for the key ideas in this lesson.  
+        It is not meant to replace the lesson—just to help you review quickly.
+      </p>
+
+      <div class="cheat-list">
+        <div><strong>Koine Greek</strong><span>Means “common” Greek.</span></div>
+        <div><strong>NT Language</strong><span>The New Testament was written in everyday Greek.</span></div>
+        <div><strong>Main Goal</strong><span>Understand what is written more clearly.</span></div>
+        <div><strong>Not a Hidden Code</strong><span>Greek gives clarity, not secret meaning.</span></div>
+      </div>
+    `
+  );
+}
+
+function showNounCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 4 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        This is a quick reference for the key ideas in this lesson.  
+        It helps you review patterns—not replace learning them step-by-step.
+      </p>
+
+      <div class="cheat-list">
+        <div><strong>Noun</strong><span>Person, place, thing, or idea.</span></div>
+        <div><strong>Subject</strong><span>The one doing the action.</span></div>
+        <div><strong>Object</strong><span>The one receiving the action.</span></div>
+        <div><strong>-ος</strong><span>Usually points to the subject.</span></div>
+        <div><strong>-ον</strong><span>Usually points to the object.</span></div>
+        <div><strong>Articles</strong><span>Match the noun and help confirm its role.</span></div>
+      </div>
+    `
+  );
+}
+
+function updateLessonTopBar(lesson) {
+  const title = document.getElementById("learnLessonTitle");
+  const action = document.getElementById("learnTopAction");
+
+  if (!title || !action) return;
+
+  const lessonNumbers = {
+    history: "Lesson 1",
+    alphabet: "Lesson 2",
+    pronunciation: "Lesson 3",
+    nouns: "Lesson 4",
+    cases: "Lesson 5",
+    howToRead: "Lesson 6"
+  };
+
+  title.innerHTML = `
+    <span class="top-lesson-kicker">${lessonNumbers[lesson] || "Lesson"}</span>
+    <span class="top-lesson-title">${learnLessonTitles[lesson] || "Lesson"}</span>
+  `;
+
+  if (lesson === "history") {
+    action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+    action.title = "Cheat Sheet";
+    action.onclick = showOverviewCheatSheet;
+  } else if (lesson === "alphabet") {
+    action.innerHTML = `Ω`;
+    action.title = "Alphabet Reference";
+    action.onclick = showAlphabetModal;
+  } else if (lesson === "pronunciation") {
+    action.innerHTML = `Ω`;
+    action.title = "Sound Reference";
+    action.onclick = showSoundModal;
+  } else if (lesson === "nouns") {
+    action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+    action.title = "Cheat Sheet";
+    action.onclick = showNounCheatSheet;
+  } else {
+    action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
+    action.title = "Info";
+    action.onclick = showLearnInfo;
   }
 }
