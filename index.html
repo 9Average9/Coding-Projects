@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Basic Greek</title>
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=25" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
@@ -22,9 +22,9 @@
 
   <div class="nav-title">Home</div>
 
-  <button class="icon-btn" onclick="showSettings()">
-    <span class="material-symbols-outlined">settings</span>
-  </button>
+ <button id="profileButton" class="icon-btn" onclick="showProfileMenu()">
+  <span class="material-symbols-outlined">account_circle</span>
+</button>
 </div>
 
 <button class="main-btn home-action" onclick="showNewLearnMenu()">
@@ -47,10 +47,7 @@
   <span>Test</span>
 </button>
 
-<button class="main-btn secondary home-action" onclick="showProgress()">
-  <span class="material-symbols-outlined">trending_up</span>
-  <span>Progress</span>
-</button>
+
     </section>
  <section id="newLearnMenu" class="screen">
   <div class="nav-bar">
@@ -789,16 +786,19 @@
           These are the letters most likely to trick English readers.
         </p>
 
-        <div class="letter-grid">
-          <div class="letter-card"><strong>η</strong><span>Eta</span><small>looks like n, sounds like “ay”</small></div>
-          <div class="letter-card"><strong>ρ</strong><span>Rho</span><small>looks like p, sounds like “r”</small></div>
-          <div class="letter-card"><strong>χ</strong><span>Chi</span><small>“ch/kh” sound</small></div>
-          <div class="letter-card"><strong>θ</strong><span>Theta</span><small>“th” as in thing</small></div>
-          <div class="letter-card"><strong>ξ</strong><span>Xi</span><small>“x” as in ax</small></div>
-          <div class="letter-card"><strong>ψ</strong><span>Psi</span><small>“ps” as in lips</small></div>
-          <div class="letter-card"><strong>σ/ς</strong><span>Sigma</span><small>“s” as in see</small></div>
-        </div>
-
+       <div class="letter-grid">
+  <div class="letter-card"><strong>η</strong><span>Eta</span><small>looks like n, sounds like “ay”</small></div>
+  <div class="letter-card"><strong>ρ</strong><span>Rho</span><small>looks like p, sounds like “r”</small></div>
+  <div class="letter-card"><strong>χ</strong><span>Chi</span><small>“ch/kh” sound</small></div>
+  <div class="letter-card"><strong>θ</strong><span>Theta</span><small>“th” as in thing</small></div>
+  <div class="letter-card"><strong>ξ</strong><span>Xi</span><small>“x” as in ax</small></div>
+  <div class="letter-card"><strong>ψ</strong><span>Psi</span><small>“ps” as in lips</small></div>
+  <div class="letter-card"><strong>σ/ς</strong><span>Sigma</span><small>“s” as in see</small></div>
+  <div class="letter-card"><strong>γγ</strong><span>Double Gamma</span><small>usually makes an “ng” sound</small></div>
+</div>
+<p class="mini-example">
+  Example: <strong>ἄγγελος</strong> is pronounced something like “AN-ge-los,” not “ag-gelos.”
+</p>
         <p class="highlight">
           Do not guess based on English shape. Learn the Greek letter for what it is.
         </p>
@@ -3319,45 +3319,403 @@
 <div id="howToReadLesson" class="learn-lesson">
   
 
-  <div class="lesson-module">
-    <div class="lesson-kicker">Lesson 6</div>
-    <h2>How to Read Greek</h2>
-
-    <p class="lesson-lead">
-      Reading Greek is about recognizing structure, not translating word by word blindly.
-    </p>
-
-    <div class="lesson-section">
-     <p class="lesson-lead">
-  This lesson will teach you how to slowly work through a Greek sentence step by step.
+  <p class="lesson-lead">
+  Greek can feel overwhelming if you try to understand everything at once.
+  This lesson gives you a simple step-by-step process for reading basic Greek sentences without panicking.
 </p>
 
 <div class="lesson-block" onclick="toggleLessonBlock(this)">
   <div class="lesson-block-header">
-    🔍 Reading Greek Step by Step
+    🎯 Your goal
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      The goal of this lesson is not to make you translate difficult verses perfectly.
+    </p>
+
+    <p>
+      The goal is to teach your eyes what to look for first.
+    </p>
+
+    <ul>
+      <li>Find the main action or statement</li>
+      <li>Find who or what the sentence is about</li>
+      <li>Notice articles and endings</li>
+      <li>Build the meaning one piece at a time</li>
+    </ul>
+
+    <p class="highlight">
+      Do not start by asking, “What does the whole sentence mean?” Start by asking, “What pieces do I recognize?”
+    </p>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🔍 Step 1: Find the verb
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      A good first step is to look for the verb — the action word or the word making the statement.
+    </p>
+
+    <p class="greek-example">
+      ὁ θεὸς ἐστιν ἀγάπη.
+    </p>
+
+    <p>
+      The verb is:
+    </p>
+
+    <p class="mini-example">
+      ἐστιν = is
+    </p>
+
+    <p>
+      Once you find the verb, you know what kind of sentence you are dealing with.
+    </p>
+
+    <p class="highlight">
+      In many basic Greek sentences, ἐστιν works like “is” in English.
+    </p>
+
+    <div class="lesson-interactive">
+      <p><strong>Knowledge check:</strong></p>
+      <p>In this sentence, what is the verb?</p>
+
+      <p class="greek-example">ὁ λόγος ἐστιν ἀληθής.</p>
+
+      <div class="answer-row">
+        <button class="small-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <span class="answer-text">ἐστιν</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    👤 Step 2: Find the subject
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      The subject is the person, place, thing, or idea the sentence is mainly talking about.
+    </p>
+
+    <p class="greek-example">
+      ὁ θεὸς ἐστιν ἀγάπη.
+    </p>
+
+    <p>
+      The subject is:
+    </p>
+
+    <p class="mini-example">
+      ὁ θεός = God
+    </p>
+
+    <p>
+      A major clue is the article:
+    </p>
+
+    <p class="mini-example">
+      ὁ = the
+    </p>
+
+    <p>
+      When you see <strong>ὁ</strong>, it often points to a masculine singular noun.
+    </p>
+
+    <p class="highlight">
+      Article + noun is one of the most important patterns to start recognizing.
+    </p>
+
+    <div class="lesson-interactive">
+      <p><strong>Knowledge check:</strong></p>
+      <p>What is the subject?</p>
+
+      <p class="greek-example">ὁ λόγος ἐστιν ἐν τῷ κόσμῳ.</p>
+
+      <div class="answer-row">
+        <button class="small-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <span class="answer-text">ὁ λόγος</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🧱 Step 3: Group words together
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      Greek is easier when you stop seeing every word as separate and start seeing groups.
+    </p>
+
+    <p class="greek-example">
+      ὁ λόγος ἐστιν ἐν τῷ κόσμῳ.
+    </p>
+
+    <p>
+      Break it into pieces:
+    </p>
+
+    <div class="takeaway-box">
+      <div class="takeaway-step">
+        <strong>ὁ λόγος</strong>
+        <span>the word</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>ἐστιν</strong>
+        <span>is</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>ἐν τῷ κόσμῳ</strong>
+        <span>in the world</span>
+      </div>
+    </div>
+
+    <p>
+      Now the sentence is much easier:
+    </p>
+
+    <p class="highlight">
+      The word is in the world.
+    </p>
+
+    <p>
+      You did not translate by guessing. You translated by recognizing the pieces.
+    </p>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    📌 Step 4: Watch for prepositions
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      Prepositions show relationships like location, direction, or connection.
+    </p>
+
+    <p>
+      One very common preposition is:
+    </p>
+
+    <p class="mini-example">
+      ἐν = in
+    </p>
+
+    <p class="greek-example">
+      ἐν τῇ καρδίᾳ
+    </p>
+
+    <p>
+      This means:
+    </p>
+
+    <p class="mini-example">
+      in the heart
+    </p>
+
+    <p>
+      Notice that the preposition brings a small phrase with it.
+    </p>
+
+    <p class="highlight">
+      When you see a preposition, look for the phrase attached to it.
+    </p>
+
+    <div class="lesson-interactive">
+      <p><strong>Knowledge check:</strong></p>
+      <p>What does this phrase mean?</p>
+
+      <p class="greek-example">ἐν τῇ βασιλείᾳ</p>
+
+      <div class="answer-row">
+        <button class="small-btn" type="button" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <span class="answer-text">in the kingdom</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🧠 Step 5: Use endings carefully
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      Greek endings help show how a word is being used.
+    </p>
+
+    <p>
+      You do not need to know every ending perfectly yet, but you should start noticing them.
+    </p>
+
+    <p class="greek-example">
+      λόγος / λόγον / λόγῳ / λόγου
+    </p>
+
+    <p>
+      These forms are related to the same basic word:
+    </p>
+
+    <p class="mini-example">
+      λόγος = word
+    </p>
+
+    <p>
+      But the endings can show different roles in the sentence.
+    </p>
+
+    <ul>
+      <li><strong>Subject</strong> — who or what is doing/being something</li>
+      <li><strong>Object</strong> — who or what receives the action</li>
+      <li><strong>Possession/source</strong> — of/from something</li>
+      <li><strong>Location/means</strong> — in/by/with something</li>
+    </ul>
+
+    <p class="highlight">
+      Do not panic over endings. Let them give you clues.
+    </p>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">
+    🪜 A simple reading process
+  </div>
+
+  <div class="lesson-block-content">
+    <p>
+      When you see a Greek sentence, use the same process every time.
+    </p>
+
+    <div class="takeaway-box">
+      <div class="takeaway-step">
+        <strong>1. Find the verb</strong>
+        <span>What is happening or being stated?</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>2. Find the subject</strong>
+        <span>Who or what is the sentence about?</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>3. Group phrases</strong>
+        <span>Keep articles, nouns, and prepositional phrases together.</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>4. Check endings</strong>
+        <span>Use forms as clues, not as something to fear.</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>5. Build the meaning</strong>
+        <span>Translate piece by piece.</span>
+      </div>
+    </div>
+
+    <p class="highlight">
+      Greek reading is not magic. It is a repeatable process.
+    </p>
+  </div>
+</div>
+
+<div class="lesson-block">
+  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
+    ⭐ Big Takeaway
   </div>
 
   <div class="lesson-block-content">
 
-    <p>
-      Do not try to instantly understand an entire sentence.
+    <p class="highlight">
+      Do not try to translate Greek by staring at the whole sentence and guessing.
     </p>
 
     <p>
-      Greek is usually read best one piece at a time:
+      Read Greek by slowing down and working through the sentence in pieces.
     </p>
 
-    <ul>
-      <li>Find the main verb</li>
-      <li>Find the subject</li>
-      <li>Look for objects or phrases</li>
-      <li>Notice endings and patterns</li>
-    </ul>
+    <div class="takeaway-box">
+      <div class="takeaway-step">
+        <strong>Verb</strong>
+        <span>What is happening or being stated?</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>Subject</strong>
+        <span>Who or what is the sentence about?</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>Groups</strong>
+        <span>Which words belong together?</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>Endings</strong>
+        <span>What clues do the forms give?</span>
+      </div>
+
+      <div class="takeaway-step">
+        <strong>Meaning</strong>
+        <span>How do the pieces fit together?</span>
+      </div>
+    </div>
 
     <p class="highlight">
-      Greek becomes much easier when you slow down and follow a consistent process.
+      Recognize the pieces first. Meaning comes from putting the pieces together.
     </p>
 
+    <hr>
+
+    <div class="lesson-interactive">
+      <p class="check-title"><strong>Final check</strong></p>
+
+      <div class="check-card">
+        <div class="check-prompt">Read this sentence step by step:</div>
+
+        <div class="check-greek greek-text">
+          ὁ θεὸς ἐστιν ἀγάπη.
+        </div>
+
+        <p>What are the main pieces?</p>
+
+        <button class="small-btn reveal-btn" onclick="revealAnswer(event, this)">
+          Show Answer
+        </button>
+
+        <div class="check-answer">
+          subject: <h4>ὁ θεός</h4> = God<br><br><br>
+          verb: <h4>ἐστιν</h4> = is<br><br><br>
+          description: <h4>ἀγάπη</h4> = love<br><br>
+          meaning: <h4>God is love.</h4>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -3375,38 +3733,6 @@
     Complete Lesson
   </button>
 </div>
-    </div>
-
-    <div class="lesson-section">
-      <h3>Step 2</h3>
-      <p>
-        Identify the subject and objects using endings.
-      </p>
-    </div>
-
-    <div class="lesson-section">
-      <h3>Step 3</h3>
-      <p>
-        Put it together into natural English.
-      </p>
-    </div>
-
-<div class="complete-lesson-box">
-  <p data-complete-message="howToRead">
-    Open every lesson section before completing this lesson.
-  </p>
-
-  <button
-    class="complete-lesson-btn"
-    data-complete-lesson="howToRead"
-    onclick="completeLesson('howToRead')"
-    disabled
-  >
-    Complete Lesson
-  </button>
-</div>
-
-  </div>
 </div>
     
   </div>
@@ -3618,7 +3944,7 @@
 
     <section id="progressScreen" class="screen">
       <div class="nav-bar">
-        <button class="icon-btn" onclick="handleLearnBack()">
+     <button class="icon-btn" onclick="backToProfileFromProgress()">
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Progress</div>
@@ -3767,16 +4093,17 @@
         <span>Quiz yourself on selected chapter's vocabulary and mark words you already know.</span>
       </div>
 
+     
       <div>
-        <strong>Progress</strong>
-        <span>Track your test scores, weak words, known words, and translation practice.</span>
+        <strong>Profile</strong>
+        <span>Start with making your profile first by pressing the profile icon on the home page.</span>
       </div>
     </div>
 
     
 
     <button class="main-btn welcome-start-btn" onclick="hideInfoModal()">
-      Start Learning
+      Continue
     </button>
   </div>
 </div>
@@ -4335,7 +4662,7 @@
     </p>
 
     <p>
-      Vocab, Translation Practice, and Tests are now unlocked.
+    Translation Practice, and Tests are now unlocked.
     </p>
 
     <button class="main-btn" onclick="hideAllLessonsCompleteModal()">
@@ -4343,9 +4670,291 @@
     </button>
   </div>
 </div>
+
+<div id="vocabUnlockedModal" class="modal-overlay" onclick="closeVocabUnlockedModal(event)">
+  <div class="modal-card vocab-unlocked-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideVocabUnlockedModal()">×</button>
+
+    <div class="mini-party">🎉</div>
+
+    <h2>Vocab Unlocked!</h2>
+
+    <p>
+      Great job completing the first three lessons. You now know enough of the basics to begin memorizing Greek vocabulary.
+    </p>
+
+    <p>
+      Start building recognition one word at a time — this is where Greek begins to feel familiar.
+    </p>
+
+    <button class="main-btn" onclick="hideVocabUnlockedModal(); showLearnMenu();">
+  Start Vocab
+</button>
+
+<button class="main-btn secondary" onclick="hideVocabUnlockedModal(); showNewLearnMenu();">
+  Continue Lessons
+</button>
+  </div>
+</div>
+
+
+<div id="profileModal" class="modal-overlay" onclick="closeProfileModal(event)">
+  <div class="modal-card profile-card" onclick="event.stopPropagation()">
+
+    <button class="modal-close" onclick="hideProfileMenu()">×</button>
+
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">
+        <span class="material-symbols-outlined">school</span>
+      </div>
+
+      <h2 id="profileDisplayName">Greek Student</h2>
+
+     <div class="profile-title-row">
+  <div class="profile-title" id="profileTitle">
+    Beginner
+  </div>
+
+  <button class="rank-info-btn" onclick="showRanksModal()" title="View ranks">
+    <span class="material-symbols-outlined">military_tech</span>
+  </button>
+</div>
+    </div>
+
+    <div class="xp-section">
+      <div class="xp-top-row">
+        <span>XP</span>
+        <span id="profileXPText">0 XP</span>
+      </div>
+
+      <div class="xp-bar">
+        <div class="xp-fill" id="xpFill"></div>
+      </div>
+    </div>
+
+<div id="profileJourneySection" class="profile-journey-card">
+  <div class="journey-header">
+    <span class="material-symbols-outlined">map</span>
+    <strong>Your Greek Journey</strong>
+  </div>
+
+  <div class="journey-stats-grid">
+    <div class="journey-stat">
+      <strong id="profileLessonsStat">0 / 6</strong>
+      <span>Lessons</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileVocabStat">0</strong>
+      <span>Vocab Chapters</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileTranslationsStat">0</strong>
+      <span>Translations</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileTestsStat">0</strong>
+      <span>Tests</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileKnownWordsStat">0</strong>
+      <span>Known Words</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileTimeStat">0m</strong>
+      <span>Time Studied</span>
+    </div>
+  </div>
+
+  <div class="profile-action-row">
+  <button class="profile-action-card" onclick="hideProfileMenu(); showProgress();">
+    <span class="material-symbols-outlined">trending_up</span>
+    <div>
+      <strong>Full Progress</strong>
+      <small>View detailed stats</small>
+    </div>
+  </button>
+
+  <button class="profile-action-card" onclick="showAchievementsModal()">
+    <span class="material-symbols-outlined">emoji_events</span>
+    <div>
+      <strong>Achievements</strong>
+      <small>View milestones</small>
+    </div>
+  </button>
+</div>
+</div>
+
+
+  <div id="profileSetupFields" class="profile-setup-fields">
+  <label class="label">First Name</label>
+  <input
+    type="text"
+    id="profileFirstNameInput"
+    maxlength="18"
+    placeholder="First name"
+    oninput="previewProfileName()"
+  />
+
+  <label class="label">Last Name</label>
+  <input
+    type="text"
+    id="profileLastNameInput"
+    maxlength="18"
+    placeholder="Last name"
+    oninput="previewProfileName()"
+  />
+
+  <label class="label">What's Your Greek Experience?</label>
+
+  <div class="experience-choice-grid">
+    <button
+      type="button"
+      id="newGreekBtn"
+      class="experience-choice selected"
+      onclick="selectGreekExperience('new')"
+    >
+      Completely New
+    </button>
+
+    <button
+      type="button"
+      id="basicGreekBtn"
+      class="experience-choice"
+      onclick="selectGreekExperience('basic')"
+    >
+      Familiar with Basics
+    </button>
+  </div>
+
+  <button
+    type="button"
+    class="text-btn basics-info-btn"
+    onclick="showBasicsInfoModal()"
+  >
+    What does “familiar with basics” mean?
+  </button>
+</div>
+
+    <label class="label">Profile Color</label>
+
+    <div class="profile-color-grid">
+      <button class="color-dot blue" onclick="setProfileColor('#4f8cff')"></button>
+      <button class="color-dot green" onclick="setProfileColor('#22c55e')"></button>
+      <button class="color-dot purple" onclick="setProfileColor('#8b5cf6')"></button>
+      <button class="color-dot gold" onclick="setProfileColor('#d6a700')"></button>
+      <button class="color-dot red" onclick="setProfileColor('#ef4444')"></button>
+      <button class="color-dot custom-color-dot" onclick="openCustomProfileColor()" title="Custom color">
+  +
+</button>
+
+<input
+  type="color"
+  id="customProfileColorInput"
+  class="hidden-color-input"
+  onchange="setProfileColor(this.value)"
+/>
+    </div>
+
+    <button id="saveProfileBtn" class="main-btn" onclick="saveProfileName()">
+  Create Profile
+</button>
+
+    <button id="profileSettingsBtn" class="main-btn secondary" onclick="openSettingsFromProfile()">
+  Settings
+</button>
+
+   <button id="profileResetBtn" class="danger-btn" onclick="resetAllAppData()">
+  Reset All App Data
+</button>
+
+  </div>
+</div>
+
+
+
+<div id="xpModal" class="xp-toast" onclick="openProfileFromXPToast()">
+ <button class="xp-toast-close" onclick="event.stopPropagation(); hideXPModal()">
+  <svg class="xp-close-ring" viewBox="0 0 36 36">
+    <circle class="xp-ring-bg" cx="18" cy="18" r="15.5"></circle>
+    <circle class="xp-ring-progress" cx="18" cy="18" r="15.5"></circle>
+  </svg>
+
+  <span class="xp-close-x">×</span>
+</button>
+
+  <div class="xp-toast-icon">✨</div>
+
+  <div class="xp-toast-content">
+    <div class="xp-toast-top">
+      <strong id="xpReasonText">Good job!</strong>
+      <span id="xpEarnedText">+0 XP</span>
+    </div>
+
+    <div id="xpTitleChange" class="xp-title-change"></div>
+
+    <div class="xp-modal-bar">
+      <div id="xpModalFill" class="xp-modal-fill"></div>
+    </div>
+
+    <div id="xpModalProgressText" class="xp-modal-progress-text">
+      0 / 250 XP to next title
+    </div>
+  </div>
+</div>
+
+<div id="basicsInfoModal" class="modal-overlay" onclick="closeBasicsInfoModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideBasicsInfoModal()">×</button>
+
+    <h2>Familiar with the Basics</h2>
+
+    <p>
+      This option is for users who already understand the Greek alphabet,
+      basic pronunciation, and the idea of reading simple Greek words.
+    </p>
+
+    <p>
+      Choosing this will unlock Vocab, Translate, and Test right away so you can
+      jump straight into practice without completing the training lessons first.
+    </p>
+
+    <button class="main-btn" onclick="hideBasicsInfoModal()">
+      Got it
+    </button>
+  </div>
+</div>
+
+<div id="achievementsModal" class="modal-overlay" onclick="closeAchievementsModal(event)">
+  <div class="modal-card achievements-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideAchievementsModal()">×</button>
+
+    <h2>Achievements</h2>
+    <p>Major milestones from your Greek journey.</p>
+
+    <div id="achievementsList" class="achievements-list"></div>
+  </div>
+</div>
+
+
+<div id="ranksModal" class="modal-overlay" onclick="closeRanksModal(event)">
+  <div class="modal-card ranks-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideRanksModal()">×</button>
+
+    <h2>Greek Ranks</h2>
+    <p>Your rank grows as you complete lessons, practice vocabulary, translate, and test yourself.</p>
+
+    <div id="ranksList" class="ranks-list"></div>
+  </div>
+</div>
+
   </main>
 
   <script src="vocab.js"></script>
-  <script src="app.js?v=26"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>
