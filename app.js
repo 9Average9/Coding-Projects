@@ -10399,3 +10399,188 @@ function backToProfileFromProgress() {
   showScreen("homeScreen");
   showProfileMenu();
 }
+
+/* =========================
+   PWA INSTALL + UPDATE LOGIC
+========================= */
+/* 
+Instructions
+Every time you update the app
+
+Change these two places:
+
+In app.js
+const APP_VERSION = "1.0.1";
+
+Update notes:
+
+const UPDATE_NOTES = [
+  "Added new lesson content.",
+  "Improved profile design.",
+  "Fixed progress screen behavior."
+];
+In service-worker.js
+const CACHE_NAME = "basic-greek-trainer-v1.0.1";
+
+That forces the app to refresh its cached files.
+*/
+const APP_VERSION = "1.0.0";
+
+const UPDATE_NOTES = [
+  "Basic Greek Trainer can now be installed to your Home Screen.",
+  "Added app-like display support for iPhone and Android.",
+  "Added offline support for core app files."
+];
+
+let deferredInstallPrompt = null;
+
+function isRunningAsInstalledApp() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+      console.warn("Service worker registration failed:", error);
+    });
+  }
+}
+
+function shouldShowInstallModal() {
+  const dismissed = localStorage.getItem("installPromptDismissed") === "true";
+  return !isRunningAsInstalledApp() && !dismissed;
+}
+
+function showInstallAppModal() {
+  const modal = document.getElementById("installAppModal");
+  if (!modal) return;
+
+  backToInstallChoices();
+  modal.classList.add("open");
+}
+
+function hideInstallAppModal() {
+  const modal = document.getElementById("installAppModal");
+  if (!modal) return;
+
+  modal.classList.remove("open");
+}
+
+function closeInstallAppModal(event) {
+  if (event.target.id === "installAppModal") {
+    hideInstallAppModal();
+  }
+}
+
+function showInstallSteps(device) {
+  const choiceView = document.getElementById("installChoiceView");
+  const iphoneSteps = document.getElementById("iphoneInstallSteps");
+  const androidSteps = document.getElementById("androidInstallSteps");
+
+  if (!choiceView || !iphoneSteps || !androidSteps) return;
+
+  choiceView.classList.add("hidden");
+  iphoneSteps.classList.add("hidden");
+  androidSteps.classList.add("hidden");
+
+  if (device === "iphone") {
+    iphoneSteps.classList.remove("hidden");
+  }
+
+  if (device === "android") {
+    androidSteps.classList.remove("hidden");
+
+    const installBtn = document.getElementById("androidInstallBtn");
+    if (installBtn && deferredInstallPrompt) {
+      installBtn.classList.remove("hidden");
+    }
+  }
+}
+
+function backToInstallChoices() {
+  const choiceView = document.getElementById("installChoiceView");
+  const iphoneSteps = document.getElementById("iphoneInstallSteps");
+  const androidSteps = document.getElementById("androidInstallSteps");
+  const installBtn = document.getElementById("androidInstallBtn");
+
+  if (choiceView) choiceView.classList.remove("hidden");
+  if (iphoneSteps) iphoneSteps.classList.add("hidden");
+  if (androidSteps) androidSteps.classList.add("hidden");
+  if (installBtn) installBtn.classList.add("hidden");
+}
+
+function dismissInstallModalForever() {
+  localStorage.setItem("installPromptDismissed", "true");
+  hideInstallAppModal();
+}
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+});
+
+async function triggerAndroidInstall() {
+  if (!deferredInstallPrompt) return;
+
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+
+  deferredInstallPrompt = null;
+  dismissInstallModalForever();
+}
+
+function checkForAppUpdateModal() {
+  const lastSeenVersion = localStorage.getItem("lastSeenAppVersion");
+
+  if (lastSeenVersion === APP_VERSION) return;
+
+  const modal = document.getElementById("updateModal");
+  const title = document.getElementById("updateModalTitle");
+  const notes = document.getElementById("updateModalNotes");
+
+  if (!modal || !title || !notes) {
+    localStorage.setItem("lastSeenAppVersion", APP_VERSION);
+    return;
+  }
+
+  title.textContent = `What’s New in Version ${APP_VERSION}`;
+
+  notes.innerHTML = `
+    <ul class="update-notes-list">
+      ${UPDATE_NOTES.map((note) => `<li>${note}</li>`).join("")}
+    </ul>
+  `;
+
+  modal.classList.add("open");
+  localStorage.setItem("lastSeenAppVersion", APP_VERSION);
+}
+
+function hideUpdateModal() {
+  const modal = document.getElementById("updateModal");
+  if (!modal) return;
+
+  modal.classList.remove("open");
+}
+
+function closeUpdateModal(event) {
+  if (event.target.id === "updateModal") {
+    hideUpdateModal();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  registerServiceWorker();
+
+  setTimeout(() => {
+    if (shouldShowInstallModal()) {
+      showInstallAppModal();
+    }
+  }, 700);
+
+  setTimeout(() => {
+    checkForAppUpdateModal();
+  }, 1000);
+});
