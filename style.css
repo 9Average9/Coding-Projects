@@ -5620,3 +5620,71 @@ body.dark .rank-item {
   background: rgba(17, 24, 39, 0.75);
   border-color: #4b5563;
 }
+
+/* =========================
+   PWA INSTALL + UPDATE MODALS
+========================= */
+
+.hidden {
+  display: none !important;
+}
+
+.install-modal-card,
+.update-modal-card {
+  text-align: center;
+}
+
+.install-modal-card .main-btn,
+.install-modal-card .small-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.install-modal-card .material-symbols-outlined {
+  color: inherit;
+}
+
+.install-steps {
+  text-align: left;
+  margin-top: 12px;
+}
+
+.install-steps h3 {
+  text-align: center;
+  margin-top: 0;
+  color: var(--font-color);
+}
+
+.install-steps ol {
+  padding-left: 22px;
+  line-height: 1.65;
+  color: var(--font-color);
+}
+
+.install-steps li {
+  margin-bottom: 8px;
+}
+
+.update-notes-list {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(36, 52, 71, 0.12);
+  border-radius: 16px;
+  padding: 16px 18px 16px 34px;
+  margin: 18px 0;
+  line-height: 1.6;
+  color: var(--font-color);
+}
+
+body.dark .install-steps h3,
+body.dark .install-steps ol,
+body.dark .update-notes-list {
+  color: #f3f4f6;
+}
+
+body.dark .update-notes-list {
+  background: rgba(17, 24, 39, 0.55);
+  border-color: #4b5563;
+}
