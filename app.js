@@ -10,7 +10,7 @@ let knownWords = JSON.parse(localStorage.getItem("knownWords")) || [];
 let currentTranslateSentence = null;
 let translationProgress =
   JSON.parse(localStorage.getItem("translationProgress")) || {};
-
+let xpToastTimeout = null;
 let translationGradedThisSentence = false;
 let currentLearnLesson = null;
 let completedLessons =
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 document.addEventListener("DOMContentLoaded", () => {
   updatePracticeToolLocks();
+  updateProfileAttention();
 });
 const REQUIRED_LESSONS = [
   "history",
@@ -36,6 +37,12 @@ const REQUIRED_LESSONS = [
   "nouns",
   "cases",
   "howToRead"
+];
+
+const VOCAB_UNLOCK_LESSONS = [
+  "history",
+  "alphabet",
+  "pronunciation"
 ];
 
 let practiceToolsUnlocked =
@@ -7995,15 +8002,23 @@ function flipCard() {
 }
 
 function nextLearnCard() {
-  if (learnIndex < learnWords.length - 1) {
-    const card = document.getElementById("learnCard");
+  const card = document.getElementById("learnCard");
 
+  if (learnIndex < learnWords.length - 1) {
     card.classList.add("slide-out");
 
     setTimeout(() => {
       learnIndex++;
       renderLearnCard();
       card.classList.remove("slide-out");
+
+      if (learnIndex === learnWords.length - 1) {
+        const finishedChapter = learnWords[0]?.chapter;
+
+        if (finishedChapter) {
+          awardVocabChapterXP(finishedChapter);
+        }
+      }
     }, 180);
   }
 }
@@ -8173,8 +8188,38 @@ function finishTest() {
       missedContainer.appendChild(div);
     });
   }
-
+  awardTestXP();
   showScreen("resultsScreen");
+}
+
+function awardTestXP() {
+
+  const earnedXP = testCorrect * 7;
+
+  if (earnedXP > 0) {
+    addXP(
+      earnedXP,
+      `${testCorrect} correct test answers!`,
+      true
+    );
+  }
+
+  if (testWords.length > 0 && testCorrect === testWords.length) {
+    addXP(25, "Perfect test bonus!", true);
+
+    unlockAchievement("firstPerfectTest");
+  }
+}
+
+function awardVocabChapterXP(chapter) {
+  const key = `vocabChapterXP_${chapter}`;
+
+  if (localStorage.getItem(key) === "true") return;
+
+  localStorage.setItem(key, "true");
+
+  addXP(75, `You finished Chapter ${getDisplayChapterNumber(Number(chapter))} vocab!`, true);
+  unlockAchievement("firstVocabChapter");
 }
 
 function studyMissedWords() {
@@ -8344,10 +8389,10 @@ function showProgress() {
 
   let html = `
   <button class="collapse-btn progress-collapse-btn" onclick="toggleProgressSection('testProgressSection', this)">
-  <span>Tests</span>
-  <span class="arrow">▼</span>
+  <span>Vocab Tests</span>
+  
 </button>
-  <div id="testProgressSection" class="progress-collapse-content">
+  <div id="testProgressSection" class="collapse-content">
 `;
 
   if (totalTests === 0) {
@@ -8381,10 +8426,9 @@ function showProgress() {
   </div>
 
   <button class="collapse-btn progress-collapse-btn" onclick="toggleProgressSection('translationProgressSection', this)">
-    Translations
-      <span class="arrow">▼</span>
-  </button>
-  <div id="translationProgressSection" class="progress-collapse-content">
+  <span>Translations</span>
+</button>
+  <div id="translationProgressSection" class="collapse-content">
 `;
 
   const chapters = Object.entries(translationByChapter)
@@ -8407,7 +8451,7 @@ function showProgress() {
 
       html += `
         <div class="review-word">
-          <h3>Chapter ${chapter}</h3>
+          <h3>Chapter ${getDisplayChapterNumber(Number(chapter))}</h3>
           <p><strong>Attempts:</strong> ${data.attempts}</p>
           <p><strong>Sentences practiced:</strong> ${data.sentencesPracticed}</p>
           <p><strong>Got it:</strong> ${data.got}</p>
@@ -8645,35 +8689,26 @@ function revealTranslation() {
   document.getElementById("revealTranslateBtn").style.display = "none";
 }
 
+let translationXPCount =
+  Number(localStorage.getItem("translationXPCount")) || 0;
+
 function gradeTranslation(result) {
-  if (!currentSentence) return;
+  if (!currentSentence || translationGradedThisSentence) return;
 
-  // Stops button spam from counting 50 times
-  if (translationGradedThisSentence) return;
+  const id = currentSentence.id;
 
-  const allowedResults = ["got", "almost", "missed"];
-  if (!allowedResults.includes(result)) return;
-
-  const sentenceId = currentSentence.id;
-  const chapter = currentSentence.chapter;
-
-  if (!translationProgress[sentenceId]) {
-    translationProgress[sentenceId] = {
-      id: sentenceId,
-      chapter,
+  if (!translationProgress[id]) {
+    translationProgress[id] = {
+      chapter: currentSentence.chapter,
       got: 0,
       almost: 0,
       missed: 0,
-      attempts: 0,
-      lastResult: null,
-      lastPracticed: null
+      attempts: 0
     };
   }
 
-  translationProgress[sentenceId][result]++;
-  translationProgress[sentenceId].attempts++;
-  translationProgress[sentenceId].lastResult = result;
-  translationProgress[sentenceId].lastPracticed = new Date().toLocaleString();
+  translationProgress[id][result]++;
+  translationProgress[id].attempts++;
 
   localStorage.setItem("translationProgress", JSON.stringify(translationProgress));
 
@@ -8690,6 +8725,23 @@ function gradeTranslation(result) {
 
   if (gradeSaved) {
     gradeSaved.textContent = "Saved!";
+  }
+
+  let xpAmount = 0;
+
+  if (result === "got") xpAmount = 15;
+  if (result === "almost") xpAmount = 8;
+  if (result === "missed") xpAmount = 3;
+
+  addXP(xpAmount, "Translation practice saved!", false);
+
+  translationXPCount++;
+  localStorage.setItem("translationXPCount", translationXPCount);
+
+  if (translationXPCount % 5 === 0) {
+    addXP(50, "You completed 5 translation practices!", true);
+
+    unlockAchievement("firstFiveTranslations");
   }
 }
 
@@ -8752,15 +8804,14 @@ function closeTranslateInfoModal(event) {
     hideTranslateInfoModal();
   }
 }
-function toggleProgressSection(id, btn) {
+function toggleProgressSection(id, button) {
   const section = document.getElementById(id);
   if (!section) return;
 
-  const isOpen = section.classList.toggle("open");
+  section.classList.toggle("open");
 
-  const arrow = btn.querySelector(".arrow");
-  if (arrow) {
-    arrow.textContent = isOpen ? "▲" : "▼";
+  if (button) {
+    button.classList.toggle("open");
   }
 }
 function resetTranslationData() {
@@ -8785,6 +8836,8 @@ function toggleLessonResetSection() {
 
 function markWordAsKnown() {
   const currentWord = testWords[testIndex];
+  testCorrect++;
+
 
   if (!currentWord) return;
 
@@ -9099,19 +9152,42 @@ function updateCompleteLessonButton(lessonId) {
 }
 
 function completeLesson(lessonId) {
+  if (completedLessons[lessonId] === true) return;
   if (!hasOpenedAllLessonBlocks(lessonId)) return;
 
-  const wasAlreadyAllComplete = allRequiredLessonsCompleted();
+  const wasVocabUnlocked = vocabLessonsCompleted();
+  const wasAllComplete = allRequiredLessonsCompleted();
 
   completedLessons[lessonId] = true;
   localStorage.setItem("completedLessons", JSON.stringify(completedLessons));
 
+  const completeBtn = document.querySelector(`[data-complete-lesson="${lessonId}"]`);
+  const completeMsg = document.querySelector(`[data-complete-message="${lessonId}"]`);
+
+  if (completeBtn) {
+    completeBtn.disabled = true;
+    completeBtn.textContent = "Completed";
+    completeBtn.classList.add("completed");
+  }
+
+  if (completeMsg) {
+    completeMsg.textContent = "Lesson completed!";
+  }
+
   updateLessonCompletionUI();
   updatePracticeToolLocks();
 
+  const nowVocabUnlocked = vocabLessonsCompleted();
   const nowAllComplete = allRequiredLessonsCompleted();
 
-  if (!wasAlreadyAllComplete && nowAllComplete) {
+  addXP(100, "Lesson completed!", true);
+
+  if (!wasVocabUnlocked && nowVocabUnlocked) {
+    showVocabUnlockedModal();
+    return;
+  }
+
+  if (!wasAllComplete && nowAllComplete) {
     practiceToolsUnlocked = true;
     localStorage.setItem("practiceToolsUnlocked", "true");
     updatePracticeToolLocks();
@@ -9120,6 +9196,7 @@ function completeLesson(lessonId) {
   }
 
   showLessonCompleteModal(lessonId);
+  unlockAchievement("firstLesson");
 }
 
 function updateLessonCompletionUI() {
@@ -9487,7 +9564,7 @@ function arePracticeToolsUnlocked() {
 }
 
 function tryOpenLockedFeature(feature) {
-  if (!arePracticeToolsUnlocked()) {
+  if (!isFeatureUnlocked(feature)) {
     shakeLockedButton(feature);
     showLockedFeatureModal();
     return;
@@ -9577,26 +9654,34 @@ function unlockPracticeToolsManually() {
 }
 
 function updatePracticeToolLocks() {
-  const unlocked = arePracticeToolsUnlocked();
+  const featureMap = {
+    vocabHomeBtn: "vocab",
+    translateHomeBtn: "translate",
+    testHomeBtn: "test"
+  };
 
-  ["vocabHomeBtn", "translateHomeBtn", "testHomeBtn"].forEach(id => {
+  Object.keys(featureMap).forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
+
+    const feature = featureMap[id];
+    const unlocked = isFeatureUnlocked(feature);
 
     btn.classList.toggle("unlocked", unlocked);
 
     const icon = btn.querySelector(".lock-icon");
-   if (icon) {
-  const openedKey = `openedUnlocked_${id}`;
-  const alreadyOpened = localStorage.getItem(openedKey) === "true";
 
-  if (unlocked && alreadyOpened) {
-    icon.style.display = "none";
-  } else {
-    icon.style.display = "";
-    icon.textContent = unlocked ? "lock_open" : "lock";
-  }
-}
+    if (icon) {
+      const openedKey = `openedUnlocked_${id}`;
+      const alreadyOpened = localStorage.getItem(openedKey) === "true";
+
+      if (unlocked && alreadyOpened) {
+        icon.style.display = "none";
+      } else {
+        icon.style.display = "";
+        icon.textContent = unlocked ? "lock_open" : "lock";
+      }
+    }
   });
 }
 
@@ -9635,4 +9720,682 @@ function updateLockedModalProgress() {
   if (text) {
     text.textContent = `Progress ${progressPercent}%`;
   }
+}
+
+function vocabLessonsCompleted() {
+  return VOCAB_UNLOCK_LESSONS.every(lessonId => completedLessons[lessonId] === true);
+
+  unlockAchievement("allLessonsComplete");
+}
+
+function isFeatureUnlocked(feature) {
+  if (practiceToolsUnlocked) return true;
+
+  if (feature === "vocab") {
+    return vocabLessonsCompleted();
+  }
+
+  return allRequiredLessonsCompleted();
+}
+function showVocabUnlockedModal() {
+
+  unlockAchievement("vocabUnlocked");
+  const modal = document.getElementById("vocabUnlockedModal");
+  if (modal) modal.classList.add("open");
+}
+
+function hideVocabUnlockedModal() {
+  document.getElementById("vocabUnlockedModal")?.classList.remove("open");
+}
+
+function closeVocabUnlockedModal(event) {
+  if (event.target.id === "vocabUnlockedModal") {
+    hideVocabUnlockedModal();
+  }
+}
+
+let profileData = JSON.parse(localStorage.getItem("profileData")) || {
+  firstName: "",
+  lastName: "",
+  color: "#4f8cff",
+  xp: 0,
+  isCreated: false,
+  greekExperience: "new"
+};
+
+function showProfileMenu() {
+  updateProfileUI();
+
+  document.getElementById("profileModal")?.classList.add("open");
+}
+
+function hideProfileMenu() {
+  document.getElementById("profileModal")?.classList.remove("open");
+}
+
+function closeProfileModal(event) {
+  if (event.target.id === "profileModal") {
+    hideProfileMenu();
+  }
+}
+
+function saveProfileName() {
+  const firstInput = document.getElementById("profileFirstNameInput");
+  const lastInput = document.getElementById("profileLastNameInput");
+
+  if (!firstInput || !lastInput) return;
+
+  profileData.firstName = firstInput.value.trim();
+  profileData.lastName = lastInput.value.trim();
+  profileData.isCreated = true;
+
+  if (profileData.greekExperience === "basic") {
+    practiceToolsUnlocked = true;
+    localStorage.setItem("practiceToolsUnlocked", "true");
+    updatePracticeToolLocks();
+  }
+  unlockAchievement("profileCreated");
+  saveProfileData();
+  updateProfileUI();
+}
+
+function setProfileColor(color) {
+  const firstInput = document.getElementById("profileFirstNameInput");
+  const lastInput = document.getElementById("profileLastNameInput");
+
+  if (firstInput) {
+    profileData.firstName = firstInput.value.trim();
+  }
+
+  if (lastInput) {
+    profileData.lastName = lastInput.value.trim();
+  }
+
+  profileData.color = color;
+
+  saveProfileData();
+  updateProfileUI();
+}
+
+function saveProfileData() {
+  localStorage.setItem("profileData", JSON.stringify(profileData));
+}
+
+const PROFILE_RANKS = [
+  { xp: 0, title: "Beginner", desc: "Starting your Koine Greek journey." },
+  { xp: 250, title: "Letter Reader", desc: "Greek letters are becoming familiar." },
+  { xp: 600, title: "Word Builder", desc: "Vocabulary recognition is taking shape." },
+  { xp: 1000, title: "Phrase Reader", desc: "You are beginning to read connected Greek." },
+  { xp: 1500, title: "Text Apprentice", desc: "You can follow basic Greek structure." },
+  { xp: 2200, title: "Koine Reader", desc: "You are reading with growing confidence." },
+  { xp: 3000, title: "NT Greek Reader", desc: "You are steadily working with New Testament Greek." },
+  { xp: 4000, title: "Greek Interpreter", desc: "You are reading with structure, context, and care." }
+];
+
+function getProfileTitleFromXP(xp) {
+  let currentRank = PROFILE_RANKS[0];
+
+  PROFILE_RANKS.forEach(rank => {
+    if (xp >= rank.xp) {
+      currentRank = rank;
+    }
+  });
+
+  return currentRank.title;
+}
+
+function getProfileTitle() {
+  return getProfileTitleFromXP(profileData.xp || 0);
+}
+
+function getNextTitleXP(xp) {
+  const nextRank = PROFILE_RANKS.find(rank => xp < rank.xp);
+  return nextRank ? nextRank.xp : null;
+}
+
+function getPreviousTitleXP(xp) {
+  let previousXP = 0;
+
+  PROFILE_RANKS.forEach(rank => {
+    if (xp >= rank.xp) {
+      previousXP = rank.xp;
+    }
+  });
+
+  return previousXP;
+}
+
+function getProfileTitle() {
+  return getProfileTitleFromXP(profileData.xp || 0);
+}
+
+function updateProfileUI() {
+  const fullName =
+    `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim();
+
+  const displayName = fullName || "Create Profile";
+
+  document.getElementById("profileDisplayName").textContent = displayName;
+
+  document.getElementById("profileTitle").textContent =
+    profileData.isCreated ? getProfileTitle() : "Set up your Greek profile";
+
+  const xpText = document.getElementById("profileXPText");
+  if (xpText) {
+    xpText.textContent = `${profileData.xp} XP`;
+  }
+
+  const firstInput = document.getElementById("profileFirstNameInput");
+  const lastInput = document.getElementById("profileLastNameInput");
+
+const newGreekBtn = document.getElementById("newGreekBtn");
+const basicGreekBtn = document.getElementById("basicGreekBtn");
+
+if (newGreekBtn && basicGreekBtn) {
+  newGreekBtn.classList.toggle("selected", profileData.greekExperience !== "basic");
+  basicGreekBtn.classList.toggle("selected", profileData.greekExperience === "basic");
+}
+
+
+  if (firstInput) firstInput.value = profileData.firstName || "";
+  if (lastInput) lastInput.value = profileData.lastName || "";
+
+  document.documentElement.style.setProperty(
+    "--profile-color",
+    profileData.color
+  );
+
+  const fill = document.getElementById("xpFill");
+
+  if (fill) {
+    const fill = document.getElementById("xpFill");
+
+if (fill) {
+  const currentXP = profileData.xp || 0;
+  const previousLevelXP = getPreviousTitleXP(currentXP);
+  const nextLevelXP = getNextTitleXP(currentXP);
+
+  if (nextLevelXP === null) {
+    fill.style.width = "100%";
+  } else {
+    const levelRange = nextLevelXP - previousLevelXP;
+    const currentProgress = currentXP - previousLevelXP;
+    const percent = Math.min((currentProgress / levelRange) * 100, 100);
+
+    fill.style.width = `${percent}%`;
+  }
+}
+  }
+
+  const setupFields = document.getElementById("profileSetupFields");
+  const saveBtn = document.getElementById("saveProfileBtn");
+
+  if (setupFields) {
+    setupFields.style.display = profileData.isCreated ? "none" : "block";
+  }
+
+  if (saveBtn) {
+  saveBtn.style.display = profileData.isCreated ? "none" : "block";
+}
+
+
+const completedLessonCount = REQUIRED_LESSONS.filter(
+  lessonId => completedLessons[lessonId] === true
+).length;
+
+const lessonsStat = document.getElementById("profileLessonsStat");
+const vocabStat = document.getElementById("profileVocabStat");
+const translationsStat = document.getElementById("profileTranslationsStat");
+const testsStat = document.getElementById("profileTestsStat");
+const knownWordsStat = document.getElementById("profileKnownWordsStat");
+const timeStat = document.getElementById("profileTimeStat");
+
+if (lessonsStat) lessonsStat.textContent = `${completedLessonCount} / ${REQUIRED_LESSONS.length}`;
+if (vocabStat) vocabStat.textContent = getCompletedVocabChaptersCount();
+if (translationsStat) translationsStat.textContent = getTranslationAttemptsCount();
+if (testsStat) testsStat.textContent = getTestsCompletedCount();
+if (knownWordsStat) knownWordsStat.textContent = knownWords.length;
+if (timeStat) timeStat.textContent = formatStudyTime(totalStudySeconds);
+
+
+const journeySection = document.getElementById("profileJourneySection");
+const settingsBtn = document.getElementById("profileSettingsBtn");
+const resetBtn = document.getElementById("profileResetBtn");
+
+if (journeySection) {
+  journeySection.style.display = profileData.isCreated ? "block" : "none";
+}
+
+if (settingsBtn) {
+  settingsBtn.style.display = profileData.isCreated ? "block" : "none";
+}
+
+if (resetBtn) {
+  resetBtn.style.display = profileData.isCreated ? "block" : "none";
+}
+
+
+updateProfileAttention();
+
+}
+
+function resetAllAppData() {
+  if (!confirm("Reset ALL app data? This cannot be undone.")) {
+    return;
+  }
+
+  localStorage.clear();
+  location.reload();
+}
+function openSettingsFromProfile() {
+  hideProfileMenu();
+  showSettings();
+}
+
+function updateProfileAttention() {
+  const profileBtn = document.getElementById("profileButton");
+
+  if (!profileBtn) return;
+
+  const shouldShake = !profileData.isCreated;
+
+  profileBtn.classList.toggle("profile-attention", shouldShake);
+}
+
+function getNextTitleXP(xp) {
+  const levels = [250, 600, 1000, 1500, 2200, 3000, 4000];
+
+  for (const level of levels) {
+    if (xp < level) return level;
+  }
+
+  return null;
+}
+
+function getPreviousTitleXP(xp) {
+  const levels = [0, 250, 600, 1000, 1500, 2200, 3000, 4000];
+
+  let previous = 0;
+
+  for (const level of levels) {
+    if (xp >= level) previous = level;
+  }
+
+  return previous;
+}
+
+function addXP(amount, reason = "Progress made", showModal = true) {
+  if (!profileData) return;
+
+  const oldXP = profileData.xp || 0;
+  const oldTitle = getProfileTitleFromXP(oldXP);
+
+  profileData.xp = oldXP + amount;
+
+  const newXP = profileData.xp;
+  const newTitle = getProfileTitleFromXP(newXP);
+
+  saveProfileData();
+  updateProfileUI();
+
+  if (showModal) {
+    showXPModal({
+      amount,
+      reason,
+      oldXP,
+      newXP,
+      oldTitle,
+      newTitle
+    });
+  }
+}
+
+function showXPModal(data) {
+  const modal = document.getElementById("xpModal");
+  if (!modal) return;
+
+  const reasonText = document.getElementById("xpReasonText");
+  const earnedText = document.getElementById("xpEarnedText");
+  const titleChange = document.getElementById("xpTitleChange");
+  const fill = document.getElementById("xpModalFill");
+  const progressText = document.getElementById("xpModalProgressText");
+
+  if (reasonText) reasonText.textContent = data.reason;
+  if (earnedText) earnedText.textContent = `+${data.amount} XP`;
+
+  if (titleChange) {
+    titleChange.textContent =
+      data.oldTitle !== data.newTitle
+        ? `${data.oldTitle} → ${data.newTitle}`
+        : data.newTitle;
+  }
+
+  const previousLevelXP = getPreviousTitleXP(data.newXP);
+  const nextLevelXP = getNextTitleXP(data.newXP);
+
+  if (fill && progressText) {
+    if (nextLevelXP === null) {
+      fill.style.width = "100%";
+      progressText.textContent = "Highest title reached!";
+    } else {
+      const levelRange = nextLevelXP - previousLevelXP;
+      const currentProgress = data.newXP - previousLevelXP;
+      const percent = Math.min((currentProgress / levelRange) * 100, 100);
+
+      fill.style.width = "0%";
+
+      setTimeout(() => {
+        fill.style.width = `${percent}%`;
+      }, 80);
+
+      progressText.textContent =
+        `${currentProgress} / ${levelRange} XP to next title`;
+    }
+  }
+
+  modal.classList.add("open");
+
+  const ring = document.querySelector(".xp-ring-progress");
+
+if (ring) {
+  ring.classList.remove("animate");
+  ring.style.strokeDashoffset = "0";
+
+  void ring.offsetWidth;
+
+  ring.classList.add("animate");
+}
+
+  clearTimeout(xpToastTimeout);
+
+  xpToastTimeout = setTimeout(() => {
+    hideXPModal();
+  }, 9000);
+}
+
+function hideXPModal() {
+  clearTimeout(xpToastTimeout);
+
+  const toast = document.getElementById("xpModal");
+  const ring = document.querySelector(".xp-ring-progress");
+
+  if (toast) {
+    toast.classList.remove("open");
+  }
+
+  if (ring) {
+    ring.classList.remove("animate");
+    ring.style.strokeDashoffset = "0";
+
+    void ring.offsetWidth;
+  }
+}
+
+function closeXPModal(event) {
+  if (event.target.id === "xpModal") {
+    hideXPModal();
+  }
+}
+
+function openProfileFromXPToast() {
+  hideXPModal();
+  showProfileMenu();
+}
+
+let appStartTime = Date.now();
+let totalStudySeconds =
+  Number(localStorage.getItem("totalStudySeconds")) || 0;
+
+setInterval(() => {
+  totalStudySeconds += 10;
+  localStorage.setItem("totalStudySeconds", totalStudySeconds);
+}, 10000);
+
+function formatStudyTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes % 60}m`;
+  }
+
+  return `${minutes}m`;
+}
+
+function getCompletedVocabChaptersCount() {
+  return Object.keys(localStorage)
+    .filter(key => key.startsWith("vocabChapterXP_"))
+    .length;
+}
+
+function getTranslationAttemptsCount() {
+  return Object.values(translationProgress || {}).reduce((total, item) => {
+    return total + (item.attempts || 0);
+  }, 0);
+}
+
+function getTestsCompletedCount() {
+  const scores = JSON.parse(localStorage.getItem("testScores")) || [];
+  return scores.length;
+}
+
+function previewProfileName() {
+  const firstInput = document.getElementById("profileFirstNameInput");
+  const lastInput = document.getElementById("profileLastNameInput");
+
+  const firstName = firstInput?.value.trim() || "";
+  const lastName = lastInput?.value.trim() || "";
+
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  const displayName = document.getElementById("profileDisplayName");
+
+  if (displayName) {
+    displayName.textContent = fullName || "Create Profile";
+  }
+}
+
+function selectGreekExperience(type) {
+  profileData.greekExperience = type;
+
+  document.getElementById("newGreekBtn")?.classList.toggle("selected", type === "new");
+  document.getElementById("basicGreekBtn")?.classList.toggle("selected", type === "basic");
+}
+
+function showBasicsInfoModal() {
+  document.getElementById("basicsInfoModal")?.classList.add("open");
+}
+
+function hideBasicsInfoModal() {
+  document.getElementById("basicsInfoModal")?.classList.remove("open");
+}
+
+function closeBasicsInfoModal(event) {
+  if (event.target.id === "basicsInfoModal") {
+    hideBasicsInfoModal();
+  }
+}
+
+let achievements =
+  JSON.parse(localStorage.getItem("achievements")) || [];
+
+const ACHIEVEMENT_DATA = {
+  profileCreated: {
+    icon: "👤",
+    title: "Profile Created",
+    desc: "Started your Greek learning journey."
+  },
+  firstLesson: {
+    icon: "📘",
+    title: "First Lesson Complete",
+    desc: "Completed your first Greek lesson."
+  },
+  vocabUnlocked: {
+    icon: "🔓",
+    title: "Vocab Unlocked",
+    desc: "Completed the first three lessons."
+  },
+  allLessonsComplete: {
+    icon: "🎓",
+    title: "Training Complete",
+    desc: "Completed all beginner Greek lessons."
+  },
+  firstPerfectTest: {
+    icon: "🏆",
+    title: "Perfect Test",
+    desc: "Got every word right on a test."
+  },
+  firstVocabChapter: {
+    icon: "🧠",
+    title: "First Vocab Chapter",
+    desc: "Finished your first full vocab chapter."
+  },
+  firstFiveTranslations: {
+    icon: "✍️",
+    title: "Translation Starter",
+    desc: "Completed 5 translation practices."
+  }
+};
+
+function unlockAchievement(id) {
+  if (achievements.includes(id)) return;
+
+  achievements.push(id);
+  localStorage.setItem("achievements", JSON.stringify(achievements));
+}
+
+function showAchievementsModal() {
+  renderAchievements();
+  document.getElementById("achievementsModal")?.classList.add("open");
+}
+
+function hideAchievementsModal() {
+  document.getElementById("achievementsModal")?.classList.remove("open");
+}
+
+function closeAchievementsModal(event) {
+  if (event.target.id === "achievementsModal") {
+    hideAchievementsModal();
+  }
+}
+
+function renderAchievements() {
+  const list = document.getElementById("achievementsList");
+  if (!list) return;
+
+  if (achievements.length === 0) {
+    list.innerHTML = `<div class="no-achievements">No major achievements yet.</div>`;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  achievements.forEach(id => {
+    const item = ACHIEVEMENT_DATA[id];
+    if (!item) return;
+
+    const div = document.createElement("div");
+    div.className = "achievement-item";
+    div.innerHTML = `
+      <div class="achievement-icon">${item.icon}</div>
+      <div>
+        <strong>${item.title}</strong>
+        <small>${item.desc}</small>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function getDisplayChapterNumber(mounceChapter) {
+  const chapterMap = {
+    4: 1,
+    6: 2,
+    7: 3,
+    8: 4,
+    9: 5,
+    10: 6,
+    11: 7,
+    12: 8,
+    13: 9,
+    14: 10,
+    15: 11,
+    16: 12,
+    17: 13,
+    18: 14,
+    19: 15,
+    20: 16,
+    21: 17,
+    22: 18,
+    23: 19,
+    24: 20,
+    25: 21,
+    26: 22,
+    27: 23,
+    28: 24,
+    29: 25,
+    30: 26,
+    31: 27,
+    32: 28,
+    33: 29,
+    34: 30,
+    35: 31
+  };
+
+  return chapterMap[mounceChapter] || mounceChapter;
+}
+
+function openCustomProfileColor() {
+  document.getElementById("customProfileColorInput")?.click();
+}
+
+function showRanksModal() {
+  renderRanksList();
+  document.getElementById("ranksModal")?.classList.add("open");
+}
+
+function hideRanksModal() {
+  document.getElementById("ranksModal")?.classList.remove("open");
+}
+
+function closeRanksModal(event) {
+  if (event.target.id === "ranksModal") {
+    hideRanksModal();
+  }
+}
+
+function renderRanksList() {
+  const list = document.getElementById("ranksList");
+  if (!list) return;
+
+  const currentXP = profileData.xp || 0;
+
+  list.innerHTML = "";
+
+  PROFILE_RANKS.forEach(rank => {
+    const unlocked = currentXP >= rank.xp;
+
+    const div = document.createElement("div");
+    div.className = `rank-item ${unlocked ? "unlocked" : "locked"}`;
+
+    div.innerHTML = `
+      <div class="rank-medal">
+        <span class="material-symbols-outlined">
+          ${unlocked ? "military_tech" : "lock"}
+        </span>
+      </div>
+
+      <div>
+        <strong>${rank.title}</strong>
+        <small>${rank.xp} XP • ${rank.desc}</small>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+function backToProfileFromProgress() {
+  showScreen("homeScreen");
+  showProfileMenu();
 }
