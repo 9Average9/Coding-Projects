@@ -10562,7 +10562,7 @@ That forces the app to refresh its cached files.
 const APP_VERSION = "1.0.3";
 
 const UPDATE_NOTES = [
-  "Bugs and someUX fixed",
+  "Bugs and UX fixed",
   "Basic Greek Trainer can now be installed to your Home Screen.",
   "Added app-like display support for iPhone and Android.",
   "Added offline support for core app files.",
