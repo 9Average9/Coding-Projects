@@ -1,4 +1,4 @@
-const CACHE_NAME = "basic-greek-trainer-v1.0.0";
+const CACHE_NAME = "basic-greek-trainer-v1.0.3";
 
 const FILES_TO_CACHE = [
   "./",
@@ -7,16 +7,23 @@ const FILES_TO_CACHE = [
   "./vocab.js?v=25",
   "./app.js?v=25",
   "./manifest.json",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+ "./icon-192.png",
+"./icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(FILES_TO_CACHE);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const file of FILES_TO_CACHE) {
+        try {
+          await cache.add(file);
+          console.log("Cached:", file);
+        } catch (error) {
+          console.warn("Skipped cache file:", file, error);
+        }
+      }
     })
   );
 });
