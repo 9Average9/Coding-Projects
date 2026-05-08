@@ -1,11 +1,11 @@
-const CACHE_NAME = "basic-greek-trainer-v1.0.3";
+const CACHE_NAME = "basic-greek-trainer-v1.0.4";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=25",
-  "./vocab.js?v=25",
-  "./app.js?v=25",
+  "./style.css?v=26",
+  "./vocab.js?v=26",
+  "./app.js?v=26",
   "./manifest.json",
  "./icon-192.png",
 "./icon-512.png"
