@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
   updatePracticeToolLocks();
   updateProfileAttention();
 });
+
+
 const REQUIRED_LESSONS = [
   "history",
   "alphabet",
@@ -7906,10 +7908,13 @@ function showScreen(id) {
 
   const target = document.getElementById(id);
   if (target) target.classList.add("active");
+  
 }
 
 function showHome() {
   showScreen("homeScreen");
+
+  document.body.classList.toggle("home-active", screenId === "homeScreen");
 }
 
 
@@ -8489,86 +8494,175 @@ function resetTestData() {
 }
 function toggleDarkMode() {
   const isDark = document.getElementById("darkModeToggle").checked;
-  document.body.classList.toggle("dark", isDark);
 
-  localStorage.setItem("darkMode", isDark);
+  if (isDark) {
+    localStorage.setItem("darkMode", "true");
+    localStorage.setItem("appTheme", "midnight");
+    applyAppTheme("midnight");
+  } else {
+    localStorage.setItem("darkMode", "false");
+    localStorage.setItem("appTheme", "parchment");
+    applyAppTheme("parchment");
+  }
 }
 
-function applyThemeColors(primary, secondary, font) {
-  document.documentElement.style.setProperty("--primary-color", primary);
-  document.documentElement.style.setProperty("--primary-light", lightenColor(primary, 35));
-  document.documentElement.style.setProperty("--secondary-color", secondary);
-  document.documentElement.style.setProperty("--font-color", font);
+
+const APP_THEMES = {
+  parchment: {
+    primary: "#efe4c8",
+    light: "#f8f3e7",
+    secondary: "#243447",
+    accent: "#c8a24a",
+    card: "rgba(255, 252, 242, 0.92)",
+    border: "#d6c49a",
+    text: "#1f2933",
+    muted: "#5f6c7b",
+    buttonText: "#ffffff"
+  },
+
+  midnight: {
+    primary: "#111827",
+    light: "#1f2937",
+    secondary: "#334155",
+    accent: "#93c5fd",
+    card: "rgba(31, 41, 55, 0.94)",
+    border: "#475569",
+    text: "#f8fafc",
+    muted: "#cbd5e1",
+    buttonText: "#ffffff"
+  },
+
+  royal: {
+    primary: "#dbeafe",
+    light: "#eff6ff",
+    secondary: "#1d4ed8",
+    accent: "#f59e0b",
+    card: "rgba(255, 255, 255, 0.88)",
+    border: "#93c5fd",
+    text: "#172033",
+    muted: "#475569",
+    buttonText: "#ffffff"
+  },
+
+  emerald: {
+    primary: "#dff7ec",
+    light: "#f0fdf4",
+    secondary: "#047857",
+    accent: "#d97706",
+    card: "rgba(255, 255, 255, 0.86)",
+    border: "#86efac",
+    text: "#14342b",
+    muted: "#4b635b",
+    buttonText: "#ffffff"
+  },
+
+  crimson: {
+    primary: "#fff1f2",
+    light: "#fff7ed",
+    secondary: "#9f1239",
+    accent: "#f59e0b",
+    card: "rgba(255, 255, 255, 0.88)",
+    border: "#fda4af",
+    text: "#30151c",
+    muted: "#6b4b52",
+    buttonText: "#ffffff"
+  },
+
+  violet: {
+    primary: "#f3e8ff",
+    light: "#faf5ff",
+    secondary: "#6d28d9",
+    accent: "#d6a700",
+    card: "rgba(255, 255, 255, 0.88)",
+    border: "#c4b5fd",
+    text: "#241733",
+    muted: "#62516f",
+    buttonText: "#ffffff"
+  },
+
+  slate: {
+    primary: "#e2e8f0",
+    light: "#f8fafc",
+    secondary: "#334155",
+    accent: "#0ea5e9",
+    card: "rgba(255, 255, 255, 0.9)",
+    border: "#cbd5e1",
+    text: "#0f172a",
+    muted: "#475569",
+    buttonText: "#ffffff"
+  },
+
+  olive: {
+    primary: "#ece8d9",
+    light: "#faf8ef",
+    secondary: "#4d5d2f",
+    accent: "#b45309",
+    card: "rgba(255, 252, 242, 0.9)",
+    border: "#c7bea0",
+    text: "#25291c",
+    muted: "#62664b",
+    buttonText: "#ffffff"
+  }
+};
+
+function applyAppTheme(themeName) {
+  const theme = APP_THEMES[themeName] || APP_THEMES.parchment;
+
+  document.documentElement.style.setProperty("--primary-color", theme.primary);
+  document.documentElement.style.setProperty("--primary-light", theme.light);
+  document.documentElement.style.setProperty("--secondary-color", theme.secondary);
+  document.documentElement.style.setProperty("--accent-color", theme.accent);
+  document.documentElement.style.setProperty("--card-color", theme.card);
+  document.documentElement.style.setProperty("--border-color", theme.border);
+  document.documentElement.style.setProperty("--font-color", theme.text);
+  document.documentElement.style.setProperty("--muted-color", theme.muted);
+  document.documentElement.style.setProperty("--btn-text-color", theme.buttonText);
+
+  document.body.classList.toggle("dark", themeName === "midnight");
+
+  document.querySelectorAll(".theme-preset").forEach(btn => {
+    btn.classList.toggle("selected", btn.classList.contains(themeName));
+  });
 }
 
-function updateThemeColors() {
-  const primary = document.getElementById("primaryColorPicker").value;
-  const secondary = document.getElementById("secondaryColorPicker").value;
-  const font = document.getElementById("fontColorPicker").value;
-
-  applyThemeColors(primary, secondary, font);
-
-document.documentElement.style.setProperty("--btn-text-color", font);
-
-  localStorage.setItem("primaryColor", primary);
-  localStorage.setItem("secondaryColor", secondary);
-  localStorage.setItem("fontColor", font);
-}
-
-function resetThemeColors() {
-  const defaultPrimary = "#efe4c8";
-  const defaultSecondary = "#243447";
-  const defaultFont = "#1f2933";
-
+function setAppTheme(themeName) {
+  localStorage.setItem("appTheme", themeName);
   localStorage.removeItem("primaryColor");
   localStorage.removeItem("secondaryColor");
   localStorage.removeItem("fontColor");
 
-  applyThemeColors(defaultPrimary, defaultSecondary, defaultFont);
-
-  document.documentElement.style.setProperty("--btn-text-color", "white");
-
-  document.getElementById("primaryColorPicker").value = defaultPrimary;
-  document.getElementById("secondaryColorPicker").value = defaultSecondary;
-  document.getElementById("fontColorPicker").value = defaultFont;
+  applyAppTheme(themeName);
 }
 
-function lightenColor(hex, percent) {
-  const num = parseInt(hex.replace("#", ""), 16);
 
-  let r = (num >> 16) + percent;
-  let g = ((num >> 8) & 255) + percent;
-  let b = (num & 255) + percent;
-
-  r = Math.min(255, r);
-  g = Math.min(255, g);
-  b = Math.min(255, b);
-
-  return "#" + (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0");
-}
 
 
 // load saved preference
 window.addEventListener("load", () => {
-  const saved = localStorage.getItem("darkMode") === "true";
-  document.body.classList.toggle("dark", saved);
+  const savedTheme = localStorage.getItem("appTheme") || "parchment";
+  const isDark = savedTheme === "midnight";
 
   const toggle = document.getElementById("darkModeToggle");
-  if (toggle) toggle.checked = saved;
+  if (toggle) toggle.checked = isDark;
 
-  const savedPrimary = localStorage.getItem("primaryColor") || "#efe4c8";
-const savedSecondary = localStorage.getItem("secondaryColor") || "#243447";
-const savedFont = localStorage.getItem("fontColor") || "#1f2933";
+  localStorage.setItem("darkMode", isDark ? "true" : "false");
 
-applyThemeColors(savedPrimary, savedSecondary, savedFont);
-if (localStorage.getItem("fontColor")) {
-  document.documentElement.style.setProperty("--btn-text-color", savedFont);
-}
-document.getElementById("primaryColorPicker").value = savedPrimary;
-document.getElementById("secondaryColorPicker").value = savedSecondary;
-document.getElementById("fontColorPicker").value = savedFont;
-updateLessonCompletionUI();
+  applyAppTheme(savedTheme);
 });
+
+function getReadableButtonTextColor(buttonColor) {
+  const hex = buttonColor.replace("#", "");
+
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return brightness > 150 ? "#1f2933" : "#ffffff";
+}
+
+
 
 function toggleResetSection() {
   const el = document.getElementById("resetContent");
@@ -9785,8 +9879,22 @@ function saveProfileName() {
 
   if (!firstInput || !lastInput) return;
 
-  profileData.firstName = firstInput.value.trim();
-  profileData.lastName = lastInput.value.trim();
+  const firstName = firstInput.value.trim();
+  const lastName = lastInput.value.trim();
+
+  firstInput.classList.remove("input-error");
+  lastInput.classList.remove("input-error");
+
+  if (!firstName || !lastName) {
+    if (!firstName) firstInput.classList.add("input-error");
+    if (!lastName) lastInput.classList.add("input-error");
+
+    showProfileValidationMessage("Please enter both your first and last name.");
+    return;
+  }
+
+  profileData.firstName = firstName;
+  profileData.lastName = lastName;
   profileData.isCreated = true;
 
   if (profileData.greekExperience === "basic") {
@@ -9794,9 +9902,29 @@ function saveProfileName() {
     localStorage.setItem("practiceToolsUnlocked", "true");
     updatePracticeToolLocks();
   }
+
   unlockAchievement("profileCreated");
   saveProfileData();
   updateProfileUI();
+
+  const message = document.getElementById("profileValidationMessage");
+  if (message) message.remove();
+}
+
+
+function showProfileValidationMessage(message) {
+  let messageBox = document.getElementById("profileValidationMessage");
+
+  if (!messageBox) {
+    messageBox = document.createElement("p");
+    messageBox.id = "profileValidationMessage";
+    messageBox.className = "profile-validation-message";
+
+    const saveBtn = document.getElementById("saveProfileBtn");
+    saveBtn.insertAdjacentElement("beforebegin", messageBox);
+  }
+
+  messageBox.textContent = message;
 }
 
 function setProfileColor(color) {
@@ -9994,12 +10122,19 @@ function openSettingsFromProfile() {
 
 function updateProfileAttention() {
   const profileBtn = document.getElementById("profileButton");
+  const profileNewsBadge = document.getElementById("profileNewsBadge");
 
   if (!profileBtn) return;
 
-  const shouldShake = !profileData.isCreated;
+  const needsProfile = !profileData.isCreated;
+  const hasUnreadUpdate = localStorage.getItem("hasUnreadUpdate") === "true";
 
-  profileBtn.classList.toggle("profile-attention", shouldShake);
+  profileBtn.classList.toggle("profile-attention", needsProfile);
+  profileBtn.classList.toggle("has-news-update", hasUnreadUpdate);
+
+  if (profileNewsBadge) {
+    profileNewsBadge.classList.toggle("hidden", !hasUnreadUpdate);
+  }
 }
 
 function getNextTitleXP(xp) {
@@ -10424,12 +10559,14 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.3";
 
 const UPDATE_NOTES = [
+  "Bugs and someUX fixed",
   "Basic Greek Trainer can now be installed to your Home Screen.",
   "Added app-like display support for iPhone and Android.",
-  "Added offline support for core app files."
+  "Added offline support for core app files.",
+  "Added welcome Modal"
 ];
 
 let deferredInstallPrompt = null;
@@ -10535,27 +10672,11 @@ async function triggerAndroidInstall() {
 function checkForAppUpdateModal() {
   const lastSeenVersion = localStorage.getItem("lastSeenAppVersion");
 
-  if (lastSeenVersion === APP_VERSION) return;
-
-  const modal = document.getElementById("updateModal");
-  const title = document.getElementById("updateModalTitle");
-  const notes = document.getElementById("updateModalNotes");
-
-  if (!modal || !title || !notes) {
-    localStorage.setItem("lastSeenAppVersion", APP_VERSION);
-    return;
+  if (lastSeenVersion !== APP_VERSION) {
+    localStorage.setItem("hasUnreadUpdate", "true");
   }
 
-  title.textContent = `What’s New in Version ${APP_VERSION}`;
-
-  notes.innerHTML = `
-    <ul class="update-notes-list">
-      ${UPDATE_NOTES.map((note) => `<li>${note}</li>`).join("")}
-    </ul>
-  `;
-
-  modal.classList.add("open");
-  localStorage.setItem("lastSeenAppVersion", APP_VERSION);
+  updateProfileAttention();
 }
 
 function hideUpdateModal() {
@@ -10563,6 +10684,7 @@ function hideUpdateModal() {
   if (!modal) return;
 
   modal.classList.remove("open");
+  updateProfileAttention();
 }
 
 function closeUpdateModal(event) {
@@ -10583,4 +10705,191 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     checkForAppUpdateModal();
   }, 1000);
+});
+function closeSettingsMenu() {
+  showScreen("homeScreen");
+  showProfileMenu();
+}
+function openNewsFromProfile() {
+  const modal = document.getElementById("updateModal");
+  const title = document.getElementById("updateModalTitle");
+  const notes = document.getElementById("updateModalNotes");
+
+  if (!modal || !title || !notes) return;
+
+  title.textContent = `What’s New in Version ${APP_VERSION}`;
+
+  notes.innerHTML = `
+    <ul class="update-notes-list">
+      ${UPDATE_NOTES.map((note) => `<li>${note}</li>`).join("")}
+    </ul>
+  `;
+
+  localStorage.setItem("lastSeenAppVersion", APP_VERSION);
+  localStorage.setItem("hasUnreadUpdate", "false");
+
+  updateProfileAttention();
+
+  modal.classList.add("open");
+}
+
+
+ const BIBLE_GREEK_FACTS = [
+  "Matthew opens the New Testament by calling Jesus the Christ, the son of David, and the son of Abraham.",
+  "The Gospel of Mark is the shortest Gospel and often moves quickly from event to event.",
+  "Luke wrote both the Gospel of Luke and Acts, giving one connected account of Jesus’ ministry and the early church.",
+  "John’s Gospel begins by calling Jesus the λόγος, usually translated “the Word.”",
+  "Acts records the gospel spreading from Jerusalem outward, just as Jesus said in Acts 1:8.",
+  "Paul’s letters were written to real churches and people dealing with real-life doctrine and practice.",
+  "Romans gives one of the clearest explanations of sin, righteousness, faith, grace, and justification.",
+  "1 Corinthians shows that even gifted churches can still need serious correction and maturity.",
+  "Galatians strongly defends justification by faith apart from works of the Law.",
+  "Ephesians emphasizes the believer’s position in Christ and then applies that truth to daily living.",
+  "Philippians was written while Paul was imprisoned, yet it contains strong themes of joy and contentment.",
+  "Colossians emphasizes the supremacy and sufficiency of Christ.",
+  "1 and 2 Thessalonians include important teaching about Christ’s return and faithful living while waiting.",
+  "The Pastoral Epistles are letters to Timothy and Titus about ministry, doctrine, and church leadership.",
+  "Philemon is a short personal letter from Paul involving forgiveness, reconciliation, and a runaway servant.",
+  "Hebrews repeatedly shows Christ as better: better priest, better sacrifice, better covenant, and better hope.",
+  "James emphasizes living faith in action, especially through endurance, speech, wisdom, and care for others.",
+  "1 Peter encourages believers to remain faithful while suffering.",
+  "2 Peter warns against false teachers and points believers back to apostolic truth.",
+  "1 John uses repeated contrasts like light and darkness, truth and error, love and hatred.",
+  "Revelation begins with letters to seven real churches in Asia Minor.",
+  "The New Testament was written in Koine Greek, the common Greek of the ancient world.",
+  "The Greek word εὐαγγέλιον means good news or gospel.",
+  "The name Jesus comes from the Hebrew name Joshua, meaning the Lord saves.",
+  "Christ is not Jesus’ last name. Χριστός means Messiah or Anointed One.",
+  "The word ἐκκλησία, often translated church, means an assembly or called-out gathering.",
+  "The Greek word μαθητής means disciple or learner.",
+  "The Greek word ἀπόστολος means apostle or sent one.",
+  "The word χάρις means grace and is central to Paul’s explanation of salvation.",
+  "The word πίστις can mean faith, trust, belief, or faithfulness depending on context.",
+  "The Greek word κύριος means Lord or master and is frequently used for Jesus.",
+  "The word ἁμαρτία means sin and carries the idea of missing the mark or falling short.",
+  "The word δικαιοσύνη means righteousness and is a major theme in Romans.",
+  "Greek verbs often carry person and number, so the subject can sometimes be built into the verb ending.",
+  "Greek nouns use case endings to show how a word functions in a sentence.",
+  "The Greek question mark looks like this: ;",
+  "Final sigma has a special shape. Sigma is written σ normally, but ς at the end of a word.",
+  "Many New Testament letters were meant to be read aloud to churches.",
+  "The book of Acts connects the ministry of Jesus in the Gospels to the spread of the church through the apostles.",
+  "The New Testament includes narrative, letters, prophecy, sermons, prayers, hymns, and teaching sections.",
+  "Jesus often taught with parables, which used everyday scenes to communicate spiritual truth.",
+  "The word baptize comes from the Greek βαπτίζω.",
+  "The word angel comes from the Greek ἄγγελος, meaning messenger.",
+  "The word evangelist is related to the Greek word for gospel or good news.",
+  "The phrase in Christ is one of Paul’s major ways of describing the believer’s position and identity.",
+  "The Gospels are not random collections of stories; each writer arranged material to communicate truth about Jesus.",
+  "John tells readers his purpose clearly: that they may believe Jesus is the Christ, the Son of God.",
+  "Luke says he investigated things carefully so Theophilus could know the certainty of what he had been taught.",
+  "Many Old Testament quotations in the New Testament are taken from the Greek translation known as the Septuagint.",
+  "Repetition is important in the New Testament. Repeated words often show themes the author wants you to notice.",
+  "The word amen comes from Hebrew, but it appears often in the Greek New Testament as a strong affirmation.",
+  "The word parable comes from Greek and has the idea of placing something alongside something else for comparison.",
+  "The Greek word δοῦλος means servant or slave and appears often in the New Testament.",
+  "The Greek word ζωή means life and is especially important in John’s writings.",
+  "The Greek word φῶς means light and is used strongly in John’s Gospel and letters.",
+  "The Greek word κόσμος means world and can refer to the created world, humanity, or the world system depending on context.",
+  "The Greek word μένω means remain or abide and is important in John 15.",
+  "The New Testament letters usually begin with the sender, recipients, and a greeting.",
+  "Paul often opens his letters with grace and peace.",
+  "The book of Revelation is written to reveal, not hide, the victory and return of Jesus Christ.",
+  "The Greek word μακάριος means blessed and appears in the Beatitudes.",
+  "The Greek word μετάνοια is often translated repentance and has the idea of a change of mind.",
+  "The Greek word ἀλήθεια means truth and is especially prominent in John’s writings.",
+  "The Greek word πνεῦμα can mean spirit, wind, or breath depending on context.",
+  "The Greek word σάρξ means flesh and can refer to the body, humanity, or fallen human weakness depending on context.",
+  "The Greek word καρδία means heart and often refers to the inner person, not merely emotions.",
+  "The New Testament was written to be understood by ordinary people, even though some passages require careful study."
+];
+
+
+function isInstalledAppMode() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function formatSessionLength(milliseconds) {
+  const minutes = Math.max(1, Math.round(milliseconds / 60000));
+
+  if (minutes < 60) {
+    return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const leftoverMinutes = minutes % 60;
+
+  if (leftoverMinutes === 0) {
+    return `${hours} hour${hours === 1 ? "" : "s"}`;
+  }
+
+  return `${hours} hour${hours === 1 ? "" : "s"} and ${leftoverMinutes} minute${leftoverMinutes === 1 ? "" : "s"}`;
+}
+
+function maybeShowWelcomeBackModal() {
+  const TEST_WELCOME_BACK = true; // change to true to test in browser
+
+  const alreadyShownThisSession =
+    sessionStorage.getItem("welcomeBackShown") === "true";
+
+  const lastSessionLength = Number(localStorage.getItem("lastSessionLength") || 0);
+
+  if (
+    !profileData?.isCreated ||
+    alreadyShownThisSession ||
+    lastSessionLength <= 0 ||
+    (!TEST_WELCOME_BACK && !isInstalledAppMode())
+  ) {
+    return;
+  }
+
+  const firstName = profileData.firstName || "friend";
+  let randomFact =
+  BIBLE_GREEK_FACTS[Math.floor(Math.random() * BIBLE_GREEK_FACTS.length)];
+
+const lastFact = localStorage.getItem("lastWelcomeBackFact");
+
+if (BIBLE_GREEK_FACTS.length > 1) {
+  while (randomFact === lastFact) {
+    randomFact =
+      BIBLE_GREEK_FACTS[Math.floor(Math.random() * BIBLE_GREEK_FACTS.length)];
+  }
+}
+
+localStorage.setItem("lastWelcomeBackFact", randomFact);
+
+  document.getElementById("welcomeBackTitle").textContent =
+    `Welcome back, ${firstName}!`;
+
+  document.getElementById("welcomeBackSession").textContent =
+    `Last time, you studied for about ${formatSessionLength(lastSessionLength)}.`;
+
+  document.getElementById("welcomeBackFact").textContent = randomFact;
+
+  document.getElementById("welcomeBackModal")?.classList.add("open");
+  sessionStorage.setItem("welcomeBackShown", "true");
+}
+
+function hideWelcomeBackModal() {
+  document.getElementById("welcomeBackModal")?.classList.remove("open");
+}
+
+window.addEventListener("load", () => {
+  if (!sessionStorage.getItem("sessionStartedAt")) {
+    sessionStorage.setItem("sessionStartedAt", Date.now().toString());
+  }
+
+  setTimeout(maybeShowWelcomeBackModal, 700);
+});
+
+window.addEventListener("pagehide", () => {
+  if (!profileData?.isCreated) return;
+
+  const startedAt = Number(sessionStorage.getItem("sessionStartedAt") || Date.now());
+  const sessionLength = Date.now() - startedAt;
+
+  localStorage.setItem("lastSessionLength", sessionLength.toString());
 });
