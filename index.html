@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+/>
   <title>Basic Greek</title>
 
   <!-- PWA / Home Screen App Support -->
@@ -10,12 +13,17 @@
 <meta name="theme-color" content="#243447" />
 
 <!-- iPhone Home Screen Support -->
+ <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Basic Greek" />
-<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="stylesheet" href="style.css?v=25" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+
+
+  
 </head>
 <body>
   <main class="app">
@@ -3966,7 +3974,7 @@
 
     <section id="settingsScreen" class="screen">
       <div class="nav-bar">
-        <button class="icon-btn" onclick="handleLearnBack()">
+       <button class="icon-btn" onclick="closeSettingsMenu()">
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Settings</div>
@@ -3984,25 +3992,43 @@
     </label>
   </div>
 
-  <div class="theme-settings">
-  <h4>Custom Theme</h4>
+ <div class="theme-settings">
+  <h4>App Theme</h4>
+  <p class="helper-text">Choose a polished preset theme.</p>
 
-  <div class="color-row">
-  <span>Background Color</span>
-  <input type="color" id="primaryColorPicker" value="#efe4c8" onchange="updateThemeColors()" />
-</div>
+  <div class="theme-preset-grid">
+    <button class="theme-preset parchment" onclick="setAppTheme('parchment')">
+      <span></span> Classic Parchment
+    </button>
 
-  <div class="color-row">
-  <span>Button Color</span>
-  <input type="color" id="secondaryColorPicker" value="#243447" onchange="updateThemeColors()" />
-</div>
+    <button class="theme-preset midnight" onclick="setAppTheme('midnight')">
+      <span></span> Midnight Study
+    </button>
 
-<div class="color-row">
-  <span>Font Color</span>
-  <input type="color" id="fontColorPicker" value="#1f2933" onchange="updateThemeColors()" />
-</div>
+    <button class="theme-preset royal" onclick="setAppTheme('royal')">
+      <span></span> Royal Blue
+    </button>
 
-  <button class="small-btn" onclick="resetThemeColors()">Reset Theme</button>
+    <button class="theme-preset emerald" onclick="setAppTheme('emerald')">
+      <span></span> Emerald Scroll
+    </button>
+
+    <button class="theme-preset crimson" onclick="setAppTheme('crimson')">
+      <span></span> Crimson Ink
+    </button>
+
+    <button class="theme-preset violet" onclick="setAppTheme('violet')">
+      <span></span> Byzantine Violet
+    </button>
+
+    <button class="theme-preset slate" onclick="setAppTheme('slate')">
+      <span></span> Clean Slate
+    </button>
+
+    <button class="theme-preset olive" onclick="setAppTheme('olive')">
+      <span></span> Olive Grove
+    </button>
+  </div>
 </div>
 </div>
      <div class="settings-card">
@@ -4874,6 +4900,12 @@
   Create Profile
 </button>
 
+<button id="profileNewsBtn" class="main-btn secondary profile-news-btn" onclick="openNewsFromProfile()">
+  <span class="material-symbols-outlined">newspaper</span>
+  <span>News & Updates</span>
+  <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
+</button>
+
     <button id="profileSettingsBtn" class="main-btn secondary" onclick="openSettingsFromProfile()">
   Settings
 </button>
@@ -5054,6 +5086,25 @@
     </button>
   </div>
 </div>
+
+
+<div id="welcomeBackModal" class="modal-overlay">
+  <div class="modal-card welcome-back-card">
+    <button class="modal-close" onclick="hideWelcomeBackModal()">×</button>
+
+    <div class="welcome-back-kicker">Welcome Back</div>
+    <h2 id="welcomeBackTitle">Welcome back!</h2>
+    <p id="welcomeBackSession"></p>
+
+    <div class="welcome-back-fact">
+      <strong>Quick Bible Greek Fact</strong>
+      <p id="welcomeBackFact"></p>
+    </div>
+
+    <button class="main-btn" onclick="hideWelcomeBackModal()">Get back to Learning</button>
+  </div>
+</div>
+
 
 </body>
 </html>
