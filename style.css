@@ -929,16 +929,47 @@ body.dark .progress-collapse-btn {
   color: #f8fafc;
 }
 .progress-collapse-btn {
-  margin-top: 14px;
-  background: #243447;
-  color: var(--font-color);
+  width: 100%;
+  margin: 12px 0;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 14px;
+  background: var(--profile-color, #4f8cff);
+  color: #ffffff !important;
+  font-size: 1rem;
+  font-weight: 800;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 1.05rem;
-  padding: 14px;
-  border-radius: 12px;
+  justify-content: space-between;
   cursor: pointer;
+}
+
+.progress-collapse-btn span,
+.progress-collapse-btn .arrow {
+  color: #ffffff !important;
+}
+
+.progress-collapse-btn:hover {
+  opacity: 0.92;
+}
+
+body.dark .progress-collapse-btn {
+  background: var(--profile-color, #4f8cff);
+  color: #ffffff !important;
+}
+
+#progressStats,
+#progressStats p,
+#progressStats h3,
+#progressStats strong {
+  color: var(--font-color);
+}
+
+body.dark #progressStats,
+body.dark #progressStats p,
+body.dark #progressStats h3,
+body.dark #progressStats strong {
+  color: #f3f4f6;
 }
 
 .progress-collapse-btn:hover {
@@ -5687,4 +5718,850 @@ body.dark .update-notes-list {
 body.dark .update-notes-list {
   background: rgba(17, 24, 39, 0.55);
   border-color: #4b5563;
+}
+:root {
+  --accent-color: #c8a24a;
+  --card-color: rgba(255, 252, 242, 0.92);
+  --border-color: #d6c49a;
+  --muted-color: #5f6c7b;
+}
+
+.screen.active,
+.test-card,
+.settings-card,
+.translate-card,
+.review-word,
+.lesson-module,
+.lesson-block,
+.modal-card,
+.complete-lesson-box {
+  background: var(--card-color) !important;
+  border-color: var(--border-color) !important;
+  color: var(--font-color) !important;
+}
+
+.header p,
+.helper-text,
+.settings-card p,
+.modal-card p,
+.tap-hint,
+.translate-label,
+.compare-label {
+  color: var(--muted-color) !important;
+}
+
+.main-btn,
+.progress-collapse-btn,
+.complete-lesson-btn {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+.main-btn span,
+.progress-collapse-btn span,
+.home-action .material-symbols-outlined {
+  color: inherit !important;
+}
+
+.icon-btn,
+.small-btn,
+.collapse-btn,
+.chapter-grid label {
+  border-color: var(--border-color) !important;
+  color: var(--font-color) !important;
+}
+
+.chapter-grid label.selected,
+.experience-choice.selected {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.material-symbols-outlined {
+  color: inherit;
+}
+
+.theme-preset-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.theme-preset {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--card-color);
+  color: var(--font-color);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-preset span {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+
+.theme-preset.selected {
+  outline: 3px solid var(--accent-color);
+  background: color-mix(in srgb, var(--secondary-color) 10%, var(--card-color));
+}
+
+.theme-preset.parchment span { background: linear-gradient(135deg, #efe4c8, #243447); }
+.theme-preset.midnight span { background: linear-gradient(135deg, #111827, #93c5fd); }
+.theme-preset.royal span { background: linear-gradient(135deg, #dbeafe, #1d4ed8); }
+.theme-preset.emerald span { background: linear-gradient(135deg, #dff7ec, #047857); }
+.theme-preset.crimson span { background: linear-gradient(135deg, #fff1f2, #9f1239); }
+.theme-preset.violet span { background: linear-gradient(135deg, #f3e8ff, #6d28d9); }
+.theme-preset.slate span { background: linear-gradient(135deg, #e2e8f0, #334155); }
+.theme-preset.olive span { background: linear-gradient(135deg, #ece8d9, #4d5d2f); }
+
+/* FINAL FIX — Progress buttons must always use profile color */
+#progressScreen .progress-collapse-btn,
+body.dark #progressScreen .progress-collapse-btn {
+  background: var(--profile-color, #4f8cff) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+#progressScreen .progress-collapse-btn *,
+body.dark #progressScreen .progress-collapse-btn * {
+  color: #ffffff !important;
+}
+
+/* FINAL FIX — Midnight theme text */
+body.dark,
+body.dark .app,
+body.dark .screen.active,
+body.dark .settings-card,
+body.dark .test-card,
+body.dark .translate-card,
+body.dark .modal-card,
+body.dark .lesson-module,
+body.dark .lesson-block,
+body.dark #progressScreen {
+  background-color: var(--card-color) !important;
+  color: var(--font-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark p,
+body.dark li,
+body.dark label,
+body.dark strong,
+body.dark span,
+body.dark small,
+body.dark .nav-title,
+body.dark .greek-word,
+body.dark .meaning,
+body.dark .translate-greek,
+body.dark .lesson-block-header,
+body.dark .lesson-block-content,
+body.dark #progressStats,
+body.dark #progressStats * {
+  color: var(--font-color) !important;
+}
+
+body.dark .helper-text,
+body.dark .tap-hint,
+body.dark .settings-card p,
+body.dark .modal-card p,
+body.dark .translate-label,
+body.dark .compare-label {
+  color: var(--muted-color) !important;
+}
+
+/* Buttons/icons in dark theme */
+body.dark .main-btn,
+body.dark .complete-lesson-btn {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+body.dark .main-btn *,
+body.dark .complete-lesson-btn * {
+  color: var(--btn-text-color) !important;
+}
+
+body.dark .icon-btn,
+body.dark .small-btn,
+body.dark .collapse-btn,
+body.dark .theme-preset,
+body.dark .chapter-grid label {
+  background: var(--card-color) !important;
+  border-color: var(--border-color) !important;
+  color: var(--font-color) !important;
+}
+
+body.dark input,
+body.dark textarea,
+body.dark select {
+  background: var(--primary-light) !important;
+  border-color: var(--border-color) !important;
+  color: var(--font-color) !important;
+}
+
+/* Clean profile theme accents — not boxy */
+#profileModal .modal-card {
+  border-color: color-mix(in srgb, var(--profile-color, #4f8cff) 35%, var(--border-color)) !important;
+}
+
+#profileModal .profile-avatar,
+#profileModal #saveProfileBtn,
+#profileModal .experience-choice.selected {
+  background: var(--profile-color, #4f8cff) !important;
+  color: white !important;
+}
+
+#profileModal #saveProfileBtn *,
+#profileModal .experience-choice.selected * {
+  color: white !important;
+}
+
+#profileModal input:focus {
+  border-color: var(--profile-color, #4f8cff) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--profile-color, #4f8cff) 18%, transparent);
+  outline: none;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16) !important;
+}
+
+.profile-validation-message {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* =========================================================
+   SETTINGS SCREEN — HARD OVERRIDE
+   MUST STAY AT VERY BOTTOM OF FILE
+========================================================= */
+
+body #settingsScreen,
+body #settingsScreen * {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Main screen */
+body #settingsScreen.screen.active {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--profile-color, #4f8cff) 12%, var(--primary-color)),
+      var(--primary-light)
+    ) !important;
+
+  color: var(--font-color) !important;
+}
+
+/* EVERYTHING card-like */
+body #settingsScreen .settings-card,
+body #settingsScreen .modal-card,
+body #settingsScreen .collapse-content,
+body #settingsScreen .theme-settings,
+body #settingsScreen .theme-preset,
+body #settingsScreen .reset-warning,
+body #settingsScreen .danger-zone {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--profile-color, #4f8cff) 8%, var(--card-color)),
+      var(--card-color)
+    ) !important;
+
+  border: 1px solid
+    color-mix(in srgb, var(--profile-color, #4f8cff) 28%, var(--border-color))
+    !important;
+
+  border-radius: 22px !important;
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.10) !important;
+
+  color: var(--font-color) !important;
+}
+
+/* ALL settings text */
+body #settingsScreen h1,
+body #settingsScreen h2,
+body #settingsScreen h3,
+body #settingsScreen h4,
+body #settingsScreen strong,
+body #settingsScreen label,
+body #settingsScreen span,
+body #settingsScreen li,
+body #settingsScreen .nav-title {
+  color: var(--font-color) !important;
+}
+
+/* Muted/helper text */
+body #settingsScreen p,
+body #settingsScreen small,
+body #settingsScreen .helper-text {
+  color: var(--muted-color) !important;
+}
+
+/* Collapse buttons */
+body #settingsScreen .collapse-btn {
+  background:
+    color-mix(in srgb, var(--profile-color, #4f8cff) 12%, var(--card-color))
+    !important;
+
+  border:
+    1px solid
+    color-mix(in srgb, var(--profile-color, #4f8cff) 35%, var(--border-color))
+    !important;
+
+  border-radius: 18px !important;
+
+  color: var(--font-color) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.06)
+    !important;
+}
+
+body #settingsScreen .collapse-btn:hover {
+  background:
+    color-mix(in srgb, var(--profile-color, #4f8cff) 18%, var(--card-color))
+    !important;
+}
+
+/* Theme buttons */
+body #settingsScreen .theme-preset {
+  padding: 14px 16px !important;
+}
+
+body #settingsScreen .theme-preset.selected {
+  outline:
+    3px solid var(--profile-color, #4f8cff)
+    !important;
+
+  background:
+    color-mix(in srgb, var(--profile-color, #4f8cff) 20%, var(--card-color))
+    !important;
+}
+
+/* Back button */
+body #settingsScreen .icon-btn {
+  background:
+    color-mix(in srgb, var(--profile-color, #4f8cff) 12%, var(--card-color))
+    !important;
+
+  border:
+    1px solid
+    color-mix(in srgb, var(--profile-color, #4f8cff) 35%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Inputs */
+body #settingsScreen input,
+body #settingsScreen select {
+  background:
+    color-mix(in srgb, var(--primary-light) 70%, white)
+    !important;
+
+  border:
+    1px solid
+    color-mix(in srgb, var(--profile-color, #4f8cff) 25%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+
+  border-radius: 14px !important;
+}
+
+/* Danger buttons stay red */
+body #settingsScreen .danger-btn {
+  background: #9f1239 !important;
+  color: white !important;
+  border: none !important;
+}
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* allows scrolling, blocks double-tap zoom on controls */
+button,
+a,
+label,
+input,
+textarea,
+select,
+.icon-btn,
+.main-btn,
+.small-btn,
+.collapse-btn,
+.theme-preset,
+.chapter-grid label {
+  touch-action: manipulation;
+}
+
+/* prevents iPhone zoom when tapping inputs */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+body.home-active {
+  overflow: hidden;
+}
+
+body:not(.home-active) {
+  overflow-y: auto;
+}
+/* HOME SCREEN CLEANUP */
+#homeScreen.screen.active {
+  padding: 26px !important;
+  border-radius: 28px !important;
+  background: var(--card-color) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.12) !important;
+}
+
+/* Make the top app title less webpage-ish */
+.header {
+  border-bottom: none !important;
+  margin-bottom: 16px !important;
+  padding-bottom: 0 !important;
+}
+
+.header h1 {
+  font-size: 2.35rem !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.06em !important;
+  margin-bottom: 8px !important;
+}
+
+.header p {
+  max-width: 320px;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--muted-color) !important;
+}
+
+/* Home nav row */
+#homeScreen .nav-bar {
+  margin-top: 0 !important;
+  margin-bottom: 22px !important;
+  grid-template-columns: 50px 1fr 50px !important;
+}
+
+#homeScreen .nav-title {
+  font-size: 1.2rem !important;
+  font-weight: 850 !important;
+}
+
+/* Home top icons */
+#homeScreen .icon-btn {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 16px !important;
+}
+
+#homeScreen .icon-btn .material-symbols-outlined {
+  font-size: 28px !important;
+}
+
+/* Bigger main home buttons */
+#homeScreen .main-btn.home-action {
+  min-height: 74px !important;
+  padding: 20px 22px !important;
+  margin: 12px 0 !important;
+  border-radius: 22px !important;
+  font-size: 1.16rem !important;
+  font-weight: 850 !important;
+  gap: 12px !important;
+}
+
+#homeScreen .main-btn.home-action .material-symbols-outlined {
+  font-size: 30px !important;
+}
+/* BIGGER MODALS — BETTER SCREEN FIT */
+.modal-card {
+  width: min(100%, 540px) !important;
+  max-height: calc(100dvh - 56px) !important;
+  padding: 26px !important;
+  border-radius: 26px !important;
+}
+
+/* Bigger profile modal specifically */
+#profileModal .modal-card {
+  width: min(100%, 580px) !important;
+}
+
+/* Tighter overlay spacing */
+.modal-overlay {
+  padding: 10px !important;
+}
+
+/* Slightly smaller modal headings */
+.modal-card h2 {
+  font-size: 1.55rem !important;
+  margin-bottom: 8px !important;
+}
+
+/* Slightly tighter modal text */
+.modal-card p,
+.modal-card label,
+.modal-card span {
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+/* Buttons */
+.modal-card .main-btn,
+.modal-card .small-btn,
+.modal-card .collapse-btn {
+  min-height: 50px;
+}
+/* NEWS / UPDATE BADGES */
+#profileButton {
+  position: relative;
+}
+
+#profileButton.has-news-update::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid var(--card-color);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.18);
+}
+
+.profile-news-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.profile-news-btn .material-symbols-outlined {
+  color: inherit !important;
+}
+
+.profile-news-badge {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ef4444;
+  display: inline-block;
+  margin-left: 2px;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+.profile-news-badge.hidden {
+  display: none;
+}
+
+/* =========================================================
+   INSTALL MODAL — CLEANER APP-LIKE DESIGN
+   Keep at very bottom.
+========================================================= */
+
+#installAppModal .install-modal-card {
+  text-align: center !important;
+  width: min(100%, 520px) !important;
+  padding: 26px !important;
+  border-radius: 28px !important;
+  background: var(--card-color) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, var(--border-color)) !important;
+  box-shadow: 0 22px 55px rgba(0,0,0,0.24) !important;
+}
+
+#installAppModal .install-modal-card h2 {
+  font-size: 1.75rem !important;
+  font-weight: 900 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.05em !important;
+  margin: 4px 0 10px !important;
+  color: var(--font-color) !important;
+}
+
+#installAppModal .install-modal-card > p {
+  max-width: 360px !important;
+  margin: 0 auto 20px !important;
+  color: var(--muted-color) !important;
+  line-height: 1.45 !important;
+}
+
+/* Choice buttons layout */
+#installChoiceView {
+  display: grid !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+}
+
+#installChoiceView .main-btn {
+  min-height: 64px !important;
+  margin: 0 !important;
+  border-radius: 20px !important;
+  font-size: 1.08rem !important;
+  font-weight: 850 !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.12) !important;
+}
+
+#installChoiceView .main-btn .material-symbols-outlined {
+  font-size: 28px !important;
+  color: inherit !important;
+}
+
+/* Secondary installed button */
+#installChoiceView .small-btn {
+  min-height: 52px !important;
+  margin-top: 4px !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+  font-weight: 800 !important;
+}
+
+/* Maybe later text button */
+#installChoiceView .text-btn {
+  margin: 0 auto !important;
+  padding: 8px 12px !important;
+  color: var(--muted-color) !important;
+  text-decoration: none !important;
+  font-weight: 750 !important;
+}
+
+/* Install steps view */
+#installAppModal .install-steps {
+  margin-top: 10px !important;
+  text-align: left !important;
+}
+
+#installAppModal .install-steps h3 {
+  text-align: center !important;
+  font-size: 1.35rem !important;
+  font-weight: 900 !important;
+  margin: 0 0 14px !important;
+  color: var(--font-color) !important;
+}
+
+#installAppModal .install-steps ol {
+  margin: 0 0 18px !important;
+  padding: 14px 18px 14px 38px !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--secondary-color) 7%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+  line-height: 1.45 !important;
+}
+
+#installAppModal .install-steps li {
+  margin-bottom: 8px !important;
+}
+
+#installAppModal .install-steps li:last-child {
+  margin-bottom: 0 !important;
+}
+
+#installAppModal .install-steps .main-btn {
+  min-height: 58px !important;
+  margin: 10px 0 8px !important;
+  border-radius: 20px !important;
+  font-weight: 850 !important;
+}
+
+#installAppModal .install-steps .text-btn {
+  display: block !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  color: var(--muted-color) !important;
+  font-weight: 800 !important;
+}
+
+/* Close button placement */
+#installAppModal .modal-close {
+  top: 12px !important;
+  right: 14px !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)) !important;
+  color: var(--font-color) !important;
+}
+/* CENTER INSTALL MODAL BETTER */
+#installAppModal.modal-overlay {
+  align-items: center !important;
+  justify-content: center !important;
+  padding-top: max(18px, env(safe-area-inset-top)) !important;
+  padding-bottom: max(18px, env(safe-area-inset-bottom)) !important;
+}
+
+#installAppModal .install-modal-card {
+  margin: auto !important;
+  transform: translateY(-10px);
+}
+/* =========================================================
+   LESSON THEME SUPPORT
+========================================================= */
+
+.lesson-module,
+.lesson-block,
+.lesson-card,
+.lesson-content,
+.lesson-section,
+.lesson-example,
+.lesson-note,
+.lesson-tip,
+.lesson-warning,
+.lesson-box,
+.knowledge-check,
+.big-takeaway,
+.alphabet-reference-grid,
+.sound-grid,
+.cheat-sheet,
+.paradigm-table-wrapper,
+.paradigm-table,
+.interactive-box {
+  background: var(--card-color) !important;
+  border-color: var(--border-color) !important;
+  color: var(--font-color) !important;
+}
+
+/* Lesson headings */
+.lesson-module h1,
+.lesson-module h2,
+.lesson-module h3,
+.lesson-module h4,
+.lesson-block h1,
+.lesson-block h2,
+.lesson-block h3,
+.lesson-block h4 {
+  color: var(--font-color) !important;
+}
+
+/* Muted lesson helper text */
+.lesson-module p,
+.lesson-module li,
+.lesson-module span,
+.lesson-block p,
+.lesson-block li,
+.lesson-block span {
+  color: var(--font-color) !important;
+}
+
+/* Secondary lesson text */
+.lesson-note,
+.lesson-tip,
+.lesson-example small,
+.lesson-kicker,
+.lesson-subtitle {
+  color: var(--muted-color) !important;
+}
+
+/* Tables/paradigms */
+.paradigm-table th {
+  background: color-mix(
+    in srgb,
+    var(--secondary-color) 14%,
+    var(--card-color)
+  ) !important;
+
+  color: var(--font-color) !important;
+}
+
+.paradigm-table td {
+  background: var(--card-color) !important;
+  color: var(--font-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Knowledge checks */
+.knowledge-check button,
+.interactive-box button {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+/* WELCOME BACK MODAL */
+.welcome-back-card {
+  text-align: center;
+}
+
+.welcome-back-kicker {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, var(--card-color));
+  color: var(--muted-color);
+  font-weight: 850;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.welcome-back-card h2 {
+  font-size: 1.9rem !important;
+  letter-spacing: -0.05em;
+}
+
+.welcome-back-fact {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 20%, var(--border-color));
+}
+
+.welcome-back-fact p {
+  margin-bottom: 0;
+}
+/* CENTER WELCOME BACK + LOCKED FEATURE MODALS */
+#welcomeBackModal.modal-overlay,
+#lockedFeatureModal.modal-overlay {
+  align-items: center !important;
+  justify-content: center !important;
+  padding-top: max(16px, env(safe-area-inset-top)) !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+}
+
+#welcomeBackModal .modal-card,
+#lockedFeatureModal .modal-card {
+  margin: auto !important;
+  transform: translateY(-8px);
 }
