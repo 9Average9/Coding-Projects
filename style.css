@@ -6565,3 +6565,35 @@ body:not(.home-active) {
   margin: auto !important;
   transform: translateY(-8px);
 }
+/* ===== MODAL CENTERING + SIZE OVERRIDE ===== */
+
+.modal-overlay {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+}
+
+.modal-card,
+.learn-welcome-modal,
+.welcome-card {
+  max-width: 400px !important;
+  max-height: 72vh !important;
+
+  padding: 22px !important;
+
+  margin: auto !important;
+
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* ===== MOVE HOME CONTENT LOWER ===== */
+
+.header {
+  margin-top: 7vh !important;
+}
+
+#homeScreen {
+  margin-top: 4vh !important;
+}
