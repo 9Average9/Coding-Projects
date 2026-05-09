@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Basic Greek" />
 <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="stylesheet" href="style.css?v=27" />
+  <link rel="stylesheet" href="style.css?v=28" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 
@@ -5181,8 +5181,8 @@
 
   </main>
 
-  <script src="vocab.js?v=27"></script>
-  <script src="app.js?v=27"></script>
+  <script src="vocab.js?v=28"></script>
+  <script src="app.js?v=28"></script>
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
@@ -5213,29 +5213,44 @@ if ("serviceWorker" in navigator) {
         I already have it installed
       </button>
 
-      <button class="text-btn" onclick="hideInstallAppModal()">
-        Maybe later
-      </button>
+     <button class="text-btn" onclick="dismissInstallModalForever()">
+  Maybe later
+</button>
     </div>
 
     <div id="iphoneInstallSteps" class="install-steps hidden">
-      <h3>Install on iPhone</h3>
-      <ol>
-        <li>Open this page in Safari.</li>
-        <li>Tap the <strong>Share</strong> button.</li>
-        <li>Scroll and tap <strong>Add to Home Screen</strong>.</li>
-        <li>Tap <strong>Add</strong>.</li>
-        <li>Open Basic Greek from your Home Screen.</li>
-      </ol>
+  <h3>Install on iPhone</h3>
 
-      <button class="main-btn" onclick="dismissInstallModalForever()">
-        Got it
-      </button>
+  <div class="install-video-wrap">
+    <video
+      class="install-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      
+      preload="auto"
+    >
+      <source src="./iphone-install.mp4" type="video/mp4">
+    </video>
+  </div>
 
-      <button class="text-btn" onclick="backToInstallChoices()">
-        Back
-      </button>
-    </div>
+  <ol>
+    <li>Open this page in Safari.</li>
+    <li>Tap the <strong>Share</strong> button.</li>
+    <li>Scroll and tap <strong>Add to Home Screen</strong>.</li>
+    <li>Tap <strong>Add</strong>.</li>
+    <li>Open Basic Greek from your Home Screen.</li>
+  </ol>
+
+  <button class="main-btn" onclick="dismissInstallModalForever()">
+    Got it
+  </button>
+
+  <button class="text-btn" onclick="backToInstallChoices()">
+    Back
+  </button>
+</div>
 
     <div id="androidInstallSteps" class="install-steps hidden">
       <h3>Install on Android</h3>
