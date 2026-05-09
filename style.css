@@ -1466,7 +1466,7 @@ body.dark .lesson-section {
 
 
 
-/* 🔥 FORCE dark mode text override */
+/*  FORCE dark mode text override */
 body.dark {
   --font-color: #f3f4f6;
   --btn-text-color: #f8fafc;
@@ -1507,7 +1507,7 @@ body.dark .highlight {
   align-items: center;
   gap: 10px;
   margin-top: 10px;
-  flex-wrap: wrap;      /* 👈 prevents squeeze on small screens */
+  flex-wrap: wrap;      /*  prevents squeeze on small screens */
 }
 
 .answer-text {
@@ -2192,9 +2192,17 @@ body.dark .word-preview-grid div {
   opacity: 0.85;
 }
 
+/* ===== COMPLETED STATUS IMPROVEMENT ===== */
+
 .lesson-status.completed {
-  color: #15803d;
+  color: #22c55e;
+  font-weight: 700;
+  text-shadow:
+    0 0 2px rgba(255,255,255,0.9),
+    0 1px 3px rgba(0,0,0,0.45);
 }
+
+
 
 .lesson-check {
   display: inline-flex;
@@ -3114,7 +3122,7 @@ body.dark .lesson-cheat-strip:hover {
   }
 }
 
-/* 🔥 MODERN LESSON NAV BAR */
+/*  MODERN LESSON NAV BAR */
 
 #newLearnMenu .nav-bar {
   grid-template-columns: 52px 1fr 52px;
@@ -3132,7 +3140,7 @@ body.dark .lesson-cheat-strip:hover {
   gap: 4px;
 }
 
-/* 🔥 Lesson badge (now more modern) */
+/*  Lesson badge (now more modern) */
 .top-lesson-kicker {
   display: inline-flex;
   align-items: center;
@@ -3157,7 +3165,7 @@ body.dark .lesson-cheat-strip:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
-/* 🔥 Main title */
+/*  Main title */
 .top-lesson-title {
   display: block;
   font-size: 1.55rem;
@@ -3166,7 +3174,7 @@ body.dark .lesson-cheat-strip:hover {
   color: var(--font-color);
 }
 
-/* 🔥 Buttons (back + action) */
+/*  Buttons (back + action) */
 #newLearnMenu .icon-btn {
   width: 46px;
   height: 46px;
@@ -3227,7 +3235,7 @@ body.dark #newLearnMenu .icon-btn:hover {
   }
 }
 /* Bigger, more fun lesson navbar title */
-/* 🔥 Friendly, bold lesson header */
+/*  Friendly, bold lesson header */
 
 .top-lesson-kicker {
   display: inline-flex;
@@ -4407,16 +4415,22 @@ body.dark .paradigm-dots {
 .logos-chart {
   grid-template-columns: 1fr 0.8fr 1fr 1.4fr;
 }
-/* 🔥 FINAL modal size override */
+/* ===== CLEAN MODAL POSITIONING ===== */
+
+.modal-overlay {
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
 .modal-card {
-  max-height: 60vh !important;   /* controls height (boxes 3–6) */
+  max-height: min(82vh, 760px);
   overflow-y: auto;
 }
 
-/* keep it centered vertically */
-.modal-overlay {
- align-items: flex-start;
-padding-top: 12vh !important;
+/* alphabet + sound modal specific sizing */
+.alphabet-modal-card {
+  width: min(760px, 100%);
 }
 /* Lesson 3 Reading Marks */
 .mark-grid {
@@ -6596,4 +6610,641 @@ body:not(.home-active) {
 
 #homeScreen {
   margin-top: 4vh !important;
+}
+
+/* ===== LOWER XP BANNER / TOAST ===== */
+
+.xp-toast {
+  top: max(72px, calc(env(safe-area-inset-top) + 56px)) !important;
+}
+
+.xp-toast.open {
+  transform: translate(-50%, 0) !important;
+}
+
+.xp-toast:hover {
+  transform: translate(-50%, 2px) !important;
+}
+
+.color-dot.orange { background: #f97316; }
+.color-dot.pink { background: #ec4899; }
+
+.theme-preset.orange span { background: linear-gradient(135deg, #fff1e7, #ea580c); }
+.theme-preset.pink span { background: linear-gradient(135deg, #fff1f7, #db2777); }
+.theme-preset.teal span { background: linear-gradient(135deg, #ecfeff, #0f766e); }
+.theme-preset.sand span { background: linear-gradient(135deg, #f5ead7, #92400e); }
+
+/* ===== THEMED RESET BUTTON ===== */
+
+.danger-btn {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.14);
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.danger-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.18);
+}
+
+/* ===== REMOVE WEIRD BOX BEHIND ALPHABET/SOUND MODALS ===== */
+
+#newLearnMenu:has(.modal-overlay.open) {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+#alphabetModal,
+#alphabetModalLesson3,
+#soundModal {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(6px);
+}
+
+#alphabetModal .alphabet-modal-card,
+#alphabetModalLesson3 .alphabet-modal-card,
+#soundModal .alphabet-modal-card {
+  background: var(--card-color) !important;
+  border-radius: 24px !important;
+  overflow: hidden;
+}
+/* ===== FIX SHARP BOX BEHIND ALPHABET GRID ===== */
+
+#alphabetModal .alphabet-reference-grid,
+#alphabetModalLesson3 .alphabet-reference-grid,
+#soundModal .alphabet-reference-grid {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+/* ===== MORE SPACE BETWEEN DROPDOWNS ===== */
+
+.lesson-block {
+  margin-bottom: 22px !important;
+}
+
+.lesson-block:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ===== TRUE WIDE LESSON DROPDOWNS ===== */
+
+@media (max-width: 760px) {
+  body .app:has(#newLearnMenu.screen.active .learn-lesson.active) {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  body #newLearnMenu.screen.active:has(.learn-lesson.active) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body #newLearnMenu .learn-lesson.active,
+  body #newLearnMenu .learn-lesson.active .lesson-module {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  body #newLearnMenu .learn-lesson.active .lesson-block,
+  body #newLearnMenu .learn-lesson.active .complete-lesson-box,
+  body #newLearnMenu .learn-lesson.active .lesson-lead {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* =========================================================
+   LESSON THEME CLEANUP — REMOVE OLD PARCHMENT HARD-CODING
+   Put this at the VERY bottom of style.css
+========================================================= */
+
+body #newLearnMenu.screen.active {
+  background: transparent !important;
+  color: var(--font-color) !important;
+}
+
+/* Main lesson intro / lead card */
+body #newLearnMenu .lesson-lead {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--secondary-color) 7%, var(--card-color)),
+      var(--card-color)
+    ) !important;
+
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color) 24%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Lesson dropdown panels */
+body #newLearnMenu .lesson-block {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--secondary-color) 5%, var(--card-color)),
+      var(--card-color)
+    ) !important;
+
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color) 22%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Dropdown header area */
+body #newLearnMenu .lesson-block-header {
+  background:
+    color-mix(in srgb, var(--secondary-color) 12%, var(--card-color))
+    !important;
+
+  border-color:
+    color-mix(in srgb, var(--secondary-color) 25%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Open content area */
+body #newLearnMenu .lesson-block-content {
+  background: transparent !important;
+  color: var(--font-color) !important;
+}
+
+/* Highlight boxes */
+body #newLearnMenu .highlight,
+body #newLearnMenu .mini-example,
+body #newLearnMenu .lesson-interactive,
+body #newLearnMenu .complete-lesson-box {
+  background:
+    color-mix(in srgb, var(--secondary-color) 8%, var(--card-color))
+    !important;
+
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color) 22%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Inner cards/grids inside lessons */
+body #newLearnMenu .letter-card,
+body #newLearnMenu .word-preview-grid div,
+body #newLearnMenu .noun-example-grid div,
+body #newLearnMenu .role-grid div,
+body #newLearnMenu .ending-grid div,
+body #newLearnMenu .article-match-grid div,
+body #newLearnMenu .pattern-box div,
+body #newLearnMenu .sentence-breakdown div,
+body #newLearnMenu .sentence-stack div,
+body #newLearnMenu .challenge-card,
+body #newLearnMenu .english-swap-box,
+body #newLearnMenu .mark-card,
+body #newLearnMenu .reading-example-box div,
+body #newLearnMenu .chart-guide-item,
+body #newLearnMenu .case-chart-wrap,
+body #newLearnMenu .chart-row-label,
+body #newLearnMenu .ending-cell,
+body #newLearnMenu .chart-divider {
+  background:
+    color-mix(in srgb, var(--secondary-color) 6%, var(--card-color))
+    !important;
+
+  border-color:
+    color-mix(in srgb, var(--secondary-color) 22%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Muted lesson text */
+body #newLearnMenu small,
+body #newLearnMenu .mini-example,
+body #newLearnMenu .letter-card small,
+body #newLearnMenu .reading-example-box small,
+body #newLearnMenu .chart-guide-item span,
+body #newLearnMenu .chart-row-label small {
+  color: var(--muted-color) !important;
+}
+
+/* Greek/example text stays readable */
+body #newLearnMenu .greek-example,
+body #newLearnMenu .greek-text,
+body #newLearnMenu .practice-letter,
+body #newLearnMenu .letter-card strong,
+body #newLearnMenu .word-preview-grid strong,
+body #newLearnMenu .mark-card strong {
+  color: var(--font-color) !important;
+}
+
+/* Themed accent strip on interactives */
+body #newLearnMenu .lesson-interactive::before {
+  background: var(--secondary-color) !important;
+}
+
+/* Chart headers stay strongly themed */
+body #newLearnMenu .chart-head,
+body #newLearnMenu .lesson-kicker,
+body #newLearnMenu .complete-lesson-btn:not(:disabled) {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+/* ===== MINI EXAMPLES NO BACKGROUND ===== */
+
+body #newLearnMenu .mini-example {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+
+  font-style: italic;
+  opacity: 0.78;
+
+  display: inline-block;
+}
+
+/* ===== FINISH THEME CLEANUP FOR LESSON INNER CARDS ===== */
+
+body #newLearnMenu .takeaway-box,
+body #newLearnMenu .takeaway-step,
+body #newLearnMenu .check-card,
+body #newLearnMenu .check-answer,
+body #newLearnMenu .ending-info-box,
+body #newLearnMenu .triple-item,
+body #newLearnMenu .stem-build-box,
+body #newLearnMenu .stem-row,
+body #newLearnMenu .case-name-grid > div,
+body #newLearnMenu .cheat-list > div {
+  background:
+    color-mix(in srgb, var(--secondary-color) 6%, var(--card-color))
+    !important;
+
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color) 22%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+/* Slightly stronger containers */
+body #newLearnMenu .takeaway-box,
+body #newLearnMenu .ending-info-box,
+body #newLearnMenu .stem-build-box {
+  background:
+    color-mix(in srgb, var(--secondary-color) 9%, var(--card-color))
+    !important;
+}
+
+/* Muted text inside these boxes */
+body #newLearnMenu .takeaway-step span,
+body #newLearnMenu .check-card small,
+body #newLearnMenu .ending-info-box span,
+body #newLearnMenu .triple-item span,
+body #newLearnMenu .stem-row span,
+body #newLearnMenu .case-name-grid span,
+body #newLearnMenu .case-name-grid small,
+body #newLearnMenu .cheat-list span {
+  color: var(--muted-color) !important;
+}
+
+/* Strong text stays readable */
+body #newLearnMenu .takeaway-step strong,
+body #newLearnMenu .check-card strong,
+body #newLearnMenu .ending-info-box strong,
+body #newLearnMenu .triple-item strong,
+body #newLearnMenu .stem-row strong,
+body #newLearnMenu .case-name-grid strong,
+body #newLearnMenu .cheat-list strong {
+  color: var(--font-color) !important;
+}
+
+/* Check answer should stay hidden until revealed */
+body #newLearnMenu .check-answer {
+  display: none;
+}
+
+body #newLearnMenu .check-answer.visible {
+  display: block;
+}
+
+/* ===== FINAL LESSON THEME FIXES ===== */
+
+body #newLearnMenu .article-definition-box,
+body #newLearnMenu .mini-case-line,
+body #newLearnMenu .process-step {
+  background:
+    color-mix(in srgb, var(--secondary-color) 7%, var(--card-color))
+    !important;
+
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color) 22%, var(--border-color))
+    !important;
+
+  color: var(--font-color) !important;
+}
+
+body #newLearnMenu .article-definition-box p,
+body #newLearnMenu .article-definition-box li,
+body #newLearnMenu .mini-case-line span,
+body #newLearnMenu .mini-case-line small,
+body #newLearnMenu .process-step span {
+  color: var(--muted-color) !important;
+}
+
+body #newLearnMenu .article-definition-box strong,
+body #newLearnMenu .mini-case-line strong,
+body #newLearnMenu .process-step strong {
+  color: var(--font-color) !important;
+}
+
+/* Makes check-answer reveal work visually */
+body #newLearnMenu .check-answer {
+  display: none;
+}
+
+body #newLearnMenu .check-answer.visible {
+  display: block;
+}
+
+.check-answer.visible {
+  display: block;
+}
+
+/* ===== UNIVERSAL REVEAL ANSWER FIX ===== */
+
+.answer-text {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.answer-text.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.check-answer {
+  display: none;
+}
+
+.check-answer.visible,
+.check-card.revealed .check-answer {
+  display: block;
+}
+
+/* =========================================================
+   FINAL LESSON VISUAL CLEANUP
+   Important: small answer text stays SIMPLE
+========================================================= */
+
+/* Real content boxes: themed, but not harsh */
+body #newLearnMenu .article-definition-box,
+body #newLearnMenu .process-box,
+body #newLearnMenu .takeaway-box,
+body #newLearnMenu .ending-info-box,
+body #newLearnMenu .stem-build-box,
+body #newLearnMenu .triple-box,
+body #newLearnMenu .case-name-grid > div,
+body #newLearnMenu .letter-card,
+body #newLearnMenu .word-preview-grid div,
+body #newLearnMenu .mark-card,
+body #newLearnMenu .reading-example-box div,
+body #newLearnMenu .chart-guide-item,
+body #newLearnMenu .noun-example-grid div,
+body #newLearnMenu .role-grid div,
+body #newLearnMenu .ending-grid div,
+body #newLearnMenu .article-match-grid div,
+body #newLearnMenu .pattern-box div,
+body #newLearnMenu .sentence-breakdown div,
+body #newLearnMenu .sentence-stack div,
+body #newLearnMenu .challenge-card,
+body #newLearnMenu .read-chart-box,
+body #newLearnMenu .ending-piece,
+body #newLearnMenu .english-swap-box {
+  background: color-mix(in srgb, var(--secondary-color) 6%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+}
+
+/* Small/simple items: NO card look */
+body #newLearnMenu .check-answer,
+body #newLearnMenu .answer-text,
+body #newLearnMenu .mini-example,
+body #newLearnMenu .mini-case-line,
+body #newLearnMenu .process-step,
+body #newLearnMenu .mini-vocab-note {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--font-color) !important;
+}
+
+/* Spacing for simple reveal answers */
+body #newLearnMenu .check-answer {
+  display: none;
+  margin-top: 10px !important;
+  padding: 8px 0 0 !important;
+  line-height: 1.5;
+}
+
+body #newLearnMenu .check-answer.visible,
+body #newLearnMenu .check-card.revealed .check-answer {
+  display: block !important;
+}
+
+/* Normal inline answer-text reveal */
+body #newLearnMenu .answer-text {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  font-weight: 700;
+}
+
+body #newLearnMenu .answer-text.visible {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Simple muted helper text */
+body #newLearnMenu .mini-example,
+body #newLearnMenu .mini-vocab-note,
+body #newLearnMenu .mini-case-line span,
+body #newLearnMenu .mini-case-line small,
+body #newLearnMenu .process-step span {
+  color: var(--muted-color) !important;
+}
+
+/* Keep actual check-card lightly themed, but answer inside stays plain */
+body #newLearnMenu .check-card {
+  background: color-mix(in srgb, var(--secondary-color) 6%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+  border-radius: 14px !important;
+  padding: 14px !important;
+}
+
+/* Strong text remains readable */
+body #newLearnMenu strong,
+body #newLearnMenu .greek-text,
+body #newLearnMenu .greek-example,
+body #newLearnMenu .practice-letter {
+  color: var(--font-color) !important;
+}
+
+/* Softer muted text globally inside lesson cards */
+body #newLearnMenu small,
+body #newLearnMenu .letter-card small,
+body #newLearnMenu .word-preview-grid span,
+body #newLearnMenu .mark-card span,
+body #newLearnMenu .mark-card small,
+body #newLearnMenu .reading-example-box small {
+  color: var(--muted-color) !important;
+}
+
+/* ===== XP BANNER TEXT AWAY FROM X BUTTON ===== */
+
+.xp-toast {
+  padding-left: 56px !important;
+}
+
+.xp-toast strong,
+.xp-toast-title,
+.xp-toast-message {
+  display: block !important;
+  margin-left: 0 !important;
+}
+
+.xp-toast .modal-close,
+.xp-toast button,
+.xp-toast-close {
+  position: absolute !important;
+  left: 12px !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+/* ===== LESSON BUTTON TEXT READABILITY BOOST ===== */
+
+.learn-path-grid button {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Main lesson title */
+.learn-path-grid button strong {
+  color: rgba(255,255,255,0.98) !important;
+
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.32),
+    0 0 10px rgba(0,0,0,0.12);
+
+  letter-spacing: 0.2px;
+}
+
+/* Small subtitle text */
+.learn-path-grid button small {
+  color: rgba(255,255,255,0.82) !important;
+
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.24);
+
+  opacity: 1 !important;
+}
+
+/* Lesson number */
+.learn-path-grid .lesson-number {
+  color: rgba(255,255,255,0.98) !important;
+
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.28);
+}
+
+/* Lesson label under number */
+.learn-path-grid .lesson-label {
+  color: rgba(255,255,255,0.72) !important;
+
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.2);
+
+  opacity: 1 !important;
+}
+
+
+
+/* Slight glossy overlay for readability */
+.learn-path-grid button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.08),
+      transparent 40%
+    );
+
+  opacity: 0.7;
+}
+/* ===== EXACT LESSON BUTTON DESCRIPTION FIX ===== */
+
+body #newLearnMenu .learn-path-grid button .lesson-text small {
+  color: #ffffff !important;
+  opacity: 0.96 !important;
+  font-weight: 650 !important;
+
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.35),
+    0 0 6px rgba(0,0,0,0.18) !important;
+}
+/* Prevent modal content from overlapping close button */
+.modal-card {
+  padding-top: 58px;
+}
+
+.modal-card h2 {
+  padding-right: 42px;
+  line-height: 1.25;
+}
+
+.modal-close {
+  top: 16px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.04);
+  z-index: 5;
+}
+
+/* Dark mode */
+body.dark .modal-close {
+  background: rgba(255,255,255,0.06);
 }
