@@ -8602,7 +8602,55 @@ const APP_THEMES = {
     text: "#25291c",
     muted: "#62664b",
     buttonText: "#ffffff"
-  }
+  },
+orange: {
+  primary: "#fff1e7",
+  light: "#fff8f1",
+  secondary: "#ea580c",
+  accent: "#fb923c",
+  card: "rgba(255, 252, 247, 0.95)",
+  border: "#fed7aa",
+  text: "#2f1b0c",
+  muted: "#7c4a24",
+  buttonText: "#ffffff"
+},
+
+pink: {
+  primary: "#fff1f7",
+  light: "#fff8fb",
+  secondary: "#db2777",
+  accent: "#f472b6",
+  card: "rgba(255, 250, 253, 0.95)",
+  border: "#fbcfe8",
+  text: "#3b1025",
+  muted: "#7a294f",
+  buttonText: "#ffffff"
+},
+
+teal: {
+  primary: "#ecfeff",
+  light: "#f8ffff",
+  secondary: "#0f766e",
+  accent: "#2dd4bf",
+  card: "rgba(248, 255, 255, 0.95)",
+  border: "#99f6e4",
+  text: "#123532",
+  muted: "#3f6f68",
+  buttonText: "#ffffff"
+},
+
+sand: {
+  primary: "#f5ead7",
+  light: "#fffaf0",
+  secondary: "#92400e",
+  accent: "#d97706",
+  card: "rgba(255, 250, 240, 0.95)",
+  border: "#e7cda8",
+  text: "#2d2115",
+  muted: "#6b5a45",
+  buttonText: "#ffffff"
+}
+
 };
 
 function applyAppTheme(themeName) {
@@ -9138,11 +9186,7 @@ function handleLearnBack() {
   }
 }
 
-function revealAnswer(btn) {
-  event.stopPropagation(); // prevent lesson block toggle
-  const answer = btn.nextElementSibling;
-  answer.classList.add("visible");
-}
+
 function toggleLessonBlock(block) {
   const lesson = block.closest(".learn-lesson");
 
@@ -9186,7 +9230,7 @@ function markLessonBlockOpened(lessonSection, block) {
 
   if (blockIndex === -1) return;
 
-  // 👇 THIS makes the checkmark appear immediately
+  //  THIS makes the checkmark appear immediately
   block.classList.add("visited");
 
   if (!openedLessonBlocks[lessonId]) {
@@ -9330,27 +9374,42 @@ function resetLessonData() {
 }
 
 
-function revealAnswer(event, btn) {
-  event.stopPropagation();
+function revealAnswer(eventOrButton, maybeButton) {
+  const event = maybeButton ? eventOrButton : null;
+  const btn = maybeButton || eventOrButton;
 
-  // New Lesson 5 card-style checks
+  if (event && event.stopPropagation) {
+    event.stopPropagation();
+  }
+
+  if (!btn) return;
+
   const card = btn.closest(".check-card");
+  const answerRow = btn.closest(".answer-row");
+  const interactive = btn.closest(".lesson-interactive");
+
   if (card) {
     card.classList.add("revealed");
-    btn.textContent = "Revealed";
-    btn.disabled = true;
-    return;
+
+    const checkAnswer = card.querySelector(".check-answer");
+    if (checkAnswer) checkAnswer.classList.add("visible");
   }
 
-  // Normal older lesson answer rows
-  const answerRow = btn.closest(".answer-row");
-  const answer = answerRow ? answerRow.querySelector(".answer-text") : btn.nextElementSibling;
-
-  if (answer) {
-    answer.classList.add("visible");
-    btn.textContent = "Revealed";
-    btn.disabled = true;
+  if (answerRow) {
+    const answerText = answerRow.querySelector(".answer-text");
+    if (answerText) answerText.classList.add("visible");
   }
+
+  if (!card && !answerRow && interactive) {
+    const answer =
+      interactive.querySelector(".answer-text") ||
+      interactive.querySelector(".check-answer");
+
+    if (answer) answer.classList.add("visible");
+  }
+
+  btn.textContent = "Revealed";
+  btn.disabled = true;
 }
 function toggleAlphabetReference(event) {
   event.stopPropagation();
@@ -9476,6 +9535,50 @@ function showNounCheatSheet() {
   );
 }
 
+function showHowToReadCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 6 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        Use this as a quick reading checklist. Do not try to translate everything at once.
+        Slow down, find the pieces, then build the meaning.
+      </p>
+
+      <div class="cheat-list">
+        <div>
+          <strong>1. Find the verb</strong>
+          <span>Look for the main action or statement. Example: ἐστιν = is.</span>
+        </div>
+
+        <div>
+          <strong>2. Find the subject</strong>
+          <span>Ask: who or what is the sentence about?</span>
+        </div>
+
+        <div>
+          <strong>3. Group words together</strong>
+          <span>Article + noun usually belong together. Example: ὁ θεός = God.</span>
+        </div>
+
+        <div>
+          <strong>4. Notice endings</strong>
+          <span>Endings help show the word’s role in the sentence.</span>
+        </div>
+
+        <div>
+          <strong>5. Build the meaning</strong>
+          <span>Put the pieces together after you recognize them.</span>
+        </div>
+
+        <div>
+          <strong>Big rule</strong>
+          <span>Do not start with “What does the whole sentence mean?” Start with “What pieces do I recognize?”</span>
+        </div>
+      </div>
+    `
+  );
+}
+
 function updateLessonTopBar(lesson) {
   const title = document.getElementById("learnLessonTitle");
   const action = document.getElementById("learnTopAction");
@@ -9516,11 +9619,15 @@ function updateLessonTopBar(lesson) {
   action.innerHTML = `<span class="material-symbols-outlined">table_chart</span>`;
   action.title = "Paradigms";
   action.onclick = openParadigmModal;
+} else if (lesson === "howToRead") {
+  action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+  action.title = "Cheat Sheet";
+  action.onclick = showHowToReadCheatSheet;
 } else {
-    action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
-    action.title = "Info";
-    action.onclick = showLearnInfo;
-  }
+  action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
+  action.title = "Info";
+  action.onclick = showLearnInfo;
+}
 }
 
 function openCaseChartModal(event) {
@@ -9944,6 +10051,14 @@ function setProfileColor(color) {
   saveProfileData();
   updateProfileUI();
 }
+ 
+function openCustomProfileColor() {
+  const picker = document.getElementById("customProfileColorInput");
+  if (!picker) return;
+
+  picker.value = profileData.color || "#4f8cff";
+  picker.click();
+}
 
 function saveProfileData() {
   localStorage.setItem("profileData", JSON.stringify(profileData));
@@ -10356,37 +10471,37 @@ let achievements =
 
 const ACHIEVEMENT_DATA = {
   profileCreated: {
-    icon: "👤",
+    icon: "",
     title: "Profile Created",
     desc: "Started your Greek learning journey."
   },
   firstLesson: {
-    icon: "📘",
+    icon: "",
     title: "First Lesson Complete",
     desc: "Completed your first Greek lesson."
   },
   vocabUnlocked: {
-    icon: "🔓",
+    icon: "",
     title: "Vocab Unlocked",
     desc: "Completed the first three lessons."
   },
   allLessonsComplete: {
-    icon: "🎓",
+    icon: "",
     title: "Training Complete",
     desc: "Completed all beginner Greek lessons."
   },
   firstPerfectTest: {
-    icon: "🏆",
+    icon: "",
     title: "Perfect Test",
     desc: "Got every word right on a test."
   },
   firstVocabChapter: {
-    icon: "🧠",
+    icon: "",
     title: "First Vocab Chapter",
     desc: "Finished your first full vocab chapter."
   },
   firstFiveTranslations: {
-    icon: "✍️",
+    icon: "️",
     title: "Translation Starter",
     desc: "Completed 5 translation practices."
   }
@@ -10559,14 +10674,13 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.0.4";
+const APP_VERSION = "1.0.5";
 
 const UPDATE_NOTES = [
-  "Bugs and UX fixed",
-  "Basic Greek Trainer can now be installed to your Home Screen.",
-  "Added app-like display support for iPhone and Android.",
-  "Added offline support for core app files.",
-  "Added welcome Modal"
+  "Fixed the lesson UX",
+  "Bug fixes",
+  "Changed facts",
+  "Removed all emojis",
 ];
 
 let deferredInstallPrompt = null;
@@ -10706,6 +10820,19 @@ document.addEventListener("DOMContentLoaded", () => {
     checkForAppUpdateModal();
   }, 1000);
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateLessonCompletionUI();
+
+  REQUIRED_LESSONS.forEach(lessonId => {
+    updateCompleteLessonButton(lessonId);
+  });
+
+  updatePracticeToolLocks();
+});
+
+
 function closeSettingsMenu() {
   showScreen("homeScreen");
   showProfileMenu();
@@ -10735,73 +10862,120 @@ function openNewsFromProfile() {
 
 
  const BIBLE_GREEK_FACTS = [
-  "Matthew opens the New Testament by calling Jesus the Christ, the son of David, and the son of Abraham.",
-  "The Gospel of Mark is the shortest Gospel and often moves quickly from event to event.",
-  "Luke wrote both the Gospel of Luke and Acts, giving one connected account of Jesus’ ministry and the early church.",
-  "John’s Gospel begins by calling Jesus the λόγος, usually translated “the Word.”",
-  "Acts records the gospel spreading from Jerusalem outward, just as Jesus said in Acts 1:8.",
-  "Paul’s letters were written to real churches and people dealing with real-life doctrine and practice.",
-  "Romans gives one of the clearest explanations of sin, righteousness, faith, grace, and justification.",
-  "1 Corinthians shows that even gifted churches can still need serious correction and maturity.",
-  "Galatians strongly defends justification by faith apart from works of the Law.",
-  "Ephesians emphasizes the believer’s position in Christ and then applies that truth to daily living.",
-  "Philippians was written while Paul was imprisoned, yet it contains strong themes of joy and contentment.",
-  "Colossians emphasizes the supremacy and sufficiency of Christ.",
-  "1 and 2 Thessalonians include important teaching about Christ’s return and faithful living while waiting.",
-  "The Pastoral Epistles are letters to Timothy and Titus about ministry, doctrine, and church leadership.",
-  "Philemon is a short personal letter from Paul involving forgiveness, reconciliation, and a runaway servant.",
-  "Hebrews repeatedly shows Christ as better: better priest, better sacrifice, better covenant, and better hope.",
-  "James emphasizes living faith in action, especially through endurance, speech, wisdom, and care for others.",
-  "1 Peter encourages believers to remain faithful while suffering.",
-  "2 Peter warns against false teachers and points believers back to apostolic truth.",
-  "1 John uses repeated contrasts like light and darkness, truth and error, love and hatred.",
-  "Revelation begins with letters to seven real churches in Asia Minor.",
-  "The New Testament was written in Koine Greek, the common Greek of the ancient world.",
-  "The Greek word εὐαγγέλιον means good news or gospel.",
-  "The name Jesus comes from the Hebrew name Joshua, meaning the Lord saves.",
-  "Christ is not Jesus’ last name. Χριστός means Messiah or Anointed One.",
-  "The word ἐκκλησία, often translated church, means an assembly or called-out gathering.",
-  "The Greek word μαθητής means disciple or learner.",
-  "The Greek word ἀπόστολος means apostle or sent one.",
-  "The word χάρις means grace and is central to Paul’s explanation of salvation.",
-  "The word πίστις can mean faith, trust, belief, or faithfulness depending on context.",
-  "The Greek word κύριος means Lord or master and is frequently used for Jesus.",
-  "The word ἁμαρτία means sin and carries the idea of missing the mark or falling short.",
-  "The word δικαιοσύνη means righteousness and is a major theme in Romans.",
-  "Greek verbs often carry person and number, so the subject can sometimes be built into the verb ending.",
-  "Greek nouns use case endings to show how a word functions in a sentence.",
-  "The Greek question mark looks like this: ;",
-  "Final sigma has a special shape. Sigma is written σ normally, but ς at the end of a word.",
-  "Many New Testament letters were meant to be read aloud to churches.",
-  "The book of Acts connects the ministry of Jesus in the Gospels to the spread of the church through the apostles.",
-  "The New Testament includes narrative, letters, prophecy, sermons, prayers, hymns, and teaching sections.",
-  "Jesus often taught with parables, which used everyday scenes to communicate spiritual truth.",
-  "The word baptize comes from the Greek βαπτίζω.",
-  "The word angel comes from the Greek ἄγγελος, meaning messenger.",
-  "The word evangelist is related to the Greek word for gospel or good news.",
-  "The phrase in Christ is one of Paul’s major ways of describing the believer’s position and identity.",
-  "The Gospels are not random collections of stories; each writer arranged material to communicate truth about Jesus.",
-  "John tells readers his purpose clearly: that they may believe Jesus is the Christ, the Son of God.",
-  "Luke says he investigated things carefully so Theophilus could know the certainty of what he had been taught.",
-  "Many Old Testament quotations in the New Testament are taken from the Greek translation known as the Septuagint.",
-  "Repetition is important in the New Testament. Repeated words often show themes the author wants you to notice.",
-  "The word amen comes from Hebrew, but it appears often in the Greek New Testament as a strong affirmation.",
-  "The word parable comes from Greek and has the idea of placing something alongside something else for comparison.",
-  "The Greek word δοῦλος means servant or slave and appears often in the New Testament.",
-  "The Greek word ζωή means life and is especially important in John’s writings.",
-  "The Greek word φῶς means light and is used strongly in John’s Gospel and letters.",
-  "The Greek word κόσμος means world and can refer to the created world, humanity, or the world system depending on context.",
-  "The Greek word μένω means remain or abide and is important in John 15.",
-  "The New Testament letters usually begin with the sender, recipients, and a greeting.",
-  "Paul often opens his letters with grace and peace.",
-  "The book of Revelation is written to reveal, not hide, the victory and return of Jesus Christ.",
-  "The Greek word μακάριος means blessed and appears in the Beatitudes.",
-  "The Greek word μετάνοια is often translated repentance and has the idea of a change of mind.",
-  "The Greek word ἀλήθεια means truth and is especially prominent in John’s writings.",
-  "The Greek word πνεῦμα can mean spirit, wind, or breath depending on context.",
-  "The Greek word σάρξ means flesh and can refer to the body, humanity, or fallen human weakness depending on context.",
-  "The Greek word καρδία means heart and often refers to the inner person, not merely emotions.",
-  "The New Testament was written to be understood by ordinary people, even though some passages require careful study."
+   "Matthew begins the New Testament with a genealogy connecting Jesus to Abraham and David.",
+  "Mark is the shortest Gospel and frequently uses words like immediately to keep the narrative moving quickly.",
+  "Luke and Acts were written by the same author and form one continuous historical account.",
+  "John begins his Gospel before creation itself: In the beginning was the Word.",
+  "Each Gospel ends with the resurrection of Jesus Christ.",
+  "Only Matthew mentions the wise men visiting Jesus.",
+  "Only Luke records the parable of the prodigal son.",
+  "Only John records Jesus turning water into wine.",
+  "Jesus asked over 300 questions throughout the Gospels.",
+  "The shortest verse in many English Bibles is Jesus wept in John 11:35.",
+  "Pilate asked Jesus, What is truth? in John 18.",
+  "Jesus wrote directly on the ground only one recorded time in Scripture.",
+  "The Sermon on the Mount spans Matthew chapters 5 through 7.",
+  "The Beatitudes begin with the word blessed repeated multiple times.",
+  "Jesus often taught using ordinary objects like seeds, lamps, bread, fish, coins, and vineyards.",
+  "Many parables begin with phrases like The kingdom of heaven is like...",
+  "Jesus calmed a storm simply by speaking.",
+  "Jesus fed thousands with a few loaves and fish more than once.",
+  "Peter walked on water briefly before beginning to sink.",
+  "Jesus slept during a violent storm while experienced fishermen panicked.",
+  "The disciples sometimes misunderstood Jesus even after witnessing miracles.",
+  "Thomas is remembered for doubting, yet later directly called Jesus My Lord and my God.",
+  "Judas Iscariot was one of the twelve disciples before betraying Jesus.",
+  "The rooster crowing became a permanent reminder of Peter denying Jesus three times.",
+  "The Gospels record women being the first witnesses of the resurrection.",
+  "Jesus appeared to over 500 people after His resurrection according to 1 Corinthians 15.",
+  "Acts begins where the Gospel accounts end: after the resurrection.",
+  "Acts 1:8 gives the geographic movement of the whole book: Jerusalem, Judea, Samaria, and the ends of the earth.",
+  "The Day of Pentecost in Acts 2 involved people hearing the message in their own languages.",
+  "Paul was originally known as Saul.",
+  "Paul’s conversion happened while traveling to Damascus.",
+  "Paul wrote letters from prison that still strongly emphasize joy and hope.",
+  "Philippians repeatedly mentions joy even though Paul was imprisoned.",
+  "Romans is Paul’s longest letter in the New Testament.",
+  "Philemon is Paul’s shortest surviving letter.",
+  "1 Corinthians deals with real church problems like division, pride, lawsuits, and misuse of spiritual gifts.",
+  "Galatians was written with such urgency that Paul said even an angel should not preach a different gospel.",
+  "Ephesians describes believers as the body of Christ.",
+  "Hebrews contains many comparisons showing Christ is better.",
+  "James uses vivid imagery like a ship rudder, wildfire, mirror, and vapor.",
+  "Revelation begins with letters addressed to seven real churches.",
+  "The final chapter of the New Testament ends with Jesus saying, Surely I am coming quickly.",
+  "The first words of Jesus recorded in Matthew are Follow Me.",
+  "The final prayer of the Bible is Even so, come, Lord Jesus.",
+  "Jesus quoted the Old Testament frequently during His ministry.",
+  "During temptation in the wilderness, Jesus answered Satan with Scripture each time.",
+  "The New Testament contains history, letters, prophecy, songs, prayers, sermons, and eyewitness testimony.",
+  "Many New Testament letters were intended to be read aloud publicly.",
+  "Paul sometimes used scribes to help write his letters.",
+  "Several New Testament writers directly identified themselves by name in their openings.",
+  "Luke specifically says he carefully investigated eyewitness accounts.",
+  "John says he wrote his Gospel so people would believe Jesus is the Christ.",
+  "The Gospel of John records seven major sign miracles before the resurrection.",
+  "John also records several I AM statements from Jesus.",
+  "The phrase fear not appears repeatedly when angels speak to people.",
+  "Jesus often withdrew to pray before major moments.",
+  "The Mount of Olives appears repeatedly during the final week before the crucifixion.",
+  "Jesus was crucified between two criminals.",
+  "One criminal mocked Jesus while the other defended Him.",
+  "The temple veil tore from top to bottom after Jesus died.",
+  "Roman soldiers cast lots for Jesus’ clothing.",
+  "After the resurrection, some disciples initially failed to recognize Jesus.",
+  "The road to Emmaus account shows Jesus explaining Scripture about Himself.",
+  "Acts records multiple imprisonments, trials, shipwrecks, and rescue events.",
+  "Paul survived a shipwreck and then a snake bite in Acts 28.",
+  "The Bereans were praised for checking Scripture daily.",
+  "The book of Acts ends with Paul preaching in Rome.",
+  "Not every apostle wrote a New Testament book.",
+  "The New Testament contains 27 books.",
+  "Four different men wrote Gospel accounts about Jesus.",
+  "Luke was not one of the twelve apostles.",
+  "Mark closely associated with Peter according to early church history.",
+  "The New Testament repeatedly uses eyewitness language like we saw and we heard.",
+  "The word gospel literally means good news.",
+  "Christ means Messiah or Anointed One.",
+  "Jesus means The Lord saves.",
+  "The name Emmanuel means God with us.",
+  "The title Son of Man is one of Jesus’ favorite ways to refer to Himself.",
+  "The title Lamb of God first appears in John chapter 1.",
+  "John the Baptist said Jesus must increase, but I must decrease.",
+  "Jesus called fishermen, tax collectors, and ordinary workers to follow Him.",
+  "Matthew was a tax collector before becoming a disciple.",
+  "Zacchaeus climbed a tree just to see Jesus.",
+  "Nicodemus came to Jesus at night.",
+  "Lazarus had already been dead four days before Jesus raised him.",
+  "Jesus cursed a fig tree shortly before entering Jerusalem.",
+  "Children were specifically welcomed by Jesus.",
+  "Jesus washed the disciples’ feet during the final supper.",
+  "The disciples argued about who was greatest even near the end of Jesus’ ministry.",
+  "Peter cut off a servant’s ear during Jesus’ arrest.",
+  "Jesus healed that servant’s ear immediately afterward.",
+  "Pilate publicly washed his hands before the crowd.",
+  "Barabbas was released instead of Jesus.",
+  "The inscription above Jesus’ cross identified Him as King of the Jews.",
+  "After the resurrection, Jesus cooked food for disciples by the sea.",
+  "The final chapter of John ends mentioning there were many more things Jesus did that were not written down.",
+  "Paul frequently used athletic imagery like running races and fighting battles.",
+  "Paul compared the church to a human body with many members.",
+  "James says the tongue can direct a life like a rudder directs a ship.",
+  "Peter described Satan as a roaring lion seeking someone to devour.",
+  "John frequently contrasts light and darkness.",
+  "Revelation describes a future city with no need for the sun because God gives it light.",
+  "The final word in many English New Testaments is Amen.",
+  "Jesus is directly called both the Alpha and Omega in Revelation.",
+  "The New Testament begins with a genealogy and ends with a promise of Jesus’ return.",
+  "The very first public command of Jesus in Matthew is repent.",
+  "The final command of Jesus in Matthew is to make disciples of all nations.",
+  "Paul named many ordinary believers individually throughout his letters.",
+  "The book of Acts contains multiple speeches and sermons preserved in detail.",
+  "Jesus frequently used questions to teach people rather than only giving direct answers.",
+  "Some people followed Jesus for miracles while others followed for truth.",
+  "The Pharisees and Sadducees often disagreed with each other even while opposing Jesus.",
+  "The resurrection is emphasized in every Gospel account.",
+  "The empty tomb is one of the central turning points of the New Testament."
 ];
 
 
