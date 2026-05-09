@@ -10700,9 +10700,23 @@ function registerServiceWorker() {
   }
 }
 
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function shouldShowInstallModal() {
   const dismissed = localStorage.getItem("installPromptDismissed") === "true";
-  return !isRunningAsInstalledApp() && !dismissed;
+
+  return (
+    isMobileDevice() &&
+    !isRunningAsInstalledApp() &&
+    !dismissed
+  );
+}
+
+function closeInstallAppModal(event) {
+  // Do nothing.
+  // This prevents the modal from closing when someone accidentally taps outside it.
 }
 
 function showInstallAppModal() {
@@ -10720,11 +10734,6 @@ function hideInstallAppModal() {
   modal.classList.remove("open");
 }
 
-function closeInstallAppModal(event) {
-  if (event.target.id === "installAppModal") {
-    hideInstallAppModal();
-  }
-}
 
 function showInstallSteps(device) {
   const choiceView = document.getElementById("installChoiceView");
