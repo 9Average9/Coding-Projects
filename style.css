@@ -7248,3 +7248,22 @@ body #newLearnMenu .learn-path-grid button .lesson-text small {
 body.dark .modal-close {
   background: rgba(255,255,255,0.06);
 }
+
+.install-video-wrap {
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto 16px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color));
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+.install-video {
+  width: 100%;
+  display: block;
+  max-height: 420px;
+  object-fit: contain;
+  background: #000;
+}
