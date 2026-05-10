@@ -11322,6 +11322,17 @@ window.addEventListener("resize", updateModalScrollHints);
 window.addEventListener("scroll", updateModalScrollHints);
 
 
+
+
+
+
+
+
+
+
+
+
+
 async function testNotifications() {
   window.OneSignalDeferred = window.OneSignalDeferred || [];
 
@@ -11340,3 +11351,28 @@ async function testNotifications() {
     }
   });
 }
+window.testNotifications = async function () {
+  alert("Test button clicked");
+
+  if (!window.OneSignalDeferred) {
+    alert("OneSignalDeferred is missing");
+    return;
+  }
+
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    alert("OneSignal loaded");
+
+    try {
+      const permissionBefore = OneSignal.Notifications.permission;
+      alert("Permission before: " + permissionBefore);
+
+      await OneSignal.Notifications.requestPermission();
+
+      const permissionAfter = OneSignal.Notifications.permission;
+      alert("Permission after: " + permissionAfter);
+    } catch (e) {
+      console.error(e);
+      alert("Notification error: " + e.message);
+    }
+  });
+};
