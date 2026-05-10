@@ -11379,22 +11379,41 @@ async function enablePushNotifications() {
     try {
       await OneSignal.Notifications.requestPermission();
 
-      const permission = OneSignal.Notifications.permission;
+      const permission = OneSignal.Notifications.permission === true;
 
-      if (permission === true) {
-        localStorage.setItem("pushNotificationsEnabled", "true");
-        localStorage.removeItem("notificationPromptDismissed");
-        hideNotificationPromptModal();
+      if (!permission) {
+        localStorage.setItem("pushNotificationsEnabled", "false");
         updateNotificationButtonUI();
-        alert("Notifications enabled!");
-      } else {
         alert("Notifications were not enabled.");
+        return;
       }
+
+      await OneSignal.User.PushSubscription.optIn();
+
+      setTimeout(async () => {
+        const optedIn = OneSignal.User.PushSubscription.optedIn === true;
+        const subscriptionId = OneSignal.User.PushSubscription.id;
+
+        console.log("OneSignal opted in:", optedIn);
+        console.log("OneSignal subscription ID:", subscriptionId);
+
+        if (optedIn && subscriptionId) {
+          localStorage.setItem("pushNotificationsEnabled", "true");
+          localStorage.removeItem("notificationPromptDismissed");
+          hideNotificationPromptModal();
+          updateNotificationButtonUI();
+          alert("Notifications enabled!");
+        } else {
+          localStorage.setItem("pushNotificationsEnabled", "false");
+          updateNotificationButtonUI();
+          alert("Permission was allowed, but OneSignal did not finish subscribing this device yet.");
+        }
+      }, 1500);
+
     } catch (error) {
       console.error("Notification permission error:", error);
       alert("Notifications could not be enabled on this device.");
     }
   });
 }
-
 
