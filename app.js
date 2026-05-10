@@ -10967,7 +10967,7 @@ function closeUpdateModal(event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   registerServiceWorker();
-
+syncOneSignalPushState();
   setTimeout(() => {
     if (shouldShowInstallModal()) {
       showInstallAppModal();
@@ -11368,7 +11368,6 @@ async function disablePushNotifications() {
 }
 
 
-
 async function enablePushNotifications() {
   if (!window.OneSignalDeferred) {
     alert("Notifications are still loading. Try again in a moment.");
@@ -11379,35 +11378,9 @@ async function enablePushNotifications() {
     try {
       await OneSignal.Notifications.requestPermission();
 
-      const permission = OneSignal.Notifications.permission === true;
+      const permission = OneSignal.Notifications.permission;
 
-      if (!permission) {
-        localStorage.setItem("pushNotificationsEnabled", "false");
-        updateNotificationButtonUI();
-        alert("Notifications were not enabled.");
-        return;
-      }
-
-      await OneSignal.User.PushSubscription.optIn();
-
-      let optedIn = false;
-      let subscriptionId = null;
-
-      for (let i = 0; i < 10; i++) {
-        optedIn = OneSignal.User.PushSubscription.optedIn === true;
-        subscriptionId = OneSignal.User.PushSubscription.id;
-
-        console.log("OneSignal check", i + 1, {
-          optedIn,
-          subscriptionId
-        });
-
-        if (optedIn && subscriptionId) break;
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
-      if (optedIn && subscriptionId) {
+      if (permission === true) {
         localStorage.setItem("pushNotificationsEnabled", "true");
         localStorage.removeItem("notificationPromptDismissed");
         hideNotificationPromptModal();
@@ -11416,20 +11389,42 @@ async function enablePushNotifications() {
       } else {
         localStorage.setItem("pushNotificationsEnabled", "false");
         updateNotificationButtonUI();
-
-        console.warn("OneSignal did not finish subscribing.", {
-          permission,
-          optedIn,
-          subscriptionId
-        });
-
-        alert("Permission was allowed, but OneSignal did not finish subscribing this device yet.");
+        alert("Notifications were not enabled.");
       }
-
     } catch (error) {
       console.error("Notification permission error:", error);
       alert("Notifications could not be enabled on this device.");
     }
   });
 }
+
+function syncOneSignalPushState() {
+  if (!window.OneSignalDeferred) return;
+
+  window.OneSignalDeferred.push(function (OneSignal) {
+    try {
+      const permission = OneSignal.Notifications.permission === true;
+      const optedIn = OneSignal.User.PushSubscription.optedIn === true;
+
+      const enabled = permission && optedIn;
+
+      localStorage.setItem("pushNotificationsEnabled", enabled ? "true" : "false");
+      updateNotificationButtonUI();
+
+      OneSignal.User.PushSubscription.addEventListener("change", function (event) {
+        const nowEnabled =
+          OneSignal.Notifications.permission === true &&
+          event.current.optedIn === true;
+
+        localStorage.setItem("pushNotificationsEnabled", nowEnabled ? "true" : "false");
+        updateNotificationButtonUI();
+
+        console.log("OneSignal subscription changed:", event.current);
+      });
+    } catch (error) {
+      console.warn("Could not sync OneSignal push state:", error);
+    }
+  });
+}
+
 
