@@ -1,11 +1,11 @@
-const CACHE_NAME = "basic-greek-trainer-v1.0.7";
+const CACHE_NAME = "basic-greek-trainer-v1.1.1";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=26",
-  "./vocab.js?v=26",
-  "./app.js?v=26",
+  "./style.css?v=35",
+  "./vocab.js?v=35",
+  "./app.js?v=35",
   "./manifest.json",
  "./icon-192.png",
 "./icon-512.png"
@@ -46,11 +46,19 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const responseClone = response.clone();
+        const shouldCache =
+          response &&
+          response.status === 200 &&
+          response.type === "basic" &&
+          !event.request.url.endsWith(".mp4");
 
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
+        if (shouldCache) {
+          const responseClone = response.clone();
+
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
 
         return response;
       })
