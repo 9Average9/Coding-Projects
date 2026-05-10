@@ -10813,7 +10813,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.1.2";
+const APP_VERSION = "1.1.3";
 
 const UPDATE_NOTES = [
  "added iphone push notifications",
