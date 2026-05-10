@@ -8649,8 +8649,128 @@ sand: {
   text: "#2d2115",
   muted: "#6b5a45",
   buttonText: "#ffffff"
-}
+},
 
+
+moss: {
+  primary: "#ddebd7",
+  light: "#f5fbf1",
+  secondary: "#355e3b",
+  accent: "#e3b341",
+  card: "rgba(247,252,244,0.95)",
+  border: "#9fbc9c",
+  text: "#1d2b20",
+  muted: "#5f7362",
+  buttonText: "#ffffff"
+},
+
+storm: {
+  primary: "#d6dde8",
+  light: "#f3f6fb",
+  secondary: "#334155",
+  accent: "#60a5fa",
+  card: "rgba(248,251,255,0.94)",
+  border: "#aebed3",
+  text: "#18222d",
+  muted: "#586575",
+  buttonText: "#ffffff"
+},
+
+coffee: {
+  primary: "#f2e3d5",
+  light: "#fff8f2",
+  secondary: "#7b4b2a",
+  accent: "#f59e0b",
+  card: "rgba(255,250,244,0.95)",
+  border: "#d8b89a",
+  text: "#2d1e15",
+  muted: "#725747",
+  buttonText: "#ffffff"
+},
+
+forest: {
+  primary: "#d9f0e2",
+  light: "#f4fcf7",
+  secondary: "#14532d",
+  accent: "#34d399",
+  card: "rgba(246,253,248,0.95)",
+  border: "#8cc7a3",
+  text: "#173126",
+  muted: "#557566",
+  buttonText: "#ffffff"
+},
+
+obsidian: {
+  primary: "#151821",
+  light: "#1f2430",
+  secondary: "#0b1120",
+  accent: "#facc15",
+  card: "rgba(26,30,40,0.97)",
+  border: "#374151",
+  text: "#f9fafb",
+  muted: "#9ca3af",
+  buttonText: "#ffffff"
+},
+
+wine: {
+  primary: "#f8e4ea",
+  light: "#fff5f7",
+  secondary: "#881337",
+  accent: "#fb7185",
+  card: "rgba(255,248,250,0.95)",
+  border: "#efb6c3",
+  text: "#3b1020",
+  muted: "#7b4a59",
+  buttonText: "#ffffff"
+},
+
+ocean: {
+  primary: "#dff4fb",
+  light: "#f4fcff",
+  secondary: "#0369a1",
+  accent: "#38bdf8",
+  card: "rgba(247,253,255,0.95)",
+  border: "#93d5ec",
+  text: "#123040",
+  muted: "#4f7282",
+  buttonText: "#ffffff"
+},
+
+charcoal: {
+  primary: "#23272f",
+  light: "#313641",
+  secondary: "#111827",
+  accent: "#f97316",
+  card: "rgba(35,39,47,0.97)",
+  border: "#4b5563",
+  text: "#f8fafc",
+  muted: "#cbd5e1",
+  buttonText: "#ffffff"
+},
+
+antique: {
+  primary: "#f4e7cf",
+  light: "#fffaf0",
+  secondary: "#8b5e34",
+  accent: "#d97706",
+  card: "rgba(255,251,243,0.95)",
+  border: "#dcc29a",
+  text: "#332417",
+  muted: "#74614b",
+  buttonText: "#ffffff"
+},
+
+glacier: {
+  primary: "#e3f3ff",
+  light: "#f6fbff",
+  secondary: "#2563eb",
+  accent: "#7dd3fc",
+  card: "rgba(250,254,255,0.95)",
+  border: "#abd8f0",
+  text: "#172b3a",
+  muted: "#5e7685",
+  buttonText: "#ffffff"
+}
 };
 
 function applyAppTheme(themeName) {
@@ -8687,7 +8807,7 @@ function setAppTheme(themeName) {
 
 // load saved preference
 window.addEventListener("load", () => {
-  const savedTheme = localStorage.getItem("appTheme") || "parchment";
+  const savedTheme = localStorage.getItem("appTheme") || "royal";
   const isDark = savedTheme === "midnight";
 
   const toggle = document.getElementById("darkModeToggle");
@@ -8731,6 +8851,8 @@ function showInfoModal() {
 function hideInfoModal() {
   const modal = document.getElementById("infoModal");
   if (modal) modal.classList.remove("open");
+
+  updateProfileAttention();
 }
 
 function closeInfoModal(event) {
@@ -9958,7 +10080,7 @@ function closeVocabUnlockedModal(event) {
 let profileData = JSON.parse(localStorage.getItem("profileData")) || {
   firstName: "",
   lastName: "",
-  color: "#4f8cff",
+  color: "#d4a93a",
   xp: 0,
   isCreated: false,
   greekExperience: "new"
@@ -9968,6 +10090,7 @@ function showProfileMenu() {
   updateProfileUI();
 
   document.getElementById("profileModal")?.classList.add("open");
+
 }
 
 function hideProfileMenu() {
@@ -10013,7 +10136,7 @@ function saveProfileName() {
   unlockAchievement("profileCreated");
   saveProfileData();
   updateProfileUI();
-
+updateProfileAttention();
   const message = document.getElementById("profileValidationMessage");
   if (message) message.remove();
 }
@@ -10238,14 +10361,20 @@ function openSettingsFromProfile() {
 function updateProfileAttention() {
   const profileBtn = document.getElementById("profileButton");
   const profileNewsBadge = document.getElementById("profileNewsBadge");
+  const profileFocusOverlay = document.getElementById("profileFocusOverlay");
 
   if (!profileBtn) return;
 
-  const needsProfile = !profileData.isCreated;
+  const needsProfile = profileData?.isCreated !== true;
   const hasUnreadUpdate = localStorage.getItem("hasUnreadUpdate") === "true";
 
   profileBtn.classList.toggle("profile-attention", needsProfile);
+  profileBtn.classList.toggle("profile-pulse", needsProfile);
   profileBtn.classList.toggle("has-news-update", hasUnreadUpdate);
+
+  if (profileFocusOverlay) {
+    profileFocusOverlay.classList.toggle("hidden", !needsProfile);
+  }
 
   if (profileNewsBadge) {
     profileNewsBadge.classList.toggle("hidden", !hasUnreadUpdate);
@@ -10471,42 +10600,47 @@ let achievements =
 
 const ACHIEVEMENT_DATA = {
   profileCreated: {
-    icon: "",
+    icon: "👤",
     title: "Profile Created",
     desc: "Started your Greek learning journey."
   },
+
   firstLesson: {
-    icon: "",
+    icon: "📘",
     title: "First Lesson Complete",
     desc: "Completed your first Greek lesson."
   },
+
   vocabUnlocked: {
-    icon: "",
+    icon: "📚",
     title: "Vocab Unlocked",
     desc: "Completed the first three lessons."
   },
+
   allLessonsComplete: {
-    icon: "",
+    icon: "🏛️",
     title: "Training Complete",
     desc: "Completed all beginner Greek lessons."
   },
+
   firstPerfectTest: {
-    icon: "",
+    icon: "🎯",
     title: "Perfect Test",
     desc: "Got every word right on a test."
   },
+
   firstVocabChapter: {
-    icon: "",
+    icon: "📝",
     title: "First Vocab Chapter",
     desc: "Finished your first full vocab chapter."
   },
+
   firstFiveTranslations: {
-    icon: "️",
+    icon: "🔤",
     title: "Translation Starter",
     desc: "Completed 5 translation practices."
   }
 };
-
 function unlockAchievement(id) {
   if (achievements.includes(id)) return;
 
@@ -10534,7 +10668,11 @@ function renderAchievements() {
   if (!list) return;
 
   if (achievements.length === 0) {
-    list.innerHTML = `<div class="no-achievements">No major achievements yet.</div>`;
+    list.innerHTML = `<div class="achievement-icon">
+  <span class="material-symbols-outlined achievement-symbol">
+    ${item.icon}
+  </span>
+</div>`;
     return;
   }
 
@@ -10674,14 +10812,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.0.6";
+const APP_VERSION = "1.0.7";
 
 const UPDATE_NOTES = [
-  "added video",
-  "Fixed the lesson UX",
+  "added scroll icon",
+"streamlined android download",
   "Bug fixes",
-  "Changed facts",
-  "Removed all emojis",
 ];
 
 let deferredInstallPrompt = null;
@@ -10829,6 +10965,16 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     checkForAppUpdateModal();
   }, 1000);
+
+  const tryAppBtn = document.getElementById("tryAppVersionBtn");
+
+  if (tryAppBtn) {
+    const shouldShow =
+      isMobileDevice() &&
+      !isRunningAsInstalledApp();
+
+    tryAppBtn.classList.toggle("hidden", !shouldShow);
+  }
 });
 
 
@@ -11077,3 +11223,100 @@ window.addEventListener("pagehide", () => {
 
   localStorage.setItem("lastSessionLength", sessionLength.toString());
 });
+
+function openInstallModalFromProfile() {
+  showInstallAppModal();
+}
+
+function showProfileFocus() {
+  const overlay = document.getElementById("profileFocusOverlay");
+  const profileBtn = document.getElementById("profileButton");
+
+  overlay?.classList.remove("hidden");
+  profileBtn?.classList.add("profile-pulse");
+}
+
+function hideProfileFocus() {
+  const overlay = document.getElementById("profileFocusOverlay");
+  const profileBtn = document.getElementById("profileButton");
+
+  overlay?.classList.add("hidden");
+  profileBtn?.classList.remove("profile-pulse");
+}
+
+function completeProfileFocusIfProfileMade() {
+  if (profileData?.isCreated === true) {
+    hideProfileFocus();
+    localStorage.setItem("hasSeenProfileFocus", "true");
+  }
+}
+function getModalScrollArrow() {
+  let arrow = document.getElementById("modalScrollArrow");
+
+  if (!arrow) {
+    arrow = document.createElement("div");
+    arrow.id = "modalScrollArrow";
+    arrow.textContent = "↓";
+    document.body.appendChild(arrow);
+  }
+
+  return arrow;
+}
+
+function updateModalScrollHints() {
+  const arrow = getModalScrollArrow();
+  const openModal = document.querySelector(".modal-overlay.open .modal-card");
+
+  if (!openModal) {
+    arrow.classList.remove("visible");
+    return;
+  }
+
+
+const modalObserver = new MutationObserver(() => {
+  setTimeout(updateModalScrollHints, 80);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".modal-overlay").forEach(modal => {
+    modalObserver.observe(modal, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+  });
+
+  updateModalScrollHints();
+});
+
+  const isScrollable = openModal.scrollHeight > openModal.clientHeight + 8;
+  const atBottom =
+    openModal.scrollTop + openModal.clientHeight >= openModal.scrollHeight - 12;
+
+  if (!isScrollable || atBottom) {
+    arrow.classList.remove("visible");
+    return;
+  }
+
+  const rect = openModal.getBoundingClientRect();
+
+  arrow.style.left = `${rect.right - 26}px`;
+  arrow.style.top = `${rect.bottom - 40}px`;
+  arrow.classList.add("visible");
+
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".modal-card").forEach(card => {
+    card.addEventListener("scroll", updateModalScrollHints);
+  });
+
+  updateModalScrollHints();
+});
+
+document.addEventListener("click", () => {
+  setTimeout(updateModalScrollHints, 60);
+});
+
+window.addEventListener("resize", updateModalScrollHints);
+window.addEventListener("scroll", updateModalScrollHints);
