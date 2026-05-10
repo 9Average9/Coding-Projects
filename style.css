@@ -7267,3 +7267,459 @@ body.dark .modal-close {
   object-fit: contain;
   background: #000;
 }
+.profile-focus-overlay {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(5px);
+  background: rgba(0,0,0,0.22);
+  z-index: 90;
+ pointer-events: auto;
+  transition: opacity 0.25s ease;
+}
+
+.profile-focus-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+#profileButton.profile-pulse {
+  position: relative;
+  z-index: 120;
+  animation: profilePulse 1.8s infinite;
+  box-shadow: 0 0 0 0 rgba(255,255,255,0.65);
+}
+
+@keyframes profilePulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255,255,255,0.55);
+  }
+
+  70% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 18px rgba(255,255,255,0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255,255,255,0);
+  }
+}
+
+button[onclick="triggerAndroidInstall()"] {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 68px !important;
+  border-radius: 22px !important;
+
+  background: linear-gradient(
+    135deg,
+    #34a853 0%,
+    #2ea043 55%,
+    #24913a 100%
+  ) !important;
+
+  border: none !important;
+
+  color: white !important;
+  font-weight: 900 !important;
+  font-size: 1.08rem !important;
+  letter-spacing: -0.01em;
+
+  box-shadow:
+    0 14px 34px rgba(52, 168, 83, 0.34),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+
+  animation: androidInstallPulse 2.8s infinite;
+}
+
+/* Android icon */
+button[onclick="triggerAndroidInstall()"] .material-symbols-outlined {
+  font-size: 30px !important;
+  color: white !important;
+}
+
+/* Hover / tap */
+button[onclick="triggerAndroidInstall()"]:hover,
+button[onclick="triggerAndroidInstall()"]:active {
+  transform: translateY(-2px) scale(1.015);
+
+  box-shadow:
+    0 18px 40px rgba(52, 168, 83, 0.42),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+
+  filter: brightness(1.03);
+}
+
+/* Moving shine */
+button[onclick="triggerAndroidInstall()"]::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255,255,255,0.16) 42%,
+      transparent 82%
+    );
+
+  transform: translateX(-120%);
+  animation: androidInstallShine 3.8s infinite;
+ 
+}
+
+/* Subtle pulse */
+@keyframes androidInstallPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+@keyframes androidInstallShine {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  45%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+button[onclick="showInstallSteps('iphone')"] {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 68px !important;
+  border-radius: 22px !important;
+
+  background: linear-gradient(
+    135deg,
+    #111827 0%,
+    #1f2937 55%,
+    #374151 100%
+  ) !important;
+
+  border: none !important;
+
+  color: white !important;
+  font-weight: 900 !important;
+  font-size: 1.08rem !important;
+  letter-spacing: -0.01em;
+
+  box-shadow:
+    0 14px 34px rgba(17, 24, 39, 0.34),
+    0 0 22px rgba(255,255,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+
+  animation: iphoneInstallPulse 2.8s infinite;
+}
+
+/* iPhone icon */
+button[onclick="showInstallSteps('iphone')"] .material-symbols-outlined {
+  font-size: 30px !important;
+  color: white !important;
+}
+
+/* Hover / tap */
+button[onclick="showInstallSteps('iphone')"]:hover,
+button[onclick="showInstallSteps('iphone')"]:active {
+  transform: translateY(-2px) scale(1.015);
+
+  box-shadow:
+    0 18px 42px rgba(17, 24, 39, 0.42),
+    0 0 26px rgba(255,255,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+
+  filter: brightness(1.04);
+}
+
+/* Moving shine */
+button[onclick="showInstallSteps('iphone')"]::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255,255,255,0.16) 42%,
+      transparent 82%
+    );
+
+  transform: translateX(-120%);
+  animation: iphoneInstallShine 3.8s infinite;
+}
+
+/* Subtle pulse */
+@keyframes iphoneInstallPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+@keyframes iphoneInstallShine {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  45%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.profile-news-icon-btn {
+  position: relative;
+  overflow: visible !important;
+  background: color-mix(in srgb, var(--profile-color, #d6a700) 14%, var(--card-color)) !important;
+  border-color: color-mix(in srgb, var(--profile-color, #d6a700) 38%, var(--border-color)) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+}
+
+.profile-news-icon-btn .material-symbols-outlined {
+  font-size: 23px !important;
+  color: var(--profile-color, #d6a700) !important;
+}
+
+.profile-news-icon-btn .profile-news-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid var(--card-color);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+.profile-news-icon-btn .profile-news-badge.hidden {
+  display: none;
+}
+.main-btn.secondary,
+.try-app-btn {
+  background: var(--profile-color) !important;
+  color: white !important;
+  border-color: var(--profile-color) !important;
+}
+.theme-preset.moss span {
+  background: #556b4f;
+}
+
+.theme-preset.storm span {
+  background: #4b5563;
+}
+
+.theme-preset.coffee span {
+  background: #6f4e37;
+}
+
+.theme-preset.forest span {
+  background: #2f5d50;
+}
+
+.theme-preset.obsidian span {
+  background: #d4a93a;
+}
+
+.theme-preset.wine span {
+  background: #7a1f3d;
+}
+
+.theme-preset.ocean span {
+  background: #1f4f6b;
+}
+
+.theme-preset.charcoal span {
+  background: #9ca3af;
+}
+
+.theme-preset.antique span {
+  background: #70543e;
+}
+
+.theme-preset.glacier span {
+  background: #3b6b8c;
+}
+
+/* GLOBAL MODAL SCROLL HINT */
+.modal-card.scrollable-modal {
+  position: relative;
+}
+
+.modal-card.scrollable-modal::after {
+  content: "";
+  position: sticky;
+  bottom: -28px;
+  display: block;
+  height: 56px;
+  margin: 0 -28px -28px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 252, 242, 0),
+    rgba(255, 252, 242, 0.98) 80%
+  );
+}
+
+
+
+.modal-card.scrollable-modal::before {
+  content: "↓";
+  position: sticky;
+  bottom: 10px;
+  margin-left: auto;
+  margin-right: 6px;
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  text-align: center;
+  line-height: 22px;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--secondary-color);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(36, 52, 71, 0.14);
+  box-shadow: 0 5px 14px rgba(0,0,0,0.10);
+  opacity: 0.55;
+  animation: modalArrowBounce 1.15s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes modalArrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+body.dark .modal-card.scrollable-modal::before {
+  color: #f3f4f6;
+  background: rgba(31, 41, 55, 0.65);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.modal-card.scrolled-bottom::before,
+.modal-card.scrolled-bottom::after {
+  display: none;
+}
+
+body.dark .modal-card.scrollable-modal::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(31, 41, 55, 0),
+    rgba(31, 41, 55, 0.98) 80%
+  );
+}
+.modal-card {
+  position: relative;
+}
+
+#modalScrollArrow {
+  position: fixed;
+  display: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  font-size: 1.20rem;
+  font-weight: 900;
+  color: var(--secondary-color);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(36, 52, 71, 0.14);
+  box-shadow: 0 5px 14px rgba(0,0,0,0.12);
+  opacity: 0.65;
+  animation: modalArrowBounce 1.15s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+#modalScrollArrow.visible {
+  display: grid;
+}
+
+@keyframes modalArrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+body.dark #modalScrollArrow {
+  color: #f3f4f6;
+  background: rgba(31, 41, 55, 0.72);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.achievement-icon .material-symbols-outlined {
+  color: white !important;
+  font-size: 23px !important;
+}.achievement-symbol {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  color: white !important;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 500,
+    'GRAD' 0,
+    'opsz' 24;
+}
+.continue-learning-btn,
+button.continue-learning-btn {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.continue-learning-btn:hover {
+  opacity: 0.92;
+}
+
+body.dark .continue-learning-btn,
+body.dark button.continue-learning-btn {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+  border-color: var(--secondary-color) !important;
+}
