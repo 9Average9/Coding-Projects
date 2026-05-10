@@ -11398,27 +11398,3 @@ async function enablePushNotifications() {
 }
 
 
-function refreshPushAfterAppOpen() {
-  if (!getPushStatus()) return;
-  if (!window.OneSignalDeferred) return;
-
-  window.OneSignalDeferred.push(async function (OneSignal) {
-    try {
-      await OneSignal.User.PushSubscription.optIn();
-      localStorage.setItem("pushNotificationsEnabled", "true");
-      updateNotificationButtonUI();
-    } catch (error) {
-      console.warn("Push refresh failed:", error);
-    }
-  });
-}
-
-window.addEventListener("focus", () => {
-  setTimeout(refreshPushAfterAppOpen, 500);
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    setTimeout(refreshPushAfterAppOpen, 500);
-  }
-});
