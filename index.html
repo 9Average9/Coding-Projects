@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Basic Greek" />
 <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="stylesheet" href="style.css?v=28" />
+  <link rel="stylesheet" href="style.css?v=29" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 
@@ -4209,6 +4209,47 @@
 <button class="theme-preset sand" onclick="setAppTheme('sand')">
   <span></span> Desert Sand
 </button>
+
+<button class="theme-preset moss" onclick="setAppTheme('moss')">
+  <span></span> Moss Study
+</button>
+
+<button class="theme-preset storm" onclick="setAppTheme('storm')">
+  <span></span> Storm Gray
+</button>
+
+<button class="theme-preset coffee" onclick="setAppTheme('coffee')">
+  <span></span> Coffee House
+</button>
+
+<button class="theme-preset forest" onclick="setAppTheme('forest')">
+  <span></span> Forest Scroll
+</button>
+
+<button class="theme-preset obsidian" onclick="setAppTheme('obsidian')">
+  <span></span> Obsidian Gold
+</button>
+
+<button class="theme-preset wine" onclick="setAppTheme('wine')">
+  <span></span> Vintage Wine
+</button>
+
+<button class="theme-preset ocean" onclick="setAppTheme('ocean')">
+  <span></span> Ocean Study
+</button>
+
+<button class="theme-preset charcoal" onclick="setAppTheme('charcoal')">
+  <span></span> Charcoal Night
+</button>
+
+<button class="theme-preset antique" onclick="setAppTheme('antique')">
+  <span></span> Antique Pages
+</button>
+
+<button class="theme-preset glacier" onclick="setAppTheme('glacier')">
+  <span></span> Glacier Blue
+</button>
+
   </div>
 </div>
 </div>
@@ -4264,6 +4305,18 @@
   </div>
 </div>
 
+<div class="settings-card">
+  <button id="profileResetBtn" class="danger-btn" onclick="resetAllAppData()">
+  Reset All App Data
+</button>
+
+</div>
+
+
+
+
+
+ 
     </section>
 
 
@@ -4311,10 +4364,7 @@
       </div>
 
      
-      <div>
-        <strong>Profile</strong>
-        <span>Start with making your profile first by pressing the profile icon on the home page.</span>
-      </div>
+      
     </div>
 
     
@@ -4908,7 +4958,7 @@
   Start Vocab
 </button>
 
-<button class="main-btn secondary" onclick="hideVocabUnlockedModal(); showNewLearnMenu();">
+<button class="main-btn continue-learning-btn" onclick="hideVocabUnlockedModal(); showNewLearnMenu();">
   Continue Lessons
 </button>
   </div>
@@ -4917,6 +4967,13 @@
 
 <div id="profileModal" class="modal-overlay" onclick="closeProfileModal(event)">
   <div class="modal-card profile-card" onclick="event.stopPropagation()">
+
+
+
+<button id="profileNewsBtn" class="icon-btn profile-news-icon-btn" onclick="openNewsFromProfile()" title="News & Updates">
+    <span class="material-symbols-outlined">campaign</span>
+    <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
+  </button>
 
     <button class="modal-close" onclick="hideProfileMenu()">×</button>
 
@@ -5068,9 +5125,7 @@
   <button class="color-dot orange" onclick="setProfileColor('#f97316')" title="Orange"></button>
   <button class="color-dot pink" onclick="setProfileColor('#ec4899')" title="Pink"></button>
 
-  <button class="color-dot custom-color-dot" onclick="openCustomProfileColor()" title="Custom color">
-    +
-  </button>
+ 
 
   <input
     type="color"
@@ -5085,19 +5140,19 @@
   Create Profile
 </button>
 
-<button id="profileNewsBtn" class="main-btn secondary profile-news-btn" onclick="openNewsFromProfile()">
-  <span class="material-symbols-outlined">newspaper</span>
-  <span>News & Updates</span>
-  <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
-</button>
 
-    <button id="profileSettingsBtn" class="main-btn secondary" onclick="openSettingsFromProfile()">
+
+    <button id="profileSettingsBtn" class="main-btn try-app-btn" onclick="openSettingsFromProfile()">
   Settings
 </button>
 
-   <button id="profileResetBtn" class="danger-btn" onclick="resetAllAppData()">
-  Reset All App Data
+  
+
+<button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
+  <span class="material-symbols-outlined">install_mobile</span>
+  <span>Try the App Version!</span>
 </button>
+
 
   </div>
 </div>
@@ -5181,8 +5236,8 @@
 
   </main>
 
-  <script src="vocab.js?v=28"></script>
-  <script src="app.js?v=28"></script>
+  <script src="vocab.js?v=29"></script>
+  <script src="app.js?v=29"></script>
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
@@ -5191,11 +5246,11 @@ if ("serviceWorker" in navigator) {
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
   <div class="modal-card install-modal-card">
-    <button class="modal-close" onclick="hideInstallAppModal()">×</button>
+    
 
-    <h2>Install Basic Greek</h2>
+    <h2>Add the Basic Greek app</h2>
     <p>
-      Add Basic Greek Trainer to your Home Screen so it opens like an app without the browser bars.
+      Follow the steps to add the app to your phone or press "maybe later" to continue using the browser
     </p>
 
     <div id="installChoiceView">
@@ -5204,18 +5259,10 @@ if ("serviceWorker" in navigator) {
         <span>iPhone</span>
       </button>
 
-      <button class="main-btn" onclick="showInstallSteps('android')">
-        <span class="material-symbols-outlined">android</span>
-        <span>Android</span>
-      </button>
+      
 
-      <button class="small-btn" onclick="dismissInstallModalForever()">
-        I already have it installed
-      </button>
+     
 
-     <button class="text-btn" onclick="dismissInstallModalForever()">
-  Maybe later
-</button>
     </div>
 
     <div id="iphoneInstallSteps" class="install-steps hidden">
@@ -5243,37 +5290,25 @@ if ("serviceWorker" in navigator) {
     <li>Open Basic Greek from your Home Screen.</li>
   </ol>
 
-  <button class="main-btn" onclick="dismissInstallModalForever()">
-    Got it
-  </button>
-
-  <button class="text-btn" onclick="backToInstallChoices()">
-    Back
-  </button>
+ 
+ 
 </div>
 
+<button class="main-btn" onclick="triggerAndroidInstall()">
+        <span class="material-symbols-outlined">android</span>
+        <span>Android</span>
+      </button>
+
     <div id="androidInstallSteps" class="install-steps hidden">
-      <h3>Install on Android</h3>
-      <ol>
-        <li>Open this page in Chrome.</li>
-        <li>Tap the <strong>⋮</strong> menu.</li>
-        <li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
-        <li>Tap <strong>Install</strong> or <strong>Add</strong>.</li>
-        <li>Open Basic Greek from your Home Screen.</li>
-      </ol>
+     
 
-      <button id="androidInstallBtn" class="main-btn hidden" onclick="triggerAndroidInstall()">
-        Install Now
-      </button>
-
-      <button class="main-btn" onclick="dismissInstallModalForever()">
-        Got it
-      </button>
-
-      <button class="text-btn" onclick="backToInstallChoices()">
-        Back
-      </button>
+      
     </div>
+
+    
+     <button class="text-btn" onclick="dismissInstallModalForever()">
+  Maybe later
+</button>
   </div>
 </div>
 
@@ -5309,6 +5344,6 @@ if ("serviceWorker" in navigator) {
   </div>
 </div>
 
-
+<div id="profileFocusOverlay" class="profile-focus-overlay hidden"></div>
 </body>
 </html>
