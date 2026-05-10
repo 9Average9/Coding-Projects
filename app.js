@@ -11390,25 +11390,41 @@ async function enablePushNotifications() {
 
       await OneSignal.User.PushSubscription.optIn();
 
-      setTimeout(async () => {
-        const optedIn = OneSignal.User.PushSubscription.optedIn === true;
-        const subscriptionId = OneSignal.User.PushSubscription.id;
+      let optedIn = false;
+      let subscriptionId = null;
 
-        console.log("OneSignal opted in:", optedIn);
-        console.log("OneSignal subscription ID:", subscriptionId);
+      for (let i = 0; i < 10; i++) {
+        optedIn = OneSignal.User.PushSubscription.optedIn === true;
+        subscriptionId = OneSignal.User.PushSubscription.id;
 
-        if (optedIn && subscriptionId) {
-          localStorage.setItem("pushNotificationsEnabled", "true");
-          localStorage.removeItem("notificationPromptDismissed");
-          hideNotificationPromptModal();
-          updateNotificationButtonUI();
-          alert("Notifications enabled!");
-        } else {
-          localStorage.setItem("pushNotificationsEnabled", "false");
-          updateNotificationButtonUI();
-          alert("Permission was allowed, but OneSignal did not finish subscribing this device yet.");
-        }
-      }, 1500);
+        console.log("OneSignal check", i + 1, {
+          optedIn,
+          subscriptionId
+        });
+
+        if (optedIn && subscriptionId) break;
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      if (optedIn && subscriptionId) {
+        localStorage.setItem("pushNotificationsEnabled", "true");
+        localStorage.removeItem("notificationPromptDismissed");
+        hideNotificationPromptModal();
+        updateNotificationButtonUI();
+        alert("Notifications enabled!");
+      } else {
+        localStorage.setItem("pushNotificationsEnabled", "false");
+        updateNotificationButtonUI();
+
+        console.warn("OneSignal did not finish subscribing.", {
+          permission,
+          optedIn,
+          subscriptionId
+        });
+
+        alert("Permission was allowed, but OneSignal did not finish subscribing this device yet.");
+      }
 
     } catch (error) {
       console.error("Notification permission error:", error);
