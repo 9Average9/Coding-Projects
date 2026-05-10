@@ -24,6 +24,8 @@
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
 
@@ -32,9 +34,14 @@
       appId: "768c709f-a4e3-4a1d-9b39-40fa1b447fc9",
       safari_web_id: "web.onesignal.auto.195e7e66-9dea-4e11-b56c-b4a654da5ab7",
 
-      notifyButton: {
-        enable: false,
+      serviceWorkerPath: "Greek-Vocab/OneSignalSDKWorker.js",
+      serviceWorkerParam: {
+        scope: "/Greek-Vocab/"
       },
+
+      notifyButton: {
+        enable: false
+      }
     });
   });
 </script>
