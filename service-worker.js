@@ -1,5 +1,5 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const CACHE_NAME = "basic-greek-trainer-v1.1.3";
+const CACHE_NAME = "basic-greek-trainer-v1.1.4";
 
 const FILES_TO_CACHE = [
   "./",
@@ -42,6 +42,15 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  // Let OneSignal handle its own requests
+  if (
+    event.request.url.includes("onesignal") ||
+    event.request.url.includes("os.tc") ||
+    event.request.url.includes("cdn.onesignal.com")
+  ) {
+    return;
+  }
+
   if (event.request.method !== "GET") return;
 
   event.respondWith(
