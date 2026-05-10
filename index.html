@@ -12,13 +12,308 @@
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#243447" />
 
+<script>
+(function () {
+  const savedTheme = localStorage.getItem("appTheme") || "royal";
+
+  const themes = {
+    parchment: {
+      primary: "#efe4c8",
+      light: "#f8f3e7",
+      secondary: "#243447",
+      accent: "#c8a24a",
+      card: "rgba(255, 252, 242, 0.92)",
+      border: "#d6c49a",
+      text: "#1f2933",
+      muted: "#5f6c7b",
+      buttonText: "#ffffff"
+    },
+
+    midnight: {
+      primary: "#111827",
+      light: "#1f2937",
+      secondary: "#334155",
+      accent: "#93c5fd",
+      card: "rgba(31, 41, 55, 0.94)",
+      border: "#475569",
+      text: "#f8fafc",
+      muted: "#cbd5e1",
+      buttonText: "#ffffff"
+    },
+
+    royal: {
+      primary: "#dbeafe",
+      light: "#eff6ff",
+      secondary: "#1d4ed8",
+      accent: "#f59e0b",
+      card: "rgba(255, 255, 255, 0.88)",
+      border: "#93c5fd",
+      text: "#172033",
+      muted: "#475569",
+      buttonText: "#ffffff"
+    },emerald: {
+    primary: "#dff7ec",
+    light: "#f0fdf4",
+    secondary: "#047857",
+    accent: "#d97706",
+    card: "rgba(255, 255, 255, 0.86)",
+    border: "#86efac",
+    text: "#14342b",
+    muted: "#4b635b",
+    buttonText: "#ffffff"
+  },
+
+  crimson: {
+    primary: "#fff1f2",
+    light: "#fff7ed",
+    secondary: "#9f1239",
+    accent: "#f59e0b",
+    card: "rgba(255, 255, 255, 0.88)",
+    border: "#fda4af",
+    text: "#30151c",
+    muted: "#6b4b52",
+    buttonText: "#ffffff"
+  },
+
+  violet: {
+    primary: "#f3e8ff",
+    light: "#faf5ff",
+    secondary: "#6d28d9",
+    accent: "#d6a700",
+    card: "rgba(255, 255, 255, 0.88)",
+    border: "#c4b5fd",
+    text: "#241733",
+    muted: "#62516f",
+    buttonText: "#ffffff"
+  },
+
+  slate: {
+    primary: "#e2e8f0",
+    light: "#f8fafc",
+    secondary: "#334155",
+    accent: "#0ea5e9",
+    card: "rgba(255, 255, 255, 0.9)",
+    border: "#cbd5e1",
+    text: "#0f172a",
+    muted: "#475569",
+    buttonText: "#ffffff"
+  },
+
+  olive: {
+    primary: "#ece8d9",
+    light: "#faf8ef",
+    secondary: "#4d5d2f",
+    accent: "#b45309",
+    card: "rgba(255, 252, 242, 0.9)",
+    border: "#c7bea0",
+    text: "#25291c",
+    muted: "#62664b",
+    buttonText: "#ffffff"
+  },
+orange: {
+  primary: "#fff1e7",
+  light: "#fff8f1",
+  secondary: "#ea580c",
+  accent: "#fb923c",
+  card: "rgba(255, 252, 247, 0.95)",
+  border: "#fed7aa",
+  text: "#2f1b0c",
+  muted: "#7c4a24",
+  buttonText: "#ffffff"
+},
+
+pink: {
+  primary: "#fff1f7",
+  light: "#fff8fb",
+  secondary: "#db2777",
+  accent: "#f472b6",
+  card: "rgba(255, 250, 253, 0.95)",
+  border: "#fbcfe8",
+  text: "#3b1025",
+  muted: "#7a294f",
+  buttonText: "#ffffff"
+},
+
+teal: {
+  primary: "#ecfeff",
+  light: "#f8ffff",
+  secondary: "#0f766e",
+  accent: "#2dd4bf",
+  card: "rgba(248, 255, 255, 0.95)",
+  border: "#99f6e4",
+  text: "#123532",
+  muted: "#3f6f68",
+  buttonText: "#ffffff"
+},
+
+sand: {
+  primary: "#f5ead7",
+  light: "#fffaf0",
+  secondary: "#92400e",
+  accent: "#d97706",
+  card: "rgba(255, 250, 240, 0.95)",
+  border: "#e7cda8",
+  text: "#2d2115",
+  muted: "#6b5a45",
+  buttonText: "#ffffff"
+},
+
+
+moss: {
+  primary: "#ddebd7",
+  light: "#f5fbf1",
+  secondary: "#355e3b",
+  accent: "#e3b341",
+  card: "rgba(247,252,244,0.95)",
+  border: "#9fbc9c",
+  text: "#1d2b20",
+  muted: "#5f7362",
+  buttonText: "#ffffff"
+},
+
+storm: {
+  primary: "#d6dde8",
+  light: "#f3f6fb",
+  secondary: "#334155",
+  accent: "#60a5fa",
+  card: "rgba(248,251,255,0.94)",
+  border: "#aebed3",
+  text: "#18222d",
+  muted: "#586575",
+  buttonText: "#ffffff"
+},
+
+coffee: {
+  primary: "#f2e3d5",
+  light: "#fff8f2",
+  secondary: "#7b4b2a",
+  accent: "#f59e0b",
+  card: "rgba(255,250,244,0.95)",
+  border: "#d8b89a",
+  text: "#2d1e15",
+  muted: "#725747",
+  buttonText: "#ffffff"
+},
+
+forest: {
+  primary: "#d9f0e2",
+  light: "#f4fcf7",
+  secondary: "#14532d",
+  accent: "#34d399",
+  card: "rgba(246,253,248,0.95)",
+  border: "#8cc7a3",
+  text: "#173126",
+  muted: "#557566",
+  buttonText: "#ffffff"
+},
+
+obsidian: {
+  primary: "#151821",
+  light: "#1f2430",
+  secondary: "#0b1120",
+  accent: "#facc15",
+  card: "rgba(26,30,40,0.97)",
+  border: "#374151",
+  text: "#f9fafb",
+  muted: "#9ca3af",
+  buttonText: "#ffffff"
+},
+
+wine: {
+  primary: "#f8e4ea",
+  light: "#fff5f7",
+  secondary: "#881337",
+  accent: "#fb7185",
+  card: "rgba(255,248,250,0.95)",
+  border: "#efb6c3",
+  text: "#3b1020",
+  muted: "#7b4a59",
+  buttonText: "#ffffff"
+},
+
+ocean: {
+  primary: "#dff4fb",
+  light: "#f4fcff",
+  secondary: "#0369a1",
+  accent: "#38bdf8",
+  card: "rgba(247,253,255,0.95)",
+  border: "#93d5ec",
+  text: "#123040",
+  muted: "#4f7282",
+  buttonText: "#ffffff"
+},
+
+charcoal: {
+  primary: "#23272f",
+  light: "#313641",
+  secondary: "#111827",
+  accent: "#f97316",
+  card: "rgba(35,39,47,0.97)",
+  border: "#4b5563",
+  text: "#f8fafc",
+  muted: "#cbd5e1",
+  buttonText: "#ffffff"
+},
+
+antique: {
+  primary: "#f4e7cf",
+  light: "#fffaf0",
+  secondary: "#8b5e34",
+  accent: "#d97706",
+  card: "rgba(255,251,243,0.95)",
+  border: "#dcc29a",
+  text: "#332417",
+  muted: "#74614b",
+  buttonText: "#ffffff"
+},
+
+glacier: {
+  primary: "#e3f3ff",
+  light: "#f6fbff",
+  secondary: "#2563eb",
+  accent: "#7dd3fc",
+  card: "rgba(250,254,255,0.95)",
+  border: "#abd8f0",
+  text: "#172b3a",
+  muted: "#5e7685",
+  buttonText: "#ffffff"
+}
+  };
+
+  const theme = themes[savedTheme] || themes.royal;
+
+  const root = document.documentElement;
+
+  root.style.setProperty("--primary-color", theme.primary);
+  root.style.setProperty("--primary-light", theme.light);
+  root.style.setProperty("--secondary-color", theme.secondary);
+  root.style.setProperty("--accent-color", theme.accent);
+  root.style.setProperty("--card-color", theme.card);
+  root.style.setProperty("--border-color", theme.border);
+  root.style.setProperty("--font-color", theme.text);
+  root.style.setProperty("--muted-color", theme.muted);
+  root.style.setProperty("--btn-text-color", theme.buttonText);
+
+  if (savedTheme === "midnight") {
+    document.documentElement.classList.add("dark");
+  }
+})();
+</script>
+
+
+
+
+
 <!-- iPhone Home Screen Support -->
  <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Basic Greek" />
 <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="stylesheet" href="style.css?v=30" />
+
+
+
+  <link rel="stylesheet" href="style.css?v=35" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 
@@ -67,10 +362,6 @@
 </button>
 </div>
 
-<!--temporary-->
-<button class="main-btn" onclick="testNotifications()">
-  Test Notifications
-</button>
 
 
 <button class="main-btn home-action" onclick="showNewLearnMenu()">
@@ -333,8 +624,13 @@
 
   <div class="lesson-block-content">
     <p>
-      The earliest Greek manuscripts were written in <strong>all capital letters</strong>, with no spaces or punctuation.
+      The earliest Greek manuscripts were written in <strong>all capital letters</strong>, with no spaces or punctuation. Below is an example:
     </p>
+
+     <p class="greek-example">
+      ΕΝΑΡΧΗΗΝΟΛΟΓΟΣ
+    </p>
+
 <p>
   Even though Greek uses a different alphabet, it is read <strong>left to right</strong>, just like English.
 </p>
@@ -346,10 +642,7 @@
 <p class="highlight">
   Greek is closer to a familiar, Western-style language than something like Latin or a right-to-left language.
 </p>
-    <p class="greek-example">
-      ΕΝΑΡΧΗΗΝΟΛΟΓΟΣ
-    </p>
-
+   
     <p>
       That means readers had to recognize words by familiarity, context, and repeated exposure.
     </p>
@@ -4634,7 +4927,7 @@
         <div class="mark-card"><strong class="greek-text">ου</strong><span>ou</span><small>like “oo”</small></div>
         <div class="mark-card"><strong class="greek-text">υι</strong><span>ui</span><small>like “wee”</small></div>
         <div class="mark-card"><strong class="greek-text">ευ</strong><span>eu</span><small>almost like "ew" or the "oo" in ooze</small></div>
-        <div class="mark-card"><strong class="greek-text">ηυ</strong><span>ēu</span><small>rare</small></div>
+        <div class="mark-card"><strong class="greek-text">ηυ</strong><span>ēu</span><small>It usually sounds similar to “ayv” or “afe” depending on the next letter.</small></div>
       </div>
 
       <p class="highlight">
@@ -5174,7 +5467,10 @@
   Settings
 </button>
 
-  
+  <button id="profileNotificationBtn" class="main-btn try-app-btn" onclick="openNotificationSettings()">
+  <span class="material-symbols-outlined">notifications</span>
+  <span id="profileNotificationBtnText">Enable Study Reminders</span>
+</button>
 
 <button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
   <span class="material-symbols-outlined">install_mobile</span>
@@ -5264,8 +5560,8 @@
 
   </main>
 
-  <script src="vocab.js?v=30"></script>
-  <script src="app.js?v=30"></script>
+  <script src="vocab.js?v=35"></script>
+  <script src="app.js?v=35"></script>
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
@@ -5373,5 +5669,44 @@ if ("serviceWorker" in navigator) {
 </div>
 
 <div id="profileFocusOverlay" class="profile-focus-overlay hidden"></div>
+
+<div id="notificationPromptModal" class="modal-overlay" onclick="closeNotificationPromptModal(event)">
+  <div class="modal-card notification-prompt-card" onclick="event.stopPropagation()">
+    
+
+    <h2>Stay Consistent</h2>
+
+    <p>
+      Would you like simple Greek study reminders and app update notifications?
+    </p>
+
+    <div class="welcome-route">
+      <div>
+        <strong>Study reminders</strong>
+        <span>Get quick reminders to review Greek for a few minutes.</span>
+      </div>
+
+      <div>
+        <strong>Progress nudges</strong>
+        <span>Stay encouraged as you build consistency.</span>
+      </div>
+
+      <div>
+        <strong>App updates</strong>
+        <span>Know when new lessons or features are added.</span>
+      </div>
+    </div>
+
+    <button class="main-btn" onclick="enablePushNotifications()">
+      Enable Notifications
+    </button>
+
+    <button class="text-btn" onclick="dismissNotificationPrompt()">
+      Maybe Later
+    </button>
+  </div>
+</div>
+
+
 </body>
 </html>
