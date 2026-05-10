@@ -11320,3 +11320,23 @@ document.addEventListener("click", () => {
 
 window.addEventListener("resize", updateModalScrollHints);
 window.addEventListener("scroll", updateModalScrollHints);
+
+
+async function testNotifications() {
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+  OneSignalDeferred.push(async function(OneSignal) {
+    try {
+      await OneSignal.Notifications.requestPermission();
+
+      const permission =
+        OneSignal.Notifications.permission;
+
+      alert("Notification permission: " + permission);
+
+    } catch (e) {
+      console.error(e);
+      alert("Notification error");
+    }
+  });
+}
