@@ -10842,11 +10842,8 @@ function isRunningAsInstalledApp() {
 }
 
 function registerServiceWorker() {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
-      console.warn("Service worker registration failed:", error);
-    });
-  }
+  // OneSignal handles the service worker registration.
+  // Do not manually register it here, or iPhone push subscription can fail.
 }
 
 function isMobileDevice() {
