@@ -18,11 +18,15 @@ select,
 }
 
 :root {
-  --primary-color: #efe4c8;
-  --primary-light: #f8f3e7;
-  --secondary-color: #243447;
-  --font-color: #1f2933;
-  --btn-text-color: white;
+  --primary-color: #dbeafe;
+  --primary-light: #eff6ff;
+  --secondary-color: #1d4ed8;
+  --accent-color: #f59e0b;
+  --card-color: rgba(255, 255, 255, 0.88);
+  --border-color: #93c5fd;
+  --font-color: #172033;
+  --muted-color: #475569;
+  --btn-text-color: #ffffff;
 }
 body {
   margin: 0;
@@ -7570,71 +7574,7 @@ button[onclick="showInstallSteps('iphone')"]::after {
   background: #3b6b8c;
 }
 
-/* GLOBAL MODAL SCROLL HINT */
-.modal-card.scrollable-modal {
-  position: relative;
-}
 
-.modal-card.scrollable-modal::after {
-  content: "";
-  position: sticky;
-  bottom: -28px;
-  display: block;
-  height: 56px;
-  margin: 0 -28px -28px;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 252, 242, 0),
-    rgba(255, 252, 242, 0.98) 80%
-  );
-}
-
-
-
-.modal-card.scrollable-modal::before {
-  content: "↓";
-  position: sticky;
-  bottom: 10px;
-  margin-left: auto;
-  margin-right: 6px;
-  display: block;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  text-align: center;
-  line-height: 22px;
-  font-size: 1rem;
-  font-weight: 900;
-  color: var(--secondary-color);
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(36, 52, 71, 0.14);
-  box-shadow: 0 5px 14px rgba(0,0,0,0.10);
-  opacity: 0.55;
-  animation: modalArrowBounce 1.15s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 5;
-}
-
-@keyframes modalArrowBounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(5px);
-  }
-}
-
-body.dark .modal-card.scrollable-modal::before {
-  color: #f3f4f6;
-  background: rgba(31, 41, 55, 0.65);
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-.modal-card.scrolled-bottom::before,
-.modal-card.scrolled-bottom::after {
-  display: none;
-}
 
 body.dark .modal-card.scrollable-modal::after {
   background: linear-gradient(
@@ -7722,4 +7662,53 @@ body.dark button.continue-learning-btn {
   background: var(--secondary-color) !important;
   color: var(--btn-text-color) !important;
   border-color: var(--secondary-color) !important;
+}
+.notification-prompt-card .text-btn {
+  display: block;
+  margin: 14px auto 0;
+  text-align: center;
+}
+#profileNotificationBtn {
+  transition: transform 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+#profileNotificationBtn.notifications-enabled {
+  background: #2f6f4e;
+  color: white;
+  box-shadow: 0 10px 22px rgba(47, 111, 78, 0.28);
+  animation: notificationEnabledPop 0.35s ease;
+}
+
+#profileNotificationBtn.notifications-enabled .material-symbols-outlined,
+#profileNotificationBtn.notifications-enabled span {
+  color: white;
+}
+
+@keyframes notificationEnabledPop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Remove unwanted inner lesson borders */
+.lesson-block-content,
+.lesson-block-content p,
+.lesson-block-content ul,
+.lesson-block-content li,
+.lesson-block-content .highlight,
+.lesson-block-content .mini-example,
+.lesson-block-content .greek-example,
+.lesson-block-content .takeaway-step,
+.lesson-block-content .lesson-interactive,
+.lesson-block-content .check-card,
+.lesson-block-content .answer-row {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none;
 }
