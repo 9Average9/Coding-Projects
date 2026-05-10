@@ -313,13 +313,13 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=37" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
 
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -329,10 +329,10 @@ glacier: {
       appId: "768c709f-a4e3-4a1d-9b39-40fa1b447fc9",
       safari_web_id: "web.onesignal.auto.195e7e66-9dea-4e11-b56c-b4a654da5ab7",
 
-      serviceWorkerPath: "Greek-Vocab/OneSignalSDKWorker.js",
-      serviceWorkerParam: {
-        scope: "/Greek-Vocab/"
-      },
+     serviceWorkerPath: "service-worker.js",
+serviceWorkerParam: {
+  scope: "/Greek-Vocab/"
+},
 
       notifyButton: {
         enable: false
@@ -5560,8 +5560,8 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=36"></script>
-  <script src="app.js?v=36"></script>
+  <script src="vocab.js?v=37"></script>
+  <script src="app.js?v=37"></script>
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
