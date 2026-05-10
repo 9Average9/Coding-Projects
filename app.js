@@ -10137,6 +10137,7 @@ function saveProfileName() {
   saveProfileData();
   updateProfileUI();
 updateProfileAttention();
+maybeShowNotificationPromptAfterProfile();
   const message = document.getElementById("profileValidationMessage");
   if (message) message.remove();
 }
@@ -10342,7 +10343,7 @@ if (resetBtn) {
 
 
 updateProfileAttention();
-
+updateNotificationButtonUI();
 }
 
 function resetAllAppData() {
@@ -10812,12 +10813,23 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.0.7";
+const APP_VERSION = "1.1.1";
 
 const UPDATE_NOTES = [
-  "added scroll icon",
-"streamlined android download",
-  "Bug fixes",
+ "added iphone push notifications",
+"added study reminder onboarding",
+"added notification settings controls",
+"fixed notification save state",
+"improved app startup speed",
+"fixed theme loading flash",
+"improved modal scrolling visuals",
+"removed bouncing scroll indicator",
+"improved theme loading behavior",
+"fixed caching stability issues",
+"updated pronunciation explanations",
+"lesson polish and UI cleanup",
+"bug fixes"
+
 ];
 
 let deferredInstallPrompt = null;
@@ -11250,129 +11262,140 @@ function completeProfileFocusIfProfileMade() {
     localStorage.setItem("hasSeenProfileFocus", "true");
   }
 }
-function getModalScrollArrow() {
-  let arrow = document.getElementById("modalScrollArrow");
 
-  if (!arrow) {
-    arrow = document.createElement("div");
-    arrow.id = "modalScrollArrow";
-    arrow.textContent = "↓";
-    document.body.appendChild(arrow);
-  }
 
-  return arrow;
+
+
+
+function isInstalledAppMode() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
 }
 
-function updateModalScrollHints() {
-  const arrow = getModalScrollArrow();
-  const openModal = document.querySelector(".modal-overlay.open .modal-card");
+function getPushStatus() {
+  return localStorage.getItem("pushNotificationsEnabled") === "true";
+}
 
-  if (!openModal) {
-    arrow.classList.remove("visible");
+function updateNotificationButtonUI() {
+  const btn = document.getElementById("profileNotificationBtn");
+  const text = document.getElementById("profileNotificationBtnText");
+
+  if (!btn || !text) return;
+
+  const enabled = getPushStatus();
+
+  text.textContent = enabled
+    ? "Disable Study Reminders"
+    : "Enable Study Reminders";
+
+  btn.classList.toggle("notifications-enabled", enabled);
+}
+
+function showNotificationPromptModal() {
+  document.getElementById("notificationPromptModal")?.classList.add("open");
+}
+
+function hideNotificationPromptModal() {
+  document.getElementById("notificationPromptModal")?.classList.remove("open");
+}
+
+function closeNotificationPromptModal(event) {
+  if (event.target.id === "notificationPromptModal") {
+    hideNotificationPromptModal();
+  }
+}
+
+function dismissNotificationPrompt() {
+  localStorage.setItem("notificationPromptDismissed", "true");
+  hideNotificationPromptModal();
+}
+
+function maybeShowNotificationPromptAfterProfile() {
+  const enabled = localStorage.getItem("pushNotificationsEnabled") === "true";
+  const dismissed = localStorage.getItem("notificationPromptDismissed") === "true";
+
+  if (!profileData?.isCreated) return;
+  if (enabled || dismissed) return;
+
+  setTimeout(() => {
+    showNotificationPromptModal();
+  }, 600);
+}
+function openNotificationSettings() {
+  if (!isInstalledAppMode()) {
+    alert("For notifications, open the installed app from your Home Screen first.");
     return;
   }
 
+  const enabled = getPushStatus();
 
-const modalObserver = new MutationObserver(() => {
-  setTimeout(updateModalScrollHints, 80);
-});
+  if (enabled) {
+    disablePushNotifications();
+  } else {
+    showNotificationPromptModal();
+  }
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".modal-overlay").forEach(modal => {
-    modalObserver.observe(modal, {
-      attributes: true,
-      attributeFilter: ["class"]
-    });
-  });
 
-  updateModalScrollHints();
-});
-
-  const isScrollable = openModal.scrollHeight > openModal.clientHeight + 8;
-  const atBottom =
-    openModal.scrollTop + openModal.clientHeight >= openModal.scrollHeight - 12;
-
-  if (!isScrollable || atBottom) {
-    arrow.classList.remove("visible");
+async function disablePushNotifications() {
+  if (!window.OneSignalDeferred) {
+    alert("Notifications are still loading.");
     return;
   }
 
-  const rect = openModal.getBoundingClientRect();
+  const confirmed = confirm(
+    "Disable Greek study reminders and notifications?"
+  );
 
-  arrow.style.left = `${rect.right - 26}px`;
-  arrow.style.top = `${rect.bottom - 40}px`;
-  arrow.classList.add("visible");
+  if (!confirmed) return;
 
-
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".modal-card").forEach(card => {
-    card.addEventListener("scroll", updateModalScrollHints);
-  });
-
-  updateModalScrollHints();
-});
-
-document.addEventListener("click", () => {
-  setTimeout(updateModalScrollHints, 60);
-});
-
-window.addEventListener("resize", updateModalScrollHints);
-window.addEventListener("scroll", updateModalScrollHints);
-
-
-
-
-
-
-
-
-
-
-
-
-
-async function testNotifications() {
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-  OneSignalDeferred.push(async function(OneSignal) {
+  window.OneSignalDeferred.push(async function (OneSignal) {
     try {
-      await OneSignal.Notifications.requestPermission();
+      await OneSignal.User.PushSubscription.optOut();
 
-      const permission =
-        OneSignal.Notifications.permission;
+      localStorage.setItem("pushNotificationsEnabled", "false");
 
-      alert("Notification permission: " + permission);
+      updateNotificationButtonUI();
 
-    } catch (e) {
-      console.error(e);
-      alert("Notification error");
+      alert("Study reminders disabled.");
+    } catch (error) {
+      console.error(error);
+      alert("Could not disable notifications.");
     }
   });
 }
-window.testNotifications = async function () {
-  alert("Test button clicked");
 
+
+
+async function enablePushNotifications() {
   if (!window.OneSignalDeferred) {
-    alert("OneSignalDeferred is missing");
+    alert("Notifications are still loading. Try again in a moment.");
     return;
   }
 
   window.OneSignalDeferred.push(async function (OneSignal) {
-    alert("OneSignal loaded");
-
     try {
-      const permissionBefore = OneSignal.Notifications.permission;
-      alert("Permission before: " + permissionBefore);
-
       await OneSignal.Notifications.requestPermission();
 
-      const permissionAfter = OneSignal.Notifications.permission;
-      alert("Permission after: " + permissionAfter);
-    } catch (e) {
-      console.error(e);
-      alert("Notification error: " + e.message);
+      const permission = OneSignal.Notifications.permission;
+
+      if (permission === true) {
+        localStorage.setItem("pushNotificationsEnabled", "true");
+        localStorage.removeItem("notificationPromptDismissed");
+        hideNotificationPromptModal();
+        updateNotificationButtonUI();
+        alert("Notifications enabled!");
+      } else {
+        alert("Notifications were not enabled.");
+      }
+    } catch (error) {
+      console.error("Notification permission error:", error);
+      alert("Notifications could not be enabled on this device.");
     }
   });
-};
+}
+
+
+
