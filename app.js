@@ -11267,13 +11267,6 @@ function completeProfileFocusIfProfileMade() {
 
 
 
-function isInstalledAppMode() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true
-  );
-}
-
 function getPushStatus() {
   return localStorage.getItem("pushNotificationsEnabled") === "true";
 }
@@ -11318,6 +11311,7 @@ function maybeShowNotificationPromptAfterProfile() {
 
   if (!profileData?.isCreated) return;
   if (enabled || dismissed) return;
+  if (!isInstalledAppMode()) return;
 
   setTimeout(() => {
     showNotificationPromptModal();
@@ -11369,6 +11363,11 @@ async function disablePushNotifications() {
 
 
 async function enablePushNotifications() {
+  if (!isInstalledAppMode()) {
+    alert("For notifications, open the installed app from your Home Screen first.");
+    return;
+  }
+
   if (!window.OneSignalDeferred) {
     alert("Notifications are still loading. Try again in a moment.");
     return;
