@@ -11379,7 +11379,18 @@ async function enablePushNotifications() {
 
       const permission = OneSignal.Notifications.permission;
 
-      if (permission === true) {
+      if (permission !== true) {
+        localStorage.setItem("pushNotificationsEnabled", "false");
+        updateNotificationButtonUI();
+        alert("Notifications were not enabled.");
+        return;
+      }
+
+      await OneSignal.User.PushSubscription.optIn();
+
+      const optedIn = OneSignal.User.PushSubscription.optedIn === true;
+
+      if (optedIn) {
         localStorage.setItem("pushNotificationsEnabled", "true");
         localStorage.removeItem("notificationPromptDismissed");
         hideNotificationPromptModal();
@@ -11388,7 +11399,7 @@ async function enablePushNotifications() {
       } else {
         localStorage.setItem("pushNotificationsEnabled", "false");
         updateNotificationButtonUI();
-        alert("Notifications were not enabled.");
+        alert("Permission granted, but OneSignal subscription did not complete. Try again.");
       }
     } catch (error) {
       console.error("Notification permission error:", error);
