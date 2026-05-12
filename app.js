@@ -7887,6 +7887,7 @@ let currentSentence = null;
 const screens = [
   "homeScreen",
   "newLearnMenu",
+  "advancedLearnMenu",
   "learnMenu",
   "learnScreen",
   "translateMenu",
@@ -8475,6 +8476,7 @@ html += `</div>`;
 
 function showSettings() {
   showScreen("settingsScreen");
+  updateLessonModeSettingsUI();
 }
 
 function resetTestData() {
@@ -9249,14 +9251,76 @@ function showLearnLesson(lesson) {
 }, 500);
 
 function showNewLearnMenu() {
-  
+  const savedMode = localStorage.getItem("lessonMode");
+  const dismissed = localStorage.getItem("lessonModePromptDismissed") === "true";
+  if (savedMode && dismissed) {
+    if (savedMode === "advanced") {
+      showAdvancedLearnMenu();
+    } else {
+      _openBasicLearnMenu();
+    }
+  } else {
+    showLessonModeModal();
+  }
+}
+
+function _openBasicLearnMenu() {
   showScreen("newLearnMenu");
-
   const overlay = document.getElementById("learnWelcomeOverlay");
-
   if (overlay && localStorage.getItem("hasSeenLearnWelcome") !== "true") {
     overlay.classList.add("open");
   }
+}
+
+function showAdvancedLearnMenu() {
+  showScreen("advancedLearnMenu");
+}
+
+function showLessonModeModal() {
+  document.getElementById("lessonModeModal")?.classList.add("open");
+}
+
+function hideLessonModeModal() {
+  document.getElementById("lessonModeModal")?.classList.remove("open");
+}
+
+function selectLessonMode(mode) {
+  const dontAsk = document.getElementById("lessonModeDontAsk")?.checked;
+  localStorage.setItem("lessonMode", mode);
+  if (dontAsk) {
+    localStorage.setItem("lessonModePromptDismissed", "true");
+  }
+  hideLessonModeModal();
+  if (mode === "advanced") {
+    showAdvancedLearnMenu();
+  } else {
+    _openBasicLearnMenu();
+  }
+}
+
+function getLessonMode() {
+  return localStorage.getItem("lessonMode") || "basic";
+}
+
+function showAdvancedLesson(lessonId) {
+  // Advanced lesson content will be added here
+  // For now show a placeholder
+  alert("Advanced lesson content coming soon. Lesson: " + lessonId);
+}
+
+function resetLessonModePrompt() {
+  localStorage.removeItem("lessonModePromptDismissed");
+  document.getElementById("lessonModeResetRow").style.display = "none";
+  alert("Lesson prompt reset. You will be asked again next time you open Lessons.");
+}
+
+function updateLessonModeSettingsUI() {
+  const mode = getLessonMode();
+  const dismissed = localStorage.getItem("lessonModePromptDismissed") === "true";
+  const label = document.getElementById("currentLessonModeLabel");
+  const resetRow = document.getElementById("lessonModeResetRow");
+  if (label) label.textContent = mode === "advanced" ? "Advanced Lessons" : "Basic Lessons";
+  if (resetRow) resetRow.style.display = dismissed ? "flex" : "none";
 }
 
 function closeLearnWelcome() {
@@ -10813,10 +10877,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.2.2";
 
 const UPDATE_NOTES = [
-  "fixed scroll fade gap at the bottom of modals"
+  "Added Advanced Lessons option — choose Basic or Advanced when opening Lessons",
+  "Advanced Lessons menu with unique gold styling and all 6 topics ready for content",
+  "Lesson mode preference saved; can be changed or reset in Settings"
 ];
 
 let deferredInstallPrompt = null;
