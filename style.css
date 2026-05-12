@@ -7576,6 +7576,10 @@ button[onclick="showInstallSteps('iphone')"]::after {
 
 
 
+.modal-card.has-scroll-fade {
+  padding-bottom: 0 !important;
+}
+
 .modal-scroll-fade {
   position: sticky;
   bottom: 0;

@@ -10813,10 +10813,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.1";
 
 const UPDATE_NOTES = [
-  "fixed scroll fade indicator at the bottom of modals"
+  "fixed scroll fade gap at the bottom of modals"
 ];
 
 let deferredInstallPrompt = null;
@@ -11440,6 +11440,7 @@ function syncOneSignalPushState() {
     function check() {
       const scrollable = card.scrollHeight > card.clientHeight + 4;
       const atBottom = card.scrollTop + card.clientHeight >= card.scrollHeight - 20;
+      card.classList.toggle('has-scroll-fade', scrollable);
       fade.style.opacity = (scrollable && !atBottom) ? '1' : '0';
     }
 
