@@ -7999,12 +7999,48 @@ body.dark-mode .lesson-progress-badge.advanced {
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .breakdown-tab.active {
   background: var(--accent, #4f8cff);
   color: #fff;
+}
+
+/* Advanced tab goes gold */
+.lessons-breakdown-card.adv-tab-active #breakdownAdvancedTab {
+  border-color: #c9a227;
+  background: #c9a227;
+  color: #fff;
+}
+
+.lessons-breakdown-card.adv-tab-active #breakdownBasicTab {
+  border-color: #c9a227;
+  color: #c9a227;
+  background: transparent;
+}
+
+.lessons-breakdown-card.adv-tab-active .breakdown-num {
+  background: #c9a227;
+}
+
+.lessons-breakdown-card.adv-tab-active .breakdown-lesson-item.done .breakdown-num {
+  background: #22c55e;
+}
+
+body.dark-mode .lessons-breakdown-card.adv-tab-active #breakdownAdvancedTab {
+  border-color: #e2b93b;
+  background: #e2b93b;
+}
+
+body.dark-mode .lessons-breakdown-card.adv-tab-active #breakdownBasicTab {
+  border-color: #e2b93b;
+  color: #e2b93b;
+}
+
+body.dark-mode .lessons-breakdown-card.adv-tab-active .breakdown-num {
+  background: #e2b93b;
+  color: #1a1a1a;
 }
 
 .lessons-breakdown-list {
