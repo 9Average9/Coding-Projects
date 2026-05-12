@@ -9489,8 +9489,72 @@ function updateAdvLessonTopBar(lessonId) {
 
   if (action) {
     action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
-    action.title = "Lesson Notes";
-    action.onclick = () => {};
+    action.title = "Cheat Sheet";
+    action.onclick = () => openAdvCheatSheet(lessonId);
+  }
+}
+
+function openAdvCheatSheet(lessonId) {
+  const modal = document.getElementById("advCheatSheetModal");
+  if (!modal) return;
+
+  const content = document.getElementById("advCheatSheetContent");
+  if (content) {
+    if (lessonId === "adv_history") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">NT Greek Overview — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">What is Koine Greek?</h4>
+          <p>The everyday ("common") Greek of the 1st century AD. Written 300 BC–AD 700. The language of the entire NT.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Why Greek spread</h4>
+          <p>Alexander the Great (334–323 BC) conquered the known world and imposed Greek as the common tongue. Rome later adopted it.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Septuagint (LXX)</h4>
+          <p>Greek translation of the OT (begun ~250 BC, Alexandria). NT authors quote it almost exclusively.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">NT Manuscript count</h4>
+          <p>5,800+ Greek manuscripts — more than any other ancient work. P52 (John 18) dated ~100–150 AD.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Textual criticism</h4>
+          <p>~400,000 variants across all manuscripts; 99.5% textually pure. None affect core doctrine. Standard text: NA28 / UBS5.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">How Greek grammar works</h4>
+          <p>Word <strong>ORDER</strong> = emphasis. Word <strong>ENDINGS</strong> (inflections) = grammatical function (subject, object, etc.).</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key word distinctions</h4>
+          <p>ἀγαπάω vs. φιλέω (two words for "love"). Verbal aspect: present = ongoing; aorist = simple whole.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Vocabulary tip (Mounce)</h4>
+          <p>Learn the 320 most frequent NT words → covers 80%+ of all word occurrences.</p>
+        </div>
+      `;
+    } else {
+      content.innerHTML = `<p style="opacity:0.6;text-align:center;padding:20px 0">No cheat sheet available for this lesson yet.</p>`;
+    }
+  }
+
+  modal.classList.add("open");
+}
+
+function closeAdvCheatSheetModal(event) {
+  if (!event || event.target.id === "advCheatSheetModal") {
+    document.getElementById("advCheatSheetModal")?.classList.remove("open");
   }
 }
 
@@ -9708,6 +9772,11 @@ function renderAdvQuizQ(idx) {
     </div>
     ${isLast && allDone ? `<button class="main-btn quiz-see-results-btn" onclick="finishAdvQuiz()">See Results</button>` : ""}
   `;
+
+  // Slide-in animation
+  body.classList.remove("quiz-modal-body-animate");
+  void body.offsetHeight;
+  body.classList.add("quiz-modal-body-animate");
 }
 
 function selectAdvQuizAns(optIdx) {
@@ -9715,6 +9784,7 @@ function selectAdvQuizAns(optIdx) {
   const total = data.questions.length;
   currentQuizAnswers[currentQuizQIdx] = optIdx;
 
+  // Highlight selection and disable all options immediately
   document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
     btn.classList.toggle("qm-selected", i === optIdx);
     btn.disabled = true;
@@ -9722,12 +9792,17 @@ function selectAdvQuizAns(optIdx) {
 
   const isLast = currentQuizQIdx === total - 1;
   if (isLast) {
-    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 400);
+    // Re-render last question locked state, then show See Results button
+    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 200);
   } else {
     setTimeout(() => {
+      // Clear selection classes before advancing to prevent flash on new question
+      document.querySelectorAll(".quiz-modal-opt").forEach(btn => {
+        btn.classList.remove("qm-selected");
+      });
       currentQuizQIdx++;
       renderAdvQuizQ(currentQuizQIdx);
-    }, 500);
+    }, 200);
   }
 }
 
@@ -9756,16 +9831,21 @@ function finishAdvQuiz() {
   const result = document.getElementById("quizModalResult");
   if (!result) return;
   result.classList.remove("hidden");
+  const seeAnswersBtn = correct < total
+    ? `<br><button class="text-btn" style="margin-top:6px" onclick="showAdvQuizAnswers()">See Answers</button>`
+    : "";
   result.innerHTML = passed
     ? `<div class="quiz-result-icon">🎉</div>
        <h3>${correct} / ${total} Correct</h3>
        <p>You passed! You can now complete this lesson.</p>
        <button class="main-btn" onclick="completeAdvancedLesson('${lessonId}'); closeAdvQuizModal();">Complete Lesson</button>
-       <br><button class="text-btn" style="margin-top:10px" onclick="retryAdvQuiz()">Retake Quiz</button>`
+       <br><button class="text-btn" style="margin-top:10px" onclick="retryAdvQuiz()">Retake Quiz</button>
+       ${seeAnswersBtn}`
     : `<div class="quiz-result-icon">📖</div>
        <h3>${correct} / ${total} Correct</h3>
        <p>You need ${data.passMark}/${total} to pass. Review the lesson and try again.</p>
-       <button class="main-btn" onclick="retryAdvQuiz()">Try Again</button>`;
+       <button class="main-btn" onclick="retryAdvQuiz()">Try Again</button>
+       ${seeAnswersBtn}`;
 
   const scores = JSON.parse(localStorage.getItem("advQuizScores") || "{}");
   scores[lessonId] = { correct, total, passed };
@@ -9780,6 +9860,35 @@ function retryAdvQuiz() {
   document.getElementById("quizModalResult")?.classList.add("hidden");
   document.getElementById("quizModalBody")?.classList.remove("hidden");
   renderAdvQuizQ(0);
+}
+
+function showAdvQuizAnswers() {
+  const data = ADV_QUIZ_DATA[currentQuizLesson];
+  const result = document.getElementById("quizModalResult");
+  if (!result || !data) return;
+
+  const rows = data.questions.map((q, i) => {
+    const userAns = currentQuizAnswers[i];
+    const correctAns = q.correct;
+    const isCorrect = userAns === correctAns;
+    const userLabel = userAns !== null ? q.options[userAns] : "—";
+    const correctLabel = q.options[correctAns];
+    return `
+      <div class="quiz-answer-row">
+        <p class="quiz-answer-q">${i + 1}. ${q.text}</p>
+        ${!isCorrect ? `<p class="quiz-answer-wrong">✗ Your answer: ${userLabel}</p>` : ""}
+        <p class="quiz-answer-correct">✓ ${isCorrect ? "Correct: " : ""}${correctLabel}</p>
+      </div>
+    `;
+  }).join("");
+
+  result.innerHTML = `
+    <div class="quiz-answer-review">
+      <h3 style="margin:0 0 14px">Answer Review</h3>
+      ${rows}
+    </div>
+    <button class="text-btn" style="margin-top:12px" onclick="finishAdvQuiz()">Back to Results</button>
+  `;
 }
 
 function updateAdvLessonScore(lessonId, correct, total, passed) {
@@ -11247,23 +11356,19 @@ function renderAchievements() {
   const list = document.getElementById("achievementsList");
   if (!list) return;
 
-  if (achievements.length === 0) {
-    list.innerHTML = `<div class="achievement-icon">
-  <span class="material-symbols-outlined achievement-symbol">
-    ${item.icon}
-  </span>
-</div>`;
-    return;
-  }
+  const total = Object.keys(ACHIEVEMENT_DATA).length;
+  const earned = achievements.length;
+
+  // Update header count if element exists
+  const header = document.getElementById("achievementsCount");
+  if (header) header.textContent = `${earned} / ${total} earned`;
 
   list.innerHTML = "";
 
-  achievements.forEach(id => {
-    const item = ACHIEVEMENT_DATA[id];
-    if (!item) return;
-
+  Object.entries(ACHIEVEMENT_DATA).forEach(([id, item]) => {
+    const isEarned = achievements.includes(id);
     const div = document.createElement("div");
-    div.className = "achievement-item";
+    div.className = "achievement-item" + (isEarned ? "" : " achievement-locked");
     div.innerHTML = `
       <div class="achievement-icon">${item.icon}</div>
       <div>
@@ -11467,14 +11572,16 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.1";
+const APP_VERSION = "1.3.2";
 
 const UPDATE_NOTES = [
-  "Advanced lessons now go full width like basic lessons",
-  "Knowledge check buttons work — instant right/wrong feedback with explanation",
-  "All blocks and knowledge checks must be completed to unlock the quiz",
-  "Quiz is now a step-by-step modal — one question at a time, back button to change answers",
-  "Quiz score saved and shown on the lesson after completion"
+  "Advanced lessons now stretch nearly full screen width",
+  "Bill Mounce credit callout added to Lesson 1",
+  "Achievements modal now shows all achievements — unearned ones are faded with a count",
+  "Cheat sheet available for Lesson 1 via the description button",
+  "Quiz transitions are faster with a slide animation",
+  "See Answers button added to quiz results when questions are wrong",
+  "Dark mode fixes for quiz modal, score badge, and cheat sheet"
 ];
 
 let deferredInstallPrompt = null;

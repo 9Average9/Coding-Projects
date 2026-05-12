@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=62" />
+  <link rel="stylesheet" href="style.css?v=63" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4359,6 +4359,10 @@ OneSignalDeferred.push(async function(OneSignal) {
       The New Testament was not handed down from heaven in a sacred code — it was written in the <em>everyday language</em> of real people living in a real empire. Understanding that language brings you closer to the text than any translation ever can.
     </p>
 
+    <p class="highlight" style="margin: 0 0 18px; font-size: 0.88rem; line-height: 1.6;">
+      <strong>About these lessons:</strong> <strong>Bill Mounce</strong> is a New Testament Greek scholar and the author of <em>Basics of Biblical Greek Grammar</em> — one of the most widely used NT Greek textbooks in seminaries and universities worldwide. Some of the structure, paradigms, and teaching approach in these advanced lessons are adapted from his work. His textbook website is <strong>billmounce.com</strong>.
+    </p>
+
     <!-- Block 1 -->
     <div class="lesson-block" onclick="toggleLessonBlock(this)">
       <div class="lesson-block-header">What Is Koine Greek?</div>
@@ -6039,7 +6043,7 @@ OneSignalDeferred.push(async function(OneSignal) {
     <button class="modal-close" onclick="hideAchievementsModal()">×</button>
 
     <h2>Achievements</h2>
-    <p>Major milestones from your Greek journey.</p>
+    <p>Major milestones from your Greek journey. <strong id="achievementsCount"></strong></p>
 
     <div id="achievementsList" class="achievements-list"></div>
   </div>
@@ -6059,8 +6063,8 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=62"></script>
-  <script src="app.js?v=62"></script>
+  <script src="vocab.js?v=63"></script>
+  <script src="app.js?v=63"></script>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
@@ -6204,6 +6208,14 @@ OneSignalDeferred.push(async function(OneSignal) {
 
 
 <!-- Advanced Quiz Modal -->
+<!-- Advanced Cheat Sheet Modal -->
+<div id="advCheatSheetModal" class="modal-overlay" onclick="closeAdvCheatSheetModal(event)">
+  <div class="modal-card adv-cheat-sheet-modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeAdvCheatSheetModal()">×</button>
+    <div id="advCheatSheetContent"></div>
+  </div>
+</div>
+
 <div id="advQuizModal" class="modal-overlay" onclick="closeAdvQuizModal(event)">
   <div class="modal-card adv-quiz-modal-card" onclick="event.stopPropagation()">
     <div class="quiz-modal-topbar">
