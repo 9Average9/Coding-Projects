@@ -10813,9 +10813,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.1.6";
+const APP_VERSION = "1.1.7";
 
 const UPDATE_NOTES = [
+  "scroll indicator on modals with more content below",
   "block iOS users from Android install button",
   "faster icon loading on all devices",
   "fixed push notifications not subscribing users",
@@ -11445,5 +11446,34 @@ function syncOneSignalPushState() {
     }
   });
 }
+
+(function () {
+  function initScrollFade(card) {
+    if (!card || card._scrollFadeInit) return;
+    card._scrollFadeInit = true;
+
+    function check() {
+      const scrollable = card.scrollHeight > card.clientHeight + 4;
+      card.classList.toggle('scrollable-modal', scrollable);
+      if (scrollable) {
+        const atBottom = card.scrollTop + card.clientHeight >= card.scrollHeight - 16;
+        card.classList.toggle('at-bottom', atBottom);
+      }
+    }
+
+    card.addEventListener('scroll', check, { passive: true });
+    new ResizeObserver(check).observe(card);
+    check();
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    new MutationObserver(() => {
+      if (overlay.classList.contains('open')) {
+        const card = overlay.querySelector('.modal-card');
+        if (card) requestAnimationFrame(() => initScrollFade(card));
+      }
+    }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
+  });
+})();
 
 
