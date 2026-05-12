@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=58" />
+  <link rel="stylesheet" href="style.css?v=59" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -395,8 +395,8 @@ OneSignalDeferred.push(async function(OneSignal) {
     </button>
 
     <div class="nav-title" id="learnLessonTitle">Lessons</div>
-    <button id="learnTopAction" class="icon-btn lesson-top-action" onclick="showLearnInfo()" title="Info">
-  <span class="material-symbols-outlined">info</span>
+    <button id="learnTopAction" class="icon-btn lesson-top-action" onclick="showLessonModeModal()" title="Switch mode">
+  <span class="material-symbols-outlined">tune</span>
 </button>
 <!--
    <button id="learnMenuBtn" class="icon-btn" onclick="toggleLearnSideMenu(event)" aria-label="Open lesson menu" title="Lessons">
@@ -4684,14 +4684,14 @@ OneSignalDeferred.push(async function(OneSignal) {
   <h3>Lesson Mode</h3>
   <p class="helper-text">Choose how you want to study through the lessons.</p>
 
-  <div class="toggle-row">
-    <span id="currentLessonModeLabel">Basic Lessons</span>
-    <button class="small-btn" onclick="showLessonModeModal()">Change</button>
+  <div class="lesson-mode-settings-row">
+    <span class="lesson-mode-settings-label" id="currentLessonModeLabel">Basic Lessons</span>
+    <button class="lesson-mode-pill-btn" onclick="showLessonModeModal()">Change</button>
   </div>
 
-  <div class="toggle-row" id="lessonModeResetRow" style="display:none">
-    <span>Reset lesson prompt</span>
-    <button class="small-btn" onclick="resetLessonModePrompt()">Reset</button>
+  <div class="lesson-mode-settings-row" id="lessonModeResetRow" style="display:none">
+    <span class="lesson-mode-settings-label">Reset lesson prompt</span>
+    <button class="lesson-mode-pill-btn muted" onclick="resetLessonModePrompt()">Reset</button>
   </div>
 </div>
 
@@ -5687,8 +5687,8 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=58"></script>
-  <script src="app.js?v=58"></script>
+  <script src="vocab.js?v=59"></script>
+  <script src="app.js?v=59"></script>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
