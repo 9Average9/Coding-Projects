@@ -11274,15 +11274,14 @@ function getPushStatus() {
 function updateNotificationButtonUI() {
   const btn = document.getElementById("profileNotificationBtn");
   const text = document.getElementById("profileNotificationBtnText");
+  const icon = btn?.querySelector(".material-symbols-outlined");
 
   if (!btn || !text) return;
 
   const enabled = getPushStatus();
 
-  text.textContent = enabled
-    ? "Disable Study Reminders"
-    : "Enable Study Reminders";
-
+  text.textContent = enabled ? "Disable Study Reminders" : "Enable Study Reminders";
+  if (icon) icon.textContent = enabled ? "notifications_off" : "notifications";
   btn.classList.toggle("notifications-enabled", enabled);
 }
 
