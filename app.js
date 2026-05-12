@@ -9784,25 +9784,30 @@ function selectAdvQuizAns(optIdx) {
   const total = data.questions.length;
   currentQuizAnswers[currentQuizQIdx] = optIdx;
 
-  // Highlight selection and disable all options immediately
-  document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
-    btn.classList.toggle("qm-selected", i === optIdx);
-    btn.disabled = true;
-  });
+  // Disable all options immediately
+  document.querySelectorAll(".quiz-modal-opt").forEach(btn => { btn.disabled = true; });
 
   const isLast = currentQuizQIdx === total - 1;
   if (isLast) {
-    // Re-render last question locked state, then show See Results button
+    // Show selection briefly on the last question, then re-render with See Results
+    document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
+      btn.classList.toggle("qm-selected", i === optIdx);
+    });
     setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 200);
   } else {
+    // Flash selection for 80ms then clear it, then after 200ms advance
+    document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
+      btn.classList.toggle("qm-selected", i === optIdx);
+    });
     setTimeout(() => {
-      // Clear selection classes before advancing to prevent flash on new question
       document.querySelectorAll(".quiz-modal-opt").forEach(btn => {
         btn.classList.remove("qm-selected");
       });
+    }, 80);
+    setTimeout(() => {
       currentQuizQIdx++;
       renderAdvQuizQ(currentQuizQIdx);
-    }, 200);
+    }, 220);
   }
 }
 
@@ -11572,7 +11577,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.2";
+const APP_VERSION = "1.3.3";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",

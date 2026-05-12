@@ -5038,7 +5038,7 @@ body.dark .xp-bar {
 
 .xp-toast {
   position: fixed;
-  top: 16px;
+  top: 56px;
   left: 50%;
   transform: translate(-50%, -140%);
   width: min(92vw, 420px);
@@ -8143,6 +8143,7 @@ body.dark-mode .profile-mode-badge.advanced {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  color: inherit;
 }
 
 .journey-stat.clickable-stat:active {
@@ -8532,8 +8533,7 @@ body.dark-mode .quiz-result.quiz-fail {
 #advancedLearnMenu.screen.active {
   background: transparent;
   box-shadow: none;
-  padding: 10px 8px 30px;
-  max-width: 100%;
+  padding: 10px 0 30px;
 }
 
 #advancedLearnMenu .adv-learn-lesson .lesson-module {
@@ -8668,15 +8668,19 @@ body.dark #advancedLearnMenu .adv-learn-lesson .lesson-block-header {
 }
 
 .quiz-modal-topbar {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(0,0,0,0.07);
 }
 
 .quiz-modal-progress-wrap {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
   display: flex;
   flex-direction: column;
   gap: 4px;
