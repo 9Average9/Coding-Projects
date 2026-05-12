@@ -10813,9 +10813,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.1.5";
+const APP_VERSION = "1.1.6";
 
 const UPDATE_NOTES = [
+  "block iOS users from Android install button",
+  "faster icon loading on all devices",
   "fixed push notifications not subscribing users",
   "fixed OneSignal service worker path",
   "updated disable notifications icon",
@@ -10935,6 +10937,11 @@ window.addEventListener("beforeinstallprompt", (event) => {
 });
 
 async function triggerAndroidInstall() {
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    alert("Must be an Android device to use this feature.");
+    return;
+  }
+
   if (!deferredInstallPrompt) return;
 
   deferredInstallPrompt.prompt();
