@@ -9284,9 +9284,9 @@ function showLearnLesson(lesson) {
 }, 500);
 
 function showNewLearnMenu() {
-  const savedMode = localStorage.getItem("lessonMode");
   const dismissed = localStorage.getItem("lessonModePromptDismissed") === "true";
-  if (savedMode && dismissed) {
+  if (dismissed) {
+    const savedMode = localStorage.getItem("lessonMode") || "basic";
     if (savedMode === "advanced") {
       showAdvancedLearnMenu();
     } else {
@@ -10907,8 +10907,10 @@ function closeLessonsBreakdownModal(event) {
 function switchLessonBreakdownTab(tab) {
   const basicTab = document.getElementById("breakdownBasicTab");
   const advTab = document.getElementById("breakdownAdvancedTab");
+  const card = document.querySelector(".lessons-breakdown-card");
   if (basicTab) basicTab.classList.toggle("active", tab === "basic");
   if (advTab) advTab.classList.toggle("active", tab === "advanced");
+  if (card) card.classList.toggle("adv-tab-active", tab === "advanced");
   renderLessonsBreakdown(tab);
 }
 
@@ -11081,14 +11083,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.2.4";
+const APP_VERSION = "1.2.5";
 
 const UPDATE_NOTES = [
-  "Completing Advanced lessons now unlocks Vocab and practice tools just like Basic",
-  "Locked feature progress bar reflects Advanced lesson count when in Advanced mode",
-  "Settings Lesson Mode card has a cleaner look with slimmer pill buttons",
-  "Advanced mode label shows in gold in Settings",
-  "Lesson menu now shows a mode-switch button matching both menus"
+  "Lesson path prompt now shows every time unless you checked Don't Ask Me Again",
+  "Advanced tab in lesson progress turns gold when selected"
 ];
 
 let deferredInstallPrompt = null;
