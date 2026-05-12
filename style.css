@@ -8989,3 +8989,112 @@ body.dark .adv-cs-header {
 #advancedLearnMenu.screen.active .nav-bar {
   margin-bottom: 4px;
 }
+
+/* ===== ADVANCED LESSON v1.3.5 LAYOUT FIXES ===== */
+
+/* 1. Nav-bar: add side padding when in lesson view so buttons don't hug edges */
+@media (max-width: 760px) {
+  body #advancedLearnMenu.screen.active:has(.adv-learn-lesson.active) .nav-bar {
+    padding: 0 10px;
+  }
+}
+
+/* 2. Checkmark: prevent it from overlapping header text */
+#advancedLearnMenu .adv-learn-lesson .lesson-block.visited .lesson-block-header {
+  position: relative !important;
+  padding-right: 44px !important;
+}
+
+/* 3. Header align — center items vertically on mobile for cleaner look */
+@media (max-width: 760px) {
+  #advancedLearnMenu .adv-learn-lesson .lesson-block-header {
+    align-items: center;
+  }
+}
+
+/* 4. Table inside .paradigm-table fix — the class was designed for div grids,
+   but the manuscripts block uses a real <table> element which display:grid breaks */
+table.paradigm-table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.paradigm-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.1);
+  margin: 12px 0;
+}
+
+table.paradigm-table th {
+  padding: 8px 12px !important;
+  text-align: left !important;
+  font-weight: 700 !important;
+  background: rgba(201, 162, 39, 0.12) !important;
+  border-bottom: 2px solid rgba(201, 162, 39, 0.25) !important;
+  color: var(--font-color) !important;
+}
+
+table.paradigm-table td {
+  padding: 8px 12px !important;
+  border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+  background: transparent !important;
+  color: var(--font-color) !important;
+}
+
+table.paradigm-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+body.dark .paradigm-table-wrap {
+  border-color: rgba(255,255,255,0.12);
+}
+
+body.dark table.paradigm-table th {
+  background: rgba(201, 162, 39, 0.15) !important;
+  border-color: rgba(201, 162, 39, 0.3) !important;
+}
+
+body.dark table.paradigm-table td {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* 5. Theme-aware colors for advanced lesson blocks */
+body #advancedLearnMenu .adv-learn-lesson .lesson-lead {
+  background: color-mix(in srgb, var(--secondary-color) 7%, var(--card-color)) !important;
+  border-color: color-mix(in srgb, var(--secondary-color) 24%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+}
+
+body #advancedLearnMenu .adv-learn-lesson .lesson-block {
+  background: color-mix(in srgb, var(--secondary-color) 5%, var(--card-color)) !important;
+  border-color: color-mix(in srgb, var(--secondary-color) 22%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+}
+
+body #advancedLearnMenu .adv-learn-lesson .lesson-block-header {
+  background: color-mix(in srgb, #c9a227 10%, var(--card-color)) !important;
+  border-color: color-mix(in srgb, #c9a227 25%, var(--border-color)) !important;
+  color: var(--font-color) !important;
+}
+
+body #advancedLearnMenu .adv-learn-lesson .lesson-block-content {
+  background: transparent !important;
+  color: var(--font-color) !important;
+}
+
+body #advancedLearnMenu .adv-learn-lesson .lesson-block p,
+body #advancedLearnMenu .adv-learn-lesson .lesson-block li,
+body #advancedLearnMenu .adv-learn-lesson .lesson-block h4,
+body #advancedLearnMenu .adv-learn-lesson .lesson-block strong,
+body #advancedLearnMenu .adv-learn-lesson .lesson-lead p {
+  color: var(--font-color) !important;
+}
+
+body #advancedLearnMenu .adv-learn-lesson .highlight {
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)) !important;
+  color: var(--font-color) !important;
+}

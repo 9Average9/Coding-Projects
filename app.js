@@ -11571,7 +11571,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.4";
+const APP_VERSION = "1.3.5";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
