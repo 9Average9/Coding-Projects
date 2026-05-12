@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=61" />
+  <link rel="stylesheet" href="style.css?v=62" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4380,10 +4380,10 @@ OneSignalDeferred.push(async function(OneSignal) {
       <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">What does the Greek word κοινή mean?</p>
       <div class="kc-options">
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_1', this, false, 'Close — but κοινή actually means \"common.\" It was the everyday, widely-spoken form of Greek, not a sacred or holy dialect.')">Sacred</button>
-        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_1', this, true, 'Correct! κοινή means \"common.\" It was the universal, everyday language of the ancient Mediterranean world — the Greek everyone spoke.')">Common</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_1', this, false, 'Not quite — κοινή means \"common.\" It refers to how widespread and shared this form of Greek was, not to whether it was written.')">Written</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_1', this, false, 'κοινή means \"common,\" not ancient. In fact, it was a relatively late development compared to Classical Greek — it was the living, everyday language of its time.')">Ancient</button>
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_history_1', this)">Sacred</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_history_1', this)">Common</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_history_1', this)">Written</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_history_1', this)">Ancient</button>
       </div>
       <div class="kc-feedback" id="kc_adv_history_1_fb"></div>
     </div>
@@ -4441,10 +4441,10 @@ OneSignalDeferred.push(async function(OneSignal) {
       <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">What event most directly caused Greek to become the universal language of the ancient Mediterranean world?</p>
       <div class="kc-options">
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_2', this, false, 'Rome\'s expansion was significant, but Romans actually adopted Greek — they didn\'t spread it. The spread of Greek came earlier, through Alexander.')">The founding and expansion of the Roman Empire</button>
-        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_2', this, true, 'Exactly right. Alexander\'s conquests from 334–323 BC imposed Greek across a massive territory, turning it into the lingua franca of the ancient world.')">Alexander the Great's military conquests</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_2', this, false, 'The Septuagint was an important use of Greek, but it was itself a product of Greek already being the dominant language — not the cause of that dominance.')">The translation of the Septuagint in Alexandria</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_2', this, false, 'The Athenian empire was regional and ended before Koine began. It was Alexander — not Athens — who spread Greek across the entire known world.')">The cultural dominance of Athens during the Classical period</button>
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_history_2', this)">The founding and expansion of the Roman Empire</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_history_2', this)">Alexander the Great's military conquests</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_history_2', this)">The translation of the Septuagint in Alexandria</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_history_2', this)">The cultural dominance of Athens during the Classical period</button>
       </div>
       <div class="kc-feedback" id="kc_adv_history_2_fb"></div>
     </div>
@@ -4497,10 +4497,10 @@ OneSignalDeferred.push(async function(OneSignal) {
       <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">When NT authors quote the Old Testament, which text do they most commonly use?</p>
       <div class="kc-options">
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_3', this, false, 'The Hebrew Masoretic Text is what modern English OT translations are based on — but NT authors writing in Greek almost always quoted the Greek Septuagint (LXX) instead.')">The Hebrew Masoretic Text (MT)</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_3', this, false, 'The Latin Vulgate was Jerome\'s 4th-century translation — centuries after the NT was written. NT authors had no access to it.')">The Latin Vulgate</button>
-        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_3', this, true, 'Correct! NT authors overwhelmingly quoted the Septuagint (LXX) — the Greek translation of the OT. This is the Bible the early church used and the text that shaped NT theology.')">The Septuagint (LXX)</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_3', this, false, 'Aramaic Targums were paraphrases used in synagogue readings, but NT authors wrote in Greek and quoted the Greek OT (LXX), not Aramaic paraphrases.')">The Aramaic Targums</button>
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_history_3', this)">The Hebrew Masoretic Text (MT)</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_history_3', this)">The Latin Vulgate</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_history_3', this)">The Septuagint (LXX)</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_history_3', this)">The Aramaic Targums</button>
       </div>
       <div class="kc-feedback" id="kc_adv_history_3_fb"></div>
     </div>
@@ -4591,10 +4591,10 @@ OneSignalDeferred.push(async function(OneSignal) {
       <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">Approximately how many Greek New Testament manuscripts do scholars have access to today?</p>
       <div class="kc-options">
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_4', this, false, 'That number is closer to the manuscript count for Caesar\'s Gallic Wars or Plato\'s works — impressive for ancient literature, but far fewer than the NT\'s 5,800+.')">About 250</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_4', this, false, 'Homer\'s Iliad has roughly 1,800 manuscripts — the second-best attested ancient work. But the NT far surpasses even that.')">About 1,800</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_4', this, false, 'Close — but the actual number exceeds even 3,000. There are over 5,800 Greek NT manuscripts, plus thousands more in Latin, Syriac, Coptic, and other languages.')">About 3,000</button>
-        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_4', this, true, 'Correct! There are over 5,800 Greek NT manuscripts — more than any other ancient document by far. This gives scholars exceptional ability to verify the text.')">Over 5,800</button>
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_history_4', this)">About 250</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_history_4', this)">About 1,800</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_history_4', this)">About 3,000</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_history_4', this)">Over 5,800</button>
       </div>
       <div class="kc-feedback" id="kc_adv_history_4_fb"></div>
     </div>
@@ -4660,10 +4660,10 @@ OneSignalDeferred.push(async function(OneSignal) {
       <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">In Greek, what primarily determines the grammatical function of a word in a sentence (i.e., whether it is the subject or object)?</p>
       <div class="kc-options">
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_5', this, false, 'In English, word position determines function — but Greek works differently. In Greek, the ending (inflection) on a word shows its grammatical role, regardless of where it sits in the sentence.')">Its position in the sentence</button>
-        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_5', this, true, 'Exactly right! Greek is an inflected language — the ending attached to a word shows whether it is a subject, object, possessive, etc. This frees Greek word order to carry emphasis instead of grammar.')">Its ending (inflection)</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_5', this, false, 'Unlike English prepositions, Greek case endings are attached directly to words. The word before it doesn\'t determine the function — the ending does.')">The word immediately before it</button>
-        <button class="kc-opt" onclick="answerKC('kc_adv_history_5', this, false, 'Accents affect pronunciation and can occasionally distinguish meaning, but they don\'t determine the grammatical function (subject vs. object). Endings do that.')">Whether or not it carries an accent</button>
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_history_5', this)">Its position in the sentence</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_history_5', this)">Its ending (inflection)</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_history_5', this)">The word immediately before it</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_history_5', this)">Whether or not it carries an accent</button>
       </div>
       <div class="kc-feedback" id="kc_adv_history_5_fb"></div>
     </div>
@@ -4700,91 +4700,17 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
     </div>
 
-    <!-- Mini Quiz -->
-    <div class="adv-mini-quiz" id="miniQuiz_adv_history">
-      <div class="quiz-header">
+    <div class="adv-quiz-start-area">
+      <div id="lessonScore_adv_history" class="lesson-score-badge" style="display:none"></div>
+      <button id="startQuiz_adv_history" class="main-btn adv-start-quiz-btn"
+        onclick="openAdvQuiz('adv_history')" disabled>
         <span class="material-symbols-outlined">assignment</span>
-        <h3>Lesson Quiz</h3>
-        <p>Answer at least <strong>5 of 7</strong> questions correctly to complete this lesson.</p>
-      </div>
-
-      <div class="quiz-questions">
-
-        <div class="quiz-q" data-correct="b">
-          <p class="q-text">1. What does the Greek word <em>κοινή</em> mean?</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q1_adv_history" value="a"> Sacred</label>
-            <label><input type="radio" name="q1_adv_history" value="b"> Common</label>
-            <label><input type="radio" name="q1_adv_history" value="c"> Written</label>
-            <label><input type="radio" name="q1_adv_history" value="d"> Ancient</label>
-          </div>
-        </div>
-
-        <div class="quiz-q" data-correct="c">
-          <p class="q-text">2. Who was primarily responsible for spreading Greek across the ancient world?</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q2_adv_history" value="a"> Julius Caesar</label>
-            <label><input type="radio" name="q2_adv_history" value="b"> Ptolemy II</label>
-            <label><input type="radio" name="q2_adv_history" value="c"> Alexander the Great</label>
-            <label><input type="radio" name="q2_adv_history" value="d"> The Apostle Paul</label>
-          </div>
-        </div>
-
-        <div class="quiz-q" data-correct="b">
-          <p class="q-text">3. The Septuagint (LXX) is best described as:</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q3_adv_history" value="a"> The original Hebrew Old Testament</label>
-            <label><input type="radio" name="q3_adv_history" value="b"> A Greek translation of the Old Testament</label>
-            <label><input type="radio" name="q3_adv_history" value="c"> A Greek commentary on the Torah</label>
-            <label><input type="radio" name="q3_adv_history" value="d"> Paul's collection of OT quotations</label>
-          </div>
-        </div>
-
-        <div class="quiz-q" data-correct="d">
-          <p class="q-text">4. Approximately how many Greek NT manuscripts exist today?</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q4_adv_history" value="a"> About 250</label>
-            <label><input type="radio" name="q4_adv_history" value="b"> About 1,800</label>
-            <label><input type="radio" name="q4_adv_history" value="c"> About 3,000</label>
-            <label><input type="radio" name="q4_adv_history" value="d"> Over 5,800</label>
-          </div>
-        </div>
-
-        <div class="quiz-q" data-correct="a">
-          <p class="q-text">5. In Greek, what primarily determines whether a word is the subject or the object of a sentence?</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q5_adv_history" value="a"> Its ending (inflection)</label>
-            <label><input type="radio" name="q5_adv_history" value="b"> Its position in the sentence</label>
-            <label><input type="radio" name="q5_adv_history" value="c"> Whether it is capitalized</label>
-            <label><input type="radio" name="q5_adv_history" value="d"> The word that precedes it</label>
-          </div>
-        </div>
-
-        <div class="quiz-q" data-correct="c">
-          <p class="q-text">6. What is the approximate date of Papyrus P52 — the oldest known NT manuscript fragment?</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q6_adv_history" value="a"> About 300 AD</label>
-            <label><input type="radio" name="q6_adv_history" value="b"> About 250 AD</label>
-            <label><input type="radio" name="q6_adv_history" value="c"> About 100–150 AD</label>
-            <label><input type="radio" name="q6_adv_history" value="d"> About 50 AD</label>
-          </div>
-        </div>
-
-        <div class="quiz-q" data-correct="b">
-          <p class="q-text">7. According to Mounce, what is the most important foundation for learning to read biblical Greek?</p>
-          <div class="q-opts">
-            <label><input type="radio" name="q7_adv_history" value="a"> Mastering all the grammar rules before reading</label>
-            <label><input type="radio" name="q7_adv_history" value="b"> Building vocabulary, starting with the most frequent NT words</label>
-            <label><input type="radio" name="q7_adv_history" value="c"> Learning to write Greek by hand first</label>
-            <label><input type="radio" name="q7_adv_history" value="d"> Studying Classical Greek before Koine</label>
-          </div>
-        </div>
-
-      </div><!-- /quiz-questions -->
-
-      <button class="main-btn quiz-submit-btn" onclick="submitAdvMiniQuiz('adv_history')">Submit Quiz</button>
-      <div class="quiz-result" id="quizResult_adv_history"></div>
-    </div><!-- /mini-quiz -->
+        Start Lesson Quiz
+      </button>
+      <p id="quizHint_adv_history" class="quiz-unlock-hint">
+        Open every section and answer every knowledge check to unlock the quiz.
+      </p>
+    </div>
 
   </div><!-- /lesson-module -->
 </div><!-- /adv_historyLesson -->
@@ -6133,8 +6059,8 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=61"></script>
-  <script src="app.js?v=61"></script>
+  <script src="vocab.js?v=62"></script>
+  <script src="app.js?v=62"></script>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
@@ -6276,6 +6202,24 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 </div>
 
+
+<!-- Advanced Quiz Modal -->
+<div id="advQuizModal" class="modal-overlay" onclick="closeAdvQuizModal(event)">
+  <div class="modal-card adv-quiz-modal-card" onclick="event.stopPropagation()">
+    <div class="quiz-modal-topbar">
+      <button class="icon-btn quiz-back-btn" id="quizBackBtn" onclick="advQuizGoBack()" style="visibility:hidden">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <div class="quiz-modal-progress-wrap">
+        <div class="quiz-modal-bar"><div class="quiz-modal-fill" id="quizModalFill"></div></div>
+        <span class="quiz-modal-counter" id="quizModalCounter">1 / 7</span>
+      </div>
+      <button class="modal-close" onclick="closeAdvQuizModal()">×</button>
+    </div>
+    <div id="quizModalBody"></div>
+    <div id="quizModalResult" class="quiz-modal-result hidden"></div>
+  </div>
+</div>
 
 <!-- Lessons Breakdown Modal -->
 <div id="lessonsBreakdownModal" class="modal-overlay" onclick="closeLessonsBreakdownModal(event)">
