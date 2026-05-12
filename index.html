@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=57" />
+  <link rel="stylesheet" href="style.css?v=58" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -408,7 +408,11 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   <div id="learnDashboard" class="learn-content">
 
-
+  <button class="lesson-progress-badge" onclick="showLessonsBreakdownModal('basic')">
+    <span class="material-symbols-outlined">check_circle</span>
+    <span id="basicLessonsProgressText">0 of 6 complete</span>
+    <span class="material-symbols-outlined lesson-progress-arrow">chevron_right</span>
+  </button>
 
   <!--  ADD THIS BLOCK -->
   <div class="learn-path-grid">
@@ -4259,6 +4263,12 @@ OneSignalDeferred.push(async function(OneSignal) {
     <p>Deep-dive lessons with knowledge checks and mini quizzes required to advance.</p>
   </div>
 
+  <button class="lesson-progress-badge advanced" onclick="showLessonsBreakdownModal('advanced')">
+    <span class="material-symbols-outlined">check_circle</span>
+    <span id="advancedLessonsProgressText">0 of 6 complete</span>
+    <span class="material-symbols-outlined lesson-progress-arrow">chevron_right</span>
+  </button>
+
   <div class="learn-path-grid advanced-path-grid">
 
     <button onclick="showAdvancedLesson('adv_history')">
@@ -5425,6 +5435,7 @@ OneSignalDeferred.push(async function(OneSignal) {
     <span class="material-symbols-outlined">military_tech</span>
   </button>
 </div>
+    <div class="profile-mode-badge" id="profileModeBadge">Basic Track</div>
     </div>
 
     <div class="xp-section">
@@ -5445,9 +5456,14 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 
   <div class="journey-stats-grid">
-    <div class="journey-stat">
+    <button class="journey-stat clickable-stat" onclick="showLessonsBreakdownModal(getLessonMode())">
       <strong id="profileLessonsStat">0 / 6</strong>
-      <span>Lessons</span>
+      <span>Lessons <span class="stat-tap-hint">tap for details</span></span>
+    </button>
+
+    <div class="journey-stat">
+      <strong id="profileStreakStat">0</strong>
+      <span>Day Streak 🔥</span>
     </div>
 
     <div class="journey-stat">
@@ -5671,8 +5687,8 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=57"></script>
-  <script src="app.js?v=57"></script>
+  <script src="vocab.js?v=58"></script>
+  <script src="app.js?v=58"></script>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
@@ -5814,6 +5830,21 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 </div>
 
+
+<!-- Lessons Breakdown Modal -->
+<div id="lessonsBreakdownModal" class="modal-overlay" onclick="closeLessonsBreakdownModal(event)">
+  <div class="modal-card lessons-breakdown-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeLessonsBreakdownModal()">×</button>
+    <h2>Lesson Progress</h2>
+
+    <div class="lesson-breakdown-tabs" id="lessonBreakdownTabs">
+      <button class="breakdown-tab active" id="breakdownBasicTab" onclick="switchLessonBreakdownTab('basic')">Basic</button>
+      <button class="breakdown-tab" id="breakdownAdvancedTab" onclick="switchLessonBreakdownTab('advanced')">Advanced</button>
+    </div>
+
+    <div id="lessonsBreakdownList" class="lessons-breakdown-list"></div>
+  </div>
+</div>
 
 <!-- Lesson Mode Selection Modal -->
 <div id="lessonModeModal" class="modal-overlay" onclick="hideLessonModeModal()">

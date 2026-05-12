@@ -7932,3 +7932,190 @@ body.dark-mode .advanced-btn {
   background: #b8911e !important;
   border-color: #b8911e !important;
 }
+
+/* ── Lesson progress badge on lesson menus ── */
+.lesson-progress-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% - 32px);
+  margin: 12px 16px 4px;
+  padding: 10px 14px;
+  background: rgba(79, 140, 255, 0.08);
+  border: 1px solid rgba(79, 140, 255, 0.2);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: var(--accent, #4f8cff);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.lesson-progress-badge.advanced {
+  background: rgba(201, 162, 39, 0.1);
+  border-color: rgba(201, 162, 39, 0.3);
+  color: #c9a227;
+}
+
+.lesson-progress-badge .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.lesson-progress-arrow {
+  margin-left: auto;
+  opacity: 0.5;
+  font-size: 16px !important;
+}
+
+body.dark-mode .lesson-progress-badge {
+  background: rgba(79, 140, 255, 0.12);
+  border-color: rgba(79, 140, 255, 0.25);
+}
+
+body.dark-mode .lesson-progress-badge.advanced {
+  background: rgba(226, 185, 59, 0.12);
+  border-color: rgba(226, 185, 59, 0.3);
+  color: #e2b93b;
+}
+
+/* ── Lessons Breakdown Modal ── */
+.lessons-breakdown-card {
+  max-width: 380px;
+}
+
+.lesson-breakdown-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.breakdown-tab {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid var(--accent, #4f8cff);
+  background: transparent;
+  color: var(--accent, #4f8cff);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.breakdown-tab.active {
+  background: var(--accent, #4f8cff);
+  color: #fff;
+}
+
+.lessons-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.breakdown-lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.9rem;
+}
+
+.breakdown-lesson-item.done {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.breakdown-num {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent, #4f8cff);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.breakdown-lesson-item.done .breakdown-num {
+  background: #22c55e;
+}
+
+.breakdown-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.breakdown-status {
+  font-size: 1.1rem;
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.breakdown-lesson-item:not(.done) .breakdown-status {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+body.dark-mode .breakdown-lesson-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .breakdown-lesson-item.done {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+body.dark-mode .breakdown-lesson-item:not(.done) .breakdown-status {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Profile mode badge ── */
+.profile-mode-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(79, 140, 255, 0.12);
+  color: var(--accent, #4f8cff);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.profile-mode-badge.advanced {
+  background: rgba(201, 162, 39, 0.15);
+  color: #c9a227;
+}
+
+body.dark-mode .profile-mode-badge.advanced {
+  color: #e2b93b;
+  background: rgba(226, 185, 59, 0.15);
+}
+
+/* ── Clickable journey stat (lessons) ── */
+.journey-stat.clickable-stat {
+  cursor: pointer;
+  border: none;
+  background: rgba(79, 140, 255, 0.07);
+  border-radius: 10px;
+  padding: 10px 6px;
+  transition: background 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.journey-stat.clickable-stat:active {
+  background: rgba(79, 140, 255, 0.18);
+}
+
+.stat-tap-hint {
+  display: block;
+  font-size: 0.65rem;
+  opacity: 0.55;
+  font-weight: 400;
+}
