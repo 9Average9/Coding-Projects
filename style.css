@@ -8948,3 +8948,44 @@ body.dark .adv-cs-title {
 body.dark .adv-cs-header {
   color: #e2b93b;
 }
+
+/* ===== ADVANCED LESSON FULL WIDTH — mirrors basic lesson :has() behavior ===== */
+
+/* Shrink .app side padding when an advanced lesson is active */
+@media (max-width: 760px) {
+  body .app:has(#advancedLearnMenu.screen.active .adv-learn-lesson.active) {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  body #advancedLearnMenu.screen.active:has(.adv-learn-lesson.active) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body #advancedLearnMenu .adv-learn-lesson.active,
+  body #advancedLearnMenu .adv-learn-lesson.active .lesson-module {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  body #advancedLearnMenu .adv-learn-lesson.active .lesson-block,
+  body #advancedLearnMenu .adv-learn-lesson.active .lesson-lead,
+  body #advancedLearnMenu .adv-learn-lesson.active .knowledge-check,
+  body #advancedLearnMenu .adv-learn-lesson.active .adv-quiz-start-area {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box;
+  }
+}
+
+/* Match basic lesson nav-bar spacing in lesson view */
+#advancedLearnMenu.screen.active .nav-bar {
+  margin-bottom: 4px;
+}

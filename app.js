@@ -9784,30 +9784,24 @@ function selectAdvQuizAns(optIdx) {
   const total = data.questions.length;
   currentQuizAnswers[currentQuizQIdx] = optIdx;
 
-  // Disable all options immediately
+  // Disable all buttons immediately — that's the tap feedback
   document.querySelectorAll(".quiz-modal-opt").forEach(btn => { btn.disabled = true; });
 
   const isLast = currentQuizQIdx === total - 1;
   if (isLast) {
-    // Show selection briefly on the last question, then re-render with See Results
+    // On the final question only, briefly show the selection then re-render with See Results
     document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
-      btn.classList.toggle("qm-selected", i === optIdx);
+      if (i === optIdx) btn.classList.add("qm-selected");
     });
-    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 200);
+    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 250);
   } else {
-    // Flash selection for 80ms then clear it, then after 200ms advance
-    document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
-      btn.classList.toggle("qm-selected", i === optIdx);
-    });
-    setTimeout(() => {
-      document.querySelectorAll(".quiz-modal-opt").forEach(btn => {
-        btn.classList.remove("qm-selected");
-      });
-    }, 80);
+    // No gold highlight during advance — disabling buttons is enough feedback.
+    // Showing qm-selected and then removing it causes the color to bleed into the
+    // next question's slide animation due to CSS transition timing.
     setTimeout(() => {
       currentQuizQIdx++;
       renderAdvQuizQ(currentQuizQIdx);
-    }, 220);
+    }, 180);
   }
 }
 
@@ -11577,7 +11571,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.3";
+const APP_VERSION = "1.3.4";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
