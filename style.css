@@ -7721,3 +7721,214 @@ body.dark button.continue-learning-btn {
   outline: none !important;
   box-shadow: none;
 }
+
+/* ===== LESSON MODE MODAL ===== */
+
+.lesson-mode-modal-card {
+  padding: 28px 24px 24px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.lesson-mode-modal-card h2 {
+  margin: 0 0 20px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  padding-right: 0;
+}
+
+.lesson-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.lesson-mode-option {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--card-bg, rgba(0,0,0,0.04));
+  border: 1px solid var(--border-color, rgba(0,0,0,0.08));
+}
+
+.lesson-mode-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.lesson-mode-icon.advanced {
+  background: #c9a227;
+  color: #fff;
+}
+
+.lesson-mode-info {
+  flex: 1;
+}
+
+.lesson-mode-info strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.lesson-mode-info p {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.lesson-mode-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.lesson-mode-actions .main-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+}
+
+.advanced-btn {
+  background: #c9a227 !important;
+  color: #fff !important;
+  border-color: #c9a227 !important;
+}
+
+.advanced-btn:hover {
+  background: #b8911e !important;
+  border-color: #b8911e !important;
+}
+
+.lesson-mode-dont-ask {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.lesson-mode-dont-ask input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.lesson-mode-dont-ask small {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* ===== ADVANCED LEARN MENU ===== */
+
+.advanced-learn-header {
+  padding: 16px 18px 12px;
+  margin: 0 0 8px;
+  background: linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.05));
+  border-bottom: 1px solid rgba(201,162,39,0.2);
+}
+
+.advanced-learn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #c9a227;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 4px 10px 4px 8px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.advanced-learn-badge .material-symbols-outlined {
+  font-size: 0.95rem;
+}
+
+.advanced-learn-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+/* Advanced path grid — gold accent on buttons */
+.advanced-path-grid button {
+  border-left: 4px solid #c9a227 !important;
+}
+
+.advanced-path-grid .lesson-number {
+  color: #c9a227 !important;
+  text-shadow: none !important;
+}
+
+.advanced-path-grid .lesson-label {
+  color: #c9a227 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+/* ===== DARK MODE OVERRIDES ===== */
+
+body.dark-mode .lesson-mode-option {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+
+body.dark-mode .lesson-mode-info p {
+  opacity: 0.7;
+}
+
+body.dark-mode .lesson-mode-dont-ask {
+  opacity: 0.65;
+}
+
+body.dark-mode .advanced-learn-header {
+  background: linear-gradient(135deg, rgba(201,162,39,0.15), rgba(201,162,39,0.06));
+  border-bottom-color: rgba(201,162,39,0.25);
+}
+
+body.dark-mode .advanced-learn-header p {
+  opacity: 0.65;
+}
+
+body.dark-mode .advanced-path-grid .lesson-number {
+  color: #e2b93b !important;
+}
+
+body.dark-mode .advanced-path-grid .lesson-label {
+  color: #e2b93b !important;
+}
+
+body.dark-mode .advanced-path-grid button {
+  border-left-color: #e2b93b !important;
+}
+
+body.dark-mode .advanced-btn {
+  background: #b8911e !important;
+  border-color: #b8911e !important;
+}

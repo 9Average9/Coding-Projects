@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=56" />
+  <link rel="stylesheet" href="style.css?v=57" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4235,9 +4235,107 @@ OneSignalDeferred.push(async function(OneSignal) {
   </button>
 </div>
 </div>
-    
+
   </div>
 </section>
+
+<!-- Advanced Lessons Menu -->
+<section id="advancedLearnMenu" class="screen">
+  <div class="nav-bar">
+    <button class="icon-btn" onclick="handleLearnBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="nav-title">Advanced Lessons</div>
+    <button class="icon-btn" onclick="showLessonModeModal()" title="Switch mode">
+      <span class="material-symbols-outlined">tune</span>
+    </button>
+  </div>
+
+  <div class="advanced-learn-header">
+    <div class="advanced-learn-badge">
+      <span class="material-symbols-outlined">school</span>
+      Advanced Track
+    </div>
+    <p>Deep-dive lessons with knowledge checks and mini quizzes required to advance.</p>
+  </div>
+
+  <div class="learn-path-grid advanced-path-grid">
+
+    <button onclick="showAdvancedLesson('adv_history')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">1</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>NT Greek Overview</strong>
+        <small>Context, history, and the world of Koine Greek</small>
+        <span class="lesson-status" data-lesson-status="adv_history">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_alphabet')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">2</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Greek Alphabet</strong>
+        <small>Letters, names, sounds, diacritics, and recognition</small>
+        <span class="lesson-status" data-lesson-status="adv_alphabet">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_pronunciation')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">3</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Pronunciation</strong>
+        <small>Sounds, breathing marks, and accent patterns</small>
+        <span class="lesson-status" data-lesson-status="adv_pronunciation">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_nouns')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">4</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Noun System</strong>
+        <small>Declensions, gender, and how meaning works</small>
+        <span class="lesson-status" data-lesson-status="adv_nouns">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_cases')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">5</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Case Endings</strong>
+        <small>All case patterns, endings, and their functions</small>
+        <span class="lesson-status" data-lesson-status="adv_cases">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_howToRead')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">6</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>How to Read Greek</strong>
+        <small>Sentence structure, parsing, and translation method</small>
+        <span class="lesson-status" data-lesson-status="adv_howToRead">○ Not completed</span>
+      </div>
+    </button>
+
+  </div>
+</section>
+
     <section id="learnMenu" class="screen">
      <div class="nav-bar">
   <button class="icon-btn" onclick="handleLearnBack()">
@@ -4571,6 +4669,22 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 </div>
 </div>
+
+<div class="settings-card">
+  <h3>Lesson Mode</h3>
+  <p class="helper-text">Choose how you want to study through the lessons.</p>
+
+  <div class="toggle-row">
+    <span id="currentLessonModeLabel">Basic Lessons</span>
+    <button class="small-btn" onclick="showLessonModeModal()">Change</button>
+  </div>
+
+  <div class="toggle-row" id="lessonModeResetRow" style="display:none">
+    <span>Reset lesson prompt</span>
+    <button class="small-btn" onclick="resetLessonModePrompt()">Reset</button>
+  </div>
+</div>
+
      <div class="settings-card">
   <button class="collapse-btn" onclick="toggleResetSection()">
     Reset Test Data
@@ -5557,8 +5671,8 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=56"></script>
-  <script src="app.js?v=56"></script>
+  <script src="vocab.js?v=57"></script>
+  <script src="app.js?v=57"></script>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
@@ -5700,6 +5814,51 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 </div>
 
+
+<!-- Lesson Mode Selection Modal -->
+<div id="lessonModeModal" class="modal-overlay" onclick="hideLessonModeModal()">
+  <div class="modal-card lesson-mode-modal-card" onclick="event.stopPropagation()">
+    <h2>Choose Your Lesson Path</h2>
+
+    <div class="lesson-mode-options">
+      <div class="lesson-mode-option" id="basicModeOption">
+        <div class="lesson-mode-icon">
+          <span class="material-symbols-outlined">menu_book</span>
+        </div>
+        <div class="lesson-mode-info">
+          <strong>Basic</strong>
+          <p>Clear, focused lessons covering Greek fundamentals step by step. Great for getting started.</p>
+        </div>
+      </div>
+
+      <div class="lesson-mode-option" id="advancedModeOption">
+        <div class="lesson-mode-icon advanced">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <div class="lesson-mode-info">
+          <strong>Advanced</strong>
+          <p>Everything in Basic, plus deeper explanations, more examples, and required knowledge checks and mini quizzes before completing each lesson.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-mode-actions">
+      <button class="main-btn" onclick="selectLessonMode('basic')">
+        <span class="material-symbols-outlined">menu_book</span>
+        Start Basic
+      </button>
+      <button class="main-btn advanced-btn" onclick="selectLessonMode('advanced')">
+        <span class="material-symbols-outlined">school</span>
+        Start Advanced
+      </button>
+    </div>
+
+    <label class="lesson-mode-dont-ask">
+      <input type="checkbox" id="lessonModeDontAsk" />
+      <span>Don't ask me again <small>(can be changed in Settings)</small></span>
+    </label>
+  </div>
+</div>
 
 </body>
 </html>
