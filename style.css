@@ -8119,3 +8119,73 @@ body.dark-mode .profile-mode-badge.advanced {
   opacity: 0.55;
   font-weight: 400;
 }
+
+/* ── Settings — Lesson Mode card ── */
+.lesson-mode-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  gap: 12px;
+}
+
+.lesson-mode-settings-row + .lesson-mode-settings-row {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.lesson-mode-settings-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--font-color);
+}
+
+.lesson-mode-label-advanced {
+  color: #c9a227 !important;
+}
+
+body.dark-mode .lesson-mode-label-advanced {
+  color: #e2b93b !important;
+}
+
+.lesson-mode-pill-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--accent, #4f8cff);
+  background: transparent;
+  color: var(--accent, #4f8cff);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lesson-mode-pill-btn:hover {
+  background: var(--accent, #4f8cff);
+  color: #fff;
+}
+
+.lesson-mode-pill-btn.muted {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lesson-mode-pill-btn.muted:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--font-color);
+}
+
+body.dark-mode .lesson-mode-pill-btn {
+  border-color: var(--accent, #4f8cff);
+  color: var(--accent, #4f8cff);
+}
+
+body.dark-mode .lesson-mode-pill-btn.muted {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body.dark-mode .lesson-mode-pill-btn.muted:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f4f6;
+}

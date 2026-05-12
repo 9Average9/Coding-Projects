@@ -74,6 +74,12 @@ const VOCAB_UNLOCK_LESSONS = [
   "pronunciation"
 ];
 
+const ADVANCED_VOCAB_UNLOCK_LESSONS = [
+  "adv_history",
+  "adv_alphabet",
+  "adv_pronunciation"
+];
+
 let practiceToolsUnlocked =
   localStorage.getItem("practiceToolsUnlocked") === "true";
 
@@ -9348,7 +9354,10 @@ function updateLessonModeSettingsUI() {
   const dismissed = localStorage.getItem("lessonModePromptDismissed") === "true";
   const label = document.getElementById("currentLessonModeLabel");
   const resetRow = document.getElementById("lessonModeResetRow");
-  if (label) label.textContent = mode === "advanced" ? "Advanced Lessons" : "Basic Lessons";
+  if (label) {
+    label.textContent = mode === "advanced" ? "Advanced Lessons" : "Basic Lessons";
+    label.classList.toggle("lesson-mode-label-advanced", mode === "advanced");
+  }
   if (resetRow) resetRow.style.display = dismissed ? "flex" : "none";
 }
 
@@ -9548,6 +9557,11 @@ function completeLesson(lessonId) {
     return;
   }
 
+  const bothDone =
+    REQUIRED_LESSONS.every(id => completedLessons[id] === true) &&
+    REQUIRED_ADVANCED_LESSONS.every(id => completedAdvancedLessons[id] === true);
+  if (bothDone) unlockAchievement("bothTracksComplete");
+
   showLessonCompleteModal(lessonId);
   unlockAchievement("firstLesson");
 }
@@ -9555,22 +9569,47 @@ function completeLesson(lessonId) {
 function completeAdvancedLesson(lessonId) {
   if (completedAdvancedLessons[lessonId] === true) return;
 
+  const wasVocabUnlocked = vocabLessonsCompleted();
+  const wasAllComplete = allRequiredLessonsCompleted();
+
   completedAdvancedLessons[lessonId] = true;
   localStorage.setItem("completedAdvancedLessons", JSON.stringify(completedAdvancedLessons));
 
   updateLessonCompletionUI();
   updateLessonMenuProgress();
+  updateLockedModalProgress();
+  updatePracticeToolLocks();
 
   addXP(150, "Advanced lesson completed!", true);
-
   unlockAchievement("firstAdvancedLesson");
+
+  const nowVocabUnlocked = vocabLessonsCompleted();
+  const nowAllComplete = allRequiredLessonsCompleted();
+
+  if (!wasVocabUnlocked && nowVocabUnlocked) {
+    showVocabUnlockedModal();
+    return;
+  }
+
+  if (!wasAllComplete && nowAllComplete) {
+    practiceToolsUnlocked = true;
+    localStorage.setItem("practiceToolsUnlocked", "true");
+    updatePracticeToolLocks();
+    unlockAchievement("allAdvancedComplete");
+    showAllLessonsCompleteModal();
+    return;
+  }
 
   if (allAdvancedLessonsCompleted()) {
     unlockAchievement("allAdvancedComplete");
-    if (allRequiredLessonsCompleted()) {
-      unlockAchievement("bothTracksComplete");
-    }
   }
+
+  const bothDone =
+    REQUIRED_LESSONS.every(id => completedLessons[id] === true) &&
+    REQUIRED_ADVANCED_LESSONS.every(id => completedAdvancedLessons[id] === true);
+  if (bothDone) unlockAchievement("bothTracksComplete");
+
+  showLessonCompleteModal(lessonId);
 }
 
 function allAdvancedLessonsCompleted() {
@@ -10000,7 +10039,10 @@ function updateAlphabetPageL3() {
 }
 
 function allRequiredLessonsCompleted() {
-  return REQUIRED_LESSONS.every(lessonId => completedLessons[lessonId] === true);
+  if (getLessonMode() === "advanced") {
+    return REQUIRED_ADVANCED_LESSONS.every(id => completedAdvancedLessons[id] === true);
+  }
+  return REQUIRED_LESSONS.every(id => completedLessons[id] === true);
 }
 
 function arePracticeToolsUnlocked() {
@@ -10144,12 +10186,14 @@ function closeAllLessonsCompleteModal(event) {
   }
 }
 function updateLockedModalProgress() {
-  const completedCount = REQUIRED_LESSONS.filter(
-    lessonId => completedLessons[lessonId] === true
-  ).length;
+  const isAdv = getLessonMode() === "advanced";
+  const lessons = isAdv ? REQUIRED_ADVANCED_LESSONS : REQUIRED_LESSONS;
+  const completionMap = isAdv ? completedAdvancedLessons : completedLessons;
+
+  const completedCount = lessons.filter(id => completionMap[id] === true).length;
 
   const progressPercent = Math.round(
-    (completedCount / REQUIRED_LESSONS.length) * 100
+    (completedCount / lessons.length) * 100
   );
 
   const progressAngle = progressPercent * 3.6;
@@ -10167,9 +10211,10 @@ function updateLockedModalProgress() {
 }
 
 function vocabLessonsCompleted() {
-  return VOCAB_UNLOCK_LESSONS.every(lessonId => completedLessons[lessonId] === true);
-
-  unlockAchievement("allLessonsComplete");
+  if (getLessonMode() === "advanced") {
+    return ADVANCED_VOCAB_UNLOCK_LESSONS.every(id => completedAdvancedLessons[id] === true);
+  }
+  return VOCAB_UNLOCK_LESSONS.every(id => completedLessons[id] === true);
 }
 
 function isFeatureUnlocked(feature) {
@@ -11036,14 +11081,14 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.2.3";
+const APP_VERSION = "1.2.4";
 
 const UPDATE_NOTES = [
-  "Advanced lessons now award 150 XP per completion with 3 unique achievements",
-  "Streak counter tracks how many days in a row you study — visible on your profile",
-  "Tap your Lessons stat on the profile to see which lessons are done",
-  "Lesson menus show a progress badge you can tap for a full breakdown",
-  "Profile shows your current lesson track (Basic or Advanced)"
+  "Completing Advanced lessons now unlocks Vocab and practice tools just like Basic",
+  "Locked feature progress bar reflects Advanced lesson count when in Advanced mode",
+  "Settings Lesson Mode card has a cleaner look with slimmer pill buttons",
+  "Advanced mode label shows in gold in Settings",
+  "Lesson menu now shows a mode-switch button matching both menus"
 ];
 
 let deferredInstallPrompt = null;
