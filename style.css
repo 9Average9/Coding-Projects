@@ -7576,22 +7576,20 @@ button[onclick="showInstallSteps('iphone')"]::after {
 
 
 
-.modal-card {
-  --modal-bg: rgba(255, 252, 242, 0.98);
+.modal-scroll-fade {
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 80px;
+  margin-top: -80px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 252, 242, 0.98));
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.2s ease;
 }
 
-body.dark .modal-card {
-  --modal-bg: var(--card-color, rgba(31, 41, 55, 0.98));
-}
-
-.modal-card.scrollable-modal {
-  background-image:
-    linear-gradient(var(--modal-bg), var(--modal-bg)),
-    linear-gradient(transparent, var(--modal-bg));
-  background-size: 100% 80px, 100% 80px;
-  background-position: center bottom, center bottom;
-  background-repeat: no-repeat, no-repeat;
-  background-attachment: local, scroll;
+body.dark .modal-scroll-fade {
+  background: linear-gradient(to bottom, transparent, var(--card-color, rgba(31, 41, 55, 0.98)));
 }
 
 #modalScrollArrow {
