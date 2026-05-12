@@ -16,6 +16,9 @@ let currentLearnLesson = null;
 let completedLessons =
   JSON.parse(localStorage.getItem("completedLessons")) || {};
 
+let completedAdvancedLessons =
+  JSON.parse(localStorage.getItem("completedAdvancedLessons")) || {};
+
 let openedLessonBlocks =
   JSON.parse(localStorage.getItem("openedLessonBlocks")) || {};
 
@@ -40,6 +43,30 @@ const REQUIRED_LESSONS = [
   "cases",
   "howToRead"
 ];
+
+const REQUIRED_ADVANCED_LESSONS = [
+  "adv_history",
+  "adv_alphabet",
+  "adv_pronunciation",
+  "adv_nouns",
+  "adv_cases",
+  "adv_howToRead"
+];
+
+const LESSON_LABELS = {
+  history: "NT Greek Overview",
+  alphabet: "Greek Alphabet",
+  pronunciation: "Pronunciation",
+  nouns: "Noun System",
+  cases: "Case Endings",
+  howToRead: "How to Read Greek",
+  adv_history: "NT Greek Overview",
+  adv_alphabet: "Greek Alphabet",
+  adv_pronunciation: "Pronunciation",
+  adv_nouns: "Noun System",
+  adv_cases: "Case Endings",
+  adv_howToRead: "How to Read Greek"
+};
 
 const VOCAB_UNLOCK_LESSONS = [
   "history",
@@ -9266,6 +9293,7 @@ function showNewLearnMenu() {
 
 function _openBasicLearnMenu() {
   showScreen("newLearnMenu");
+  updateLessonMenuProgress();
   const overlay = document.getElementById("learnWelcomeOverlay");
   if (overlay && localStorage.getItem("hasSeenLearnWelcome") !== "true") {
     overlay.classList.add("open");
@@ -9274,6 +9302,7 @@ function _openBasicLearnMenu() {
 
 function showAdvancedLearnMenu() {
   showScreen("advancedLearnMenu");
+  updateLessonMenuProgress();
 }
 
 function showLessonModeModal() {
@@ -9523,10 +9552,38 @@ function completeLesson(lessonId) {
   unlockAchievement("firstLesson");
 }
 
+function completeAdvancedLesson(lessonId) {
+  if (completedAdvancedLessons[lessonId] === true) return;
+
+  completedAdvancedLessons[lessonId] = true;
+  localStorage.setItem("completedAdvancedLessons", JSON.stringify(completedAdvancedLessons));
+
+  updateLessonCompletionUI();
+  updateLessonMenuProgress();
+
+  addXP(150, "Advanced lesson completed!", true);
+
+  unlockAchievement("firstAdvancedLesson");
+
+  if (allAdvancedLessonsCompleted()) {
+    unlockAchievement("allAdvancedComplete");
+    if (allRequiredLessonsCompleted()) {
+      unlockAchievement("bothTracksComplete");
+    }
+  }
+}
+
+function allAdvancedLessonsCompleted() {
+  return REQUIRED_ADVANCED_LESSONS.every(id => completedAdvancedLessons[id] === true);
+}
+
 function updateLessonCompletionUI() {
   document.querySelectorAll("[data-lesson-status]").forEach(status => {
     const lessonId = status.dataset.lessonStatus;
-    const isCompleted = completedLessons[lessonId] === true;
+    const isAdv = lessonId.startsWith("adv_");
+    const isCompleted = isAdv
+      ? completedAdvancedLessons[lessonId] === true
+      : completedLessons[lessonId] === true;
 
     status.innerHTML = isCompleted
       ? `<span class="lesson-check">✓</span> Completed`
@@ -10370,9 +10427,11 @@ if (fill) {
 }
 
 
-const completedLessonCount = REQUIRED_LESSONS.filter(
-  lessonId => completedLessons[lessonId] === true
-).length;
+const isAdvMode = getLessonMode() === "advanced";
+const completedLessonCount = isAdvMode
+  ? REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length
+  : REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
+const totalLessons = REQUIRED_LESSONS.length;
 
 const lessonsStat = document.getElementById("profileLessonsStat");
 const vocabStat = document.getElementById("profileVocabStat");
@@ -10380,8 +10439,15 @@ const translationsStat = document.getElementById("profileTranslationsStat");
 const testsStat = document.getElementById("profileTestsStat");
 const knownWordsStat = document.getElementById("profileKnownWordsStat");
 const timeStat = document.getElementById("profileTimeStat");
+const streakStat = document.getElementById("profileStreakStat");
+const modeBadge = document.getElementById("profileModeBadge");
 
-if (lessonsStat) lessonsStat.textContent = `${completedLessonCount} / ${REQUIRED_LESSONS.length}`;
+if (lessonsStat) lessonsStat.textContent = `${completedLessonCount} / ${totalLessons}`;
+if (streakStat) streakStat.textContent = getStreakDays();
+if (modeBadge) {
+  modeBadge.textContent = isAdvMode ? "Advanced Track" : "Basic Track";
+  modeBadge.classList.toggle("advanced", isAdvMode);
+}
 if (vocabStat) vocabStat.textContent = getCompletedVocabChaptersCount();
 if (translationsStat) translationsStat.textContent = getTranslationAttemptsCount();
 if (testsStat) testsStat.textContent = getTestsCompletedCount();
@@ -10470,6 +10536,8 @@ function getPreviousTitleXP(xp) {
 
 function addXP(amount, reason = "Progress made", showModal = true) {
   if (!profileData) return;
+
+  updateStudyStreak();
 
   const oldXP = profileData.xp || 0;
   const oldTitle = getProfileTitleFromXP(oldXP);
@@ -10704,6 +10772,24 @@ const ACHIEVEMENT_DATA = {
     icon: "🔤",
     title: "Translation Starter",
     desc: "Completed 5 translation practices."
+  },
+
+  firstAdvancedLesson: {
+    icon: "⚡",
+    title: "Advanced First Step",
+    desc: "Completed your first Advanced lesson."
+  },
+
+  allAdvancedComplete: {
+    icon: "🎓",
+    title: "Advanced Scholar",
+    desc: "Completed all six Advanced Greek lessons."
+  },
+
+  bothTracksComplete: {
+    icon: "👑",
+    title: "Greek Master",
+    desc: "Completed both the Basic and Advanced lesson tracks."
   }
 };
 function unlockAchievement(id) {
@@ -10758,6 +10844,79 @@ function renderAchievements() {
     `;
     list.appendChild(div);
   });
+}
+
+function showLessonsBreakdownModal(tab) {
+  const modal = document.getElementById("lessonsBreakdownModal");
+  if (!modal) return;
+  switchLessonBreakdownTab(tab || getLessonMode());
+  modal.classList.add("open");
+}
+
+function closeLessonsBreakdownModal(event) {
+  if (!event || event.target.id === "lessonsBreakdownModal") {
+    document.getElementById("lessonsBreakdownModal")?.classList.remove("open");
+  }
+}
+
+function switchLessonBreakdownTab(tab) {
+  const basicTab = document.getElementById("breakdownBasicTab");
+  const advTab = document.getElementById("breakdownAdvancedTab");
+  if (basicTab) basicTab.classList.toggle("active", tab === "basic");
+  if (advTab) advTab.classList.toggle("active", tab === "advanced");
+  renderLessonsBreakdown(tab);
+}
+
+function renderLessonsBreakdown(tab) {
+  const list = document.getElementById("lessonsBreakdownList");
+  if (!list) return;
+
+  const isAdv = tab === "advanced";
+  const lessons = isAdv ? REQUIRED_ADVANCED_LESSONS : REQUIRED_LESSONS;
+  const completionMap = isAdv ? completedAdvancedLessons : completedLessons;
+
+  list.innerHTML = lessons.map((id, i) => {
+    const done = completionMap[id] === true;
+    return `
+      <div class="breakdown-lesson-item ${done ? "done" : ""}">
+        <span class="breakdown-num">${i + 1}</span>
+        <span class="breakdown-name">${LESSON_LABELS[id]}</span>
+        <span class="breakdown-status">${done ? "✓" : "○"}</span>
+      </div>`;
+  }).join("");
+}
+
+function updateLessonMenuProgress() {
+  const basicDone = REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
+  const advDone = REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length;
+
+  const basicEl = document.getElementById("basicLessonsProgressText");
+  const advEl = document.getElementById("advancedLessonsProgressText");
+  if (basicEl) basicEl.textContent = `${basicDone} of ${REQUIRED_LESSONS.length} complete`;
+  if (advEl) advEl.textContent = `${advDone} of ${REQUIRED_ADVANCED_LESSONS.length} complete`;
+}
+
+function updateStudyStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  const last = localStorage.getItem("lastStudyDate");
+  let streak = parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
+
+  if (last === today) return;
+
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  streak = (last === yesterday) ? streak + 1 : 1;
+
+  localStorage.setItem("lastStudyDate", today);
+  localStorage.setItem("studyStreakDays", String(streak));
+}
+
+function getStreakDays() {
+  const last = localStorage.getItem("lastStudyDate");
+  if (!last) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (last !== today && last !== yesterday) return 0;
+  return parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 }
 
 function getDisplayChapterNumber(mounceChapter) {
@@ -10877,12 +11036,14 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.2.2";
+const APP_VERSION = "1.2.3";
 
 const UPDATE_NOTES = [
-  "Added Advanced Lessons option — choose Basic or Advanced when opening Lessons",
-  "Advanced Lessons menu with unique gold styling and all 6 topics ready for content",
-  "Lesson mode preference saved; can be changed or reset in Settings"
+  "Advanced lessons now award 150 XP per completion with 3 unique achievements",
+  "Streak counter tracks how many days in a row you study — visible on your profile",
+  "Tap your Lessons stat on the profile to see which lessons are done",
+  "Lesson menus show a progress badge you can tap for a full breakdown",
+  "Profile shows your current lesson track (Basic or Advanced)"
 ];
 
 let deferredInstallPrompt = null;
