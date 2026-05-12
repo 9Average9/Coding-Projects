@@ -20,6 +20,8 @@ let completedLessons =
 let completedAdvancedLessons =
   JSON.parse(localStorage.getItem("completedAdvancedLessons")) || {};
 
+let answeredKCs = JSON.parse(localStorage.getItem("answeredKCs")) || {};
+
 let openedLessonBlocks =
   JSON.parse(localStorage.getItem("openedLessonBlocks")) || {};
 
@@ -9446,6 +9448,14 @@ function showAdvancedLesson(lessonId) {
   }
 
   section.classList.add("active");
+  restoreOpenedLessonBlocks(section, lessonId);
+  restoreAnsweredKCs(lessonId, section);
+  checkAdvQuizAvailability(lessonId);
+  const savedScores = JSON.parse(localStorage.getItem("advQuizScores") || "{}");
+  if (savedScores[lessonId]) {
+    const s = savedScores[lessonId];
+    updateAdvLessonScore(lessonId, s.correct, s.total, s.passed);
+  }
   currentAdvLearnLesson = lessonId;
   updateAdvLessonTopBar(lessonId);
 }
@@ -9484,112 +9494,305 @@ function updateAdvLessonTopBar(lessonId) {
   }
 }
 
+// ── KC and Quiz data ────────────────────────────────────────────────────────
+
+const ADV_KC_DATA = {
+  kc_adv_history_1: [
+    { feedback: 'Close — but κοινή actually means "common." It was the everyday, widely-spoken form of Greek, not a sacred or holy dialect.' },
+    { correct: true, feedback: 'Correct! κοινή means "common." It was the universal, everyday language of the ancient Mediterranean world — the Greek everyone spoke.' },
+    { feedback: 'Not quite — κοινή means "common." It refers to how widespread and shared this form of Greek was, not to whether it was written.' },
+    { feedback: 'κοινή means "common," not ancient. In fact, it was a relatively late development compared to Classical Greek — it was the living, everyday language of its time.' }
+  ],
+  kc_adv_history_2: [
+    { feedback: "Rome's expansion was significant, but Romans actually adopted Greek — they didn't spread it. The spread of Greek came earlier, through Alexander." },
+    { correct: true, feedback: "Exactly right. Alexander's conquests from 334–323 BC imposed Greek across a massive territory, turning it into the lingua franca of the ancient world." },
+    { feedback: "The Septuagint was an important use of Greek, but it was itself a product of Greek already being the dominant language — not the cause of that dominance." },
+    { feedback: "The Athenian empire was regional and ended before Koine began. It was Alexander — not Athens — who spread Greek across the entire known world." }
+  ],
+  kc_adv_history_3: [
+    { feedback: "The Hebrew Masoretic Text is what modern English OT translations are based on — but NT authors writing in Greek almost always quoted the Greek Septuagint (LXX) instead." },
+    { feedback: "The Latin Vulgate was Jerome's 4th-century translation — centuries after the NT was written. NT authors had no access to it." },
+    { correct: true, feedback: "Correct! NT authors overwhelmingly quoted the Septuagint (LXX) — the Greek translation of the OT. This is the Bible the early church used and the text that shaped NT theology." },
+    { feedback: "Aramaic Targums were paraphrases used in synagogue readings, but NT authors wrote in Greek and quoted the Greek OT (LXX), not Aramaic paraphrases." }
+  ],
+  kc_adv_history_4: [
+    { feedback: "That number is closer to the manuscript count for Caesar's Gallic Wars or Plato's works — impressive for ancient literature, but far fewer than the NT's 5,800+." },
+    { feedback: "Homer's Iliad has roughly 1,800 manuscripts — the second-best attested ancient work. But the NT far surpasses even that." },
+    { feedback: "Close — but the actual number exceeds even 3,000. There are over 5,800 Greek NT manuscripts, plus thousands more in Latin, Syriac, Coptic, and other languages." },
+    { correct: true, feedback: "Correct! There are over 5,800 Greek NT manuscripts — more than any other ancient document by far. This gives scholars exceptional ability to verify the text." }
+  ],
+  kc_adv_history_5: [
+    { feedback: "In English, word position determines function — but Greek works differently. In Greek, the ending (inflection) on a word shows its grammatical role, regardless of where it sits in the sentence." },
+    { correct: true, feedback: "Exactly right! Greek is an inflected language — the ending attached to a word shows whether it is a subject, object, possessive, etc. This frees Greek word order to carry emphasis instead of grammar." },
+    { feedback: "Unlike English prepositions, Greek case endings are attached directly to words. The word before it doesn't determine the function — the ending does." },
+    { feedback: "Accents affect pronunciation and can occasionally distinguish meaning, but they don't determine the grammatical function (subject vs. object). Endings do that." }
+  ]
+};
+
+const ADV_QUIZ_DATA = {
+  adv_history: {
+    title: "NT Greek Overview",
+    passMark: 5,
+    questions: [
+      {
+        text: "What does the Greek word κοινή mean?",
+        options: ["Sacred", "Common", "Written", "Ancient"],
+        correct: 1
+      },
+      {
+        text: "Who was primarily responsible for spreading Greek across the ancient world?",
+        options: ["Julius Caesar", "Ptolemy II Philadelphus", "Alexander the Great", "The Apostle Paul"],
+        correct: 2
+      },
+      {
+        text: "The Septuagint (LXX) is best described as:",
+        options: ["The original Hebrew Old Testament", "A Greek translation of the Old Testament", "A Greek commentary on the Torah", "Paul's collection of OT quotations"],
+        correct: 1
+      },
+      {
+        text: "Approximately how many Greek NT manuscripts exist today?",
+        options: ["About 250", "About 1,800", "About 3,000", "Over 5,800"],
+        correct: 3
+      },
+      {
+        text: "In Greek, what primarily determines whether a word is the subject or object of a sentence?",
+        options: ["Its ending (inflection)", "Its position in the sentence", "Whether it is capitalized", "The word that precedes it"],
+        correct: 0
+      },
+      {
+        text: "What is the approximate date of Papyrus P52 — the oldest known NT manuscript fragment?",
+        options: ["About 300 AD", "About 250 AD", "About 100–150 AD", "About 50 AD"],
+        correct: 2
+      },
+      {
+        text: "According to Mounce, what is the most important foundation for learning to read biblical Greek?",
+        options: ["Mastering grammar rules before reading", "Building vocabulary from the most frequent NT words", "Learning to write Greek by hand first", "Studying Classical Greek before Koine"],
+        correct: 1
+      }
+    ]
+  }
+};
+
 // ── Knowledge Checks ────────────────────────────────────────────────────────
 
-function answerKC(checkId, el, isCorrect, explanation) {
+function answerKC(checkId, el) {
   const container = document.getElementById(checkId);
   if (!container || container.classList.contains("answered")) return;
 
+  const kcData = ADV_KC_DATA[checkId];
+  if (!kcData) return;
+
+  const optIdx = parseInt(el.dataset.opt, 10);
+  const optData = kcData[optIdx];
+  const isCorrect = optData.correct === true;
+
   container.classList.add("answered");
 
-  container.querySelectorAll(".kc-opt").forEach(btn => {
+  container.querySelectorAll(".kc-opt").forEach((btn, i) => {
     btn.disabled = true;
+    if (kcData[i].correct) btn.classList.add("kc-correct");
   });
 
-  el.classList.add(isCorrect ? "kc-correct" : "kc-wrong");
-
-  if (!isCorrect) {
-    container.querySelectorAll(".kc-opt").forEach(btn => {
-      if (btn.dataset.correct === "true") btn.classList.add("kc-correct");
-    });
-  }
+  if (!isCorrect) el.classList.add("kc-wrong");
 
   const feedback = document.getElementById(checkId + "_fb");
   if (feedback) {
-    feedback.textContent = explanation;
+    feedback.textContent = optData.feedback;
     feedback.className = "kc-feedback " + (isCorrect ? "kc-fb-correct" : "kc-fb-wrong");
   }
+
+  const section = container.closest(".adv-learn-lesson");
+  const lessonId = section?.id?.replace("Lesson", "");
+  if (lessonId) {
+    if (!answeredKCs[lessonId]) answeredKCs[lessonId] = {};
+    answeredKCs[lessonId][checkId] = true;
+    localStorage.setItem("answeredKCs", JSON.stringify(answeredKCs));
+    checkAdvQuizAvailability(lessonId);
+  }
 }
 
-// ── Advanced Mini Quiz ──────────────────────────────────────────────────────
-
-const ADV_QUIZ_PASS_THRESHOLD = 0.70;
-
-function submitAdvMiniQuiz(lessonId) {
-  const quizEl = document.getElementById("miniQuiz_" + lessonId);
-  if (!quizEl) return;
-
-  const questions = quizEl.querySelectorAll(".quiz-q");
-  let total = questions.length;
-  let correct = 0;
-  let allAnswered = true;
-
-  questions.forEach(q => {
-    const correctVal = q.dataset.correct;
-    const chosen = q.querySelector("input[type=radio]:checked");
-    if (!chosen) { allAnswered = false; return; }
-
-    const isRight = chosen.value === correctVal;
-    if (isRight) correct++;
-
-    q.querySelectorAll(".q-opt label").forEach(label => {
-      const input = label.querySelector("input");
-      if (input.value === correctVal) label.classList.add("q-correct");
-      if (input.value === chosen.value && !isRight) label.classList.add("q-wrong");
-    });
-
-    q.querySelectorAll("input[type=radio]").forEach(r => r.disabled = true);
-  });
-
-  if (!allAnswered) {
-    const result = document.getElementById("quizResult_" + lessonId);
-    if (result) {
-      result.className = "quiz-result quiz-warning";
-      result.textContent = "Please answer all questions before submitting.";
+function restoreAnsweredKCs(lessonId, section) {
+  const answered = answeredKCs[lessonId] || {};
+  section.querySelectorAll(".knowledge-check").forEach(kc => {
+    if (answered[kc.id]) {
+      kc.classList.add("answered");
+      kc.querySelectorAll(".kc-opt").forEach(btn => { btn.disabled = true; });
+      const fb = document.getElementById(kc.id + "_fb");
+      if (fb && fb.className === "kc-feedback") {
+        fb.textContent = "You already answered this question.";
+        fb.className = "kc-feedback kc-fb-correct";
+      }
     }
-    return;
-  }
+  });
+}
 
-  const passed = correct / total >= ADV_QUIZ_PASS_THRESHOLD;
-  const result = document.getElementById("quizResult_" + lessonId);
-  const submitBtn = quizEl.querySelector(".quiz-submit-btn");
-  if (submitBtn) submitBtn.style.display = "none";
+function checkAdvQuizAvailability(lessonId) {
+  const section = document.getElementById(lessonId + "Lesson");
+  if (!section) return;
 
-  if (result) {
-    result.className = "quiz-result " + (passed ? "quiz-pass" : "quiz-fail");
-    result.innerHTML = passed
-      ? `<strong>🎉 Passed! ${correct}/${total} correct.</strong><br>
-         <button class="main-btn" style="margin-top:14px" onclick="completeAdvancedLesson('${lessonId}')">Complete Lesson</button>`
-      : `<strong>Not quite — ${correct}/${total} correct. You need ${Math.ceil(total * ADV_QUIZ_PASS_THRESHOLD)}/${total} to pass.</strong><br>
-         Review the sections above, then<br>
-         <button class="small-btn" style="margin-top:12px" onclick="retryAdvMiniQuiz('${lessonId}')">Try Again</button>`;
+  const totalBlocks = section.querySelectorAll(".lesson-block").length;
+  const openedCount = (openedLessonBlocks[lessonId] || []).length;
+  const allBlocksOpened = totalBlocks > 0 && openedCount >= totalBlocks;
+
+  const kcIds = Array.from(section.querySelectorAll(".knowledge-check")).map(kc => kc.id);
+  const lessonAnswered = answeredKCs[lessonId] || {};
+  const allKCsAnswered = kcIds.every(id => lessonAnswered[id] === true);
+
+  const canStart = allBlocksOpened && allKCsAnswered;
+
+  const startBtn = document.getElementById("startQuiz_" + lessonId);
+  const hint = document.getElementById("quizHint_" + lessonId);
+
+  if (startBtn) startBtn.disabled = !canStart;
+  if (hint) hint.style.display = canStart ? "none" : "block";
+}
+
+// ── Advanced Quiz Modal ─────────────────────────────────────────────────────
+
+let currentQuizLesson = null;
+let currentQuizAnswers = [];
+let currentQuizQIdx = 0;
+
+function openAdvQuiz(lessonId) {
+  const data = ADV_QUIZ_DATA[lessonId];
+  if (!data) return;
+
+  currentQuizLesson = lessonId;
+  currentQuizAnswers = new Array(data.questions.length).fill(null);
+  currentQuizQIdx = 0;
+
+  const modal = document.getElementById("advQuizModal");
+  if (!modal) return;
+
+  document.getElementById("quizModalResult")?.classList.add("hidden");
+  document.getElementById("quizModalBody")?.classList.remove("hidden");
+
+  renderAdvQuizQ(0);
+  modal.classList.add("open");
+}
+
+function closeAdvQuizModal(event) {
+  if (!event || event.target.id === "advQuizModal") {
+    document.getElementById("advQuizModal")?.classList.remove("open");
   }
 }
 
-function retryAdvMiniQuiz(lessonId) {
-  const quizEl = document.getElementById("miniQuiz_" + lessonId);
-  if (!quizEl) return;
+function renderAdvQuizQ(idx) {
+  const data = ADV_QUIZ_DATA[currentQuizLesson];
+  const q = data.questions[idx];
+  const total = data.questions.length;
+  const prevAnswer = currentQuizAnswers[idx];
+  const isLast = idx === total - 1;
+  const allDone = currentQuizAnswers.every(a => a !== null);
 
-  quizEl.querySelectorAll(".quiz-q").forEach(q => {
-    q.querySelectorAll("input[type=radio]").forEach(r => {
-      r.disabled = false;
-      r.checked = false;
-    });
-    q.querySelectorAll(".q-opt label").forEach(l => {
-      l.classList.remove("q-correct", "q-wrong");
-    });
+  const fill = document.getElementById("quizModalFill");
+  const counter = document.getElementById("quizModalCounter");
+  const backBtn = document.getElementById("quizBackBtn");
+
+  if (fill) fill.style.width = `${(idx / total) * 100}%`;
+  if (counter) counter.textContent = `${idx + 1} / ${total}`;
+  if (backBtn) backBtn.style.visibility = idx === 0 ? "hidden" : "visible";
+
+  const body = document.getElementById("quizModalBody");
+  if (!body) return;
+
+  body.innerHTML = `
+    <p class="quiz-modal-q-text">${q.text}</p>
+    <div class="quiz-modal-opts">
+      ${q.options.map((opt, i) => `
+        <button class="quiz-modal-opt ${prevAnswer === i ? "qm-selected" : ""}"
+          onclick="selectAdvQuizAns(${i})"
+          ${prevAnswer !== null && prevAnswer !== i ? "disabled" : ""}>
+          ${opt}
+        </button>`).join("")}
+    </div>
+    ${isLast && allDone ? `<button class="main-btn quiz-see-results-btn" onclick="finishAdvQuiz()">See Results</button>` : ""}
+  `;
+}
+
+function selectAdvQuizAns(optIdx) {
+  const data = ADV_QUIZ_DATA[currentQuizLesson];
+  const total = data.questions.length;
+  currentQuizAnswers[currentQuizQIdx] = optIdx;
+
+  document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
+    btn.classList.toggle("qm-selected", i === optIdx);
+    btn.disabled = true;
   });
 
-  const result = document.getElementById("quizResult_" + lessonId);
-  if (result) { result.className = "quiz-result"; result.innerHTML = ""; }
+  const isLast = currentQuizQIdx === total - 1;
+  if (isLast) {
+    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 400);
+  } else {
+    setTimeout(() => {
+      currentQuizQIdx++;
+      renderAdvQuizQ(currentQuizQIdx);
+    }, 500);
+  }
+}
 
-  const submitBtn = quizEl.querySelector(".quiz-submit-btn");
-  if (submitBtn) submitBtn.style.display = "";
+function advQuizGoBack() {
+  if (currentQuizQIdx > 0) {
+    currentQuizQIdx--;
+    currentQuizAnswers[currentQuizQIdx] = null;
+    renderAdvQuizQ(currentQuizQIdx);
+  }
+}
+
+function finishAdvQuiz() {
+  const lessonId = currentQuizLesson;
+  const data = ADV_QUIZ_DATA[lessonId];
+  const total = data.questions.length;
+  let correct = 0;
+  currentQuizAnswers.forEach((ans, i) => {
+    if (ans === data.questions[i].correct) correct++;
+  });
+  const passed = correct >= data.passMark;
+
+  document.getElementById("quizModalBody")?.classList.add("hidden");
+  const fill = document.getElementById("quizModalFill");
+  if (fill) fill.style.width = "100%";
+
+  const result = document.getElementById("quizModalResult");
+  if (!result) return;
+  result.classList.remove("hidden");
+  result.innerHTML = passed
+    ? `<div class="quiz-result-icon">🎉</div>
+       <h3>${correct} / ${total} Correct</h3>
+       <p>You passed! You can now complete this lesson.</p>
+       <button class="main-btn" onclick="completeAdvancedLesson('${lessonId}'); closeAdvQuizModal();">Complete Lesson</button>
+       <br><button class="text-btn" style="margin-top:10px" onclick="retryAdvQuiz()">Retake Quiz</button>`
+    : `<div class="quiz-result-icon">📖</div>
+       <h3>${correct} / ${total} Correct</h3>
+       <p>You need ${data.passMark}/${total} to pass. Review the lesson and try again.</p>
+       <button class="main-btn" onclick="retryAdvQuiz()">Try Again</button>`;
+
+  const scores = JSON.parse(localStorage.getItem("advQuizScores") || "{}");
+  scores[lessonId] = { correct, total, passed };
+  localStorage.setItem("advQuizScores", JSON.stringify(scores));
+  updateAdvLessonScore(lessonId, correct, total, passed);
+}
+
+function retryAdvQuiz() {
+  const data = ADV_QUIZ_DATA[currentQuizLesson];
+  currentQuizAnswers = new Array(data.questions.length).fill(null);
+  currentQuizQIdx = 0;
+  document.getElementById("quizModalResult")?.classList.add("hidden");
+  document.getElementById("quizModalBody")?.classList.remove("hidden");
+  renderAdvQuizQ(0);
+}
+
+function updateAdvLessonScore(lessonId, correct, total, passed) {
+  const el = document.getElementById("lessonScore_" + lessonId);
+  if (!el) return;
+  el.textContent = `${correct}/${total} ${passed ? "· Passed ✓" : "· Try Again"}`;
+  el.className = "lesson-score-badge " + (passed ? "score-passed" : "score-failed");
+  el.style.display = "inline-flex";
 }
 
 
 function toggleLessonBlock(block) {
-  const lesson = block.closest(".learn-lesson");
+  const lesson = block.closest(".learn-lesson, .adv-learn-lesson");
 
   if (!lesson) {
     block.classList.toggle("open");
@@ -9643,6 +9846,10 @@ function markLessonBlockOpened(lessonSection, block) {
   }
 
   localStorage.setItem("openedLessonBlocks", JSON.stringify(openedLessonBlocks));
+
+  if (lessonId.startsWith("adv_")) {
+    checkAdvQuizAvailability(lessonId);
+  }
 
   updateCompleteLessonButton(lessonId);
 }
@@ -11260,12 +11467,14 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.3.1";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 1 (NT Greek Overview) is fully live with content, knowledge checks, and a quiz",
-  "New knowledge check system: inline questions with instant feedback throughout lessons",
-  "New mini quiz system: required 70% pass rate before completing each Advanced lesson"
+  "Advanced lessons now go full width like basic lessons",
+  "Knowledge check buttons work — instant right/wrong feedback with explanation",
+  "All blocks and knowledge checks must be completed to unlock the quiz",
+  "Quiz is now a step-by-step modal — one question at a time, back button to change answers",
+  "Quiz score saved and shown on the lesson after completion"
 ];
 
 let deferredInstallPrompt = null;
