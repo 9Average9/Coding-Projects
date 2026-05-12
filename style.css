@@ -7581,9 +7581,9 @@ button[onclick="showInstallSteps('iphone')"]::after {
   position: sticky;
   bottom: 0;
   display: block;
-  height: 72px;
+  height: 100px;
   margin-top: -72px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 252, 242, 0.98) 85%);
+  background: linear-gradient(to bottom, transparent, rgba(255, 252, 242, 0.98) 72%);
   pointer-events: none;
   border-radius: 0 0 22px 22px;
   transition: opacity 0.25s ease;
@@ -7594,7 +7594,7 @@ button[onclick="showInstallSteps('iphone')"]::after {
 }
 
 body.dark .modal-card.scrollable-modal::after {
-  background: linear-gradient(to bottom, transparent, var(--card-color, rgba(31, 41, 55, 0.98)) 85%);
+  background: linear-gradient(to bottom, transparent, var(--card-color, rgba(31, 41, 55, 0.98)) 72%);
 }
 
 #modalScrollArrow {

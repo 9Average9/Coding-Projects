@@ -10813,29 +10813,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.1.7";
+const APP_VERSION = "1.1.8";
 
 const UPDATE_NOTES = [
-  "scroll indicator on modals with more content below",
-  "block iOS users from Android install button",
-  "faster icon loading on all devices",
-  "fixed push notifications not subscribing users",
-  "fixed OneSignal service worker path",
-  "updated disable notifications icon",
-  "welcome back screen loads faster",
-  "added iphone push notifications",
-  "added study reminder onboarding",
-  "added notification settings controls",
-  "fixed notification save state",
-  "improved app startup speed",
-  "fixed theme loading flash",
-  "improved modal scrolling visuals",
-  "removed bouncing scroll indicator",
-  "improved theme loading behavior",
-  "fixed caching stability issues",
-  "updated pronunciation explanations",
-  "lesson polish and UI cleanup",
-  "bug fixes"
+  "fixed scroll indicator gap at bottom of modals",
+  "what's new now shows only the current version's changes"
 ];
 
 let deferredInstallPrompt = null;
