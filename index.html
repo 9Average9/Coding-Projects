@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=60" />
+  <link rel="stylesheet" href="style.css?v=61" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4249,12 +4249,13 @@ OneSignalDeferred.push(async function(OneSignal) {
     <button class="icon-btn" onclick="handleLearnBack()">
       <span class="material-symbols-outlined">arrow_back</span>
     </button>
-    <div class="nav-title">Advanced Lessons</div>
-    <button class="icon-btn" onclick="showLessonModeModal()" title="Switch mode">
+    <div class="nav-title" id="advLearnNavTitle">Advanced Lessons</div>
+    <button id="advLearnTopAction" class="icon-btn" onclick="showLessonModeModal()" title="Switch mode">
       <span class="material-symbols-outlined">tune</span>
     </button>
   </div>
 
+  <div id="advLearnDashboard">
   <div class="advanced-learn-header">
     <div class="advanced-learn-badge">
       <span class="material-symbols-outlined">school</span>
@@ -4344,6 +4345,451 @@ OneSignalDeferred.push(async function(OneSignal) {
     </button>
 
   </div>
+  </div><!-- /advLearnDashboard -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ADVANCED LESSON 1: NT GREEK OVERVIEW
+═══════════════════════════════════════════════════════ -->
+<div id="adv_historyLesson" class="adv-learn-lesson">
+  <div class="lesson-module">
+
+    <p class="lesson-lead">
+      You are about to learn a language that <strong>changed the world</strong>.<br><br>
+      The New Testament was not handed down from heaven in a sacred code — it was written in the <em>everyday language</em> of real people living in a real empire. Understanding that language brings you closer to the text than any translation ever can.
+    </p>
+
+    <!-- Block 1 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">What Is Koine Greek?</div>
+      <div class="lesson-block-content">
+        <p>The word <strong>κοινή</strong> (koi-NAY) simply means <em>"common."</em></p>
+        <p>This is not the high-literary Greek of Plato's dialogues or the epic poetry of Homer. Koine Greek is the language that ordinary people — soldiers, merchants, letter-writers, fishermen — used every day across the ancient Mediterranean world.</p>
+        <p>It developed between roughly <strong>300 BC and 300 AD</strong> as Greek spread far beyond its homeland and became the shared language of a vast, multicultural empire.</p>
+        <p class="highlight">Think of it like this: Koine Greek was the <em>English of the ancient world</em> — not because it was English, but because it was the universal language everyone was expected to know.</p>
+        <p>This matters for Bible study because the NT authors weren't trying to write elevated literature. They were writing <strong>to be understood</strong> — by slaves, by tradesmen, by Gentile converts, by Roman officials. The language was chosen for clarity and reach.</p>
+        <hr>
+        <h4>Koine vs. Classical Greek</h4>
+        <p>Classical (Attic) Greek — the language of Plato, Thucydides, and Sophocles — was a more complex, regional dialect. It had more grammatical distinctions, a richer vocabulary of specialized forms, and was associated with Athenian culture and intellectual life.</p>
+        <p>Koine simplified some of those distinctions as Greek became the shared tongue of many different peoples. But it was <em>not</em> a degraded or inferior version. It was a living, flexible, remarkably expressive language — and it is the language God chose for the definitive written revelation of the New Testament.</p>
+      </div>
+    </div>
+
+    <!-- KC 1 -->
+    <div class="knowledge-check" id="kc_adv_history_1">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">What does the Greek word κοινή mean?</p>
+      <div class="kc-options">
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_1', this, false, 'Close — but κοινή actually means \"common.\" It was the everyday, widely-spoken form of Greek, not a sacred or holy dialect.')">Sacred</button>
+        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_1', this, true, 'Correct! κοινή means \"common.\" It was the universal, everyday language of the ancient Mediterranean world — the Greek everyone spoke.')">Common</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_1', this, false, 'Not quite — κοινή means \"common.\" It refers to how widespread and shared this form of Greek was, not to whether it was written.')">Written</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_1', this, false, 'κοινή means \"common,\" not ancient. In fact, it was a relatively late development compared to Classical Greek — it was the living, everyday language of its time.')">Ancient</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_history_1_fb"></div>
+    </div>
+
+    <!-- Block 2 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">The Timeline: Greek Through the Ages</div>
+      <div class="lesson-block-content">
+        <p>Greek has a long history. Understanding the timeline helps you see exactly where Koine fits and why it matters.</p>
+        <div class="timeline-list">
+          <div class="timeline-item">
+            <span class="timeline-date">~800 BC</span>
+            <div><strong>Epic Greek</strong> — Homer's <em>Iliad</em> and <em>Odyssey</em>. Poetic, formulaic, very different from later prose.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">500–300 BC</span>
+            <div><strong>Classical / Attic Greek</strong> — The golden age of Greek philosophy and drama. Plato, Aristotle, Thucydides, Sophocles. This is the dialect most university Greek courses focus on.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">300 BC–300 AD</span>
+            <div><strong>Koine Greek</strong> — The NT period. Widely spoken, simplified, universally accessible. The Septuagint (Greek OT) and the entire New Testament are written in Koine.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">300–1453 AD</span>
+            <div><strong>Byzantine Greek</strong> — The Greek of the Eastern Roman (Byzantine) Empire. More conservative and literary, pulling back toward Classical forms.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">1453–Present</span>
+            <div><strong>Modern Greek</strong> — The living Greek language today. Recognizably descended from Koine, though significantly changed in vocabulary, pronunciation, and grammar.</div>
+          </div>
+        </div>
+        <p class="highlight">The NT sits right in the middle of this timeline — Koine Greek was the most widely accessible Greek that ever existed, and it was exactly what the early church needed to spread the gospel across the entire known world.</p>
+      </div>
+    </div>
+
+    <!-- Block 3 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">Alexander the Great and the Lingua Franca</div>
+      <div class="lesson-block-content">
+        <p>The single most important human factor in the spread of Greek was <strong>Alexander the Great</strong> (356–323 BC).</p>
+        <p>Alexander was the king of Macedon, educated by the philosopher Aristotle, and gifted with both military brilliance and a genuine enthusiasm for Greek culture. Between 334 and 323 BC, he led his armies across an extraordinary territory — from Greece and Egypt through Persia, into Central Asia, all the way to the borders of India.</p>
+        <p>As he conquered, he required that Greek be used as the language of administration, commerce, and education throughout his empire. He founded dozens of cities — many named Alexandria — and populated them with Greek-speaking settlers who brought their language and culture with them.</p>
+        <p class="highlight">The result was a linguistic miracle: from the Nile Delta to the Euphrates River, Greek became the shared tongue that transcended ethnic and cultural boundaries.</p>
+        <hr>
+        <h4>After Alexander</h4>
+        <p>Alexander died young (at 32) in 323 BC. His empire fragmented into competing kingdoms ruled by his generals — the Ptolemies in Egypt, the Seleucids in Syria and Persia, the Antigonids in Macedonia. But <em>Greek remained</em> as the shared cultural language across all of them.</p>
+        <p>When Rome later conquered these territories, Roman educated classes adopted Greek as their second language. The Empire had Latin as its official language, but Greek was the language of culture, philosophy, and international commerce.</p>
+        <p>By the first century AD — the time of Paul, Peter, and John — you could travel from Rome to Jerusalem to Antioch to Alexandria and be understood in Greek everywhere you went.</p>
+        <p><strong>Paul's letters to churches in Galatia, Corinth, Ephesus, Philippi, Colossae, and Rome</strong> — all of them in Greek — made perfect sense in this world. One language, one message, one empire.</p>
+      </div>
+    </div>
+
+    <!-- KC 2 -->
+    <div class="knowledge-check" id="kc_adv_history_2">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">What event most directly caused Greek to become the universal language of the ancient Mediterranean world?</p>
+      <div class="kc-options">
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_2', this, false, 'Rome\'s expansion was significant, but Romans actually adopted Greek — they didn\'t spread it. The spread of Greek came earlier, through Alexander.')">The founding and expansion of the Roman Empire</button>
+        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_2', this, true, 'Exactly right. Alexander\'s conquests from 334–323 BC imposed Greek across a massive territory, turning it into the lingua franca of the ancient world.')">Alexander the Great's military conquests</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_2', this, false, 'The Septuagint was an important use of Greek, but it was itself a product of Greek already being the dominant language — not the cause of that dominance.')">The translation of the Septuagint in Alexandria</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_2', this, false, 'The Athenian empire was regional and ended before Koine began. It was Alexander — not Athens — who spread Greek across the entire known world.')">The cultural dominance of Athens during the Classical period</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_history_2_fb"></div>
+    </div>
+
+    <!-- Block 4 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">Why Greek? Providence and Language</div>
+      <div class="lesson-block-content">
+        <p>Here is a question that doesn't get asked enough: <em>Why did God choose Greek?</em></p>
+        <p>Jesus and his disciples spoke <strong>Aramaic</strong> as their daily language. The Jewish scriptures were written in <strong>Hebrew</strong> (with some Aramaic sections in Daniel and Ezra). The OT was the authoritative Word of God. So why not write the NT in Hebrew or Aramaic?</p>
+        <hr>
+        <h4>The Mission Demanded a Universal Language</h4>
+        <p>Jesus's commission was clear: <em>"Go therefore and make disciples of all nations"</em> (Matthew 28:19). <em>"You will be my witnesses in Jerusalem and in all Judea and Samaria, and to the end of the earth"</em> (Acts 1:8).</p>
+        <p>A gospel message written in Hebrew would have reached Jewish readers well — but no one else. A message in Aramaic would have been understood in parts of the Near East. But a message in Greek could reach <em>every literate person in the Roman Empire</em>.</p>
+        <p class="highlight">Mounce puts it this way: the spread of Greek across the ancient world was part of God's providential preparation for the gospel. The "fullness of time" in which Christ came (Galatians 4:4) included not just a political moment but a linguistic one.</p>
+        <hr>
+        <h4>The Relationship Between Greek and the OT</h4>
+        <p>There is another dimension: by the first century, the majority of Jewish communities outside Palestine — the Diaspora — used the Greek Old Testament (the Septuagint) as their Scripture. When NT authors cite the OT, they almost always quote the <strong>Greek Septuagint</strong>, not the Hebrew text.</p>
+        <p>This means Greek was already the language of Scripture for a huge portion of the Jewish world before the NT was ever written. The NT simply continued in the same linguistic stream.</p>
+      </div>
+    </div>
+
+    <!-- Block 5 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">The Septuagint (LXX) — The Greek Old Testament</div>
+      <div class="lesson-block-content">
+        <p>The <strong>Septuagint</strong> is the Greek translation of the Hebrew Old Testament. It is one of the most important documents in the history of Christianity — and most Christians have never heard of it.</p>
+        <hr>
+        <h4>The Name</h4>
+        <p>The word "Septuagint" comes from the Latin <em>septuaginta</em>, meaning <strong>"seventy."</strong> It is abbreviated <strong>LXX</strong> (the Roman numeral for 70). The name comes from the tradition that 72 Jewish scholars (rounded to 70) were commissioned to translate the Hebrew scriptures into Greek.</p>
+        <hr>
+        <h4>The Story</h4>
+        <p>According to the <em>Letter of Aristeas</em> (ca. 200 BC), the Egyptian king <strong>Ptolemy II Philadelphus</strong> (reigned 285–246 BC) wanted a copy of the Jewish law for his famous Library of Alexandria. He requested that Jewish scholars from Jerusalem come to Alexandria to produce a Greek translation.</p>
+        <p>The translation began with the Torah (the first five books — Genesis through Deuteronomy) around <strong>250 BC</strong> in Alexandria, Egypt. The rest of the OT was translated over the following century or two.</p>
+        <p class="highlight">The LXX was not just a translation project — it was the Bible of the Greek-speaking Jewish Diaspora. Millions of Jews who had never learned Hebrew used it as their primary Scripture.</p>
+        <hr>
+        <h4>Why It Matters for NT Study</h4>
+        <ul>
+          <li>When Matthew writes <em>"Behold, the virgin shall conceive"</em> (Matthew 1:23), he quotes <strong>Isaiah 7:14 from the LXX</strong>.</li>
+          <li>When Paul quotes Psalm 51, Habakkuk 2, or Genesis 15, he is typically quoting the <strong>LXX</strong>.</li>
+          <li>The early church read, quoted, and preached from the LXX. To understand NT quotations of the OT, you need to know the LXX.</li>
+          <li>Many NT theological terms — like <em>δικαιοσύνη</em> (righteousness), <em>χάρις</em> (grace), and <em>πίστις</em> (faith) — carry meaning shaped by how the LXX used them to translate Hebrew concepts.</li>
+        </ul>
+        <p>Learning Greek doesn't just open the NT to you. It opens the LXX — and through it, a whole layer of OT quotation and allusion in the NT that translations obscure.</p>
+      </div>
+    </div>
+
+    <!-- KC 3 -->
+    <div class="knowledge-check" id="kc_adv_history_3">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">When NT authors quote the Old Testament, which text do they most commonly use?</p>
+      <div class="kc-options">
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_3', this, false, 'The Hebrew Masoretic Text is what modern English OT translations are based on — but NT authors writing in Greek almost always quoted the Greek Septuagint (LXX) instead.')">The Hebrew Masoretic Text (MT)</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_3', this, false, 'The Latin Vulgate was Jerome\'s 4th-century translation — centuries after the NT was written. NT authors had no access to it.')">The Latin Vulgate</button>
+        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_3', this, true, 'Correct! NT authors overwhelmingly quoted the Septuagint (LXX) — the Greek translation of the OT. This is the Bible the early church used and the text that shaped NT theology.')">The Septuagint (LXX)</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_3', this, false, 'Aramaic Targums were paraphrases used in synagogue readings, but NT authors wrote in Greek and quoted the Greek OT (LXX), not Aramaic paraphrases.')">The Aramaic Targums</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_history_3_fb"></div>
+    </div>
+
+    <!-- Block 6 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">The New Testament Documents</div>
+      <div class="lesson-block-content">
+        <p>The New Testament consists of <strong>27 documents</strong> written in Koine Greek over roughly <strong>50 years</strong>, from approximately 48 AD to 95 AD.</p>
+        <hr>
+        <h4>The Genres</h4>
+        <ul>
+          <li><strong>Gospels (4):</strong> Matthew, Mark, Luke, John — narrative accounts of Jesus's life, ministry, death, and resurrection.</li>
+          <li><strong>Acts (1):</strong> Luke's history of the early church, from Jerusalem to Rome.</li>
+          <li><strong>Pauline Epistles (13):</strong> Letters from Paul to churches and individuals — Romans through Philemon.</li>
+          <li><strong>General Epistles (8):</strong> Hebrews, James, 1–2 Peter, 1–3 John, Jude.</li>
+          <li><strong>Apocalypse (1):</strong> Revelation — apocalyptic literature written by John.</li>
+        </ul>
+        <hr>
+        <h4>The Timeline</h4>
+        <div class="timeline-list">
+          <div class="timeline-item">
+            <span class="timeline-date">~48–49 AD</span>
+            <div><strong>Galatians</strong> — possibly the earliest Pauline letter, written before the Jerusalem Council.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">~50–52 AD</span>
+            <div><strong>1–2 Thessalonians</strong> — Paul's earliest surviving letters to a church he planted.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">~55–57 AD</span>
+            <div><strong>1–2 Corinthians, Romans</strong> — some of Paul's most theologically rich letters.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">~62–63 AD</span>
+            <div><strong>Prison Epistles</strong> — Ephesians, Philippians, Colossians, Philemon (written during Paul's Roman imprisonment).</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">~65–70 AD</span>
+            <div><strong>Mark</strong> — widely considered the earliest Gospel. Luke and Matthew likely follow.</div>
+          </div>
+          <div class="timeline-item">
+            <span class="timeline-date">~85–95 AD</span>
+            <div><strong>John's writings</strong> — The Gospel of John, 1–3 John, Revelation — the latest NT documents.</div>
+          </div>
+        </div>
+        <p class="highlight">The entire NT was written within living memory of Jesus. The most recent documents (John, Revelation) were written while people who had walked with Jesus were still alive or recently deceased. This is remarkable by the standards of ancient literature.</p>
+      </div>
+    </div>
+
+    <!-- Block 7 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">NT Manuscripts — The Evidence</div>
+      <div class="lesson-block-content">
+        <p>One of the strongest arguments for the reliability of the NT text is the <em>sheer quantity and quality</em> of the manuscript evidence.</p>
+        <p>We currently have over <strong>5,800 Greek NT manuscripts</strong>. No other work from the ancient world comes close to this level of attestation.</p>
+        <div class="paradigm-table-wrap">
+          <table class="paradigm-table">
+            <thead><tr><th>Ancient Work</th><th>Manuscripts</th><th>Earliest Copy</th></tr></thead>
+            <tbody>
+              <tr><td>New Testament</td><td>5,800+</td><td>~100–125 AD (P52)</td></tr>
+              <tr><td>Homer's Iliad</td><td>~1,800</td><td>~400 BC</td></tr>
+              <tr><td>Plato's works</td><td>~250</td><td>~900 AD</td></tr>
+              <tr><td>Caesar's Gallic Wars</td><td>~251</td><td>~900 AD</td></tr>
+              <tr><td>Tacitus's Annals</td><td>~2</td><td>~1100 AD</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <hr>
+        <h4>Types of Manuscripts</h4>
+        <ul>
+          <li><strong>Papyri (~140):</strong> The oldest manuscripts, written on papyrus. Most were discovered in Egypt's dry climate. Designated with "P" (e.g., P46, P66, P75).</li>
+          <li><strong>Uncials/Majuscules (~323):</strong> Written in all-capital (majuscule) letters on parchment. The great 4th-century codices fall here.</li>
+          <li><strong>Minuscules (~2,900+):</strong> Written in cursive lowercase letters, mostly medieval. The most numerous category.</li>
+          <li><strong>Lectionaries (~2,400+):</strong> Church service books with NT readings arranged by liturgical calendar.</li>
+        </ul>
+        <hr>
+        <h4>Key Manuscripts</h4>
+        <p><strong>P52 (Rylands Papyrus)</strong> — A fragment of John 18:31–33 and 37–38, dated to approximately <strong>100–150 AD</strong>. This puts a NT manuscript within 50–70 years of the original writing. No other ancient work has anything remotely this close to its original date.</p>
+        <p><strong>Codex Sinaiticus (~330–360 AD)</strong> — One of the oldest complete NT manuscripts. Discovered at St. Catherine's Monastery on Mount Sinai by Constantin von Tischendorf in 1844. Now housed primarily in the British Library.</p>
+        <p><strong>Codex Vaticanus (~300–325 AD)</strong> — Another near-complete Bible manuscript, housed in the Vatican Library. Along with Sinaiticus, it forms the backbone of critical NT scholarship.</p>
+        <p class="highlight">The abundance of manuscripts doesn't just prove the NT's existence — it allows scholars to cross-check variants, identify scribal errors, and reconstruct the original text with extraordinary confidence.</p>
+      </div>
+    </div>
+
+    <!-- KC 4 -->
+    <div class="knowledge-check" id="kc_adv_history_4">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">Approximately how many Greek New Testament manuscripts do scholars have access to today?</p>
+      <div class="kc-options">
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_4', this, false, 'That number is closer to the manuscript count for Caesar\'s Gallic Wars or Plato\'s works — impressive for ancient literature, but far fewer than the NT\'s 5,800+.')">About 250</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_4', this, false, 'Homer\'s Iliad has roughly 1,800 manuscripts — the second-best attested ancient work. But the NT far surpasses even that.')">About 1,800</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_4', this, false, 'Close — but the actual number exceeds even 3,000. There are over 5,800 Greek NT manuscripts, plus thousands more in Latin, Syriac, Coptic, and other languages.')">About 3,000</button>
+        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_4', this, true, 'Correct! There are over 5,800 Greek NT manuscripts — more than any other ancient document by far. This gives scholars exceptional ability to verify the text.')">Over 5,800</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_history_4_fb"></div>
+    </div>
+
+    <!-- Block 8 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">Textual Criticism — What Is It?</div>
+      <div class="lesson-block-content">
+        <p><strong>Textual criticism</strong> is the scholarly discipline of comparing manuscript copies to determine what the original text most likely said.</p>
+        <p>Because manuscripts were copied by hand over centuries, scribes occasionally introduced changes — some accidental (spelling slips, skipped lines), some intentional (harmonizing parallel passages, clarifying ambiguous phrases). Textual criticism identifies and evaluates these variations.</p>
+        <hr>
+        <h4>How Many Variants Are There?</h4>
+        <p>There are approximately <strong>400,000 textual variants</strong> across all NT manuscripts. This sounds alarming until you understand what it means:</p>
+        <ul>
+          <li>The vast majority (~75%) are simple spelling differences — the ancient equivalent of "favor" vs. "favour."</li>
+          <li>Most of the rest involve word order, synonyms, or clearly accidental omissions.</li>
+          <li>Only about <strong>1%</strong> of variants are what scholars call "meaningful and viable" — they could potentially affect translation and are attested in significant manuscripts.</li>
+          <li><strong>None of them affect any core Christian doctrine.</strong></li>
+        </ul>
+        <p class="highlight">New Testament scholar Daniel Wallace puts it this way: "The NT is 99.5% textually pure." The half percent that remains uncertain involves no fundamental doctrine.</p>
+        <hr>
+        <h4>The Standard Greek Text</h4>
+        <p>The text used by most Greek NT scholars today is the <strong>Nestle-Aland Greek New Testament</strong> (currently the 28th edition, abbreviated <strong>NA28</strong>). It is the result of centuries of textual scholarship and represents the editors' best reconstruction of the original text.</p>
+        <p>The <strong>UBS5</strong> (United Bible Societies, 5th edition) uses the same base text but has a more detailed apparatus for translators. Both are essential tools for serious Greek study.</p>
+        <p>When you see footnotes in your English Bible saying "some manuscripts read..." — that is textual criticism at work.</p>
+      </div>
+    </div>
+
+    <!-- Block 9 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">What Greek Reveals That Translation Hides</div>
+      <div class="lesson-block-content">
+        <p>This is Mounce's core motivation — and it should be yours too. There are things in the Greek text that English translation simply cannot fully convey.</p>
+        <hr>
+        <h4>Inflection: Endings Carry the Meaning</h4>
+        <p>In English, word order determines function. "God loves the world" means something completely different from "The world loves God." Swap the words and the meaning changes.</p>
+        <p>In Greek, <em>endings</em> carry the grammatical function, not word order. The sentence <strong>θεὸς ἀγαπᾷ τὸν κόσμον</strong> means the same thing whether written as <strong>τὸν κόσμον ἀγαπᾷ θεός</strong> or <strong>ἀγαπᾷ θεὸς τὸν κόσμον</strong> — the ending on κόσμον shows it is the object, regardless of where it appears.</p>
+        <p class="highlight">This means word order in Greek is used not for grammar — but for <em>emphasis</em>. Whatever comes first gets the spotlight. This is often entirely invisible in English translation.</p>
+        <hr>
+        <h4>Verbal Aspect</h4>
+        <p>Greek verbs carry not just tense (when the action happens) but <strong>aspect</strong> — how the action is portrayed. The present tense typically shows <em>ongoing, continuous</em> action. The aorist tense treats the action as a <em>simple whole</em>, without commenting on duration.</p>
+        <p>In 1 John 3:9, John writes that the one born of God <em>does not practice sin</em> (present tense — ongoing habitual sin) vs. a single act. This nuance is almost always lost in translation. In Greek, you see it immediately.</p>
+        <hr>
+        <h4>The John 21 Example</h4>
+        <p>One of Mounce's favorite examples: In John 21:15–17, Jesus asks Peter three times, "Do you love me?" English translations often use two different words — "love" (ἀγαπάω) and "love" (φιλέω) — but they look identical in English.</p>
+        <p>In Greek: Jesus asks with <strong>ἀγαπάω</strong> (the word for deep, sacrificial love). Peter responds with <strong>φιλέω</strong> (the word for friendship-love). The third time, Jesus asks with <em>Peter's word</em> — φιλέω. Something is happening in that exchange that English completely flattens.</p>
+        <p>(Note: scholars debate whether John intended a significant distinction here, but the point stands: you can't even see the question in English.)</p>
+        <hr>
+        <h4>Words That Don't Translate</h4>
+        <p>Some Greek words are so rich that English requires a phrase to approximate them:</p>
+        <ul>
+          <li><strong>ἀγάπη</strong> — "love," but specifically unconditional, self-giving love (not just any affection)</li>
+          <li><strong>δικαιοσύνη</strong> — "righteousness" — but it carries legal, relational, and covenantal dimensions simultaneously</li>
+          <li><strong>σάρξ</strong> — "flesh" — but Paul uses it to mean the fallen human nature, not just physical tissue</li>
+          <li><strong>λόγος</strong> — "word" — but in John 1:1 it carries cosmic, philosophical, and revelatory weight that "word" barely scratches</li>
+        </ul>
+        <p class="highlight">Every time you look at a Greek word, you are seeing the actual word the author chose — not a translator's best approximation of it. That access changes everything.</p>
+      </div>
+    </div>
+
+    <!-- KC 5 -->
+    <div class="knowledge-check" id="kc_adv_history_5">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In Greek, what primarily determines the grammatical function of a word in a sentence (i.e., whether it is the subject or object)?</p>
+      <div class="kc-options">
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_5', this, false, 'In English, word position determines function — but Greek works differently. In Greek, the ending (inflection) on a word shows its grammatical role, regardless of where it sits in the sentence.')">Its position in the sentence</button>
+        <button class="kc-opt" data-correct="true" onclick="answerKC('kc_adv_history_5', this, true, 'Exactly right! Greek is an inflected language — the ending attached to a word shows whether it is a subject, object, possessive, etc. This frees Greek word order to carry emphasis instead of grammar.')">Its ending (inflection)</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_5', this, false, 'Unlike English prepositions, Greek case endings are attached directly to words. The word before it doesn\'t determine the function — the ending does.')">The word immediately before it</button>
+        <button class="kc-opt" onclick="answerKC('kc_adv_history_5', this, false, 'Accents affect pronunciation and can occasionally distinguish meaning, but they don\'t determine the grammatical function (subject vs. object). Endings do that.')">Whether or not it carries an accent</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_history_5_fb"></div>
+    </div>
+
+    <!-- Block 10 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">Mounce's Approach — What You're Signing Up For</div>
+      <div class="lesson-block-content">
+        <p>Bill Mounce opens <em>Basics of Biblical Greek</em> with unusual honesty. He tells you upfront: <em>"Learning Greek is not easy."</em> But then he makes a promise: <em>"If you put in the time, you will learn Greek."</em></p>
+        <hr>
+        <h4>The Foundation: Vocabulary</h4>
+        <p>Mounce's number one priority is <strong>vocabulary</strong>. His reasoning is simple: you cannot read what you do not recognize. Before you can analyze grammar or appreciate theological nuance, you need to be able to identify words.</p>
+        <p>In BBG, Mounce introduces vocabulary systematically — starting with the most frequent words in the NT. The 320 words he requires you to learn occur over 50 times each in the NT. Together, those 320 words cover over <strong>80% of all word occurrences</strong> in the NT text.</p>
+        <p class="highlight">The math is on your side: a relatively small vocabulary investment gives you dramatically broad coverage of the actual text.</p>
+        <hr>
+        <h4>The Method: Paradigms and Patterns</h4>
+        <p>After vocabulary, Mounce focuses on <strong>paradigms</strong> — the charts of noun endings, verb conjugations, and pronoun forms that make Greek systematic. Rather than treating Greek as a collection of isolated rules, Mounce teaches you to <em>see the patterns</em>.</p>
+        <p>Once you see that the genitive singular of a second-declension noun ends in -ου, and that -ου keeps appearing in other grammatical contexts, you start reading rather than just decoding.</p>
+        <hr>
+        <h4>The Goal: Reading, Not Just Studying</h4>
+        <p>Mounce's stated goal is not that you can recite grammar rules — it is that you can <strong>read the NT in Greek</strong>. The distinction matters. Grammar rules exist to explain what you are already recognizing. The goal is fluency with the text, not mastery of a textbook.</p>
+        <p>He also emphasizes: do not use Greek as a way to create an artificial authority over others who only have English. Use it to <em>serve</em> the text and the people you are teaching.</p>
+        <hr>
+        <h4>What's Ahead</h4>
+        <p>In the lessons that follow, you will learn:</p>
+        <ul>
+          <li>The Greek alphabet — every letter, upper and lowercase, with diacritical marks</li>
+          <li>Greek pronunciation — including the Erasmian system used in most classroom and textbook settings</li>
+          <li>The noun system — declensions, gender, case</li>
+          <li>Case endings — the key to reading Greek sentences</li>
+          <li>How to read a Greek sentence — parsing, structure, and what to look for first</li>
+        </ul>
+        <p class="highlight">By the end of this track, you will have the foundation to open a Greek NT, identify words, recognize grammatical forms, and begin reading. That is a real skill — and it starts here.</p>
+      </div>
+    </div>
+
+    <!-- Mini Quiz -->
+    <div class="adv-mini-quiz" id="miniQuiz_adv_history">
+      <div class="quiz-header">
+        <span class="material-symbols-outlined">assignment</span>
+        <h3>Lesson Quiz</h3>
+        <p>Answer at least <strong>5 of 7</strong> questions correctly to complete this lesson.</p>
+      </div>
+
+      <div class="quiz-questions">
+
+        <div class="quiz-q" data-correct="b">
+          <p class="q-text">1. What does the Greek word <em>κοινή</em> mean?</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q1_adv_history" value="a"> Sacred</label>
+            <label><input type="radio" name="q1_adv_history" value="b"> Common</label>
+            <label><input type="radio" name="q1_adv_history" value="c"> Written</label>
+            <label><input type="radio" name="q1_adv_history" value="d"> Ancient</label>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-correct="c">
+          <p class="q-text">2. Who was primarily responsible for spreading Greek across the ancient world?</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q2_adv_history" value="a"> Julius Caesar</label>
+            <label><input type="radio" name="q2_adv_history" value="b"> Ptolemy II</label>
+            <label><input type="radio" name="q2_adv_history" value="c"> Alexander the Great</label>
+            <label><input type="radio" name="q2_adv_history" value="d"> The Apostle Paul</label>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-correct="b">
+          <p class="q-text">3. The Septuagint (LXX) is best described as:</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q3_adv_history" value="a"> The original Hebrew Old Testament</label>
+            <label><input type="radio" name="q3_adv_history" value="b"> A Greek translation of the Old Testament</label>
+            <label><input type="radio" name="q3_adv_history" value="c"> A Greek commentary on the Torah</label>
+            <label><input type="radio" name="q3_adv_history" value="d"> Paul's collection of OT quotations</label>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-correct="d">
+          <p class="q-text">4. Approximately how many Greek NT manuscripts exist today?</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q4_adv_history" value="a"> About 250</label>
+            <label><input type="radio" name="q4_adv_history" value="b"> About 1,800</label>
+            <label><input type="radio" name="q4_adv_history" value="c"> About 3,000</label>
+            <label><input type="radio" name="q4_adv_history" value="d"> Over 5,800</label>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-correct="a">
+          <p class="q-text">5. In Greek, what primarily determines whether a word is the subject or the object of a sentence?</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q5_adv_history" value="a"> Its ending (inflection)</label>
+            <label><input type="radio" name="q5_adv_history" value="b"> Its position in the sentence</label>
+            <label><input type="radio" name="q5_adv_history" value="c"> Whether it is capitalized</label>
+            <label><input type="radio" name="q5_adv_history" value="d"> The word that precedes it</label>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-correct="c">
+          <p class="q-text">6. What is the approximate date of Papyrus P52 — the oldest known NT manuscript fragment?</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q6_adv_history" value="a"> About 300 AD</label>
+            <label><input type="radio" name="q6_adv_history" value="b"> About 250 AD</label>
+            <label><input type="radio" name="q6_adv_history" value="c"> About 100–150 AD</label>
+            <label><input type="radio" name="q6_adv_history" value="d"> About 50 AD</label>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-correct="b">
+          <p class="q-text">7. According to Mounce, what is the most important foundation for learning to read biblical Greek?</p>
+          <div class="q-opts">
+            <label><input type="radio" name="q7_adv_history" value="a"> Mastering all the grammar rules before reading</label>
+            <label><input type="radio" name="q7_adv_history" value="b"> Building vocabulary, starting with the most frequent NT words</label>
+            <label><input type="radio" name="q7_adv_history" value="c"> Learning to write Greek by hand first</label>
+            <label><input type="radio" name="q7_adv_history" value="d"> Studying Classical Greek before Koine</label>
+          </div>
+        </div>
+
+      </div><!-- /quiz-questions -->
+
+      <button class="main-btn quiz-submit-btn" onclick="submitAdvMiniQuiz('adv_history')">Submit Quiz</button>
+      <div class="quiz-result" id="quizResult_adv_history"></div>
+    </div><!-- /mini-quiz -->
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_historyLesson -->
+
+
 </section>
 
     <section id="learnMenu" class="screen">
@@ -5687,8 +6133,8 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=60"></script>
-  <script src="app.js?v=60"></script>
+  <script src="vocab.js?v=61"></script>
+  <script src="app.js?v=61"></script>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">

@@ -13,6 +13,7 @@ let translationProgress =
 let xpToastTimeout = null;
 let translationGradedThisSentence = false;
 let currentLearnLesson = null;
+let currentAdvLearnLesson = null;
 let completedLessons =
   JSON.parse(localStorage.getItem("completedLessons")) || {};
 
@@ -9405,9 +9406,185 @@ function showLearnDashboard() {
 function handleLearnBack() {
   if (currentLearnLesson) {
     showLearnDashboard();
+  } else if (currentAdvLearnLesson) {
+    showAdvancedLearnDashboard();
   } else {
     showHome();
   }
+}
+
+// ── Advanced lesson display system ─────────────────────────────────────────
+
+const advLessonTitles = {
+  adv_history: "NT Greek Overview",
+  adv_alphabet: "Greek Alphabet",
+  adv_pronunciation: "Pronunciation",
+  adv_nouns: "Noun System",
+  adv_cases: "Case Endings",
+  adv_howToRead: "How to Read Greek"
+};
+
+const advLessonNumbers = {
+  adv_history: "Advanced · Lesson 1",
+  adv_alphabet: "Advanced · Lesson 2",
+  adv_pronunciation: "Advanced · Lesson 3",
+  adv_nouns: "Advanced · Lesson 4",
+  adv_cases: "Advanced · Lesson 5",
+  adv_howToRead: "Advanced · Lesson 6"
+};
+
+function showAdvancedLesson(lessonId) {
+  const dashboard = document.getElementById("advLearnDashboard");
+  if (dashboard) dashboard.style.display = "none";
+
+  document.querySelectorAll(".adv-learn-lesson").forEach(s => s.classList.remove("active"));
+
+  const section = document.getElementById(lessonId + "Lesson");
+  if (!section) {
+    console.warn("Missing advanced lesson section:", lessonId + "Lesson");
+    return;
+  }
+
+  section.classList.add("active");
+  currentAdvLearnLesson = lessonId;
+  updateAdvLessonTopBar(lessonId);
+}
+
+function showAdvancedLearnDashboard() {
+  const dashboard = document.getElementById("advLearnDashboard");
+  document.querySelectorAll(".adv-learn-lesson").forEach(s => s.classList.remove("active"));
+  if (dashboard) dashboard.style.display = "block";
+  currentAdvLearnLesson = null;
+
+  const title = document.getElementById("advLearnNavTitle");
+  const action = document.getElementById("advLearnTopAction");
+  if (title) title.textContent = "Advanced Lessons";
+  if (action) {
+    action.innerHTML = `<span class="material-symbols-outlined">tune</span>`;
+    action.title = "Switch mode";
+    action.onclick = showLessonModeModal;
+  }
+  updateLessonMenuProgress();
+}
+
+function updateAdvLessonTopBar(lessonId) {
+  const title = document.getElementById("advLearnNavTitle");
+  const action = document.getElementById("advLearnTopAction");
+  if (!title) return;
+
+  title.innerHTML = `
+    <span class="top-lesson-kicker" style="color:#c9a227">${advLessonNumbers[lessonId] || "Advanced"}</span>
+    <span class="top-lesson-title">${advLessonTitles[lessonId] || "Lesson"}</span>
+  `;
+
+  if (action) {
+    action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+    action.title = "Lesson Notes";
+    action.onclick = () => {};
+  }
+}
+
+// ── Knowledge Checks ────────────────────────────────────────────────────────
+
+function answerKC(checkId, el, isCorrect, explanation) {
+  const container = document.getElementById(checkId);
+  if (!container || container.classList.contains("answered")) return;
+
+  container.classList.add("answered");
+
+  container.querySelectorAll(".kc-opt").forEach(btn => {
+    btn.disabled = true;
+  });
+
+  el.classList.add(isCorrect ? "kc-correct" : "kc-wrong");
+
+  if (!isCorrect) {
+    container.querySelectorAll(".kc-opt").forEach(btn => {
+      if (btn.dataset.correct === "true") btn.classList.add("kc-correct");
+    });
+  }
+
+  const feedback = document.getElementById(checkId + "_fb");
+  if (feedback) {
+    feedback.textContent = explanation;
+    feedback.className = "kc-feedback " + (isCorrect ? "kc-fb-correct" : "kc-fb-wrong");
+  }
+}
+
+// ── Advanced Mini Quiz ──────────────────────────────────────────────────────
+
+const ADV_QUIZ_PASS_THRESHOLD = 0.70;
+
+function submitAdvMiniQuiz(lessonId) {
+  const quizEl = document.getElementById("miniQuiz_" + lessonId);
+  if (!quizEl) return;
+
+  const questions = quizEl.querySelectorAll(".quiz-q");
+  let total = questions.length;
+  let correct = 0;
+  let allAnswered = true;
+
+  questions.forEach(q => {
+    const correctVal = q.dataset.correct;
+    const chosen = q.querySelector("input[type=radio]:checked");
+    if (!chosen) { allAnswered = false; return; }
+
+    const isRight = chosen.value === correctVal;
+    if (isRight) correct++;
+
+    q.querySelectorAll(".q-opt label").forEach(label => {
+      const input = label.querySelector("input");
+      if (input.value === correctVal) label.classList.add("q-correct");
+      if (input.value === chosen.value && !isRight) label.classList.add("q-wrong");
+    });
+
+    q.querySelectorAll("input[type=radio]").forEach(r => r.disabled = true);
+  });
+
+  if (!allAnswered) {
+    const result = document.getElementById("quizResult_" + lessonId);
+    if (result) {
+      result.className = "quiz-result quiz-warning";
+      result.textContent = "Please answer all questions before submitting.";
+    }
+    return;
+  }
+
+  const passed = correct / total >= ADV_QUIZ_PASS_THRESHOLD;
+  const result = document.getElementById("quizResult_" + lessonId);
+  const submitBtn = quizEl.querySelector(".quiz-submit-btn");
+  if (submitBtn) submitBtn.style.display = "none";
+
+  if (result) {
+    result.className = "quiz-result " + (passed ? "quiz-pass" : "quiz-fail");
+    result.innerHTML = passed
+      ? `<strong>🎉 Passed! ${correct}/${total} correct.</strong><br>
+         <button class="main-btn" style="margin-top:14px" onclick="completeAdvancedLesson('${lessonId}')">Complete Lesson</button>`
+      : `<strong>Not quite — ${correct}/${total} correct. You need ${Math.ceil(total * ADV_QUIZ_PASS_THRESHOLD)}/${total} to pass.</strong><br>
+         Review the sections above, then<br>
+         <button class="small-btn" style="margin-top:12px" onclick="retryAdvMiniQuiz('${lessonId}')">Try Again</button>`;
+  }
+}
+
+function retryAdvMiniQuiz(lessonId) {
+  const quizEl = document.getElementById("miniQuiz_" + lessonId);
+  if (!quizEl) return;
+
+  quizEl.querySelectorAll(".quiz-q").forEach(q => {
+    q.querySelectorAll("input[type=radio]").forEach(r => {
+      r.disabled = false;
+      r.checked = false;
+    });
+    q.querySelectorAll(".q-opt label").forEach(l => {
+      l.classList.remove("q-correct", "q-wrong");
+    });
+  });
+
+  const result = document.getElementById("quizResult_" + lessonId);
+  if (result) { result.className = "quiz-result"; result.innerHTML = ""; }
+
+  const submitBtn = quizEl.querySelector(".quiz-submit-btn");
+  if (submitBtn) submitBtn.style.display = "";
 }
 
 
@@ -11083,11 +11260,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.2.5";
+const APP_VERSION = "1.3.0";
 
 const UPDATE_NOTES = [
-  "Lesson path prompt now shows every time unless you checked Don't Ask Me Again",
-  "Advanced tab in lesson progress turns gold when selected"
+  "Advanced Lesson 1 (NT Greek Overview) is fully live with content, knowledge checks, and a quiz",
+  "New knowledge check system: inline questions with instant feedback throughout lessons",
+  "New mini quiz system: required 70% pass rate before completing each Advanced lesson"
 ];
 
 let deferredInstallPrompt = null;
