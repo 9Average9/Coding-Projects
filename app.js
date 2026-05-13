@@ -11008,12 +11008,19 @@ updateNotificationButtonUI();
 }
 
 function resetAllAppData() {
-  if (!confirm("Reset ALL app data? This cannot be undone.")) {
+  if (!confirm("Reset ALL app data? This will also remove you from all leaderboards. This cannot be undone.")) {
     return;
   }
 
-  localStorage.clear();
-  location.reload();
+  if (window.LB) {
+    window.LB.deleteUserData().finally(() => {
+      localStorage.clear();
+      location.reload();
+    });
+  } else {
+    localStorage.clear();
+    location.reload();
+  }
 }
 function openSettingsFromProfile() {
   hideProfileMenu();
@@ -11080,6 +11087,7 @@ function addXP(amount, reason = "Progress made", showModal = true) {
 
   saveProfileData();
   updateProfileUI();
+  window.LB?.syncXP(profileData.xp);
 
   if (showModal) {
     showXPModal({
@@ -11437,6 +11445,7 @@ function updateStudyStreak() {
 
   localStorage.setItem("lastStudyDate", today);
   localStorage.setItem("studyStreakDays", String(streak));
+  window.LB?.syncStreak(streak);
 }
 
 function getStreakDays() {
@@ -11565,7 +11574,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.6";
+const APP_VERSION = "1.3.7";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
@@ -12218,3 +12227,289 @@ function syncOneSignalPushState() {
 })();
 
 
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+
+function openLeaderboard() {
+  if (!localStorage.getItem("lbHasSeenIntro")) {
+    localStorage.setItem("lbHasSeenIntro", "true");
+    document.getElementById("lbIntroModal").classList.add("open");
+    return;
+  }
+  showLbModal();
+}
+
+function closeLbIntro() {
+  document.getElementById("lbIntroModal").classList.remove("open");
+  showLbModal();
+}
+
+let _lbUnsub = null;
+let _lbActiveTab = "xp";
+
+function showLbModal() {
+  document.getElementById("lbModal").classList.add("open");
+  showLbTab("xp");
+}
+
+function closeLbModal() {
+  document.getElementById("lbModal").classList.remove("open");
+  if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
+}
+
+function lbOverlayClick(e) {
+  if (e.target === document.getElementById("lbModal")) closeLbModal();
+}
+
+function showLbTab(tab) {
+  _lbActiveTab = tab;
+  document.querySelectorAll(".lb-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".lb-tab-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
+  if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
+  if (tab === "xp") _renderXPBoard();
+  else if (tab === "scholar") _renderScholarBoard();
+  else if (tab === "cons") _renderConsBoard();
+}
+
+function _lbEscape(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function _renderLbEntries(listEl, entries, field, myUid) {
+  if (!entries.length) {
+    listEl.innerHTML = '<p class="lb-empty">No entries yet — be the first!</p>';
+    return;
+  }
+  const medals = ["🥇","🥈","🥉"];
+  listEl.innerHTML = entries.map((e, i) => {
+    const rank = i + 1;
+    const medal = rank <= 3 ? medals[i] : `<span class="lb-rank-num">#${rank}</span>`;
+    const isMe = e.id === myUid;
+    const val = field === "xp"
+      ? `${(e.xp || 0).toLocaleString()} XP`
+      : field === "bestScore"
+      ? `${e.bestScore || 0} correct`
+      : `${e.streak || 0} day streak`;
+    return `<div class="lb-entry${rank <= 3 ? " lb-top-" + rank : ""}${isMe ? " lb-me" : ""}">
+      <span class="lb-rank">${medal}</span>
+      <span class="lb-name">${_lbEscape(e.name)}</span>
+      <span class="lb-value">${val}</span>
+    </div>`;
+  }).join("");
+}
+
+function _renderXPBoard() {
+  const listEl = document.getElementById("lbListXP");
+  const joinEl = document.getElementById("lbJoinXP");
+  const uid = window.LB?.getUserId();
+  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+
+  if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
+
+  _lbUnsub = window.LB.listenBoard("xp_board", "xp", entries => {
+    _renderLbEntries(listEl, entries, "xp", uid);
+    updateProfileBadges();
+  });
+
+  if (window.LB.isXpJoined()) {
+    joinEl.innerHTML = `<p class="lb-joined-note">✓ You're on the board — your XP syncs automatically.</p>`;
+  } else {
+    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinXP()">⚡ Join XP Board</button>`;
+  }
+}
+
+function _renderScholarBoard() {
+  const listEl = document.getElementById("lbListScholar");
+  const joinEl = document.getElementById("lbJoinScholar");
+  const uid = window.LB?.getUserId();
+  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+
+  if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
+
+  window.LB.getBoard("scholar_board", "bestScore").then(entries => {
+    _renderLbEntries(listEl, entries, "bestScore", uid);
+    updateProfileBadges();
+  });
+
+  if (window.LB.isScholarJoined()) {
+    const best = localStorage.getItem("lbScholarBest") || "0";
+    joinEl.innerHTML = `
+      <p class="lb-joined-note">✓ Your best: <strong>${best} correct</strong></p>
+      <button class="lb-join-btn lb-retake-btn" onclick="startScholarTest()">📖 Retake Scholar Test</button>`;
+  } else {
+    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinScholar()">📖 Join Scholar Board</button>`;
+  }
+}
+
+function _renderConsBoard() {
+  const listEl = document.getElementById("lbListCons");
+  const joinEl = document.getElementById("lbJoinCons");
+  const uid = window.LB?.getUserId();
+  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+
+  if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
+
+  window.LB.getBoard("consistency_board", "streak").then(entries => {
+    _renderLbEntries(listEl, entries, "streak", uid);
+    updateProfileBadges();
+  });
+
+  if (window.LB.isConsJoined()) {
+    joinEl.innerHTML = `<p class="lb-joined-note">✓ Your streak syncs automatically. Keep it up! 🔥</p>`;
+  } else {
+    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinCons()">🔥 Join Consistency Board</button>`;
+  }
+}
+
+// ── Opt-in flows ──────────────────────────────────────────────────────────────
+
+let _lbNameTarget = null;
+
+function promptJoinXP() { _lbNameTarget = "xp"; _showLbNameModal("Join the Global XP Board"); }
+function promptJoinScholar() { _lbNameTarget = "scholar"; _showLbNameModal("Join the Scholar Board"); }
+function promptJoinCons() { _lbNameTarget = "cons"; _showLbNameModal("Join the Consistency Board"); }
+
+function _showLbNameModal(title) {
+  document.getElementById("lbNameModalTitle").textContent = title;
+  document.getElementById("lbNameInput").value = "";
+  document.getElementById("lbNameModal").classList.add("open");
+  setTimeout(() => document.getElementById("lbNameInput").focus(), 100);
+}
+
+function closeLbNameModal() {
+  document.getElementById("lbNameModal").classList.remove("open");
+}
+
+function lbNameOverlayClick(e) {
+  if (e.target === document.getElementById("lbNameModal")) closeLbNameModal();
+}
+
+async function confirmLbName() {
+  const name = document.getElementById("lbNameInput").value.trim();
+  if (!name) { alert("Please enter a name."); return; }
+  if (name.length > 24) { alert("Name must be 24 characters or less."); return; }
+
+  closeLbNameModal();
+
+  if (_lbNameTarget === "xp") {
+    const xp = profileData?.xp || 0;
+    await window.LB.joinXPBoard(name, xp);
+    _renderXPBoard();
+  } else if (_lbNameTarget === "scholar") {
+    window.LB.joinScholarBoard(name);
+    startScholarTest();
+    return;
+  } else if (_lbNameTarget === "cons") {
+    const streak = getStreakDays();
+    await window.LB.joinConsistencyBoard(name, streak);
+    _renderConsBoard();
+  }
+  updateProfileBadges();
+}
+
+// ── Scholar Test ───────────────────────────────────────────────────────────────
+
+let _scholarTimer = null;
+let _scholarSecondsLeft = 180;
+let _scholarScore = 0;
+let _scholarPool = [];
+let _scholarIdx = 0;
+
+function startScholarTest() {
+  document.getElementById("lbModal").classList.remove("open");
+  _scholarPool = [...VOCAB].sort(() => Math.random() - 0.5);
+  _scholarIdx = 0;
+  _scholarScore = 0;
+  _scholarSecondsLeft = 180;
+  document.getElementById("scholarScore").textContent = "0";
+  document.getElementById("lbScholarModal").classList.add("open");
+  _renderScholarCard();
+  _startScholarTimer();
+}
+
+function _renderScholarCard() {
+  if (_scholarIdx >= _scholarPool.length) { _endScholarTest(); return; }
+  const word = _scholarPool[_scholarIdx];
+  document.getElementById("scholarGreekWord").textContent = word.greek;
+  document.getElementById("scholarScore").textContent = _scholarScore;
+  document.querySelectorAll(".lb-scholar-btns button").forEach(b => { b.disabled = false; });
+}
+
+function knowScholarCard() {
+  _scholarScore++;
+  document.getElementById("scholarScore").textContent = _scholarScore;
+  document.querySelectorAll(".lb-scholar-btns button").forEach(b => { b.disabled = true; });
+  setTimeout(() => { _scholarIdx++; _renderScholarCard(); }, 200);
+}
+
+function skipScholarCard() {
+  document.querySelectorAll(".lb-scholar-btns button").forEach(b => { b.disabled = true; });
+  setTimeout(() => { _scholarIdx++; _renderScholarCard(); }, 150);
+}
+
+function _startScholarTimer() {
+  if (_scholarTimer) clearInterval(_scholarTimer);
+  _updateScholarTimerDisplay();
+  _scholarTimer = setInterval(() => {
+    _scholarSecondsLeft--;
+    _updateScholarTimerDisplay();
+    if (_scholarSecondsLeft <= 0) _endScholarTest();
+  }, 1000);
+}
+
+function _updateScholarTimerDisplay() {
+  const m = Math.floor(_scholarSecondsLeft / 60);
+  const s = _scholarSecondsLeft % 60;
+  const el = document.getElementById("scholarTimer");
+  el.textContent = `${m}:${s.toString().padStart(2, "0")}`;
+  el.classList.toggle("scholar-timer-warning", _scholarSecondsLeft <= 30);
+}
+
+async function _endScholarTest() {
+  if (_scholarTimer) { clearInterval(_scholarTimer); _scholarTimer = null; }
+  document.getElementById("lbScholarModal").classList.remove("open");
+
+  const prev = parseInt(localStorage.getItem("lbScholarBest") || "0");
+  const isNewBest = _scholarScore > prev;
+
+  if (window.LB?.isScholarJoined()) {
+    await window.LB.submitScholarScore(_scholarScore);
+  }
+
+  const best = Math.max(prev, _scholarScore);
+  const msg = isNewBest
+    ? `New personal best! 🎉 You got ${_scholarScore} correct.`
+    : `You got ${_scholarScore} correct.\nYour best: ${best}`;
+  alert(msg);
+
+  document.getElementById("lbModal").classList.add("open");
+  showLbTab("scholar");
+}
+
+// ── Profile Badges ─────────────────────────────────────────────────────────────
+
+async function updateProfileBadges() {
+  const badgeRow = document.getElementById("profileBadgeRow");
+  if (!badgeRow || !window.LB) return;
+
+  const optedInAny = window.LB.isXpJoined() || window.LB.isScholarJoined() || window.LB.isConsJoined();
+  if (!optedInAny) { badgeRow.innerHTML = ""; return; }
+
+  try {
+    const ranks = await window.LB.getUserRanks();
+    const defs = [
+      { key: "xp_board", label: "XP" },
+      { key: "scholar_board", label: "Scholar" },
+      { key: "consistency_board", label: "Streak" }
+    ];
+    const medals = ["🥇","🥈","🥉"];
+    const badges = [];
+    for (const { key, label } of defs) {
+      const r = ranks[key];
+      if (r && r <= 3) badges.push(`<span class="profile-lb-badge" title="${label} #${r}">${medals[r-1]}</span>`);
+    }
+    badgeRow.innerHTML = badges.join("");
+  } catch (e) {
+    badgeRow.innerHTML = "";
+  }
+}
