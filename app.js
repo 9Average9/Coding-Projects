@@ -9639,6 +9639,80 @@ function openAdvCheatSheet(lessonId) {
           <p><strong>Liquids</strong>: λ ρ &nbsp;|&nbsp; <strong>Nasals</strong>: μ ν &nbsp;|&nbsp; <strong>Sibilant</strong>: σ/ς &nbsp;|&nbsp; <strong>Double</strong>: ξ (ks) · ψ (ps) · ζ (dz)</p>
         </div>
       `;
+    } else if (lessonId === "adv_pronunciation") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">Syllables, Accents &amp; Pronunciation — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Syllable Rule</h4>
+          <p>Every syllable contains exactly <strong>one vowel or one diphthong</strong>. Count vowels/diphthongs to count syllables.<br>
+          λό-γος (2) &nbsp;·&nbsp; ἄν-θρω-πος (3) &nbsp;·&nbsp; ἀ-πό-στο-λος (4)</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Syllable Names (from the end)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Name</th><th>Position</th><th>Example (ἄνθρωπος)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Ultima</strong></td><td>Last syllable</td><td>-πος</td></tr>
+              <tr><td><strong>Penult</strong></td><td>Second-to-last</td><td>-θρω-</td></tr>
+              <tr><td><strong>Antepenult</strong></td><td>Third-to-last</td><td>ἄν-</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Three Accent Marks</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Mark</th><th>Name</th><th>Allowed positions</th><th>Vowel requirement</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ά</strong> acute</td><td>ὀξεῖα</td><td>Any of last 3 syllables</td><td>Any vowel</td></tr>
+              <tr><td><strong>ὰ</strong> grave</td><td>βαρεῖα</td><td>Ultima only</td><td>Any vowel (replaces acute before next word)</td></tr>
+              <tr><td><strong>ᾶ</strong> circumflex</td><td>περισπωμένη</td><td>Last 2 syllables only</td><td>Long vowel/diphthong only</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key Accent Rules</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Rule</th><th>Applies to</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Recessive</strong></td><td>Finite verbs</td><td>Accent goes as far back as allowed (antepenult if ultima short; penult if ultima long)</td></tr>
+              <tr><td><strong>Persistent</strong></td><td>Nouns</td><td>Accent stays on the same syllable as the dictionary form; shifts only when forced</td></tr>
+              <tr><td><strong>Long ultima</strong></td><td>All words</td><td>Blocks accent from antepenult; forces circumflex to become acute on penult</td></tr>
+              <tr><td><strong>Acute → Grave</strong></td><td>All words</td><td>Acute on ultima becomes grave when another word immediately follows</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Circumflex Signals to Watch</h4>
+          <p><strong>-ων on the ultima</strong> → usually genitive plural<br>
+          <strong>Circumflex on contracted verb</strong> (like ποιεῖ) → two vowels compressed into one long syllable</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Erasmian vs. Modern Greek</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th></th><th>Erasmian</th><th>Modern Greek</th></tr></thead>
+            <tbody>
+              <tr><td>η / ι / υ / ει / οι</td><td>All distinct sounds</td><td>All = "ee" (iotacism)</td></tr>
+              <tr><td>β</td><td>"b" (bay)</td><td>"v" (vine)</td></tr>
+              <tr><td>Used in</td><td>Most seminaries/universities</td><td>Greece today</td></tr>
+              <tr><td>Advantage</td><td>Distinguishes endings clearly</td><td>Matches living language</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Elision &amp; Moveable Nu</h4>
+          <p><strong>Elision (᾽):</strong> Final short vowel drops before a word starting with a vowel<br>
+          ἀπό + αὐτοῦ → ἀπ' αὐτοῦ</p>
+          <p><strong>Moveable ν:</strong> Optional final ν added before vowels (like English "a" vs. "an")<br>
+          ἐστίν αὐτός &nbsp;·&nbsp; ἐστί ποιμήν</p>
+        </div>
+      `;
     } else {
       content.innerHTML = `<p style="opacity:0.6;text-align:center;padding:20px 0">No cheat sheet available for this lesson yet.</p>`;
     }
@@ -9715,6 +9789,36 @@ const ADV_KC_DATA = {
     { correct: true, feedback: "Correct! Ρ ρ (rho) looks exactly like an English capital 'P' and lowercase 'p' — but it makes the 'r' sound, not 'p.' This is one of the most dangerous recognition traps for English speakers. Ρ = 'r,' always." },
     { feedback: "Φ φ (phi) doesn't look like an English 'P' — it has a distinctive circle-with-a-vertical-line shape. The letter that looks like 'P' but isn't is Ρ ρ (rho), which makes an 'r' sound." },
     { feedback: "Β β (beta) looks like an English 'B' and makes a 'b' sound — it's one of the safer letters. The 'P' look-alike trap is Ρ ρ (rho), which actually makes an 'r' sound." }
+  ],
+  kc_adv_pronunciation_1: [
+    { feedback: "Count the vowels and diphthongs: ἀ-πό-στο-λος has four separate vowel sounds (α, ο, ο, ο) → 4 syllables. Remember: one vowel or diphthong = one syllable." },
+    { feedback: "Three syllables would mean three vowel sounds. ἀπόστολος has four: ἀ-πό-στο-λος — each of those four segments has its own vowel." },
+    { correct: true, feedback: "Correct! ἀπόστολος divides into 4 syllables: ἀ-πό-στο-λος. Count the vowels: α, ο, ο, ο — four vowel sounds, four syllables. This is where the English word 'apostle' comes from." },
+    { feedback: "Five syllables would require five separate vowel sounds or diphthongs. ἀπόστολος has four: ἀ-πό-στο-λος." }
+  ],
+  kc_adv_pronunciation_2: [
+    { feedback: "Stress (loudness/prominence) is how modern Greek and English use accent marks — but ancient Greek accents originally marked something different. The pitch system predates the stress system by centuries." },
+    { correct: true, feedback: "Correct! Ancient Greek was a pitch-accent language — the marks indicated rising and falling musical pitch, not stress. The acute raised the pitch, the circumflex rose then fell. The pitch system collapsed into a stress system around the Byzantine period (AD 300–600)." },
+    { feedback: "Vowel length is indicated by which vowel letter is used (ε always short, η always long) — that's separate from the accent marks. The accent marks indicated pitch, not length." },
+    { feedback: "Accent marks don't indicate part of speech. What they historically indicated was musical pitch — the rise and fall of the voice on a syllable." }
+  ],
+  kc_adv_pronunciation_3: [
+    { feedback: "The acute can appear on any of the last three syllables — but the circumflex is more restricted. It can only appear on the last two syllables (penult or ultima), and only on long vowels or diphthongs." },
+    { feedback: "The circumflex has a strict requirement: it can only appear on long vowels or long diphthongs. Short vowels physically cannot carry a circumflex, because the circumflex represents a rise-then-fall of pitch that requires a long syllable." },
+    { correct: true, feedback: "Correct! The circumflex can only appear on long vowels or diphthongs, and only on the last two syllables (penult or ultima). Both conditions must be met. This is stricter than the acute, which can sit on any of the last three syllables regardless of length." },
+    { feedback: "While a circumflex on the ultima -ων does often signal genitive plural, the circumflex appears in many other contexts too (contracted verbs, certain noun cases). The defining feature is that it requires a long vowel in the last two syllables." }
+  ],
+  kc_adv_pronunciation_4: [
+    { feedback: "Persistent accent (staying on the same syllable as the dictionary form) is the rule for nouns, not verbs. Finite verbs follow the opposite principle — they recede." },
+    { correct: true, feedback: "Correct! Greek finite verbs follow the recessive accent rule — the accent moves as far back toward the beginning of the word as the rules allow. If the ultima is short, the accent lands on the antepenult; if the ultima is long, it's forced to the penult." },
+    { feedback: "Accenting the ultima is not a standard verb rule. Some specific verb forms (like the aorist imperative active 2nd singular) have accent on the ultima, but as a general rule verbs are recessive — the accent moves back as far as possible." },
+    { feedback: "Verbs don't always use the circumflex. The recessive rule determines the syllable; whether that syllable gets an acute or circumflex depends on the length of the vowel and the rules for each accent type." }
+  ],
+  kc_adv_pronunciation_5: [
+    { feedback: "Erasmian is almost certainly not a perfect reconstruction of 1st-century Koine — some sound mergers had already begun by that period. The honest reason for using Erasmian is pedagogical, not historical accuracy." },
+    { feedback: "Erasmian is actually quite different from modern Greek. Modern Greek has merged η, ι, υ, ει, οι all into one 'ee' sound — Erasmian keeps them distinct precisely because modern Greek pronunciation obscures differences students need to see." },
+    { correct: true, feedback: "Correct! Erasmian preserves distinct sounds for letters that have merged in modern Greek (like η vs. ι, or ει vs. υ vs. οι). This lets students hear and distinguish different endings when listening and reading aloud — which is crucial for learning grammar." },
+    { feedback: "There's no evidence the apostles used anything like Erasmian pronunciation — that system was developed in the 16th century by Erasmus. The practical reason for Erasmian is that it keeps letter sounds distinct in ways that help students learn endings and vocabulary." }
   ]
 };
 
@@ -9798,6 +9902,47 @@ const ADV_QUIZ_DATA = {
         text: "What does the iota subscript (ᾳ, ῃ, ῳ) primarily serve to indicate?",
         options: ["That the vowel is always pronounced long", "That the syllable carries a rough breathing", "A grammatical distinction that became silent in pronunciation", "That the word ends a sentence"],
         correct: 2
+      }
+    ]
+  },
+  adv_pronunciation: {
+    title: "Syllables, Accents & Pronunciation",
+    passMark: 5,
+    questions: [
+      {
+        text: "How many syllables does the word ἀπόστολος (apostle) have?",
+        options: ["2", "3", "4", "5"],
+        correct: 2
+      },
+      {
+        text: "What did Greek accent marks originally indicate in the ancient language?",
+        options: ["Stress on a syllable", "Musical pitch (rise/fall)", "Vowel length", "Part of speech"],
+        correct: 1
+      },
+      {
+        text: "Which accent mark can ONLY appear on a long vowel or diphthong?",
+        options: ["Acute (´)", "Grave (`)", "Circumflex (~)", "Either acute or grave"],
+        correct: 2
+      },
+      {
+        text: "Greek finite verbs follow which accent rule?",
+        options: ["Persistent — stays on the same syllable as the dictionary form", "Recessive — moves as far back from the end as rules allow", "Always accent the ultima", "Always use the circumflex"],
+        correct: 1
+      },
+      {
+        text: "What happens to an acute accent on the ultima when the next word immediately follows?",
+        options: ["It becomes a circumflex", "It disappears entirely", "It becomes a grave", "It shifts to the penult"],
+        correct: 2
+      },
+      {
+        text: "Why is Erasmian pronunciation used in most Greek textbooks?",
+        options: ["It matches how Koine Greek sounded in the 1st century", "It keeps letter sounds distinct that have merged in modern Greek", "It is identical to modern Greek", "It requires no knowledge of accent rules"],
+        correct: 1
+      },
+      {
+        text: "What does elision (marked by an apostrophe) indicate in a Greek text?",
+        options: ["A vowel has been lengthened before a consonant cluster", "A final short vowel was dropped before a word beginning with a vowel", "The word is a quotation from the Septuagint", "The accent has shifted to the ultima"],
+        correct: 1
       }
     ]
   }
@@ -11703,10 +11848,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.6";
+const APP_VERSION = "1.5.7";
 
 const UPDATE_NOTES = [
-  "Lesson 2 cheat sheet: full alphabet table, vowel length rules, diphthongs, diacritical marks, recognition traps"
+  "Advanced Lesson 3: Syllables, Accents & Pronunciation — syllabification rules, accent marks, recessive/persistent accent, Erasmian vs. Modern Greek, elision and moveable nu"
 ];
 
 let deferredInstallPrompt = null;
