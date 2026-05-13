@@ -11530,14 +11530,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.5.1";
 
 const UPDATE_NOTES = [
-  "Account system: create a username and password — your progress is saved and syncs across devices",
-  "Sign in on any device to restore all your lessons, XP, streak, and vocab",
-  "Leaderboards now use your display name automatically — just tap Join to opt in",
-  "Delete Account fully removes your account and data from the server",
-  "Welcome modal removed for a cleaner launch experience"
+  "Fixed member since and time in app showing on your own leaderboard entry",
+  "Leaderboard placement badges now display correctly after account creation",
+  "Display name centered under profile avatar"
 ];
 
 let deferredInstallPrompt = null;
@@ -11806,7 +11804,11 @@ function gatherMigrationData() {
     achievements: JSON.parse(localStorage.getItem("achievements") || "[]"),
     practiceToolsUnlocked: localStorage.getItem("practiceToolsUnlocked") === "true",
     lessonMode: localStorage.getItem("lessonMode") || "basic",
-    vocabChapterXP
+    vocabChapterXP,
+    lbXpJoined: localStorage.getItem("lbXpJoined") === "true",
+    lbConsJoined: localStorage.getItem("lbConsJoined") === "true",
+    lbScholarJoined: localStorage.getItem("lbScholarJoined") === "true",
+    lbScholarBest: parseInt(localStorage.getItem("lbScholarBest") || "0")
   };
 }
 
@@ -11897,6 +11899,11 @@ async function submitCreateAccount() {
       isCreated: true
     };
     localStorage.setItem("profileData", JSON.stringify(profileData));
+
+    // Re-sync leaderboard entries under the new Auth UID if user was already joined
+    if (migration.lbXpJoined) await window.LB.joinXPBoard(migration.xp || 0).catch(() => {});
+    if (migration.lbConsJoined) await window.LB.joinConsistencyBoard(parseInt(localStorage.getItem("studyStreakDays") || "0")).catch(() => {});
+    if (migration.lbScholarJoined) window.LB.joinScholarBoard();
 
     hideAuthModal();
     updateProfileUI();
@@ -12752,14 +12759,18 @@ function showLbUserInfo(id) {
 
   document.getElementById("lbUserName").textContent = e.name || "—";
 
-  const joinRaw = e.joinDate;
+  // For own entry use live localStorage so values are always current
+  const isMe = window.LB?.getUserId() === id;
+  const joinRaw = isMe ? localStorage.getItem("appJoinDate") : e.joinDate;
   document.getElementById("lbUserJoinDate").textContent = joinRaw
     ? new Date(joinRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : "—";
 
-  const seconds = Number(e.studySeconds) || 0;
-  const hours = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
+  const rawSeconds = isMe
+    ? (Number(localStorage.getItem("totalStudySeconds")) || 0)
+    : (Number(e.studySeconds) || 0);
+  const hours = Math.floor(rawSeconds / 3600);
+  const mins = Math.floor((rawSeconds % 3600) / 60);
   document.getElementById("lbUserTime").textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   document.getElementById("lbUserModal").classList.add("open");

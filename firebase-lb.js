@@ -87,10 +87,10 @@ async function createAccount(username, password, displayName, migrationData = {}
     practiceToolsUnlocked: migrationData.practiceToolsUnlocked || false,
     lessonMode: migrationData.lessonMode || "basic",
     vocabChapterXP: migrationData.vocabChapterXP || {},
-    lbXpJoined: false,
-    lbConsJoined: false,
-    lbScholarJoined: false,
-    lbScholarBest: 0,
+    lbXpJoined: migrationData.lbXpJoined || false,
+    lbConsJoined: migrationData.lbConsJoined || false,
+    lbScholarJoined: migrationData.lbScholarJoined || false,
+    lbScholarBest: migrationData.lbScholarBest || 0,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
