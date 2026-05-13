@@ -10778,6 +10778,9 @@ function saveProfileName() {
   profileData.firstName = firstName;
   profileData.lastName = lastName;
   profileData.isCreated = true;
+  if (!localStorage.getItem("appJoinDate")) {
+    localStorage.setItem("appJoinDate", new Date().toISOString());
+  }
 
   if (profileData.greekExperience === "basic") {
     practiceToolsUnlocked = true;
@@ -10889,6 +10892,8 @@ function getProfileTitle() {
 }
 
 function updateProfileUI() {
+  _applyProfileAvatar();
+
   const fullName =
     `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim();
 
@@ -11574,7 +11579,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.9";
+const APP_VERSION = "1.4.0";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
@@ -12275,15 +12280,26 @@ function _lbEscape(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
+function _lbAvatarHtml(entry) {
+  const icon = entry.avatar || "person";
+  // Photos can't be shared cross-device — show icon only
+  return `<span class="lb-avatar"><span class="material-symbols-outlined">${_lbEscape(icon)}</span></span>`;
+}
+
+function _rankBadgeHtml(rank) {
+  const labels = ["1st", "2nd", "3rd"];
+  const cls = ["lb-rank-gold", "lb-rank-silver", "lb-rank-bronze"];
+  if (rank <= 3) return `<span class="lb-rank-badge ${cls[rank-1]}">${labels[rank-1]}</span>`;
+  return `<span class="lb-rank-num">#${rank}</span>`;
+}
+
 function _renderLbEntries(listEl, entries, field, myUid) {
   if (!entries.length) {
     listEl.innerHTML = '<p class="lb-empty">No entries yet — be the first!</p>';
     return;
   }
-  const medals = ["🥇","🥈","🥉"];
   listEl.innerHTML = entries.map((e, i) => {
     const rank = i + 1;
-    const medal = rank <= 3 ? medals[i] : `<span class="lb-rank-num">#${rank}</span>`;
     const isMe = e.id === myUid;
     const val = field === "xp"
       ? `${(e.xp || 0).toLocaleString()} XP`
@@ -12291,7 +12307,8 @@ function _renderLbEntries(listEl, entries, field, myUid) {
       ? `${e.bestScore || 0} correct`
       : `${e.streak || 0} day streak`;
     return `<div class="lb-entry${rank <= 3 ? " lb-top-" + rank : ""}${isMe ? " lb-me" : ""}">
-      <span class="lb-rank">${medal}</span>
+      ${_rankBadgeHtml(rank)}
+      ${_lbAvatarHtml(e)}
       <span class="lb-name">${_lbEscape(e.name)}</span>
       <span class="lb-value">${val}</span>
     </div>`;
@@ -12388,6 +12405,18 @@ async function confirmLbName() {
   const name = document.getElementById("lbNameInput").value.trim();
   if (!name) { alert("Please enter a name."); return; }
   if (name.length > 24) { alert("Name must be 24 characters or less."); return; }
+
+  // Check for duplicate names on this specific board
+  const boardMap = { xp: "xp_board", scholar: "scholar_board", cons: "consistency_board" };
+  const board = boardMap[_lbNameTarget];
+  const btn = document.querySelector("#lbNameModal .lb-primary-btn");
+  if (btn) { btn.disabled = true; btn.textContent = "Checking…"; }
+  const taken = await window.LB.checkNameTaken(board, name).catch(() => false);
+  if (btn) { btn.disabled = false; btn.textContent = "Confirm →"; }
+  if (taken) {
+    alert(`"${name}" is already taken on this board. Please choose a different name.`);
+    return;
+  }
 
   closeLbNameModal();
 
@@ -12530,6 +12559,14 @@ async function _endScholarTest() {
 
 // ── Profile Badges ─────────────────────────────────────────────────────────────
 
+// Board badge definitions — each board has its own icon and color class
+const LB_BADGE_DEFS = [
+  { key: "xp_board",           label: "Global XP Board",     icon: "bolt",                 cls: "lb-badge-xp" },
+  { key: "scholar_board",      label: "Scholar Board",        icon: "menu_book",            cls: "lb-badge-scholar" },
+  { key: "consistency_board",  label: "Consistency Board",    icon: "local_fire_department", cls: "lb-badge-cons" }
+];
+const LB_RANK_LABELS = ["1st Place", "2nd Place", "3rd Place"];
+
 async function updateProfileBadges() {
   const badgeRow = document.getElementById("profileBadgeRow");
   if (!badgeRow || !window.LB) return;
@@ -12539,19 +12576,139 @@ async function updateProfileBadges() {
 
   try {
     const ranks = await window.LB.getUserRanks();
-    const defs = [
-      { key: "xp_board", label: "XP" },
-      { key: "scholar_board", label: "Scholar" },
-      { key: "consistency_board", label: "Streak" }
-    ];
-    const medals = ["🥇","🥈","🥉"];
     const badges = [];
-    for (const { key, label } of defs) {
-      const r = ranks[key];
-      if (r && r <= 3) badges.push(`<span class="profile-lb-badge" title="${label} #${r}">${medals[r-1]}</span>`);
+    for (const def of LB_BADGE_DEFS) {
+      const r = ranks[def.key];
+      if (r && r <= 3) {
+        const rankCls = `lb-badge-rank-${r}`;
+        badges.push(
+          `<button class="profile-lb-badge ${def.cls} ${rankCls}" onclick="showBadgeInfo('${def.key}',${r})" title="${def.label} — ${LB_RANK_LABELS[r-1]}">
+            <span class="material-symbols-outlined">${def.icon}</span>
+            <span class="lb-badge-rank-num">${r}</span>
+          </button>`
+        );
+      }
     }
     badgeRow.innerHTML = badges.join("");
   } catch (e) {
     badgeRow.innerHTML = "";
   }
+}
+
+function showBadgeInfo(boardKey, rank) {
+  const def = LB_BADGE_DEFS.find(d => d.key === boardKey);
+  if (!def) return;
+  const modal = document.getElementById("badgeInfoModal");
+  document.getElementById("badgeInfoIconWrap").innerHTML =
+    `<span class="material-symbols-outlined badge-info-big-icon ${def.cls}">${def.icon}</span>`;
+  document.getElementById("badgeInfoTitle").textContent = `${def.label}`;
+  document.getElementById("badgeInfoSub").textContent = `You placed ${LB_RANK_LABELS[rank-1]} on this board. Keep it up!`;
+  modal.classList.add("open");
+}
+
+function closeBadgeInfo() {
+  document.getElementById("badgeInfoModal").classList.remove("open");
+}
+
+// ── Avatar Picker ─────────────────────────────────────────────────────────────
+
+const AVATAR_ICONS = [
+  "school","person","face","sentiment_satisfied","star","favorite",
+  "church","auto_stories","psychology","self_improvement","spa","anchor",
+  "bolt","diamond","military_tech","workspace_premium","emoji_events",
+  "local_fire_department","rocket_launch","nature","palette","music_note",
+  "pets","sports_soccer","travel_explore","groups","volunteer_activism","shield"
+];
+
+function openAvatarPicker() {
+  const grid = document.getElementById("avatarIconGrid");
+  const current = localStorage.getItem("profilePicValue") || "school";
+  grid.innerHTML = AVATAR_ICONS.map(icon =>
+    `<button class="avatar-icon-btn${icon === current ? " selected" : ""}" onclick="selectAvatarIcon('${icon}')">
+      <span class="material-symbols-outlined">${icon}</span>
+    </button>`
+  ).join("");
+  document.getElementById("avatarPickerModal").classList.add("open");
+}
+
+function closeAvatarPicker() {
+  document.getElementById("avatarPickerModal").classList.remove("open");
+}
+
+function avatarPickerOverlayClick(e) {
+  if (e.target === document.getElementById("avatarPickerModal")) closeAvatarPicker();
+}
+
+function selectAvatarIcon(icon) {
+  localStorage.setItem("profilePicType", "icon");
+  localStorage.setItem("profilePicValue", icon);
+  _applyProfileAvatar();
+  closeAvatarPicker();
+  window.LB?.syncAvatar();
+}
+
+function handleAvatarPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Compress to small square via canvas
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 120; canvas.height = 120;
+      const ctx = canvas.getContext("2d");
+      const size = Math.min(img.width, img.height);
+      const x = (img.width - size) / 2;
+      const y = (img.height - size) / 2;
+      ctx.drawImage(img, x, y, size, size, 0, 0, 120, 120);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+      localStorage.setItem("profilePicType", "photo");
+      localStorage.setItem("profilePicValue", dataUrl);
+      _applyProfileAvatar();
+      closeAvatarPicker();
+      // Leaderboard shows generic icon for photos (can't share photos cross-device)
+      window.LB?.syncAvatar();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function _applyProfileAvatar() {
+  const el = document.getElementById("profileAvatar");
+  if (!el) return;
+  const type = localStorage.getItem("profilePicType") || "icon";
+  const value = localStorage.getItem("profilePicValue") || "school";
+  if (type === "photo") {
+    el.innerHTML = `<img src="${value}" alt="avatar" class="avatar-photo-img">`;
+  } else {
+    el.innerHTML = `<span class="material-symbols-outlined">${value}</span>`;
+  }
+}
+
+// ── Profile Info Modal ─────────────────────────────────────────────────────────
+
+function showProfileInfoModal() {
+  // Ensure join date is set
+  if (!localStorage.getItem("appJoinDate")) {
+    localStorage.setItem("appJoinDate", new Date().toISOString());
+  }
+  const joinRaw = localStorage.getItem("appJoinDate");
+  const joinDate = joinRaw
+    ? new Date(joinRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : "Unknown";
+
+  const seconds = Number(localStorage.getItem("totalStudySeconds")) || 0;
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+
+  document.getElementById("profileInfoJoinDate").textContent = joinDate;
+  document.getElementById("profileInfoTime").textContent = timeStr;
+  document.getElementById("profileInfoModal").classList.add("open");
+}
+
+function closeProfileInfoModal() {
+  document.getElementById("profileInfoModal").classList.remove("open");
 }

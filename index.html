@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=70" />
+  <link rel="stylesheet" href="style.css?v=71" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -5800,11 +5800,21 @@ OneSignalDeferred.push(async function(OneSignal) {
     <button class="modal-close" onclick="hideProfileMenu()">×</button>
 
     <div class="profile-header">
-      <div class="profile-avatar" id="profileAvatar">
-        <span class="material-symbols-outlined">school</span>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <button class="profile-avatar-edit" onclick="openAvatarPicker()" title="Change avatar">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
       </div>
 
-      <h2 id="profileDisplayName">Greek Student</h2>
+      <div class="profile-name-row">
+        <h2 id="profileDisplayName">Greek Student</h2>
+        <button class="profile-info-btn" onclick="showProfileInfoModal()" title="Account info">
+          <span class="material-symbols-outlined">info</span>
+        </button>
+      </div>
       <div id="profileBadgeRow" class="profile-badge-row"></div>
 
      <div class="profile-title-row">
@@ -6068,34 +6078,34 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=70"></script>
-  <script src="app.js?v=70"></script>
-  <script type="module" src="firebase-lb.js?v=70"></script>
+  <script src="vocab.js?v=71"></script>
+  <script src="app.js?v=71"></script>
+  <script type="module" src="firebase-lb.js?v=71"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
   <div class="lb-intro-card">
-    <div class="lb-intro-trophy">🏆</div>
+    <span class="material-symbols-outlined lb-intro-trophy-icon">emoji_events</span>
     <h2>Church Leaderboard</h2>
     <p class="lb-intro-desc">See how your Greek journey stacks up with your church community. Everything is opt-in — you choose what to share.</p>
     <div class="lb-intro-boards">
       <div class="lb-intro-board-item">
-        <span class="lb-intro-board-icon">⚡</span>
+        <span class="material-symbols-outlined lb-intro-board-icon lb-icon-xp">bolt</span>
         <strong>Global XP</strong>
         <span>Ranked by total XP earned</span>
       </div>
       <div class="lb-intro-board-item">
-        <span class="lb-intro-board-icon">📖</span>
+        <span class="material-symbols-outlined lb-intro-board-icon lb-icon-scholar">menu_book</span>
         <strong>Scholar</strong>
         <span>3-min vocab challenge</span>
       </div>
       <div class="lb-intro-board-item">
-        <span class="lb-intro-board-icon">🔥</span>
+        <span class="material-symbols-outlined lb-intro-board-icon lb-icon-cons">local_fire_department</span>
         <strong>Consistency</strong>
         <span>Longest daily streak</span>
       </div>
     </div>
-    <button class="lb-primary-btn" onclick="closeLbIntro()">Let's Go →</button>
+    <button class="lb-primary-btn" onclick="closeLbIntro()">Let's Go</button>
   </div>
 </div>
 
@@ -6103,13 +6113,22 @@ OneSignalDeferred.push(async function(OneSignal) {
 <div id="lbModal" class="modal-overlay lb-modal-overlay" onclick="lbOverlayClick(event)">
   <div class="lb-modal">
     <div class="lb-modal-header">
-      <span class="lb-modal-title">🏆 Leaderboard</span>
+      <div class="lb-modal-title-wrap">
+        <span class="material-symbols-outlined lb-header-icon">emoji_events</span>
+        <span class="lb-modal-title">Leaderboard</span>
+      </div>
       <button class="modal-close" onclick="closeLbModal()">×</button>
     </div>
     <div class="lb-tabs">
-      <button class="lb-tab-btn active" data-tab="xp" onclick="showLbTab('xp')">⚡ XP</button>
-      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">📖 Scholar</button>
-      <button class="lb-tab-btn" data-tab="cons" onclick="showLbTab('cons')">🔥 Streak</button>
+      <button class="lb-tab-btn active" data-tab="xp" onclick="showLbTab('xp')">
+        <span class="material-symbols-outlined">bolt</span> XP
+      </button>
+      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
+        <span class="material-symbols-outlined">menu_book</span> Scholar
+      </button>
+      <button class="lb-tab-btn" data-tab="cons" onclick="showLbTab('cons')">
+        <span class="material-symbols-outlined">local_fire_department</span> Streak
+      </button>
     </div>
 
     <div id="lbPaneXP" class="lb-tab-pane active" data-tab="xp">
@@ -6393,6 +6412,65 @@ OneSignalDeferred.push(async function(OneSignal) {
       <input type="checkbox" id="lessonModeDontAsk" />
       <span>Don't ask me again <small>(can be changed in Settings)</small></span>
     </label>
+  </div>
+</div>
+
+<!-- Avatar Picker Modal -->
+<div id="avatarPickerModal" class="modal-overlay" onclick="avatarPickerOverlayClick(event)">
+  <div class="avatar-picker-card">
+    <div class="avatar-picker-header">
+      <h3>Choose Your Avatar</h3>
+      <button class="modal-close" onclick="closeAvatarPicker()">×</button>
+    </div>
+    <div class="avatar-icon-grid" id="avatarIconGrid"></div>
+    <div class="avatar-picker-divider"><span>or</span></div>
+    <div class="avatar-upload-row">
+      <label class="avatar-upload-btn">
+        <span class="material-symbols-outlined">photo_library</span>
+        Choose Photo
+        <input type="file" accept="image/*" onchange="handleAvatarPhoto(this)" style="display:none">
+      </label>
+      <label class="avatar-upload-btn">
+        <span class="material-symbols-outlined">photo_camera</span>
+        Take Photo
+        <input type="file" accept="image/*" capture="user" onchange="handleAvatarPhoto(this)" style="display:none">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Badge Info Modal -->
+<div id="badgeInfoModal" class="modal-overlay" onclick="closeBadgeInfo()">
+  <div class="badge-info-card">
+    <div class="badge-info-icon-wrap" id="badgeInfoIconWrap"></div>
+    <p class="badge-info-title" id="badgeInfoTitle"></p>
+    <p class="badge-info-sub" id="badgeInfoSub"></p>
+    <button class="lb-primary-btn" onclick="closeBadgeInfo()">Got it</button>
+  </div>
+</div>
+
+<!-- Profile Info Modal -->
+<div id="profileInfoModal" class="modal-overlay" onclick="closeProfileInfoModal()">
+  <div class="profile-info-card">
+    <div class="profile-info-header">
+      <span class="material-symbols-outlined profile-info-icon">account_circle</span>
+      <h3>Account Info</h3>
+    </div>
+    <div class="profile-info-row">
+      <span class="material-symbols-outlined">calendar_today</span>
+      <div>
+        <strong>Member Since</strong>
+        <span id="profileInfoJoinDate">—</span>
+      </div>
+    </div>
+    <div class="profile-info-row">
+      <span class="material-symbols-outlined">schedule</span>
+      <div>
+        <strong>Total Time in App</strong>
+        <span id="profileInfoTime">—</span>
+      </div>
+    </div>
+    <button class="lb-primary-btn" onclick="closeProfileInfoModal()">Close</button>
   </div>
 </div>
 

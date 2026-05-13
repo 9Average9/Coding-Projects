@@ -7,6 +7,7 @@ import {
   collection,
   query,
   orderBy,
+  where,
   limit,
   getDocs,
   onSnapshot,
@@ -34,12 +35,29 @@ function getUserId() {
   return uid;
 }
 
+function getAvatar() {
+  return localStorage.getItem("profilePicValue") || "school";
+}
+
+async function checkNameTaken(boardName, name) {
+  try {
+    const q = query(collection(db, boardName), where("name", "==", name), limit(1));
+    const snap = await getDocs(q);
+    // Exclude self (in case they're re-joining same board)
+    return snap.docs.some(d => d.id !== getUserId());
+  } catch (e) {
+    return false;
+  }
+}
+
 async function syncXP(xp) {
   if (localStorage.getItem("lbXpJoined") !== "true") return;
   const name = localStorage.getItem("lbXpName");
   if (!name) return;
   try {
-    await setDoc(doc(db, "xp_board", getUserId()), { name, xp, updatedAt: serverTimestamp() });
+    await setDoc(doc(db, "xp_board", getUserId()), {
+      name, xp, avatar: getAvatar(), updatedAt: serverTimestamp()
+    });
   } catch (e) { console.warn("LB syncXP:", e); }
 }
 
@@ -48,7 +66,9 @@ async function syncStreak(streak) {
   const name = localStorage.getItem("lbConsName");
   if (!name) return;
   try {
-    await setDoc(doc(db, "consistency_board", getUserId()), { name, streak, updatedAt: serverTimestamp() });
+    await setDoc(doc(db, "consistency_board", getUserId()), {
+      name, streak, avatar: getAvatar(), updatedAt: serverTimestamp()
+    });
   } catch (e) { console.warn("LB syncStreak:", e); }
 }
 
@@ -60,14 +80,18 @@ async function submitScholarScore(score) {
   if (score <= best) return;
   localStorage.setItem("lbScholarBest", String(score));
   try {
-    await setDoc(doc(db, "scholar_board", getUserId()), { name, bestScore: score, updatedAt: serverTimestamp() });
+    await setDoc(doc(db, "scholar_board", getUserId()), {
+      name, bestScore: score, avatar: getAvatar(), updatedAt: serverTimestamp()
+    });
   } catch (e) { console.warn("LB submitScholar:", e); }
 }
 
 async function joinXPBoard(name, xp) {
   localStorage.setItem("lbXpJoined", "true");
   localStorage.setItem("lbXpName", name);
-  await setDoc(doc(db, "xp_board", getUserId()), { name, xp, updatedAt: serverTimestamp() });
+  await setDoc(doc(db, "xp_board", getUserId()), {
+    name, xp, avatar: getAvatar(), updatedAt: serverTimestamp()
+  });
 }
 
 function joinScholarBoard(name) {
@@ -78,7 +102,26 @@ function joinScholarBoard(name) {
 async function joinConsistencyBoard(name, streak) {
   localStorage.setItem("lbConsJoined", "true");
   localStorage.setItem("lbConsName", name);
-  await setDoc(doc(db, "consistency_board", getUserId()), { name, streak, updatedAt: serverTimestamp() });
+  await setDoc(doc(db, "consistency_board", getUserId()), {
+    name, streak, avatar: getAvatar(), updatedAt: serverTimestamp()
+  });
+}
+
+async function syncAvatar() {
+  const avatar = getAvatar();
+  const boards = [
+    { key: "xp_board", joined: "lbXpJoined" },
+    { key: "scholar_board", joined: "lbScholarJoined" },
+    { key: "consistency_board", joined: "lbConsJoined" }
+  ];
+  for (const { key, joined } of boards) {
+    if (localStorage.getItem(joined) === "true") {
+      try {
+        const ref = doc(db, key, getUserId());
+        await setDoc(ref, { avatar }, { merge: true });
+      } catch (e) { /* silent */ }
+    }
+  }
 }
 
 async function getBoard(boardName, field, topN = 100) {
@@ -126,8 +169,10 @@ async function getUserRanks() {
 
 window.LB = {
   getUserId,
+  checkNameTaken,
   syncXP,
   syncStreak,
+  syncAvatar,
   submitScholarScore,
   joinXPBoard,
   joinScholarBoard,
