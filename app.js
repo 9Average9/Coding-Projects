@@ -9584,6 +9584,36 @@ const ADV_KC_DATA = {
     { correct: true, feedback: "Exactly right! Greek is an inflected language — the ending attached to a word shows whether it is a subject, object, possessive, etc. This frees Greek word order to carry emphasis instead of grammar." },
     { feedback: "Unlike English prepositions, Greek case endings are attached directly to words. The word before it doesn't determine the function — the ending does." },
     { feedback: "Accents affect pronunciation and can occasionally distinguish meaning, but they don't determine the grammatical function (subject vs. object). Endings do that." }
+  ],
+  kc_adv_alphabet_1: [
+    { feedback: "The Phoenician alphabet had 22 symbols — but the Greeks expanded and reorganized that to 24 letters, including new vowel letters the Greeks introduced themselves." },
+    { correct: true, feedback: "Correct! The Greek alphabet has 24 letters — from Alpha (Α) to Omega (Ω). The Phoenician script they adapted had 22, but the Greeks added dedicated letters for vowels, making it the first fully phonetic alphabet." },
+    { feedback: "26 is the English alphabet. Greek has 24 — two fewer than English, but covers everything needed for a fully phonetic writing system." },
+    { feedback: "28 is too many. Greek has exactly 24 letters — a count that has remained consistent through the ancient, Byzantine, and modern periods." }
+  ],
+  kc_adv_alphabet_2: [
+    { feedback: "α and ι can be either short or long — their length depends on the specific word form. Only η and ω are locked into always being long, with no exceptions." },
+    { feedback: "ε and ο are the opposite — they are ALWAYS short. Their long partners are η (for ε) and ω (for ο). The very names reflect this: omicron = 'small o' (short), omega = 'great o' (long)." },
+    { correct: true, feedback: "Correct! η (eta) and ω (omega) are always long — never short. Their names encode this: 'omicron' means small o (short), 'omega' means great o (long). They are the dedicated long versions of ε and ο." },
+    { feedback: "υ (upsilon) and α (alpha) can be either short or long — their length shifts depending on the grammatical form. Only η and ω are always long without any exception." }
+  ],
+  kc_adv_alphabet_3: [
+    { feedback: "Sigma at the beginning of a word always uses the standard form σ. The final form ς is reserved specifically for the last position in a word." },
+    { feedback: "The position after a vowel doesn't determine which sigma form to use. What matters is whether sigma is at the very END of the word — that's when ς is used, regardless of what comes before it." },
+    { correct: true, feedback: "Correct! The final sigma (ς) is used only at the very end of a word — no exceptions. σ is used everywhere else. You can see both in a single word like κόσμος (world): σ in the middle, ς at the end." },
+    { feedback: "Sigma form has nothing to do with whether a word is a proper name. The rule is purely positional: ς at the end of any word, σ everywhere else." }
+  ],
+  kc_adv_alphabet_4: [
+    { feedback: "Vowel length is indicated by which vowel letter is used — ε is always short, η is always long. Breathing marks are a separate system indicating aspiration (an 'h' sound), not length." },
+    { correct: true, feedback: "Correct! A rough breathing mark (῾) indicates that an 'h' sound is added before the vowel. So ἁμαρτία (sin) is pronounced 'hamartia' — the rough breathing on the α contributes the initial 'h.' Smooth breathing (᾿) means no 'h.'" },
+    { feedback: "Accents and breathing marks are different systems. The circumflex (˜) is an accent mark indicating pitch/stress. The rough breathing is a separate mark that specifically signals aspiration — an 'h' sound before the vowel." },
+    { feedback: "Breathing marks appear on all words beginning with a vowel — not just questions. Interrogative words often begin with vowels, but the breathing mark reflects pronunciation, not sentence type." }
+  ],
+  kc_adv_alphabet_5: [
+    { feedback: "Π π (pi) actually makes a 'p' sound — its appearance and sound are consistent. Pi looks like a gate or goalpost (Π), not quite like a printed English 'P.' The dangerous look-alike is Ρ ρ (rho)." },
+    { correct: true, feedback: "Correct! Ρ ρ (rho) looks exactly like an English capital 'P' and lowercase 'p' — but it makes the 'r' sound, not 'p.' This is one of the most dangerous recognition traps for English speakers. Ρ = 'r,' always." },
+    { feedback: "Φ φ (phi) doesn't look like an English 'P' — it has a distinctive circle-with-a-vertical-line shape. The letter that looks like 'P' but isn't is Ρ ρ (rho), which makes an 'r' sound." },
+    { feedback: "Β β (beta) looks like an English 'B' and makes a 'b' sound — it's one of the safer letters. The 'P' look-alike trap is Ρ ρ (rho), which actually makes an 'r' sound." }
   ]
 };
 
@@ -9626,6 +9656,47 @@ const ADV_QUIZ_DATA = {
         text: "According to Mounce, what is the most important foundation for learning to read biblical Greek?",
         options: ["Mastering grammar rules before reading", "Building vocabulary from the most frequent NT words", "Learning to write Greek by hand first", "Studying Classical Greek before Koine"],
         correct: 1
+      }
+    ]
+  },
+  adv_alphabet: {
+    title: "The Greek Alphabet",
+    passMark: 5,
+    questions: [
+      {
+        text: "How many letters are in the Greek alphabet?",
+        options: ["22", "24", "26", "28"],
+        correct: 1
+      },
+      {
+        text: "Which two Greek vowels are ALWAYS long and can never be short?",
+        options: ["α and ι", "ε and ο", "η and ω", "υ and ο"],
+        correct: 2
+      },
+      {
+        text: "Where is the final form of sigma (ς) always used?",
+        options: ["At the beginning of a word", "After any vowel in a word", "At the end of a word", "Only in proper names"],
+        correct: 2
+      },
+      {
+        text: "What does a rough breathing mark (῾) placed over an initial vowel indicate?",
+        options: ["The vowel is long", "An 'h' sound before the vowel", "A circumflex accent on the syllable", "The word is a question"],
+        correct: 1
+      },
+      {
+        text: "Which Greek letter looks exactly like an English 'P' but makes an 'r' sound?",
+        options: ["Π π (pi)", "Ρ ρ (rho)", "Φ φ (phi)", "Β β (beta)"],
+        correct: 1
+      },
+      {
+        text: "What two consonant sounds does the double letter ξ (xi) represent?",
+        options: ["π + σ (ps)", "κ + σ (ks)", "δ + σ (ds)", "τ + σ (ts)"],
+        correct: 1
+      },
+      {
+        text: "What does the iota subscript (ᾳ, ῃ, ῳ) primarily serve to indicate?",
+        options: ["That the vowel is always pronounced long", "That the syllable carries a rough breathing", "A grammatical distinction that became silent in pronunciation", "That the word ends a sentence"],
+        correct: 2
       }
     ]
   }
@@ -11531,12 +11602,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.4";
+const APP_VERSION = "1.5.5";
 
 const UPDATE_NOTES = [
-  "Fixed display name centering under profile avatar (overrode conflicting modal padding rule)",
-  "Consistency leaderboard tiebreaker: equal streaks ranked by total time in app",
-  "Leaderboard button matches app theme color"
+  "Advanced Lesson 2: The Greek Alphabet — full 24-letter coverage, diacritical marks, recognition traps, and reading John 1:1"
 ];
 
 let deferredInstallPrompt = null;
