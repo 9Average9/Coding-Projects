@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=82" />
+  <link rel="stylesheet" href="style.css?v=83" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -5226,23 +5226,16 @@ OneSignalDeferred.push(async function(OneSignal) {
 
 
 <div id="adv_pronunciationLesson" class="adv-learn-lesson">
-  <div class="adv-lesson-header">
-    <button class="adv-back-btn" onclick="closeAdvancedLesson()">← Back</button>
-    <div class="adv-lesson-meta">
-      <span class="adv-lesson-number">Advanced · Lesson 3</span>
-      <h2 class="adv-lesson-title">Syllables, Accents &amp; Pronunciation</h2>
-    </div>
-  </div>
-
   <div class="lesson-module">
 
+    <p class="lesson-lead">
+      You already know how to pronounce things — you just haven't had to think about the rules behind it. This lesson makes those rules visible, first in English so they feel familiar, then in Greek where they become tools for reading the text.
+    </p>
+
     <!-- Block 1: What Is a Syllable? -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">1 · What Is a Syllable in Greek?</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">1 · What Is a Syllable in Greek?</div>
+      <div class="lesson-block-content">
         <p>Every Greek word is divided into <strong>syllables</strong> — the building blocks of pronunciation. Understanding syllables is not just about saying words correctly; it is essential for reading accents, which are tied directly to syllable position and length.</p>
         <p>The rule is elegantly simple: <strong>every syllable contains exactly one vowel or one diphthong</strong>. That's it. You never have a syllable without a vowel, and you never cram two separate vowels into the same syllable unless they form a diphthong.</p>
         <p>So to count syllables in a Greek word, just count the vowels and diphthongs:</p>
@@ -5257,6 +5250,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 1 -->
     <div class="knowledge-check" id="kc_adv_pronunciation_1">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">How many syllables does the word <strong>ἀπόστολος</strong> (apostle) have?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_1', this)">2</button>
@@ -5268,12 +5262,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 2: Syllabification Rules -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">2 · How to Split Greek Words into Syllables</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">2 · How to Split Greek Words into Syllables</div>
+      <div class="lesson-block-content">
         <p>Greek syllabification follows consistent rules that help you both pronounce words and understand where accents can fall.</p>
         <p><strong>Rule 1 — Single consonant between vowels:</strong> It goes with the following vowel.<br>
         λό-γος (not λόγ-ος) &nbsp;|&nbsp; θε-ός (not θεό-ς)</p>
@@ -5289,12 +5280,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 3: The Three Accent Marks -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">3 · The Three Accent Marks — Shapes &amp; Names</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">3 · The Three Accent Marks — Shapes &amp; Names</div>
+      <div class="lesson-block-content">
         <p>Greek has three distinct accent marks, and each has a specific shape, name, and set of rules about where it may appear:</p>
         <div class="adv-table-wrap">
           <table class="adv-ref-table">
@@ -5312,12 +5300,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 4: Accents Were Pitch, Not Stress -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">4 · Accents Marked Pitch, Not Stress</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">4 · Accents Marked Pitch, Not Stress</div>
+      <div class="lesson-block-content">
         <p>Here is something that surprises most English speakers: Greek accent marks did not originally indicate <em>stress</em> the way English accents do. They indicated <strong>pitch</strong> — the rising and falling of the voice on a musical tone.</p>
         <p>Ancient Greek was a <strong>pitch-accent language</strong> (also called a tonal language), similar in concept to modern Mandarin or Japanese pitch systems. The acute accent raised the pitch, the circumflex involved a rise-then-fall on a long syllable, and the grave replaced an acute when the next word followed immediately.</p>
         <p>By the Byzantine period (roughly AD 300–600), the pitch distinction collapsed and Greek became a <strong>stress-accent language</strong> — which is why modern Greek speakers treat accents exactly like English stress marks.</p>
@@ -5328,6 +5313,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 2 -->
     <div class="knowledge-check" id="kc_adv_pronunciation_2">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">What did Greek accent marks originally indicate in the ancient language?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_2', this)">Stress/loudness on a syllable</button>
@@ -5339,12 +5325,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 5: Acute Accent Rules -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">5 · Rules for the Acute Accent</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">5 · Rules for the Acute Accent</div>
+      <div class="lesson-block-content">
         <p>The <strong>acute accent (´)</strong> is the most common accent in Greek. It can appear on any of the last three syllables of a word — the antepenult, penult, or ultima — but with one important restriction:</p>
         <p><strong>If the ultima (last syllable) is long, the acute can only appear on the penult or ultima — not the antepenult.</strong></p>
         <p>This is why accent positions shift when endings change. Take λόγος (word, nominative): the acute sits on the antepenult (λό-γος). But in the genitive form λόγου, the ending -ου is a long diphthong. Now the antepenult is off-limits, so the accent moves to the penult: λόγου (though in practice this particular word keeps the accent on the same syllable — the rule matters more with 3-syllable forms).</p>
@@ -5354,12 +5337,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 6: Circumflex Rules -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">6 · Rules for the Circumflex Accent</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">6 · Rules for the Circumflex Accent</div>
+      <div class="lesson-block-content">
         <p>The <strong>circumflex (~)</strong> is the most restricted accent. It has two absolute requirements:</p>
         <ol>
           <li><strong>It can only appear on the last two syllables</strong> — the penult or ultima. Never the antepenult.</li>
@@ -5373,6 +5353,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 3 -->
     <div class="knowledge-check" id="kc_adv_pronunciation_3">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">Which is true of the circumflex accent?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_3', this)">It can appear on any of the last three syllables</button>
@@ -5384,12 +5365,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 7: Recessive Accent (Verbs) -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">7 · Recessive Accent — How Verbs Are Accented</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">7 · Recessive Accent — How Verbs Are Accented</div>
+      <div class="lesson-block-content">
         <p>Greek finite verbs follow what grammarians call the <strong>recessive accent rule</strong>: the accent recedes (moves back) as far from the end of the word as the rules allow.</p>
         <p>In practice this means:</p>
         <ul>
@@ -5413,12 +5391,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 8: Persistent Accent (Nouns) -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">8 · Persistent Accent — How Nouns Are Accented</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">8 · Persistent Accent — How Nouns Are Accented</div>
+      <div class="lesson-block-content">
         <p>Nouns follow the opposite principle from verbs: the <strong>persistent accent rule</strong>. A noun tries to keep (persist in) the same syllable position as the lexical form (the form you'd find in a dictionary), shifting only as much as the accent rules require.</p>
         <p>This means you need to learn where each noun is accented in its dictionary form — that accent wants to stay there through all the case endings, moving only when a long ultima forces it toward the end.</p>
         <p>Take λόγος (word, masculine), accented on the first syllable (λό-):</p>
@@ -5440,6 +5415,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 4 -->
     <div class="knowledge-check" id="kc_adv_pronunciation_4">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">Greek finite verbs follow which accent rule?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_4', this)">Persistent accent — stay on the same syllable as the dictionary form</button>
@@ -5451,12 +5427,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 9: Erasmian vs Modern Greek -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">9 · Erasmian vs. Modern Greek Pronunciation</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">9 · Erasmian vs. Modern Greek Pronunciation</div>
+      <div class="lesson-block-content">
         <p>When you study biblical Greek, you will encounter two competing pronunciation systems. Understanding the difference matters because each has real advantages — and real trade-offs.</p>
         <p><strong>Erasmian pronunciation</strong> (named after the Renaissance scholar Erasmus, c. 1466–1536) attempts to reconstruct the distinct sounds of ancient Greek. Key features:</p>
         <ul>
@@ -5477,12 +5450,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 10: Elision, Moveable Nu, and Putting It Together -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">10 · Elision, Moveable Nu &amp; Reading It All Together</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">10 · Elision, Moveable Nu &amp; Reading It All Together</div>
+      <div class="lesson-block-content">
         <p>Two small but very common pronunciation phenomena round out the picture:</p>
         <p><strong>Elision</strong> — when a preposition or small word ending in a short vowel is followed by a word beginning with a vowel, the short vowel drops and is replaced by an apostrophe. The words flow together without a vowel clash:</p>
         <ul>
@@ -5501,6 +5471,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 5 -->
     <div class="knowledge-check" id="kc_adv_pronunciation_5">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">What is the primary reason Erasmian pronunciation is used in most Greek textbooks and classrooms?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_5', this)">It perfectly matches how Koine Greek sounded in the 1st century</button>
@@ -5526,23 +5497,78 @@ OneSignalDeferred.push(async function(OneSignal) {
 
 
 <div id="adv_nounsLesson" class="adv-learn-lesson">
-  <div class="adv-lesson-header">
-    <button class="adv-back-btn" onclick="closeAdvancedLesson()">← Back</button>
-    <div class="adv-lesson-meta">
-      <span class="adv-lesson-number">Advanced · Lesson 4</span>
-      <h2 class="adv-lesson-title">The Greek Noun System</h2>
-    </div>
-  </div>
-
   <div class="lesson-module">
 
-    <!-- Block 1: Why Nouns Matter -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">1 · Why the Noun System Is the Heart of Greek</span>
-        <span class="lesson-block-arrow">›</span>
+    <p class="lesson-lead">
+      The noun system is where Greek grammar starts to feel real. Before we get into Greek specifics, we'll make sure the English grammar terms — subject, object, possession — are clearly defined. If you know what those mean in English, the Greek system will click faster than you expect.
+    </p>
+
+    <!-- Block 0: English Grammar Foundations -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">English Grammar Foundations — What You Already Know</div>
+      <div class="lesson-block-content">
+        <p>Greek grammar uses terms like <em>subject</em>, <em>direct object</em>, <em>indirect object</em>, and <em>possession</em>. These are not new concepts — you use them every time you speak English. You just might not have had names for them since grade school. Let's make sure the vocabulary is solid before we see how Greek handles the same ideas.</p>
+
+        <hr>
+        <h4>The Subject</h4>
+        <p>The <strong>subject</strong> is the person or thing that performs or is the action of the verb. Ask "Who/what is doing (or being) the verb?" — that's your subject.</p>
+        <ul>
+          <li><strong>The dog</strong> bit the man. → <em>The dog</em> is the subject.</li>
+          <li><strong>God</strong> loved the world. → <em>God</em> is the subject.</li>
+          <li><strong>The Word</strong> was in the beginning. → <em>The Word</em> is the subject.</li>
+        </ul>
+
+        <hr>
+        <h4>The Direct Object</h4>
+        <p>The <strong>direct object</strong> is the person or thing that directly receives the action of the verb. Ask "Who/what did the subject [verb]?" — that's your direct object.</p>
+        <ul>
+          <li>God loved <strong>the world</strong>. → <em>the world</em> is the direct object (what God loved).</li>
+          <li>The dog bit <strong>the man</strong>. → <em>the man</em> is the direct object.</li>
+          <li>She read <strong>the letter</strong>. → <em>the letter</em> is the direct object.</li>
+        </ul>
+        <p class="highlight">In English, word order tells you which is which. "The dog bit the man" and "The man bit the dog" mean opposite things because of position. Greek doesn't work that way — it's the <em>ending</em> on each word that tells you its role.</p>
+
+        <hr>
+        <h4>The Indirect Object</h4>
+        <p>The <strong>indirect object</strong> is the recipient — the one <em>to</em> or <em>for</em> whom something is done. It answers "to whom?" or "for whom?" after the verb.</p>
+        <ul>
+          <li>He gave <strong>Mary</strong> the book. → <em>Mary</em> is the indirect object (she receives the giving).</li>
+          <li>I wrote <strong>him</strong> a letter. → <em>him</em> is the indirect object.</li>
+          <li>God gave <strong>us</strong> eternal life. → <em>us</em> is the indirect object.</li>
+        </ul>
+        <p>In English you can say either "He gave Mary the book" or "He gave the book <em>to</em> Mary" — both express the same indirect object, one with word order and one with the preposition "to." Greek expresses this with an ending instead of a preposition.</p>
+
+        <hr>
+        <h4>Possession</h4>
+        <p><strong>Possession</strong> shows that something belongs to or is related to something else. English uses two patterns:</p>
+        <ul>
+          <li>Apostrophe-s: <strong>God's</strong> word = the word that belongs to God</li>
+          <li>"Of" construction: the word <strong>of God</strong> = the same thing expressed differently</li>
+        </ul>
+        <p>Both say the same thing. Greek expresses possession entirely through a case ending — no apostrophe, no "of" required. The ending on the noun tells you "this noun is in a possessive relationship."</p>
+
+        <hr>
+        <h4>Direct Address</h4>
+        <p><strong>Direct address</strong> is when you call out to someone or something directly in speech or writing. In English we just use the name or title, sometimes preceded by "O."</p>
+        <ul>
+          <li>"<strong>Father</strong>, hear my prayer." — addressing God directly</li>
+          <li>"<strong>Lord</strong>, if you are willing..." — Matt 8:2</li>
+          <li>"O <strong>Jerusalem</strong>, Jerusalem..." — Matt 23:37</li>
+        </ul>
+        <p>Greek has a dedicated case for this — the <em>vocative</em> — with its own ending. In English, the word doesn't change. In Greek, it does.</p>
+
+        <hr>
+        <h4>Why This Matters for Greek</h4>
+        <p>English uses three main tools to show grammatical relationships: <strong>word order</strong>, <strong>prepositions</strong> ("of," "to," "by," "for"), and <strong>helper words</strong>. Change the order and the meaning changes.</p>
+        <p>Greek uses one main tool: <strong>endings on the words themselves</strong>. The ending attached to a noun tells you whether it is the subject, object, possessive, indirect object, or vocative — regardless of where it sits in the sentence. This is called <em>inflection</em>, and it is the foundation of everything in Greek grammar.</p>
+        <p class="highlight">Once you learn to read endings, Greek sentences open up. Word order in Greek carries <em>emphasis</em>, not grammar. The most important word goes first. That changes how you read and interpret every sentence.</p>
       </div>
-      <div class="lesson-block-body">
+    </div>
+
+    <!-- Block 1: Why Nouns Matter -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">1 · Why the Noun System Is the Heart of Greek</div>
+      <div class="lesson-block-content">
         <p>If there is one system in Greek grammar that unlocks everything else, it is the noun system. Every time you encounter a Greek word that is a noun, pronoun, adjective, or article — and that covers the majority of words on any given page of the NT — you are dealing with this system.</p>
         <p>What makes Greek nouns so different from English nouns is simple: <strong>Greek nouns change their endings to show grammatical function</strong>. In English, we mostly rely on word order. "The dog bit the man" and "The man bit the dog" mean opposite things because of position, not word form. In Greek, the ending on each noun tells you whether it is the biter or the bitten — regardless of where it sits in the sentence.</p>
         <p>This system is called <strong>inflection</strong> (or <em>declension</em> for nouns). Each noun has a set of possible endings, one for each combination of case, gender, and number. Learning to recognize these endings — even imperfectly at first — is what transforms a page of squiggly characters into a sentence you can understand.</p>
@@ -5551,12 +5577,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 2: Grammatical Gender -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">2 · Grammatical Gender — Not What You Think</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">2 · Grammatical Gender — Not What You Think</div>
+      <div class="lesson-block-content">
         <p>Every Greek noun has a <strong>grammatical gender</strong> — masculine, feminine, or neuter. This surprises English speakers because English has almost no grammatical gender left (we only see it in pronouns: he/she/it). But in Greek (like French, Spanish, German, and most ancient languages), every single noun belongs to one of these three gender categories.</p>
         <p><strong>Crucial point: grammatical gender is not biological sex.</strong> It is a grammatical classification system — a way of grouping nouns — that happens to use the labels "masculine" and "feminine." Sometimes the grammar aligns with biology (ἀνήρ, man = masculine; γυνή, woman = feminine), but often it does not:</p>
         <ul>
@@ -5573,6 +5596,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 1 -->
     <div class="knowledge-check" id="kc_adv_nouns_1">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">The word πνεῦμα (Spirit/spirit/wind) is grammatically neuter in Greek. What does this tell us theologically?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_1', this)">The Holy Spirit is impersonal, not a person</button>
@@ -5584,12 +5608,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 3: The Five Cases — Overview -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">3 · The Five Cases — What Each One Does</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">3 · The Five Cases — What Each One Does</div>
+      <div class="lesson-block-content">
         <p>A <strong>case</strong> is the grammatical function of a noun in its sentence. The ending on the noun signals which case it is in — and therefore what role it plays. Standard NT Greek grammars recognize five cases:</p>
         <div class="adv-table-wrap">
           <table class="adv-ref-table">
@@ -5609,12 +5630,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 4: Nominative and Accusative -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">4 · Nominative &amp; Accusative — Subject and Object</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">4 · Nominative &amp; Accusative — Subject and Object</div>
+      <div class="lesson-block-content">
         <p>The nominative and accusative are the two cases you will encounter most often, and they form a natural pair: the nominative is the <em>actor</em>, the accusative is the <em>acted upon</em>.</p>
         <p><strong>Nominative case — the subject:</strong></p>
         <ul>
@@ -5634,6 +5652,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 2 -->
     <div class="knowledge-check" id="kc_adv_nouns_2">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">In the sentence ἠγάπησεν ὁ θεὸς τὸν κόσμον (God loved the world), what tells you that κόσμον is the direct object rather than the subject?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_2', this)">Its position at the end of the sentence</button>
@@ -5645,12 +5664,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 5: Genitive Case -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">5 · The Genitive — Possession, Description &amp; More</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">5 · The Genitive — Possession, Description &amp; More</div>
+      <div class="lesson-block-content">
         <p>The <strong>genitive case</strong> is one of the richest and most theologically significant cases in the NT. At its core it expresses a relationship between two nouns — most often translated with "of" — but that single English word covers a surprisingly wide range of meanings.</p>
         <p><strong>Common genitive functions:</strong></p>
         <ul>
@@ -5667,12 +5683,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 6: Dative Case -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">6 · The Dative — Indirect Object, Location &amp; Means</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">6 · The Dative — Indirect Object, Location &amp; Means</div>
+      <div class="lesson-block-content">
         <p>The <strong>dative case</strong> is the most versatile of the five cases because it absorbed three older cases (dative, locative, and instrumental) in the Koine period. What looks like a single form can carry three distinct meanings — and context tells you which.</p>
         <p><strong>Dative proper — indirect object:</strong> The one <em>to whom</em> or <em>for whom</em> something is done.</p>
         <ul>
@@ -5698,6 +5711,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 3 -->
     <div class="knowledge-check" id="kc_adv_nouns_3">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">In the phrase χάριτί ἐστε σεσῳσμένοι ("by grace you have been saved," Eph 2:8), the dative χάριτι expresses what function?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_3', this)">Indirect object — grace receives the saving</button>
@@ -5709,12 +5723,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 7: The Greek Article -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">7 · The Greek Article — ὁ ἡ τό</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">7 · The Greek Article — ὁ ἡ τό</div>
+      <div class="lesson-block-content">
         <p>Greek has a definite article (ὁ, ἡ, τό — "the") but <strong>no indefinite article</strong> ("a/an"). When Greek wants to say "a word," it simply uses the noun without an article: λόγος. When it says "the word," it adds the article: ὁ λόγος.</p>
         <p>The article is the most frequent word in the Greek NT — it appears over 19,000 times. And it is one of the most important parsing tools you have, because <strong>it must agree with its noun in gender, case, and number</strong>. Learn the article paradigm and you have a key that unlocks noun identification across all declensions.</p>
         <div class="adv-table-wrap">
@@ -5743,6 +5754,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 4 -->
     <div class="knowledge-check" id="kc_adv_nouns_4">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">In John 1:1c, θεὸς ἦν ὁ λόγος — θεός is a predicate nominative placed before the verb without an article. What does this grammatical structure primarily signal?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_4', this)">That the Word is a secondary, lesser divine being</button>
@@ -5754,12 +5766,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 8: The Three Declensions -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">8 · The Three Declensions — Noun Families</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">8 · The Three Declensions — Noun Families</div>
+      <div class="lesson-block-content">
         <p>Greek nouns are organized into three <strong>declensions</strong> — groups of nouns that share the same set of endings. Think of them as three extended families: each family has its own characteristic endings, but all families use the same five cases.</p>
         <p><strong>Second Declension (learn first — most common):</strong></p>
         <ul>
@@ -5788,12 +5797,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 9: Agreement -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">9 · Agreement — How Greek Words Belong Together</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">9 · Agreement — How Greek Words Belong Together</div>
+      <div class="lesson-block-content">
         <p><strong>Agreement</strong> is the rule that adjectives, articles, and pronouns must match their noun in three categories: <strong>gender, case, and number</strong>. This agreement system is one of the most powerful features of Greek — it lets you identify which words in a sentence belong together, even when they are separated by other words.</p>
         <p>In English, "the good word" must have those three words adjacent. In Greek, you could write:</p>
         <p style="text-align:center; font-style:italic;">ὁ ἀγαθὸς λόγος (the good word — all three together)</p>
@@ -5815,12 +5821,9 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
 
     <!-- Block 10: Parsing Nouns -->
-    <div class="lesson-block" onclick="toggleBlock(this)">
-      <div class="lesson-block-header">
-        <span class="lesson-block-title">10 · How to Parse a Greek Noun</span>
-        <span class="lesson-block-arrow">›</span>
-      </div>
-      <div class="lesson-block-body">
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">10 · How to Parse a Greek Noun</div>
+      <div class="lesson-block-content">
         <p><strong>Parsing</strong> means identifying all the grammatical properties of a word. For a Greek noun, you must identify five things:</p>
         <ol>
           <li><strong>Gender</strong> — masculine, feminine, or neuter</li>
@@ -5850,6 +5853,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- KC 5 -->
     <div class="knowledge-check" id="kc_adv_nouns_5">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
       <p class="kc-question">When parsing the Greek noun phrase τῆς ἀγαθῆς καρδίας, what case and gender/number does the article τῆς indicate?</p>
       <div class="kc-options">
         <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_5', this)">Dative feminine singular</button>
@@ -7245,9 +7249,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=82"></script>
-  <script src="app.js?v=82"></script>
-  <script type="module" src="firebase-lb.js?v=82"></script>
+  <script src="vocab.js?v=83"></script>
+  <script src="app.js?v=83"></script>
+  <script type="module" src="firebase-lb.js?v=83"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">

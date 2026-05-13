@@ -12018,10 +12018,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.9";
+const APP_VERSION = "1.6.0";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 4: The Greek Noun System — cases, grammatical gender, the article paradigm, three declensions, agreement, and parsing"
+  "Fix Lessons 3 & 4 structure — dropdowns now work, side padding restored, matches Lesson 1 design",
+  "Lesson 4 now opens with English grammar foundations (subject, object, indirect object, possession, direct address) before introducing Greek cases"
 ];
 
 let deferredInstallPrompt = null;
