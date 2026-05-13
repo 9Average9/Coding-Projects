@@ -9168,12 +9168,11 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 .lb-home-btn .material-symbols-outlined { color: #fff !important; }
 
 /* Intro Modal */
-.lb-intro-overlay {
+.lb-intro-overlay.open {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.lb-intro-overlay.open { display: flex; }
 .lb-intro-card {
   background: var(--card-color);
   border-radius: 24px;
@@ -9203,12 +9202,11 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 .lb-intro-board-item span:last-child { font-size: 0.68rem; color: var(--font-color); opacity: 0.65; text-align: center; line-height: 1.3; }
 
 /* Main leaderboard modal */
-.lb-modal-overlay {
+.lb-modal-overlay.open {
   display: flex;
   align-items: flex-end;
   justify-content: center;
 }
-.lb-modal-overlay.open { display: flex; }
 .lb-modal {
   background: var(--card-color);
   border-radius: 24px 24px 0 0;
@@ -9368,12 +9366,11 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 }
 
 /* Scholar test modal */
-.lb-scholar-overlay {
+.lb-scholar-overlay.open {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.lb-scholar-overlay.open { display: flex; }
 .lb-scholar-card {
   background: var(--card-color);
   border-radius: 24px;
@@ -9441,6 +9438,17 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 .lb-know-btn:hover { transform: translateY(-1px); }
 .lb-skip-btn:disabled, .lb-know-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 .lb-scholar-hint { font-size: 0.75rem; color: var(--font-color); opacity: 0.45; margin: 0; }
+.lb-scholar-quit {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--font-color);
+  opacity: 0.45;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.lb-scholar-quit:hover { opacity: 0.8; }
 
 /* Profile badges */
 .profile-badge-row {
