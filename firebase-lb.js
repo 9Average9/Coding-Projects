@@ -3,6 +3,7 @@ import {
   getFirestore,
   doc,
   setDoc,
+  getDoc,
   deleteDoc,
   collection,
   query,
@@ -13,6 +14,14 @@ import {
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  deleteUser,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVWKRCtjg7ppR-D8ZNs-TfSwPlWdXXQ5Q",
@@ -25,18 +34,141 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+
+const EMAIL_DOMAIN = "@greek-vocab.app";
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+function toEmail(username) {
+  return `${username.toLowerCase().trim()}${EMAIL_DOMAIN}`;
+}
+
+async function checkUsernameTaken(username) {
+  try {
+    const snap = await getDoc(doc(db, "usernames", username.toLowerCase().trim()));
+    return snap.exists();
+  } catch { return false; }
+}
+
+async function checkDisplayNameTaken(displayName) {
+  try {
+    const snap = await getDoc(doc(db, "displayNames", displayName.toLowerCase().trim()));
+    return snap.exists();
+  } catch { return false; }
+}
+
+async function createAccount(username, password, displayName, migrationData = {}) {
+  const cred = await createUserWithEmailAndPassword(auth, toEmail(username), password);
+  const uid = cred.user.uid;
+  const joinDate = migrationData.joinDate || new Date().toISOString();
+
+  await Promise.all([
+    setDoc(doc(db, "usernames", username.toLowerCase().trim()), { uid }),
+    setDoc(doc(db, "displayNames", displayName.toLowerCase().trim()), { uid, displayName })
+  ]);
+
+  const userData = {
+    username,
+    displayName,
+    joinDate,
+    xp: migrationData.xp || 0,
+    color: migrationData.color || "#d4a93a",
+    greekExperience: migrationData.greekExperience || "new",
+    avatar: migrationData.avatar || "school",
+    streak: migrationData.streak || 0,
+    lastStudyDate: migrationData.lastStudyDate || null,
+    totalStudySeconds: migrationData.totalStudySeconds || 0,
+    completedLessons: migrationData.completedLessons || {},
+    completedAdvancedLessons: migrationData.completedAdvancedLessons || {},
+    knownWords: migrationData.knownWords || [],
+    translationProgress: migrationData.translationProgress || {},
+    achievements: migrationData.achievements || [],
+    practiceToolsUnlocked: migrationData.practiceToolsUnlocked || false,
+    lessonMode: migrationData.lessonMode || "basic",
+    vocabChapterXP: migrationData.vocabChapterXP || {},
+    lbXpJoined: false,
+    lbConsJoined: false,
+    lbScholarJoined: false,
+    lbScholarBest: 0,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  await setDoc(doc(db, "users", uid), userData);
+  return { uid, joinDate, displayName, username };
+}
+
+async function login(username, password) {
+  const cred = await signInWithEmailAndPassword(auth, toEmail(username), password);
+  return cred.user;
+}
+
+async function logout() {
+  await signOut(auth);
+}
+
+async function deleteAccount() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const uid = user.uid;
+
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    if (snap.exists()) {
+      const { username, displayName } = snap.data();
+      await Promise.all([
+        deleteDoc(doc(db, "usernames", (username || "").toLowerCase().trim())).catch(() => {}),
+        deleteDoc(doc(db, "displayNames", (displayName || "").toLowerCase().trim())).catch(() => {})
+      ]);
+    }
+  } catch {}
+
+  await Promise.all([
+    deleteDoc(doc(db, "users", uid)).catch(() => {}),
+    deleteDoc(doc(db, "xp_board", uid)).catch(() => {}),
+    deleteDoc(doc(db, "scholar_board", uid)).catch(() => {}),
+    deleteDoc(doc(db, "consistency_board", uid)).catch(() => {})
+  ]);
+
+  await deleteUser(user);
+}
+
+function onAuthChange(callback) {
+  onAuthStateChanged(auth, callback);
+}
+
+function getCurrentUser() {
+  return auth.currentUser;
+}
+
+async function loadUserData(uid) {
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    return snap.exists() ? snap.data() : null;
+  } catch { return null; }
+}
+
+async function syncUserData(uid, data) {
+  try {
+    await setDoc(doc(db, "users", uid), { ...data, updatedAt: serverTimestamp() }, { merge: true });
+  } catch (e) { console.warn("syncUserData:", e); }
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
 
 function getUserId() {
-  let uid = localStorage.getItem("lbUserId");
-  if (!uid) {
-    uid = crypto.randomUUID();
-    localStorage.setItem("lbUserId", uid);
-  }
-  return uid;
+  return auth.currentUser?.uid || localStorage.getItem("lbUserId") || (() => {
+    const id = crypto.randomUUID();
+    localStorage.setItem("lbUserId", id);
+    return id;
+  })();
 }
 
 function getAvatar() {
-  return localStorage.getItem("profilePicValue") || "school";
+  return localStorage.getItem("profilePicType") === "icon"
+    ? (localStorage.getItem("profilePicValue") || "school")
+    : "school";
 }
 
 function getMeta() {
@@ -46,71 +178,63 @@ function getMeta() {
   };
 }
 
+function getLbDisplayName() {
+  return localStorage.getItem("authDisplayName") || "Anonymous";
+}
+
 async function checkNameTaken(boardName, name) {
   try {
     const q = query(collection(db, boardName), where("name", "==", name), limit(1));
     const snap = await getDocs(q);
-    // Exclude self (in case they're re-joining same board)
     return snap.docs.some(d => d.id !== getUserId());
-  } catch (e) {
-    return false;
-  }
+  } catch { return false; }
 }
 
 async function syncXP(xp) {
   if (localStorage.getItem("lbXpJoined") !== "true") return;
-  const name = localStorage.getItem("lbXpName");
-  if (!name) return;
   try {
     await setDoc(doc(db, "xp_board", getUserId()), {
-      name, xp, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
-    });
+      name: getLbDisplayName(), xp, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
+    }, { merge: true });
   } catch (e) { console.warn("LB syncXP:", e); }
 }
 
 async function syncStreak(streak) {
   if (localStorage.getItem("lbConsJoined") !== "true") return;
-  const name = localStorage.getItem("lbConsName");
-  if (!name) return;
   try {
     await setDoc(doc(db, "consistency_board", getUserId()), {
-      name, streak, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
-    });
+      name: getLbDisplayName(), streak, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
+    }, { merge: true });
   } catch (e) { console.warn("LB syncStreak:", e); }
 }
 
 async function submitScholarScore(score) {
   if (localStorage.getItem("lbScholarJoined") !== "true") return;
-  const name = localStorage.getItem("lbScholarName");
-  if (!name) return;
   const best = parseInt(localStorage.getItem("lbScholarBest") || "0");
   if (score <= best) return;
   localStorage.setItem("lbScholarBest", String(score));
   try {
     await setDoc(doc(db, "scholar_board", getUserId()), {
-      name, bestScore: score, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
-    });
+      name: getLbDisplayName(), bestScore: score, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
+    }, { merge: true });
   } catch (e) { console.warn("LB submitScholar:", e); }
 }
 
-async function joinXPBoard(name, xp) {
+async function joinXPBoard(xp) {
   localStorage.setItem("lbXpJoined", "true");
-  localStorage.setItem("lbXpName", name);
   await setDoc(doc(db, "xp_board", getUserId()), {
-    name, xp, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
+    name: getLbDisplayName(), xp, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
   });
 }
 
-function joinScholarBoard(name) {
+function joinScholarBoard() {
   localStorage.setItem("lbScholarJoined", "true");
-  localStorage.setItem("lbScholarName", name);
 }
 
-async function joinConsistencyBoard(name, streak) {
+async function joinConsistencyBoard(streak) {
   localStorage.setItem("lbConsJoined", "true");
-  localStorage.setItem("lbConsName", name);
   await setDoc(doc(db, "consistency_board", getUserId()), {
-    name, streak, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
+    name: getLbDisplayName(), streak, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
   });
 }
 
@@ -124,9 +248,8 @@ async function syncAvatar() {
   for (const { key, joined } of boards) {
     if (localStorage.getItem(joined) === "true") {
       try {
-        const ref = doc(db, key, getUserId());
-        await setDoc(ref, { avatar }, { merge: true });
-      } catch (e) { /* silent */ }
+        await setDoc(doc(db, key, getUserId()), { avatar }, { merge: true });
+      } catch {}
     }
   }
 }
@@ -167,7 +290,7 @@ async function getUserRanks() {
       const snap = await getDocs(q);
       const idx = snap.docs.findIndex(d => d.id === uid);
       ranks[key] = idx >= 0 ? idx + 1 : null;
-    } catch (e) {
+    } catch {
       ranks[key] = null;
     }
   }
@@ -192,3 +315,26 @@ window.LB = {
   isScholarJoined: () => localStorage.getItem("lbScholarJoined") === "true",
   isConsJoined: () => localStorage.getItem("lbConsJoined") === "true"
 };
+
+window.Auth = {
+  createAccount,
+  login,
+  logout,
+  deleteAccount,
+  onAuthChange,
+  getCurrentUser,
+  loadUserData,
+  syncUserData,
+  checkUsernameTaken,
+  checkDisplayNameTaken
+};
+
+// Notify app.js when Firebase auth state is resolved
+onAuthStateChanged(auth, user => {
+  if (typeof window.__onAuthStateReady === "function") {
+    window.__onAuthStateReady(user);
+  } else {
+    window.__pendingAuthUser = user;
+    window.__pendingAuthResolved = true;
+  }
+});

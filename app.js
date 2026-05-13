@@ -10814,20 +10814,9 @@ function showProfileValidationMessage(message) {
 }
 
 function setProfileColor(color) {
-  const firstInput = document.getElementById("profileFirstNameInput");
-  const lastInput = document.getElementById("profileLastNameInput");
-
-  if (firstInput) {
-    profileData.firstName = firstInput.value.trim();
-  }
-
-  if (lastInput) {
-    profileData.lastName = lastInput.value.trim();
-  }
-
   profileData.color = color;
-
   saveProfileData();
+  syncUserData();
   updateProfileUI();
 }
  
@@ -10894,145 +10883,99 @@ function getProfileTitle() {
 function updateProfileUI() {
   _applyProfileAvatar();
 
-  const fullName =
-    `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim();
-
-  const displayName = fullName || "Create Profile";
+  const displayName = profileData.displayName || "Greek Student";
+  const username = localStorage.getItem("authUsername") || "";
 
   document.getElementById("profileDisplayName").textContent = displayName;
 
-  document.getElementById("profileTitle").textContent =
-    profileData.isCreated ? getProfileTitle() : "Set up your Greek profile";
+  const usernameEl = document.getElementById("profileUsername");
+  if (usernameEl) usernameEl.textContent = username ? `@${username}` : "";
+
+  document.getElementById("profileTitle").textContent = getProfileTitle();
 
   const xpText = document.getElementById("profileXPText");
-  if (xpText) {
-    xpText.textContent = `${profileData.xp} XP`;
+  if (xpText) xpText.textContent = `${profileData.xp} XP`;
+
+  const newGreekBtn = document.getElementById("newGreekBtn");
+  const basicGreekBtn = document.getElementById("basicGreekBtn");
+  if (newGreekBtn && basicGreekBtn) {
+    newGreekBtn.classList.toggle("selected", profileData.greekExperience !== "basic");
+    basicGreekBtn.classList.toggle("selected", profileData.greekExperience === "basic");
   }
 
-  const firstInput = document.getElementById("profileFirstNameInput");
-  const lastInput = document.getElementById("profileLastNameInput");
-
-const newGreekBtn = document.getElementById("newGreekBtn");
-const basicGreekBtn = document.getElementById("basicGreekBtn");
-
-if (newGreekBtn && basicGreekBtn) {
-  newGreekBtn.classList.toggle("selected", profileData.greekExperience !== "basic");
-  basicGreekBtn.classList.toggle("selected", profileData.greekExperience === "basic");
-}
-
-
-  if (firstInput) firstInput.value = profileData.firstName || "";
-  if (lastInput) lastInput.value = profileData.lastName || "";
-
-  document.documentElement.style.setProperty(
-    "--profile-color",
-    profileData.color
-  );
+  document.documentElement.style.setProperty("--profile-color", profileData.color);
 
   const fill = document.getElementById("xpFill");
-
   if (fill) {
-    const fill = document.getElementById("xpFill");
-
-if (fill) {
-  const currentXP = profileData.xp || 0;
-  const previousLevelXP = getPreviousTitleXP(currentXP);
-  const nextLevelXP = getNextTitleXP(currentXP);
-
-  if (nextLevelXP === null) {
-    fill.style.width = "100%";
-  } else {
-    const levelRange = nextLevelXP - previousLevelXP;
-    const currentProgress = currentXP - previousLevelXP;
-    const percent = Math.min((currentProgress / levelRange) * 100, 100);
-
-    fill.style.width = `${percent}%`;
-  }
-}
+    const currentXP = profileData.xp || 0;
+    const previousLevelXP = getPreviousTitleXP(currentXP);
+    const nextLevelXP = getNextTitleXP(currentXP);
+    if (nextLevelXP === null) {
+      fill.style.width = "100%";
+    } else {
+      const levelRange = nextLevelXP - previousLevelXP;
+      const currentProgress = currentXP - previousLevelXP;
+      fill.style.width = `${Math.min((currentProgress / levelRange) * 100, 100)}%`;
+    }
   }
 
-  const setupFields = document.getElementById("profileSetupFields");
-  const saveBtn = document.getElementById("saveProfileBtn");
+  const isAdvMode = getLessonMode() === "advanced";
+  const completedLessonCount = isAdvMode
+    ? REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length
+    : REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
+  const totalLessons = REQUIRED_LESSONS.length;
 
-  if (setupFields) {
-    setupFields.style.display = profileData.isCreated ? "none" : "block";
+  const lessonsStat = document.getElementById("profileLessonsStat");
+  const vocabStat = document.getElementById("profileVocabStat");
+  const translationsStat = document.getElementById("profileTranslationsStat");
+  const testsStat = document.getElementById("profileTestsStat");
+  const knownWordsStat = document.getElementById("profileKnownWordsStat");
+  const timeStat = document.getElementById("profileTimeStat");
+  const streakStat = document.getElementById("profileStreakStat");
+  const modeBadge = document.getElementById("profileModeBadge");
+
+  if (lessonsStat) lessonsStat.textContent = `${completedLessonCount} / ${totalLessons}`;
+  if (streakStat) streakStat.textContent = getStreakDays();
+  if (modeBadge) {
+    modeBadge.textContent = isAdvMode ? "Advanced Track" : "Basic Track";
+    modeBadge.classList.toggle("advanced", isAdvMode);
+  }
+  if (vocabStat) vocabStat.textContent = getCompletedVocabChaptersCount();
+  if (translationsStat) translationsStat.textContent = getTranslationAttemptsCount();
+  if (testsStat) testsStat.textContent = getTestsCompletedCount();
+  if (knownWordsStat) knownWordsStat.textContent = knownWords.length;
+  if (timeStat) timeStat.textContent = formatStudyTime(totalStudySeconds);
+
+  const joinStat = document.getElementById("profileJoinStat");
+  if (joinStat) {
+    const joinRaw = localStorage.getItem("appJoinDate");
+    joinStat.textContent = joinRaw
+      ? new Date(joinRaw).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      : "—";
   }
 
-  if (saveBtn) {
-  saveBtn.style.display = profileData.isCreated ? "none" : "block";
+  updateProfileAttention();
+  updateNotificationButtonUI();
 }
 
-
-const isAdvMode = getLessonMode() === "advanced";
-const completedLessonCount = isAdvMode
-  ? REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length
-  : REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
-const totalLessons = REQUIRED_LESSONS.length;
-
-const lessonsStat = document.getElementById("profileLessonsStat");
-const vocabStat = document.getElementById("profileVocabStat");
-const translationsStat = document.getElementById("profileTranslationsStat");
-const testsStat = document.getElementById("profileTestsStat");
-const knownWordsStat = document.getElementById("profileKnownWordsStat");
-const timeStat = document.getElementById("profileTimeStat");
-const streakStat = document.getElementById("profileStreakStat");
-const modeBadge = document.getElementById("profileModeBadge");
-
-if (lessonsStat) lessonsStat.textContent = `${completedLessonCount} / ${totalLessons}`;
-if (streakStat) streakStat.textContent = getStreakDays();
-if (modeBadge) {
-  modeBadge.textContent = isAdvMode ? "Advanced Track" : "Basic Track";
-  modeBadge.classList.toggle("advanced", isAdvMode);
-}
-if (vocabStat) vocabStat.textContent = getCompletedVocabChaptersCount();
-if (translationsStat) translationsStat.textContent = getTranslationAttemptsCount();
-if (testsStat) testsStat.textContent = getTestsCompletedCount();
-if (knownWordsStat) knownWordsStat.textContent = knownWords.length;
-if (timeStat) timeStat.textContent = formatStudyTime(totalStudySeconds);
-
-const joinStat = document.getElementById("profileJoinStat");
-if (joinStat) {
-  const joinRaw = localStorage.getItem("appJoinDate");
-  joinStat.textContent = joinRaw
-    ? new Date(joinRaw).toLocaleDateString("en-US", { month: "short", year: "numeric" })
-    : "—";
-}
-
-const journeySection = document.getElementById("profileJourneySection");
-const settingsBtn = document.getElementById("profileSettingsBtn");
-const resetBtn = document.getElementById("profileResetBtn");
-
-if (journeySection) {
-  journeySection.style.display = profileData.isCreated ? "block" : "none";
-}
-
-if (settingsBtn) {
-  settingsBtn.style.display = profileData.isCreated ? "block" : "none";
-}
-
-if (resetBtn) {
-  resetBtn.style.display = profileData.isCreated ? "block" : "none";
-}
-
-
-updateProfileAttention();
-updateNotificationButtonUI();
-}
-
-function resetAllAppData() {
-  if (!confirm("Reset ALL app data? This will also remove you from all leaderboards. This cannot be undone.")) {
+async function resetAllAppData() {
+  if (!confirm("Delete your account? This removes all your data, leaderboard entries, and cannot be undone.")) return;
+  try {
+    await window.Auth.deleteAccount();
+  } catch (e) {
+    alert("Error deleting account: " + e.message);
     return;
   }
+  localStorage.clear();
+  location.reload();
+}
 
-  if (window.LB) {
-    window.LB.deleteUserData().finally(() => {
-      localStorage.clear();
-      location.reload();
-    });
-  } else {
+function signOutAccount() {
+  if (!confirm("Sign out of your account?")) return;
+  window.Auth.logout().then(() => {
     localStorage.clear();
     location.reload();
-  }
+  });
 }
 function openSettingsFromProfile() {
   hideProfileMenu();
@@ -11046,15 +10989,14 @@ function updateProfileAttention() {
 
   if (!profileBtn) return;
 
-  const needsProfile = profileData?.isCreated !== true;
   const hasUnreadUpdate = localStorage.getItem("hasUnreadUpdate") === "true";
 
-  profileBtn.classList.toggle("profile-attention", needsProfile);
-  profileBtn.classList.toggle("profile-pulse", needsProfile);
+  profileBtn.classList.toggle("profile-attention", false);
+  profileBtn.classList.toggle("profile-pulse", false);
   profileBtn.classList.toggle("has-news-update", hasUnreadUpdate);
 
   if (profileFocusOverlay) {
-    profileFocusOverlay.classList.toggle("hidden", !needsProfile);
+    profileFocusOverlay.classList.add("hidden");
   }
 
   if (profileNewsBadge) {
@@ -11100,6 +11042,7 @@ function addXP(amount, reason = "Progress made", showModal = true) {
   saveProfileData();
   updateProfileUI();
   window.LB?.syncXP(profileData.xp);
+  syncUserData();
 
   if (showModal) {
     showXPModal({
@@ -11458,6 +11401,7 @@ function updateStudyStreak() {
   localStorage.setItem("lastStudyDate", today);
   localStorage.setItem("studyStreakDays", String(streak));
   window.LB?.syncStreak(streak);
+  syncUserData();
 }
 
 function getStreakDays() {
@@ -11586,16 +11530,14 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.4.1";
+const APP_VERSION = "1.5.0";
 
 const UPDATE_NOTES = [
-  "Community leaderboards: join the XP, Scholar, or Consistency boards and compete with others",
-  "Scholar Board: type-the-answer quiz pulling vocab from all chapters",
-  "Custom profile avatars: choose a Material icon or upload a photo",
-  "Unique rank badges (gold, silver, bronze) per leaderboard",
-  "Member Since added to your profile stats",
-  "Tap any leaderboard entry to see that user's join date and time studied",
-  "Profile info is stored when joining any leaderboard so stats stay current"
+  "Account system: create a username and password — your progress is saved and syncs across devices",
+  "Sign in on any device to restore all your lessons, XP, streak, and vocab",
+  "Leaderboards now use your display name automatically — just tap Join to opt in",
+  "Delete Account fully removes your account and data from the server",
+  "Welcome modal removed for a cleaner launch experience"
 ];
 
 let deferredInstallPrompt = null;
@@ -11736,6 +11678,288 @@ function closeUpdateModal(event) {
   }
 }
 
+// ── Auth state handler ───────────────────────────────────────────────────────
+
+async function restoreUserFromFirestore(user) {
+  const data = await window.Auth.loadUserData(user.uid);
+  if (!data) return;
+
+  localStorage.setItem("authUsername", data.username || "");
+  localStorage.setItem("authDisplayName", data.displayName || "");
+  localStorage.setItem("appJoinDate", data.joinDate || new Date().toISOString());
+
+  profileData = {
+    displayName: data.displayName || "",
+    username: data.username || "",
+    color: data.color || "#d4a93a",
+    xp: data.xp || 0,
+    greekExperience: data.greekExperience || "new",
+    isCreated: true
+  };
+  localStorage.setItem("profileData", JSON.stringify(profileData));
+
+  if (data.completedLessons) {
+    completedLessons = data.completedLessons;
+    localStorage.setItem("completedLessons", JSON.stringify(completedLessons));
+  }
+  if (data.completedAdvancedLessons) {
+    completedAdvancedLessons = data.completedAdvancedLessons;
+    localStorage.setItem("completedAdvancedLessons", JSON.stringify(completedAdvancedLessons));
+  }
+  if (data.knownWords) {
+    knownWords = data.knownWords;
+    localStorage.setItem("knownWords", JSON.stringify(knownWords));
+  }
+  if (data.translationProgress) {
+    translationProgress = data.translationProgress;
+    localStorage.setItem("translationProgress", JSON.stringify(translationProgress));
+  }
+  if (data.achievements) {
+    achievements = data.achievements;
+    localStorage.setItem("achievements", JSON.stringify(achievements));
+  }
+  if (data.totalStudySeconds) {
+    totalStudySeconds = data.totalStudySeconds;
+    localStorage.setItem("totalStudySeconds", String(data.totalStudySeconds));
+  }
+  if (data.streak) localStorage.setItem("studyStreakDays", String(data.streak));
+  if (data.lastStudyDate) localStorage.setItem("lastStudyDate", data.lastStudyDate);
+  if (data.lessonMode) localStorage.setItem("lessonMode", data.lessonMode);
+  if (data.practiceToolsUnlocked) {
+    practiceToolsUnlocked = true;
+    localStorage.setItem("practiceToolsUnlocked", "true");
+  }
+  if (data.lbXpJoined) localStorage.setItem("lbXpJoined", "true");
+  if (data.lbConsJoined) localStorage.setItem("lbConsJoined", "true");
+  if (data.lbScholarJoined) localStorage.setItem("lbScholarJoined", "true");
+  if (data.lbScholarBest) localStorage.setItem("lbScholarBest", String(data.lbScholarBest));
+  if (data.avatar) {
+    localStorage.setItem("profilePicType", "icon");
+    localStorage.setItem("profilePicValue", data.avatar);
+  }
+  if (data.vocabChapterXP) {
+    Object.entries(data.vocabChapterXP).forEach(([k, v]) => {
+      try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
+    });
+  }
+}
+
+async function syncUserData() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) return;
+
+  const vocabChapterXP = {};
+  Object.keys(localStorage).filter(k => k.startsWith("vocabChapterXP_")).forEach(k => {
+    try { vocabChapterXP[k] = JSON.parse(localStorage.getItem(k)); } catch {}
+  });
+
+  const data = {
+    username: localStorage.getItem("authUsername") || "",
+    displayName: profileData.displayName || "",
+    joinDate: localStorage.getItem("appJoinDate") || null,
+    xp: profileData.xp || 0,
+    color: profileData.color || "#d4a93a",
+    greekExperience: profileData.greekExperience || "new",
+    avatar: localStorage.getItem("profilePicType") === "icon"
+      ? (localStorage.getItem("profilePicValue") || "school") : "school",
+    streak: getStreakDays(),
+    lastStudyDate: localStorage.getItem("lastStudyDate") || null,
+    totalStudySeconds: totalStudySeconds || 0,
+    completedLessons: completedLessons || {},
+    completedAdvancedLessons: completedAdvancedLessons || {},
+    knownWords: knownWords || [],
+    translationProgress: translationProgress || {},
+    achievements: achievements || [],
+    practiceToolsUnlocked: practiceToolsUnlocked || false,
+    lessonMode: getLessonMode(),
+    vocabChapterXP,
+    lbXpJoined: localStorage.getItem("lbXpJoined") === "true",
+    lbConsJoined: localStorage.getItem("lbConsJoined") === "true",
+    lbScholarJoined: localStorage.getItem("lbScholarJoined") === "true",
+    lbScholarBest: parseInt(localStorage.getItem("lbScholarBest") || "0"),
+    lastSeenAppVersion: APP_VERSION
+  };
+
+  await window.Auth.syncUserData(user.uid, data);
+}
+
+function gatherMigrationData() {
+  const profileRaw = JSON.parse(localStorage.getItem("profileData") || "{}");
+  const vocabChapterXP = {};
+  Object.keys(localStorage).filter(k => k.startsWith("vocabChapterXP_")).forEach(k => {
+    try { vocabChapterXP[k] = JSON.parse(localStorage.getItem(k)); } catch {}
+  });
+  return {
+    joinDate: localStorage.getItem("appJoinDate") || null,
+    xp: profileRaw.xp || 0,
+    color: profileRaw.color || "#d4a93a",
+    greekExperience: profileRaw.greekExperience || "new",
+    avatar: localStorage.getItem("profilePicType") === "icon"
+      ? (localStorage.getItem("profilePicValue") || "school") : "school",
+    streak: parseInt(localStorage.getItem("studyStreakDays") || "0"),
+    lastStudyDate: localStorage.getItem("lastStudyDate") || null,
+    totalStudySeconds: Number(localStorage.getItem("totalStudySeconds")) || 0,
+    completedLessons: JSON.parse(localStorage.getItem("completedLessons") || "{}"),
+    completedAdvancedLessons: JSON.parse(localStorage.getItem("completedAdvancedLessons") || "{}"),
+    knownWords: JSON.parse(localStorage.getItem("knownWords") || "[]"),
+    translationProgress: JSON.parse(localStorage.getItem("translationProgress") || "{}"),
+    achievements: JSON.parse(localStorage.getItem("achievements") || "[]"),
+    practiceToolsUnlocked: localStorage.getItem("practiceToolsUnlocked") === "true",
+    lessonMode: localStorage.getItem("lessonMode") || "basic",
+    vocabChapterXP
+  };
+}
+
+// ── Auth modal UI ────────────────────────────────────────────────────────────
+
+function showAuthModal() {
+  document.getElementById("authModal")?.classList.add("open");
+}
+
+function hideAuthModal() {
+  document.getElementById("authModal")?.classList.remove("open");
+}
+
+function switchAuthTab(tab) {
+  const isCreate = tab === "create";
+  document.getElementById("authCreateForm").style.display = isCreate ? "block" : "none";
+  document.getElementById("authLoginForm").style.display = isCreate ? "none" : "block";
+  document.getElementById("authTabCreate").classList.toggle("active", isCreate);
+  document.getElementById("authTabLogin").classList.toggle("active", !isCreate);
+  document.getElementById("authCreateError").textContent = "";
+  document.getElementById("authLoginError").textContent = "";
+}
+
+function showDisplayNameInfo(e) {
+  e?.stopPropagation();
+  document.getElementById("displayNameInfoModal")?.classList.add("open");
+}
+
+function closeDisplayNameInfo() {
+  document.getElementById("displayNameInfoModal")?.classList.remove("open");
+}
+
+async function submitCreateAccount() {
+  const username = document.getElementById("authUsername").value.trim();
+  const displayName = document.getElementById("authDisplayName").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const passwordConfirm = document.getElementById("authPasswordConfirm").value;
+  const errEl = document.getElementById("authCreateError");
+  const btn = document.querySelector("#authCreateForm .auth-submit-btn");
+
+  errEl.textContent = "";
+
+  if (!username || !displayName || !password) {
+    errEl.textContent = "Please fill in all fields."; return;
+  }
+  if (username.length < 3) {
+    errEl.textContent = "Username must be at least 3 characters."; return;
+  }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    errEl.textContent = "Username can only contain letters, numbers, and underscores."; return;
+  }
+  if (displayName.length < 2) {
+    errEl.textContent = "Display name must be at least 2 characters."; return;
+  }
+  if (password.length < 6) {
+    errEl.textContent = "Password must be at least 6 characters."; return;
+  }
+  if (password !== passwordConfirm) {
+    errEl.textContent = "Passwords don't match."; return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Checking…";
+
+  try {
+    const usernameTaken = await window.Auth.checkUsernameTaken(username);
+    if (usernameTaken) { errEl.textContent = "That username is already taken."; return; }
+
+    const displayNameTaken = await window.Auth.checkDisplayNameTaken(displayName);
+    if (displayNameTaken) { errEl.textContent = "That display name is already taken."; return; }
+
+    btn.textContent = "Creating account…";
+    const migration = gatherMigrationData();
+    await window.Auth.createAccount(username, password, displayName, migration);
+
+    localStorage.setItem("authUsername", username);
+    localStorage.setItem("authDisplayName", displayName);
+    if (!localStorage.getItem("appJoinDate")) {
+      localStorage.setItem("appJoinDate", new Date().toISOString());
+    }
+
+    profileData = {
+      displayName,
+      username,
+      color: migration.color || "#d4a93a",
+      xp: migration.xp || 0,
+      greekExperience: migration.greekExperience || "new",
+      isCreated: true
+    };
+    localStorage.setItem("profileData", JSON.stringify(profileData));
+
+    hideAuthModal();
+    updateProfileUI();
+    updatePracticeToolLocks();
+    updateLessonCompletionUI();
+    maybeShowNotificationPromptAfterProfile();
+  } catch (e) {
+    errEl.textContent = e.message || "Something went wrong. Please try again.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Create Account";
+  }
+}
+
+async function submitLogin() {
+  const username = document.getElementById("authLoginUsername").value.trim();
+  const password = document.getElementById("authLoginPassword").value;
+  const errEl = document.getElementById("authLoginError");
+  const btn = document.querySelector("#authLoginForm .auth-submit-btn");
+
+  errEl.textContent = "";
+
+  if (!username || !password) {
+    errEl.textContent = "Please enter your username and password."; return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+
+  try {
+    await window.Auth.login(username, password);
+    // Auth state change will trigger restoreUserFromFirestore
+  } catch (e) {
+    const msg = e.code === "auth/invalid-credential" || e.code === "auth/user-not-found" || e.code === "auth/wrong-password"
+      ? "Incorrect username or password."
+      : (e.message || "Sign in failed.");
+    errEl.textContent = msg;
+    btn.disabled = false;
+    btn.textContent = "Sign In";
+  }
+}
+
+// Register auth state handler (called by firebase-lb.js when auth resolves)
+window.__onAuthStateReady = async (user) => {
+  if (user) {
+    await restoreUserFromFirestore(user);
+    hideAuthModal();
+    updateProfileUI();
+    updateProfileBadges?.();
+    updatePracticeToolLocks();
+    updateLessonCompletionUI();
+  } else {
+    showAuthModal();
+  }
+};
+
+// Handle case where Firebase auth resolved before DOMContentLoaded
+if (window.__pendingAuthResolved) {
+  window.__onAuthStateReady(window.__pendingAuthUser ?? null);
+}
+
+// ── Startup ──────────────────────────────────────────────────────────────────
+
 document.addEventListener("DOMContentLoaded", () => {
   registerServiceWorker();
 syncOneSignalPushState();
@@ -11800,122 +12024,6 @@ function openNewsFromProfile() {
 }
 
 
- const BIBLE_GREEK_FACTS = [
-   "Matthew begins the New Testament with a genealogy connecting Jesus to Abraham and David.",
-  "Mark is the shortest Gospel and frequently uses words like immediately to keep the narrative moving quickly.",
-  "Luke and Acts were written by the same author and form one continuous historical account.",
-  "John begins his Gospel before creation itself: In the beginning was the Word.",
-  "Each Gospel ends with the resurrection of Jesus Christ.",
-  "Only Matthew mentions the wise men visiting Jesus.",
-  "Only Luke records the parable of the prodigal son.",
-  "Only John records Jesus turning water into wine.",
-  "Jesus asked over 300 questions throughout the Gospels.",
-  "The shortest verse in many English Bibles is Jesus wept in John 11:35.",
-  "Pilate asked Jesus, What is truth? in John 18.",
-  "Jesus wrote directly on the ground only one recorded time in Scripture.",
-  "The Sermon on the Mount spans Matthew chapters 5 through 7.",
-  "The Beatitudes begin with the word blessed repeated multiple times.",
-  "Jesus often taught using ordinary objects like seeds, lamps, bread, fish, coins, and vineyards.",
-  "Many parables begin with phrases like The kingdom of heaven is like...",
-  "Jesus calmed a storm simply by speaking.",
-  "Jesus fed thousands with a few loaves and fish more than once.",
-  "Peter walked on water briefly before beginning to sink.",
-  "Jesus slept during a violent storm while experienced fishermen panicked.",
-  "The disciples sometimes misunderstood Jesus even after witnessing miracles.",
-  "Thomas is remembered for doubting, yet later directly called Jesus My Lord and my God.",
-  "Judas Iscariot was one of the twelve disciples before betraying Jesus.",
-  "The rooster crowing became a permanent reminder of Peter denying Jesus three times.",
-  "The Gospels record women being the first witnesses of the resurrection.",
-  "Jesus appeared to over 500 people after His resurrection according to 1 Corinthians 15.",
-  "Acts begins where the Gospel accounts end: after the resurrection.",
-  "Acts 1:8 gives the geographic movement of the whole book: Jerusalem, Judea, Samaria, and the ends of the earth.",
-  "The Day of Pentecost in Acts 2 involved people hearing the message in their own languages.",
-  "Paul was originally known as Saul.",
-  "Paul’s conversion happened while traveling to Damascus.",
-  "Paul wrote letters from prison that still strongly emphasize joy and hope.",
-  "Philippians repeatedly mentions joy even though Paul was imprisoned.",
-  "Romans is Paul’s longest letter in the New Testament.",
-  "Philemon is Paul’s shortest surviving letter.",
-  "1 Corinthians deals with real church problems like division, pride, lawsuits, and misuse of spiritual gifts.",
-  "Galatians was written with such urgency that Paul said even an angel should not preach a different gospel.",
-  "Ephesians describes believers as the body of Christ.",
-  "Hebrews contains many comparisons showing Christ is better.",
-  "James uses vivid imagery like a ship rudder, wildfire, mirror, and vapor.",
-  "Revelation begins with letters addressed to seven real churches.",
-  "The final chapter of the New Testament ends with Jesus saying, Surely I am coming quickly.",
-  "The first words of Jesus recorded in Matthew are Follow Me.",
-  "The final prayer of the Bible is Even so, come, Lord Jesus.",
-  "Jesus quoted the Old Testament frequently during His ministry.",
-  "During temptation in the wilderness, Jesus answered Satan with Scripture each time.",
-  "The New Testament contains history, letters, prophecy, songs, prayers, sermons, and eyewitness testimony.",
-  "Many New Testament letters were intended to be read aloud publicly.",
-  "Paul sometimes used scribes to help write his letters.",
-  "Several New Testament writers directly identified themselves by name in their openings.",
-  "Luke specifically says he carefully investigated eyewitness accounts.",
-  "John says he wrote his Gospel so people would believe Jesus is the Christ.",
-  "The Gospel of John records seven major sign miracles before the resurrection.",
-  "John also records several I AM statements from Jesus.",
-  "The phrase fear not appears repeatedly when angels speak to people.",
-  "Jesus often withdrew to pray before major moments.",
-  "The Mount of Olives appears repeatedly during the final week before the crucifixion.",
-  "Jesus was crucified between two criminals.",
-  "One criminal mocked Jesus while the other defended Him.",
-  "The temple veil tore from top to bottom after Jesus died.",
-  "Roman soldiers cast lots for Jesus’ clothing.",
-  "After the resurrection, some disciples initially failed to recognize Jesus.",
-  "The road to Emmaus account shows Jesus explaining Scripture about Himself.",
-  "Acts records multiple imprisonments, trials, shipwrecks, and rescue events.",
-  "Paul survived a shipwreck and then a snake bite in Acts 28.",
-  "The Bereans were praised for checking Scripture daily.",
-  "The book of Acts ends with Paul preaching in Rome.",
-  "Not every apostle wrote a New Testament book.",
-  "The New Testament contains 27 books.",
-  "Four different men wrote Gospel accounts about Jesus.",
-  "Luke was not one of the twelve apostles.",
-  "Mark closely associated with Peter according to early church history.",
-  "The New Testament repeatedly uses eyewitness language like we saw and we heard.",
-  "The word gospel literally means good news.",
-  "Christ means Messiah or Anointed One.",
-  "Jesus means The Lord saves.",
-  "The name Emmanuel means God with us.",
-  "The title Son of Man is one of Jesus’ favorite ways to refer to Himself.",
-  "The title Lamb of God first appears in John chapter 1.",
-  "John the Baptist said Jesus must increase, but I must decrease.",
-  "Jesus called fishermen, tax collectors, and ordinary workers to follow Him.",
-  "Matthew was a tax collector before becoming a disciple.",
-  "Zacchaeus climbed a tree just to see Jesus.",
-  "Nicodemus came to Jesus at night.",
-  "Lazarus had already been dead four days before Jesus raised him.",
-  "Jesus cursed a fig tree shortly before entering Jerusalem.",
-  "Children were specifically welcomed by Jesus.",
-  "Jesus washed the disciples’ feet during the final supper.",
-  "The disciples argued about who was greatest even near the end of Jesus’ ministry.",
-  "Peter cut off a servant’s ear during Jesus’ arrest.",
-  "Jesus healed that servant’s ear immediately afterward.",
-  "Pilate publicly washed his hands before the crowd.",
-  "Barabbas was released instead of Jesus.",
-  "The inscription above Jesus’ cross identified Him as King of the Jews.",
-  "After the resurrection, Jesus cooked food for disciples by the sea.",
-  "The final chapter of John ends mentioning there were many more things Jesus did that were not written down.",
-  "Paul frequently used athletic imagery like running races and fighting battles.",
-  "Paul compared the church to a human body with many members.",
-  "James says the tongue can direct a life like a rudder directs a ship.",
-  "Peter described Satan as a roaring lion seeking someone to devour.",
-  "John frequently contrasts light and darkness.",
-  "Revelation describes a future city with no need for the sun because God gives it light.",
-  "The final word in many English New Testaments is Amen.",
-  "Jesus is directly called both the Alpha and Omega in Revelation.",
-  "The New Testament begins with a genealogy and ends with a promise of Jesus’ return.",
-  "The very first public command of Jesus in Matthew is repent.",
-  "The final command of Jesus in Matthew is to make disciples of all nations.",
-  "Paul named many ordinary believers individually throughout his letters.",
-  "The book of Acts contains multiple speeches and sermons preserved in detail.",
-  "Jesus frequently used questions to teach people rather than only giving direct answers.",
-  "Some people followed Jesus for miracles while others followed for truth.",
-  "The Pharisees and Sadducees often disagreed with each other even while opposing Jesus.",
-  "The resurrection is emphasized in every Gospel account.",
-  "The empty tomb is one of the central turning points of the New Testament."
-];
 
 
 function isInstalledAppMode() {
@@ -11942,69 +12050,16 @@ function formatSessionLength(milliseconds) {
   return `${hours} hour${hours === 1 ? "" : "s"} and ${leftoverMinutes} minute${leftoverMinutes === 1 ? "" : "s"}`;
 }
 
-function maybeShowWelcomeBackModal() {
-  const TEST_WELCOME_BACK = true; // change to true to test in browser
-
-  const alreadyShownThisSession =
-    sessionStorage.getItem("welcomeBackShown") === "true";
-
-  const lastSessionLength = Number(localStorage.getItem("lastSessionLength") || 0);
-
-  if (
-    !profileData?.isCreated ||
-    alreadyShownThisSession ||
-    lastSessionLength <= 0 ||
-    (!TEST_WELCOME_BACK && !isInstalledAppMode())
-  ) {
-    return;
-  }
-
-  const firstName = profileData.firstName || "friend";
-  let randomFact =
-  BIBLE_GREEK_FACTS[Math.floor(Math.random() * BIBLE_GREEK_FACTS.length)];
-
-const lastFact = localStorage.getItem("lastWelcomeBackFact");
-
-if (BIBLE_GREEK_FACTS.length > 1) {
-  while (randomFact === lastFact) {
-    randomFact =
-      BIBLE_GREEK_FACTS[Math.floor(Math.random() * BIBLE_GREEK_FACTS.length)];
-  }
-}
-
-localStorage.setItem("lastWelcomeBackFact", randomFact);
-
-  document.getElementById("welcomeBackTitle").textContent =
-    `Welcome back, ${firstName}!`;
-
-  document.getElementById("welcomeBackSession").textContent =
-    `Last time, you studied for about ${formatSessionLength(lastSessionLength)}.`;
-
-  document.getElementById("welcomeBackFact").textContent = randomFact;
-
-  document.getElementById("welcomeBackModal")?.classList.add("open");
-  sessionStorage.setItem("welcomeBackShown", "true");
-}
-
-function hideWelcomeBackModal() {
-  document.getElementById("welcomeBackModal")?.classList.remove("open");
-}
-
 window.addEventListener("load", () => {
   if (!sessionStorage.getItem("sessionStartedAt")) {
     sessionStorage.setItem("sessionStartedAt", Date.now().toString());
   }
-
-  setTimeout(maybeShowWelcomeBackModal, 50);
 });
 
 window.addEventListener("pagehide", () => {
-  if (!profileData?.isCreated) return;
-
   const startedAt = Number(sessionStorage.getItem("sessionStartedAt") || Date.now());
-  const sessionLength = Date.now() - startedAt;
-
-  localStorage.setItem("lastSessionLength", sessionLength.toString());
+  localStorage.setItem("lastSessionLength", String(Date.now() - startedAt));
+  syncUserData();
 });
 
 function openInstallModalFromProfile() {
@@ -12341,7 +12396,7 @@ function _renderXPBoard() {
   if (window.LB.isXpJoined()) {
     joinEl.innerHTML = `<p class="lb-joined-note">✓ You're on the board — your XP syncs automatically.</p>`;
   } else {
-    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinXP()">⚡ Join XP Board</button>`;
+    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinXP()">Join XP Board</button>`;
   }
 }
 
@@ -12364,7 +12419,7 @@ function _renderScholarBoard() {
       <p class="lb-joined-note">✓ Your best: <strong>${best} correct</strong></p>
       <button class="lb-join-btn lb-retake-btn" onclick="startScholarTest()">📖 Retake Scholar Test</button>`;
   } else {
-    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinScholar()">📖 Join Scholar Board</button>`;
+    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinScholar()">Join Scholar Board</button>`;
   }
 }
 
@@ -12384,7 +12439,7 @@ function _renderConsBoard() {
   if (window.LB.isConsJoined()) {
     joinEl.innerHTML = `<p class="lb-joined-note">✓ Your streak syncs automatically. Keep it up! 🔥</p>`;
   } else {
-    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinCons()">🔥 Join Consistency Board</button>`;
+    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinCons()">Join Consistency Board</button>`;
   }
 }
 
@@ -12392,56 +12447,43 @@ function _renderConsBoard() {
 
 let _lbNameTarget = null;
 
-function promptJoinXP() { _lbNameTarget = "xp"; _showLbNameModal("Join the Global XP Board"); }
-function promptJoinScholar() { _lbNameTarget = "scholar"; _showLbNameModal("Join the Scholar Board"); }
-function promptJoinCons() { _lbNameTarget = "cons"; _showLbNameModal("Join the Consistency Board"); }
+function promptJoinXP() { _lbNameTarget = "xp"; _showLbConfirmModal("Join the Global XP Board"); }
+function promptJoinScholar() { _lbNameTarget = "scholar"; _showLbConfirmModal("Join the Scholar Board"); }
+function promptJoinCons() { _lbNameTarget = "cons"; _showLbConfirmModal("Join the Consistency Board"); }
 
-function _showLbNameModal(title) {
-  document.getElementById("lbNameModalTitle").textContent = title;
-  document.getElementById("lbNameInput").value = "";
-  document.getElementById("lbNameModal").classList.add("open");
-  setTimeout(() => document.getElementById("lbNameInput").focus(), 100);
+function _showLbConfirmModal(title) {
+  const displayName = localStorage.getItem("authDisplayName") || "You";
+  document.getElementById("lbConfirmTitle").textContent = title;
+  document.getElementById("lbConfirmMsg").textContent = `You'll appear as "${displayName}" on the leaderboard.`;
+  document.getElementById("lbConfirmModal").classList.add("open");
 }
 
-function closeLbNameModal() {
-  document.getElementById("lbNameModal").classList.remove("open");
+function closeLbConfirmModal() {
+  document.getElementById("lbConfirmModal").classList.remove("open");
 }
 
-function lbNameOverlayClick(e) {
-  if (e.target === document.getElementById("lbNameModal")) closeLbNameModal();
-}
+async function confirmLbJoin() {
+  closeLbConfirmModal();
+  const btn = document.getElementById("lbConfirmJoinBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Joining…"; }
 
-async function confirmLbName() {
-  const name = document.getElementById("lbNameInput").value.trim();
-  if (!name) { alert("Please enter a name."); return; }
-  if (name.length > 24) { alert("Name must be 24 characters or less."); return; }
-
-  // Check for duplicate names on this specific board
-  const boardMap = { xp: "xp_board", scholar: "scholar_board", cons: "consistency_board" };
-  const board = boardMap[_lbNameTarget];
-  const btn = document.querySelector("#lbNameModal .lb-primary-btn");
-  if (btn) { btn.disabled = true; btn.textContent = "Checking…"; }
-  const taken = await window.LB.checkNameTaken(board, name).catch(() => false);
-  if (btn) { btn.disabled = false; btn.textContent = "Confirm →"; }
-  if (taken) {
-    alert(`"${name}" is already taken on this board. Please choose a different name.`);
-    return;
-  }
-
-  closeLbNameModal();
-
-  if (_lbNameTarget === "xp") {
-    const xp = profileData?.xp || 0;
-    await window.LB.joinXPBoard(name, xp);
-    _renderXPBoard();
-  } else if (_lbNameTarget === "scholar") {
-    window.LB.joinScholarBoard(name);
-    startScholarTest();
-    return;
-  } else if (_lbNameTarget === "cons") {
-    const streak = getStreakDays();
-    await window.LB.joinConsistencyBoard(name, streak);
-    _renderConsBoard();
+  try {
+    if (_lbNameTarget === "xp") {
+      await window.LB.joinXPBoard(profileData?.xp || 0);
+      syncUserData();
+      _renderXPBoard();
+    } else if (_lbNameTarget === "scholar") {
+      window.LB.joinScholarBoard();
+      syncUserData();
+      startScholarTest();
+      return;
+    } else if (_lbNameTarget === "cons") {
+      await window.LB.joinConsistencyBoard(getStreakDays());
+      syncUserData();
+      _renderConsBoard();
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Join →"; }
   }
   updateProfileBadges();
 }
@@ -12655,6 +12697,7 @@ function selectAvatarIcon(icon) {
   _applyProfileAvatar();
   closeAvatarPicker();
   window.LB?.syncAvatar();
+  syncUserData();
 }
 
 function handleAvatarPhoto(input) {
