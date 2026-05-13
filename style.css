@@ -9077,6 +9077,42 @@ body.dark .adv-cs-header {
   color: #e2b93b;
 }
 
+.adv-cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.adv-cs-table th {
+  text-align: left;
+  font-weight: 700;
+  color: #c9a227;
+  padding: 4px 8px 4px 0;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.25);
+  white-space: nowrap;
+}
+
+.adv-cs-table td {
+  padding: 4px 8px 4px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  line-height: 1.4;
+  vertical-align: top;
+}
+
+.adv-cs-table tr:last-child td {
+  border-bottom: none;
+}
+
+body.dark .adv-cs-table th {
+  color: #e2b93b;
+  border-color: rgba(226, 185, 59, 0.25);
+}
+
+body.dark .adv-cs-table td {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
 /* ===== ADVANCED LESSON FULL WIDTH — mirrors basic lesson :has() behavior ===== */
 
 /* Shrink .app side padding when an advanced lesson is active */

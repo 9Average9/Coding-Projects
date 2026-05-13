@@ -9538,6 +9538,107 @@ function openAdvCheatSheet(lessonId) {
           <p>Learn the 320 most frequent NT words → covers 80%+ of all word occurrences.</p>
         </div>
       `;
+    } else if (lessonId === "adv_alphabet") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">The Greek Alphabet — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The 24 Letters</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Upper</th><th>Lower</th><th>Name</th><th>Sound</th></tr></thead>
+            <tbody>
+              <tr><td>Α</td><td>α</td><td>alpha</td><td>"a" (father)</td></tr>
+              <tr><td>Β</td><td>β</td><td>beta</td><td>"b"</td></tr>
+              <tr><td>Γ</td><td>γ</td><td>gamma</td><td>"g" (hard) / "ng" before γ κ χ ξ</td></tr>
+              <tr><td>Δ</td><td>δ</td><td>delta</td><td>"d"</td></tr>
+              <tr><td>Ε</td><td>ε</td><td>epsilon</td><td>short "e" (met) — always short</td></tr>
+              <tr><td>Ζ</td><td>ζ</td><td>zeta</td><td>"dz" or "z"</td></tr>
+              <tr><td>Η</td><td>η</td><td>eta</td><td>long "e" (they) — always long</td></tr>
+              <tr><td>Θ</td><td>θ</td><td>theta</td><td>"th" (think)</td></tr>
+              <tr><td>Ι</td><td>ι</td><td>iota</td><td>"i" (bit) / long "ee"</td></tr>
+              <tr><td>Κ</td><td>κ</td><td>kappa</td><td>"k"</td></tr>
+              <tr><td>Λ</td><td>λ</td><td>lambda</td><td>"l"</td></tr>
+              <tr><td>Μ</td><td>μ</td><td>mu</td><td>"m"</td></tr>
+              <tr><td>Ν</td><td>ν</td><td>nu</td><td>"n"</td></tr>
+              <tr><td>Ξ</td><td>ξ</td><td>xi</td><td>"ks"</td></tr>
+              <tr><td>Ο</td><td>ο</td><td>omicron</td><td>short "o" — always short</td></tr>
+              <tr><td>Π</td><td>π</td><td>pi</td><td>"p"</td></tr>
+              <tr><td>Ρ</td><td>ρ</td><td>rho</td><td>"r" (looks like P!)</td></tr>
+              <tr><td>Σ</td><td>σ / ς</td><td>sigma</td><td>"s" (ς at end of word)</td></tr>
+              <tr><td>Τ</td><td>τ</td><td>tau</td><td>"t"</td></tr>
+              <tr><td>Υ</td><td>υ</td><td>upsilon</td><td>"u" / "oo"</td></tr>
+              <tr><td>Φ</td><td>φ</td><td>phi</td><td>"ph" (phone)</td></tr>
+              <tr><td>Χ</td><td>χ</td><td>chi</td><td>"ch" (Bach)</td></tr>
+              <tr><td>Ψ</td><td>ψ</td><td>psi</td><td>"ps"</td></tr>
+              <tr><td>Ω</td><td>ω</td><td>omega</td><td>long "o" — always long</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Vowels — Length Rules</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Always Short</th><th>Always Long</th><th>Either Short or Long</th></tr></thead>
+            <tbody>
+              <tr><td>ε (epsilon)</td><td>η (eta)</td><td>α (alpha)</td></tr>
+              <tr><td>ο (omicron)</td><td>ω (omega)</td><td>ι (iota)</td></tr>
+              <tr><td></td><td></td><td>υ (upsilon)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Diphthongs</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Diphthong</th><th>Sounds like</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td>αι</td><td>"ai" (aisle)</td><td>καί (and)</td></tr>
+              <tr><td>αυ</td><td>"ow" (ouch)</td><td>αὐτός (he/self)</td></tr>
+              <tr><td>ει</td><td>"ei" (eight)</td><td>εἰ (if)</td></tr>
+              <tr><td>ευ</td><td>"eh-oo"</td><td>εὐαγγέλιον (gospel)</td></tr>
+              <tr><td>οι</td><td>"oi" (oil)</td><td>οἶκος (house)</td></tr>
+              <tr><td>ου</td><td>"oo" (food)</td><td>οὐ (not)</td></tr>
+              <tr><td>υι</td><td>"wee"</td><td>υἱός (son)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Diacritical Marks</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Mark</th><th>Name</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td>᾿</td><td>smooth breathing</td><td>No "h" — all vowel-initial words carry one</td></tr>
+              <tr><td>῾</td><td>rough breathing</td><td>Adds an "h" sound before the vowel</td></tr>
+              <tr><td>´</td><td>acute accent</td><td>Stress/pitch rise on that syllable</td></tr>
+              <tr><td>`</td><td>grave accent</td><td>Acute shifted before the next word</td></tr>
+              <tr><td>῀</td><td>circumflex</td><td>Rising-then-falling pitch on a long syllable</td></tr>
+              <tr><td>ᾳ ῃ ῳ</td><td>iota subscript</td><td>Silent grammatical marker (was once pronounced)</td></tr>
+              <tr><td>ϊ ϋ</td><td>diaeresis</td><td>Two vowels pronounced separately, not as diphthong</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Recognition Traps</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Looks like</th><th>Is actually</th><th>Sound</th></tr></thead>
+            <tbody>
+              <tr><td>English "H"</td><td>Η η (eta)</td><td>long "e" — NOT "h"</td></tr>
+              <tr><td>English "P"</td><td>Ρ ρ (rho)</td><td>"r" — NOT "p"</td></tr>
+              <tr><td>English "X"</td><td>Χ χ (chi)</td><td>"ch" (Bach) — NOT "x"</td></tr>
+              <tr><td>English "N"</td><td>Ν ν (nu)</td><td>"n" — same! (safe)</td></tr>
+              <tr><td>English "Y"</td><td>Υ υ (upsilon)</td><td>"u" / "oo" — NOT "y"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Consonant Families</h4>
+          <p><strong>Labials</strong> (lips): π β φ &nbsp;|&nbsp; <strong>Velars</strong> (throat): κ γ χ &nbsp;|&nbsp; <strong>Dentals</strong> (teeth): τ δ θ</p>
+          <p><strong>Liquids</strong>: λ ρ &nbsp;|&nbsp; <strong>Nasals</strong>: μ ν &nbsp;|&nbsp; <strong>Sibilant</strong>: σ/ς &nbsp;|&nbsp; <strong>Double</strong>: ξ (ks) · ψ (ps) · ζ (dz)</p>
+        </div>
+      `;
     } else {
       content.innerHTML = `<p style="opacity:0.6;text-align:center;padding:20px 0">No cheat sheet available for this lesson yet.</p>`;
     }
@@ -11602,10 +11703,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.5";
+const APP_VERSION = "1.5.6";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 2: The Greek Alphabet — full 24-letter coverage, diacritical marks, recognition traps, and reading John 1:1"
+  "Lesson 2 cheat sheet: full alphabet table, vowel length rules, diphthongs, diacritical marks, recognition traps"
 ];
 
 let deferredInstallPrompt = null;
