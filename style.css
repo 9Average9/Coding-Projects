@@ -4938,6 +4938,8 @@ body.dark .xp-bar {
 #profileModal h2 {
   font-size: 1.35rem;
   margin-bottom: 4px;
+  text-align: center;
+  padding-right: 0;
 }
 
 #profileModal .profile-title {

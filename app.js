@@ -11531,12 +11531,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.3";
+const APP_VERSION = "1.5.4";
 
 const UPDATE_NOTES = [
-  "Consistency leaderboard tiebreaker: equal streaks now ranked by total time in app",
-  "Display name properly centered under profile avatar",
-  "Leaderboard button updated to match app theme color"
+  "Fixed display name centering under profile avatar (overrode conflicting modal padding rule)",
+  "Consistency leaderboard tiebreaker: equal streaks ranked by total time in app",
+  "Leaderboard button matches app theme color"
 ];
 
 let deferredInstallPrompt = null;
