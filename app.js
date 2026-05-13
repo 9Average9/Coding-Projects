@@ -11531,15 +11531,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.2";
+const APP_VERSION = "1.5.3";
 
 const UPDATE_NOTES = [
-  "Leaderboard entry properly detects your own entry even after account migration",
-  "Old anonymous leaderboard entries cleaned up when creating an account",
-  "Lesson count in menu header updates immediately after completing a lesson",
-  "Leaderboard join modal now appears on top of the leaderboard",
-  "Display name now centered under profile avatar",
-  "Leaderboard avatar icons render correctly for all users"
+  "Consistency leaderboard tiebreaker: equal streaks now ranked by total time in app",
+  "Display name properly centered under profile avatar",
+  "Leaderboard button updated to match app theme color"
 ];
 
 let deferredInstallPrompt = null;
@@ -12449,6 +12446,11 @@ function _renderConsBoard() {
   if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
 
   window.LB.getBoard("consistency_board", "streak").then(entries => {
+    // Tiebreaker: same streak → rank by total study time
+    entries.sort((a, b) => {
+      if (b.streak !== a.streak) return b.streak - a.streak;
+      return (b.studySeconds || 0) - (a.studySeconds || 0);
+    });
     _renderLbEntries(listEl, entries, "streak", uid);
     updateProfileBadges();
   });
