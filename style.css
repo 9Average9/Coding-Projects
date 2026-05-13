@@ -9397,27 +9397,53 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 .lb-scholar-timer-wrap .material-symbols-outlined { font-size: 20px; }
 .scholar-timer-warning { color: #e53935 !important; }
 .lb-scholar-score-wrap { font-size: 0.95rem; color: var(--font-color); opacity: 0.8; }
-.lb-scholar-prompt { font-size: 0.88rem; color: var(--font-color); opacity: 0.65; margin: 0 0 16px; }
 .lb-scholar-word {
-  font-size: 3rem;
+  font-size: 2.8rem;
   font-weight: 900;
   color: var(--font-color);
-  margin-bottom: 28px;
+  margin: 16px 0 14px;
   letter-spacing: -1px;
-  min-height: 64px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
-.lb-scholar-btns { display: flex; gap: 12px; margin-bottom: 16px; }
+.scholar-feedback {
+  min-height: 22px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.scholar-feedback-correct { color: #2e7d32; }
+.scholar-feedback-wrong { color: #c62828; }
+.scholar-answer-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 2px solid var(--border-color);
+  background: var(--card-color);
+  color: var(--font-color);
+  font-size: 1rem;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.scholar-answer-input:focus { border-color: var(--secondary-color); }
+.scholar-input-correct { border-color: #2e7d32 !important; background: rgba(46,125,50,0.08) !important; }
+.scholar-input-wrong { border-color: #c62828 !important; background: rgba(198,40,40,0.08) !important; }
+.scholar-answer-input:disabled { opacity: 0.7; }
+.lb-scholar-btns { display: flex; gap: 10px; }
 .lb-skip-btn {
   flex: 1;
-  padding: 14px;
+  padding: 13px;
   border-radius: 14px;
   border: 1.5px solid var(--border-color);
   background: transparent;
   color: var(--font-color);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s;
@@ -9425,19 +9451,18 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 .lb-skip-btn:hover { background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)); }
 .lb-know-btn {
   flex: 2;
-  padding: 14px;
+  padding: 13px;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(135deg, #2e7d32, #1b5e20);
-  color: #fff;
-  font-size: 1rem;
+  background: linear-gradient(135deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 70%, #000));
+  color: var(--btn-text-color);
+  font-size: 0.96rem;
   font-weight: 900;
   cursor: pointer;
   transition: transform 0.15s;
 }
 .lb-know-btn:hover { transform: translateY(-1px); }
-.lb-skip-btn:disabled, .lb-know-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
-.lb-scholar-hint { font-size: 0.75rem; color: var(--font-color); opacity: 0.45; margin: 0; }
+.lb-skip-btn:disabled, .lb-know-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
 .lb-scholar-quit {
   background: transparent;
   border: none;

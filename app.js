@@ -11574,7 +11574,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.8";
+const APP_VERSION = "1.3.9";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
@@ -12432,17 +12432,51 @@ function _renderScholarCard() {
   const word = _scholarPool[_scholarIdx];
   document.getElementById("scholarGreekWord").textContent = word.greek;
   document.getElementById("scholarScore").textContent = _scholarScore;
+  const input = document.getElementById("scholarAnswerInput");
+  const feedback = document.getElementById("scholarFeedback");
+  input.value = "";
+  input.disabled = false;
+  input.className = "scholar-answer-input";
+  feedback.textContent = "";
+  feedback.className = "scholar-feedback";
   document.querySelectorAll(".lb-scholar-btns button").forEach(b => { b.disabled = false; });
+  setTimeout(() => input.focus(), 50);
 }
 
-function knowScholarCard() {
-  _scholarScore++;
-  document.getElementById("scholarScore").textContent = _scholarScore;
+function _checkAnswer(userAnswer, word) {
+  const cleaned = userAnswer.trim().toLowerCase();
+  if (!cleaned) return false;
+  return word.meaning.split(",").map(m => m.trim().toLowerCase()).some(m => m === cleaned);
+}
+
+function submitScholarAnswer() {
+  const input = document.getElementById("scholarAnswerInput");
+  const feedback = document.getElementById("scholarFeedback");
+  const word = _scholarPool[_scholarIdx];
+  if (!word || input.disabled) return;
+
+  const correct = _checkAnswer(input.value, word);
+  input.disabled = true;
   document.querySelectorAll(".lb-scholar-btns button").forEach(b => { b.disabled = true; });
-  setTimeout(() => { _scholarIdx++; _renderScholarCard(); }, 200);
+
+  if (correct) {
+    _scholarScore++;
+    document.getElementById("scholarScore").textContent = _scholarScore;
+    input.className = "scholar-answer-input scholar-input-correct";
+    feedback.textContent = "✓ Correct!";
+    feedback.className = "scholar-feedback scholar-feedback-correct";
+  } else {
+    input.className = "scholar-answer-input scholar-input-wrong";
+    const meanings = word.meaning.split(",")[0].trim();
+    feedback.textContent = `✗  "${meanings}"`;
+    feedback.className = "scholar-feedback scholar-feedback-wrong";
+  }
+
+  setTimeout(() => { _scholarIdx++; _renderScholarCard(); }, correct ? 600 : 900);
 }
 
 function skipScholarCard() {
+  document.getElementById("scholarAnswerInput").disabled = true;
   document.querySelectorAll(".lb-scholar-btns button").forEach(b => { b.disabled = true; });
   setTimeout(() => { _scholarIdx++; _renderScholarCard(); }, 150);
 }
