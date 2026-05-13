@@ -11574,7 +11574,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.7";
+const APP_VERSION = "1.3.8";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
@@ -12463,6 +12463,14 @@ function _updateScholarTimerDisplay() {
   const el = document.getElementById("scholarTimer");
   el.textContent = `${m}:${s.toString().padStart(2, "0")}`;
   el.classList.toggle("scholar-timer-warning", _scholarSecondsLeft <= 30);
+}
+
+function cancelScholarTest() {
+  if (!confirm("Quit the Scholar test? Your score won't be submitted.")) return;
+  if (_scholarTimer) { clearInterval(_scholarTimer); _scholarTimer = null; }
+  document.getElementById("lbScholarModal").classList.remove("open");
+  document.getElementById("lbModal").classList.add("open");
+  showLbTab("scholar");
 }
 
 async function _endScholarTest() {
