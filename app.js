@@ -9611,7 +9611,7 @@ function openAdvCheatSheet(lessonId) {
               <tr><td>᾿</td><td>smooth breathing</td><td>No "h" — all vowel-initial words carry one</td></tr>
               <tr><td>῾</td><td>rough breathing</td><td>Adds an "h" sound before the vowel</td></tr>
               <tr><td>´</td><td>acute accent</td><td>Stress/pitch rise on that syllable</td></tr>
-              <tr><td>`</td><td>grave accent</td><td>Acute shifted before the next word</td></tr>
+              <tr><td>\`</td><td>grave accent</td><td>Acute shifted before the next word</td></tr>
               <tr><td>῀</td><td>circumflex</td><td>Rising-then-falling pitch on a long syllable</td></tr>
               <tr><td>ᾳ ῃ ῳ</td><td>iota subscript</td><td>Silent grammatical marker (was once pronounced)</td></tr>
               <tr><td>ϊ ϋ</td><td>diaeresis</td><td>Two vowels pronounced separately, not as diphthong</td></tr>
@@ -9713,7 +9713,6 @@ function openAdvCheatSheet(lessonId) {
           ἐστίν αὐτός &nbsp;·&nbsp; ἐστί ποιμήν</p>
         </div>
       `;
-    } else {
     } else if (lessonId === "adv_nouns") {
       content.innerHTML = `
         <h3 class="adv-cs-title">The Greek Noun System — Cheat Sheet</h3>
@@ -9914,16 +9913,16 @@ const ADV_KC_DATA = {
     { feedback: "Possession is expressed by the genitive case, not the dative. The dative here functions as a means/instrument marker, not a possessive." }
   ],
   kc_adv_nouns_4: [
-    { feedback: "This is actually the argument made by certain groups (most notably Jehovah's Witnesses). However, the absence of the article does not mean 'a god' in Greek — that would require an indefinite article, which Greek doesn't have. The anarthrous predicate nominative in Greek emphasizes the nature or quality of the subject, not indefiniteness. The Granville Sharp rule and Colwell's Rule both bear on this." },
-    { feedback: "The absence of the article before θεός in John 1:1c is deliberate and grammatically significant, not an oversight. Predicate nominatives that precede the verb commonly appear without the article in Greek — this is a well-documented pattern (Colwell's Rule)." },
-    { correct: true, feedback: "Correct! When a predicate nominative (θεός) precedes the verb (ἦν) and lacks the article, Greek grammar emphasizes the nature or quality of the subject — what kind of being the Word is — rather than asserting simple identity. The Word is fully divine in nature. This is the standard evangelical exegetical position, supported by Colwell's Rule and the context of the entire Prologue." },
-    { feedback: "θεός consistently means God throughout the Prologue and the rest of John. The anarthrous form here is about the grammatical function of the predicate nominative, not a change in the word's meaning." }
+    { feedback: "Greek has no indefinite article — there is no word for 'a.' An anarthrous noun (without the article) does not mean 'a lesser version' of the thing. In predicate nominative constructions that precede the verb, the anarthrous form is actually the grammatically expected pattern (Colwell's Rule). The focus is on the nature of the Word, not on quantity." },
+    { feedback: "The absence of the article before θεός in John 1:1c is grammatically significant, not an oversight. When a predicate nominative precedes the verb in Greek, it commonly appears without the article — this is a well-documented pattern. The question is what that anarthrous form communicates, not whether it was intentional." },
+    { correct: true, feedback: "Correct! This is a grammatical point, not a theological one: when a predicate nominative precedes the verb and lacks the article, Greek grammar foregrounds the nature or quality of the subject rather than asserting full identity. The structure of John 1:1c (θεὸς ἦν ὁ λόγος) distinguishes the Word from 'the God' (ὁ θεός = the Father, v.1b) while affirming that he shares that divine nature. This is Colwell's Rule applied." },
+    { feedback: "θεός consistently means God throughout the Prologue. The grammatical issue here is specifically the function of the anarthrous predicate nominative — it concerns how the Word's relationship to divinity is framed grammatically, not a change in the word's meaning." }
   ],
   kc_adv_nouns_5: [
-    { feedback: "Dative feminine singular would be τῇ, not τῆς. The dative article has the iota subscript (τῇ for feminine, τῷ for masculine/neuter). τῆς is the genitive feminine singular form." },
-    { feedback: "Nominative feminine plural would be αἱ. τῆς is singular and genitive. The plural feminine forms of the article are αἱ (nominative), τῶν (genitive), ταῖς (dative), τάς (accusative)." },
-    { feedback: "Genitive masculine singular would be τοῦ — the same form as genitive neuter singular. τῆς is exclusively feminine. The η in τῆς is the hallmark of feminine genitive singular (and dative singular ← wait, that's τῇ)." },
-    { correct: true, feedback: "Correct! τῆς is the genitive feminine singular form of the article. It appears only with feminine nouns in the genitive singular. So τῆς ἀγαθῆς καρδίας = 'of the good heart' — all three words (article, adjective, noun) are genitive feminine singular, locked together by agreement." }
+    { feedback: "Dative feminine singular would be τῇ, not τῆς. The dative article carries an iota subscript (τῇ for feminine, τῷ for masculine/neuter). τῆς is the genitive feminine singular form." },
+    { feedback: "Nominative feminine plural would be αἱ. τῆς is singular and genitive, not plural or nominative. The plural feminine article forms are αἱ (nom.), τῶν (gen.), ταῖς (dat.), τάς (acc.)." },
+    { feedback: "Genitive masculine singular is τοῦ — which also doubles as genitive neuter singular. τῆς is exclusively feminine genitive singular. The η in τῆς is the marker that signals feminine (compare τοῦ with ου vs. τῆς with η)." },
+    { correct: true, feedback: "Correct! τῆς is the genitive feminine singular article. So τῆς ἀγαθῆς καρδίας = 'of the good heart' — article, adjective, and noun all agree: genitive, feminine, singular. The agreement across all three words is what holds the phrase together." }
   ]
 };
 
@@ -10086,8 +10085,8 @@ const ADV_QUIZ_DATA = {
         correct: 2
       },
       {
-        text: "The dative case in χάριτί ἐστε σεσῳσμένοι (Eph 2:8) expresses what function?",
-        options: ["Indirect object", "Means/instrument (by grace)", "Location (in grace)", "Possession (grace's)"],
+        text: "In χάριτί ἐστε σεσῳσμένοι (Eph 2:8), the dative χάριτι answers the question 'saved HOW?' — making it which type of dative?",
+        options: ["Indirect object dative", "Dative of means/instrument", "Locative dative (sphere)", "Dative of possession"],
         correct: 1
       },
       {
@@ -10096,8 +10095,8 @@ const ADV_QUIZ_DATA = {
         correct: 2
       },
       {
-        text: "In John 1:1c, θεὸς ἦν ὁ λόγος — θεός appears without an article. According to standard Greek grammar, the anarthrous predicate nominative before the verb primarily emphasizes:",
-        options: ["That the Word is merely 'a god,' not the God", "The divine nature and quality of the Word", "That God was accidentally left anarthrous by John", "That the Word is identical to God the Father"],
+        text: "In John 1:1c, θεὸς ἦν ὁ λόγος — θεός is an anarthrous predicate nominative placed before the verb. What does this grammatical construction primarily emphasize?",
+        options: ["That the Word is a lesser, secondary god", "The quality or nature of the subject (what kind of being the Word is)", "That the article was accidentally omitted", "That the Word and the Father are the exact same person"],
         correct: 1
       },
       {
@@ -12019,7 +12018,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.8";
+const APP_VERSION = "1.5.9";
 
 const UPDATE_NOTES = [
   "Advanced Lesson 4: The Greek Noun System — cases, grammatical gender, the article paradigm, three declensions, agreement, and parsing"
