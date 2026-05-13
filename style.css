@@ -9039,13 +9039,21 @@ body.dark .adv-quiz-start-area {
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0 0 16px;
-  padding-bottom: 10px;
+  padding: 28px 40px 10px 0;
   border-bottom: 2px solid rgba(201, 162, 39, 0.3);
   color: #c9a227;
 }
 
 .adv-cs-section {
   margin-bottom: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.adv-cs-gk {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .adv-cs-header {

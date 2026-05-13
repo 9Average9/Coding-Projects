@@ -9547,30 +9547,30 @@ function openAdvCheatSheet(lessonId) {
           <table class="adv-cs-table">
             <thead><tr><th>Upper</th><th>Lower</th><th>Name</th><th>Sound</th></tr></thead>
             <tbody>
-              <tr><td>Α</td><td>α</td><td>alpha</td><td>"a" (father)</td></tr>
-              <tr><td>Β</td><td>β</td><td>beta</td><td>"b"</td></tr>
-              <tr><td>Γ</td><td>γ</td><td>gamma</td><td>"g" (hard) / "ng" before γ κ χ ξ</td></tr>
-              <tr><td>Δ</td><td>δ</td><td>delta</td><td>"d"</td></tr>
-              <tr><td>Ε</td><td>ε</td><td>epsilon</td><td>short "e" (met) — always short</td></tr>
-              <tr><td>Ζ</td><td>ζ</td><td>zeta</td><td>"dz" or "z"</td></tr>
-              <tr><td>Η</td><td>η</td><td>eta</td><td>long "e" (they) — always long</td></tr>
-              <tr><td>Θ</td><td>θ</td><td>theta</td><td>"th" (think)</td></tr>
-              <tr><td>Ι</td><td>ι</td><td>iota</td><td>"i" (bit) / long "ee"</td></tr>
-              <tr><td>Κ</td><td>κ</td><td>kappa</td><td>"k"</td></tr>
-              <tr><td>Λ</td><td>λ</td><td>lambda</td><td>"l"</td></tr>
-              <tr><td>Μ</td><td>μ</td><td>mu</td><td>"m"</td></tr>
-              <tr><td>Ν</td><td>ν</td><td>nu</td><td>"n"</td></tr>
-              <tr><td>Ξ</td><td>ξ</td><td>xi</td><td>"ks"</td></tr>
-              <tr><td>Ο</td><td>ο</td><td>omicron</td><td>short "o" — always short</td></tr>
-              <tr><td>Π</td><td>π</td><td>pi</td><td>"p"</td></tr>
-              <tr><td>Ρ</td><td>ρ</td><td>rho</td><td>"r" (looks like P!)</td></tr>
-              <tr><td>Σ</td><td>σ / ς</td><td>sigma</td><td>"s" (ς at end of word)</td></tr>
-              <tr><td>Τ</td><td>τ</td><td>tau</td><td>"t"</td></tr>
-              <tr><td>Υ</td><td>υ</td><td>upsilon</td><td>"u" / "oo"</td></tr>
-              <tr><td>Φ</td><td>φ</td><td>phi</td><td>"ph" (phone)</td></tr>
-              <tr><td>Χ</td><td>χ</td><td>chi</td><td>"ch" (Bach)</td></tr>
-              <tr><td>Ψ</td><td>ψ</td><td>psi</td><td>"ps"</td></tr>
-              <tr><td>Ω</td><td>ω</td><td>omega</td><td>long "o" — always long</td></tr>
+              <tr><td class="adv-cs-gk">Α</td><td class="adv-cs-gk">α</td><td>alpha</td><td>"a" (father)</td></tr>
+              <tr><td class="adv-cs-gk">Β</td><td class="adv-cs-gk">β</td><td>beta</td><td>"b"</td></tr>
+              <tr><td class="adv-cs-gk">Γ</td><td class="adv-cs-gk">γ</td><td>gamma</td><td>"g" (hard) / "ng" before γ κ χ ξ</td></tr>
+              <tr><td class="adv-cs-gk">Δ</td><td class="adv-cs-gk">δ</td><td>delta</td><td>"d"</td></tr>
+              <tr><td class="adv-cs-gk">Ε</td><td class="adv-cs-gk">ε</td><td>epsilon</td><td>short "e" (met) — always short</td></tr>
+              <tr><td class="adv-cs-gk">Ζ</td><td class="adv-cs-gk">ζ</td><td>zeta</td><td>"dz" or "z"</td></tr>
+              <tr><td class="adv-cs-gk">Η</td><td class="adv-cs-gk">η</td><td>eta</td><td>long "e" (they) — always long</td></tr>
+              <tr><td class="adv-cs-gk">Θ</td><td class="adv-cs-gk">θ</td><td>theta</td><td>"th" (think)</td></tr>
+              <tr><td class="adv-cs-gk">Ι</td><td class="adv-cs-gk">ι</td><td>iota</td><td>"i" (bit) / long "ee"</td></tr>
+              <tr><td class="adv-cs-gk">Κ</td><td class="adv-cs-gk">κ</td><td>kappa</td><td>"k"</td></tr>
+              <tr><td class="adv-cs-gk">Λ</td><td class="adv-cs-gk">λ</td><td>lambda</td><td>"l"</td></tr>
+              <tr><td class="adv-cs-gk">Μ</td><td class="adv-cs-gk">μ</td><td>mu</td><td>"m"</td></tr>
+              <tr><td class="adv-cs-gk">Ν</td><td class="adv-cs-gk">ν</td><td>nu</td><td>"n"</td></tr>
+              <tr><td class="adv-cs-gk">Ξ</td><td class="adv-cs-gk">ξ</td><td>xi</td><td>"ks"</td></tr>
+              <tr><td class="adv-cs-gk">Ο</td><td class="adv-cs-gk">ο</td><td>omicron</td><td>short "o" — always short</td></tr>
+              <tr><td class="adv-cs-gk">Π</td><td class="adv-cs-gk">π</td><td>pi</td><td>"p"</td></tr>
+              <tr><td class="adv-cs-gk">Ρ</td><td class="adv-cs-gk">ρ</td><td>rho</td><td>"r" (looks like P!)</td></tr>
+              <tr><td class="adv-cs-gk">Σ</td><td class="adv-cs-gk">σ / ς</td><td>sigma</td><td>"s" (ς at end of word)</td></tr>
+              <tr><td class="adv-cs-gk">Τ</td><td class="adv-cs-gk">τ</td><td>tau</td><td>"t"</td></tr>
+              <tr><td class="adv-cs-gk">Υ</td><td class="adv-cs-gk">υ</td><td>upsilon</td><td>"u" / "oo"</td></tr>
+              <tr><td class="adv-cs-gk">Φ</td><td class="adv-cs-gk">φ</td><td>phi</td><td>"ph" (phone)</td></tr>
+              <tr><td class="adv-cs-gk">Χ</td><td class="adv-cs-gk">χ</td><td>chi</td><td>"ch" (Bach)</td></tr>
+              <tr><td class="adv-cs-gk">Ψ</td><td class="adv-cs-gk">ψ</td><td>psi</td><td>"ps"</td></tr>
+              <tr><td class="adv-cs-gk">Ω</td><td class="adv-cs-gk">ω</td><td>omega</td><td>long "o" — always long</td></tr>
             </tbody>
           </table>
         </div>
@@ -9580,9 +9580,9 @@ function openAdvCheatSheet(lessonId) {
           <table class="adv-cs-table">
             <thead><tr><th>Always Short</th><th>Always Long</th><th>Either Short or Long</th></tr></thead>
             <tbody>
-              <tr><td>ε (epsilon)</td><td>η (eta)</td><td>α (alpha)</td></tr>
-              <tr><td>ο (omicron)</td><td>ω (omega)</td><td>ι (iota)</td></tr>
-              <tr><td></td><td></td><td>υ (upsilon)</td></tr>
+              <tr><td class="adv-cs-gk">ε <span style="font-size:0.75rem;font-weight:400">(epsilon)</span></td><td class="adv-cs-gk">η <span style="font-size:0.75rem;font-weight:400">(eta)</span></td><td class="adv-cs-gk">α <span style="font-size:0.75rem;font-weight:400">(alpha)</span></td></tr>
+              <tr><td class="adv-cs-gk">ο <span style="font-size:0.75rem;font-weight:400">(omicron)</span></td><td class="adv-cs-gk">ω <span style="font-size:0.75rem;font-weight:400">(omega)</span></td><td class="adv-cs-gk">ι <span style="font-size:0.75rem;font-weight:400">(iota)</span></td></tr>
+              <tr><td></td><td></td><td class="adv-cs-gk">υ <span style="font-size:0.75rem;font-weight:400">(upsilon)</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -9592,13 +9592,13 @@ function openAdvCheatSheet(lessonId) {
           <table class="adv-cs-table">
             <thead><tr><th>Diphthong</th><th>Sounds like</th><th>Example</th></tr></thead>
             <tbody>
-              <tr><td>αι</td><td>"ai" (aisle)</td><td>καί (and)</td></tr>
-              <tr><td>αυ</td><td>"ow" (ouch)</td><td>αὐτός (he/self)</td></tr>
-              <tr><td>ει</td><td>"ei" (eight)</td><td>εἰ (if)</td></tr>
-              <tr><td>ευ</td><td>"eh-oo"</td><td>εὐαγγέλιον (gospel)</td></tr>
-              <tr><td>οι</td><td>"oi" (oil)</td><td>οἶκος (house)</td></tr>
-              <tr><td>ου</td><td>"oo" (food)</td><td>οὐ (not)</td></tr>
-              <tr><td>υι</td><td>"wee"</td><td>υἱός (son)</td></tr>
+              <tr><td class="adv-cs-gk">αι</td><td>"ai" (aisle)</td><td>καί (and)</td></tr>
+              <tr><td class="adv-cs-gk">αυ</td><td>"ow" (ouch)</td><td>αὐτός (he/self)</td></tr>
+              <tr><td class="adv-cs-gk">ει</td><td>"ei" (eight)</td><td>εἰ (if)</td></tr>
+              <tr><td class="adv-cs-gk">ευ</td><td>"eh-oo"</td><td>εὐαγγέλιον (gospel)</td></tr>
+              <tr><td class="adv-cs-gk">οι</td><td>"oi" (oil)</td><td>οἶκος (house)</td></tr>
+              <tr><td class="adv-cs-gk">ου</td><td>"oo" (food)</td><td>οὐ (not)</td></tr>
+              <tr><td class="adv-cs-gk">υι</td><td>"wee"</td><td>υἱός (son)</td></tr>
             </tbody>
           </table>
         </div>
@@ -9606,15 +9606,15 @@ function openAdvCheatSheet(lessonId) {
         <div class="adv-cs-section">
           <h4 class="adv-cs-header">Diacritical Marks</h4>
           <table class="adv-cs-table">
-            <thead><tr><th>Mark</th><th>Name</th><th>What it does</th></tr></thead>
+            <thead><tr><th>Example</th><th>Name</th><th>What it does</th></tr></thead>
             <tbody>
-              <tr><td>᾿</td><td>smooth breathing</td><td>No "h" — all vowel-initial words carry one</td></tr>
-              <tr><td>῾</td><td>rough breathing</td><td>Adds an "h" sound before the vowel</td></tr>
-              <tr><td>´</td><td>acute accent</td><td>Stress/pitch rise on that syllable</td></tr>
-              <tr><td>\`</td><td>grave accent</td><td>Acute shifted before the next word</td></tr>
-              <tr><td>῀</td><td>circumflex</td><td>Rising-then-falling pitch on a long syllable</td></tr>
-              <tr><td>ᾳ ῃ ῳ</td><td>iota subscript</td><td>Silent grammatical marker (was once pronounced)</td></tr>
-              <tr><td>ϊ ϋ</td><td>diaeresis</td><td>Two vowels pronounced separately, not as diphthong</td></tr>
+              <tr><td class="adv-cs-gk">ἀ</td><td>smooth breathing</td><td>No "h" — all vowel-initial words carry one</td></tr>
+              <tr><td class="adv-cs-gk">ἁ</td><td>rough breathing</td><td>Adds an "h" sound before the vowel</td></tr>
+              <tr><td class="adv-cs-gk">ά</td><td>acute accent</td><td>Stress/pitch rise on that syllable</td></tr>
+              <tr><td class="adv-cs-gk">ὰ</td><td>grave accent</td><td>Acute shifted when next word follows closely</td></tr>
+              <tr><td class="adv-cs-gk">ᾶ</td><td>circumflex</td><td>Rising-then-falling pitch on a long syllable</td></tr>
+              <tr><td class="adv-cs-gk">ᾳ ῃ ῳ</td><td>iota subscript</td><td>Silent grammatical marker — signals dative singular</td></tr>
+              <tr><td class="adv-cs-gk">ϊ ϋ</td><td>diaeresis</td><td>Two vowels pronounced separately, not as diphthong</td></tr>
             </tbody>
           </table>
         </div>
@@ -9624,11 +9624,11 @@ function openAdvCheatSheet(lessonId) {
           <table class="adv-cs-table">
             <thead><tr><th>Looks like</th><th>Is actually</th><th>Sound</th></tr></thead>
             <tbody>
-              <tr><td>English "H"</td><td>Η η (eta)</td><td>long "e" — NOT "h"</td></tr>
-              <tr><td>English "P"</td><td>Ρ ρ (rho)</td><td>"r" — NOT "p"</td></tr>
-              <tr><td>English "X"</td><td>Χ χ (chi)</td><td>"ch" (Bach) — NOT "x"</td></tr>
-              <tr><td>English "N"</td><td>Ν ν (nu)</td><td>"n" — same! (safe)</td></tr>
-              <tr><td>English "Y"</td><td>Υ υ (upsilon)</td><td>"u" / "oo" — NOT "y"</td></tr>
+              <tr><td>English "H"</td><td class="adv-cs-gk">Η η <span style="font-size:0.75rem;font-weight:400">(eta)</span></td><td>long "e" — NOT "h"</td></tr>
+              <tr><td>English "P"</td><td class="adv-cs-gk">Ρ ρ <span style="font-size:0.75rem;font-weight:400">(rho)</span></td><td>"r" — NOT "p"</td></tr>
+              <tr><td>English "X"</td><td class="adv-cs-gk">Χ χ <span style="font-size:0.75rem;font-weight:400">(chi)</span></td><td>"ch" (Bach) — NOT "x"</td></tr>
+              <tr><td>English "N"</td><td class="adv-cs-gk">Ν ν <span style="font-size:0.75rem;font-weight:400">(nu)</span></td><td>"n" — same! (safe)</td></tr>
+              <tr><td>English "Y"</td><td class="adv-cs-gk">Υ υ <span style="font-size:0.75rem;font-weight:400">(upsilon)</span></td><td>"u" / "oo" — NOT "y"</td></tr>
             </tbody>
           </table>
         </div>
@@ -9787,6 +9787,110 @@ function openAdvCheatSheet(lessonId) {
           <p><strong>πνεῦμα is neuter</strong> grammatically, but John uses masculine ἐκεῖνος (John 16:13) — theologically significant override</p>
         </div>
       `;
+    } else if (lessonId === "adv_cases") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">Case Endings — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">2nd Declension Masculine — λόγος (word)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Singular</th><th>Plural</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>λόγ<strong>ος</strong></td><td>λόγ<strong>οι</strong></td></tr>
+              <tr><td><strong>Gen.</strong></td><td>λόγ<strong>ου</strong></td><td>λόγ<strong>ων</strong></td></tr>
+              <tr><td><strong>Dat.</strong></td><td>λόγ<strong>ῳ</strong></td><td>λόγ<strong>οις</strong></td></tr>
+              <tr><td><strong>Acc.</strong></td><td>λόγ<strong>ον</strong></td><td>λόγ<strong>ους</strong></td></tr>
+              <tr><td><strong>Voc.</strong></td><td>λόγ<strong>ε</strong></td><td>λόγ<strong>οι</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">2nd Declension Neuter — ἔργον (work)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Singular</th><th>Plural</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom./Voc./Acc.</strong></td><td>ἔργ<strong>ον</strong></td><td>ἔργ<strong>α</strong></td></tr>
+              <tr><td><strong>Gen.</strong></td><td>ἔργ<strong>ου</strong></td><td>ἔργ<strong>ων</strong></td></tr>
+              <tr><td><strong>Dat.</strong></td><td>ἔργ<strong>ῳ</strong></td><td>ἔργ<strong>οις</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">1st Declension Feminine — ἀγάπη (love) &amp; καρδία (heart)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>ἀγάπη sg</th><th>ἀγάπη pl</th><th>καρδία sg</th><th>καρδία pl</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>ἀγάπ<strong>η</strong></td><td>ἀγάπ<strong>αι</strong></td><td>καρδί<strong>α</strong></td><td>καρδί<strong>αι</strong></td></tr>
+              <tr><td><strong>Gen.</strong></td><td>ἀγάπ<strong>ης</strong></td><td>ἀγαπ<strong>ῶν</strong></td><td>καρδί<strong>ας</strong></td><td>καρδι<strong>ῶν</strong></td></tr>
+              <tr><td><strong>Dat.</strong></td><td>ἀγάπ<strong>ῃ</strong></td><td>ἀγάπ<strong>αις</strong></td><td>καρδί<strong>ᾳ</strong></td><td>καρδί<strong>αις</strong></td></tr>
+              <tr><td><strong>Acc.</strong></td><td>ἀγάπ<strong>ην</strong></td><td>ἀγάπ<strong>ας</strong></td><td>καρδί<strong>αν</strong></td><td>καρδί<strong>ας</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">1st Declension Masculine — μαθητής (disciple)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Singular</th><th>Plural</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>μαθητ<strong>ής</strong></td><td>μαθητ<strong>αί</strong></td></tr>
+              <tr><td><strong>Gen.</strong></td><td>μαθητ<strong>οῦ</strong> ← masc. borrows 2nd decl.</td><td>μαθητ<strong>ῶν</strong></td></tr>
+              <tr><td><strong>Dat.</strong></td><td>μαθητ<strong>ῇ</strong></td><td>μαθητ<strong>αῖς</strong></td></tr>
+              <tr><td><strong>Acc.</strong></td><td>μαθητ<strong>ήν</strong></td><td>μαθητ<strong>άς</strong></td></tr>
+              <tr><td><strong>Voc.</strong></td><td>μαθητ<strong>ά</strong></td><td>μαθητ<strong>αί</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Article as Your Parsing Guide — ὁ ἡ τό</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Article</th><th>Case</th><th>Gender</th><th>Number</th></tr></thead>
+            <tbody>
+              <tr><td>ὁ</td><td>Nom.</td><td>Masc.</td><td>Sg.</td></tr>
+              <tr><td>ἡ</td><td>Nom.</td><td>Fem.</td><td>Sg.</td></tr>
+              <tr><td>τό</td><td>Nom./Acc.</td><td>Neut.</td><td>Sg.</td></tr>
+              <tr><td>τοῦ</td><td>Gen.</td><td>Masc./Neut.</td><td>Sg.</td></tr>
+              <tr><td>τῆς</td><td>Gen.</td><td>Fem.</td><td>Sg.</td></tr>
+              <tr><td>τῷ</td><td>Dat.</td><td>Masc./Neut.</td><td>Sg.</td></tr>
+              <tr><td>τῇ</td><td>Dat.</td><td>Fem.</td><td>Sg.</td></tr>
+              <tr><td>τόν</td><td>Acc.</td><td>Masc.</td><td>Sg.</td></tr>
+              <tr><td>τήν</td><td>Acc.</td><td>Fem.</td><td>Sg.</td></tr>
+              <tr><td>οἱ</td><td>Nom.</td><td>Masc.</td><td>Pl.</td></tr>
+              <tr><td>αἱ</td><td>Nom.</td><td>Fem.</td><td>Pl.</td></tr>
+              <tr><td>τά</td><td>Nom./Acc.</td><td>Neut.</td><td>Pl.</td></tr>
+              <tr><td>τῶν</td><td>Gen.</td><td>Any</td><td>Pl.</td></tr>
+              <tr><td>τοῖς / ταῖς</td><td>Dat.</td><td>Masc./Neut. · Fem.</td><td>Pl.</td></tr>
+              <tr><td>τούς / τάς</td><td>Acc.</td><td>Masc. · Fem.</td><td>Pl.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key Signals to Recognize Instantly</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>You see</th><th>It always means</th></tr></thead>
+            <tbody>
+              <tr><td>Iota subscript (-ῳ / -ῃ / -ᾳ)</td><td>Dative singular</td></tr>
+              <tr><td>Circumflex + -ων</td><td>Genitive plural</td></tr>
+              <tr><td>-ου (2nd decl.)</td><td>Genitive singular</td></tr>
+              <tr><td>Neuter: same form nom. &amp; acc.</td><td>Must use context to distinguish</td></tr>
+              <tr><td>-ου in 1st decl. masc. genitive</td><td>Noun is masculine (not feminine)</td></tr>
+              <tr><td>3rd decl.: drop -ος from genitive</td><td>That is the stem for all endings</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">3rd Declension — Finding the Stem</h4>
+          <p>The 3rd declension uses consonant stems. The nominative singular is often irregular — always find the stem by dropping <strong>-ος</strong> from the genitive singular.</p>
+          <p>σάρξ (flesh) → genitive σαρκ<strong>ός</strong> → drop -ος → stem <strong>σαρκ-</strong></p>
+          <p>πνεῦμα (spirit/wind) → genitive πνεύματ<strong>ος</strong> → stem <strong>πνευματ-</strong></p>
+          <p>This is why dictionaries always give: nominative, genitive, article (e.g., σάρξ, σαρκός, ἡ).</p>
+        </div>
+      `;
     } else {
       content.innerHTML = `<p style="opacity:0.6;text-align:center;padding:20px 0">No cheat sheet available for this lesson yet.</p>`;
     }
@@ -9923,6 +10027,36 @@ const ADV_KC_DATA = {
     { feedback: "Nominative feminine plural would be αἱ. τῆς is singular and genitive, not plural or nominative. The plural feminine article forms are αἱ (nom.), τῶν (gen.), ταῖς (dat.), τάς (acc.)." },
     { feedback: "Genitive masculine singular is τοῦ — which also doubles as genitive neuter singular. τῆς is exclusively feminine genitive singular. The η in τῆς is the marker that signals feminine (compare τοῦ with ου vs. τῆς with η)." },
     { correct: true, feedback: "Correct! τῆς is the genitive feminine singular article. So τῆς ἀγαθῆς καρδίας = 'of the good heart' — article, adjective, and noun all agree: genitive, feminine, singular. The agreement across all three words is what holds the phrase together." }
+  ],
+  kc_adv_cases_1: [
+    { feedback: "The -ος ending marks nominative singular in the 2nd declension — that would make it the subject. λόγου has a different ending with a different function." },
+    { correct: true, feedback: "Correct! The ending -ου marks the genitive singular in the 2nd declension — it expresses 'of the word' (possession or relationship). λόγου appears constantly in phrases like 'the word of God' (λόγου θεοῦ)." },
+    { feedback: "Accusative singular in the 2nd declension masculine ends in -ον (λόγον), not -ου. These endings are distinct and signal different grammatical roles." },
+    { feedback: "Dative plural ends in -οις (λόγοις), not -ου. And -ου is singular, not plural." }
+  ],
+  kc_adv_cases_2: [
+    { feedback: "Nominative singular feminine in the 1st declension (η-stem) ends in -η (ἀγάπη), not -ῃ. The iota subscript makes all the difference — it signals the dative." },
+    { feedback: "Genitive singular feminine ends in -ης (ἀγάπης), not -ῃ. Notice: -ης has a plain η, while -ῃ has an iota subscript beneath it." },
+    { correct: true, feedback: "Correct! The iota subscript is the universal dative signal. -ῃ is the dative singular ending for 1st declension feminine nouns, just as -ῳ is the dative singular for 2nd declension masculine/neuter. If you see an iota subscript, it's dative singular — no exceptions in these declensions." },
+    { feedback: "Accusative plural feminine ends in -ας (ἀγάπας), not -ῃ. The iota subscript on -ῃ always signals dative singular, not plural." }
+  ],
+  kc_adv_cases_3: [
+    { correct: true, feedback: "Correct! Masculine 1st declension nouns like μαθητής borrow the genitive singular -ου from the 2nd declension masculine pattern. This is the key signal that tells you the noun is masculine despite living in the 1st declension family. The article confirms it: ὁ μαθητής, not ἡ." },
+    { feedback: "If μαθητής were feminine 1st declension, the genitive singular would be -ης (like ἀγάπης), not -ου. The -ου genitive is the masculine tell — it follows the 2nd declension masculine pattern even though μαθητής belongs to the 1st declension family." },
+    { feedback: "The 3rd declension is a separate family with consonant stems. μαθητής is a 1st declension noun — its nominative -ης ending and 1st declension case forms confirm this. It is masculine, not belonging to the 3rd declension." },
+    { feedback: "-ου is not a marker of neuter gender. Neuter 2nd declension nouns also use -ου in the genitive (like ἔργου), but the ending alone doesn't mark gender — the article does. μαθητοῦ with ὁ = masculine." }
+  ],
+  kc_adv_cases_4: [
+    { feedback: "Nominative plural in the 2nd declension masculine ends in -οι, with no iota subscript. The iota subscript is the exclusive marker of dative singular in 1st and 2nd declension nouns." },
+    { feedback: "Genitive singular ends in -ου (2nd decl.) or -ης (1st decl. fem.). Neither has an iota subscript. The iota subscript appears only in the dative singular: -ῳ for masculine/neuter, -ῃ for feminine." },
+    { correct: true, feedback: "Correct! The iota subscript is the most reliable dative signal in Greek. Whether you see -ῳ (2nd declension) or -ῃ (1st declension feminine) or -ᾳ (1st declension alpha-stem), the iota subscript means dative singular — every time, no exceptions in these declensions." },
+    { feedback: "Accusative plural in the 2nd declension ends in -ους, and in the 1st declension feminine in -ας. Neither uses an iota subscript. The iota subscript is dative singular only." }
+  ],
+  kc_adv_cases_5: [
+    { correct: true, feedback: "Correct! For 3rd declension nouns, always use the genitive singular to find the stem: drop the -ος ending. σαρκός → drop -ος → stem is σαρκ-. All other case endings attach to this stem. This is why Greek lexicons always give the genitive form alongside the nominative." },
+    { feedback: "The nominative form (σάρξ) is NOT the stem in the 3rd declension — this is exactly why the nominative alone is insufficient. The stem is found from the genitive, not the nominative. σάρξ → σαρκός → drop -ος → σαρκ-." },
+    { feedback: "The full genitive form σαρκός is NOT the stem — you must remove the genitive ending -ος to get the bare stem σαρκ-. The stem is what remains after dropping -ος." },
+    { feedback: "The stem is found from the genitive singular, not by manipulating the nominative. σάρξ has ξ as a combined consonant (κ + σ) — the genitive σαρκός reveals the true stem σαρκ-." }
   ]
 };
 
@@ -10112,6 +10246,62 @@ const ADV_QUIZ_DATA = {
       {
         text: "When you encounter the article τῶν before a noun, what do you immediately know about that noun?",
         options: ["It is nominative plural, any gender", "It is genitive plural, any gender", "It is dative singular, masculine or neuter", "It is accusative plural, masculine"],
+        correct: 1
+      }
+    ]
+  },
+  adv_cases: {
+    title: "Case Endings",
+    passMark: 7,
+    questions: [
+      {
+        text: "What is the grammatical function of the nominative case?",
+        options: ["Direct object of the verb", "Subject of the verb", "Possession or relationship", "Indirect object"],
+        correct: 1
+      },
+      {
+        text: "The ending -ου on a 2nd declension masculine noun signals which case and number?",
+        options: ["Nominative singular", "Accusative singular", "Genitive singular", "Dative plural"],
+        correct: 2
+      },
+      {
+        text: "What visual feature always signals the dative singular in 1st and 2nd declension nouns?",
+        options: ["A circumflex accent on the ultima", "An iota subscript beneath the vowel", "A rough breathing mark", "A sigma at the end of the word"],
+        correct: 1
+      },
+      {
+        text: "In the 2nd declension neuter, which two cases always share identical forms?",
+        options: ["Nominative and genitive", "Genitive and dative", "Nominative and accusative", "Dative and accusative"],
+        correct: 2
+      },
+      {
+        text: "The noun μαθητής (disciple) is 1st declension, yet its genitive singular is μαθητοῦ (not μαθητῆς). What does this tell you?",
+        options: ["It is a masculine noun — 1st declension masculine nouns borrow the -ου genitive from the 2nd declension", "It is a neuter noun with irregular genitive", "It is actually a 2nd declension noun in disguise", "The ending -ου here is a 1st declension feminine genitive variant"],
+        correct: 0
+      },
+      {
+        text: "What does a circumflex accent on the ultima -ων signal?",
+        options: ["Nominative singular neuter", "Dative plural", "Genitive plural", "Accusative plural masculine"],
+        correct: 2
+      },
+      {
+        text: "How do you find the stem of a 3rd declension noun?",
+        options: ["Take the nominative singular form as-is", "Drop the -ος ending from the genitive singular", "Drop the final consonant from the nominative", "Use the accusative singular form"],
+        correct: 1
+      },
+      {
+        text: "In the phrase τὸν λόγον, the accusative article τόν and ending -ον tell you the noun is:",
+        options: ["The subject of the sentence", "In a genitive relationship with another noun", "The direct object of the verb", "An indirect object"],
+        correct: 2
+      },
+      {
+        text: "You encounter the word form ἀγάπαις. The ending -αις identifies this as:",
+        options: ["Accusative plural", "Genitive plural", "Dative plural", "Nominative plural"],
+        correct: 2
+      },
+      {
+        text: "In John 3:16, τὸν υἱὸν τὸν μονογενῆ — the repeated article τόν marks both words as accusative masculine singular. Why does this matter for reading?",
+        options: ["It tells us μονογενῆ is the subject of the sentence", "It confirms that μονογενῆ agrees with υἱόν — 'only' describes 'Son', not some other word", "It signals a dative of reference", "It indicates a vocative — God is being addressed"],
         correct: 1
       }
     ]
@@ -12018,11 +12208,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.1";
 
 const UPDATE_NOTES = [
-  "Fix Lessons 3 & 4 structure — dropdowns now work, side padding restored, matches Lesson 1 design",
-  "Lesson 4 now opens with English grammar foundations (subject, object, indirect object, possession, direct address) before introducing Greek cases"
+  "Advanced Lesson 5: Case Endings — full 1st &amp; 2nd declension paradigms, the article as parsing guide, 3rd declension preview, 10-question quiz, and cheat sheet",
+  "Lesson 2 cheat sheet: Greek text now larger and clearer for easier reading of diacritical marks"
 ];
 
 let deferredInstallPrompt = null;
