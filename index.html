@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=72" />
+  <link rel="stylesheet" href="style.css?v=73" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -5129,7 +5129,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
 <div class="settings-card">
   <button id="profileResetBtn" class="danger-btn" onclick="resetAllAppData()">
-  Reset All App Data
+  Delete Account
 </button>
 
 </div>
@@ -5787,6 +5787,74 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 
+<!-- Auth Modal -->
+<div id="authModal" class="modal-overlay auth-modal-overlay">
+  <div class="auth-card" onclick="event.stopPropagation()">
+    <div class="auth-logo">
+      <span class="material-symbols-outlined auth-logo-icon">menu_book</span>
+      <h2 class="auth-logo-title">Basic Greek Trainer</h2>
+      <p class="auth-logo-sub">Your Koine Greek journey starts here</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabCreate" onclick="switchAuthTab('create')">Create Account</button>
+      <button class="auth-tab" id="authTabLogin" onclick="switchAuthTab('login')">Sign In</button>
+    </div>
+    <div id="authCreateForm" class="auth-form">
+      <div class="auth-field">
+        <label class="auth-label">Username <span class="auth-label-hint">used to log in — not shown publicly</span></label>
+        <input type="text" id="authUsername" class="auth-input" placeholder="e.g. john_smith" autocomplete="username" />
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Display Name <button class="auth-info-btn" onclick="showDisplayNameInfo(event)">ⓘ</button></label>
+        <input type="text" id="authDisplayName" class="auth-input" placeholder="e.g. John Smith" />
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password <span class="auth-label-hint">for logging in</span></label>
+        <input type="password" id="authPassword" class="auth-input" placeholder="At least 6 characters" autocomplete="new-password" />
+      </div>
+      <div class="auth-field">
+        <input type="password" id="authPasswordConfirm" class="auth-input" placeholder="Confirm password" autocomplete="new-password" />
+      </div>
+      <p class="auth-error" id="authCreateError"></p>
+      <button class="auth-submit-btn" onclick="submitCreateAccount()">Create Account</button>
+    </div>
+    <div id="authLoginForm" class="auth-form" style="display:none">
+      <div class="auth-field">
+        <label class="auth-label">Username</label>
+        <input type="text" id="authLoginUsername" class="auth-input" placeholder="Your username" autocomplete="username" />
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input type="password" id="authLoginPassword" class="auth-input" placeholder="Your password" autocomplete="current-password" />
+      </div>
+      <p class="auth-error" id="authLoginError"></p>
+      <button class="auth-submit-btn" onclick="submitLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Display Name Info -->
+<div id="displayNameInfoModal" class="modal-overlay" onclick="closeDisplayNameInfo()">
+  <div class="auth-info-card" onclick="event.stopPropagation()">
+    <h3>About Your Display Name</h3>
+    <p>Your display name is what others see on leaderboards. We recommend using your real name so friends and family can find you easily.</p>
+    <p><strong>This name cannot be changed</strong> without contacting the developer, so choose carefully.</p>
+    <button class="auth-submit-btn" onclick="closeDisplayNameInfo()">Got it</button>
+  </div>
+</div>
+
+<!-- Leaderboard Join Confirm -->
+<div id="lbConfirmModal" class="modal-overlay" onclick="closeLbConfirmModal()">
+  <div class="lb-confirm-card" onclick="event.stopPropagation()">
+    <h3 id="lbConfirmTitle">Join Board</h3>
+    <p id="lbConfirmMsg"></p>
+    <div class="lb-name-btns">
+      <button class="lb-cancel-btn" onclick="closeLbConfirmModal()">Cancel</button>
+      <button class="lb-primary-btn" id="lbConfirmJoinBtn" onclick="confirmLbJoin()">Join →</button>
+    </div>
+  </div>
+</div>
+
 <div id="profileModal" class="modal-overlay" onclick="closeProfileModal(event)">
   <div class="modal-card profile-card" onclick="event.stopPropagation()">
 
@@ -5810,6 +5878,7 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
 
       <h2 id="profileDisplayName">Greek Student</h2>
+      <p id="profileUsername" class="profile-username-label"></p>
       <div id="profileBadgeRow" class="profile-badge-row"></div>
 
      <div class="profile-title-row">
@@ -5903,57 +5972,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 
-  <div id="profileSetupFields" class="profile-setup-fields">
-  <label class="label">First Name</label>
-  <input
-    type="text"
-    id="profileFirstNameInput"
-    maxlength="18"
-    placeholder="First name"
-    oninput="previewProfileName()"
-  />
-
-  <label class="label">Last Name</label>
-  <input
-    type="text"
-    id="profileLastNameInput"
-    maxlength="18"
-    placeholder="Last name"
-    oninput="previewProfileName()"
-  />
-
-  <label class="label">What's Your Greek Experience?</label>
-
-  <div class="experience-choice-grid">
-    <button
-      type="button"
-      id="newGreekBtn"
-      class="experience-choice selected"
-      onclick="selectGreekExperience('new')"
-    >
-      Completely New
-    </button>
-
-    <button
-      type="button"
-      id="basicGreekBtn"
-      class="experience-choice"
-      onclick="selectGreekExperience('basic')"
-    >
-      Familiar with Basics
-    </button>
-  </div>
-
-  <button
-    type="button"
-    class="text-btn basics-info-btn"
-    onclick="showBasicsInfoModal()"
-  >
-    What does “familiar with basics” mean?
-  </button>
-</div>
-
-    <label class="label">Profile Color</label>
+    <label class=”label”>Profile Color</label>
 
     <div class="profile-color-grid">
   <button class="color-dot blue" onclick="setProfileColor('#4f8cff')" title="Blue"></button>
@@ -5975,14 +5994,12 @@ OneSignalDeferred.push(async function(OneSignal) {
   />
 </div>
 
-    <button id="saveProfileBtn" class="main-btn" onclick="saveProfileName()">
-  Create Profile
-</button>
-
-
-
     <button id="profileSettingsBtn" class="main-btn try-app-btn" onclick="openSettingsFromProfile()">
   Settings
+</button>
+    <button class="main-btn try-app-btn" onclick="signOutAccount()">
+  <span class="material-symbols-outlined">logout</span>
+  <span>Sign Out</span>
 </button>
 
   <button id="profileNotificationBtn" class="main-btn try-app-btn" onclick="openNotificationSettings()">
@@ -6078,9 +6095,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=72"></script>
-  <script src="app.js?v=72"></script>
-  <script type="module" src="firebase-lb.js?v=72"></script>
+  <script src="vocab.js?v=73"></script>
+  <script src="app.js?v=73"></script>
+  <script type="module" src="firebase-lb.js?v=73"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -6152,18 +6169,6 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 <!-- Name Entry Modal -->
-<div id="lbNameModal" class="modal-overlay" onclick="lbNameOverlayClick(event)">
-  <div class="lb-name-card">
-    <h3 id="lbNameModalTitle">Join the Leaderboard</h3>
-    <p class="lb-name-warning">⚠️ Your display name <strong>cannot be changed</strong> after you join.</p>
-    <input id="lbNameInput" class="lb-name-input" type="text" placeholder="Your name (max 24 chars)" maxlength="24" onkeydown="if(event.key==='Enter')confirmLbName()" />
-    <div class="lb-name-btns">
-      <button class="lb-cancel-btn" onclick="closeLbNameModal()">Cancel</button>
-      <button class="lb-primary-btn" onclick="confirmLbName()">Confirm →</button>
-    </div>
-  </div>
-</div>
-
 <!-- Scholar Test Modal -->
 <div id="lbScholarModal" class="modal-overlay lb-scholar-overlay">
   <div class="lb-scholar-card">
@@ -6272,22 +6277,6 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 
-<div id="welcomeBackModal" class="modal-overlay">
-  <div class="modal-card welcome-back-card">
-    <button class="modal-close" onclick="hideWelcomeBackModal()">×</button>
-
-    <div class="welcome-back-kicker">Welcome Back</div>
-    <h2 id="welcomeBackTitle">Welcome back!</h2>
-    <p id="welcomeBackSession"></p>
-
-    <div class="welcome-back-fact">
-      <strong>Quick Bible Greek Fact</strong>
-      <p id="welcomeBackFact"></p>
-    </div>
-
-    <button class="main-btn" onclick="hideWelcomeBackModal()">Get back to Learning</button>
-  </div>
-</div>
 
 <div id="profileFocusOverlay" class="profile-focus-overlay hidden"></div>
 
