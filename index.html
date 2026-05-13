@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=71" />
+  <link rel="stylesheet" href="style.css?v=72" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -5809,12 +5809,7 @@ OneSignalDeferred.push(async function(OneSignal) {
         </button>
       </div>
 
-      <div class="profile-name-row">
-        <h2 id="profileDisplayName">Greek Student</h2>
-        <button class="profile-info-btn" onclick="showProfileInfoModal()" title="Account info">
-          <span class="material-symbols-outlined">info</span>
-        </button>
-      </div>
+      <h2 id="profileDisplayName">Greek Student</h2>
       <div id="profileBadgeRow" class="profile-badge-row"></div>
 
      <div class="profile-title-row">
@@ -5880,6 +5875,11 @@ OneSignalDeferred.push(async function(OneSignal) {
     <div class="journey-stat">
       <strong id="profileTimeStat">0m</strong>
       <span>Time Studied</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileJoinStat">—</strong>
+      <span>Member Since</span>
     </div>
   </div>
 
@@ -6078,9 +6078,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=71"></script>
-  <script src="app.js?v=71"></script>
-  <script type="module" src="firebase-lb.js?v=71"></script>
+  <script src="vocab.js?v=72"></script>
+  <script src="app.js?v=72"></script>
+  <script type="module" src="firebase-lb.js?v=72"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -6449,28 +6449,28 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 </div>
 
-<!-- Profile Info Modal -->
-<div id="profileInfoModal" class="modal-overlay" onclick="closeProfileInfoModal()">
-  <div class="profile-info-card">
-    <div class="profile-info-header">
-      <span class="material-symbols-outlined profile-info-icon">account_circle</span>
-      <h3>Account Info</h3>
-    </div>
-    <div class="profile-info-row">
-      <span class="material-symbols-outlined">calendar_today</span>
-      <div>
-        <strong>Member Since</strong>
-        <span id="profileInfoJoinDate">—</span>
+<!-- Leaderboard User Info Modal -->
+<div id="lbUserModal" class="modal-overlay" onclick="closeLbUserModal()">
+  <div class="lb-user-card">
+    <div class="lb-user-avatar" id="lbUserAvatar"></div>
+    <p class="lb-user-name" id="lbUserName"></p>
+    <div class="lb-user-stats">
+      <div class="lb-user-stat">
+        <span class="material-symbols-outlined">calendar_today</span>
+        <div>
+          <strong>Member Since</strong>
+          <span id="lbUserJoinDate">—</span>
+        </div>
+      </div>
+      <div class="lb-user-stat">
+        <span class="material-symbols-outlined">schedule</span>
+        <div>
+          <strong>Time in App</strong>
+          <span id="lbUserTime">—</span>
+        </div>
       </div>
     </div>
-    <div class="profile-info-row">
-      <span class="material-symbols-outlined">schedule</span>
-      <div>
-        <strong>Total Time in App</strong>
-        <span id="profileInfoTime">—</span>
-      </div>
-    </div>
-    <button class="lb-primary-btn" onclick="closeProfileInfoModal()">Close</button>
+    <button class="lb-cancel-btn" onclick="closeLbUserModal()">Close</button>
   </div>
 </div>
 

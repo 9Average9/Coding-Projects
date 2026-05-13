@@ -9665,36 +9665,50 @@ body.dark .lb-badge-cons   { background: rgba(252,165,165,0.2); color: #f87171; 
 .avatar-upload-btn .material-symbols-outlined { font-size: 22px; }
 
 /* Profile info modal */
-.profile-info-card {
+.lb-user-card {
   background: var(--card-color);
   border-radius: 20px;
   padding: 28px 22px 22px;
   max-width: 320px;
   width: 90%;
   box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-}
-.profile-info-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 22px;
+  gap: 6px;
 }
-.profile-info-icon { font-size: 2.4rem !important; color: var(--secondary-color); }
-.profile-info-header h3 { font-size: 1.1rem; font-weight: 900; color: var(--font-color); margin: 0; }
-.profile-info-row {
+.lb-user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--secondary-color) 15%, var(--card-color));
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.lb-user-avatar .material-symbols-outlined { font-size: 30px; color: var(--secondary-color); }
+.lb-user-name { font-size: 1.1rem; font-weight: 900; color: var(--font-color); margin: 0 0 12px; }
+.lb-user-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 16px;
+}
+.lb-user-stat {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: 0;
 }
-.profile-info-row:last-of-type { border-bottom: none; margin-bottom: 16px; }
-.profile-info-row > .material-symbols-outlined { font-size: 20px; color: var(--secondary-color); margin-top: 2px; flex-shrink: 0; }
-.profile-info-row > div { display: flex; flex-direction: column; gap: 2px; }
-.profile-info-row strong { font-size: 0.78rem; color: var(--font-color); opacity: 0.55; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.profile-info-row span { font-size: 0.98rem; font-weight: 700; color: var(--font-color); }
+.lb-user-stat:last-child { border-bottom: none; }
+.lb-user-stat > .material-symbols-outlined { font-size: 20px; color: var(--secondary-color); margin-top: 2px; flex-shrink: 0; }
+.lb-user-stat > div { display: flex; flex-direction: column; gap: 2px; }
+.lb-user-stat strong { font-size: 0.78rem; color: var(--font-color); opacity: 0.55; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.lb-user-stat span { font-size: 0.98rem; font-weight: 700; color: var(--font-color); }
 
 /* Leaderboard rank badges (replacing medal emojis) */
 .lb-rank-badge {
