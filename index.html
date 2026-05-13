@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=67" />
+  <link rel="stylesheet" href="style.css?v=68" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -384,6 +384,10 @@ OneSignalDeferred.push(async function(OneSignal) {
   <span>Test</span>
 </button>
 
+<button class="main-btn home-action lb-home-btn" onclick="openLeaderboard()">
+  <span class="material-symbols-outlined">emoji_events</span>
+  <span>Leaderboard</span>
+</button>
 
     </section>
  <section id="newLearnMenu" class="screen">
@@ -5801,6 +5805,7 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
 
       <h2 id="profileDisplayName">Greek Student</h2>
+      <div id="profileBadgeRow" class="profile-badge-row"></div>
 
      <div class="profile-title-row">
   <div class="profile-title" id="profileTitle">
@@ -6063,8 +6068,102 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=67"></script>
-  <script src="app.js?v=67"></script>
+  <script src="vocab.js?v=68"></script>
+  <script src="app.js?v=68"></script>
+  <script type="module" src="firebase-lb.js?v=68"></script>
+
+<!-- Leaderboard Intro Modal -->
+<div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
+  <div class="lb-intro-card">
+    <div class="lb-intro-trophy">🏆</div>
+    <h2>Church Leaderboard</h2>
+    <p class="lb-intro-desc">See how your Greek journey stacks up with your church community. Everything is opt-in — you choose what to share.</p>
+    <div class="lb-intro-boards">
+      <div class="lb-intro-board-item">
+        <span class="lb-intro-board-icon">⚡</span>
+        <strong>Global XP</strong>
+        <span>Ranked by total XP earned</span>
+      </div>
+      <div class="lb-intro-board-item">
+        <span class="lb-intro-board-icon">📖</span>
+        <strong>Scholar</strong>
+        <span>3-min vocab challenge</span>
+      </div>
+      <div class="lb-intro-board-item">
+        <span class="lb-intro-board-icon">🔥</span>
+        <strong>Consistency</strong>
+        <span>Longest daily streak</span>
+      </div>
+    </div>
+    <button class="lb-primary-btn" onclick="closeLbIntro()">Let's Go →</button>
+  </div>
+</div>
+
+<!-- Main Leaderboard Modal -->
+<div id="lbModal" class="modal-overlay lb-modal-overlay" onclick="lbOverlayClick(event)">
+  <div class="lb-modal">
+    <div class="lb-modal-header">
+      <span class="lb-modal-title">🏆 Leaderboard</span>
+      <button class="modal-close" onclick="closeLbModal()">×</button>
+    </div>
+    <div class="lb-tabs">
+      <button class="lb-tab-btn active" data-tab="xp" onclick="showLbTab('xp')">⚡ XP</button>
+      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">📖 Scholar</button>
+      <button class="lb-tab-btn" data-tab="cons" onclick="showLbTab('cons')">🔥 Streak</button>
+    </div>
+
+    <div id="lbPaneXP" class="lb-tab-pane active" data-tab="xp">
+      <p class="lb-board-desc">Ranked by total XP earned. Your XP syncs live if you opt in.</p>
+      <div class="lb-list" id="lbListXP"></div>
+      <div class="lb-join-area" id="lbJoinXP"></div>
+    </div>
+
+    <div id="lbPaneScholar" class="lb-tab-pane" data-tab="scholar">
+      <p class="lb-board-desc">Most vocab words correctly identified in 3 minutes wins.</p>
+      <div class="lb-list" id="lbListScholar"></div>
+      <div class="lb-join-area" id="lbJoinScholar"></div>
+    </div>
+
+    <div id="lbPaneCons" class="lb-tab-pane" data-tab="cons">
+      <p class="lb-board-desc">Ranked by longest consecutive daily study streak.</p>
+      <div class="lb-list" id="lbListCons"></div>
+      <div class="lb-join-area" id="lbJoinCons"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Name Entry Modal -->
+<div id="lbNameModal" class="modal-overlay" onclick="lbNameOverlayClick(event)">
+  <div class="lb-name-card">
+    <h3 id="lbNameModalTitle">Join the Leaderboard</h3>
+    <p class="lb-name-warning">⚠️ Your display name <strong>cannot be changed</strong> after you join.</p>
+    <input id="lbNameInput" class="lb-name-input" type="text" placeholder="Your name (max 24 chars)" maxlength="24" onkeydown="if(event.key==='Enter')confirmLbName()" />
+    <div class="lb-name-btns">
+      <button class="lb-cancel-btn" onclick="closeLbNameModal()">Cancel</button>
+      <button class="lb-primary-btn" onclick="confirmLbName()">Confirm →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scholar Test Modal -->
+<div id="lbScholarModal" class="modal-overlay lb-scholar-overlay">
+  <div class="lb-scholar-card">
+    <div class="lb-scholar-header">
+      <div class="lb-scholar-timer-wrap">
+        <span class="material-symbols-outlined">timer</span>
+        <span id="scholarTimer">3:00</span>
+      </div>
+      <div class="lb-scholar-score-wrap">Score: <strong id="scholarScore">0</strong></div>
+    </div>
+    <p class="lb-scholar-prompt">Do you know this word?</p>
+    <div class="lb-scholar-word" id="scholarGreekWord"></div>
+    <div class="lb-scholar-btns">
+      <button class="lb-skip-btn" onclick="skipScholarCard()">Skip →</button>
+      <button class="lb-know-btn" onclick="knowScholarCard()">✓ I Know It</button>
+    </div>
+    <p class="lb-scholar-hint">Tap "I Know It" only if you can translate it — honor system!</p>
+  </div>
+</div>
 
 <!-- Install App Modal -->
 <div id="installAppModal" class="modal-overlay" onclick="closeInstallAppModal(event)">
