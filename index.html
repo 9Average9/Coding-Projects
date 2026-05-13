@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=79" />
+  <link rel="stylesheet" href="style.css?v=80" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -5225,6 +5225,306 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div><!-- /adv_alphabetLesson -->
 
 
+<div id="adv_pronunciationLesson" class="adv-learn-lesson">
+  <div class="adv-lesson-header">
+    <button class="adv-back-btn" onclick="closeAdvancedLesson()">← Back</button>
+    <div class="adv-lesson-meta">
+      <span class="adv-lesson-number">Advanced · Lesson 3</span>
+      <h2 class="adv-lesson-title">Syllables, Accents &amp; Pronunciation</h2>
+    </div>
+  </div>
+
+  <div class="lesson-module">
+
+    <!-- Block 1: What Is a Syllable? -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">1 · What Is a Syllable in Greek?</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Every Greek word is divided into <strong>syllables</strong> — the building blocks of pronunciation. Understanding syllables is not just about saying words correctly; it is essential for reading accents, which are tied directly to syllable position and length.</p>
+        <p>The rule is elegantly simple: <strong>every syllable contains exactly one vowel or one diphthong</strong>. That's it. You never have a syllable without a vowel, and you never cram two separate vowels into the same syllable unless they form a diphthong.</p>
+        <p>So to count syllables in a Greek word, just count the vowels and diphthongs:</p>
+        <ul>
+          <li><strong>λόγος</strong> (word) → o, o → 2 syllables: λό-γος</li>
+          <li><strong>ἄνθρωπος</strong> (man/human) → α, ω, ο → 3 syllables: ἄν-θρω-πος</li>
+          <li><strong>εὐαγγέλιον</strong> (gospel) → ευ, α, ε, ι, ο → 5 syllables: εὐ-αγ-γέ-λι-ον</li>
+        </ul>
+        <p>Diphthongs — two vowels that merge into one sound (like αι, ου, ει) — always count as a single syllable unit. They cannot be split.</p>
+      </div>
+    </div>
+
+    <!-- KC 1 -->
+    <div class="knowledge-check" id="kc_adv_pronunciation_1">
+      <p class="kc-question">How many syllables does the word <strong>ἀπόστολος</strong> (apostle) have?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_1', this)">2</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronunciation_1', this)">3</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronunciation_1', this)">4</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronunciation_1', this)">5</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronunciation_1_fb"></div>
+    </div>
+
+    <!-- Block 2: Syllabification Rules -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">2 · How to Split Greek Words into Syllables</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek syllabification follows consistent rules that help you both pronounce words and understand where accents can fall.</p>
+        <p><strong>Rule 1 — Single consonant between vowels:</strong> It goes with the following vowel.<br>
+        λό-γος (not λόγ-ος) &nbsp;|&nbsp; θε-ός (not θεό-ς)</p>
+        <p><strong>Rule 2 — Two consonants between vowels:</strong> Usually split between them.<br>
+        ἄν-θρω-πος &nbsp;|&nbsp; ἔμ-προ-σθεν (before)</p>
+        <p><strong>Rule 3 — Consonant clusters that can begin a word:</strong> Stay together with the next syllable.<br>
+        Greek allows words to begin with στ, πν, γν, πρ, etc. So if a cluster could start a word, it starts a syllable instead of splitting: ε-στίν (he is).</p>
+        <p><strong>Rule 4 — Compound words:</strong> Split at the seam between the original parts.<br>
+        ἐκ-κλησία (church — from ἐκ + καλέω) shows the prefix boundary.</p>
+        <p><strong>Double letters</strong> (like γγ, ττ) always split: ἐγ-γύς (near).</p>
+        <p>The practical payoff: once you can syllabify a word, you can correctly identify the <em>antepenult</em> (third-to-last syllable), <em>penult</em> (second-to-last), and <em>ultima</em> (last) — which is exactly the language grammarians use when explaining accent rules.</p>
+      </div>
+    </div>
+
+    <!-- Block 3: The Three Accent Marks -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">3 · The Three Accent Marks — Shapes &amp; Names</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek has three distinct accent marks, and each has a specific shape, name, and set of rules about where it may appear:</p>
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Mark</th><th>Name</th><th>Shape</th><th>Where it appears</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ά</strong></td><td>Acute (ὀξεῖα)</td><td>Slants up →</td><td>Any of the last 3 syllables</td></tr>
+              <tr><td><strong>ὰ</strong></td><td>Grave (βαρεῖα)</td><td>Slants down ←</td><td>Only on the ultima</td></tr>
+              <tr><td><strong>ᾶ</strong></td><td>Circumflex (περισπωμένη)</td><td>Curved ~ over vowel</td><td>Only on the last 2 syllables</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Every Greek word of more than one syllable carries exactly one accent. One-syllable words (called <em>enclitics</em> or <em>proclitics</em>) sometimes carry no accent because they lean on adjacent words.</p>
+        <p>The names in Greek are descriptive: <em>ὀξεῖα</em> means "sharp" (a sharp rise in pitch), <em>βαρεῖα</em> means "heavy" (the pitch falls), and <em>περισπωμένη</em> means "circumflexed" (pitch rises then falls on a single long syllable).</p>
+      </div>
+    </div>
+
+    <!-- Block 4: Accents Were Pitch, Not Stress -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">4 · Accents Marked Pitch, Not Stress</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Here is something that surprises most English speakers: Greek accent marks did not originally indicate <em>stress</em> the way English accents do. They indicated <strong>pitch</strong> — the rising and falling of the voice on a musical tone.</p>
+        <p>Ancient Greek was a <strong>pitch-accent language</strong> (also called a tonal language), similar in concept to modern Mandarin or Japanese pitch systems. The acute accent raised the pitch, the circumflex involved a rise-then-fall on a long syllable, and the grave replaced an acute when the next word followed immediately.</p>
+        <p>By the Byzantine period (roughly AD 300–600), the pitch distinction collapsed and Greek became a <strong>stress-accent language</strong> — which is why modern Greek speakers treat accents exactly like English stress marks.</p>
+        <p>For learning Koine Greek, most teachers use the <em>stress</em> interpretation: the accented syllable is simply spoken louder or more prominently. This is the practical approach Mounce uses, and it works well for reading and vocabulary. But knowing the historical pitch background helps you understand why the accent rules are sometimes complex — they were designed for a musical pitch system, not a stress system.</p>
+        <p>The key takeaway: <strong>accent marks are your friends</strong>. They help you identify word forms, distinguish words that would otherwise look identical, and read Greek aloud naturally.</p>
+      </div>
+    </div>
+
+    <!-- KC 2 -->
+    <div class="knowledge-check" id="kc_adv_pronunciation_2">
+      <p class="kc-question">What did Greek accent marks originally indicate in the ancient language?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_2', this)">Stress/loudness on a syllable</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronunciation_2', this)">Musical pitch (rise and fall of the voice)</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronunciation_2', this)">The length of the vowel</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronunciation_2', this)">Whether the word was a verb or noun</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronunciation_2_fb"></div>
+    </div>
+
+    <!-- Block 5: Acute Accent Rules -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">5 · Rules for the Acute Accent</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>acute accent (´)</strong> is the most common accent in Greek. It can appear on any of the last three syllables of a word — the antepenult, penult, or ultima — but with one important restriction:</p>
+        <p><strong>If the ultima (last syllable) is long, the acute can only appear on the penult or ultima — not the antepenult.</strong></p>
+        <p>This is why accent positions shift when endings change. Take λόγος (word, nominative): the acute sits on the antepenult (λό-γος). But in the genitive form λόγου, the ending -ου is a long diphthong. Now the antepenult is off-limits, so the accent moves to the penult: λόγου (though in practice this particular word keeps the accent on the same syllable — the rule matters more with 3-syllable forms).</p>
+        <p><strong>Acute → Grave shift:</strong> When an acute sits on the ultima and another word immediately follows (with no punctuation between them), the acute becomes a grave: λόγον τοῦτον. This is purely phonological — the pitch lowers before flowing into the next word. It does not change the word's meaning or grammatical function.</p>
+        <p>The practical rule most students use: <em>the acute can sit on any of the last three syllables, but is forced closer to the end when the ultima is long</em>.</p>
+      </div>
+    </div>
+
+    <!-- Block 6: Circumflex Rules -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">6 · Rules for the Circumflex Accent</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>circumflex (~)</strong> is the most restricted accent. It has two absolute requirements:</p>
+        <ol>
+          <li><strong>It can only appear on the last two syllables</strong> — the penult or ultima. Never the antepenult.</li>
+          <li><strong>It can only appear on a long vowel or long diphthong.</strong> Because the circumflex represents a rise-then-fall of pitch, it physically requires a long syllable to play out on. Short syllables cannot carry a circumflex.</li>
+        </ol>
+        <p>On the <strong>penult</strong>: the circumflex appears when the penult is long AND the ultima is short. If the ultima is long, the acute is used instead (even on a long penult).</p>
+        <p>On the <strong>ultima</strong>: the circumflex appears on many contracted forms and certain noun/verb endings. The genitive plural ending -ων always carries a circumflex (e.g., λόγων — of words).</p>
+        <p>Watch for circumflexes as signals: a circumflex on the ultima often marks the genitive plural. A circumflex on a contracted verb form (like ποιεῖ — he does) signals that two vowels were compressed into one long sound.</p>
+      </div>
+    </div>
+
+    <!-- KC 3 -->
+    <div class="knowledge-check" id="kc_adv_pronunciation_3">
+      <p class="kc-question">Which is true of the circumflex accent?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_3', this)">It can appear on any of the last three syllables</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronunciation_3', this)">It can appear on short or long vowels</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronunciation_3', this)">It can only appear on long vowels in the last two syllables</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronunciation_3', this)">It always indicates the genitive plural</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronunciation_3_fb"></div>
+    </div>
+
+    <!-- Block 7: Recessive Accent (Verbs) -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">7 · Recessive Accent — How Verbs Are Accented</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek finite verbs follow what grammarians call the <strong>recessive accent rule</strong>: the accent recedes (moves back) as far from the end of the word as the rules allow.</p>
+        <p>In practice this means:</p>
+        <ul>
+          <li>If the ultima is short, the accent goes on the <strong>antepenult</strong> (third-to-last syllable)</li>
+          <li>If the ultima is long, the accent is forced to the <strong>penult</strong> (second-to-last)</li>
+        </ul>
+        <p>Examples with λύω (I loose/release):</p>
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Form</th><th>Meaning</th><th>Accent position</th></tr></thead>
+            <tbody>
+              <tr><td>λύ-ω</td><td>I loose</td><td>Penult (ultima -ω is long)</td></tr>
+              <tr><td>λύ-εις</td><td>you loose</td><td>Penult (ultima -εις counts long)</td></tr>
+              <tr><td>λύ-ει</td><td>he/she loosens</td><td>Penult (ultima -ει is long)</td></tr>
+              <tr><td>λύ-ο-μεν</td><td>we loose</td><td>Antepenult (ultima -μεν is short)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Why does this matter practically? Because when you see an accent on the antepenult of a verb form, it's a signal that the ultima is short — and that tells you something about the ending and therefore the person/number. Accents carry grammatical information even when you aren't explicitly analyzing them.</p>
+      </div>
+    </div>
+
+    <!-- Block 8: Persistent Accent (Nouns) -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">8 · Persistent Accent — How Nouns Are Accented</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Nouns follow the opposite principle from verbs: the <strong>persistent accent rule</strong>. A noun tries to keep (persist in) the same syllable position as the lexical form (the form you'd find in a dictionary), shifting only as much as the accent rules require.</p>
+        <p>This means you need to learn where each noun is accented in its dictionary form — that accent wants to stay there through all the case endings, moving only when a long ultima forces it toward the end.</p>
+        <p>Take λόγος (word, masculine), accented on the first syllable (λό-):</p>
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Form</th><th>Case</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td>λόγος</td><td>Nominative sg.</td><td>Accent on penult (antepenult blocked by long ultima -ος? No — -ος is short here)</td></tr>
+              <tr><td>λόγου</td><td>Genitive sg.</td><td>-ου is a long diphthong; accent stays on penult</td></tr>
+              <tr><td>λόγῳ</td><td>Dative sg.</td><td>-ῳ is long; accent stays on penult</td></tr>
+              <tr><td>λόγον</td><td>Accusative sg.</td><td>-ον is short; accent on penult still</td></tr>
+              <tr><td>λόγων</td><td>Genitive pl.</td><td>-ων forces circumflex on penult (long syllable + short ultima rule → circumflex)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Accent shifts in nouns are a goldmine for parsing. Once you know the accent rules, a circumflex on the ultima (-ῶν) shouts "genitive plural!" A shift from penult to ultima in certain noun families indicates a specific case. You don't need to memorize these now — but knowing they exist prepares you to use them.</p>
+      </div>
+    </div>
+
+    <!-- KC 4 -->
+    <div class="knowledge-check" id="kc_adv_pronunciation_4">
+      <p class="kc-question">Greek finite verbs follow which accent rule?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_4', this)">Persistent accent — stay on the same syllable as the dictionary form</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronunciation_4', this)">Recessive accent — move as far back from the end as rules allow</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronunciation_4', this)">Always accent the ultima</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronunciation_4', this)">Always use the circumflex</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronunciation_4_fb"></div>
+    </div>
+
+    <!-- Block 9: Erasmian vs Modern Greek -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">9 · Erasmian vs. Modern Greek Pronunciation</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>When you study biblical Greek, you will encounter two competing pronunciation systems. Understanding the difference matters because each has real advantages — and real trade-offs.</p>
+        <p><strong>Erasmian pronunciation</strong> (named after the Renaissance scholar Erasmus, c. 1466–1536) attempts to reconstruct the distinct sounds of ancient Greek. Key features:</p>
+        <ul>
+          <li>η (eta) ≠ ι (iota) — they are different sounds ("ey" vs. "ee")</li>
+          <li>ει, η, ι, υ, οι are all pronounced differently</li>
+          <li>β is "b," not "v"</li>
+          <li>Every letter retains a distinct sound</li>
+        </ul>
+        <p><strong>Modern Greek pronunciation</strong> (how Greeks speak today) has undergone centuries of sound mergers:</p>
+        <ul>
+          <li>η, ι, υ, ει, οι all sound identical — the "ee" sound (called <em>iotacism</em>)</li>
+          <li>β is now "v" (like English "vine")</li>
+          <li>γ before front vowels is "y" or "gh"</li>
+        </ul>
+        <p><strong>Why Erasmian is used in most seminary and university classrooms:</strong> Because it preserves sound distinctions that help you recognize different Greek letters and endings. If η and ι both sound like "ee," how do you distinguish an η-ending from an ι-ending when listening to someone read? You can't. Erasmian keeps them separate, which aids spelling, vocabulary, and learning.</p>
+        <p><strong>The honest caveat:</strong> Erasmian is probably not exactly how Koine Greek actually sounded in the 1st century. The koine period had already seen some sound mergers from Classical Greek. Some scholars prefer a reconstructed "Koine" pronunciation that splits the difference. For now, Erasmian gives you the clearest path to learning to read, and it's what Mounce uses.</p>
+      </div>
+    </div>
+
+    <!-- Block 10: Elision, Moveable Nu, and Putting It Together -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">10 · Elision, Moveable Nu &amp; Reading It All Together</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Two small but very common pronunciation phenomena round out the picture:</p>
+        <p><strong>Elision</strong> — when a preposition or small word ending in a short vowel is followed by a word beginning with a vowel, the short vowel drops and is replaced by an apostrophe. The words flow together without a vowel clash:</p>
+        <ul>
+          <li>ἀπό + αὐτοῦ → ἀπ' αὐτοῦ (from him)</li>
+          <li>ἀλλά + ἐγώ → ἀλλ' ἐγώ (but I)</li>
+        </ul>
+        <p>You will encounter this constantly. The apostrophe is the signal — it tells you a vowel was dropped. The meaning is unchanged.</p>
+        <p><strong>Moveable nu (ν)</strong> — certain verb forms and the word ἐστί(ν) can optionally add a final ν when the next word begins with a vowel (or at the end of a clause). It's purely phonetic smoothing — the same reason English speakers say "a apple" vs. "an apple."</p>
+        <ul>
+          <li>ἐστίν ἀγαθός (he is good) — moveable ν appears before vowel</li>
+          <li>ἐστί ποιμήν (he is a shepherd) — ν dropped before consonant</li>
+        </ul>
+        <p><strong>Reading everything together:</strong> You now have all the tools — letters, diphthongs, breathing marks, syllabification, accent rules, and pronunciation system. The next step is simply practice. Read Greek out loud, slowly at first, calling out each letter. The sounds will become automatic faster than you expect. Every Greek scholar you admire started exactly where you are now.</p>
+      </div>
+    </div>
+
+    <!-- KC 5 -->
+    <div class="knowledge-check" id="kc_adv_pronunciation_5">
+      <p class="kc-question">What is the primary reason Erasmian pronunciation is used in most Greek textbooks and classrooms?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronunciation_5', this)">It perfectly matches how Koine Greek sounded in the 1st century</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronunciation_5', this)">It is identical to modern Greek, making it easier to learn</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronunciation_5', this)">It preserves distinct sounds for letters that have merged in modern Greek, helping students distinguish endings</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronunciation_5', this)">It was the system used by the apostles themselves</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronunciation_5_fb"></div>
+    </div>
+
+    <!-- Quiz Start -->
+    <div class="adv-quiz-start-area" id="quizStart_adv_pronunciation">
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_pronunciation">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_pronunciation" disabled onclick="openAdvQuiz('adv_pronunciation')">
+        Take the Lesson Quiz →
+      </button>
+    </div>
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_pronunciationLesson -->
+
+
 </section>
 
     <section id="learnMenu" class="screen">
@@ -6596,9 +6896,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=79"></script>
-  <script src="app.js?v=79"></script>
-  <script type="module" src="firebase-lb.js?v=79"></script>
+  <script src="vocab.js?v=80"></script>
+  <script src="app.js?v=80"></script>
+  <script type="module" src="firebase-lb.js?v=80"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
