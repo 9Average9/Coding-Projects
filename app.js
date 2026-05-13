@@ -9714,6 +9714,81 @@ function openAdvCheatSheet(lessonId) {
         </div>
       `;
     } else {
+    } else if (lessonId === "adv_nouns") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">The Greek Noun System — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Five Cases</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Function</th><th>English signal</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nominative</strong></td><td>Subject of the verb</td><td>"the ___"</td></tr>
+              <tr><td><strong>Genitive</strong></td><td>Possession / relationship</td><td>"of the ___"</td></tr>
+              <tr><td><strong>Dative</strong></td><td>Indirect object / means / sphere</td><td>"to / for / by / with / in the ___"</td></tr>
+              <tr><td><strong>Accusative</strong></td><td>Direct object / motion toward</td><td>"the ___" (as object)</td></tr>
+              <tr><td><strong>Vocative</strong></td><td>Direct address</td><td>"O ___!"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Greek Article — ὁ ἡ τό</h4>
+          <table class="adv-cs-table">
+            <thead>
+              <tr><th>Case</th><th>M. sg</th><th>F. sg</th><th>N. sg</th><th>M. pl</th><th>F. pl</th><th>N. pl</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>ὁ</td><td>ἡ</td><td>τό</td><td>οἱ</td><td>αἱ</td><td>τά</td></tr>
+              <tr><td><strong>Gen.</strong></td><td>τοῦ</td><td>τῆς</td><td>τοῦ</td><td>τῶν</td><td>τῶν</td><td>τῶν</td></tr>
+              <tr><td><strong>Dat.</strong></td><td>τῷ</td><td>τῇ</td><td>τῷ</td><td>τοῖς</td><td>ταῖς</td><td>τοῖς</td></tr>
+              <tr><td><strong>Acc.</strong></td><td>τόν</td><td>τήν</td><td>τό</td><td>τούς</td><td>τάς</td><td>τά</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Three Declensions</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Declension</th><th>Stem</th><th>Primary gender(s)</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1st</strong></td><td>α / η</td><td>Mostly feminine</td><td>ἀγάπη, καρδία</td></tr>
+              <tr><td><strong>2nd</strong></td><td>ο</td><td>Mostly masc. &amp; neuter</td><td>λόγος, ἔργον</td></tr>
+              <tr><td><strong>3rd</strong></td><td>Consonant</td><td>All three</td><td>σάρξ, πνεῦμα</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Agreement Rule</h4>
+          <p>Articles and adjectives must agree with their noun in <strong>gender, case, and number</strong> — all three, always.</p>
+          <p>ὁ ἀγαθὸς λόγος (masc. nom. sg.) &nbsp;·&nbsp; τῆς ἀγαθῆς καρδίας (fem. gen. sg.) &nbsp;·&nbsp; τὰ ἀγαθὰ ἔργα (neut. nom./acc. pl.)</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Quick Recognition Signals</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>You see</th><th>It signals</th></tr></thead>
+            <tbody>
+              <tr><td>τῶν + noun ending -ων</td><td>Genitive plural (any gender)</td></tr>
+              <tr><td>τοῦ or τῆς</td><td>Genitive singular (masc./neut. or fem.)</td></tr>
+              <tr><td>τῷ or τῇ (with iota subscript)</td><td>Dative singular</td></tr>
+              <tr><td>τόν / τήν</td><td>Accusative singular (masc. / fem.)</td></tr>
+              <tr><td>Circumflex on ultima -ων</td><td>Genitive plural ending</td></tr>
+              <tr><td>Neuter: nom. = acc.</td><td>Both forms always identical</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key Rules to Remember</h4>
+          <p><strong>Neuter plural → singular verb</strong> (τὰ τέκνα ἔρχεται — "the children comes")</p>
+          <p><strong>Granville Sharp Rule:</strong> One article + καί + two nouns = same person</p>
+          <p><strong>Anarthrous predicate nominative</strong> before verb = emphasizes nature/quality</p>
+          <p><strong>πνεῦμα is neuter</strong> grammatically, but John uses masculine ἐκεῖνος (John 16:13) — theologically significant override</p>
+        </div>
+      `;
+    } else {
       content.innerHTML = `<p style="opacity:0.6;text-align:center;padding:20px 0">No cheat sheet available for this lesson yet.</p>`;
     }
   }
@@ -9819,6 +9894,36 @@ const ADV_KC_DATA = {
     { feedback: "Erasmian is actually quite different from modern Greek. Modern Greek has merged η, ι, υ, ει, οι all into one 'ee' sound — Erasmian keeps them distinct precisely because modern Greek pronunciation obscures differences students need to see." },
     { correct: true, feedback: "Correct! Erasmian preserves distinct sounds for letters that have merged in modern Greek (like η vs. ι, or ει vs. υ vs. οι). This lets students hear and distinguish different endings when listening and reading aloud — which is crucial for learning grammar." },
     { feedback: "There's no evidence the apostles used anything like Erasmian pronunciation — that system was developed in the 16th century by Erasmus. The practical reason for Erasmian is that it keeps letter sounds distinct in ways that help students learn endings and vocabulary." }
+  ],
+  kc_adv_nouns_1: [
+    { feedback: "Grammatical neuter gender in Greek has nothing to do with personhood or theology. πνεῦμα is neuter because it belongs to the neuter declension — the same way 'child' (τέκνον) and 'boat' (πλοῖον) are neuter. The NT authors used masculine pronouns for the Spirit when referring back to him personally, which is the theologically significant move." },
+    { feedback: "Grammatical gender has no ranking or hierarchy — masculine, feminine, and neuter are simply three organizational categories. The neuter gender of πνεῦμα tells us nothing about the Spirit's status relative to the Father." },
+    { correct: true, feedback: "Correct! Grammatical gender is a classification system, not a statement about biology or personhood. πνεῦμα is neuter simply because that is its grammatical category — the same as τέκνον (child) and πλοῖον (boat). When John 16:13 uses the masculine pronoun ἐκεῖνος to refer back to the Spirit, that is the theologically weighty choice." },
+    { feedback: "While the Hebrew word for spirit (רוּחַ, ruach) is actually feminine — not neuter — grammatical gender transfer between languages doesn't work that way, and the neuter gender of πνεῦμα is not derived from Hebrew." }
+  ],
+  kc_adv_nouns_2: [
+    { feedback: "Position matters in English, but not in Greek grammar. Greek uses case endings to signal function, not word order. τὸν κόσμον could appear anywhere in the Greek sentence and still be the direct object — the accusative ending (-ον) and article (τόν) tell you that, not the position." },
+    { correct: true, feedback: "Correct! The accusative case ending (-ον on κόσμον) and the accusative article (τόν) mark it as the direct object. In Greek, endings carry grammar; word order carries emphasis. You could rearrange the Greek words and κόσμον would still be the object — its accusative form doesn't change." },
+    { feedback: "Following the verb is an English signal for direct objects, but Greek doesn't work this way. The object could just as easily precede the verb. Only the accusative ending reliably marks it as the direct object." },
+    { feedback: "Accent marks indicate pitch/stress, not grammatical function. They can occasionally distinguish two otherwise identical word forms, but they don't identify a word as subject or object — case endings do that." }
+  ],
+  kc_adv_nouns_3: [
+    { feedback: "The indirect object receives the action indirectly — it is the one to or for whom something is done. In Eph 2:8, grace is not receiving the saving; it is the means by which saving happens. The implied indirect object would be 'you' (ἐστε)." },
+    { correct: true, feedback: "Correct! This is the dative of means (or instrument) — grace is the means or instrument through which salvation is accomplished. 'By grace you have been saved' identifies grace as the operative agent. This is one of the most theologically important datives in the entire NT." },
+    { feedback: "A locative dative would place the action in a sphere or location — 'in grace you have been saved.' While that's a possible rendering, the standard interpretation of this phrase is instrumental: grace as the means of salvation, not simply its context." },
+    { feedback: "Possession is expressed by the genitive case, not the dative. The dative here functions as a means/instrument marker, not a possessive." }
+  ],
+  kc_adv_nouns_4: [
+    { feedback: "This is actually the argument made by certain groups (most notably Jehovah's Witnesses). However, the absence of the article does not mean 'a god' in Greek — that would require an indefinite article, which Greek doesn't have. The anarthrous predicate nominative in Greek emphasizes the nature or quality of the subject, not indefiniteness. The Granville Sharp rule and Colwell's Rule both bear on this." },
+    { feedback: "The absence of the article before θεός in John 1:1c is deliberate and grammatically significant, not an oversight. Predicate nominatives that precede the verb commonly appear without the article in Greek — this is a well-documented pattern (Colwell's Rule)." },
+    { correct: true, feedback: "Correct! When a predicate nominative (θεός) precedes the verb (ἦν) and lacks the article, Greek grammar emphasizes the nature or quality of the subject — what kind of being the Word is — rather than asserting simple identity. The Word is fully divine in nature. This is the standard evangelical exegetical position, supported by Colwell's Rule and the context of the entire Prologue." },
+    { feedback: "θεός consistently means God throughout the Prologue and the rest of John. The anarthrous form here is about the grammatical function of the predicate nominative, not a change in the word's meaning." }
+  ],
+  kc_adv_nouns_5: [
+    { feedback: "Dative feminine singular would be τῇ, not τῆς. The dative article has the iota subscript (τῇ for feminine, τῷ for masculine/neuter). τῆς is the genitive feminine singular form." },
+    { feedback: "Nominative feminine plural would be αἱ. τῆς is singular and genitive. The plural feminine forms of the article are αἱ (nominative), τῶν (genitive), ταῖς (dative), τάς (accusative)." },
+    { feedback: "Genitive masculine singular would be τοῦ — the same form as genitive neuter singular. τῆς is exclusively feminine. The η in τῆς is the hallmark of feminine genitive singular (and dative singular ← wait, that's τῇ)." },
+    { correct: true, feedback: "Correct! τῆς is the genitive feminine singular form of the article. It appears only with feminine nouns in the genitive singular. So τῆς ἀγαθῆς καρδίας = 'of the good heart' — all three words (article, adjective, noun) are genitive feminine singular, locked together by agreement." }
   ]
 };
 
@@ -9942,6 +10047,72 @@ const ADV_QUIZ_DATA = {
       {
         text: "What does elision (marked by an apostrophe) indicate in a Greek text?",
         options: ["A vowel has been lengthened before a consonant cluster", "A final short vowel was dropped before a word beginning with a vowel", "The word is a quotation from the Septuagint", "The accent has shifted to the ultima"],
+        correct: 1
+      }
+    ]
+  },
+  adv_nouns: {
+    title: "The Greek Noun System",
+    passMark: 7,
+    questions: [
+      {
+        text: "Greek nouns change their endings to show grammatical function. This system is called:",
+        options: ["Conjugation", "Inflection (declension)", "Elision", "Agreement"],
+        correct: 1
+      },
+      {
+        text: "The word τέκνον (child) is grammatically neuter. What does this tell us about the child's biological sex?",
+        options: ["The child is male", "The child is female", "The child is neither male nor female", "Nothing — grammatical gender is a classification system, not a statement about biology"],
+        correct: 3
+      },
+      {
+        text: "Which case marks the subject of a Greek verb?",
+        options: ["Accusative", "Genitive", "Nominative", "Dative"],
+        correct: 2
+      },
+      {
+        text: "Which case marks the direct object of a Greek verb?",
+        options: ["Nominative", "Genitive", "Vocative", "Accusative"],
+        correct: 3
+      },
+      {
+        text: "The phrase τοῦ θεοῦ uses the genitive case. How is this typically translated?",
+        options: ["To God", "O God!", "Of God", "By God"],
+        correct: 2
+      },
+      {
+        text: "In ἡ ἀγάπη τοῦ Χριστοῦ, the genitive τοῦ Χριστοῦ could mean 'Christ loves us' (subjective) OR 'we love Christ' (objective). What resolves the ambiguity?",
+        options: ["The accent on Χριστοῦ", "The article ἡ", "Context and theology — the Greek form is identical for both meanings", "The word order"],
+        correct: 2
+      },
+      {
+        text: "The dative case in χάριτί ἐστε σεσῳσμένοι (Eph 2:8) expresses what function?",
+        options: ["Indirect object", "Means/instrument (by grace)", "Location (in grace)", "Possession (grace's)"],
+        correct: 1
+      },
+      {
+        text: "The Greek article ὁ, ἡ, τό must agree with its noun in how many categories?",
+        options: ["One (case only)", "Two (case and number)", "Three (gender, case, and number)", "Four (gender, case, number, and declension)"],
+        correct: 2
+      },
+      {
+        text: "In John 1:1c, θεὸς ἦν ὁ λόγος — θεός appears without an article. According to standard Greek grammar, the anarthrous predicate nominative before the verb primarily emphasizes:",
+        options: ["That the Word is merely 'a god,' not the God", "The divine nature and quality of the Word", "That God was accidentally left anarthrous by John", "That the Word is identical to God the Father"],
+        correct: 1
+      },
+      {
+        text: "The 1st declension is primarily associated with which grammatical gender?",
+        options: ["Masculine", "Feminine", "Neuter", "All three equally"],
+        correct: 1
+      },
+      {
+        text: "In Greek, a neuter plural subject takes what form of the verb?",
+        options: ["A plural verb, matching the plural subject", "A singular verb — neuter plurals are treated as collectives", "No verb — neuter plural sentences use verbless constructions", "A dual verb form"],
+        correct: 1
+      },
+      {
+        text: "When you encounter the article τῶν before a noun, what do you immediately know about that noun?",
+        options: ["It is nominative plural, any gender", "It is genitive plural, any gender", "It is dative singular, masculine or neuter", "It is accusative plural, masculine"],
         correct: 1
       }
     ]
@@ -11848,10 +12019,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.7";
+const APP_VERSION = "1.5.8";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 3: Syllables, Accents & Pronunciation — syllabification rules, accent marks, recessive/persistent accent, Erasmian vs. Modern Greek, elision and moveable nu"
+  "Advanced Lesson 4: The Greek Noun System — cases, grammatical gender, the article paradigm, three declensions, agreement, and parsing"
 ];
 
 let deferredInstallPrompt = null;

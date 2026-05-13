@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=80" />
+  <link rel="stylesheet" href="style.css?v=81" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -5525,6 +5525,355 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div><!-- /adv_pronunciationLesson -->
 
 
+<div id="adv_nounsLesson" class="adv-learn-lesson">
+  <div class="adv-lesson-header">
+    <button class="adv-back-btn" onclick="closeAdvancedLesson()">← Back</button>
+    <div class="adv-lesson-meta">
+      <span class="adv-lesson-number">Advanced · Lesson 4</span>
+      <h2 class="adv-lesson-title">The Greek Noun System</h2>
+    </div>
+  </div>
+
+  <div class="lesson-module">
+
+    <!-- Block 1: Why Nouns Matter -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">1 · Why the Noun System Is the Heart of Greek</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>If there is one system in Greek grammar that unlocks everything else, it is the noun system. Every time you encounter a Greek word that is a noun, pronoun, adjective, or article — and that covers the majority of words on any given page of the NT — you are dealing with this system.</p>
+        <p>What makes Greek nouns so different from English nouns is simple: <strong>Greek nouns change their endings to show grammatical function</strong>. In English, we mostly rely on word order. "The dog bit the man" and "The man bit the dog" mean opposite things because of position, not word form. In Greek, the ending on each noun tells you whether it is the biter or the bitten — regardless of where it sits in the sentence.</p>
+        <p>This system is called <strong>inflection</strong> (or <em>declension</em> for nouns). Each noun has a set of possible endings, one for each combination of case, gender, and number. Learning to recognize these endings — even imperfectly at first — is what transforms a page of squiggly characters into a sentence you can understand.</p>
+        <p>The good news: the system is consistent. Once you learn the core patterns, they repeat across thousands of words. Mounce estimates that mastering noun endings gives you the tools to parse a huge percentage of all NT words.</p>
+      </div>
+    </div>
+
+    <!-- Block 2: Grammatical Gender -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">2 · Grammatical Gender — Not What You Think</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Every Greek noun has a <strong>grammatical gender</strong> — masculine, feminine, or neuter. This surprises English speakers because English has almost no grammatical gender left (we only see it in pronouns: he/she/it). But in Greek (like French, Spanish, German, and most ancient languages), every single noun belongs to one of these three gender categories.</p>
+        <p><strong>Crucial point: grammatical gender is not biological sex.</strong> It is a grammatical classification system — a way of grouping nouns — that happens to use the labels "masculine" and "feminine." Sometimes the grammar aligns with biology (ἀνήρ, man = masculine; γυνή, woman = feminine), but often it does not:</p>
+        <ul>
+          <li>ἁμαρτία (sin) — feminine</li>
+          <li>νόμος (law) — masculine</li>
+          <li>τέκνον (child) — neuter</li>
+          <li>πνεῦμα (spirit) — neuter</li>
+          <li>παιδίον (little child) — neuter</li>
+        </ul>
+        <p>There is no theological implication when πνεῦμα (Spirit) is grammatically neuter — the Holy Spirit is not being called "it" by the NT authors. Grammatical gender and natural gender are simply different categories.</p>
+        <p>Why does it matter? Because <strong>articles and adjectives must match their noun in gender</strong>. You cannot use a masculine article with a feminine noun. This agreement system is how you identify which words in a sentence belong together — and it becomes a powerful parsing tool.</p>
+      </div>
+    </div>
+
+    <!-- KC 1 -->
+    <div class="knowledge-check" id="kc_adv_nouns_1">
+      <p class="kc-question">The word πνεῦμα (Spirit/spirit/wind) is grammatically neuter in Greek. What does this tell us theologically?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_1', this)">The Holy Spirit is impersonal, not a person</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_nouns_1', this)">The NT authors considered the Spirit inferior to the Father</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_nouns_1', this)">Nothing theological — grammatical gender is a classification system, not a statement about personhood</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_nouns_1', this)">The word must have been translated from a feminine Hebrew word</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_nouns_1_fb"></div>
+    </div>
+
+    <!-- Block 3: The Five Cases — Overview -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">3 · The Five Cases — What Each One Does</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>A <strong>case</strong> is the grammatical function of a noun in its sentence. The ending on the noun signals which case it is in — and therefore what role it plays. Standard NT Greek grammars recognize five cases:</p>
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Case</th><th>Greek name</th><th>Primary function</th><th>English equivalent</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nominative</strong></td><td>ὀνομαστική</td><td>Subject of the verb</td><td>"the word"</td></tr>
+              <tr><td><strong>Genitive</strong></td><td>γενική</td><td>Possession/relationship</td><td>"of the word"</td></tr>
+              <tr><td><strong>Dative</strong></td><td>δοτική</td><td>Indirect object / sphere / means</td><td>"to/for/with/by the word"</td></tr>
+              <tr><td><strong>Accusative</strong></td><td>αἰτιατική</td><td>Direct object of the verb</td><td>"the word" (as object)</td></tr>
+              <tr><td><strong>Vocative</strong></td><td>κλητική</td><td>Direct address</td><td>"O word!" / "Word!"</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Notice that English barely marks case anymore — we rely on word order and prepositions ("of," "to," "by") to express what Greek does with a single ending. When Greek says <em>τοῦ λόγου</em>, the -ου ending alone tells you "of the word" — no extra word needed.</p>
+        <p>A technical note: Classical Greek had eight cases. Some grammarians (including Wallace) still recognize instrumental (by means of) and locative (location/sphere) functions — but in Koine they collapsed into the dative, sharing the same form. Mounce uses the five-case system for simplicity.</p>
+      </div>
+    </div>
+
+    <!-- Block 4: Nominative and Accusative -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">4 · Nominative &amp; Accusative — Subject and Object</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The nominative and accusative are the two cases you will encounter most often, and they form a natural pair: the nominative is the <em>actor</em>, the accusative is the <em>acted upon</em>.</p>
+        <p><strong>Nominative case — the subject:</strong></p>
+        <ul>
+          <li>The noun performing or being the verb</li>
+          <li>ὁ <strong>λόγος</strong> ἦν πρὸς τὸν θεόν — "<strong>the Word</strong> was with God" (John 1:1)</li>
+          <li>Also used for predicate nominatives: ὁ θεὸς <strong>ἀγάπη</strong> ἐστίν — "God is <strong>love</strong>" (1 John 4:8)</li>
+        </ul>
+        <p><strong>Accusative case — the direct object:</strong></p>
+        <ul>
+          <li>The noun receiving the action of the verb directly</li>
+          <li>ἠγάπησεν ὁ θεὸς τὸν <strong>κόσμον</strong> — "God loved <strong>the world</strong>" (John 3:16)</li>
+          <li>Also used with many prepositions to express motion toward: εἰς τὸν <strong>οἶκον</strong> — "into <strong>the house</strong>"</li>
+        </ul>
+        <p>In John 3:16, notice that even though <em>τὸν κόσμον</em> (the world) appears after the verb, it's the accusative ending that tells you it's the object — not its position. You could rearrange the Greek sentence and it would still mean the same thing. The case ending carries the grammar; word order carries the emphasis.</p>
+      </div>
+    </div>
+
+    <!-- KC 2 -->
+    <div class="knowledge-check" id="kc_adv_nouns_2">
+      <p class="kc-question">In the sentence ἠγάπησεν ὁ θεὸς τὸν κόσμον (God loved the world), what tells you that κόσμον is the direct object rather than the subject?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_2', this)">Its position at the end of the sentence</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_nouns_2', this)">The accusative case ending (-ον) and the accusative article (τόν)</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_nouns_2', this)">The fact that it follows the verb</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_nouns_2', this)">The accent mark on the word</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_nouns_2_fb"></div>
+    </div>
+
+    <!-- Block 5: Genitive Case -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">5 · The Genitive — Possession, Description &amp; More</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>genitive case</strong> is one of the richest and most theologically significant cases in the NT. At its core it expresses a relationship between two nouns — most often translated with "of" — but that single English word covers a surprisingly wide range of meanings.</p>
+        <p><strong>Common genitive functions:</strong></p>
+        <ul>
+          <li><strong>Possessive:</strong> ὁ λόγος τοῦ θεοῦ — "the word <em>of God</em>" (God's word)</li>
+          <li><strong>Descriptive:</strong> σῶμα τῆς ἁμαρτίας — "the body <em>of sin</em>" (sinful body)</li>
+          <li><strong>Subjective genitive:</strong> ἡ ἀγάπη τοῦ Χριστοῦ — "the love <em>of Christ</em>" → Christ loves (he is the subject doing the loving)</li>
+          <li><strong>Objective genitive:</strong> ἡ ἀγάπη τοῦ Χριστοῦ — "the love <em>of Christ</em>" → we love Christ (he is the object of love)</li>
+        </ul>
+        <p>Notice that <em>ἡ ἀγάπη τοῦ Χριστοῦ</em> can be either subjective or objective genitive — the Greek form is identical. Context and theology determine the meaning. This is one of the most significant exegetical debates in Pauline studies (especially in Galatians and Romans).</p>
+        <p><strong>With prepositions:</strong> The genitive often follows prepositions like ἐκ (out of), ἀπό (from), διά (through/because of). ἐκ τοῦ κόσμου — "out of the world."</p>
+        <p><strong>Genitive absolute:</strong> A participle + noun both in the genitive, forming a clause grammatically independent from the main sentence. Common in Luke and Acts.</p>
+        <p>One quick recognition signal: a circumflex on the ultima (-ων) almost always indicates a <strong>genitive plural</strong> ending. λόγων = "of words."</p>
+      </div>
+    </div>
+
+    <!-- Block 6: Dative Case -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">6 · The Dative — Indirect Object, Location &amp; Means</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>dative case</strong> is the most versatile of the five cases because it absorbed three older cases (dative, locative, and instrumental) in the Koine period. What looks like a single form can carry three distinct meanings — and context tells you which.</p>
+        <p><strong>Dative proper — indirect object:</strong> The one <em>to whom</em> or <em>for whom</em> something is done.</p>
+        <ul>
+          <li>ἔδωκεν αὐτοῖς ἐξουσίαν — "He gave authority <em>to them</em>" (John 1:12)</li>
+        </ul>
+        <p><strong>Locative function — sphere or location:</strong> Describes where something occurs, often metaphorical.</p>
+        <ul>
+          <li>τῇ καρδίᾳ — "in the heart"</li>
+          <li>τῷ πνεύματι — "in/by the Spirit"</li>
+        </ul>
+        <p><strong>Instrumental function — means or agency:</strong> The tool or means by which something is accomplished.</p>
+        <ul>
+          <li>χάριτί ἐστε σεσῳσμένοι — "by grace you have been saved" (Eph 2:8) — χάριτι is dative of means</li>
+          <li>πίστει — "by faith" (dative of means)</li>
+        </ul>
+        <p><strong>Dative of association:</strong> Expressing accompaniment or personal relationship.</p>
+        <ul>
+          <li>εἰρήνη ὑμῖν — "Peace <em>to/with</em> you" (standard Greek greeting)</li>
+        </ul>
+        <p>The dative is where you will find the richest theological debates about prepositions and case function. "Saved by grace through faith" — every preposition in that phrase governs a specific case, and the case tells you something about the relationship between the concepts.</p>
+      </div>
+    </div>
+
+    <!-- KC 3 -->
+    <div class="knowledge-check" id="kc_adv_nouns_3">
+      <p class="kc-question">In the phrase χάριτί ἐστε σεσῳσμένοι ("by grace you have been saved," Eph 2:8), the dative χάριτι expresses what function?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_3', this)">Indirect object — grace receives the saving</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_nouns_3', this)">Means/instrument — grace is the means by which saving occurs</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_nouns_3', this)">Location — grace is the place where saving happens</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_nouns_3', this)">Possession — the saving belongs to grace</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_nouns_3_fb"></div>
+    </div>
+
+    <!-- Block 7: The Greek Article -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">7 · The Greek Article — ὁ ἡ τό</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek has a definite article (ὁ, ἡ, τό — "the") but <strong>no indefinite article</strong> ("a/an"). When Greek wants to say "a word," it simply uses the noun without an article: λόγος. When it says "the word," it adds the article: ὁ λόγος.</p>
+        <p>The article is the most frequent word in the Greek NT — it appears over 19,000 times. And it is one of the most important parsing tools you have, because <strong>it must agree with its noun in gender, case, and number</strong>. Learn the article paradigm and you have a key that unlocks noun identification across all declensions.</p>
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead>
+              <tr><th></th><th colspan="3">Singular</th><th colspan="3">Plural</th></tr>
+              <tr><th>Case</th><th>Masc.</th><th>Fem.</th><th>Neut.</th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>ὁ</td><td>ἡ</td><td>τό</td><td>οἱ</td><td>αἱ</td><td>τά</td></tr>
+              <tr><td><strong>Gen.</strong></td><td>τοῦ</td><td>τῆς</td><td>τοῦ</td><td>τῶν</td><td>τῶν</td><td>τῶν</td></tr>
+              <tr><td><strong>Dat.</strong></td><td>τῷ</td><td>τῇ</td><td>τῷ</td><td>τοῖς</td><td>ταῖς</td><td>τοῖς</td></tr>
+              <tr><td><strong>Acc.</strong></td><td>τόν</td><td>τήν</td><td>τό</td><td>τούς</td><td>τάς</td><td>τά</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Notice: masculine and neuter share the same genitive and dative forms. Neuter nominative and accusative are always identical. The genitive plural τῶν is the same for all three genders — context or the noun ending resolves the ambiguity.</p>
+        <p><strong>Special uses of the Greek article:</strong></p>
+        <ul>
+          <li><strong>Granville Sharp Rule:</strong> When two nouns are joined by καί and share one article, they refer to the same person. "Our God and Savior Jesus Christ" — one article means one person (Titus 2:13).</li>
+          <li><strong>Articular infinitive:</strong> An article + infinitive turns the infinitive into a noun phrase.</li>
+          <li><strong>Absence of article (anarthrous):</strong> Can emphasize quality or nature rather than identity. θεὸς ἦν ὁ λόγος (John 1:1c) — "the Word was God" (divine in nature, not "the God" = the Father).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- KC 4 -->
+    <div class="knowledge-check" id="kc_adv_nouns_4">
+      <p class="kc-question">In John 1:1c, θεὸς ἦν ὁ λόγος, the word θεός appears without an article (anarthrous). According to standard exegesis, what does this most likely emphasize?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_4', this)">That the Word is a lesser god — a god among gods</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_nouns_4', this)">That "God" was accidentally left without an article by the author</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_nouns_4', this)">The divine nature or quality of the Word — what kind of being he is — rather than simple identity with the Father</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_nouns_4', this)">That θεός here means "spirit" rather than God</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_nouns_4_fb"></div>
+    </div>
+
+    <!-- Block 8: The Three Declensions -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">8 · The Three Declensions — Noun Families</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek nouns are organized into three <strong>declensions</strong> — groups of nouns that share the same set of endings. Think of them as three extended families: each family has its own characteristic endings, but all families use the same five cases.</p>
+        <p><strong>Second Declension (learn first — most common):</strong></p>
+        <ul>
+          <li>Called the <em>o-stem</em> declension because the stem vowel is ο</li>
+          <li>Mostly <strong>masculine</strong> and <strong>neuter</strong> nouns</li>
+          <li>Masculine: λόγος, λόγου, λόγῳ, λόγον... (word)</li>
+          <li>Neuter: ἔργον, ἔργου, ἔργῳ, ἔργον... (work/deed)</li>
+          <li>Key feature: neuter nominative and accusative are always identical</li>
+        </ul>
+        <p><strong>First Declension (learn second):</strong></p>
+        <ul>
+          <li>Called the <em>a-stem</em> declension because the stem vowel is α (or η)</li>
+          <li>Mostly <strong>feminine</strong> nouns (but some masculines: μαθητής, disciple)</li>
+          <li>ἀγάπη, ἀγάπης, ἀγάπῃ, ἀγάπην... (love)</li>
+          <li>Or with alpha: καρδία, καρδίας, καρδίᾳ, καρδίαν... (heart)</li>
+        </ul>
+        <p><strong>Third Declension (more complex):</strong></p>
+        <ul>
+          <li>All three genders; consonant stems (labial, dental, liquid, etc.)</li>
+          <li>The stem is found by removing the -ος from the genitive singular</li>
+          <li>σάρξ (flesh): stem σαρκ- → σαρκός, σαρκί, σάρκα...</li>
+          <li>πνεῦμα (spirit): stem πνευματ- → πνεύματος, πνεύματι...</li>
+        </ul>
+        <p>Good news: the article paradigm you already learned will help you identify case even when the noun ending is unfamiliar. If you see τῆς before a noun, you know genitive feminine singular — regardless of which declension the noun belongs to.</p>
+      </div>
+    </div>
+
+    <!-- Block 9: Agreement -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">9 · Agreement — How Greek Words Belong Together</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p><strong>Agreement</strong> is the rule that adjectives, articles, and pronouns must match their noun in three categories: <strong>gender, case, and number</strong>. This agreement system is one of the most powerful features of Greek — it lets you identify which words in a sentence belong together, even when they are separated by other words.</p>
+        <p>In English, "the good word" must have those three words adjacent. In Greek, you could write:</p>
+        <p style="text-align:center; font-style:italic;">ὁ ἀγαθὸς λόγος (the good word — all three together)</p>
+        <p>But Greek can also scatter them: ὁ λόγος ὁ ἀγαθός — "the word, the good one" — and you still know they agree because all three (article, noun, adjective) are masculine nominative singular. The agreement markers create invisible threads connecting words across a sentence.</p>
+        <p><strong>The three-way agreement rule:</strong></p>
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>If a noun is...</th><th>Then its article and adjectives must be...</th></tr></thead>
+            <tbody>
+              <tr><td>Masculine nominative singular</td><td>ὁ ἀγαθός (not ἡ or τό)</td></tr>
+              <tr><td>Feminine genitive singular</td><td>τῆς ἀγαθῆς (not τοῦ)</td></tr>
+              <tr><td>Neuter accusative plural</td><td>τά ἀγαθά (not τούς or τάς)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>Important exception — neuter plural subjects take singular verbs.</strong> This surprises students: τὰ τέκνα ἔρχεται (the children comes). Greek grammar treats a neuter plural subject as a collective, using a singular verb. You will encounter this constantly in the NT.</p>
+        <p>Agreement also applies to pronouns: αὐτός (he/him/it) must agree with the noun it refers to in gender and number — even when that creates a mismatch with biological sex. When the NT refers back to πνεῦμα with a masculine pronoun ἐκεῖνος (John 16:13), it is making a grammatical choice to override the neuter gender — a theologically significant move.</p>
+      </div>
+    </div>
+
+    <!-- Block 10: Parsing Nouns -->
+    <div class="lesson-block" onclick="toggleBlock(this)">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">10 · How to Parse a Greek Noun</span>
+        <span class="lesson-block-arrow">›</span>
+      </div>
+      <div class="lesson-block-body">
+        <p><strong>Parsing</strong> means identifying all the grammatical properties of a word. For a Greek noun, you must identify five things:</p>
+        <ol>
+          <li><strong>Gender</strong> — masculine, feminine, or neuter</li>
+          <li><strong>Case</strong> — nominative, genitive, dative, accusative, or vocative</li>
+          <li><strong>Number</strong> — singular or plural</li>
+          <li><strong>Declension</strong> — 1st, 2nd, or 3rd</li>
+          <li><strong>Lexical form</strong> — the dictionary form (nominative singular)</li>
+        </ol>
+        <p>Let's parse τοῦ λόγου step by step:</p>
+        <ul>
+          <li>Article τοῦ → genitive, masculine or neuter, singular</li>
+          <li>Noun λόγου → ending -ου = 2nd declension genitive singular</li>
+          <li>Combining: <strong>masculine, genitive, singular, 2nd declension</strong>, from λόγος (word)</li>
+          <li>Translation: "of the word" or "the word's"</li>
+        </ul>
+        <p>Now parse τῶν ἀγαθῶν ἔργων:</p>
+        <ul>
+          <li>τῶν → genitive plural (all genders)</li>
+          <li>ἀγαθῶν → adjective, genitive plural (agreeing with noun)</li>
+          <li>ἔργων → 2nd declension neuter genitive plural</li>
+          <li>All three agree: neuter, genitive, plural → "of the good works"</li>
+        </ul>
+        <p><strong>A practical parsing strategy:</strong> Start with the article if there is one — it is the most reliable case indicator. Then check the noun ending against what you know about declension patterns. Finally, verify that adjectives agree. Over time this process becomes intuitive, but it always follows these same steps.</p>
+        <p>You now have a working framework for the entire Greek noun system. Everything you study in nouns, pronouns, and adjectives builds on what you've learned here — cases, gender, number, agreement, the article, and the three declensions. The system is large but deeply consistent.</p>
+      </div>
+    </div>
+
+    <!-- KC 5 -->
+    <div class="knowledge-check" id="kc_adv_nouns_5">
+      <p class="kc-question">When parsing the Greek noun phrase τῆς ἀγαθῆς καρδίας, what case and gender/number does the article τῆς indicate?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_nouns_5', this)">Dative feminine singular</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_nouns_5', this)">Nominative feminine plural</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_nouns_5', this)">Genitive masculine singular</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_nouns_5', this)">Genitive feminine singular</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_nouns_5_fb"></div>
+    </div>
+
+    <!-- Quiz Start -->
+    <div class="adv-quiz-start-area" id="quizStart_adv_nouns">
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_nouns">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_nouns" disabled onclick="openAdvQuiz('adv_nouns')">
+        Take the Lesson Quiz →
+      </button>
+    </div>
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_nounsLesson -->
+
+
 </section>
 
     <section id="learnMenu" class="screen">
@@ -6896,9 +7245,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=80"></script>
-  <script src="app.js?v=80"></script>
-  <script type="module" src="firebase-lb.js?v=80"></script>
+  <script src="vocab.js?v=81"></script>
+  <script src="app.js?v=81"></script>
+  <script type="module" src="firebase-lb.js?v=81"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
