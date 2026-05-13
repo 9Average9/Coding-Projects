@@ -9340,12 +9340,6 @@ function getLessonMode() {
   return localStorage.getItem("lessonMode") || "basic";
 }
 
-function showAdvancedLesson(lessonId) {
-  // Advanced lesson content will be added here
-  // For now show a placeholder
-  alert("Advanced lesson content coming soon. Lesson: " + lessonId);
-}
-
 function resetLessonModePrompt() {
   localStorage.removeItem("lessonModePromptDismissed");
   document.getElementById("lessonModeResetRow").style.display = "none";
@@ -9436,16 +9430,16 @@ const advLessonNumbers = {
 };
 
 function showAdvancedLesson(lessonId) {
+  const section = document.getElementById(lessonId + "Lesson");
+  if (!section) {
+    alert("This lesson is coming soon! Check back for updates.");
+    return;
+  }
+
   const dashboard = document.getElementById("advLearnDashboard");
   if (dashboard) dashboard.style.display = "none";
 
   document.querySelectorAll(".adv-learn-lesson").forEach(s => s.classList.remove("active"));
-
-  const section = document.getElementById(lessonId + "Lesson");
-  if (!section) {
-    console.warn("Missing advanced lesson section:", lessonId + "Lesson");
-    return;
-  }
 
   section.classList.add("active");
   restoreOpenedLessonBlocks(section, lessonId);
@@ -11571,7 +11565,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.3.5";
+const APP_VERSION = "1.3.6";
 
 const UPDATE_NOTES = [
   "Advanced lessons now stretch nearly full screen width",
