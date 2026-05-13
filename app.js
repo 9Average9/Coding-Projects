@@ -10023,6 +10023,7 @@ function completeLesson(lessonId) {
   }
 
   updateLessonCompletionUI();
+  updateLessonMenuProgress();
   updatePracticeToolLocks();
 
   const nowVocabUnlocked = vocabLessonsCompleted();
@@ -11530,12 +11531,15 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.5.1";
+const APP_VERSION = "1.5.2";
 
 const UPDATE_NOTES = [
-  "Fixed member since and time in app showing on your own leaderboard entry",
-  "Leaderboard placement badges now display correctly after account creation",
-  "Display name centered under profile avatar"
+  "Leaderboard entry properly detects your own entry even after account migration",
+  "Old anonymous leaderboard entries cleaned up when creating an account",
+  "Lesson count in menu header updates immediately after completing a lesson",
+  "Leaderboard join modal now appears on top of the leaderboard",
+  "Display name now centered under profile avatar",
+  "Leaderboard avatar icons render correctly for all users"
 ];
 
 let deferredInstallPrompt = null;
@@ -11881,6 +11885,7 @@ async function submitCreateAccount() {
     if (displayNameTaken) { errEl.textContent = "That display name is already taken."; return; }
 
     btn.textContent = "Creating account…";
+    const oldAnonymousUid = localStorage.getItem("lbUserId");
     const migration = gatherMigrationData();
     await window.Auth.createAccount(username, password, displayName, migration);
 
@@ -11899,6 +11904,12 @@ async function submitCreateAccount() {
       isCreated: true
     };
     localStorage.setItem("profileData", JSON.stringify(profileData));
+
+    // Delete old anonymous leaderboard entries (random UUID) before creating new ones under Auth UID
+    if (oldAnonymousUid) {
+      await window.LB.deleteEntriesForId(oldAnonymousUid).catch(() => {});
+      localStorage.removeItem("lbUserId");
+    }
 
     // Re-sync leaderboard entries under the new Auth UID if user was already joined
     if (migration.lbXpJoined) await window.LB.joinXPBoard(migration.xp || 0).catch(() => {});
@@ -12350,9 +12361,8 @@ function _lbEscape(str) {
 }
 
 function _lbAvatarHtml(entry) {
-  const icon = entry.avatar || "person";
-  // Photos can't be shared cross-device — show icon only
-  return `<span class="lb-avatar"><span class="material-symbols-outlined">${_lbEscape(icon)}</span></span>`;
+  const icon = (entry.avatar && /^[a-z_]+$/.test(entry.avatar)) ? entry.avatar : "person";
+  return `<span class="lb-avatar"><span class="material-symbols-outlined">${icon}</span></span>`;
 }
 
 function _rankBadgeHtml(rank) {
@@ -12759,8 +12769,10 @@ function showLbUserInfo(id) {
 
   document.getElementById("lbUserName").textContent = e.name || "—";
 
-  // For own entry use live localStorage so values are always current
-  const isMe = window.LB?.getUserId() === id;
+  // For own entry use live localStorage so values are always current.
+  // Fall back to display name match to handle legacy random-UUID entries.
+  const myName = localStorage.getItem("authDisplayName");
+  const isMe = window.LB?.getUserId() === id || (myName && e.name === myName);
   const joinRaw = isMe ? localStorage.getItem("appJoinDate") : e.joinDate;
   document.getElementById("lbUserJoinDate").textContent = joinRaw
     ? new Date(joinRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })

@@ -4840,6 +4840,7 @@ body.dark .lesson-unlock-progress-text {
 
 .profile-header {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .profile-avatar {
@@ -6679,6 +6680,9 @@ body:not(.home-active) {
   font-weight: 600;
   margin: -4px 0 8px;
   text-align: center;
+}
+#lbConfirmModal {
+  z-index: 1100;
 }
 .lb-confirm-card {
   background: var(--card-color);
@@ -9279,9 +9283,10 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 
 /* Home button */
 .lb-home-btn {
-  background: linear-gradient(135deg, #c9a227, #a07c10) !important;
+  background: linear-gradient(135deg, #7c3aed, #4f1d96) !important;
   color: #fff !important;
-  border-color: #c9a227 !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.35) !important;
 }
 .lb-home-btn .material-symbols-outlined { color: #fff !important; }
 

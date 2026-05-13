@@ -276,6 +276,14 @@ async function deleteUserData() {
   ]);
 }
 
+async function deleteEntriesForId(uid) {
+  await Promise.all([
+    deleteDoc(doc(db, "xp_board", uid)).catch(() => {}),
+    deleteDoc(doc(db, "scholar_board", uid)).catch(() => {}),
+    deleteDoc(doc(db, "consistency_board", uid)).catch(() => {})
+  ]);
+}
+
 async function getUserRanks() {
   const uid = getUserId();
   const boards = [
@@ -310,6 +318,7 @@ window.LB = {
   getBoard,
   listenBoard,
   deleteUserData,
+  deleteEntriesForId,
   getUserRanks,
   isXpJoined: () => localStorage.getItem("lbXpJoined") === "true",
   isScholarJoined: () => localStorage.getItem("lbScholarJoined") === "true",
