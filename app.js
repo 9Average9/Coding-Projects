@@ -10990,6 +10990,13 @@ if (testsStat) testsStat.textContent = getTestsCompletedCount();
 if (knownWordsStat) knownWordsStat.textContent = knownWords.length;
 if (timeStat) timeStat.textContent = formatStudyTime(totalStudySeconds);
 
+const joinStat = document.getElementById("profileJoinStat");
+if (joinStat) {
+  const joinRaw = localStorage.getItem("appJoinDate");
+  joinStat.textContent = joinRaw
+    ? new Date(joinRaw).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "—";
+}
 
 const journeySection = document.getElementById("profileJourneySection");
 const settingsBtn = document.getElementById("profileSettingsBtn");
@@ -11579,16 +11586,16 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.4.1";
 
 const UPDATE_NOTES = [
-  "Advanced lessons now stretch nearly full screen width",
-  "Bill Mounce credit callout added to Lesson 1",
-  "Achievements modal now shows all achievements — unearned ones are faded with a count",
-  "Cheat sheet available for Lesson 1 via the description button",
-  "Quiz transitions are faster with a slide animation",
-  "See Answers button added to quiz results when questions are wrong",
-  "Dark mode fixes for quiz modal, score badge, and cheat sheet"
+  "Community leaderboards: join the XP, Scholar, or Consistency boards and compete with others",
+  "Scholar Board: type-the-answer quiz pulling vocab from all chapters",
+  "Custom profile avatars: choose a Material icon or upload a photo",
+  "Unique rank badges (gold, silver, bronze) per leaderboard",
+  "Member Since added to your profile stats",
+  "Tap any leaderboard entry to see that user's join date and time studied",
+  "Profile info is stored when joining any leaderboard so stats stay current"
 ];
 
 let deferredInstallPrompt = null;
@@ -12293,11 +12300,14 @@ function _rankBadgeHtml(rank) {
   return `<span class="lb-rank-num">#${rank}</span>`;
 }
 
+let _lbEntryCache = {};
+
 function _renderLbEntries(listEl, entries, field, myUid) {
   if (!entries.length) {
     listEl.innerHTML = '<p class="lb-empty">No entries yet — be the first!</p>';
     return;
   }
+  entries.forEach(e => { _lbEntryCache[e.id] = e; });
   listEl.innerHTML = entries.map((e, i) => {
     const rank = i + 1;
     const isMe = e.id === myUid;
@@ -12306,7 +12316,7 @@ function _renderLbEntries(listEl, entries, field, myUid) {
       : field === "bestScore"
       ? `${e.bestScore || 0} correct`
       : `${e.streak || 0} day streak`;
-    return `<div class="lb-entry${rank <= 3 ? " lb-top-" + rank : ""}${isMe ? " lb-me" : ""}">
+    return `<div class="lb-entry${rank <= 3 ? " lb-top-" + rank : ""}${isMe ? " lb-me" : ""}" onclick="showLbUserInfo('${_lbEscape(e.id)}')">
       ${_rankBadgeHtml(rank)}
       ${_lbAvatarHtml(e)}
       <span class="lb-name">${_lbEscape(e.name)}</span>
@@ -12689,26 +12699,29 @@ function _applyProfileAvatar() {
 
 // ── Profile Info Modal ─────────────────────────────────────────────────────────
 
-function showProfileInfoModal() {
-  // Ensure join date is set
-  if (!localStorage.getItem("appJoinDate")) {
-    localStorage.setItem("appJoinDate", new Date().toISOString());
-  }
-  const joinRaw = localStorage.getItem("appJoinDate");
-  const joinDate = joinRaw
-    ? new Date(joinRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
-    : "Unknown";
+function showLbUserInfo(id) {
+  const e = _lbEntryCache[id];
+  if (!e) return;
 
-  const seconds = Number(localStorage.getItem("totalStudySeconds")) || 0;
+  const avatarEl = document.getElementById("lbUserAvatar");
+  const icon = (e.avatar && /^[a-z_]+$/.test(e.avatar)) ? e.avatar : "school";
+  avatarEl.innerHTML = `<span class="material-symbols-outlined">${icon}</span>`;
+
+  document.getElementById("lbUserName").textContent = e.name || "—";
+
+  const joinRaw = e.joinDate;
+  document.getElementById("lbUserJoinDate").textContent = joinRaw
+    ? new Date(joinRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : "—";
+
+  const seconds = Number(e.studySeconds) || 0;
   const hours = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  document.getElementById("lbUserTime").textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
-  document.getElementById("profileInfoJoinDate").textContent = joinDate;
-  document.getElementById("profileInfoTime").textContent = timeStr;
-  document.getElementById("profileInfoModal").classList.add("open");
+  document.getElementById("lbUserModal").classList.add("open");
 }
 
-function closeProfileInfoModal() {
-  document.getElementById("profileInfoModal").classList.remove("open");
+function closeLbUserModal() {
+  document.getElementById("lbUserModal").classList.remove("open");
 }

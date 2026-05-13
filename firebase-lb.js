@@ -39,6 +39,13 @@ function getAvatar() {
   return localStorage.getItem("profilePicValue") || "school";
 }
 
+function getMeta() {
+  return {
+    joinDate: localStorage.getItem("appJoinDate") || null,
+    studySeconds: Number(localStorage.getItem("totalStudySeconds")) || 0
+  };
+}
+
 async function checkNameTaken(boardName, name) {
   try {
     const q = query(collection(db, boardName), where("name", "==", name), limit(1));
@@ -56,7 +63,7 @@ async function syncXP(xp) {
   if (!name) return;
   try {
     await setDoc(doc(db, "xp_board", getUserId()), {
-      name, xp, avatar: getAvatar(), updatedAt: serverTimestamp()
+      name, xp, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
     });
   } catch (e) { console.warn("LB syncXP:", e); }
 }
@@ -67,7 +74,7 @@ async function syncStreak(streak) {
   if (!name) return;
   try {
     await setDoc(doc(db, "consistency_board", getUserId()), {
-      name, streak, avatar: getAvatar(), updatedAt: serverTimestamp()
+      name, streak, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
     });
   } catch (e) { console.warn("LB syncStreak:", e); }
 }
@@ -81,7 +88,7 @@ async function submitScholarScore(score) {
   localStorage.setItem("lbScholarBest", String(score));
   try {
     await setDoc(doc(db, "scholar_board", getUserId()), {
-      name, bestScore: score, avatar: getAvatar(), updatedAt: serverTimestamp()
+      name, bestScore: score, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
     });
   } catch (e) { console.warn("LB submitScholar:", e); }
 }
@@ -90,7 +97,7 @@ async function joinXPBoard(name, xp) {
   localStorage.setItem("lbXpJoined", "true");
   localStorage.setItem("lbXpName", name);
   await setDoc(doc(db, "xp_board", getUserId()), {
-    name, xp, avatar: getAvatar(), updatedAt: serverTimestamp()
+    name, xp, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
   });
 }
 
@@ -103,7 +110,7 @@ async function joinConsistencyBoard(name, streak) {
   localStorage.setItem("lbConsJoined", "true");
   localStorage.setItem("lbConsName", name);
   await setDoc(doc(db, "consistency_board", getUserId()), {
-    name, streak, avatar: getAvatar(), updatedAt: serverTimestamp()
+    name, streak, avatar: getAvatar(), ...getMeta(), updatedAt: serverTimestamp()
   });
 }
 
