@@ -481,14 +481,50 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
   </button>
 
-  <button onclick="showLearnLesson('howToRead')">
+  <button onclick="showLearnLesson('adjectives')">
     <div class="lesson-number-wrap">
       <div class="lesson-number">6</div>
       <div class="lesson-label">Lesson</div>
     </div>
     <div class="lesson-text">
+      <strong>Adjectives</strong>
+      <small>Describing words that agree with nouns</small>
+      <span class="lesson-status" data-lesson-status="adjectives">○ Not completed</span>
+    </div>
+  </button>
+
+  <button onclick="showLearnLesson('pronouns')">
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">7</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+    <div class="lesson-text">
+      <strong>Pronouns</strong>
+      <small>He, she, this, who — pointing back to nouns</small>
+      <span class="lesson-status" data-lesson-status="pronouns">○ Not completed</span>
+    </div>
+  </button>
+
+  <button onclick="showLearnLesson('conjunctions')">
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">8</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+    <div class="lesson-text">
+      <strong>Conjunctions</strong>
+      <small>And, but, because — how ideas connect</small>
+      <span class="lesson-status" data-lesson-status="conjunctions">○ Not completed</span>
+    </div>
+  </button>
+
+  <button onclick="showLearnLesson('howToRead')">
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">9</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+    <div class="lesson-text">
       <strong>How to Read Greek</strong>
-      <small>Step-by-step sentence approach</small>
+      <small>Putting all the tools together</small>
       <span class="lesson-status" data-lesson-status="howToRead">○ Not completed</span>
     </div>
   </button>
@@ -3825,37 +3861,430 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </div>
 </div>
-<div id="howToReadLesson" class="learn-lesson">
-  
-
-  <p class="lesson-lead">
-  Greek can feel overwhelming if you try to understand everything at once.
-  This lesson gives you a simple step-by-step process for reading basic Greek sentences without panicking.
-</p>
-
-<div class="lesson-block" onclick="toggleLessonBlock(this)">
-  <div class="lesson-block-header">
-     Your goal
+<!-- Adjectives Lesson -->
+<div id="adjectivesLesson" class="learn-lesson">
+  <div class="lesson-module">
+  <div class="lesson-title-clean">
+    <div class="lesson-kicker">Lesson 6</div>
+    <h2>Adjectives</h2>
   </div>
 
-  <div class="lesson-block-content">
-    <p>
-      The goal of this lesson is not to make you translate difficult verses perfectly.
-    </p>
+  <button class="lesson-cheat-strip" onclick="showAdjectivesCheatSheet()">
+    <span class="material-symbols-outlined">description</span>
+    <span>
+      <strong>Cheat Sheet</strong>
+      <small>Quick reference for adjective forms and agreement</small>
+    </span>
+  </button>
 
-    <p>
-      The goal is to teach your eyes what to look for first.
-    </p>
+  <p class="lesson-lead">
+    Greek nouns don't travel alone — they pick up adjectives. Describing words that change their endings to match the noun they're attached to. Once you learn to spot them, sentences become much richer and you start seeing things in verses you never noticed before.
+  </p>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">What does an adjective do?</div>
+    <div class="lesson-block-content">
+      <p>An adjective describes a noun. In English: "the <strong>good</strong> word," "the <strong>holy</strong> Spirit," "<strong>eternal</strong> life."</p>
+      <p>Greek adjectives do the same thing — but they also change their endings to match the noun they describe. If the noun is masculine, the adjective takes a masculine ending. If the noun is accusative, the adjective takes an accusative ending.</p>
+      <p class="mini-example">ὁ ἀγαθὸς λόγος — the good word (both masculine, nominative, singular)</p>
+      <p class="mini-example">ζωὴν αἰώνιον — eternal life (both accusative)</p>
+      <p class="highlight">
+        The adjective has to agree with its noun in gender, case, and number. That's the one rule to remember.
+      </p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">The agreement rule</div>
+    <div class="lesson-block-content">
+      <p>When you see an article and a noun, the adjective joins that group — and it matches everything the noun does:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>Gender</strong><span>Masculine noun → masculine adjective ending (-ος, -ον)</span></div>
+        <div class="takeaway-step"><strong>Case</strong><span>Nominative noun → nominative adjective ending</span></div>
+        <div class="takeaway-step"><strong>Number</strong><span>Singular noun → singular adjective ending</span></div>
+      </div>
+
+      <p>This is actually helpful for reading. If you can identify the adjective's ending, it gives you more information about the noun it's attached to — even if you don't recognize the noun yet.</p>
+      <p class="mini-example">τὴν ἁγίαν ἐκκλησίαν — the holy church (both accusative feminine singular)</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>In ζωὴν αἰώνιον, which word is the adjective?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">αἰώνιον — it describes ζωήν (life) and matches it in case and number. "Eternal life."</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">Common NT adjectives you need to know</div>
+    <div class="lesson-block-content">
+      <p>These adjectives appear constantly in the New Testament. Start recognizing their forms:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>πᾶς / πᾶσα / πᾶν</strong><span>all / every — the most common adjective in the NT</span></div>
+        <div class="takeaway-step"><strong>ἅγιος</strong><span>holy — Πνεῦμα ἅγιον = Holy Spirit</span></div>
+        <div class="takeaway-step"><strong>αἰώνιος</strong><span>eternal — ζωὴν αἰώνιον = eternal life</span></div>
+        <div class="takeaway-step"><strong>πιστός</strong><span>faithful — πιστὸς ὁ θεός = God is faithful</span></div>
+        <div class="takeaway-step"><strong>καλός</strong><span>good / beautiful — ὁ ποιμὴν ὁ καλός = the good shepherd</span></div>
+        <div class="takeaway-step"><strong>μέγας</strong><span>great — μεγάλη ἡ χαρά = great is the joy</span></div>
+      </div>
+
+      <p class="highlight">You will see these in almost every chapter of the NT. Locking them in now pays off immediately.</p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">Two ways to use an adjective</div>
+    <div class="lesson-block-content">
+      <p>An adjective can either sit <em>inside</em> the article-noun group or <em>outside</em> it — and the meaning shifts slightly.</p>
+
+      <p><strong>Inside (attributive) — directly describes the noun:</strong></p>
+      <p class="mini-example">ὁ ἀγαθὸς λόγος = the <em>good</em> word</p>
+      <p class="mini-example">ὁ ποιμὴν ὁ καλός = the <em>good</em> shepherd (repeated article re-links the adjective)</p>
+
+      <p><strong>Outside (predicative) — makes a statement about the noun:</strong></p>
+      <p class="mini-example">ὁ λόγος ἀγαθός = the word <em>is good</em></p>
+
+      <p class="highlight">Is the adjective inside the article-noun group or outside it? That's the question to ask.</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>In ὁ ποιμὴν ὁ καλός — is καλός inside or outside the article-noun group?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">Inside — it's linked back to ὁ ποιμήν by a second article ὁ. "The good shepherd." Attributive position.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">Adjectives in real NT sentences</div>
+    <div class="lesson-block-content">
+      <p>Let's see adjectives doing their job in verses you know:</p>
+
+      <p class="greek-example">ζωὴν αἰώνιον</p>
+      <p>John 3:16 — "eternal life." Both words accusative. ζωήν is the noun, αἰώνιον is the agreeing adjective. They travel together as a unit.</p>
+
+      <p class="greek-example">πᾶσα ἡ γῆ</p>
+      <p>"All the earth." πᾶσα is the adjective agreeing with ἡ γῆ — both nominative feminine singular.</p>
+
+      <p class="greek-example">ὁ ποιμὴν ὁ καλός</p>
+      <p>John 10:11 — "The good shepherd." The repeated article before καλός links it emphatically back to ὁ ποιμήν.</p>
+
+      <p class="highlight">
+        When you see a word that doesn't look like the main noun but matches its ending, ask: is this an adjective? If it agrees in gender, case, and number — it probably is.
+      </p>
+    </div>
+  </div>
+
+  <div class="complete-lesson-box">
+    <p data-complete-message="adjectives">Open every lesson section before completing this lesson.</p>
+    <button class="complete-lesson-btn" data-complete-lesson="adjectives" onclick="completeLesson('adjectives')" disabled>Complete Lesson</button>
+  </div>
+
+  </div>
+</div>
+
+<!-- Pronouns Lesson -->
+<div id="pronounsLesson" class="learn-lesson">
+  <div class="lesson-module">
+  <div class="lesson-title-clean">
+    <div class="lesson-kicker">Lesson 7</div>
+    <h2>Pronouns</h2>
+  </div>
+
+  <button class="lesson-cheat-strip" onclick="showPronounsCheatSheet()">
+    <span class="material-symbols-outlined">description</span>
+    <span>
+      <strong>Cheat Sheet</strong>
+      <small>Quick reference for common Greek pronouns</small>
+    </span>
+  </button>
+
+  <p class="lesson-lead">
+    Pronouns are shortcuts — instead of repeating a noun over and over, Greek uses a small word that points back to it. Knowing a handful of core pronouns makes a huge difference in following who is doing what in any NT passage.
+  </p>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">What is a pronoun?</div>
+    <div class="lesson-block-content">
+      <p>A pronoun stands in for a noun that was already mentioned — its <em>antecedent</em>.</p>
+      <p>In English: "God loved the world. <strong>He</strong> gave his Son." The word "he" points back to "God." That's a pronoun doing its job.</p>
+      <p>Greek pronouns work exactly the same way, but they change their endings just like nouns do — showing case, gender, and number. This is actually useful: the pronoun's form tells you which noun it's pointing back to.</p>
+      <p class="highlight">
+        When you see a pronoun, ask: what noun was just introduced that matches this gender and number?
+      </p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">αὐτός — he, she, it, him, her</div>
+    <div class="lesson-block-content">
+      <p>αὐτός is the most common pronoun in the NT. Its form changes by gender and case:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>αὐτός / αὐτή / αὐτό</strong><span>he / she / it (nominative)</span></div>
+        <div class="takeaway-step"><strong>αὐτοῦ / αὐτῆς</strong><span>of him, his / of her, her (genitive)</span></div>
+        <div class="takeaway-step"><strong>αὐτόν / αὐτήν</strong><span>him / her (accusative — direct object)</span></div>
+        <div class="takeaway-step"><strong>αὐτῷ / αὐτῇ</strong><span>to him / to her (dative — indirect object)</span></div>
+      </div>
+
+      <p class="mini-example">εἰς αὐτόν — "in/into him" (John 3:16 — points back to the Son)</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>In John 3:16, αὐτόν is accusative masculine. What noun earlier in the verse does it point back to?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">τὸν υἱόν — "the Son." αὐτόν (masculine accusative) matches υἱόν (masculine accusative). The pronoun's gender resolves the reference.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">οὗτος — this, these</div>
+    <div class="lesson-block-content">
+      <p>οὗτος means "this" — it points to something near, immediate, or just mentioned.</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>οὗτος</strong><span>this (masculine)</span></div>
+        <div class="takeaway-step"><strong>αὕτη</strong><span>this (feminine)</span></div>
+        <div class="takeaway-step"><strong>τοῦτο</strong><span>this (neuter)</span></div>
+      </div>
+
+      <p class="greek-example">οὗτός ἐστιν ὁ υἱός μου ὁ ἀγαπητός.</p>
+      <p>"This is my beloved Son." (Matthew 3:17) — the heavenly voice uses οὗτος to point directly to Jesus. The spotlight is unmistakable.</p>
+
+      <p class="highlight">
+        When you see οὗτος, the author is putting a spotlight on something specific. Ask: what was just said or done that this is pointing to?
+      </p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">I, you, we — personal pronouns</div>
+    <div class="lesson-block-content">
+      <p>Personal pronouns appear constantly in NT letters and the words of Jesus:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>ἐγώ</strong><span>I — "ἐγώ εἰμι" = I am (the great "I AM" statements in John)</span></div>
+        <div class="takeaway-step"><strong>σύ</strong><span>you (singular) — "σύ εἶ ὁ Χριστός" = you are the Christ</span></div>
+        <div class="takeaway-step"><strong>ἡμεῖς</strong><span>we — common in Paul's letters</span></div>
+        <div class="takeaway-step"><strong>ὑμεῖς</strong><span>you all — Jesus addressing his disciples</span></div>
+        <div class="takeaway-step"><strong>μου / σου</strong><span>of me/my — of you/your (short genitive forms)</span></div>
+      </div>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>In ἐγώ εἰμι ὁ ποιμὴν ὁ καλός (John 10:11), what does ἐγώ mean, and why is it emphatic?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">ἐγώ = I. It's emphatic because Greek verbs already include the subject — adding ἐγώ separately puts extra stress on "I am the one." "I — I myself — am the good shepherd."</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">Following pronouns through a passage</div>
+    <div class="lesson-block-content">
+      <p>The practical skill: when you see a pronoun, work backward through the sentence to find what it points to. The pronoun's gender and number tell you which noun it came from.</p>
+
+      <p class="greek-example">ὁ θεὸς ἠγάπησεν τὸν κόσμον... εἰς αὐτόν</p>
+      <p>"God loved the world... into him." But wait — αὐτόν is masculine accusative. Does it point to τὸν κόσμον (world)? No — world is the direct object of "loved." αὐτόν points back to τὸν υἱόν (the Son) mentioned just before. Gender and number resolve it.</p>
+
+      <p class="highlight">
+        Pronoun tracking is one of the most practical reading skills you can have. It turns ambiguous "he" and "him" references into clear, specific identifications.
+      </p>
+    </div>
+  </div>
+
+  <div class="complete-lesson-box">
+    <p data-complete-message="pronouns">Open every lesson section before completing this lesson.</p>
+    <button class="complete-lesson-btn" data-complete-lesson="pronouns" onclick="completeLesson('pronouns')" disabled>Complete Lesson</button>
+  </div>
+
+  </div>
+</div>
+
+<!-- Conjunctions Lesson -->
+<div id="conjunctionsLesson" class="learn-lesson">
+  <div class="lesson-module">
+  <div class="lesson-title-clean">
+    <div class="lesson-kicker">Lesson 8</div>
+    <h2>Conjunctions</h2>
+  </div>
+
+  <button class="lesson-cheat-strip" onclick="showConjunctionsCheatSheet()">
+    <span class="material-symbols-outlined">description</span>
+    <span>
+      <strong>Cheat Sheet</strong>
+      <small>Quick reference for Greek conjunctions and connectors</small>
+    </span>
+  </button>
+
+  <p class="lesson-lead">
+    Small words, big job. Conjunctions connect ideas and tell you how the author is thinking — whether they're adding, contrasting, explaining, or drawing a conclusion. Learning them makes NT Greek feel like it has a real flow rather than a series of disconnected words.
+  </p>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">What conjunctions do</div>
+    <div class="lesson-block-content">
+      <p>Conjunctions link ideas. In English: "God loved the world <strong>and</strong> gave his Son." "Not by works <strong>but</strong> by grace." "He came, <strong>because</strong> God sent him."</p>
+      <p>Greek conjunctions are similar — but more precise. Where English just says "but," Greek distinguishes between a gentle transition and a sharp contrast. Where English says "and," Greek might mean "also" or even "even."</p>
+      <p class="highlight">
+        Reading conjunctions carefully tells you how the author is thinking, not just what they're saying.
+      </p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">καί and δέ — adding and transitioning</div>
+    <div class="lesson-block-content">
+      <p><strong>καί</strong> = "and / also / even" — the single most common word in the entire NT.</p>
+      <p class="mini-example">καὶ ὁ λόγος ἦν πρὸς τὸν θεόν — "and the Word was with God" (John 1:1)</p>
+
+      <p><strong>δέ</strong> = "but / and / now" — marks a soft transition or mild contrast. One key quirk: <strong>δέ always comes second in its clause</strong>, never first. Watch for it tucked behind the first word.</p>
+      <p class="mini-example">ὁ δὲ Ἰησοῦς — "but Jesus" or "now Jesus" — δέ goes after ὁ, the first word</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>In ὁ δὲ θεός, where does δέ appear, and what does that tell you?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">Second position — δέ always comes second. It signals a transition: "but God" or "now God." Watch for this pattern throughout the NT — it almost always marks a new move in the narrative or argument.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">ἀλλά and γάρ — contrast and explanation</div>
+    <div class="lesson-block-content">
+      <p><strong>ἀλλά</strong> = "but" — strong contrast. Where δέ is a gentle turn, ἀλλά is a hard pivot. It often follows "οὐ/not..." to form the pattern: "not X, but rather Y."</p>
+      <p class="mini-example">οὐκ ἦλθον καταλῦσαι ἀλλὰ πληρῶσαι — "I came not to abolish but to fulfill" (Matt 5:17)</p>
+
+      <p><strong>γάρ</strong> = "for / because / since" — gives the reason for what was just said. Like δέ, it always comes second in its clause.</p>
+      <p class="mini-example">Οὕτως γὰρ ἠγάπησεν ὁ θεός — "For God so loved..." (John 3:16) — γάρ explains WHY God did what was described before.</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>In John 3:16, the sentence begins with γάρ in second position. What does that signal about this sentence?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">γάρ signals that this verse is giving the REASON for what came before (John 3:14-15). "For God so loved..." answers the WHY behind what was just said about the Son being lifted up.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">ἵνα and ὅτι — purpose and content</div>
+    <div class="lesson-block-content">
+      <p><strong>ἵνα</strong> = "in order that / so that" — introduces the <em>purpose</em> of an action. When you see ἵνα, ask: what is the goal here?</p>
+      <p class="mini-example">ἵνα μὴ ἀπόληται ἀλλ' ἔχῃ ζωὴν αἰώνιον — "so that he might not perish but have eternal life" (John 3:16)</p>
+
+      <p><strong>ὅτι</strong> = "that / because" — two jobs: it either introduces a reason ("because") or introduces the content of a statement ("that"). Context tells you which applies.</p>
+      <p class="mini-example">οἴδαμεν ὅτι ἀληθής ἐστιν — "we know that he is true" — ὅτι introduces what is known</p>
+
+      <p class="highlight">
+        ἵνα is one of the most theologically important words in the NT — it reveals the purpose and intent behind the actions it follows.
+      </p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">οὖν — therefore, drawing conclusions</div>
+    <div class="lesson-block-content">
+      <p><strong>οὖν</strong> = "therefore / so / then" — draws a conclusion from what came before. When you see οὖν, the author is saying: "given all that, here is the takeaway." Like γάρ and δέ, it always comes second.</p>
+      <p class="mini-example">εἰρήνην ἔχομεν πρὸς τὸν θεόν — "we have peace with God" (Romans 5:1 — the verse starts with "having been justified, <strong>therefore</strong>...")</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>γάρ (2nd position)</strong><span>for / because → gives the reason</span></div>
+        <div class="takeaway-step"><strong>οὖν (2nd position)</strong><span>therefore / so → draws a conclusion</span></div>
+        <div class="takeaway-step"><strong>δέ (2nd position)</strong><span>but / now → transitions to next idea</span></div>
+        <div class="takeaway-step"><strong>ἀλλά</strong><span>but (strong) → sharp contrast</span></div>
+        <div class="takeaway-step"><strong>ἵνα</strong><span>in order that → introduces purpose</span></div>
+        <div class="takeaway-step"><strong>ὅτι</strong><span>that / because → reason or content</span></div>
+      </div>
+
+      <p class="highlight">
+        Once you recognize these six conjunctions, you can follow the logic of almost any NT passage — even before you fully understand every word.
+      </p>
+    </div>
+  </div>
+
+  <div class="complete-lesson-box">
+    <p data-complete-message="conjunctions">Open every lesson section before completing this lesson.</p>
+    <button class="complete-lesson-btn" data-complete-lesson="conjunctions" onclick="completeLesson('conjunctions')" disabled>Complete Lesson</button>
+  </div>
+
+  </div>
+</div>
+
+<!-- How to Read Greek Lesson (Capstone) -->
+<div id="howToReadLesson" class="learn-lesson">
+  <div class="lesson-module">
+
+  <div class="lesson-title-clean">
+    <div class="lesson-kicker">Lesson 9</div>
+    <h2>How to Read Greek</h2>
+  </div>
+
+  <button class="lesson-cheat-strip" onclick="showHowToReadCheatSheet()">
+    <span class="material-symbols-outlined">description</span>
+    <span>
+      <strong>Cheat Sheet</strong>
+      <small>Reading checklist using all your tools</small>
+    </span>
+  </button>
+
+  <p class="lesson-lead">
+  You've built the tools across eight lessons — alphabet, pronunciation, nouns, cases, adjectives, pronouns, and conjunctions. This lesson brings it all together into one repeatable approach for reading any Greek sentence without panicking.
+</p>
+
+<div class=”lesson-block” onclick=”toggleLessonBlock(this)”>
+  <div class=”lesson-block-header”>Your goal</div>
+  <div class=”lesson-block-content”>
+    <p>The goal of this lesson is not to translate perfectly. The goal is to teach your eyes what to look for first — using all the tools you've built.</p>
 
     <ul>
-      <li>Find the main action or statement</li>
-      <li>Find who or what the sentence is about</li>
-      <li>Notice articles and endings</li>
-      <li>Build the meaning one piece at a time</li>
+      <li>Notice how sentences are connected (conjunctions)</li>
+      <li>Find who or what the sentence is about (subject)</li>
+      <li>Group words that belong together (article + noun + adjective)</li>
+      <li>Track pronouns back to what they refer to</li>
+      <li>Build meaning one piece at a time</li>
     </ul>
 
-    <p class="highlight">
-      Do not start by asking, “What does the whole sentence mean?” Start by asking, “What pieces do I recognize?”
+    <p class=”highlight”>
+      Do not start by asking “What does the whole sentence mean?” Start by asking “What pieces do I recognize?”
+    </p>
+  </div>
+</div>
+
+<div class=”lesson-block” onclick=”toggleLessonBlock(this)”>
+  <div class=”lesson-block-header”>Step 0 — Notice conjunctions first</div>
+  <div class=”lesson-block-content”>
+    <p>
+      Before you even find the verb, glance at the conjunctions. They tell you how this sentence relates to what came before — and that context shapes everything you read next.
+    </p>
+
+    <div class=”takeaway-box”>
+      <div class=”takeaway-step”><strong>γάρ (second)</strong><span>This sentence explains what came before — “for/because”</span></div>
+      <div class=”takeaway-step”><strong>οὖν (second)</strong><span>This sentence draws a conclusion — “therefore/so”</span></div>
+      <div class=”takeaway-step”><strong>δέ (second)</strong><span>This is a new move or mild contrast — “but/now”</span></div>
+      <div class=”takeaway-step”><strong>ἀλλά</strong><span>Strong contrast — “but/rather” (often after “not...”)</span></div>
+      <div class=”takeaway-step”><strong>ἵνα</strong><span>What follows is the purpose — “in order that”</span></div>
+    </div>
+
+    <p class=”highlight”>
+      Conjunctions are road signs. Read them first and you already know which direction the sentence is heading.
     </p>
   </div>
 </div>
@@ -3963,50 +4392,27 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 <div class="lesson-block" onclick="toggleLessonBlock(this)">
-  <div class="lesson-block-header">
-     Step 3: Group words together
-  </div>
-
+  <div class="lesson-block-header">Step 3: Group words together — noun + adjective + article</div>
   <div class="lesson-block-content">
     <p>
-      Greek is easier when you stop seeing every word as separate and start seeing groups.
+      Greek is easier when you stop seeing every word as separate and start seeing groups. The article tells you where a group begins — and adjectives join that group.
     </p>
 
-    <p class="greek-example">
-      ὁ λόγος ἐστιν ἐν τῷ κόσμῳ.
-    </p>
+    <p class="greek-example">ζωὴν αἰώνιον ἔχομεν.</p>
 
-    <p>
-      Break it into pieces:
-    </p>
+    <p>Break it into pieces:</p>
 
     <div class="takeaway-box">
-      <div class="takeaway-step">
-        <strong>ὁ λόγος</strong>
-        <span>the word</span>
-      </div>
-
-      <div class="takeaway-step">
-        <strong>ἐστιν</strong>
-        <span>is</span>
-      </div>
-
-      <div class="takeaway-step">
-        <strong>ἐν τῷ κόσμῳ</strong>
-        <span>in the world</span>
-      </div>
+      <div class="takeaway-step"><strong>ζωὴν αἰώνιον</strong><span>"eternal life" — noun + agreeing adjective, both accusative</span></div>
+      <div class="takeaway-step"><strong>ἔχομεν</strong><span>"we have" — the verb</span></div>
     </div>
 
     <p>
-      Now the sentence is much easier:
+      The adjective αἰώνιον matches ζωήν in case and number — so they travel together as one unit. "We have eternal life." You did not guess. You recognized the groups.
     </p>
 
     <p class="highlight">
-      The word is in the world.
-    </p>
-
-    <p>
-      You did not translate by guessing. You translated by recognizing the pieces.
+      Article + noun + adjective = one phrase. Keep them together and the sentence structure becomes clear.
     </p>
   </div>
 </div>
@@ -4067,6 +4473,30 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 <div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">Step 4b: Track pronouns back to their noun</div>
+  <div class="lesson-block-content">
+    <p>
+      When you see a pronoun — αὐτόν, αὐτῆς, οὗτος, αὕτη — pause and ask: what noun does this point back to?
+    </p>
+    <p>
+      The pronoun's gender and number will match the noun it refers to. This is how you follow the "he/she/it/him/her" references through a passage without losing track of who is being talked about.
+    </p>
+
+    <p class="mini-example">ἐπίστευσαν εἰς αὐτόν — "they believed in him"</p>
+    <p>αὐτόν is masculine accusative — look back for the masculine noun it came from. In John 3:16, that's τὸν υἱόν (the Son).</p>
+
+    <div class="lesson-interactive">
+      <p><strong>Knowledge check:</strong></p>
+      <p>In οὗτός ἐστιν ὁ υἱός μου, what does οὗτος mean and what is it pointing to?</p>
+      <div class="answer-row">
+        <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+        <span class="answer-text">οὗτος = "this" (masculine, pointing to Jesus). "This is my Son." The heavenly voice uses οὗτος to put the spotlight directly on Jesus, just heard or seen.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
   <div class="lesson-block-header">
      Step 5: Use endings carefully
   </div>
@@ -4110,104 +4540,80 @@ OneSignalDeferred.push(async function(OneSignal) {
 </div>
 
 <div class="lesson-block" onclick="toggleLessonBlock(this)">
-  <div class="lesson-block-header">
-     A simple reading process
-  </div>
-
+  <div class="lesson-block-header">A complete reading process</div>
   <div class="lesson-block-content">
     <p>
-      When you see a Greek sentence, use the same process every time.
+      When you see a Greek sentence, use the same process every time. All eight lessons are working together here.
     </p>
 
     <div class="takeaway-box">
+      <div class="takeaway-step">
+        <strong>0. Read conjunctions</strong>
+        <span>γάρ? οὖν? ἀλλά? ἵνα? Know the direction before you read a noun.</span>
+      </div>
       <div class="takeaway-step">
         <strong>1. Find the verb</strong>
         <span>What is happening or being stated?</span>
       </div>
-
       <div class="takeaway-step">
         <strong>2. Find the subject</strong>
-        <span>Who or what is the sentence about?</span>
+        <span>Look for the nominative article (ὁ/ἡ/οἱ/αἱ). That is your subject.</span>
       </div>
-
       <div class="takeaway-step">
         <strong>3. Group phrases</strong>
-        <span>Keep articles, nouns, and prepositional phrases together.</span>
+        <span>Article + noun + adjective travel together. Keep them grouped.</span>
       </div>
-
       <div class="takeaway-step">
-        <strong>4. Check endings</strong>
-        <span>Use forms as clues, not as something to fear.</span>
+        <strong>4. Track pronouns</strong>
+        <span>αὐτόν, οὗτος, μου — follow them back to the noun they came from.</span>
       </div>
-
       <div class="takeaway-step">
-        <strong>5. Build the meaning</strong>
-        <span>Translate piece by piece.</span>
+        <strong>5. Use endings and prepositions</strong>
+        <span>Endings show case. Prepositions add location, direction, source.</span>
+      </div>
+      <div class="takeaway-step">
+        <strong>6. Build the meaning</strong>
+        <span>Translate piece by piece. Meaning comes from the pieces.</span>
       </div>
     </div>
 
     <p class="highlight">
-      Greek reading is not magic. It is a repeatable process.
+      Greek reading is not magic. It is a repeatable process — and now you have all the tools for it.
     </p>
   </div>
 </div>
 
-<div class="lesson-block">
-  <div class="lesson-block-header" onclick="toggleLessonBlock(this.closest('.lesson-block'))">
-     Big Takeaway
-  </div>
-
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+  <div class="lesson-block-header">Big Takeaway</div>
   <div class="lesson-block-content">
 
     <p class="highlight">
-      Do not try to translate Greek by staring at the whole sentence and guessing.
-    </p>
-
-    <p>
-      Read Greek by slowing down and working through the sentence in pieces.
+      Do not stare at the whole sentence and guess. Read by finding the pieces — all eight lessons gave you the tools to do exactly that.
     </p>
 
     <div class="takeaway-box">
-      <div class="takeaway-step">
-        <strong>Verb</strong>
-        <span>What is happening or being stated?</span>
-      </div>
-
-      <div class="takeaway-step">
-        <strong>Subject</strong>
-        <span>Who or what is the sentence about?</span>
-      </div>
-
-      <div class="takeaway-step">
-        <strong>Groups</strong>
-        <span>Which words belong together?</span>
-      </div>
-
-      <div class="takeaway-step">
-        <strong>Endings</strong>
-        <span>What clues do the forms give?</span>
-      </div>
-
-      <div class="takeaway-step">
-        <strong>Meaning</strong>
-        <span>How do the pieces fit together?</span>
-      </div>
+      <div class="takeaway-step"><strong>Conjunctions</strong><span>Tell you the direction — reason, conclusion, contrast, purpose</span></div>
+      <div class="takeaway-step"><strong>Verb + Subject</strong><span>What is happening and who is doing it</span></div>
+      <div class="takeaway-step"><strong>Noun groups</strong><span>Article + noun + adjective travel together</span></div>
+      <div class="takeaway-step"><strong>Pronouns</strong><span>Point back to nouns — follow them</span></div>
+      <div class="takeaway-step"><strong>Endings + prepositions</strong><span>Show roles and relationships</span></div>
+      <div class="takeaway-step"><strong>Meaning</strong><span>Put the pieces together after you recognize them</span></div>
     </div>
 
     <p class="highlight">
-      Recognize the pieces first. Meaning comes from putting the pieces together.
+      Recognize the pieces first. Meaning comes from putting them together.
     </p>
 
     <hr>
 
     <div class="lesson-interactive">
-      <p class="check-title"><strong>Final check</strong></p>
+      <p class="check-title"><strong>Final check — all tools in action</strong></p>
 
       <div class="check-card">
-        <div class="check-prompt">Read this sentence step by step:</div>
+        <div class="check-prompt">Work through this sentence step by step:</div>
 
         <div class="check-greek greek-text">
-          ὁ θεὸς ἐστιν ἀγάπη.
+          Οὕτως γὰρ ἠγάπησεν ὁ θεὸς τὸν κόσμον.
         </div>
 
         <p>What are the main pieces?</p>
@@ -4217,10 +4623,11 @@ OneSignalDeferred.push(async function(OneSignal) {
         </button>
 
         <div class="check-answer">
-          subject: <h4>ὁ θεός</h4> = God<br><br><br>
-          verb: <h4>ἐστιν</h4> = is<br><br><br>
-          description: <h4>ἀγάπη</h4> = love<br><br>
-          meaning: <h4>God is love.</h4>
+          conjunction: <h4>γάρ (second)</h4> = "for/because" — this sentence explains something before it<br><br>
+          subject: <h4>ὁ θεός</h4> = God (nominative, article confirms it)<br><br>
+          verb: <h4>ἠγάπησεν</h4> = loved<br><br>
+          object: <h4>τὸν κόσμον</h4> = the world (accusative)<br><br>
+          meaning: <h4>For God so loved the world.</h4>
         </div>
       </div>
     </div>
@@ -4242,6 +4649,8 @@ OneSignalDeferred.push(async function(OneSignal) {
     Complete Lesson
   </button>
 </div>
+
+  </div>
 </div>
 
   </div>

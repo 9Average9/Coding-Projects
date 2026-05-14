@@ -44,6 +44,9 @@ const REQUIRED_LESSONS = [
   "pronunciation",
   "nouns",
   "cases",
+  "adjectives",
+  "pronouns",
+  "conjunctions",
   "howToRead"
 ];
 
@@ -65,6 +68,9 @@ const LESSON_LABELS = {
   pronunciation: "Pronunciation",
   nouns: "Noun System",
   cases: "Case Endings",
+  adjectives: "Adjectives",
+  pronouns: "Pronouns",
+  conjunctions: "Conjunctions",
   howToRead: "How to Read Greek",
   adv_history: "NT Greek Overview",
   adv_alphabet: "Greek Alphabet",
@@ -9237,6 +9243,9 @@ const learnLessonTitles = {
   pronunciation: "Pronunciation",
   nouns: "Noun System",
   cases: "Case Endings",
+  adjectives: "Adjectives",
+  pronouns: "Pronouns",
+  conjunctions: "Conjunctions",
   howToRead: "How to Read Greek"
 };
 
@@ -11675,44 +11684,113 @@ function showNounCheatSheet() {
   );
 }
 
-function showHowToReadCheatSheet() {
+function showAdjectivesCheatSheet() {
   showLessonCheatSheet(
     "Lesson 6 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        A quick reference for adjective agreement. Adjectives change their endings to match their noun — always.
+      </p>
+
+      <div class="cheat-list">
+        <div><strong>Agreement rule</strong><span>Adjective must match its noun in gender, case, and number.</span></div>
+        <div><strong>Attributive</strong><span>Inside the article-noun group — directly describes: ὁ ἀγαθὸς λόγος (the good word).</span></div>
+        <div><strong>Predicative</strong><span>Outside the group — makes a statement: ὁ λόγος ἀγαθός (the word is good).</span></div>
+        <div><strong>πᾶς / πᾶσα / πᾶν</strong><span>All / every — the most common NT adjective.</span></div>
+        <div><strong>ἅγιος</strong><span>Holy — Πνεῦμα ἅγιον = Holy Spirit.</span></div>
+        <div><strong>αἰώνιος</strong><span>Eternal — ζωὴν αἰώνιον = eternal life.</span></div>
+        <div><strong>καλός</strong><span>Good / beautiful — ὁ ποιμὴν ὁ καλός = the good shepherd.</span></div>
+      </div>
+    `
+  );
+}
+
+function showPronounsCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 7 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        Core pronouns to recognize. When you see one, ask: what noun came before that matches its gender and number?
+      </p>
+
+      <div class="cheat-list">
+        <div><strong>αὐτός / αὐτή / αὐτό</strong><span>He / she / it — most common pronoun in the NT.</span></div>
+        <div><strong>αὐτοῦ / αὐτῆς</strong><span>Of him, his / of her, her (genitive).</span></div>
+        <div><strong>αὐτόν / αὐτήν</strong><span>Him / her (accusative — direct object).</span></div>
+        <div><strong>οὗτος / αὕτη / τοῦτο</strong><span>This — points to something near or just mentioned.</span></div>
+        <div><strong>ἐγώ</strong><span>I — emphatic self-reference. ἐγώ εἰμι = I am.</span></div>
+        <div><strong>σύ</strong><span>You (singular).</span></div>
+        <div><strong>ἡμεῖς / ὑμεῖς</strong><span>We / you all.</span></div>
+        <div><strong>μου / σου</strong><span>Of me / of you (short genitive forms).</span></div>
+      </div>
+    `
+  );
+}
+
+function showConjunctionsCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 8 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        Read conjunctions first — they tell you the direction before you parse a single noun.
+      </p>
+
+      <div class="cheat-list">
+        <div><strong>καί</strong><span>And / also / even — most common word in the NT.</span></div>
+        <div><strong>δέ (2nd position)</strong><span>But / now / and — soft transition. Always second in its clause.</span></div>
+        <div><strong>ἀλλά</strong><span>But (strong) — sharp contrast. Often follows "not... but rather..."</span></div>
+        <div><strong>γάρ (2nd position)</strong><span>For / because — gives the reason. Always second in its clause.</span></div>
+        <div><strong>οὖν (2nd position)</strong><span>Therefore / so — draws a conclusion. Always second in its clause.</span></div>
+        <div><strong>ἵνα</strong><span>In order that / so that — introduces purpose.</span></div>
+        <div><strong>ὅτι</strong><span>That / because — introduces reason or content of a statement.</span></div>
+      </div>
+    `
+  );
+}
+
+function showHowToReadCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 9 Cheat Sheet",
     `
       <p class="cheat-intro">
         Use this as a quick reading checklist. Do not try to translate everything at once.
         Slow down, find the pieces, then build the meaning.
       </p>
 
-      <div class="cheat-list">
+      <div class=”cheat-list”>
+        <div>
+          <strong>0. Read conjunctions</strong>
+          <span>γάρ (reason), οὖν (conclusion), δέ (transition), ἀλλά (contrast), ἵνα (purpose). Read these first.</span>
+        </div>
+
         <div>
           <strong>1. Find the verb</strong>
-          <span>Look for the main action or statement. Example: ἐστιν = is.</span>
+          <span>What is happening or being stated? Example: ἐστιν = is, ἠγάπησεν = loved.</span>
         </div>
 
         <div>
           <strong>2. Find the subject</strong>
-          <span>Ask: who or what is the sentence about?</span>
+          <span>Look for ὁ/ἡ/οἱ/αἱ — the nominative article. That noun is the subject.</span>
         </div>
 
         <div>
-          <strong>3. Group words together</strong>
-          <span>Article + noun usually belong together. Example: ὁ θεός = God.</span>
+          <strong>3. Group words</strong>
+          <span>Article + noun + adjective travel together. ζωὴν αἰώνιον = “eternal life” (one group).</span>
         </div>
 
         <div>
-          <strong>4. Notice endings</strong>
-          <span>Endings help show the word’s role in the sentence.</span>
+          <strong>4. Track pronouns</strong>
+          <span>αὐτόν, οὗτος, μου — follow gender and number back to the noun they came from.</span>
         </div>
 
         <div>
-          <strong>5. Build the meaning</strong>
-          <span>Put the pieces together after you recognize them.</span>
+          <strong>5. Use endings + prepositions</strong>
+          <span>Endings show role. ἐν + dative = in/by. εἰς + accusative = into/toward.</span>
         </div>
 
         <div>
           <strong>Big rule</strong>
-          <span>Do not start with “What does the whole sentence mean?” Start with “What pieces do I recognize?”</span>
+          <span>Do not stare at the whole sentence. Find the pieces — meaning follows.</span>
         </div>
       </div>
     `
@@ -11731,7 +11809,10 @@ function updateLessonTopBar(lesson) {
     pronunciation: "Lesson 3",
     nouns: "Lesson 4",
     cases: "Lesson 5",
-    howToRead: "Lesson 6"
+    adjectives: "Lesson 6",
+    pronouns: "Lesson 7",
+    conjunctions: "Lesson 8",
+    howToRead: "Lesson 9"
   };
 
   title.innerHTML = `
@@ -11759,6 +11840,18 @@ function updateLessonTopBar(lesson) {
   action.innerHTML = `<span class="material-symbols-outlined">table_chart</span>`;
   action.title = "Paradigms";
   action.onclick = openParadigmModal;
+} else if (lesson === "adjectives") {
+  action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+  action.title = "Cheat Sheet";
+  action.onclick = showAdjectivesCheatSheet;
+} else if (lesson === "pronouns") {
+  action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+  action.title = "Cheat Sheet";
+  action.onclick = showPronounsCheatSheet;
+} else if (lesson === "conjunctions") {
+  action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+  action.title = "Cheat Sheet";
+  action.onclick = showConjunctionsCheatSheet;
 } else if (lesson === "howToRead") {
   action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
   action.title = "Cheat Sheet";
@@ -12902,10 +12995,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.7";
+const APP_VERSION = "1.6.8";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 9 capstone update — expanded to integrate all 9 lessons: updated reading strategy (conjunctions first), John 3:16 conjunction/pronoun analysis, new Romans 5:1–2 full walkthrough, expanded 'What You Can Do' list, updated quiz and cheat sheet"
+  "Basic Lessons 6–9 added: Adjectives (agreement, positions, common forms), Pronouns (αὐτός, οὗτος, personal), Conjunctions (καί/δέ/ἀλλά/γάρ/οὖν/ἵνα/ὅτι), and Lesson 9 (How to Read Greek) updated as capstone integrating all tools"
 ];
 
 let deferredInstallPrompt = null;
