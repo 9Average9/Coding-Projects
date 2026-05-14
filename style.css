@@ -4273,6 +4273,101 @@ body.dark .confusion-row {
 body.dark .shortcut-box {
   background: rgba(214, 196, 154, 0.16);
 }
+
+.nt-hook {
+  display: block;
+  margin-top: 4px;
+  color: #5a6e84;
+  font-size: 0.72rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+body.dark .nt-hook {
+  color: #94a3b8;
+}
+
+.nt-moment-box {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(214, 196, 154, 0.25);
+  border: 1px solid rgba(36, 52, 71, 0.18);
+  text-align: center;
+}
+
+.nt-moment-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5a6e84;
+  margin-bottom: 8px;
+}
+
+.nt-moment-verse {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 8px 0 4px;
+  line-height: 1.5;
+}
+
+.nt-moment-trans {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #5a6e84;
+  margin-bottom: 12px;
+}
+
+.nt-moment-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.nt-moment-breakdown > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 140px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 252, 242, 0.8);
+  border: 1px solid rgba(36, 52, 71, 0.1);
+}
+
+.nt-moment-breakdown > div .greek-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.nt-moment-breakdown > div small {
+  font-size: 0.72rem;
+  color: #5a6e84;
+}
+
+body.dark .nt-moment-box {
+  background: rgba(214, 196, 154, 0.12);
+  border-color: rgba(255,255,255,0.1);
+}
+
+body.dark .nt-moment-title,
+body.dark .nt-moment-trans {
+  color: #94a3b8;
+}
+
+body.dark .nt-moment-breakdown > div {
+  background: rgba(17, 24, 39, 0.6);
+  border-color: #4b5563;
+}
+
+body.dark .nt-moment-breakdown > div small {
+  color: #94a3b8;
+}
+
 .article-match-box {
   margin: 16px 0;
   display: flex;
@@ -4442,6 +4537,53 @@ body.dark .paradigm-dots {
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 10px;
   margin: 14px 0;
+}
+
+.case-name-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.case-name-grid > div {
+  background: rgba(255, 252, 242, 0.75);
+  border: 1px solid rgba(36, 52, 71, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.case-name-grid > div strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.case-name-grid > div span {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--font-color);
+  opacity: 0.85;
+}
+
+.case-name-grid > div small {
+  display: block;
+  font-size: 0.75rem;
+  color: #5a6e84;
+  margin-top: 2px;
+}
+
+body.dark .case-name-grid > div {
+  background: rgba(17, 24, 39, 0.6);
+  border-color: #4b5563;
+}
+
+body.dark .case-name-grid > div small {
+  color: #94a3b8;
 }
 
 .mark-card {
@@ -7029,6 +7171,7 @@ body #newLearnMenu .triple-item,
 body #newLearnMenu .stem-build-box,
 body #newLearnMenu .stem-row,
 body #newLearnMenu .case-name-grid > div,
+body #newLearnMenu .nt-moment-breakdown > div,
 body #newLearnMenu .cheat-list > div {
   background:
     color-mix(in srgb, var(--secondary-color) 6%, var(--card-color))
@@ -7044,9 +7187,16 @@ body #newLearnMenu .cheat-list > div {
 /* Slightly stronger containers */
 body #newLearnMenu .takeaway-box,
 body #newLearnMenu .ending-info-box,
-body #newLearnMenu .stem-build-box {
+body #newLearnMenu .stem-build-box,
+body #newLearnMenu .nt-moment-box {
   background:
     color-mix(in srgb, var(--secondary-color) 9%, var(--card-color))
+    !important;
+}
+
+body #newLearnMenu .nt-moment-box {
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color) 22%, var(--border-color))
     !important;
 }
 
