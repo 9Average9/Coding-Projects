@@ -13159,10 +13159,14 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "1.7.5";
 
 const UPDATE_NOTES = [
-  "Basic Lessons 6–9 added: Adjectives (agreement, positions, common forms), Pronouns (αὐτός, οὗτος, personal), Conjunctions (καί/δέ/ἀλλά/γάρ/οὖν/ἵνα/ὅτι), and Lesson 9 (How to Read Greek) updated as capstone integrating all tools"
+  "Cases lesson fully rewritten — engaging new opening, unified case visual, NT phrase hooks for every case, and a John 3:16 highlight showing nominative/accusative in a real verse",
+  "Adjectives (L7) and Pronouns (L8) now have Big Takeaway sections with summary boxes and final knowledge checks — all 10 basic lessons now have consistent structure",
+  "Grammatical gender teaching added to Nouns (L4), verb framework bridge added to Conjunctions (L9) and How to Read (L10)",
+  "Prepositions lesson (L6) added to both Basic and Advanced tracks",
+  "Various content improvements: pronunciation flow, iota subscript callout in Cases, αὐτός full paradigm table in Pronouns, and multiple knowledge check upgrades"
 ];
 
 let deferredInstallPrompt = null;

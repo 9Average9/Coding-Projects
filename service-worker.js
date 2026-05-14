@@ -6,7 +6,7 @@ const FILES_TO_CACHE = [
   "./index.html",
   "./style.css?v=91",
   "./vocab.js?v=89",
-  "./app.js?v=89",
+  "./app.js?v=92",
   "./firebase-lb.js?v=89",
   "./manifest.json",
   "./icon-192.png",
