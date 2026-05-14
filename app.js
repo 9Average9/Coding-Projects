@@ -10152,6 +10152,7 @@ function openAdvCheatSheet(lessonId) {
               <tr><td><strong class="adv-cs-gk">ἐκ / ἐξ</strong></td><td>Gen. only</td><td>out of, from (source)</td><td>ἐκ τοῦ θεοῦ — out of God</td></tr>
               <tr><td><strong class="adv-cs-gk">ἀπό</strong></td><td>Gen. only</td><td>from, away from</td><td>ἀπὸ θεοῦ — from God</td></tr>
               <tr><td><strong class="adv-cs-gk">πρός</strong></td><td>Acc. only</td><td>to, toward, with (relational)</td><td>πρὸς τὸν θεόν — with God (John 1:1)</td></tr>
+
             </tbody>
           </table>
         </div>
@@ -11829,7 +11830,7 @@ function showPrepositionsCheatSheet() {
       </p>
 
       <div class="cheat-list">
-        <div><strong>ἐν + dative</strong><span>In / within / by means of — ἐν ἀρχῇ (in the beginning), ἐν Χριστῷ (in Christ).</span></div>
+        <div><strong>ἐν + dative</strong><span>In / within / by means of — ἐν ἀρχῇ (in the beginning), ἐν χριστῷ (in Christ).</span></div>
         <div><strong>εἰς + accusative</strong><span>Into / toward — εἰς τὸν κόσμον (into the world).</span></div>
         <div><strong>ἐκ + genitive</strong><span>Out of / from — ἐκ τοῦ θεοῦ (out of God).</span></div>
         <div><strong>ἀπό + genitive</strong><span>From / away from — ἀπὸ θεοῦ (from God).</span></div>
@@ -11855,7 +11856,7 @@ function showAdjectivesCheatSheet() {
         <div><strong>Attributive</strong><span>Inside the article-noun group — directly describes: ὁ ἀγαθὸς λόγος (the good word).</span></div>
         <div><strong>Predicative</strong><span>Outside the group — makes a statement: ὁ λόγος ἀγαθός (the word is good).</span></div>
         <div><strong>πᾶς / πᾶσα / πᾶν</strong><span>All / every — the most common NT adjective.</span></div>
-        <div><strong>ἅγιος</strong><span>Holy — Πνεῦμα ἅγιον = Holy Spirit.</span></div>
+        <div><strong>ἅγιος</strong><span>Holy — πνεῦμα ἅγιον = Holy Spirit.</span></div>
         <div><strong>αἰώνιος</strong><span>Eternal — ζωὴν αἰώνιον = eternal life.</span></div>
         <div><strong>καλός</strong><span>Good / beautiful — ὁ ποιμὴν ὁ καλός = the good shepherd.</span></div>
       </div>
