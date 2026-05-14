@@ -11158,25 +11158,21 @@ function selectAdvQuizAns(optIdx) {
   const total = data.questions.length;
   currentQuizAnswers[currentQuizQIdx] = optIdx;
 
-  // Disable all buttons immediately — that's the tap feedback
-  document.querySelectorAll(".quiz-modal-opt").forEach(btn => { btn.disabled = true; });
+  // Highlight the selected answer and lock all options
+  document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === optIdx) btn.classList.add("qm-selected");
+  });
 
   const isLast = currentQuizQIdx === total - 1;
-  if (isLast) {
-    // On the final question only, briefly show the selection then re-render with See Results
-    document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
-      if (i === optIdx) btn.classList.add("qm-selected");
-    });
-    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 250);
-  } else {
-    // No gold highlight during advance — disabling buttons is enough feedback.
-    // Showing qm-selected and then removing it causes the color to bleed into the
-    // next question's slide animation due to CSS transition timing.
-    setTimeout(() => {
+  setTimeout(() => {
+    if (isLast) {
+      renderAdvQuizQ(currentQuizQIdx); // re-render last question to show "See Results" button
+    } else {
       currentQuizQIdx++;
       renderAdvQuizQ(currentQuizQIdx);
-    }, 180);
-  }
+    }
+  }, 420);
 }
 
 function advQuizGoBack() {
@@ -11198,6 +11194,8 @@ function finishAdvQuiz() {
   const passed = correct >= data.passMark;
 
   document.getElementById("quizModalBody")?.classList.add("hidden");
+  const backBtn = document.getElementById("quizBackBtn");
+  if (backBtn) backBtn.style.visibility = "hidden";
   const fill = document.getElementById("quizModalFill");
   if (fill) fill.style.width = "100%";
 
@@ -12995,7 +12993,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.8";
+const APP_VERSION = "1.6.9";
 
 const UPDATE_NOTES = [
   "Basic Lessons 6–9 added: Adjectives (agreement, positions, common forms), Pronouns (αὐτός, οὗτος, personal), Conjunctions (καί/δέ/ἀλλά/γάρ/οὖν/ἵνα/ὅτι), and Lesson 9 (How to Read Greek) updated as capstone integrating all tools"
