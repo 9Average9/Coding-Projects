@@ -55,6 +55,7 @@ const REQUIRED_ADVANCED_LESSONS = [
   "adv_cases",
   "adv_adjectives",
   "adv_pronouns",
+  "adv_conjunctions",
   "adv_howToRead"
 ];
 
@@ -72,6 +73,7 @@ const LESSON_LABELS = {
   adv_cases: "Case Endings",
   adv_adjectives: "Adjectives",
   adv_pronouns: "Pronouns",
+  adv_conjunctions: "Conjunctions & Particles",
   adv_howToRead: "How to Read Greek"
 };
 
@@ -9423,6 +9425,7 @@ const advLessonTitles = {
   adv_cases: "Case Endings",
   adv_adjectives: "Adjectives",
   adv_pronouns: "Pronouns",
+  adv_conjunctions: "Conjunctions & Particles",
   adv_howToRead: "How to Read Greek"
 };
 
@@ -9434,7 +9437,8 @@ const advLessonNumbers = {
   adv_cases: "Advanced · Lesson 5",
   adv_adjectives: "Advanced · Lesson 6",
   adv_pronouns: "Advanced · Lesson 7",
-  adv_howToRead: "Advanced · Lesson 8"
+  adv_conjunctions: "Advanced · Lesson 8",
+  adv_howToRead: "Advanced · Lesson 9"
 };
 
 function showAdvancedLesson(lessonId) {
@@ -10053,6 +10057,71 @@ function openAdvCheatSheet(lessonId) {
           </table>
         </div>
       `;
+    } else if (lessonId === "adv_conjunctions") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">Conjunctions &amp; Particles — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Coordinating Conjunctions</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Word</th><th>Meaning</th><th>Signal</th><th>Postpositive?</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">καί</strong></td><td>and, also, even</td><td>Addition / continuation</td><td>No</td></tr>
+              <tr><td><strong class="adv-cs-gk">δέ</strong></td><td>and, but, now</td><td>Mild transition or contrast</td><td>Yes — always 2nd</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἀλλά</strong></td><td>but, rather</td><td>Strong contrast or correction</td><td>No</td></tr>
+              <tr><td><strong class="adv-cs-gk">γάρ</strong></td><td>for, because</td><td>Explanation of preceding clause</td><td>Yes — always 2nd</td></tr>
+              <tr><td><strong class="adv-cs-gk">οὖν</strong></td><td>therefore, then, so</td><td>Conclusion from preceding argument</td><td>Yes — always 2nd</td></tr>
+              <tr><td><strong class="adv-cs-gk">τε</strong></td><td>and (close connection)</td><td>Links tightly related items</td><td>Yes — always 2nd</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Subordinating Conjunctions</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Word</th><th>Meaning</th><th>Takes what mood</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">ὅτι</strong></td><td>that (indirect statement) / because</td><td>Indicative</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἵνα</strong></td><td>in order that, so that</td><td>Subjunctive always</td></tr>
+              <tr><td><strong class="adv-cs-gk">ὥστε</strong></td><td>so that, with the result that</td><td>Indicative or infinitive</td></tr>
+              <tr><td><strong class="adv-cs-gk">εἰ</strong></td><td>if (simple condition)</td><td>Indicative</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἐάν</strong></td><td>if (uncertain condition)</td><td>Subjunctive</td></tr>
+              <tr><td><strong class="adv-cs-gk">ὅτε / ὅταν</strong></td><td>when / whenever</td><td>Indicative / Subjunctive</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Negation</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Word</th><th>Used with</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">οὐ / οὐκ / οὐχ</strong></td><td>Indicative mood</td><td>Standard negation of facts</td></tr>
+              <tr><td><strong class="adv-cs-gk">μή</strong></td><td>Subjunctive, imperative, infinitive, participle</td><td>Negation of non-indicative</td></tr>
+              <tr><td><strong class="adv-cs-gk">οὐ μή</strong></td><td>Subjunctive</td><td>Emphatic negation — "absolutely not"</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἵνα μή</strong></td><td>Subjunctive</td><td>Purpose/result negation — "so that not"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key Particles</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Particle</th><th>Position</th><th>Signal</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">μέν...δέ</strong></td><td>Both postpositive</td><td>"on the one hand...on the other hand"</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἄρα</strong></td><td>Usually postpositive</td><td>Logical consequence — "then, therefore"</td></tr>
+              <tr><td><strong class="adv-cs-gk">νῦν (logical)</strong></td><td>Free</td><td>"as it is, in fact" — logical, not temporal</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἰδού</strong></td><td>Sentence-initial</td><td>"Behold! Look!" — draws attention</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Argument Navigation — What to Ask</h4>
+          <p><strong>καί</strong> → "what is being added?" &nbsp;·&nbsp; <strong>δέ</strong> → "what new development?" &nbsp;·&nbsp; <strong>ἀλλά</strong> → "what is being corrected?" &nbsp;·&nbsp; <strong>γάρ</strong> → "why is this true?" &nbsp;·&nbsp; <strong>οὖν</strong> → "what conclusion follows?" &nbsp;·&nbsp; <strong>ἵνα</strong> → "what is the purpose?"</p>
+        </div>
+      `;
     } else if (lessonId === "adv_howToRead") {
       content.innerHTML = `
         <h3 class="adv-cs-title">How to Read Greek — Cheat Sheet</h3>
@@ -10325,6 +10394,36 @@ const ADV_KC_DATA = {
     { correct: true, feedback: "Correct! πνεῦμα is a grammatically neuter noun. Any adjective modifying it must take the neuter form to agree. So ἅγιος (masc.) becomes ἅγιον (neut.) to match πνεῦμα's gender. This is pure grammatical agreement — not a theological statement." },
     { feedback: "The adjective follows the noun's grammatical gender — not the adjective's own declension family. ἅγιος is a 2-1-2 adjective and does have a neuter form: ἅγιον." },
     { feedback: "Position doesn't determine the adjective's form — the noun's gender, case, and number do. ἅγιον is neuter because πνεῦμα is neuter, regardless of where the adjective appears." }
+  ],
+  kc_adv_conjunctions_1: [
+    { feedback: "Postpositive doesn't mean negation — that's οὐ and μή. Postpositive is about position: these words cannot stand first in their clause." },
+    { correct: true, feedback: "Correct! 'Postpositive' means these words always appear second (or later) in their clause — never first. This is why you see ὁ δέ, εἶπεν γάρ, and τί οὖν — the conjunction is tucked into second position, with the first word of the clause preceding it." },
+    { feedback: "Postpositive words appear in second position within their clause — not necessarily at the sentence end. Many more words can follow them." },
+    { feedback: "Postpositive words appear in both independent and dependent clauses. The rule is about position (second), not clause type." }
+  ],
+  kc_adv_conjunctions_2: [
+    { feedback: "ἵνα introduces a subjunctive clause, not an indicative statement of fact. Facts are stated without ἵνα." },
+    { correct: true, feedback: "Correct! ἵνα always introduces a purpose or result clause and always takes the subjunctive mood. 'In order that' (purpose) or 'so that' (result). You saw this in John 3:16: ἵνα...μὴ ἀπόληται ἀλλ' ἔχῃ — both verbs (ἀπόληται, ἔχῃ) are subjunctive, following ἵνα." },
+    { feedback: "ἵνα uses the subjunctive, not the imperative. Direct commands use the imperative independently without ἵνα." },
+    { feedback: "Indirect questions use ὅτι or interrogative pronouns (τίς), not ἵνα. ἵνα specifically signals purpose or result." }
+  ],
+  kc_adv_conjunctions_3: [
+    { feedback: "The tense of the action doesn't determine the negative particle — the mood of the verb does." },
+    { feedback: "Future actions can take either negative depending on the mood. An indicative future uses οὐ; a subjunctive future uses μή." },
+    { correct: true, feedback: "Correct! μή negates non-indicative verb forms: subjunctive, imperative, infinitive, and participle. οὐ negates indicative verbs. So ἵνα μή (purpose clause, subjunctive) uses μή; οὐ λέγει ('he does not say,' indicative) uses οὐ. This rule has almost no exceptions in the NT." },
+    { feedback: "The subject has nothing to do with which negative is used. It's the verb's mood that determines οὐ vs. μή." }
+  ],
+  kc_adv_conjunctions_4: [
+    { feedback: "οὖν draws a conclusion FROM the previous argument — inferential. Contrast is δέ or ἀλλά, not οὖν." },
+    { correct: true, feedback: "Correct! οὖν is inferential — 'therefore, then, so.' In Romans 5:1, δικαιωθέντες οὖν ἐκ πίστεως ('therefore, having been justified by faith') uses οὖν to draw a conclusion from chapters 1–4's argument about justification. It's a logical hinge — always ask: what is Paul concluding from what came before?" },
+    { feedback: "γάρ signals explanation ('for, because'). οὖν signals conclusion ('therefore, then'). They have different directional logic: γάρ looks backward to explain; οὖν looks backward to conclude." },
+    { feedback: "οὖν is a transitional particle — but it signals a conclusion from what came before, not a break from it. When you see οὖν, the argument is building forward, not changing topic." }
+  ],
+  kc_adv_conjunctions_5: [
+    { feedback: "δέ is postpositive (always second), ἀλλά is not. But the main functional difference is strength of contrast, not position." },
+    { correct: true, feedback: "Correct! ἀλλά is a strong adversative — a sharp contrast or correction ('but, rather, on the contrary'). δέ is milder — often just a transition ('and, now') or a gentle contrast ('but'). Both can be translated 'but' in English, but ἀλλά signals a more emphatic shift. Not...ἀλλά is the standard correction formula: 'not X, but rather Y.'" },
+    { feedback: "Both ἀλλά and δέ appear in main clauses. ἀλλά doesn't specifically introduce subordinate clauses." },
+    { feedback: "ἀλλά and δέ are not interchangeable — their strengths of contrast differ meaningfully. Greek uses both precisely; translating both simply as 'but' loses the distinction." }
   ],
   kc_adv_pronouns_1: [
     { feedback: "αὐτός is the masculine nominative singular form — 'he.' The feminine would need a different ending." },
@@ -10630,6 +10729,62 @@ const ADV_QUIZ_DATA = {
       {
         text: "In John 3:16, τὸν υἱὸν τὸν μονογενῆ — the repeated article τόν marks both words as accusative masculine singular. Why does this matter for reading?",
         options: ["It tells us μονογενῆ is the subject of the sentence", "It confirms that μονογενῆ agrees with υἱόν — 'only' describes 'Son', not some other word", "It signals a dative of reference", "It indicates a vocative — God is being addressed"],
+        correct: 1
+      }
+    ]
+  },
+  adv_conjunctions: {
+    title: "Conjunctions & Particles",
+    passMark: 7,
+    questions: [
+      {
+        text: "What does γάρ primarily signal in a Greek sentence?",
+        options: ["A contrast with the preceding clause", "An explanation or reason — 'for, because'", "A conclusion drawn from the previous argument", "A purpose or result clause using the subjunctive"],
+        correct: 1
+      },
+      {
+        text: "Which group of conjunctions is 'postpositive' — meaning they never appear first in their clause?",
+        options: ["καί and ἀλλά", "δέ, γάρ, and οὖν", "ὅτι and ἵνα", "εἰ and ἐάν"],
+        correct: 1
+      },
+      {
+        text: "ἵνα followed by a verb introduces what kind of clause?",
+        options: ["A completed past action in the indicative", "A purpose or result clause using the subjunctive", "A conditional sentence using the imperative", "An indirect question"],
+        correct: 1
+      },
+      {
+        text: "ὅτι can mean two different things depending on context. Which pair is correct?",
+        options: ["'who' (relative) / 'that' (indirect statement)", "'that' (indirect statement after verbs of saying/knowing) / 'because' (explaining the preceding clause)", "'if' (condition) / 'when' (time clause)", "'therefore' / 'however'"],
+        correct: 1
+      },
+      {
+        text: "οὐ μή together create what kind of negation?",
+        options: ["Simple past negation", "Emphatic negation — 'absolutely not, never'", "Conditional negation only", "A negated purpose clause"],
+        correct: 1
+      },
+      {
+        text: "In the μέν...δέ construction, what does it communicate?",
+        options: ["Both items are identical in meaning", "'On the one hand...on the other hand' — a contrast or balance between two things", "The first item is more important than the second", "The first item is hypothetical; the second is real"],
+        correct: 1
+      },
+      {
+        text: "When you see ὁ δέ or αὐτὸς δέ at the start of a clause, what does δέ tell you?",
+        options: ["The article is functioning as a relative pronoun", "A new development or mild contrast is beginning", "The noun is in predicate position", "The pronoun refers to a very distant antecedent"],
+        correct: 1
+      },
+      {
+        text: "ἀλλά signals a...",
+        options: ["Mild transition or simple addition", "Strong contrast or correction — 'but, rather, on the contrary'", "Explanation of the previous clause", "Conclusion drawn from the preceding argument"],
+        correct: 1
+      },
+      {
+        text: "In John 3:16 — ἵνα...μὴ ἀπόληται — why is μή used rather than οὐ?",
+        options: ["Because the action is set in the past", "Because ἀπόληται is a subjunctive verb, and μή negates non-indicative moods", "Because the sentence is phrased as a question", "Because μή is always required in purpose clauses regardless of mood"],
+        correct: 1
+      },
+      {
+        text: "In Ephesians 2:4 — ὁ δὲ θεός — after verses describing human sinfulness, what does δέ signal?",
+        options: ["A smooth continuation of the argument about sin", "A mild contrast or new development — 'But God...' turning from human condition to divine action", "An explanation of why humans sin", "A conclusion Paul draws from the preceding argument"],
         correct: 1
       }
     ]
@@ -12704,10 +12859,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.5";
+const APP_VERSION = "1.6.6";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 7: Pronouns — personal (ἐγώ/σύ/αὐτός), demonstratives (οὗτος/ἐκεῖνος), relative pronoun (ὅς/ἥ/ὅ), interrogative/indefinite (τίς/τις), antecedent agreement, and NT tracking examples"
+  "Advanced Lesson 8: Conjunctions & Particles — καί/δέ/ἀλλά/γάρ/οὖν, the postpositive rule, ὅτι/ἵνα/ὥστε/εἰ/ἐάν, negation (οὐ vs. μή), μέν...δέ, and NT argument structure examples"
 ];
 
 let deferredInstallPrompt = null;
