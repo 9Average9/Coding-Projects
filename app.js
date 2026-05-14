@@ -54,6 +54,7 @@ const REQUIRED_ADVANCED_LESSONS = [
   "adv_nouns",
   "adv_cases",
   "adv_adjectives",
+  "adv_pronouns",
   "adv_howToRead"
 ];
 
@@ -70,6 +71,7 @@ const LESSON_LABELS = {
   adv_nouns: "Noun System",
   adv_cases: "Case Endings",
   adv_adjectives: "Adjectives",
+  adv_pronouns: "Pronouns",
   adv_howToRead: "How to Read Greek"
 };
 
@@ -9420,6 +9422,7 @@ const advLessonTitles = {
   adv_nouns: "Noun System",
   adv_cases: "Case Endings",
   adv_adjectives: "Adjectives",
+  adv_pronouns: "Pronouns",
   adv_howToRead: "How to Read Greek"
 };
 
@@ -9430,7 +9433,8 @@ const advLessonNumbers = {
   adv_nouns: "Advanced · Lesson 4",
   adv_cases: "Advanced · Lesson 5",
   adv_adjectives: "Advanced · Lesson 6",
-  adv_howToRead: "Advanced · Lesson 7"
+  adv_pronouns: "Advanced · Lesson 7",
+  adv_howToRead: "Advanced · Lesson 8"
 };
 
 function showAdvancedLesson(lessonId) {
@@ -9963,6 +9967,92 @@ function openAdvCheatSheet(lessonId) {
           </table>
         </div>
       `;
+    } else if (lessonId === "adv_pronouns") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">Pronouns — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Core Rule</h4>
+          <p>A pronoun's <strong>gender and number</strong> come from its antecedent (the noun it replaces). Its <strong>case</strong> comes from its own role in the sentence.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">1st &amp; 2nd Person — ἐγώ / σύ</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>1st sg.</th><th>1st pl.</th><th>2nd sg.</th><th>2nd pl.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>ἐγώ</td><td>ἡμεῖς</td><td>σύ</td><td>ὑμεῖς</td></tr>
+              <tr><td><strong>Gen.</strong></td><td>μου / ἐμοῦ</td><td>ἡμῶν</td><td>σου / σοῦ</td><td>ὑμῶν</td></tr>
+              <tr><td><strong>Dat.</strong></td><td>μοι / ἐμοί</td><td>ἡμῖν</td><td>σοι / σοί</td><td>ὑμῖν</td></tr>
+              <tr><td><strong>Acc.</strong></td><td>με / ἐμέ</td><td>ἡμᾶς</td><td>σε / σέ</td><td>ὑμᾶς</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:6px;font-size:0.82rem;opacity:0.8">Short forms (μου, μοι, με) are unemphatic. Long forms (ἐμοῦ, ἐμοί, ἐμέ) are emphatic.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">3rd Person — αὐτός / αὐτή / αὐτό (2-1-2 pattern)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>αὐτός</td><td>αὐτή</td><td>αὐτό</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>αὐτοῦ</td><td>αὐτῆς</td><td>αὐτοῦ</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>αὐτῷ</td><td>αὐτῇ</td><td>αὐτῷ</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>αὐτόν</td><td>αὐτήν</td><td>αὐτό</td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>αὐτοί</td><td>αὐταί</td><td>αὐτά</td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>αὐτῶν</td><td>αὐτῶν</td><td>αὐτῶν</td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>αὐτοῖς</td><td>αὐταῖς</td><td>αὐτοῖς</td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>αὐτούς</td><td>αὐτάς</td><td>αὐτά</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:6px;font-size:0.82rem;opacity:0.8"><strong>Three uses:</strong> personal (he/she/it) · intensive (himself/herself) · "the same" (in attributive position)</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Demonstratives — οὗτος (this) / ἐκεῖνος (that)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>οὗτος m.</th><th>αὕτη f.</th><th>τοῦτο n.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>οὗτος</td><td>αὕτη</td><td>τοῦτο</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>τούτου</td><td>ταύτης</td><td>τούτου</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>τούτῳ</td><td>ταύτῃ</td><td>τούτῳ</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>τοῦτον</td><td>ταύτην</td><td>τοῦτο</td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>οὗτοι</td><td>αὗται</td><td>ταῦτα</td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>τούτους</td><td>ταύτας</td><td>ταῦτα</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:6px;font-size:0.82rem;opacity:0.8">ἐκεῖνος/ἐκείνη/ἐκεῖνο follows the standard 2-1-2 pattern.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Relative Pronoun — ὅς / ἥ / ὅ (who, which, that)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>ὅς</td><td>ἥ</td><td>ὅ</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>οὗ</td><td>ἧς</td><td>οὗ</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>ᾧ</td><td>ᾗ</td><td>ᾧ</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>ὅν</td><td>ἥν</td><td>ὅ</td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>οἵ</td><td>αἵ</td><td>ἅ</td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>ὧν</td><td>ὧν</td><td>ὧν</td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>οἷς</td><td>αἷς</td><td>οἷς</td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>οὕς</td><td>ἅς</td><td>ἅ</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:6px;font-size:0.82rem;opacity:0.8">Looks like the article but with rough breathing (᾿) on most forms. Gender/number from antecedent; case from role in the relative clause.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Interrogative &amp; Indefinite — τίς / τις</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th></th><th>τίς (accent)</th><th>τις (no accent)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Meaning</strong></td><td>who? what? (interrogative)</td><td>someone, a certain (indefinite)</td></tr>
+              <tr><td><strong>Example</strong></td><td>τίς ἐστιν; — Who is it?</td><td>ἄνθρωπός τις — a certain man</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
     } else if (lessonId === "adv_howToRead") {
       content.innerHTML = `
         <h3 class="adv-cs-title">How to Read Greek — Cheat Sheet</h3>
@@ -10235,6 +10325,36 @@ const ADV_KC_DATA = {
     { correct: true, feedback: "Correct! πνεῦμα is a grammatically neuter noun. Any adjective modifying it must take the neuter form to agree. So ἅγιος (masc.) becomes ἅγιον (neut.) to match πνεῦμα's gender. This is pure grammatical agreement — not a theological statement." },
     { feedback: "The adjective follows the noun's grammatical gender — not the adjective's own declension family. ἅγιος is a 2-1-2 adjective and does have a neuter form: ἅγιον." },
     { feedback: "Position doesn't determine the adjective's form — the noun's gender, case, and number do. ἅγιον is neuter because πνεῦμα is neuter, regardless of where the adjective appears." }
+  ],
+  kc_adv_pronouns_1: [
+    { feedback: "αὐτός is the masculine nominative singular form — 'he.' The feminine would need a different ending." },
+    { correct: true, feedback: "Correct! αὐτή is the feminine nominative singular — 'she.' It follows the 1st declension pattern for the feminine, just like the 2-1-2 adjectives you learned. αὐτός (masc.), αὐτή (fem.), αὐτό (neut.)." },
+    { feedback: "αὐτό is the neuter nominative singular — 'it.' Both nominative and accusative neuter forms are αὐτό." },
+    { feedback: "αὐτῆς is the genitive feminine singular — 'of her / her (possession).' Not the nominative." }
+  ],
+  kc_adv_pronouns_2: [
+    { feedback: "οὗτος is neuter only when it appears as τοῦτο. The form οὗτος itself is masculine nominative singular." },
+    { feedback: "The feminine nominative singular of οὗτος is αὕτη — not οὗτος. The masculine and feminine differ in form." },
+    { correct: true, feedback: "Correct! οὗτος is masculine nominative singular — so it refers back to a masculine noun. In Matthew 3:17 it refers back to 'my Son' (υἱός, masculine). The pronoun's gender tracks the antecedent's grammatical gender." },
+    { feedback: "While pronouns often agree with nearby subjects, it's the grammatical gender of the antecedent — not its clause position — that determines the pronoun's gender." }
+  ],
+  kc_adv_pronouns_3: [
+    { feedback: "The verb in the relative clause determines the pronoun's CASE — not its gender and number. Gender and number come from the antecedent." },
+    { feedback: "The case of the antecedent in the main clause does not determine the relative pronoun's case — the relative pronoun gets its case from its own role inside the relative clause." },
+    { correct: true, feedback: "Correct! The relative pronoun gets its gender and number from its antecedent — the noun it refers back to. Its case, however, comes from its grammatical role inside the relative clause (subject = nominative, object = accusative, etc.)." },
+    { feedback: "Word order is free in Greek and does not determine the form of a relative pronoun. Gender/number from antecedent, case from role — that's the rule." }
+  ],
+  kc_adv_pronouns_4: [
+    { feedback: "τίς and τις are not distinguished by gender — both have masculine/feminine forms that look the same, and both have neuter forms (τί / τι). The distinction is interrogative vs. indefinite." },
+    { correct: true, feedback: "Correct! τίς (with the acute accent on the iota) is interrogative — 'who?' or 'what?' τις (enclitic, no accent or diminished accent) is indefinite — 'someone,' 'something,' 'a certain.' The accent is everything." },
+    { feedback: "τίς and τις are not distinguished by number. Both have singular and plural forms. The distinction is interrogative vs. indefinite, marked by the accent." },
+    { feedback: "Both τίς and τις are pronouns (or adjectives). Neither is a conjunction. The distinction is the accent, which marks interrogative vs. indefinite meaning." }
+  ],
+  kc_adv_pronouns_5: [
+    { feedback: "Greek uses grammatical gender for agreement, not theological category. The masculine ἐκεῖνος here agrees with παράκλητος — a grammatical decision, not a theological statement about the Spirit's personhood." },
+    { correct: true, feedback: "Correct! In John 14:26, ἐκεῖνος is masculine because it primarily agrees with παράκλητος (masculine noun), even though the Holy Spirit is also identified as τὸ πνεῦμα (neuter). Greek pronouns track the grammatical gender of the antecedent — and when two antecedents are in apposition, the pronoun can agree with either. Here the masculine emphasizes the Counselor's personal agency." },
+    { feedback: "ἐκεῖνος does refer to the Holy Spirit — the whole verse identifies the παράκλητος as τὸ πνεῦμα τὸ ἅγιον. The masculine agreement is a grammatical feature, not a denial of the identification." },
+    { feedback: "While the masculine pronoun is consistent with the Spirit's personal nature, the grammatical reason is agreement with παράκλητος. Greek grammar here doesn't itself make a theological argument — it follows agreement rules." }
   ],
   kc_adv_howToRead_1: [
     { feedback: "The accusative is governed by εἰς (into/toward) — not ἐν. These two are frequently confused: ἐν + dative = 'in' (location), εἰς + accusative = 'into' (direction). They are not interchangeable." },
@@ -10510,6 +10630,62 @@ const ADV_QUIZ_DATA = {
       {
         text: "In John 3:16, τὸν υἱὸν τὸν μονογενῆ — the repeated article τόν marks both words as accusative masculine singular. Why does this matter for reading?",
         options: ["It tells us μονογενῆ is the subject of the sentence", "It confirms that μονογενῆ agrees with υἱόν — 'only' describes 'Son', not some other word", "It signals a dative of reference", "It indicates a vocative — God is being addressed"],
+        correct: 1
+      }
+    ]
+  },
+  adv_pronouns: {
+    title: "Pronouns",
+    passMark: 7,
+    questions: [
+      {
+        text: "A Greek pronoun's CASE is determined by...",
+        options: ["The gender of its antecedent noun", "Its own grammatical role in the sentence (subject, object, etc.)", "The gender and number of its antecedent", "The tense of the main verb in the clause"],
+        correct: 1
+      },
+      {
+        text: "αὐτός can be used in three distinct ways. Which of these is NOT one of them?",
+        options: ["Personal pronoun — he/she/it", "Intensive pronoun — himself/herself/itself", "'The same' — when used in attributive position", "Relative pronoun — who/which/that"],
+        correct: 3
+      },
+      {
+        text: "In αὐτοῦ, what does the genitive case tell you about this pronoun's role?",
+        options: ["It is the subject of the clause", "It expresses possession — 'his / her / its'", "It is the direct object of the verb", "It marks the indirect object"],
+        correct: 1
+      },
+      {
+        text: "οὗτος means ___ and ἐκεῖνος means ___.",
+        options: ["this (near) / that (distant or prior)", "that (distant) / this (near)", "he / she", "the same / another"],
+        correct: 0
+      },
+      {
+        text: "The phrase διὰ τοῦτο appears throughout the NT. What does it mean?",
+        options: ["Through this one", "Because of this / for this reason", "In this place", "After this time"],
+        correct: 1
+      },
+      {
+        text: "In a relative clause, what determines which form of ὅς/ἥ/ὅ to use?",
+        options: ["The verb form in the relative clause", "The case of the noun in the main clause", "Gender and number from the antecedent; case from the relative clause's own structure", "The position of the relative clause in the sentence"],
+        correct: 2
+      },
+      {
+        text: "What is the key difference between τίς (accented) and τις (unaccented)?",
+        options: ["τίς is masculine, τις is feminine", "τίς is interrogative ('who?/what?'), τις is indefinite ('someone/something')", "τίς is singular, τις is plural", "τίς is a pronoun, τις is an adjective"],
+        correct: 1
+      },
+      {
+        text: "In John 1:2 — οὗτος ἦν ἐν ἀρχῇ πρὸς τὸν θεόν — what does οὗτος refer back to?",
+        options: ["τὸν θεόν in the same clause", "ὁ λόγος from John 1:1", "ἀρχή (the beginning)", "The author John himself"],
+        correct: 1
+      },
+      {
+        text: "ἡμεῖς is the plural form of which pronoun?",
+        options: ["αὐτός", "σύ", "ἐγώ", "οὗτος"],
+        correct: 2
+      },
+      {
+        text: "In 1 John 4:10 — αὐτὸς ἠγάπησεν ἡμᾶς — αὐτός appears alongside the verb even though the verb's ending already implies a subject. What is this use of αὐτός called?",
+        options: ["Demonstrative use — pointing to a distant referent", "Intensive use — 'he himself loved us,' emphasizing the subject", "Relative use — introducing a relative clause", "Reflexive use — 'he loved himself'"],
         correct: 1
       }
     ]
@@ -12528,10 +12704,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.4";
+const APP_VERSION = "1.6.5";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 6: Adjectives — agreement rule, 2-1-2 declension, attributive/predicate/substantive positions, irregular adjectives (πᾶς, μέγας, πολύς), high-frequency NT adjectives, and NT parsing examples"
+  "Advanced Lesson 7: Pronouns — personal (ἐγώ/σύ/αὐτός), demonstratives (οὗτος/ἐκεῖνος), relative pronoun (ὅς/ἥ/ὅ), interrogative/indefinite (τίς/τις), antecedent agreement, and NT tracking examples"
 ];
 
 let deferredInstallPrompt = null;
