@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=86" />
+  <link rel="stylesheet" href="style.css?v=87" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4336,9 +4336,21 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
     </button>
 
-    <button onclick="showAdvancedLesson('adv_howToRead')">
+    <button onclick="showAdvancedLesson('adv_adjectives')">
       <div class="lesson-number-wrap">
         <div class="lesson-number">6</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Adjectives</strong>
+        <small>Agreement, attributive, predicate, and substantive use</small>
+        <span class="lesson-status" data-lesson-status="adv_adjectives">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_howToRead')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">7</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -6230,6 +6242,369 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div><!-- /lesson-module -->
 </div><!-- /adv_casesLesson -->
 
+<div id="adv_adjectivesLesson" class="adv-learn-lesson">
+  <div class="lesson-module">
+
+    <p class="lesson-lead">
+      You know the noun system — cases, endings, and the article. Adjectives are the next natural step: they work entirely within that system. Every Greek adjective must match its noun in gender, case, and number. Once that agreement rule clicks, you can parse any adjective phrase instantly.
+    </p>
+
+    <!-- Block 1 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">1 · What Greek Adjectives Do — The Agreement Rule</div>
+      <div class="lesson-block-content">
+        <p>In English, adjectives never change form. "Good" stays "good" whether it describes a man, a woman, or a thing — "the good man," "the good woman," "the good words." The adjective is completely inert.</p>
+        <p>Greek adjectives are very different. They <strong>agree with the noun they modify in three ways simultaneously: gender, case, and number.</strong> The same adjective ἀγαθός (good) appears in different forms depending on what noun it's attached to:</p>
+        <ul>
+          <li><strong>ἀγαθός</strong> — masculine (modifying a masculine noun like λόγος)</li>
+          <li><strong>ἀγαθή</strong> — feminine (modifying a feminine noun like ἀγάπη)</li>
+          <li><strong>ἀγαθόν</strong> — neuter (modifying a neuter noun like ἔργον, work/deed)</li>
+        </ul>
+        <p>And those forms change further depending on case and number. A feminine accusative singular adjective looks different from a feminine genitive plural adjective — even though both come from the same root ἀγαθ-.</p>
+        <p>This might seem like a burden. It's actually a powerful feature. Because the adjective carries gender/case/number information, it acts as a second tag on the noun — confirming what the article already told you, and helping you parse phrases even when word order is shuffled.</p>
+        <p class="highlight">The rule in one sentence: find the noun, identify its gender/case/number, then confirm the adjective matches all three. That's adjective agreement.</p>
+      </div>
+    </div>
+
+    <!-- Block 2 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">2 · The 2-1-2 Declension — The Standard Adjective Pattern</div>
+      <div class="lesson-block-content">
+        <p>Most Greek adjectives follow what grammarians call the <strong>2-1-2 pattern</strong>: masculine and neuter use 2nd declension endings, feminine uses 1st declension endings. The adjective ἀγαθός (good) is the model form.</p>
+        <p>The stem is <strong>ἀγαθ-</strong>. Everything else is endings you already know from the noun system.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Case</th><th>Masc. (2nd decl.)</th><th>Fem. (1st decl.)</th><th>Neut. (2nd decl.)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>ἀγαθ<strong>ός</strong></td><td>ἀγαθ<strong>ή</strong></td><td>ἀγαθ<strong>όν</strong></td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>ἀγαθ<strong>οῦ</strong></td><td>ἀγαθ<strong>ῆς</strong></td><td>ἀγαθ<strong>οῦ</strong></td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>ἀγαθ<strong>ῷ</strong></td><td>ἀγαθ<strong>ῇ</strong></td><td>ἀγαθ<strong>ῷ</strong></td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>ἀγαθ<strong>όν</strong></td><td>ἀγαθ<strong>ήν</strong></td><td>ἀγαθ<strong>όν</strong></td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>ἀγαθ<strong>οί</strong></td><td>ἀγαθ<strong>αί</strong></td><td>ἀγαθ<strong>ά</strong></td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>ἀγαθ<strong>ῶν</strong></td><td>ἀγαθ<strong>ῶν</strong></td><td>ἀγαθ<strong>ῶν</strong></td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>ἀγαθ<strong>οῖς</strong></td><td>ἀγαθ<strong>αῖς</strong></td><td>ἀγαθ<strong>οῖς</strong></td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>ἀγαθ<strong>ούς</strong></td><td>ἀγαθ<strong>άς</strong></td><td>ἀγαθ<strong>ά</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Look familiar? The masculine column is identical to 2nd declension nouns like λόγος. The feminine column is identical to 1st declension nouns like ἀγάπη. The neuter column is identical to 2nd declension neuter nouns like ἔργον. You already know these endings — the adjective just uses all three patterns at once depending on the noun's gender.</p>
+        <p>Other common 2-1-2 adjectives: ἅγιος (holy), δίκαιος (righteous), μόνος (only/alone), πρῶτος (first), νεκρός (dead), πιστός (faithful), μακάριος (blessed). They all follow the same ἀγαθός pattern.</p>
+      </div>
+    </div>
+
+    <!-- Block 3 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">3 · Reading Adjective Agreement — The Article Is Still the Key</div>
+      <div class="lesson-block-content">
+        <p>You already know how to use the article to parse a noun phrase. The same skill works for adjectives — because the article's form tells you exactly what the adjective must look like.</p>
+        <p>When you see an article, you instantly know the gender, case, and number of the entire noun phrase. The adjective's ending will match. So in practice, reading an adjective means:</p>
+        <ol>
+          <li>Read the article → parse gender/case/number</li>
+          <li>The adjective that follows will have matching endings</li>
+          <li>Confirm: does the adjective ending match what the article said?</li>
+        </ol>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>What you see</th><th>Article tells you</th><th>Adjective must be</th><th>Translation</th></tr></thead>
+            <tbody>
+              <tr><td>τὸν ἀγαθὸν λόγον</td><td>τόν → acc. masc. sg.</td><td>ἀγαθόν → acc. masc. sg. ✓</td><td>the good word (direct object)</td></tr>
+              <tr><td>ἡ ἀγαθὴ ἀγάπη</td><td>ἡ → nom. fem. sg.</td><td>ἀγαθή → nom. fem. sg. ✓</td><td>the good love (subject)</td></tr>
+              <tr><td>τοῦ ἁγίου πνεύματος</td><td>τοῦ → gen. neut. sg.</td><td>ἁγίου → gen. neut. sg. ✓</td><td>of the Holy Spirit</td></tr>
+              <tr><td>τοῖς ἁγίοις</td><td>τοῖς → dat. pl.</td><td>ἁγίοις → dat. pl. ✓</td><td>to/for the saints (no noun — substantive)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>The last example — τοῖς ἁγίοις — shows something important: the adjective can stand alone with the article and no noun. That's a substantive adjective, which you'll learn in Block 6.</p>
+        <p class="highlight">The article and the adjective always tell the same story. If the article says accusative feminine plural, the adjective says accusative feminine plural. They are locked together. When they don't match, something else is going on — often a predicate or substantive construction, which you'll learn shortly.</p>
+      </div>
+    </div>
+
+    <!-- KC 1 -->
+    <div class="knowledge-check" id="kc_adv_adjectives_1">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In the 2-1-2 adjective pattern using ἀγαθός as the model — which form is the feminine nominative singular?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_adjectives_1', this)">ἀγαθός</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_adjectives_1', this)">ἀγαθή</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_adjectives_1', this)">ἀγαθόν</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_adjectives_1', this)">ἀγαθᾶς</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_adjectives_1_fb"></div>
+    </div>
+
+    <!-- Block 4 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">4 · Attributive Position — The Adjective Inside the Noun Phrase</div>
+      <div class="lesson-block-content">
+        <p>When an adjective directly describes a noun — "the good word," "the holy spirit," "the righteous man" — it is in <strong>attributive position</strong>. In Greek, there are two ways to express this.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Position</th><th>Pattern</th><th>Example</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1st Attributive</strong></td><td>article · adjective · noun</td><td>ὁ ἀγαθὸς λόγος</td><td>the good word</td></tr>
+              <tr><td><strong>2nd Attributive</strong></td><td>article · noun · article · adjective</td><td>ὁ λόγος ὁ ἀγαθός</td><td>the good word</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>Both mean exactly the same thing.</strong> Greek uses both freely. The second attributive position is somewhat more emphatic or formal — it's common in longer phrases and in the NT when multiple adjectives or genitives are stacked on a noun.</p>
+        <p>The key marker you're looking for: <strong>is there an article immediately before the adjective?</strong> If yes — attributive. The adjective is inside the article-noun structure, describing the noun.</p>
+        <p>You've already seen the second attributive position in John 3:16: <strong>τὸν υἱὸν τὸν μονογενῆ</strong> — article, noun, article, adjective. Both τόν are accusative masculine singular. μονογενῆ is the accusative form of μονογενής (one-of-a-kind, only). Translation: "his one-of-a-kind Son."</p>
+        <p>Another NT example — Revelation 3:14: <strong>ὁ μάρτυς ὁ πιστός</strong> — "the faithful witness." Article, noun, article, adjective. Second attributive position, emphasizing the faithfulness of the witness.</p>
+        <p class="highlight">Shortcut: if you see the pattern [article][adjective] anywhere in a phrase, the adjective is attributive. It's describing a noun, not making an independent statement about it.</p>
+      </div>
+    </div>
+
+    <!-- Block 5 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">5 · Predicate Position — The Adjective Outside the Noun Phrase</div>
+      <div class="lesson-block-content">
+        <p>When an adjective makes a <em>statement about</em> a noun rather than simply describing it, it is in <strong>predicate position</strong>. The critical difference: there is <strong>no article immediately before the adjective</strong>.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Pattern</th><th>Example</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>article · noun · adjective (no article before adj.)</td><td>ὁ λόγος ἀγαθός</td><td>The word <em>is</em> good</td></tr>
+              <tr><td>adjective · article · noun (no article before adj.)</td><td>ἀγαθὸς ὁ λόγος</td><td>The word <em>is</em> good</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>In predicate position, the adjective functions like a predicate — it asserts something about the noun. A linking verb (εἰμί, "to be") is typically implied but often not written. The structure is essentially: subject + "is" + predicate adjective.</p>
+        <p>NT examples:</p>
+        <ul>
+          <li><strong>πιστὸς ὁ θεός</strong> — "God is faithful" (1 Cor 1:9). ὁ θεός has the article; πιστός does not. Predicate position.</li>
+          <li><strong>δίκαιός ἐστιν ὁ κύριος</strong> — "The Lord is righteous" (2 Thess 1:6). δίκαιος is the predicate, ὁ κύριος the subject.</li>
+          <li><strong>μακάριοι οἱ πτωχοί</strong> (Matthew 5:3) — "Blessed are the poor." μακάριοι has no article; it's the predicate adjective. οἱ πτωχοί is the subject. No verb written — εἰσίν (they are) is implied.</li>
+        </ul>
+        <p>The Beatitudes use predicate position throughout — each one is [predicate adjective] [subject noun/adjective]. Understanding this makes the Beatitudes immediately readable.</p>
+        <p class="highlight">The test: is there an article directly before the adjective? Yes → attributive ("the good word"). No → predicate ("the word is good"). One article placement changes the entire meaning.</p>
+      </div>
+    </div>
+
+    <!-- KC 2 -->
+    <div class="knowledge-check" id="kc_adv_adjectives_2">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">Which of these is an example of the second attributive position?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_adjectives_2', this)">ὁ ἀγαθὸς λόγος</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_adjectives_2', this)">ὁ λόγος ὁ ἀγαθός</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_adjectives_2', this)">ὁ λόγος ἀγαθός</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_adjectives_2', this)">ἀγαθὸς ὁ λόγος</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_adjectives_2_fb"></div>
+    </div>
+
+    <!-- Block 6 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">6 · Substantive Use — When Adjectives Become Nouns</div>
+      <div class="lesson-block-content">
+        <p>Greek adjectives can function as nouns. When an adjective has an article but no noun alongside it, the adjective is <strong>substantive</strong> — it stands in for a noun and means "the one who is ___" or "the ___ one/thing."</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Form</th><th>Meaning</th><th>Implied noun</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ὁ ἀγαθός</strong></td><td>the good one / the good man</td><td>masc. person implied</td></tr>
+              <tr><td><strong>ἡ ἀγαθή</strong></td><td>the good woman / the good one</td><td>fem. person implied</td></tr>
+              <tr><td><strong>τὸ ἀγαθόν</strong></td><td>the good thing / the good</td><td>neut. thing or concept implied</td></tr>
+              <tr><td><strong>οἱ ἀγαθοί</strong></td><td>the good ones / the good people</td><td>masc. group implied</td></tr>
+              <tr><td><strong>τὰ ἀγαθά</strong></td><td>the good things / good things</td><td>neut. plural things implied</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>The gender of the article tells you what kind of noun is implied. Masculine articles imply people or masculine nouns. Neuter articles imply things, concepts, or abstract qualities. Feminine implies feminine persons or things.</p>
+
+        <p>NT examples — substantive adjectives are everywhere:</p>
+        <ul>
+          <li><strong>οἱ πτωχοί</strong> — "the poor ones / the poor" (Matthew 5:3). The article οἱ is nominative masculine plural; πτωχοί is the adjective. No noun — they are the subject as a group.</li>
+          <li><strong>τοῖς ἁγίοις</strong> — "to the saints / to the holy ones" (Ephesians 1:1). Dative plural — the saints as the indirect object/recipient of the letter.</li>
+          <li><strong>πᾶς ὁ πιστεύων</strong> — "everyone who believes" (John 3:16). ὁ πιστεύων is a participle used substantively — the same pattern. "The believing one."</li>
+          <li><strong>τὸ ἀγαθόν</strong> — "the good / the good thing" — appears frequently in Paul's letters when discussing what is good or beneficial (Romans 7:18, 13:4).</li>
+        </ul>
+        <p>Understanding substantive adjectives is essential for the Beatitudes, the epistles, and practically every NT passage that discusses groups of people ("the righteous," "the faithful," "the dead," "the poor").</p>
+      </div>
+    </div>
+
+    <!-- KC 3 -->
+    <div class="knowledge-check" id="kc_adv_adjectives_3">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">You see τὸ ἀγαθόν in a Greek sentence with no noun following it. What kind of construction is this?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_adjectives_3', this)">Attributive position — the adjective is describing an implied noun</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_adjectives_3', this)">Predicate position — "the thing is good"</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_adjectives_3', this)">Substantive adjective — meaning "the good thing"</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_adjectives_3', this)">Feminine adjective — the article τό marks feminine gender</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_adjectives_3_fb"></div>
+    </div>
+
+    <!-- Block 7 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">7 · Adjectives with Irregular Forms — The High-Frequency Exceptions</div>
+      <div class="lesson-block-content">
+        <p>Most NT adjectives follow the 2-1-2 pattern. But three adjectives are used so frequently that their irregular forms must be recognized. You don't need to memorize their full paradigms right now — just recognize that they exist and that they don't look like ἀγαθός.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Masc. (nom. sg.)</th><th>Fem.</th><th>Neut.</th><th>Meaning</th><th>Why irregular</th></tr></thead>
+            <tbody>
+              <tr><td><strong>πᾶς</strong></td><td>πᾶσα</td><td>πᾶν</td><td>all, every, each</td><td>Masc./neut. use 3rd declension endings</td></tr>
+              <tr><td><strong>μέγας</strong></td><td>μεγάλη</td><td>μέγα</td><td>great, large</td><td>Mixed 3rd/2nd declension forms</td></tr>
+              <tr><td><strong>πολύς</strong></td><td>πολλή</td><td>πολύ</td><td>much, many</td><td>Mixed 3rd/2nd declension forms</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>πᾶς</strong> is by far the most important. It appears over 1,200 times in the NT — you will see it on nearly every page. Key forms to recognize:</p>
+        <ul>
+          <li><strong>πᾶς</strong> (nom. masc. sg.) — "every, each one"</li>
+          <li><strong>πάντες / πᾶσαι / πάντα</strong> (nom. pl.) — "all (men/women/things)"</li>
+          <li><strong>πάντων</strong> (gen. pl.) — "of all"</li>
+          <li><strong>πᾶν</strong> (nom./acc. neut. sg.) — "every thing, all"</li>
+        </ul>
+        <p>NT examples: <strong>πᾶσα γραφή</strong> (2 Tim 3:16) — "all Scripture / every Scripture." <strong>πάντες ἥμαρτον</strong> (Rom 3:23) — "all sinned." <strong>πᾶς ὁ πιστεύων</strong> (John 3:16) — "everyone who believes."</p>
+        <p>For μέγας and πολύς: the key is to recognize the stem. μεγάλ- appears in most oblique cases (μεγάλης, μεγάλῳ, etc.) even though the nominative is μέγας. Similarly, πολλ- appears in most cases even though the nominative is πολύς.</p>
+      </div>
+    </div>
+
+    <!-- Block 8 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">8 · High-Frequency NT Adjectives — The Ones Worth Knowing Now</div>
+      <div class="lesson-block-content">
+        <p>These adjectives appear frequently enough in the NT that recognizing them — and knowing their 2-1-2 forms — will pay off immediately in your reading. All follow the ἀγαθός pattern unless noted.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Masc. form</th><th>Fem. form</th><th>Neut. form</th><th>Meaning</th><th>Key NT use</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ἅγιος</strong></td><td>ἁγία</td><td>ἅγιον</td><td>holy, set apart</td><td>πνεῦμα ἅγιον (Holy Spirit); οἱ ἅγιοι (the saints)</td></tr>
+              <tr><td><strong>αἰώνιος</strong></td><td>αἰώνιος</td><td>αἰώνιον</td><td>eternal, age-long</td><td>ζωὴν αἰώνιον (eternal life, John 3:16)</td></tr>
+              <tr><td><strong>δίκαιος</strong></td><td>δικαία</td><td>δίκαιον</td><td>righteous, just</td><td>ὁ δίκαιος (the righteous one, Rom 1:17)</td></tr>
+              <tr><td><strong>μακάριος</strong></td><td>μακαρία</td><td>μακάριον</td><td>blessed, happy</td><td>μακάριοι οἱ πτωχοί (Matt 5:3)</td></tr>
+              <tr><td><strong>μόνος</strong></td><td>μόνη</td><td>μόνον</td><td>only, alone</td><td>τὸν μόνον ἀληθινὸν θεόν (John 17:3)</td></tr>
+              <tr><td><strong>νεκρός</strong></td><td>νεκρά</td><td>νεκρόν</td><td>dead</td><td>ἐκ νεκρῶν (from the dead)</td></tr>
+              <tr><td><strong>πιστός</strong></td><td>πιστή</td><td>πιστόν</td><td>faithful, believing</td><td>πιστὸς ὁ θεός (God is faithful, 1 Cor 1:9)</td></tr>
+              <tr><td><strong>πρῶτος</strong></td><td>πρώτη</td><td>πρῶτον</td><td>first</td><td>ὁ πρῶτος καὶ ὁ ἔσχατος (Rev 1:17)</td></tr>
+              <tr><td><strong>ἔσχατος</strong></td><td>ἐσχάτη</td><td>ἔσχατον</td><td>last</td><td>ἐν ταῖς ἐσχάταις ἡμέραις (in the last days)</td></tr>
+              <tr><td><strong>μονογενής</strong></td><td>μονογενής</td><td>μονογενές</td><td>one-of-a-kind, only</td><td>τὸν υἱὸν τὸν μονογενῆ (John 3:16)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Note: αἰώνιος and μονογενής have the same form for masculine and feminine (2-termination adjectives) — their gender is distinguished only by the article, not the adjective ending. This is a smaller category but important to recognize.</p>
+      </div>
+    </div>
+
+    <!-- KC 4 -->
+    <div class="knowledge-check" id="kc_adv_adjectives_4">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In the Beatitude μακάριοι οἱ πτωχοί (Matthew 5:3) — both μακάριοι and πτωχοί end in -οι. Why?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_adjectives_4', this)">Both are nominative masculine plural — μακάριοι is the predicate adjective agreeing in case with the subject οἱ πτωχοί</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_adjectives_4', this)">πτωχοί is the predicate and μακάριοι is the subject — the -οι ending marks the predicate in Greek</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_adjectives_4', this)">Word order determines the -οι ending — words at the start of a clause always take this form</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_adjectives_4', this)">πτωχοί is genitive plural — the -οι ending marks possession in the 1st declension</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_adjectives_4_fb"></div>
+    </div>
+
+    <!-- Block 9 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">9 · Parsing Adjectives in NT Passages</div>
+      <div class="lesson-block-content">
+        <p>Let's apply everything to real NT phrases. For each one, identify: what position is the adjective in? What does it tell you?</p>
+
+        <hr>
+        <h4>John 3:16 — τὸν υἱὸν τὸν μονογενῆ</h4>
+        <p>Two accusative articles (τόν, τόν) + noun + adjective. This is <strong>second attributive position</strong>. μονογενῆ is the accusative singular form of μονογενής (one-of-a-kind). The repeated τόν confirms the adjective agrees with υἱόν in case (accusative), gender (masculine), and number (singular). Translation: "his one-of-a-kind Son."</p>
+
+        <hr>
+        <h4>Matthew 5:3 — μακάριοι οἱ πτωχοὶ τῷ πνεύματι</h4>
+        <p><strong>μακάριοι</strong> — predicate position (no article before it). <strong>οἱ πτωχοί</strong> — substantive adjective: article + adjective, no noun = "the poor ones." <strong>τῷ πνεύματι</strong> — dative (τῷ = dat. neut. sg.), "in spirit" or "with respect to spirit." Full reading: "Blessed are the poor in spirit." The predicate adjective + substantive subject is the Beatitude formula.</p>
+
+        <hr>
+        <h4>Revelation 1:17 — ὁ πρῶτος καὶ ὁ ἔσχατος</h4>
+        <p>Both are <strong>substantive adjectives</strong> — article + adjective, no noun. ὁ πρῶτος = "the First One." ὁ ἔσχατος = "the Last One." Nominative masculine singular both times — these are titles, used as subjects or predicate nominatives. "I am the First and the Last."</p>
+
+        <hr>
+        <h4>1 Corinthians 1:9 — πιστὸς ὁ θεός</h4>
+        <p><strong>Predicate position</strong>. ὁ θεός has the article — it is the subject. πιστός has no article — it is the predicate adjective. εἰμί is implied. "God is faithful." The predicate comes first for emphasis — faithfulness is the point being stressed.</p>
+
+        <hr>
+        <h4>Ephesians 1:1 — τοῖς ἁγίοις τοῖς οὖσιν ἐν Ἐφέσῳ</h4>
+        <p><strong>Substantive adjective</strong>. τοῖς ἁγίοις = "to the saints / to the holy ones" — dative plural, indirect object. No noun — the adjective is the noun. τοῖς οὖσιν is a participial phrase ("the ones who are") — same substantive pattern. "To the saints who are in Ephesus."</p>
+      </div>
+    </div>
+
+    <!-- Block 10 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">10 · A Quick-Reference Method for Any Adjective</div>
+      <div class="lesson-block-content">
+        <p>When you encounter an adjective in a Greek text, run through this three-second check:</p>
+        <ol>
+          <li><strong>Is there an article directly before the adjective?</strong>
+            <ul>
+              <li>Yes, and there's a noun → <strong>Attributive</strong> (describing the noun: "the good word")</li>
+              <li>Yes, but no noun alongside → <strong>Substantive</strong> (the adjective is the noun: "the good one")</li>
+              <li>No article before the adjective → <strong>Predicate</strong> (statement about the noun: "the word is good")</li>
+            </ul>
+          </li>
+          <li><strong>What noun does it agree with?</strong> — find the matching gender/case/number</li>
+          <li><strong>What case is the noun phrase?</strong> — that tells you its role in the sentence (subject, object, etc.)</li>
+        </ol>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Pattern</th><th>Position</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>ὁ ἀγαθὸς λόγος</td><td>1st Attributive</td><td>"the good word"</td></tr>
+              <tr><td>ὁ λόγος ὁ ἀγαθός</td><td>2nd Attributive</td><td>"the good word"</td></tr>
+              <tr><td>ὁ λόγος ἀγαθός</td><td>Predicate</td><td>"the word is good"</td></tr>
+              <tr><td>ἀγαθὸς ὁ λόγος</td><td>Predicate</td><td>"the word is good"</td></tr>
+              <tr><td>ὁ ἀγαθός (no noun)</td><td>Substantive</td><td>"the good one / the good man"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Everything in this lesson builds on what you already know. The article is still the primary tool. Adjective endings follow the same patterns as noun endings. The three positions are the only new concept — and the article placement tells you which one you're dealing with every time.</p>
+        <p>In the next lesson, you'll learn <strong>pronouns</strong> — which follow the same declension logic as adjectives and nouns, and which you'll recognize immediately because of the agreement skills you just built.</p>
+      </div>
+    </div>
+
+    <!-- KC 5 -->
+    <div class="knowledge-check" id="kc_adv_adjectives_5">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In πνεῦμα ἅγιον (Holy Spirit), ἅγιον is in the neuter form rather than ἅγιος. Why?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_adjectives_5', this)">Because the Spirit is not a person and neuter is used for impersonal things in Greek</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_adjectives_5', this)">Because πνεῦμα is a grammatically neuter noun — the adjective must agree in gender, so it takes the neuter form ἅγιον</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_adjectives_5', this)">Because ἅγιος follows the 3rd declension and neuter is the default form</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_adjectives_5', this)">Because ἅγιον is in predicate position — predicate adjectives always take the neuter form</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_adjectives_5_fb"></div>
+    </div>
+
+    <!-- Quiz Start -->
+    <div class="adv-quiz-start-area" id="quizStart_adv_adjectives">
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_adjectives">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_adjectives" disabled onclick="openAdvQuiz('adv_adjectives')">
+        Take the Lesson Quiz →
+      </button>
+    </div>
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_adjectivesLesson -->
+
 <div id="adv_howToReadLesson" class="adv-learn-lesson">
   <div class="lesson-module">
 
@@ -7961,9 +8336,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=86"></script>
-  <script src="app.js?v=86"></script>
-  <script type="module" src="firebase-lb.js?v=86"></script>
+  <script src="vocab.js?v=87"></script>
+  <script src="app.js?v=87"></script>
+  <script type="module" src="firebase-lb.js?v=87"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">

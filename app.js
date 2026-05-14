@@ -53,6 +53,7 @@ const REQUIRED_ADVANCED_LESSONS = [
   "adv_pronunciation",
   "adv_nouns",
   "adv_cases",
+  "adv_adjectives",
   "adv_howToRead"
 ];
 
@@ -68,6 +69,7 @@ const LESSON_LABELS = {
   adv_pronunciation: "Pronunciation",
   adv_nouns: "Noun System",
   adv_cases: "Case Endings",
+  adv_adjectives: "Adjectives",
   adv_howToRead: "How to Read Greek"
 };
 
@@ -9417,6 +9419,7 @@ const advLessonTitles = {
   adv_pronunciation: "Pronunciation",
   adv_nouns: "Noun System",
   adv_cases: "Case Endings",
+  adv_adjectives: "Adjectives",
   adv_howToRead: "How to Read Greek"
 };
 
@@ -9426,7 +9429,8 @@ const advLessonNumbers = {
   adv_pronunciation: "Advanced · Lesson 3",
   adv_nouns: "Advanced · Lesson 4",
   adv_cases: "Advanced · Lesson 5",
-  adv_howToRead: "Advanced · Lesson 6"
+  adv_adjectives: "Advanced · Lesson 6",
+  adv_howToRead: "Advanced · Lesson 7"
 };
 
 function showAdvancedLesson(lessonId) {
@@ -9891,6 +9895,74 @@ function openAdvCheatSheet(lessonId) {
           <p>This is why dictionaries always give: nominative, genitive, article (e.g., σάρξ, σαρκός, ἡ).</p>
         </div>
       `;
+    } else if (lessonId === "adv_adjectives") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">Adjectives — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Agreement Rule</h4>
+          <p>A Greek adjective must match its noun in <strong>gender, case, and number</strong> — all three simultaneously. The article already tells you what those values are; the adjective ending confirms them.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">2-1-2 Declension — ἀγαθός / ἀγαθή / ἀγαθόν (good)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Case</th><th>Masc. (2nd)</th><th>Fem. (1st)</th><th>Neut. (2nd)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>ἀγαθ<strong>ός</strong></td><td>ἀγαθ<strong>ή</strong></td><td>ἀγαθ<strong>όν</strong></td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>ἀγαθ<strong>οῦ</strong></td><td>ἀγαθ<strong>ῆς</strong></td><td>ἀγαθ<strong>οῦ</strong></td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>ἀγαθ<strong>ῷ</strong></td><td>ἀγαθ<strong>ῇ</strong></td><td>ἀγαθ<strong>ῷ</strong></td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>ἀγαθ<strong>όν</strong></td><td>ἀγαθ<strong>ήν</strong></td><td>ἀγαθ<strong>όν</strong></td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>ἀγαθ<strong>οί</strong></td><td>ἀγαθ<strong>αί</strong></td><td>ἀγαθ<strong>ά</strong></td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>ἀγαθ<strong>ῶν</strong></td><td>ἀγαθ<strong>ῶν</strong></td><td>ἀγαθ<strong>ῶν</strong></td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>ἀγαθ<strong>οῖς</strong></td><td>ἀγαθ<strong>αῖς</strong></td><td>ἀγαθ<strong>οῖς</strong></td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>ἀγαθ<strong>ούς</strong></td><td>ἀγαθ<strong>άς</strong></td><td>ἀγαθ<strong>ά</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Three Positions — Quick Reference</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Position</th><th>Pattern</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1st Attributive</strong></td><td>ὁ ἀγαθὸς λόγος</td><td>"the good word" — article·adj·noun</td></tr>
+              <tr><td><strong>2nd Attributive</strong></td><td>ὁ λόγος ὁ ἀγαθός</td><td>"the good word" — article·noun·article·adj</td></tr>
+              <tr><td><strong>Predicate</strong></td><td>ὁ λόγος ἀγαθός</td><td>"the word <em>is</em> good" — no article before adj</td></tr>
+              <tr><td><strong>Substantive</strong></td><td>ὁ ἀγαθός</td><td>"the good one/man" — article·adj, no noun</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key Irregular Adjectives</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Masc.</th><th>Fem.</th><th>Neut.</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>πᾶς</td><td>πᾶσα</td><td>πᾶν</td><td>all, every (3rd decl. masc/neut)</td></tr>
+              <tr><td>μέγας</td><td>μεγάλη</td><td>μέγα</td><td>great, large</td></tr>
+              <tr><td>πολύς</td><td>πολλή</td><td>πολύ</td><td>much, many</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">High-Frequency NT Adjectives</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Masc. form</th><th>Meaning</th><th>NT example</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">ἅγιος</strong></td><td>holy, set apart</td><td>πνεῦμα ἅγιον — Holy Spirit</td></tr>
+              <tr><td><strong class="adv-cs-gk">αἰώνιος</strong></td><td>eternal</td><td>ζωὴν αἰώνιον — eternal life (John 3:16)</td></tr>
+              <tr><td><strong class="adv-cs-gk">μόνος</strong></td><td>only, alone</td><td>τὸν μόνον ἀληθινὸν θεόν — the only true God</td></tr>
+              <tr><td><strong class="adv-cs-gk">πιστός</strong></td><td>faithful, believing</td><td>πιστὸς ὁ θεός — God is faithful</td></tr>
+              <tr><td><strong class="adv-cs-gk">δίκαιος</strong></td><td>righteous, just</td><td>ὁ δίκαιος ἐκ πίστεως ζήσεται</td></tr>
+              <tr><td><strong class="adv-cs-gk">μακάριος</strong></td><td>blessed, happy</td><td>μακάριοι οἱ πτωχοί — blessed are the poor</td></tr>
+              <tr><td><strong class="adv-cs-gk">νεκρός</strong></td><td>dead</td><td>ἐκ νεκρῶν — from the dead</td></tr>
+              <tr><td><strong class="adv-cs-gk">μονογενής</strong></td><td>one-of-a-kind, only</td><td>τὸν υἱὸν τὸν μονογενῆ — his one-of-a-kind Son</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
     } else if (lessonId === "adv_howToRead") {
       content.innerHTML = `
         <h3 class="adv-cs-title">How to Read Greek — Cheat Sheet</h3>
@@ -10133,6 +10205,36 @@ const ADV_KC_DATA = {
     { feedback: "The nominative form (σάρξ) is NOT the stem in the 3rd declension — this is exactly why the nominative alone is insufficient. The stem is found from the genitive, not the nominative. σάρξ → σαρκός → drop -ος → σαρκ-." },
     { feedback: "The full genitive form σαρκός is NOT the stem — you must remove the genitive ending -ος to get the bare stem σαρκ-. The stem is what remains after dropping -ος." },
     { feedback: "The stem is found from the genitive singular, not by manipulating the nominative. σάρξ has ξ as a combined consonant (κ + σ) — the genitive σαρκός reveals the true stem σαρκ-." }
+  ],
+  kc_adv_adjectives_1: [
+    { feedback: "ἀγαθός is the masculine form — it follows the 2nd declension (-ος ending)." },
+    { correct: true, feedback: "Correct! ἀγαθή is the feminine form — it follows the 1st declension pattern, just like ἀρχή or ἀγάπη. The stem ἀγαθ- stays the same; only the ending changes to mark feminine gender." },
+    { feedback: "ἀγαθόν is the neuter form — also 2nd declension, with the characteristic -ον ending." },
+    { feedback: "ἀγαθᾶς is a genitive singular feminine form (like ἀγάπης pattern) — not the nominative. The nominative feminine is ἀγαθή." }
+  ],
+  kc_adv_adjectives_2: [
+    { feedback: "ὁ ἀγαθὸς λόγος is the first attributive position — article, adjective, noun. Both are attributive, but this is the first pattern." },
+    { correct: true, feedback: "Correct! ὁ λόγος ὁ ἀγαθός is the second attributive position — article, noun, then article + adjective. Both patterns mean 'the good word.' The repeated article is the key marker of this position." },
+    { feedback: "ὁ λόγος ἀγαθός is predicate position — there is no article immediately before ἀγαθός, so it means 'the word is good,' not 'the good word.'" },
+    { feedback: "ἀγαθὸς ὁ λόγος is also predicate position — the adjective is outside the article-noun unit without its own article." }
+  ],
+  kc_adv_adjectives_3: [
+    { feedback: "Attributive position requires an article immediately before the adjective. τὸ ἀγαθόν has an article, but with no noun following, the adjective is functioning as a noun — not attributing to another noun." },
+    { feedback: "Predicate adjectives stand in relation to an article-noun unit without their own article. τὸ ἀγαθόν has its own article and no noun — this is substantive use, not predicate." },
+    { correct: true, feedback: "Correct! τὸ ἀγαθόν — article + neuter adjective with no noun — is a substantive adjective meaning 'the good thing.' The neuter article τό signals neuter gender; the adjective stands alone as a noun." },
+    { feedback: "The article τό marks it as neuter, not feminine. The feminine substantive would be ἡ ἀγαθή ('the good woman/one')." }
+  ],
+  kc_adv_adjectives_4: [
+    { correct: true, feedback: "Correct! In μακάριοι οἱ πτωχοί, μακάριοι is a 2-1-2 adjective in the nominative masculine plural (-οι ending). The article οἱ before πτωχοί is nominative plural masculine — so both adjectives are nominative plural, identifying them as the two parts of a subject-predicate structure: 'the poor [are] blessed.'" },
+    { feedback: "πτωχοί is the subject (substantive adjective: 'the poor ones'), and μακάριοι is the predicate adjective. But they agree in case (nominative) because predicate adjectives match the subject's case." },
+    { feedback: "Word order in Greek does not determine grammatical agreement — case endings and articles do." },
+    { feedback: "πτωχοί ends in -οί which is nominative plural masculine — not genitive. The genitive plural would be πτωχῶν." }
+  ],
+  kc_adv_adjectives_5: [
+    { feedback: "Grammatical gender in Greek is not primarily about biological sex or theological identity — it is a grammatical classification system. πνεῦμα is neuter not because of any statement about the Spirit's nature but because of how Greek grammar works." },
+    { correct: true, feedback: "Correct! πνεῦμα is a grammatically neuter noun. Any adjective modifying it must take the neuter form to agree. So ἅγιος (masc.) becomes ἅγιον (neut.) to match πνεῦμα's gender. This is pure grammatical agreement — not a theological statement." },
+    { feedback: "The adjective follows the noun's grammatical gender — not the adjective's own declension family. ἅγιος is a 2-1-2 adjective and does have a neuter form: ἅγιον." },
+    { feedback: "Position doesn't determine the adjective's form — the noun's gender, case, and number do. ἅγιον is neuter because πνεῦμα is neuter, regardless of where the adjective appears." }
   ],
   kc_adv_howToRead_1: [
     { feedback: "The accusative is governed by εἰς (into/toward) — not ἐν. These two are frequently confused: ἐν + dative = 'in' (location), εἰς + accusative = 'into' (direction). They are not interchangeable." },
@@ -10409,6 +10511,62 @@ const ADV_QUIZ_DATA = {
         text: "In John 3:16, τὸν υἱὸν τὸν μονογενῆ — the repeated article τόν marks both words as accusative masculine singular. Why does this matter for reading?",
         options: ["It tells us μονογενῆ is the subject of the sentence", "It confirms that μονογενῆ agrees with υἱόν — 'only' describes 'Son', not some other word", "It signals a dative of reference", "It indicates a vocative — God is being addressed"],
         correct: 1
+      }
+    ]
+  },
+  adv_adjectives: {
+    title: "Adjectives",
+    passMark: 7,
+    questions: [
+      {
+        text: "A Greek adjective must agree with its noun in which three ways?",
+        options: ["Tense, voice, and mood", "Gender, case, and number", "Person, number, and gender", "Declension, stem, and ending"],
+        correct: 1
+      },
+      {
+        text: "In the 2-1-2 adjective pattern, which declension does the feminine form follow?",
+        options: ["2nd declension", "3rd declension", "1st declension", "It varies depending on the adjective"],
+        correct: 2
+      },
+      {
+        text: "ὁ ἀγαθὸς λόγος — what position is this adjective in?",
+        options: ["Predicate position", "Substantive position", "First attributive position", "Second attributive position"],
+        correct: 2
+      },
+      {
+        text: "ὁ λόγος ὁ ἀγαθός — what is this pattern called?",
+        options: ["Predicate position", "Substantive position", "First attributive position", "Second attributive position"],
+        correct: 3
+      },
+      {
+        text: "ὁ λόγος ἀγαθός — what does this construction communicate?",
+        options: ["'The good word' — adjective describing the noun", "'The word is good' — adjective making a predicate statement", "'A certain good word' — indefinite attribution", "'The word of goodness' — genitive relationship"],
+        correct: 1
+      },
+      {
+        text: "What is a substantive adjective?",
+        options: ["An adjective with no ending at all", "An adjective placed after the main verb", "An adjective with an article but no noun — functioning as a noun itself", "An adjective that modifies a verb instead of a noun"],
+        correct: 2
+      },
+      {
+        text: "In the Beatitude μακάριοι οἱ πτωχοί, οἱ πτωχοί means...",
+        options: ["'the poverty' — an abstract noun", "'the poor ones' — substantive adjective serving as the subject", "'of the poor' — genitive relationship", "'to the poor' — dative indirect object"],
+        correct: 1
+      },
+      {
+        text: "In τὸν υἱὸν τὸν μονογενῆ (John 3:16), what confirms that μονογενῆ agrees with υἱόν?",
+        options: ["Both words end in the same consonant", "Both carry the accusative masculine singular article τόν", "μονογενῆ always follows υἱόν in the NT", "The verb ἔδωκεν links them together"],
+        correct: 1
+      },
+      {
+        text: "The adjective πᾶς, πᾶσα, πᾶν (all, every) is unusual because...",
+        options: ["It never changes form regardless of the noun", "Its masculine and neuter forms use 3rd declension endings", "It only appears in predicate position in the NT", "It cannot be used as a substantive adjective"],
+        correct: 1
+      },
+      {
+        text: "ἅγιον πνεῦμα — why is ἅγιον in the neuter form?",
+        options: ["Because πνεῦμα refers to something invisible and spiritual", "Because all abstract nouns take neuter adjectives in Greek", "Because πνεῦμα is a grammatically neuter noun — the adjective must match its gender", "Because ἅγιος has no masculine form"],
+        correct: 2
       }
     ]
   },
@@ -12370,10 +12528,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.3";
+const APP_VERSION = "1.6.4";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 6 revised: How to Read Greek — noun-system reading strategy, article scanning, prepositions, verb recognition (no paradigm drilling), John 1:1 and John 3:16 walkthroughs, and a preview of the upcoming verb lesson series"
+  "Advanced Lesson 6: Adjectives — agreement rule, 2-1-2 declension, attributive/predicate/substantive positions, irregular adjectives (πᾶς, μέγας, πολύς), high-frequency NT adjectives, and NT parsing examples"
 ];
 
 let deferredInstallPrompt = null;
