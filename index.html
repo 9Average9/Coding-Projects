@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=87" />
+  <link rel="stylesheet" href="style.css?v=88" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4348,9 +4348,21 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
     </button>
 
-    <button onclick="showAdvancedLesson('adv_howToRead')">
+    <button onclick="showAdvancedLesson('adv_pronouns')">
       <div class="lesson-number-wrap">
         <div class="lesson-number">7</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Pronouns</strong>
+        <small>Personal, demonstrative, relative, and interrogative pronouns</small>
+        <span class="lesson-status" data-lesson-status="adv_pronouns">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_howToRead')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">8</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -6605,6 +6617,374 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div><!-- /lesson-module -->
 </div><!-- /adv_adjectivesLesson -->
 
+<div id="adv_pronounsLesson" class="adv-learn-lesson">
+  <div class="lesson-module">
+
+    <p class="lesson-lead">
+      You know the noun system. You know adjectives. Pronouns are the natural next step — they decline the same way, follow the same agreement rules, and show up in almost every Greek sentence. Master these and you can track who's doing what across an entire paragraph.
+    </p>
+
+    <!-- Block 1 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">1 · What Greek Pronouns Do — And How They Agree</div>
+      <div class="lesson-block-content">
+        <p>A pronoun stands in place of a noun. In English: "God loved the world because <em>he</em> gave his Son." The word "he" is a pronoun standing in for "God." Greek works the same way — but with a critical rule about how pronouns agree.</p>
+        <p>Greek pronouns follow this pattern:</p>
+        <ul>
+          <li><strong>Gender and number</strong> come from the <strong>antecedent</strong> — the noun the pronoun refers back to</li>
+          <li><strong>Case</strong> comes from the pronoun's <strong>own role</strong> in its clause — subject, object, possession, etc.</li>
+        </ul>
+        <p>This is the key insight. A pronoun's gender and number track its antecedent. But its case is independent — determined by what the pronoun is doing in its own clause, not by what the antecedent was doing in a previous clause.</p>
+        <p>Example from John 1: ὁ λόγος (nominative masculine) is the antecedent. Later, αὐτοῦ (genitive masculine) refers back to it — masculine because λόγος is masculine, but genitive because this pronoun expresses possession in its clause. The antecedent was nominative; the pronoun is genitive. That's normal.</p>
+        <p class="highlight">Pronoun tracking is how you follow the argument in Paul's letters and the narrative in John's Gospel. Once you know the pronoun forms, reading long Greek sentences becomes much more manageable.</p>
+      </div>
+    </div>
+
+    <!-- Block 2 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">2 · 1st and 2nd Person Pronouns — ἐγώ and σύ</div>
+      <div class="lesson-block-content">
+        <p>First and second person pronouns are the simplest: they have no gender (speakers and addressees don't need gender specification — context makes it clear). They just have case and number.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Case</th><th>1st sg. (I)</th><th>1st pl. (we)</th><th>2nd sg. (you)</th><th>2nd pl. (you all)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom.</strong></td><td>ἐγώ</td><td>ἡμεῖς</td><td>σύ</td><td>ὑμεῖς</td></tr>
+              <tr><td><strong>Gen.</strong></td><td>μου / ἐμοῦ</td><td>ἡμῶν</td><td>σου / σοῦ</td><td>ὑμῶν</td></tr>
+              <tr><td><strong>Dat.</strong></td><td>μοι / ἐμοί</td><td>ἡμῖν</td><td>σοι / σοί</td><td>ὑμῖν</td></tr>
+              <tr><td><strong>Acc.</strong></td><td>με / ἐμέ</td><td>ἡμᾶς</td><td>σε / σέ</td><td>ὑμᾶς</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Two forms for the singular cases: the <strong>short forms</strong> (μου, μοι, με / σου, σοι, σε) are unemphatic — they attach to the preceding word and carry no special emphasis. The <strong>long forms</strong> (ἐμοῦ, ἐμοί, ἐμέ / σοῦ, σοί, σέ) are emphatic — they stress the pronoun. In English: "he loves me" vs. "he loves <em>me</em>" (not anyone else).</p>
+        <p>Remember: in Greek, the verb already encodes the subject — so ἐγώ and σύ are often omitted when used as subjects. When they do appear as subjects, it's usually for emphasis or contrast.</p>
+        <p>NT examples you'll recognize immediately:</p>
+        <ul>
+          <li><strong>ἐγώ εἰμι</strong> — "I am" — Jesus's seven "I am" sayings in John (6:35, 8:12, 10:9, 10:11, 11:25, 14:6, 15:1)</li>
+          <li><strong>ἀγαπῶ ὑμᾶς</strong> — "I love you (all)" — throughout the epistles</li>
+          <li><strong>ἡμῶν</strong> — "of us / our" — the Lord's Prayer: πατὴρ ἡμῶν (our Father)</li>
+          <li><strong>ὑμεῖς ἐστε τὸ φῶς τοῦ κόσμου</strong> — "You are the light of the world" (Matt 5:14)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Block 3 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">3 · The 3rd Person Pronoun — αὐτός, αὐτή, αὐτό</div>
+      <div class="lesson-block-content">
+        <p>αὐτός is the workhorse of the Greek pronoun system. It declines exactly like the 2-1-2 adjective ἀγαθός — which means you already know all its forms.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Case</th><th>Masc. (he)</th><th>Fem. (she)</th><th>Neut. (it)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>αὐτός</td><td>αὐτή</td><td>αὐτό</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>αὐτοῦ</td><td>αὐτῆς</td><td>αὐτοῦ</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>αὐτῷ</td><td>αὐτῇ</td><td>αὐτῷ</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>αὐτόν</td><td>αὐτήν</td><td>αὐτό</td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>αὐτοί</td><td>αὐταί</td><td>αὐτά</td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>αὐτῶν</td><td>αὐτῶν</td><td>αὐτῶν</td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>αὐτοῖς</td><td>αὐταῖς</td><td>αὐτοῖς</td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>αὐτούς</td><td>αὐτάς</td><td>αὐτά</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>αὐτός has <strong>three distinct uses</strong> in Greek — all using the same forms:</p>
+        <ol>
+          <li><strong>Personal pronoun</strong> — he, she, it, they (most common). αὐτὸν εἶδεν = "he saw him."</li>
+          <li><strong>Intensive pronoun</strong> — himself, herself, itself. Used when αὐτός appears in the predicate position (without an article immediately before it) alongside a noun. αὐτὸς ὁ κύριος = "the Lord himself." 1 John 4:10: αὐτὸς ἠγάπησεν ἡμᾶς = "he himself loved us."</li>
+          <li><strong>"The same"</strong> — used when αὐτός appears in attributive position (with an article before it). ὁ αὐτὸς λόγος = "the same word."</li>
+        </ol>
+        <p>The key to telling them apart: <strong>is there an article before αὐτός?</strong> Attributive position (article first) = "the same." No article before it or predicate position = intensive or personal. Context tells you which of those two.</p>
+      </div>
+    </div>
+
+    <!-- KC 1 -->
+    <div class="knowledge-check" id="kc_adv_pronouns_1">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">αὐτός, αὐτή, αὐτό — which form is the feminine nominative singular?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronouns_1', this)">αὐτός</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronouns_1', this)">αὐτή</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronouns_1', this)">αὐτό</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronouns_1', this)">αὐτῆς</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronouns_1_fb"></div>
+    </div>
+
+    <!-- Block 4 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">4 · The Antecedent Rule in Action — Case vs. Gender/Number</div>
+      <div class="lesson-block-content">
+        <p>The single most important concept in Greek pronouns is understanding that <strong>gender/number tracks the antecedent</strong> while <strong>case tracks the pronoun's own role</strong>. Let's see this in real NT sentences.</p>
+
+        <hr>
+        <h4>John 1:1–4 — Tracking ὁ λόγος through pronouns</h4>
+        <p>John 1:1 introduces ὁ λόγος — masculine, nominative, singular. Watch how the pronouns that refer to it work:</p>
+        <ul>
+          <li>John 1:2: <strong>οὗτος</strong> ἦν ἐν ἀρχῇ πρὸς τὸν θεόν — "this one was in the beginning with God." οὗτος is masculine sg. (tracking λόγος) and nominative (it's the subject here).</li>
+          <li>John 1:3: πάντα δι' <strong>αὐτοῦ</strong> ἐγένετο — "all things came into being through him." αὐτοῦ is masculine sg. (tracking λόγος) but genitive (governed by διά + genitive).</li>
+          <li>John 1:4: ἐν <strong>αὐτῷ</strong> ζωὴ ἦν — "in him was life." αὐτῷ is masculine sg. (tracking λόγος) but dative (governed by ἐν + dative).</li>
+        </ul>
+        <p>The same antecedent (ὁ λόγος) is tracked through nominative, genitive, and dative pronouns — each case reflecting what that pronoun is doing in its own clause, not what λόγος was doing when it was first introduced.</p>
+
+        <hr>
+        <h4>Romans 8:11 — Tracking θεός</h4>
+        <p>τὸ πνεῦμα τοῦ ἐγείραντος τὸν Ἰησοῦν ἐκ νεκρῶν οἰκεῖ ἐν ὑμῖν — "the Spirit of the one who raised Jesus from the dead dwells in you." Then: εἰ δὲ τὸ πνεῦμα τοῦ ἐγείραντος Ἰησοῦν ἐκ νεκρῶν οἰκεῖ ἐν ὑμῖν, ὁ ἐγείρας Χριστὸν ἐκ νεκρῶν ζῳοποιήσει καὶ τὰ θνητὰ σώματα ὑμῶν διὰ τοῦ ἐνοικοῦντος <strong>αὐτοῦ</strong> πνεύματος ἐν ὑμῖν — αὐτοῦ (genitive masculine) refers back to God (ὁ ἐγείρας), expressing possession: "his Spirit." Masculine from the antecedent; genitive from its attributive/possessive role.</p>
+        <p class="highlight">Once you can track antecedents through pronoun forms, long Pauline sentences — which can run 10+ words before completing a thought — become much more readable. You're following a thread, not parsing chaos.</p>
+      </div>
+    </div>
+
+    <!-- Block 5 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">5 · Demonstrative Pronouns — οὗτος and ἐκεῖνος</div>
+      <div class="lesson-block-content">
+        <p>Demonstrative pronouns point. <strong>οὗτος</strong> points near — "this" (what's here, what was just mentioned). <strong>ἐκεῖνος</strong> points far — "that" (what's over there, what was mentioned earlier or is more distant in thought).</p>
+        <p>ἐκεῖνος declines exactly like ἀγαθός (2-1-2, fully regular). οὗτος is trickier — it has some irregular forms. The key ones to recognize:</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Case</th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>οὗτος</td><td>αὕτη</td><td>τοῦτο</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>τούτου</td><td>ταύτης</td><td>τούτου</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>τούτῳ</td><td>ταύτῃ</td><td>τούτῳ</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>τοῦτον</td><td>ταύτην</td><td>τοῦτο</td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>οὗτοι</td><td>αὗται</td><td>ταῦτα</td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>τούτων</td><td>τούτων</td><td>τούτων</td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>τούτοις</td><td>ταύταις</td><td>τούτοις</td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>τούτους</td><td>ταύτας</td><td>ταῦτα</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Pattern tip: nominative singular and plural begin with οὑ-/αὑ- (rough breathing + vowel). Most other forms begin with τ- (like the article). Once you spot that pattern, the forms become recognizable quickly.</p>
+        <p>High-frequency NT phrases built on οὗτος:</p>
+        <ul>
+          <li><strong>διὰ τοῦτο</strong> — "because of this / for this reason" — Paul's favorite transitional phrase (Romans, Ephesians, Colossians)</li>
+          <li><strong>ἐν τούτῳ</strong> — "in this / by this" — 1 John 4:10: ἐν τούτῳ ἐστὶν ἡ ἀγάπη = "in this is love"</li>
+          <li><strong>οὗτός ἐστιν</strong> — "this is" — Matthew 3:17: οὗτός ἐστιν ὁ υἱός μου ὁ ἀγαπητός</li>
+          <li><strong>ταῦτα</strong> — "these things" — John 20:31: ταῦτα δὲ γέγραπται = "but these things have been written"</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- KC 2 -->
+    <div class="knowledge-check" id="kc_adv_pronouns_2">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In Matthew 3:17 — οὗτός ἐστιν ὁ υἱός μου — οὗτος is masculine singular. What does this tell you about its antecedent?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronouns_2', this)">The antecedent is a neuter noun — οὗτος is neuter in this context</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronouns_2', this)">The antecedent is feminine singular — pronouns shift gender to masculine in predicate position</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronouns_2', this)">The antecedent is masculine singular — the pronoun tracks the antecedent's gender</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronouns_2', this)">The antecedent must be the subject of the immediately preceding clause</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronouns_2_fb"></div>
+    </div>
+
+    <!-- Block 6 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">6 · ἐκεῖνος — The "That One" Pronoun</div>
+      <div class="lesson-block-content">
+        <p>ἐκεῖνος (masc.), ἐκείνη (fem.), ἐκεῖνο (neut.) — "that one / those." It's the pointing-away partner of οὗτος. It declines completely regularly, following the 2-1-2 pattern. You already know all its forms.</p>
+        <p>In John's Gospel, ἐκεῖνος is used in a theologically striking way. After Jesus introduces the Holy Spirit as the παράκλητος (Counselor/Advocate), a neuter noun if described as τὸ πνεῦμα (the Spirit), John repeatedly uses the masculine ἐκεῖνος when referring to him:</p>
+        <ul>
+          <li>John 14:26: ὁ δὲ παράκλητος, τὸ πνεῦμα τὸ ἅγιον... <strong>ἐκεῖνος</strong> ὑμᾶς διδάξει πάντα — "the Counselor, the Holy Spirit... <em>that one</em> will teach you everything." ἐκεῖνος is masculine, agreeing with παράκλητος (masc.) even as it refers to the Spirit (πνεῦμα, neut.).</li>
+          <li>John 15:26; 16:8, 13, 14 — the same pattern repeated.</li>
+        </ul>
+        <p>This is a grammatical feature worth noting: when two nouns in apposition have different genders, the pronoun can agree with either — and John consistently chooses the masculine παράκλητος as the controlling antecedent. This is a grammatical observation; what it implies about the Spirit's person is a matter of theological discussion beyond the grammar itself.</p>
+        <p>Other NT examples of ἐκεῖνος:</p>
+        <ul>
+          <li><strong>ἐν ἐκείνῃ τῇ ἡμέρᾳ</strong> — "in that day" — common in prophetic and eschatological passages</li>
+          <li><strong>ἐκεῖνος ὁ λόγος</strong> — "that word" — referring to a previously mentioned statement</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Block 7 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">7 · Relative Pronouns — ὅς, ἥ, ὅ (who, which, that)</div>
+      <div class="lesson-block-content">
+        <p>The relative pronoun introduces a relative clause — "who," "which," "that." In English: "the man <em>who</em> believes," "the word <em>that</em> was spoken." In Greek: ὁ ἄνθρωπος <strong>ὅς</strong> πιστεύει.</p>
+        <p>The relative pronoun applies the same antecedent rule: gender and number from the antecedent, case from its role inside the relative clause.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Case</th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>ὅς</td><td>ἥ</td><td>ὅ</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>οὗ</td><td>ἧς</td><td>οὗ</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>ᾧ</td><td>ᾗ</td><td>ᾧ</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>ὅν</td><td>ἥν</td><td>ὅ</td></tr>
+              <tr><td><strong>Nom. pl.</strong></td><td>οἵ</td><td>αἵ</td><td>ἅ</td></tr>
+              <tr><td><strong>Gen. pl.</strong></td><td>ὧν</td><td>ὧν</td><td>ὧν</td></tr>
+              <tr><td><strong>Dat. pl.</strong></td><td>οἷς</td><td>αἷς</td><td>οἷς</td></tr>
+              <tr><td><strong>Acc. pl.</strong></td><td>οὕς</td><td>ἅς</td><td>ἅ</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>The relative pronoun looks very similar to the article — but with <strong>rough breathing marks</strong> on most forms. Compare: the article ὁ, ἡ, τό vs. the relative pronoun ὅς, ἥ, ὅ. The rough breathing (the mark over ὅ that looks like a backwards comma) is the distinguishing mark.</p>
+        <p>NT examples:</p>
+        <ul>
+          <li>Romans 8:11: τοῦ ἐγείραντος Ἰησοῦν... <strong>ὅς</strong> καὶ ζῳοποιήσει — "the one who raised Jesus... who will also give life." ὅς is masculine sg. (antecedent = God, masc.) and nominative (subject of ζῳοποιήσει).</li>
+          <li>Ephesians 1:14: <strong>ὅ</strong> ἐστιν ἀρραβὼν τῆς κληρονομίας ἡμῶν — "which is the pledge of our inheritance." ὅ is neuter sg. (antecedent = τὸ πνεῦμα, neut.) and nominative (subject of ἐστιν).</li>
+          <li>John 1:33: ἐφ' <strong>ὅν</strong> ἂν ἴδῃς τὸ πνεῦμα — "upon whom you see the Spirit descending." ὅν is masculine sg. accusative (object of ἐπί).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- KC 3 -->
+    <div class="knowledge-check" id="kc_adv_pronouns_3">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In a relative clause, what determines the gender and number of the relative pronoun ὅς/ἥ/ὅ?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronouns_3', this)">The verb form inside the relative clause</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronouns_3', this)">The case of the antecedent noun in the main clause</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronouns_3', this)">The gender and number of the antecedent noun it refers back to</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronouns_3', this)">The word order of the relative clause</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronouns_3_fb"></div>
+    </div>
+
+    <!-- Block 8 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">8 · Interrogative and Indefinite — τίς and τις</div>
+      <div class="lesson-block-content">
+        <p>Two pronouns that look nearly identical but mean very different things:</p>
+        <ul>
+          <li><strong>τίς / τί</strong> (with accent on the first syllable) — <em>interrogative</em>: "who?" (masc./fem.) or "what?" (neut.). Used in direct and indirect questions.</li>
+          <li><strong>τις / τι</strong> (enclitic — no accent, or accent shifts to previous word) — <em>indefinite</em>: "someone," "something," "a certain," "any." Used to introduce indefinite persons or things.</li>
+        </ul>
+        <p>The accent is the only written difference. In context, the meaning is usually clear: a question uses τίς, a statement uses τις.</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Form</th><th>τίς (accent)</th><th>Meaning</th><th>τις (no accent)</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nom. sg.</strong></td><td>τίς</td><td>who?</td><td>τις</td><td>someone, a certain one</td></tr>
+              <tr><td><strong>Nom. sg. neut.</strong></td><td>τί</td><td>what?</td><td>τι</td><td>something, anything</td></tr>
+              <tr><td><strong>Gen. sg.</strong></td><td>τίνος</td><td>of whom?</td><td>τινός</td><td>of someone</td></tr>
+              <tr><td><strong>Dat. sg.</strong></td><td>τίνι</td><td>to whom?</td><td>τινί</td><td>to someone</td></tr>
+              <tr><td><strong>Acc. sg.</strong></td><td>τίνα</td><td>whom?</td><td>τινά</td><td>someone (acc.)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>NT examples:</p>
+        <ul>
+          <li><strong>τίς ἐστιν οὗτος;</strong> — "Who is this?" (Luke 7:49) — interrogative, asking for identification</li>
+          <li><strong>τί ποιήσω;</strong> — "What shall I do?" (Luke 10:25; 16:3) — interrogative, neuter</li>
+          <li><strong>ἄνθρωπός τις</strong> — "a certain man" (Luke 10:30) — indefinite, introducing a parable character</li>
+          <li><strong>εἴ τις</strong> — "if anyone" (very common in Paul's letters — 1 Cor 3:12, 14, 17, etc.)</li>
+        </ul>
+        <p>τίς also appears in indirect questions: "he asked τίς ἦν" = "he asked who he was." The accent stays in indirect as well as direct questions.</p>
+      </div>
+    </div>
+
+    <!-- Block 9 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">9 · Pronouns in NT Passages — Tracking Arguments</div>
+      <div class="lesson-block-content">
+        <p>Pronouns are how Greek writers sustain an argument across multiple clauses. Here are two passages that show pronoun tracking at work.</p>
+
+        <hr>
+        <h4>John 14:26 — The Counselor Passage</h4>
+        <p style="font-size:0.95rem; letter-spacing:0.02em; margin:10px 0"><strong>ὁ δὲ παράκλητος, τὸ πνεῦμα τὸ ἅγιον ὃ πέμψει ὁ πατὴρ ἐν τῷ ὀνόματί μου, ἐκεῖνος ὑμᾶς διδάξει πάντα.</strong></p>
+        <ul>
+          <li><strong>ὁ παράκλητος</strong> — nominative masculine singular, the subject: "the Counselor"</li>
+          <li><strong>τὸ πνεῦμα τὸ ἅγιον</strong> — in apposition, nominative neuter: "the Holy Spirit"</li>
+          <li><strong>ὃ πέμψει</strong> — relative pronoun ὅ, neuter (tracking πνεῦμα) nominative, subject of πέμψει: "which the Father will send"</li>
+          <li><strong>ἐκεῖνος</strong> — masculine (tracking παράκλητος), nominative, resumptive subject: "that one will teach you everything"</li>
+        </ul>
+        <p>Notice: the relative pronoun ὅ takes neuter from πνεῦμα; the resumptive pronoun ἐκεῖνος takes masculine from παράκλητος. Both are tracking different antecedents from the same appositive phrase. This is Greek pronoun agreement at its most nuanced.</p>
+
+        <hr>
+        <h4>Romans 8:14–15 — Spirit of Adoption</h4>
+        <p style="font-size:0.95rem; letter-spacing:0.02em; margin:10px 0"><strong>ὅσοι γὰρ πνεύματι θεοῦ ἄγονται, οὗτοί εἰσιν υἱοὶ θεοῦ. οὐ γὰρ ἐλάβετε πνεῦμα δουλείας πάλιν εἰς φόβον, ἀλλὰ ἐλάβετε πνεῦμα υἱοθεσίας ἐν ᾧ κράζομεν· Αββα ὁ πατήρ.</strong></p>
+        <ul>
+          <li><strong>ὅσοι</strong> — relative pronoun "as many as / all who" — sets up the group</li>
+          <li><strong>οὗτοί</strong> — demonstrative, masculine plural nominative — "these ones [are] sons of God." The pronoun refers back to ὅσοι (those led by the Spirit).</li>
+          <li><strong>ἐν ᾧ</strong> — relative pronoun ᾧ, dative (governed by ἐν) — "in which" — referring to the πνεῦμα υἱοθεσίας (Spirit of adoption). Neuter from πνεῦμα; dative from ἐν.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- KC 4 -->
+    <div class="knowledge-check" id="kc_adv_pronouns_4">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">τίς and τις look nearly identical. What is the primary difference between them?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronouns_4', this)">τίς is masculine, τις is feminine — they mark different genders</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronouns_4', this)">τίς (with accent) is interrogative — "who? what?"; τις (no accent) is indefinite — "someone, a certain"</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronouns_4', this)">τίς is singular, τις is plural — they mark different numbers</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronouns_4', this)">τίς is a pronoun, τις is a conjunction — they function differently in a sentence</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronouns_4_fb"></div>
+    </div>
+
+    <!-- Block 10 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">10 · A Pronoun Reference — Putting It All Together</div>
+      <div class="lesson-block-content">
+        <p>Here's the full landscape of Greek pronouns you now know:</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Type</th><th>Key forms</th><th>Meaning</th><th>Agreement rule</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1st person</strong></td><td>ἐγώ, ἡμεῖς</td><td>I, we</td><td>No gender — case only</td></tr>
+              <tr><td><strong>2nd person</strong></td><td>σύ, ὑμεῖς</td><td>you, you all</td><td>No gender — case only</td></tr>
+              <tr><td><strong>3rd person</strong></td><td>αὐτός/αὐτή/αὐτό</td><td>he/she/it, they</td><td>Gender/number from antecedent; case from own role</td></tr>
+              <tr><td><strong>Intensive</strong></td><td>αὐτός (predicate position)</td><td>himself/herself/itself</td><td>Same forms as 3rd person — position distinguishes</td></tr>
+              <tr><td><strong>Demonstrative (near)</strong></td><td>οὗτος/αὕτη/τοῦτο</td><td>this, this one</td><td>Gender/number from antecedent; case from own role</td></tr>
+              <tr><td><strong>Demonstrative (far)</strong></td><td>ἐκεῖνος/ἐκείνη/ἐκεῖνο</td><td>that, that one</td><td>Gender/number from antecedent; case from own role</td></tr>
+              <tr><td><strong>Relative</strong></td><td>ὅς/ἥ/ὅ</td><td>who, which, that</td><td>Gender/number from antecedent; case from relative clause</td></tr>
+              <tr><td><strong>Interrogative</strong></td><td>τίς/τί (accent)</td><td>who? what?</td><td>No gender agreement — asks for identification</td></tr>
+              <tr><td><strong>Indefinite</strong></td><td>τις/τι (no accent)</td><td>someone, something</td><td>Same forms as interrogative — accent differs</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>When reading Greek, develop the habit of asking three questions when you see a pronoun:</p>
+        <ol>
+          <li><strong>What type is it?</strong> Personal? Demonstrative? Relative? Interrogative?</li>
+          <li><strong>What is its case?</strong> That tells you its grammatical role right here</li>
+          <li><strong>What is its antecedent?</strong> That tells you what it refers to</li>
+        </ol>
+        <p>In the next lesson — Conjunctions and Particles — you'll learn the connecting words that link clauses, signal logical relationships, and tell you whether an argument is building, contrasting, concluding, or explaining. Combined with pronouns, conjunctions are what make long Greek sentences readable.</p>
+      </div>
+    </div>
+
+    <!-- KC 5 -->
+    <div class="knowledge-check" id="kc_adv_pronouns_5">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In John 14:26, ἐκεῖνος is masculine even though the Holy Spirit is also described as τὸ πνεῦμα (neuter). What explains this?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_pronouns_5', this)">Greek always uses masculine for the Holy Spirit as a theological rule</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_pronouns_5', this)">ἐκεῖνος agrees with παράκλητος (masculine) — when two nouns are in apposition with different genders, the pronoun can track either antecedent</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_pronouns_5', this)">ἐκεῖνος does not actually refer to the Holy Spirit in this verse</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_pronouns_5', this)">The masculine is used because the Holy Spirit is always treated as masculine regardless of grammar</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_pronouns_5_fb"></div>
+    </div>
+
+    <!-- Quiz Start -->
+    <div class="adv-quiz-start-area" id="quizStart_adv_pronouns">
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_pronouns">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_pronouns" disabled onclick="openAdvQuiz('adv_pronouns')">
+        Take the Lesson Quiz →
+      </button>
+    </div>
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_pronounsLesson -->
+
 <div id="adv_howToReadLesson" class="adv-learn-lesson">
   <div class="lesson-module">
 
@@ -8336,9 +8716,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=87"></script>
-  <script src="app.js?v=87"></script>
-  <script type="module" src="firebase-lb.js?v=87"></script>
+  <script src="vocab.js?v=88"></script>
+  <script src="app.js?v=88"></script>
+  <script type="module" src="firebase-lb.js?v=88"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
