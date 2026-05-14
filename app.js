@@ -10181,8 +10181,51 @@ function openAdvCheatSheet(lessonId) {
         </div>
 
         <div class="adv-cs-section">
-          <h4 class="adv-cs-header">Reading Strategy — 6 Steps</h4>
-          <p><strong>1</strong> Scan for articles — they tell you case/gender/number before you read the noun &nbsp;·&nbsp; <strong>2</strong> Identify the nominative noun phrase (subject) &nbsp;·&nbsp; <strong>3</strong> Identify the accusative noun phrase (direct object) if present &nbsp;·&nbsp; <strong>4</strong> Find prepositions — the case of what follows is fixed &nbsp;·&nbsp; <strong>5</strong> Spot the verb — recognize it from vocabulary or context; look it up if needed &nbsp;·&nbsp; <strong>6</strong> Connect the noun phrases through the verb</p>
+          <h4 class="adv-cs-header">Adjectives — Agreement Rule</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Position</th><th>Pattern</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Attributive</strong></td><td>article–adj–noun <em>or</em> article–noun–article–adj</td><td>ὁ ἀγαθὸς λόγος / ὁ λόγος ὁ ἀγαθός — "the good word"</td></tr>
+              <tr><td><strong>Predicative</strong></td><td>adj outside the article-noun group</td><td>ἀγαθὸς ὁ λόγος — "the word is good"</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:8px;font-size:0.85rem;opacity:0.8"><strong>Rule:</strong> An adjective must always agree with its noun in case, gender, and number — use the article to confirm the match.</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Core Pronouns — Quick Reference</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Pronoun</th><th>Meaning</th><th>Key signal</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">αὐτός / αὐτή / αὐτό</strong></td><td>he / she / it / him / her</td><td>Gender+number traces back to the antecedent noun</td></tr>
+              <tr><td><strong class="adv-cs-gk">οὗτος / αὕτη / τοῦτο</strong></td><td>this / these</td><td>Near — the author is highlighting something immediate</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἐκεῖνος / ἐκείνη / ἐκεῖνο</strong></td><td>that / those</td><td>Far — the author points to something more distant</td></tr>
+              <tr><td><strong class="adv-cs-gk">ὅς / ἥ / ὅ</strong></td><td>who / which / that</td><td>Relative pronoun — gender+number identifies the antecedent; case shows its role in the clause</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἐγώ / ἡμεῖς</strong></td><td>I / we</td><td>ἡμῶν (our), ἡμᾶς (us), ἡμῖν (to us)</td></tr>
+              <tr><td><strong class="adv-cs-gk">σύ / ὑμεῖς</strong></td><td>you (sg.) / you (pl.)</td><td>ὑμῶν (your), ὑμᾶς (you), ὑμῖν (to you)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Conjunctions — Argument Markers</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Word</th><th>Meaning</th><th>Direction</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">γάρ</strong></td><td>for / because</td><td>← Backward: explains what came before; always postpositive (2nd position)</td></tr>
+              <tr><td><strong class="adv-cs-gk">οὖν</strong></td><td>therefore / so / then</td><td>→ Forward: concludes from what came before; always postpositive (2nd position)</td></tr>
+              <tr><td><strong class="adv-cs-gk">δέ</strong></td><td>but / and / now</td><td>Transition; always postpositive (2nd position)</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἀλλά</strong></td><td>but (strong contrast)</td><td>Sharp contrast — corrects or replaces the previous statement</td></tr>
+              <tr><td><strong class="adv-cs-gk">καί</strong></td><td>and / also / even</td><td>Addition; can stand first</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἵνα</strong></td><td>in order that</td><td>Purpose clause — always followed by subjunctive mood</td></tr>
+              <tr><td><strong class="adv-cs-gk">ὅτι</strong></td><td>that / because</td><td>"that" (indirect statement) or "because" (causal) — context decides</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Reading Strategy — 9 Steps</h4>
+          <p><strong>1</strong> Read conjunctions (γάρ/οὖν/δέ/ἀλλά — they frame the argument) &nbsp;·&nbsp; <strong>2</strong> Scan for articles &nbsp;·&nbsp; <strong>3</strong> Find the nominative (subject) &nbsp;·&nbsp; <strong>4</strong> Find the accusative (direct object) &nbsp;·&nbsp; <strong>5</strong> Check adjective agreement (case/gender/number must match noun) &nbsp;·&nbsp; <strong>6</strong> Identify pronouns and trace antecedents &nbsp;·&nbsp; <strong>7</strong> Handle prepositions (preposition + case = relationship) &nbsp;·&nbsp; <strong>8</strong> Spot the verb — look it up if needed &nbsp;·&nbsp; <strong>9</strong> Connect all pieces</p>
         </div>
 
         <div class="adv-cs-section">
@@ -10480,10 +10523,10 @@ const ADV_KC_DATA = {
     { feedback: "Both articles are τόν — accusative, not genitive. Genitive articles are τοῦ/τῆς/τῶν. τόν marks accusative masculine singular both times." }
   ],
   kc_adv_howToRead_5: [
-    { feedback: "This is not what the lesson teaches. The whole strategy is built around the noun system you have — and verbs are handled by looking them up when needed. Not being able to parse a verb fully does not stop you from reading." },
-    { correct: true, feedback: "Correct! Look it up — that is exactly what the tools are for. Blue Letter Bible, Bible Gateway's interlinear, and Logos all give you instant parsing of any verb form. Your job at this stage is to handle the noun system yourself and use tools for verb parsing. That is a real, productive workflow — not a shortcut." },
-    { feedback: "Skipping the verb entirely leaves you with noun phrases but no action connecting them. Looking up the verb takes seconds and completes the sentence. Use the tools." },
-    { feedback: "Guessing tense introduces errors that can change the meaning significantly. The right move is always to look it up — tools are instant and accurate." }
+    { feedback: "οὖν is a conjunction/particle — not a case-marked noun or pronoun. Accusative case marks nouns and pronouns that function as direct objects. οὖν has no case; it signals logical relationship between clauses." },
+    { correct: true, feedback: "Correct! οὖν is a postpositive conjunction meaning 'therefore / so / then.' It appears second in its clause (after Δικαιωθέντες) because postpositive particles cannot stand first — the rule you learned in Lesson 8. Seeing οὖν tells you immediately: Paul is drawing a conclusion. Ask yourself what he just argued in Romans 1–4, and then this conclusion (peace with God through Christ) lands with its full logical weight." },
+    { feedback: "οὖν is a conjunction, not an adverb modifying a participle. It operates at the clause level — connecting this sentence to the prior argument — not at the word level modifying Δικαιωθέντες." },
+    { feedback: "Greek prepositions are standalone words (ἐν, εἰς, ἐκ, πρός, διά, etc.) and govern noun phrases. οὖν is a conjunction that connects clauses — it signals argument direction, not spatial or relational meaning. The preposition in this clause is ἐκ, not οὖν." }
   ]
 };
 
@@ -10911,9 +10954,9 @@ const ADV_QUIZ_DATA = {
         correct: 2
       },
       {
-        text: "The preposition εἰς always takes which case?",
-        options: ["Dative", "Genitive", "Accusative", "Nominative"],
-        correct: 2
+        text: "In Romans 5:1, Paul writes διὰ τοῦ κυρίου ἡμῶν. ἡμῶν is the genitive plural of ἐγώ (I). What does ἡμῶν mean in this phrase?",
+        options: ["Of him / his", "Of us / our", "Of them / their", "Of you (singular) / your"],
+        correct: 1
       },
       {
         text: "When you see τῶν before a noun, what do you immediately know?",
@@ -10926,9 +10969,9 @@ const ADV_QUIZ_DATA = {
         correct: 2
       },
       {
-        text: "What does πρὸς τὸν θεόν (John 1:1b) mean, and why?",
-        options: ["'From God' — πρός + genitive signals source", "'Against God' — πρός always signals opposition", "'With / toward God' — πρός + accusative signals close association or direction", "'Like God' — πρός + accusative signals comparison"],
-        correct: 2
+        text: "John 3:16 begins: Οὕτως γὰρ ἠγάπησεν... γάρ appears as the second word in the clause. What does this signal?",
+        options: ["γάρ introduces a purpose clause — the goal of God's love", "γάρ is a backward-pointing conjunction signaling explanation — this verse gives the reason for what John said in 3:14–15", "γάρ marks a strong contrast — God's love is being set against something opposed to it", "γάρ signals a logical conclusion drawn from the argument before"],
+        correct: 1
       },
       {
         text: "In John 1:1c, how do you identify ὁ λόγος as the subject and not θεός?",
@@ -10936,8 +10979,8 @@ const ADV_QUIZ_DATA = {
         correct: 1
       },
       {
-        text: "In the reading strategy taught in this lesson, what is the recommended first step when reading a Greek sentence?",
-        options: ["Find the main verb and parse it fully", "Scan for articles — they anchor the noun phrase structure", "Identify all genitive relationships first", "Look up every unknown word in a lexicon before proceeding"],
+        text: "According to the nine-step reading strategy in this lesson, what is the very first step when reading a Greek sentence?",
+        options: ["Scan for articles — they anchor the noun phrase structure", "Read the conjunctions first — γάρ, οὖν, δέ, ἀλλά tell you how the sentence connects to the surrounding argument", "Find the main verb and look it up in an interlinear", "Identify all genitive relationships before anything else"],
         correct: 1
       },
       {
@@ -12859,10 +12902,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.6";
+const APP_VERSION = "1.6.7";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 8: Conjunctions & Particles — καί/δέ/ἀλλά/γάρ/οὖν, the postpositive rule, ὅτι/ἵνα/ὥστε/εἰ/ἐάν, negation (οὐ vs. μή), μέν...δέ, and NT argument structure examples"
+  "Advanced Lesson 9 capstone update — expanded to integrate all 9 lessons: updated reading strategy (conjunctions first), John 3:16 conjunction/pronoun analysis, new Romans 5:1–2 full walkthrough, expanded 'What You Can Do' list, updated quiz and cheat sheet"
 ];
 
 let deferredInstallPrompt = null;
