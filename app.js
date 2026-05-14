@@ -44,6 +44,7 @@ const REQUIRED_LESSONS = [
   "pronunciation",
   "nouns",
   "cases",
+  "prepositions",
   "adjectives",
   "pronouns",
   "conjunctions",
@@ -56,6 +57,7 @@ const REQUIRED_ADVANCED_LESSONS = [
   "adv_pronunciation",
   "adv_nouns",
   "adv_cases",
+  "adv_prepositions",
   "adv_adjectives",
   "adv_pronouns",
   "adv_conjunctions",
@@ -68,6 +70,7 @@ const LESSON_LABELS = {
   pronunciation: "Pronunciation",
   nouns: "Noun System",
   cases: "Case Endings",
+  prepositions: "Prepositions",
   adjectives: "Adjectives",
   pronouns: "Pronouns",
   conjunctions: "Conjunctions",
@@ -77,6 +80,7 @@ const LESSON_LABELS = {
   adv_pronunciation: "Pronunciation",
   adv_nouns: "Noun System",
   adv_cases: "Case Endings",
+  adv_prepositions: "Prepositions",
   adv_adjectives: "Adjectives",
   adv_pronouns: "Pronouns",
   adv_conjunctions: "Conjunctions & Particles",
@@ -9243,6 +9247,7 @@ const learnLessonTitles = {
   pronunciation: "Pronunciation",
   nouns: "Noun System",
   cases: "Case Endings",
+  prepositions: "Prepositions",
   adjectives: "Adjectives",
   pronouns: "Pronouns",
   conjunctions: "Conjunctions",
@@ -9432,6 +9437,7 @@ const advLessonTitles = {
   adv_pronunciation: "Pronunciation",
   adv_nouns: "Noun System",
   adv_cases: "Case Endings",
+  adv_prepositions: "Prepositions",
   adv_adjectives: "Adjectives",
   adv_pronouns: "Pronouns",
   adv_conjunctions: "Conjunctions & Particles",
@@ -9444,10 +9450,11 @@ const advLessonNumbers = {
   adv_pronunciation: "Advanced · Lesson 3",
   adv_nouns: "Advanced · Lesson 4",
   adv_cases: "Advanced · Lesson 5",
-  adv_adjectives: "Advanced · Lesson 6",
-  adv_pronouns: "Advanced · Lesson 7",
-  adv_conjunctions: "Advanced · Lesson 8",
-  adv_howToRead: "Advanced · Lesson 9"
+  adv_prepositions: "Advanced · Lesson 6",
+  adv_adjectives: "Advanced · Lesson 7",
+  adv_pronouns: "Advanced · Lesson 8",
+  adv_conjunctions: "Advanced · Lesson 9",
+  adv_howToRead: "Advanced · Lesson 10"
 };
 
 function showAdvancedLesson(lessonId) {
@@ -10131,6 +10138,49 @@ function openAdvCheatSheet(lessonId) {
           <p><strong>καί</strong> → "what is being added?" &nbsp;·&nbsp; <strong>δέ</strong> → "what new development?" &nbsp;·&nbsp; <strong>ἀλλά</strong> → "what is being corrected?" &nbsp;·&nbsp; <strong>γάρ</strong> → "why is this true?" &nbsp;·&nbsp; <strong>οὖν</strong> → "what conclusion follows?" &nbsp;·&nbsp; <strong>ἵνα</strong> → "what is the purpose?"</p>
         </div>
       `;
+    } else if (lessonId === "adv_prepositions") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">Prepositions — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Single-Case Prepositions</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Prep.</th><th>Case</th><th>Core meaning</th><th>Key example</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">ἐν</strong></td><td>Dat. only</td><td>in, within, by means of</td><td>ἐν ἀρχῇ — in the beginning (John 1:1)</td></tr>
+              <tr><td><strong class="adv-cs-gk">εἰς</strong></td><td>Acc. only</td><td>into, toward, for (purpose)</td><td>εἰς τὸν κόσμον — into the world</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἐκ / ἐξ</strong></td><td>Gen. only</td><td>out of, from (source)</td><td>ἐκ τοῦ θεοῦ — out of God</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἀπό</strong></td><td>Gen. only</td><td>from, away from</td><td>ἀπὸ θεοῦ — from God</td></tr>
+              <tr><td><strong class="adv-cs-gk">πρός</strong></td><td>Acc. only</td><td>to, toward, with (relational)</td><td>πρὸς τὸν θεόν — with God (John 1:1)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Dual-Case Prepositions — Case Changes the Meaning</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Prep.</th><th>Case</th><th>Meaning</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="2"><strong class="adv-cs-gk">διά</strong></td><td>Gen.</td><td>through, by means of</td><td>δι᾽ αὐτοῦ — through him</td></tr>
+              <tr><td>Acc.</td><td>because of, on account of</td><td>διὰ τοῦτο — because of this</td></tr>
+              <tr><td rowspan="2"><strong class="adv-cs-gk">μετά</strong></td><td>Gen.</td><td>with (accompaniment)</td><td>μετὰ τῶν μαθητῶν — with the disciples</td></tr>
+              <tr><td>Acc.</td><td>after (time/sequence)</td><td>μετὰ ταῦτα — after these things</td></tr>
+              <tr><td rowspan="2"><strong class="adv-cs-gk">κατά</strong></td><td>Gen.</td><td>against</td><td>καθ᾽ ἡμῶν — against us</td></tr>
+              <tr><td>Acc.</td><td>according to, throughout</td><td>κατὰ σάρκα — according to flesh</td></tr>
+              <tr><td rowspan="2"><strong class="adv-cs-gk">ὑπό</strong></td><td>Gen.</td><td>by (agent of passive verb)</td><td>ὑπὸ τοῦ θεοῦ — by God</td></tr>
+              <tr><td>Acc.</td><td>under (location/authority)</td><td>ὑπὸ νόμον — under law</td></tr>
+              <tr><td rowspan="2"><strong class="adv-cs-gk">περί</strong></td><td>Gen.</td><td>concerning, about</td><td>περὶ τῆς ἁμαρτίας — concerning sin</td></tr>
+              <tr><td>Acc.</td><td>around</td><td>περὶ τὸν τόπον — around the place</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Reading Strategy</h4>
+          <p>See the preposition → predict which case(s) follow → read the article to confirm the case → lock in the meaning. The article is always your fastest case signal.</p>
+          <p style="margin-top:6px"><strong>ἐν</strong> = always dative &nbsp;·&nbsp; <strong>εἰς</strong> = always accusative &nbsp;·&nbsp; <strong>ἐκ</strong> = always genitive &nbsp;·&nbsp; <strong>διά</strong> = genitive (through) or accusative (because of)</p>
+        </div>
+      `;
     } else if (lessonId === "adv_howToRead") {
       content.innerHTML = `
         <h3 class="adv-cs-title">How to Read Greek — Cheat Sheet</h3>
@@ -10533,9 +10583,39 @@ const ADV_KC_DATA = {
   ],
   kc_adv_howToRead_5: [
     { feedback: "οὖν is a conjunction/particle — not a case-marked noun or pronoun. Accusative case marks nouns and pronouns that function as direct objects. οὖν has no case; it signals logical relationship between clauses." },
-    { correct: true, feedback: "Correct! οὖν is a postpositive conjunction meaning 'therefore / so / then.' It appears second in its clause (after Δικαιωθέντες) because postpositive particles cannot stand first — the rule you learned in Lesson 8. Seeing οὖν tells you immediately: Paul is drawing a conclusion. Ask yourself what he just argued in Romans 1–4, and then this conclusion (peace with God through Christ) lands with its full logical weight." },
+    { correct: true, feedback: "Correct! οὖν is a postpositive conjunction meaning 'therefore / so / then.' It appears second in its clause (after Δικαιωθέντες) because postpositive particles cannot stand first — the rule you learned in Lesson 9. Seeing οὖν tells you immediately: Paul is drawing a conclusion. Ask yourself what he just argued in Romans 1–4, and then this conclusion (peace with God through Christ) lands with its full logical weight." },
     { feedback: "οὖν is a conjunction, not an adverb modifying a participle. It operates at the clause level — connecting this sentence to the prior argument — not at the word level modifying Δικαιωθέντες." },
     { feedback: "Greek prepositions are standalone words (ἐν, εἰς, ἐκ, πρός, διά, etc.) and govern noun phrases. οὖν is a conjunction that connects clauses — it signals argument direction, not spatial or relational meaning. The preposition in this clause is ἐκ, not οὖν." }
+  ],
+  kc_adv_prepositions_1: [
+    { feedback: "ἐν never takes the genitive. Genitive prepositions include ἐκ (out of) and ἀπό (from). ἐν governs one case only — no exceptions in the NT." },
+    { feedback: "ἐν never takes the accusative. Accusative prepositions include εἰς (into/toward) and πρός (to/toward). ἐν always signals location or sphere." },
+    { correct: true, feedback: "Correct! ἐν always and only governs the dative — without a single exception in the entire NT. ἐν ἀρχῇ (John 1:1), ἐν Χριστῷ (in Christ), ἐν τῷ πνεύματι (in the Spirit) — every occurrence is dative. The iota subscript on a noun or article is often your visual confirmation." },
+    { feedback: "No preposition in Greek governs the nominative. The nominative is for subjects only. Prepositions govern genitive, dative, or accusative." }
+  ],
+  kc_adv_prepositions_2: [
+    { feedback: "That's the meaning of διά + genitive — δι᾽ αὐτοῦ means 'through him' (agency or means). When διά takes the accusative, the meaning shifts entirely to reason or cause." },
+    { correct: true, feedback: "Correct! When διά takes the accusative, it shifts from agency/means ('through') to reason/cause ('because of'). διὰ τοῦτο is one of the most common prepositional phrases in the NT — Paul uses it frequently to draw inferences. The pronoun τοῦτο (accusative neuter singular) is your signal that διά is expressing reason here." },
+    { feedback: "That's μετά + genitive — μετὰ αὐτοῦ = 'with him.' διά does not mean 'with' in any case." },
+    { feedback: "That's κατά + genitive — καθ᾽ ἡμῶν = 'against us.' διά + accusative specifically means 'because of' or 'on account of.'" }
+  ],
+  kc_adv_prepositions_3: [
+    { feedback: "The verb ἦν (was) is intransitive — it does not take a direct object. τὸν θεόν is accusative not as a direct object but because πρός governs the accusative. The preposition, not the verb, determines the case here." },
+    { correct: true, feedback: "Correct! πρός + accusative expresses direction toward or relational nearness. In John 1:1, πρὸς τὸν θεόν describes the Word's face-to-face relationship with God — a relational proximity, not mere location. The accusative article τόν confirms that πρός is governing this phrase in its 'with/toward' sense." },
+    { feedback: "κατά + accusative means 'according to' — a completely different preposition with a different meaning. πρός expresses direction and relational nearness, not standard or norm." },
+    { feedback: "τόν is the accusative masculine singular article — not genitive. Genitive articles are τοῦ (masculine/neuter) and τῆς (feminine). τόν unambiguously marks accusative masculine singular." }
+  ],
+  kc_adv_prepositions_4: [
+    { feedback: "That's ὑπό + accusative — ὑπὸ νόμον means 'under law' (physical or metaphorical location). But with the genitive, ὑπό shifts to agency. The case change completely changes the meaning." },
+    { correct: true, feedback: "Correct! ὑπό + genitive marks the agent of a passive verb — the one actually performing the action. ὑπὸ τοῦ θεοῦ = 'by God'; ὑπὸ τοῦ πνεύματος = 'by the Spirit.' Whenever you see a passive verb followed by ὑπό + genitive, you've found who is doing the action behind the passive construction." },
+    { feedback: "Motion toward is εἰς + accusative. ὑπό + genitive specifically identifies the agent behind a passive verb — not direction of movement." },
+    { feedback: "Separation from a source is ἐκ or ἀπό + genitive. ὑπό + genitive has a distinct and specific role: it marks the agent of a passive verb construction." }
+  ],
+  kc_adv_prepositions_5: [
+    { feedback: "ἐκ does require the genitive, so seeing it tells you what case to expect — but ἐκ itself is not in any case. It's the article τοῦ that actually marks the genitive in this phrase. Train yourself to reach for the article first." },
+    { correct: true, feedback: "Correct! τοῦ is the genitive singular article for masculine and neuter nouns — it signals genitive instantly, before you even process the noun. In ἐκ τοῦ θεοῦ, τοῦ tells you: genitive, masculine or neuter, singular. The noun ending -οῦ on θεοῦ confirms it, but τοῦ is the fastest signal available to you." },
+    { feedback: "θεοῦ does confirm the genitive through its -οῦ ending — but it's the slower signal. The article τοῦ comes first in the phrase and locks in the case before you process the noun. Always read the article first." },
+    { feedback: "You only need one signal to confirm the case, and τοῦ is faster because it appears before the noun. The article is always the primary case marker — the noun ending is confirmation, not discovery." }
   ]
 };
 
@@ -10782,6 +10862,62 @@ const ADV_QUIZ_DATA = {
         text: "In John 3:16, τὸν υἱὸν τὸν μονογενῆ — the repeated article τόν marks both words as accusative masculine singular. Why does this matter for reading?",
         options: ["It tells us μονογενῆ is the subject of the sentence", "It confirms that μονογενῆ agrees with υἱόν — 'only' describes 'Son', not some other word", "It signals a dative of reference", "It indicates a vocative — God is being addressed"],
         correct: 1
+      }
+    ]
+  },
+  adv_prepositions: {
+    title: "Prepositions",
+    passMark: 7,
+    questions: [
+      {
+        text: "Which case does ἐν always govern — without exception?",
+        options: ["Genitive", "Accusative", "Dative", "Nominative"],
+        correct: 2
+      },
+      {
+        text: "εἰς + accusative primarily signals...",
+        options: ["Location within (in / by)", "Motion toward or into; purpose", "Source or separation (out of)", "Agent of a passive verb"],
+        correct: 1
+      },
+      {
+        text: "διά + genitive means ___; but διά + accusative means ___.",
+        options: ["through / by means of ... because of / on account of", "because of ... through / by means of", "with ... after", "against ... according to"],
+        correct: 0
+      },
+      {
+        text: "In John 1:1 — πρὸς τὸν θεόν — which case does πρός govern?",
+        options: ["Genitive", "Dative", "Nominative", "Accusative"],
+        correct: 3
+      },
+      {
+        text: "ὑπό + genitive marks what grammatical relationship?",
+        options: ["Physical location underneath something", "The agent performing the action in a passive construction", "Motion toward a destination", "Source or point of origin"],
+        correct: 1
+      },
+      {
+        text: "ἐκ τοῦ θεοῦ — what does this phrase mean?",
+        options: ["Into God", "With God", "Out of God / from God", "According to God"],
+        correct: 2
+      },
+      {
+        text: "Which of these prepositions takes ONLY the dative case?",
+        options: ["διά", "κατά", "ἐν", "μετά"],
+        correct: 2
+      },
+      {
+        text: "μετά + genitive means ___; but μετά + accusative means ___.",
+        options: ["with (accompaniment) ... after (time/sequence)", "after ... with", "against ... through", "through ... with"],
+        correct: 0
+      },
+      {
+        text: "κατά + accusative most commonly means...",
+        options: ["Against", "According to / throughout", "Through / by means of", "Out of / from"],
+        correct: 1
+      },
+      {
+        text: "In ἐκ πίστεως (Romans 1:17), what does the genitive after ἐκ signal?",
+        options: ["Direction — faith is the destination", "Agent — faith is performing an action", "Source — 'out of' or 'from' faith", "Means — the same as 'through faith'"],
+        correct: 2
       }
     ]
   },
@@ -11158,21 +11294,25 @@ function selectAdvQuizAns(optIdx) {
   const total = data.questions.length;
   currentQuizAnswers[currentQuizQIdx] = optIdx;
 
-  // Highlight the selected answer and lock all options
-  document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === optIdx) btn.classList.add("qm-selected");
-  });
+  // Disable all buttons immediately — that's the tap feedback
+  document.querySelectorAll(".quiz-modal-opt").forEach(btn => { btn.disabled = true; });
 
   const isLast = currentQuizQIdx === total - 1;
-  setTimeout(() => {
-    if (isLast) {
-      renderAdvQuizQ(currentQuizQIdx); // re-render last question to show "See Results" button
-    } else {
+  if (isLast) {
+    // On the final question only, briefly show the selection then re-render with See Results
+    document.querySelectorAll(".quiz-modal-opt").forEach((btn, i) => {
+      if (i === optIdx) btn.classList.add("qm-selected");
+    });
+    setTimeout(() => renderAdvQuizQ(currentQuizQIdx), 250);
+  } else {
+    // No gold highlight during advance — disabling buttons is enough feedback.
+    // Showing qm-selected and then removing it causes the color to bleed into the
+    // next question's slide animation due to CSS transition timing.
+    setTimeout(() => {
       currentQuizQIdx++;
       renderAdvQuizQ(currentQuizQIdx);
-    }
-  }, 420);
+    }, 180);
+  }
 }
 
 function advQuizGoBack() {
@@ -11194,8 +11334,6 @@ function finishAdvQuiz() {
   const passed = correct >= data.passMark;
 
   document.getElementById("quizModalBody")?.classList.add("hidden");
-  const backBtn = document.getElementById("quizBackBtn");
-  if (backBtn) backBtn.style.visibility = "hidden";
   const fill = document.getElementById("quizModalFill");
   if (fill) fill.style.width = "100%";
 
@@ -11682,9 +11820,31 @@ function showNounCheatSheet() {
   );
 }
 
-function showAdjectivesCheatSheet() {
+function showPrepositionsCheatSheet() {
   showLessonCheatSheet(
     "Lesson 6 Cheat Sheet",
+    `
+      <p class="cheat-intro">
+        Prepositions tell you where, how, or why — and in Greek, each one locks onto a specific case. Case + preposition = precise meaning.
+      </p>
+
+      <div class="cheat-list">
+        <div><strong>ἐν + dative</strong><span>In / within / by means of — ἐν ἀρχῇ (in the beginning), ἐν Χριστῷ (in Christ).</span></div>
+        <div><strong>εἰς + accusative</strong><span>Into / toward — εἰς τὸν κόσμον (into the world).</span></div>
+        <div><strong>ἐκ + genitive</strong><span>Out of / from — ἐκ τοῦ θεοῦ (out of God).</span></div>
+        <div><strong>ἀπό + genitive</strong><span>From / away from — ἀπὸ θεοῦ (from God).</span></div>
+        <div><strong>πρός + accusative</strong><span>To / toward / with — πρὸς τὸν θεόν (with God, John 1:1).</span></div>
+        <div><strong>διά + genitive</strong><span>Through / by means of — δι᾽ αὐτοῦ (through him).</span></div>
+        <div><strong>διά + accusative</strong><span>Because of — διὰ τοῦτο (because of this).</span></div>
+        <div><strong>κατά + accusative</strong><span>According to — κατὰ σάρκα (according to flesh).</span></div>
+      </div>
+    `
+  );
+}
+
+function showAdjectivesCheatSheet() {
+  showLessonCheatSheet(
+    "Lesson 7 Cheat Sheet",
     `
       <p class="cheat-intro">
         A quick reference for adjective agreement. Adjectives change their endings to match their noun — always.
@@ -11705,7 +11865,7 @@ function showAdjectivesCheatSheet() {
 
 function showPronounsCheatSheet() {
   showLessonCheatSheet(
-    "Lesson 7 Cheat Sheet",
+    "Lesson 8 Cheat Sheet",
     `
       <p class="cheat-intro">
         Core pronouns to recognize. When you see one, ask: what noun came before that matches its gender and number?
@@ -11727,7 +11887,7 @@ function showPronounsCheatSheet() {
 
 function showConjunctionsCheatSheet() {
   showLessonCheatSheet(
-    "Lesson 8 Cheat Sheet",
+    "Lesson 9 Cheat Sheet",
     `
       <p class="cheat-intro">
         Read conjunctions first — they tell you the direction before you parse a single noun.
@@ -11748,7 +11908,7 @@ function showConjunctionsCheatSheet() {
 
 function showHowToReadCheatSheet() {
   showLessonCheatSheet(
-    "Lesson 9 Cheat Sheet",
+    "Lesson 10 Cheat Sheet",
     `
       <p class="cheat-intro">
         Use this as a quick reading checklist. Do not try to translate everything at once.
@@ -11807,10 +11967,11 @@ function updateLessonTopBar(lesson) {
     pronunciation: "Lesson 3",
     nouns: "Lesson 4",
     cases: "Lesson 5",
-    adjectives: "Lesson 6",
-    pronouns: "Lesson 7",
-    conjunctions: "Lesson 8",
-    howToRead: "Lesson 9"
+    prepositions: "Lesson 6",
+    adjectives: "Lesson 7",
+    pronouns: "Lesson 8",
+    conjunctions: "Lesson 9",
+    howToRead: "Lesson 10"
   };
 
   title.innerHTML = `
@@ -11838,6 +11999,10 @@ function updateLessonTopBar(lesson) {
   action.innerHTML = `<span class="material-symbols-outlined">table_chart</span>`;
   action.title = "Paradigms";
   action.onclick = openParadigmModal;
+} else if (lesson === "prepositions") {
+  action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
+  action.title = "Cheat Sheet";
+  action.onclick = showPrepositionsCheatSheet;
 } else if (lesson === "adjectives") {
   action.innerHTML = `<span class="material-symbols-outlined">description</span>`;
   action.title = "Cheat Sheet";
@@ -12993,7 +13158,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.9";
+const APP_VERSION = "1.7.0";
 
 const UPDATE_NOTES = [
   "Basic Lessons 6–9 added: Adjectives (agreement, positions, common forms), Pronouns (αὐτός, οὗτος, personal), Conjunctions (καί/δέ/ἀλλά/γάρ/οὖν/ἵνα/ὅτι), and Lesson 9 (How to Read Greek) updated as capstone integrating all tools"
