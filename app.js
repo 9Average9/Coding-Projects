@@ -9891,6 +9891,94 @@ function openAdvCheatSheet(lessonId) {
           <p>This is why dictionaries always give: nominative, genitive, article (e.g., σάρξ, σαρκός, ἡ).</p>
         </div>
       `;
+    } else if (lessonId === "adv_howToRead") {
+      content.innerHTML = `
+        <h3 class="adv-cs-title">How to Read Greek — Cheat Sheet</h3>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Present Active Indicative — λύω (I loose)</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Person</th><th>Singular</th><th>Plural</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1st</strong></td><td>λύ<strong>ω</strong> — I am loosing</td><td>λύ<strong>ομεν</strong> — we are loosing</td></tr>
+              <tr><td><strong>2nd</strong></td><td>λύ<strong>εις</strong> — you are loosing</td><td>λύ<strong>ετε</strong> — you all are loosing</td></tr>
+              <tr><td><strong>3rd</strong></td><td>λύ<strong>ει</strong> — he/she/it is loosing</td><td>λύ<strong>ουσι(ν)</strong> — they are loosing</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">εἰμί (to be) — Present &amp; Imperfect</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Person</th><th>Present sg.</th><th>Present pl.</th><th>Imperfect sg.</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1st</strong></td><td>εἰμί (I am)</td><td>ἐσμέν (we are)</td><td>ἤμην (I was)</td></tr>
+              <tr><td><strong>2nd</strong></td><td>εἶ (you are)</td><td>ἐστέ (you all are)</td><td>ἦς (you were)</td></tr>
+              <tr><td><strong>3rd</strong></td><td>ἐστίν (he/she/it is)</td><td>εἰσίν (they are)</td><td>ἦν (he/she/it was)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">The Five Tenses — Quick Reference</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Tense</th><th>Aspect</th><th>Example (3rd sg.)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Present</strong></td><td>Ongoing / repeated action</td><td>λύει (he is loosing)</td></tr>
+              <tr><td><strong>Imperfect</strong></td><td>Ongoing past action</td><td>ἔλυεν (he was loosing)</td></tr>
+              <tr><td><strong>Aorist</strong></td><td>Simple past event</td><td>ἔλυσεν (he loosed)</td></tr>
+              <tr><td><strong>Perfect</strong></td><td>Past act, present result</td><td>λέλυκεν (he has loosed)</td></tr>
+              <tr><td><strong>Future</strong></td><td>Action to come</td><td>λύσει (he will loose)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Key Prepositions</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Prep.</th><th>Case</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ἐν</strong></td><td>Dat.</td><td>in, within, by means of</td></tr>
+              <tr><td><strong>εἰς</strong></td><td>Acc.</td><td>into, toward, for</td></tr>
+              <tr><td><strong>ἐκ/ἐξ</strong></td><td>Gen.</td><td>out of, from</td></tr>
+              <tr><td><strong>ἀπό</strong></td><td>Gen.</td><td>from, away from</td></tr>
+              <tr><td><strong>πρός</strong></td><td>Acc.</td><td>to, toward, with</td></tr>
+              <tr><td><strong>διά</strong></td><td>Gen.</td><td>through, by means of</td></tr>
+              <tr><td><strong>διά</strong></td><td>Acc.</td><td>because of</td></tr>
+              <tr><td><strong>ὑπό</strong></td><td>Gen.</td><td>by (agent)</td></tr>
+              <tr><td><strong>κατά</strong></td><td>Acc.</td><td>according to</td></tr>
+              <tr><td><strong>μετά</strong></td><td>Gen.</td><td>with</td></tr>
+              <tr><td><strong>μετά</strong></td><td>Acc.</td><td>after</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Reading Strategy — 7 Steps</h4>
+          <p><strong>1</strong> Find the main verb &nbsp;·&nbsp; <strong>2</strong> Parse it (person/number/tense/voice/mood) &nbsp;·&nbsp; <strong>3</strong> Find the subject (nominative) &nbsp;·&nbsp; <strong>4</strong> Find the direct object (accusative) &nbsp;·&nbsp; <strong>5</strong> Handle genitives (possession/relationship) &nbsp;·&nbsp; <strong>6</strong> Handle datives (indirect obj./means/sphere) &nbsp;·&nbsp; <strong>7</strong> Handle prepositional phrases</p>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">High-Frequency Forms to Memorize</h4>
+          <table class="adv-cs-table">
+            <thead><tr><th>Form</th><th>Parse</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>εἶπεν</td><td>Aor. act. ind. 3 sg. (λέγω)</td><td>he/she said</td></tr>
+              <tr><td>ἦλθεν</td><td>Aor. ind. 3 sg. (ἔρχομαι)</td><td>he/she came</td></tr>
+              <tr><td>ἐγένετο</td><td>Aor. ind. 3 sg. (γίνομαι)</td><td>it happened / it came to pass</td></tr>
+              <tr><td>γέγραπται</td><td>Perf. pass. ind. 3 sg. (γράφω)</td><td>it stands written</td></tr>
+              <tr><td>ἠγέρθη</td><td>Aor. pass. ind. 3 sg. (ἐγείρω)</td><td>he was raised</td></tr>
+              <tr><td>ἔδωκεν</td><td>Aor. act. ind. 3 sg. (δίδωμι)</td><td>he gave</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adv-cs-section">
+          <h4 class="adv-cs-header">Mood Guide</h4>
+          <p><strong>Indicative:</strong> States a fact — "he says" &nbsp;·&nbsp; <strong>Subjunctive:</strong> Purpose/possibility (after ἵνα, ἐάν) &nbsp;·&nbsp; <strong>Imperative:</strong> Command &nbsp;·&nbsp; <strong>Infinitive:</strong> "to ___" (verbal noun) &nbsp;·&nbsp; <strong>Participle:</strong> "the one ___-ing" (verbal adjective)</p>
+          <p><strong>Key signal:</strong> ἵνα + subjunctive = purpose clause ("in order that / so that")</p>
+        </div>
+      `;
     } else {
       content.innerHTML = `<p style="opacity:0.6;text-align:center;padding:20px 0">No cheat sheet available for this lesson yet.</p>`;
     }
@@ -10057,6 +10145,36 @@ const ADV_KC_DATA = {
     { feedback: "The nominative form (σάρξ) is NOT the stem in the 3rd declension — this is exactly why the nominative alone is insufficient. The stem is found from the genitive, not the nominative. σάρξ → σαρκός → drop -ος → σαρκ-." },
     { feedback: "The full genitive form σαρκός is NOT the stem — you must remove the genitive ending -ος to get the bare stem σαρκ-. The stem is what remains after dropping -ος." },
     { feedback: "The stem is found from the genitive singular, not by manipulating the nominative. σάρξ has ξ as a combined consonant (κ + σ) — the genitive σαρκός reveals the true stem σαρκ-." }
+  ],
+  kc_adv_howToRead_1: [
+    { feedback: "λύεις is the 2nd person singular — 'you are loosing.' The -εις ending is the 2nd singular marker. The 1st plural uses -ομεν." },
+    { correct: true, feedback: "Correct! λύομεν is the 1st person plural present active indicative — 'we are loosing.' The -ομεν ending is one of the clearest plural markers in the paradigm. λύω (I), λύεις (you), λύει (he/she/it), λύομεν (we), λύετε (you all), λύουσι(ν) (they)." },
+    { feedback: "λύουσι(ν) is the 3rd person plural — 'they are loosing.' The -ουσι ending marks 3rd plural. λύομεν ends in -ομεν, which is the 1st person plural ending." },
+    { feedback: "λύω is the 1st person singular — 'I am loosing.' The -ω ending marks 1st singular. λύομεν with -ομεν is 1st plural: 'we.'" }
+  ],
+  kc_adv_howToRead_2: [
+    { feedback: "εἰμί is 1st person singular — 'I am.' The 3rd person singular of εἰμί is a completely different form that you simply must memorize." },
+    { feedback: "εἶ is 2nd person singular — 'you are.' Look at the full paradigm: εἰμί (I am), εἶ (you are), ἐστίν (he/she/it is), ἐσμέν (we are), ἐστέ (you all are), εἰσίν (they are)." },
+    { correct: true, feedback: "Correct! ἐστίν is the 3rd person singular present indicative of εἰμί — 'he/she/it is.' You will see this form constantly in the NT: θεός ἐστιν (God is), ἀληθὴς ἐστιν (it is true), οὗτός ἐστιν (this is). The moveable ν appears before vowels or at end of sentence." },
+    { feedback: "ἐσμέν is 1st person plural — 'we are.' The 3rd singular is ἐστίν. These differ significantly: 1st plural -μεν vs. 3rd singular -(ν)." }
+  ],
+  kc_adv_howToRead_3: [
+    { feedback: "The accusative is the case for εἰς (into/toward), not ἐν. These two prepositions are frequently confused: ἐν + dative = 'in' (location); εἰς + accusative = 'into' (direction). They are not interchangeable." },
+    { feedback: "The genitive is the case for ἐκ (out of) and ἀπό (from), not ἐν. Remember: ἐν always takes the dative — it expresses being inside something, which is a static location, matching the dative case." },
+    { correct: true, feedback: "Correct! ἐν always takes the dative case — without exception. ἐν + dative = 'in, within, by means of, among.' ἐν ἀρχῇ (dative of ἀρχή), ἐν Χριστῷ (dative of Χριστός), ἐν τῷ κόσμῳ (dative of κόσμος). Every occurrence of ἐν in the NT is followed by the dative." },
+    { feedback: "No preposition takes the nominative as its object. The nominative is the case for subjects, not for objects of prepositions. Greek prepositions govern genitive, dative, or accusative — never nominative." }
+  ],
+  kc_adv_howToRead_4: [
+    { correct: true, feedback: "Correct! This is an anarthrous predicate nominative placed before the verb — a construction that emphasizes the nature or quality of the subject (what kind of being the Word is) rather than making a simple identity equation. The grammar itself does not mandate a single English translation; different scholars render θεὸς ἦν ὁ λόγος in various ways, and the debate involves both grammar and broader theological commitments." },
+    { feedback: "The grammar does not establish that the Word is a lesser or secondary being. An anarthrous predicate nominative emphasizes nature/quality; it does not rank or subordinate. That conclusion imports external theological assumptions into what is a grammatical observation." },
+    { feedback: "The presence or absence of the article makes a significant grammatical difference. If John had written ὁ θεὸς ἦν ὁ λόγος (both with article), the two terms would be fully interchangeable — the Word would simply be identified as 'the God.' By making θεός anarthrous, John uses a construction that stresses what the Word is, not just that the Word and 'the God' are identical." },
+    { feedback: "The grammar does not establish this either. Note that clause 2 (ὁ λόγος ἦν πρὸς τὸν θεόν) already distinguishes the Word from τὸν θεόν — showing they are in relationship with each other, not identical persons. The grammar presents a nuanced picture that different theological traditions interpret differently." }
+  ],
+  kc_adv_howToRead_5: [
+    { feedback: "ἵνα + subjunctive does not express a completed past action. Past completed action would use the aorist indicative. ἵνα introduces a purpose or result clause — it points forward to what is intended or hoped for." },
+    { correct: true, feedback: "Correct! ἵνα + subjunctive is the standard construction for purpose and result clauses in Greek: 'in order that,' 'so that.' In John 3:16, ἵνα πᾶς ὁ πιστεύων...ἔχῃ ζωὴν αἰώνιον = 'so that everyone who believes might have eternal life.' The giving of the Son had a stated purpose, expressed by this ἵνα clause." },
+    { feedback: "A simple statement of fact uses the indicative mood, not the subjunctive. ἵνα specifically triggers the subjunctive, which signals contingency, purpose, or possibility — not factual assertion." },
+    { feedback: "Embedded questions in Greek typically use the indicative or optative, not ἵνα + subjunctive. ἵνα is reserved for purpose and result clauses, conditional purpose, and a few other constructions — not questions." }
   ]
 };
 
@@ -10303,6 +10421,62 @@ const ADV_QUIZ_DATA = {
         text: "In John 3:16, τὸν υἱὸν τὸν μονογενῆ — the repeated article τόν marks both words as accusative masculine singular. Why does this matter for reading?",
         options: ["It tells us μονογενῆ is the subject of the sentence", "It confirms that μονογενῆ agrees with υἱόν — 'only' describes 'Son', not some other word", "It signals a dative of reference", "It indicates a vocative — God is being addressed"],
         correct: 1
+      }
+    ]
+  },
+  adv_howToRead: {
+    title: "How to Read Greek",
+    passMark: 7,
+    questions: [
+      {
+        text: "In the present active indicative paradigm, λύεις means:",
+        options: ["I am loosing (1st singular)", "You are loosing (2nd singular)", "He/she is loosing (3rd singular)", "We are loosing (1st plural)"],
+        correct: 1
+      },
+      {
+        text: "Which tense primarily describes ongoing, repeated, or in-progress action?",
+        options: ["Present", "Aorist", "Perfect", "Imperfect"],
+        correct: 0
+      },
+      {
+        text: "The aorist tense primarily signals:",
+        options: ["Ongoing present action", "A simple event or fact, often past — the action viewed as a whole", "Past action with enduring present results", "Future intended action"],
+        correct: 1
+      },
+      {
+        text: "The preposition εἰς always takes which case?",
+        options: ["Dative", "Genitive", "Accusative", "Nominative"],
+        correct: 2
+      },
+      {
+        text: "In ἐν ἀρχῇ (John 1:1), ἀρχῇ is dative singular. How is the phrase ἐν ἀρχῇ translated?",
+        options: ["From the beginning", "After the beginning", "In the beginning", "Before the beginning"],
+        correct: 2
+      },
+      {
+        text: "What does πρὸς τὸν θεόν (John 1:1b) mean?",
+        options: ["From God", "Against God", "With / toward God (in close relationship)", "Like God"],
+        correct: 2
+      },
+      {
+        text: "Greek active voice means:",
+        options: ["The subject receives the action", "The subject acts on or for itself", "The subject performs the action", "The action has no specified agent"],
+        correct: 2
+      },
+      {
+        text: "λέγουσιν is present active indicative 3rd plural of λέγω. What does it mean?",
+        options: ["He said", "They are saying", "You (all) are saying", "We said"],
+        correct: 1
+      },
+      {
+        text: "In John 3:16, πᾶς ὁ πιστεύων is literally 'all, the believing one' — a present participle with the article. How is this phrase typically translated?",
+        options: ["All who will believe at some future point", "Everyone who believes / all who trust", "Only those predestined to believe", "The believing community as a collective institution"],
+        correct: 1
+      },
+      {
+        text: "Which of the following is NOT one of the five properties used to parse a Greek verb?",
+        options: ["Person", "Number", "Declension", "Tense"],
+        correct: 2
       }
     ]
   }
@@ -12208,11 +12382,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.6.1";
+const APP_VERSION = "1.6.2";
 
 const UPDATE_NOTES = [
-  "Advanced Lesson 5: Case Endings — full 1st &amp; 2nd declension paradigms, the article as parsing guide, 3rd declension preview, 10-question quiz, and cheat sheet",
-  "Lesson 2 cheat sheet: Greek text now larger and clearer for easier reading of diacritical marks"
+  "Advanced Lesson 6: How to Read Greek — Greek verbs, the five parsing properties, present active indicative, tense overview, common NT verbs, prepositions, a 7-step reading strategy, full analysis of John 1:1 and John 3:16, and a path forward with resources"
 ];
 
 let deferredInstallPrompt = null;
