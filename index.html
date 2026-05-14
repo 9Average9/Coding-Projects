@@ -481,9 +481,21 @@ OneSignalDeferred.push(async function(OneSignal) {
     </div>
   </button>
 
-  <button onclick="showLearnLesson('adjectives')">
+  <button onclick="showLearnLesson('prepositions')">
     <div class="lesson-number-wrap">
       <div class="lesson-number">6</div>
+      <div class="lesson-label">Lesson</div>
+    </div>
+    <div class="lesson-text">
+      <strong>Prepositions</strong>
+      <small>In, into, out of — how case sharpens meaning</small>
+      <span class="lesson-status" data-lesson-status="prepositions">○ Not completed</span>
+    </div>
+  </button>
+
+  <button onclick="showLearnLesson('adjectives')">
+    <div class="lesson-number-wrap">
+      <div class="lesson-number">7</div>
       <div class="lesson-label">Lesson</div>
     </div>
     <div class="lesson-text">
@@ -495,7 +507,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   <button onclick="showLearnLesson('pronouns')">
     <div class="lesson-number-wrap">
-      <div class="lesson-number">7</div>
+      <div class="lesson-number">8</div>
       <div class="lesson-label">Lesson</div>
     </div>
     <div class="lesson-text">
@@ -507,7 +519,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   <button onclick="showLearnLesson('conjunctions')">
     <div class="lesson-number-wrap">
-      <div class="lesson-number">8</div>
+      <div class="lesson-number">9</div>
       <div class="lesson-label">Lesson</div>
     </div>
     <div class="lesson-text">
@@ -519,7 +531,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   <button onclick="showLearnLesson('howToRead')">
     <div class="lesson-number-wrap">
-      <div class="lesson-number">9</div>
+      <div class="lesson-number">10</div>
       <div class="lesson-label">Lesson</div>
     </div>
     <div class="lesson-text">
@@ -3861,11 +3873,129 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </div>
 </div>
+<!-- Prepositions Lesson -->
+<div id="prepositionsLesson" class="learn-lesson">
+  <div class="lesson-module">
+  <div class="lesson-title-clean">
+    <div class="lesson-kicker">Lesson 6</div>
+    <h2>Prepositions</h2>
+  </div>
+
+  <button class="lesson-cheat-strip" onclick="showPrepositionsCheatSheet()">
+    <span class="material-symbols-outlined">description</span>
+    <span>
+      <strong>Cheat Sheet</strong>
+      <small>Quick reference for prepositions and their cases</small>
+    </span>
+  </button>
+
+  <p class="lesson-lead">
+    You already know that Greek endings carry meaning — now meet the small words that work alongside them. Prepositions tell you <em>where</em>, <em>how</em>, and <em>why</em>, and in Greek every preposition locks onto a specific case to sharpen its meaning further. Learn these and common phrases like "in Christ," "into the world," and "out of God" snap into focus.
+  </p>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">What does a preposition do?</div>
+    <div class="lesson-block-content">
+      <p>In English, prepositions are words like <em>in</em>, <em>from</em>, <em>to</em>, <em>through</em>, and <em>because of</em>. They tell you the relationship between a noun and the rest of the sentence.</p>
+      <p>Greek prepositions do the same job — but with a twist. Each Greek preposition requires a specific case for its object, and that case adds extra precision to the meaning.</p>
+      <p class="mini-example">ἐν ἀρχῇ — "in the beginning" (ἐν always takes the dative)</p>
+      <p class="mini-example">εἰς τὸν κόσμον — "into the world" (εἰς always takes the accusative)</p>
+      <p class="highlight">
+        In Greek, preposition + case = precise meaning. Once you learn which case each preposition takes, you can lock in the meaning instantly.
+      </p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">The big three — ἐν, εἰς, ἐκ</div>
+    <div class="lesson-block-content">
+      <p>These three prepositions appear constantly in the NT and each takes one specific case:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>ἐν + dative</strong><span>In / within / by means of — ἐν Χριστῷ (in Christ), ἐν ἀρχῇ (in the beginning)</span></div>
+        <div class="takeaway-step"><strong>εἰς + accusative</strong><span>Into / toward — εἰς τὸν κόσμον (into the world), εἰς ζωὴν αἰώνιον (into eternal life)</span></div>
+        <div class="takeaway-step"><strong>ἐκ + genitive</strong><span>Out of / from — ἐκ τοῦ θεοῦ (out of God), ἐκ πίστεως (out of / from faith)</span></div>
+      </div>
+
+      <p>Notice how the case tells you the direction: the dative locates you inside, the accusative points you toward something, the genitive takes you out from a source.</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>ἐν always takes which case?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">The dative — every single time. ἐν ἀρχῇ, ἐν Χριστῷ, ἐν τῷ πνεύματι — they're all dative. No exceptions.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">More common prepositions</div>
+    <div class="lesson-block-content">
+      <p>Beyond the big three, these prepositions appear throughout the NT:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>ἀπό + genitive</strong><span>From / away from — ἀπὸ θεοῦ (from God)</span></div>
+        <div class="takeaway-step"><strong>πρός + accusative</strong><span>To / toward / with — πρὸς τὸν θεόν (with God, John 1:1)</span></div>
+        <div class="takeaway-step"><strong>διά + genitive</strong><span>Through / by means of — δι᾽ αὐτοῦ (through him)</span></div>
+        <div class="takeaway-step"><strong>διά + accusative</strong><span>Because of — διὰ τοῦτο (because of this)</span></div>
+        <div class="takeaway-step"><strong>κατά + accusative</strong><span>According to — κατὰ σάρκα (according to flesh)</span></div>
+      </div>
+
+      <p>Notice that <strong>διά</strong> appears twice with two different cases — and a completely different meaning. That's the power of the case system: the same preposition can say two different things depending on what follows it.</p>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">Why this matters for reading the NT</div>
+    <div class="lesson-block-content">
+      <p>Some of the richest theological language in the NT is built on prepositions. The meaning changes completely depending on the case:</p>
+      <p class="mini-example">ἐν Χριστῷ — "in Christ" (sphere, belonging)</p>
+      <p class="mini-example">εἰς Χριστόν — "into Christ" (direction, used in baptism texts)</p>
+      <p class="mini-example">ἐκ πίστεως — "out of / from faith" (source of righteousness, Romans 1:17)</p>
+      <p>When translators debate whether a phrase means "through" or "because of," they're often looking at exactly this: which case follows the preposition?</p>
+
+      <div class="lesson-interactive">
+        <p><strong>Knowledge check:</strong></p>
+        <p>εἰς τὸν κόσμον (John 3:17) — what direction does this phrase describe?</p>
+        <div class="answer-row">
+          <button class="small-btn" type="button" onclick="revealAnswer(event, this)">Show Answer</button>
+          <span class="answer-text">Motion into the world — εἰς + accusative always signals direction toward or into something. God sent his Son into the world, not merely "in" it.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-block" onclick="toggleLessonBlock(this)">
+    <div class="lesson-block-header">Reading prepositions quickly</div>
+    <div class="lesson-block-content">
+      <p>When you hit a preposition phrase while reading Greek:</p>
+
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>Step 1</strong><span>Spot the preposition</span></div>
+        <div class="takeaway-step"><strong>Step 2</strong><span>Check the case of what follows (look at the article or ending)</span></div>
+        <div class="takeaway-step"><strong>Step 3</strong><span>Lock in the meaning — preposition + case = relationship</span></div>
+      </div>
+
+      <p class="mini-example">ἐκ τοῦ θεοῦ — ἐκ (out of) + τοῦ (genitive article) = "out of God"</p>
+      <p>The article <em>τοῦ</em> tells you the genitive before you even read the noun. That's why learning the articles pays off immediately.</p>
+      <p class="highlight">Preposition + case = precise relationship. You now have a powerful reading tool.</p>
+    </div>
+  </div>
+
+  <div class="complete-lesson-box">
+    <button class="complete-lesson-btn" data-complete-lesson="prepositions" onclick="completeLesson('prepositions')" disabled>Complete Lesson</button>
+  </div>
+
+  </div>
+</div>
+
 <!-- Adjectives Lesson -->
 <div id="adjectivesLesson" class="learn-lesson">
   <div class="lesson-module">
   <div class="lesson-title-clean">
-    <div class="lesson-kicker">Lesson 6</div>
+    <div class="lesson-kicker">Lesson 7</div>
     <h2>Adjectives</h2>
   </div>
 
@@ -3994,7 +4124,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 <div id="pronounsLesson" class="learn-lesson">
   <div class="lesson-module">
   <div class="lesson-title-clean">
-    <div class="lesson-kicker">Lesson 7</div>
+    <div class="lesson-kicker">Lesson 8</div>
     <h2>Pronouns</h2>
   </div>
 
@@ -4117,7 +4247,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 <div id="conjunctionsLesson" class="learn-lesson">
   <div class="lesson-module">
   <div class="lesson-title-clean">
-    <div class="lesson-kicker">Lesson 8</div>
+    <div class="lesson-kicker">Lesson 9</div>
     <h2>Conjunctions</h2>
   </div>
 
@@ -4233,7 +4363,7 @@ OneSignalDeferred.push(async function(OneSignal) {
   <div class="lesson-module">
 
   <div class="lesson-title-clean">
-    <div class="lesson-kicker">Lesson 9</div>
+    <div class="lesson-kicker">Lesson 10</div>
     <h2>How to Read Greek</h2>
   </div>
 
@@ -4745,9 +4875,21 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
     </button>
 
-    <button onclick="showAdvancedLesson('adv_adjectives')">
+    <button onclick="showAdvancedLesson('adv_prepositions')">
       <div class="lesson-number-wrap">
         <div class="lesson-number">6</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Prepositions</strong>
+        <small>Case-governed prepositions and how they shape meaning</small>
+        <span class="lesson-status" data-lesson-status="adv_prepositions">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_adjectives')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">7</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -4759,7 +4901,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <button onclick="showAdvancedLesson('adv_pronouns')">
       <div class="lesson-number-wrap">
-        <div class="lesson-number">7</div>
+        <div class="lesson-number">8</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -4771,7 +4913,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <button onclick="showAdvancedLesson('adv_conjunctions')">
       <div class="lesson-number-wrap">
-        <div class="lesson-number">8</div>
+        <div class="lesson-number">9</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -4783,7 +4925,7 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <button onclick="showAdvancedLesson('adv_howToRead')">
       <div class="lesson-number-wrap">
-        <div class="lesson-number">9</div>
+        <div class="lesson-number">10</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -5929,14 +6071,12 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_pronunciation">
-      <div id="lessonScore_adv_pronunciation" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_pronunciation" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_pronunciation')" disabled>
-        <span class="material-symbols-outlined">assignment</span>
-        Start Lesson Quiz
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_pronunciation">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_pronunciation" disabled onclick="openAdvQuiz('adv_pronunciation')">
+        Take the Lesson Quiz →
       </button>
-      <p id="quizHint_adv_pronunciation" class="quiz-unlock-hint">
-        Open every section and answer every knowledge check to unlock the quiz.
-      </p>
     </div>
 
   </div><!-- /lesson-module -->
@@ -6313,14 +6453,12 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_nouns">
-      <div id="lessonScore_adv_nouns" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_nouns" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_nouns')" disabled>
-        <span class="material-symbols-outlined">assignment</span>
-        Start Lesson Quiz
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_nouns">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_nouns" disabled onclick="openAdvQuiz('adv_nouns')">
+        Take the Lesson Quiz →
       </button>
-      <p id="quizHint_adv_nouns" class="quiz-unlock-hint">
-        Open every section and answer every knowledge check to unlock the quiz.
-      </p>
     </div>
 
   </div><!-- /lesson-module -->
@@ -6668,18 +6806,189 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_cases">
-      <div id="lessonScore_adv_cases" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_cases" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_cases')" disabled>
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_cases">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_cases" disabled onclick="openAdvQuiz('adv_cases')">
+        Take the Lesson Quiz →
+      </button>
+    </div>
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_casesLesson -->
+
+<!-- ═══════════════════════════════════════════════════════
+     ADVANCED LESSON 6: PREPOSITIONS
+═══════════════════════════════════════════════════════ -->
+<div id="adv_prepositionsLesson" class="adv-learn-lesson">
+  <div class="lesson-module">
+
+    <p class="lesson-lead">
+      You've mastered case endings. Now see what Greek prepositions add to them. Each preposition locks onto a specific case — and one preposition can carry two completely different meanings depending on which case follows it. This lesson is your guide to reading prepositional phrases precisely.
+    </p>
+
+    <!-- Block 1 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">1 · Why Greek Prepositions Are Different</div>
+      <div class="lesson-block-content">
+        <p>English prepositions are imprecise — "for" can mean purpose, benefit, duration, exchange, and more, and you have to infer the meaning from context. Greek prepositions are much more precise: each one governs one or two specific cases, and the case determines the meaning.</p>
+        <p>There are two types of Greek prepositions based on how many cases they govern:</p>
+        <ul>
+          <li><strong>Single-case prepositions</strong> — they always take the same case, always with the same core meaning: ἐν (dative only), εἰς (accusative only), ἐκ/ἐξ (genitive only).</li>
+          <li><strong>Dual-case prepositions</strong> — the same word takes either of two cases, and the case changes the meaning entirely: διά + genitive = "through," but διά + accusative = "because of."</li>
+        </ul>
+        <p class="highlight">The case isn't just grammatical bookkeeping — it is part of the meaning. When you learn which case a preposition takes, you're not learning punctuation. You're learning what the word actually says.</p>
+      </div>
+    </div>
+
+    <!-- Block 2 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">2 · Single-Case Prepositions</div>
+      <div class="lesson-block-content">
+        <p>These prepositions lock onto one case and one core meaning every time they appear:</p>
+        <ul>
+          <li><strong>ἐν + dative</strong> — location, sphere, or means: ἐν ἀρχῇ (in the beginning), ἐν Χριστῷ (in Christ), ἐν τῷ πνεύματι (in the Spirit). No exceptions in the NT.</li>
+          <li><strong>εἰς + accusative</strong> — motion toward or into; purpose: εἰς τὸν κόσμον (into the world), εἰς ζωὴν αἰώνιον (into eternal life, for eternal life).</li>
+          <li><strong>ἐκ / ἐξ + genitive</strong> — source or separation: ἐκ τοῦ θεοῦ (out of God), ἐκ πίστεως (out of / from faith). The ἐξ form appears before vowels.</li>
+          <li><strong>ἀπό + genitive</strong> — separation or origin, often more general than ἐκ: ἀπὸ θεοῦ (from God). ἀπό emphasizes distance or point of origin; ἐκ emphasizes emergence from within.</li>
+          <li><strong>πρός + accusative</strong> — direction toward or relational nearness: πρὸς τὸν θεόν (with/toward God, John 1:1), πρὸς ὑμᾶς (to you).</li>
+        </ul>
+        <p class="highlight">ἐν = in (dative) · εἰς = into (accusative) · ἐκ = out of (genitive) · ἀπό = from (genitive) · πρός = toward/with (accusative)</p>
+
+        <div class="knowledge-check" id="kc_adv_prepositions_1">
+          <p class="kc-question">Which case does ἐν always govern — without any exception in the NT?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_prepositions_1', this)">Genitive</button>
+            <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_prepositions_1', this)">Accusative</button>
+            <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_prepositions_1', this)">Dative</button>
+            <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_prepositions_1', this)">Nominative</button>
+          </div>
+          <div class="kc-feedback" id="kc_adv_prepositions_1_fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 3 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">3 · Dual-Case Prepositions — the Case Shifts the Meaning</div>
+      <div class="lesson-block-content">
+        <p>These prepositions appear with two different cases — and the case completely changes what they mean:</p>
+        <ul>
+          <li><strong>διά + genitive</strong> — through, by means of: δι᾽ οὗ τὰ πάντα (through whom all things — 1 Cor 8:6); δι᾽ αὐτοῦ (through him)</li>
+          <li><strong>διά + accusative</strong> — because of, on account of: διὰ τοῦτο (because of this); διὰ τὴν ἀγάπην (because of the love)</li>
+          <li><strong>μετά + genitive</strong> — with (accompaniment): μετὰ τῶν μαθητῶν (with the disciples)</li>
+          <li><strong>μετά + accusative</strong> — after (time or sequence): μετὰ ταῦτα (after these things)</li>
+          <li><strong>κατά + genitive</strong> — against: καθ᾽ ἡμῶν (against us)</li>
+          <li><strong>κατά + accusative</strong> — according to, throughout: κατὰ σάρκα (according to flesh); κατὰ πόλιν (throughout the city)</li>
+        </ul>
+        <p>The pattern: with the <strong>genitive</strong>, these prepositions tend to express closer relationship or means. With the <strong>accusative</strong>, they express result, cause, or sequence.</p>
+
+        <div class="knowledge-check" id="kc_adv_prepositions_2">
+          <p class="kc-question">διά + accusative — what does the phrase διὰ τοῦτο mean?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_prepositions_2', this)">Through this thing</button>
+            <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_prepositions_2', this)">Because of this</button>
+            <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_prepositions_2', this)">With this</button>
+            <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_prepositions_2', this)">Against this</button>
+          </div>
+          <div class="kc-feedback" id="kc_adv_prepositions_2_fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 4 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">4 · Prepositions in Key Theological Phrases</div>
+      <div class="lesson-block-content">
+        <p>Some of the most-discussed phrases in NT theology turn on preposition + case. Now you can read them directly:</p>
+        <ul>
+          <li><strong>ἐν Χριστῷ</strong> — "in Christ" (dative: sphere of existence and belonging). This phrase appears over 80 times in Paul.</li>
+          <li><strong>εἰς Χριστόν</strong> — "into Christ" (accusative: union through direction). Used in baptism texts — the direction of incorporation.</li>
+          <li><strong>ἐκ πίστεως</strong> — "out of / from faith" (genitive: faith as the source). Romans 1:17: δικαιοσύνη γὰρ θεοῦ ἐν αὐτῷ ἀποκαλύπτεται ἐκ πίστεως εἰς πίστιν — "righteousness of God is revealed from faith to faith."</li>
+          <li><strong>πρὸς τὸν θεόν</strong> — "with God / toward God" (accusative: face-to-face nearness). John 1:1: καὶ ὁ λόγος ἦν πρὸς τὸν θεόν — the Word was in intimate relationship with God.</li>
+        </ul>
+        <p>Notice how "in Christ" and "into Christ" describe different theological realities — one is static existence, the other is directional union. The preposition + case captures that distinction in a single word.</p>
+
+        <div class="knowledge-check" id="kc_adv_prepositions_3">
+          <p class="kc-question">In John 1:1 — πρὸς τὸν θεόν — what does πρός + accusative signal?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_prepositions_3', this)">God is accusative because he is the direct object of the verb ἦν</button>
+            <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_prepositions_3', this)">πρός + accusative signals relational nearness — "with/toward God" (face-to-face proximity)</button>
+            <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_prepositions_3', this)">πρός here means "according to God" — functioning like κατά</button>
+            <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_prepositions_3', this)">τὸν marks a genitive phrase — τὸν θεόν means "of God"</button>
+          </div>
+          <div class="kc-feedback" id="kc_adv_prepositions_3_fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 5 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">5 · ὑπό and περί — Two More Tools</div>
+      <div class="lesson-block-content">
+        <p>Two more dual-case prepositions that appear throughout the NT:</p>
+        <ul>
+          <li><strong>ὑπό + genitive</strong> — by (marks the agent of a passive verb): ὑπὸ τοῦ θεοῦ (by God); ὑπὸ τοῦ πνεύματος (by the Spirit)</li>
+          <li><strong>ὑπό + accusative</strong> — under (location or authority): ὑπὸ νόμον (under law); ὑπὸ χάριν (under grace — Romans 6:14)</li>
+          <li><strong>περί + genitive</strong> — concerning, about: περὶ ἁμαρτίας (concerning sin); περὶ τῆς σωτηρίας (concerning salvation)</li>
+          <li><strong>περί + accusative</strong> — around, approximately: περὶ τὸν τόπον (around the place)</li>
+        </ul>
+        <p>ὑπό + genitive is especially important for reading passive verbs. In Greek passive constructions, the agent (the one actually doing the action) is often expressed with ὑπό + genitive. So when you see ὑπό, ask: is there a passive verb nearby?</p>
+
+        <div class="knowledge-check" id="kc_adv_prepositions_4">
+          <p class="kc-question">ὑπό + genitive signals what?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_prepositions_4', this)">Location underneath something</button>
+            <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_prepositions_4', this)">The agent performing an action in a passive construction</button>
+            <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_prepositions_4', this)">Motion toward a place</button>
+            <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_prepositions_4', this)">Separation from a source</button>
+          </div>
+          <div class="kc-feedback" id="kc_adv_prepositions_4_fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 6 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">6 · Reading Prepositions Fast</div>
+      <div class="lesson-block-content">
+        <p>When you encounter a prepositional phrase while reading Greek, run this three-step process:</p>
+        <ol>
+          <li><strong>Spot the preposition</strong> — recognize it immediately (ἐν, εἰς, ἐκ, ἀπό, πρός, διά, μετά, κατά...)</li>
+          <li><strong>Check the case of what follows</strong> — look at the article first (τοῦ = genitive, τῷ = dative, τόν/τήν = accusative)</li>
+          <li><strong>Lock in the meaning</strong> — preposition + case = precise relationship</li>
+        </ol>
+        <p class="mini-example">ἐκ τοῦ θεοῦ — ἐκ (out of) + τοῦ (genitive article) → "out of God" ✓</p>
+        <p class="mini-example">διὰ τοῦτο — διά (because of) + τοῦτο (accusative) → "because of this" ✓</p>
+        <p>The article is always your fastest case signal — read it before the noun, and you already know the case before you've finished the phrase.</p>
+        <p class="highlight">Preposition → article → meaning. A three-second check that unlocks every prepositional phrase in the NT.</p>
+
+        <div class="knowledge-check" id="kc_adv_prepositions_5">
+          <p class="kc-question">In ἐκ τοῦ θεοῦ — which word most quickly confirms the genitive case?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_prepositions_5', this)">ἐκ — the preposition requires the genitive, so that confirms it</button>
+            <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_prepositions_5', this)">τοῦ — the genitive article, which signals the case before you read the noun</button>
+            <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_prepositions_5', this)">θεοῦ — the -οῦ ending on the noun confirms the genitive</button>
+            <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_prepositions_5', this)">Both τοῦ and θεοῦ are needed together to confirm it</button>
+          </div>
+          <div class="kc-feedback" id="kc_adv_prepositions_5_fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="adv-quiz-start-area" id="quizStart_adv_prepositions">
+      <div id="lessonScore_adv_prepositions" class="lesson-score-badge" style="display:none"></div>
+      <button id="startQuiz_adv_prepositions" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_prepositions')" disabled>
         <span class="material-symbols-outlined">assignment</span>
         Start Lesson Quiz
       </button>
-      <p id="quizHint_adv_cases" class="quiz-unlock-hint">
+      <p id="quizHint_adv_prepositions" class="quiz-unlock-hint">
         Open every section and answer every knowledge check to unlock the quiz.
       </p>
     </div>
 
   </div><!-- /lesson-module -->
-</div><!-- /adv_casesLesson -->
+</div><!-- /adv_prepositionsLesson -->
 
 <div id="adv_adjectivesLesson" class="adv-learn-lesson">
   <div class="lesson-module">
@@ -7033,14 +7342,12 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_adjectives">
-      <div id="lessonScore_adv_adjectives" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_adjectives" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_adjectives')" disabled>
-        <span class="material-symbols-outlined">assignment</span>
-        Start Lesson Quiz
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_adjectives">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_adjectives" disabled onclick="openAdvQuiz('adv_adjectives')">
+        Take the Lesson Quiz →
       </button>
-      <p id="quizHint_adv_adjectives" class="quiz-unlock-hint">
-        Open every section and answer every knowledge check to unlock the quiz.
-      </p>
     </div>
 
   </div><!-- /lesson-module -->
@@ -7403,14 +7710,12 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_pronouns">
-      <div id="lessonScore_adv_pronouns" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_pronouns" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_pronouns')" disabled>
-        <span class="material-symbols-outlined">assignment</span>
-        Start Lesson Quiz
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_pronouns">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_pronouns" disabled onclick="openAdvQuiz('adv_pronouns')">
+        Take the Lesson Quiz →
       </button>
-      <p id="quizHint_adv_pronouns" class="quiz-unlock-hint">
-        Open every section and answer every knowledge check to unlock the quiz.
-      </p>
     </div>
 
   </div><!-- /lesson-module -->
@@ -7737,14 +8042,12 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_conjunctions">
-      <div id="lessonScore_adv_conjunctions" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_conjunctions" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_conjunctions')" disabled>
-        <span class="material-symbols-outlined">assignment</span>
-        Start Lesson Quiz
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_conjunctions">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_conjunctions" disabled onclick="openAdvQuiz('adv_conjunctions')">
+        Take the Lesson Quiz →
       </button>
-      <p id="quizHint_adv_conjunctions" class="quiz-unlock-hint">
-        Open every section and answer every knowledge check to unlock the quiz.
-      </p>
     </div>
 
   </div><!-- /lesson-module -->
@@ -8202,14 +8505,12 @@ OneSignalDeferred.push(async function(OneSignal) {
 
     <!-- Quiz Start -->
     <div class="adv-quiz-start-area" id="quizStart_adv_howToRead">
-      <div id="lessonScore_adv_howToRead" class="lesson-score-badge" style="display:none"></div>
-      <button id="startQuiz_adv_howToRead" class="main-btn adv-start-quiz-btn" onclick="openAdvQuiz('adv_howToRead')" disabled>
-        <span class="material-symbols-outlined">assignment</span>
-        Start Lesson Quiz
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_howToRead">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_howToRead" disabled onclick="openAdvQuiz('adv_howToRead')">
+        Take the Lesson Quiz →
       </button>
-      <p id="quizHint_adv_howToRead" class="quiz-unlock-hint">
-        Open every section and answer every knowledge check to unlock the quiz.
-      </p>
     </div>
 
   </div><!-- /lesson-module -->
