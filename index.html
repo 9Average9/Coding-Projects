@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=88" />
+  <link rel="stylesheet" href="style.css?v=89" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -4360,9 +4360,21 @@ OneSignalDeferred.push(async function(OneSignal) {
       </div>
     </button>
 
-    <button onclick="showAdvancedLesson('adv_howToRead')">
+    <button onclick="showAdvancedLesson('adv_conjunctions')">
       <div class="lesson-number-wrap">
         <div class="lesson-number">8</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Conjunctions &amp; Particles</strong>
+        <small>καί, δέ, ἀλλά, γάρ, οὖν, ἵνα, ὅτι, and how to read Greek argument</small>
+        <span class="lesson-status" data-lesson-status="adv_conjunctions">○ Not completed</span>
+      </div>
+    </button>
+
+    <button onclick="showAdvancedLesson('adv_howToRead')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">9</div>
         <div class="lesson-label">Advanced</div>
       </div>
       <div class="lesson-text">
@@ -6985,6 +6997,338 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div><!-- /lesson-module -->
 </div><!-- /adv_pronounsLesson -->
 
+<div id="adv_conjunctionsLesson" class="adv-learn-lesson">
+  <div class="lesson-module">
+
+    <p class="lesson-lead">
+      You can parse nouns, adjectives, and pronouns. Now learn the connective tissue — the small words that tell you whether the argument is building, turning, explaining, or concluding. Conjunctions and particles are the skeleton of Greek logic.
+    </p>
+
+    <!-- Block 1 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">1 · What Conjunctions and Particles Do</div>
+      <div class="lesson-block-content">
+        <p>Strip all the conjunctions out of a Greek paragraph and you're left with a list of disconnected facts. Put them back in and suddenly you have an argument — with reasons, contrasts, conclusions, and purposes woven through every clause.</p>
+        <p>Greek is exceptionally rich in these words. Where English might just string clauses together with "and," Greek writers chose precisely between:</p>
+        <ul>
+          <li><strong>καί</strong> — pure addition ("and")</li>
+          <li><strong>δέ</strong> — new development or mild contrast ("and, but, now")</li>
+          <li><strong>ἀλλά</strong> — sharp correction ("but, rather")</li>
+          <li><strong>γάρ</strong> — explanation ("for, because")</li>
+          <li><strong>οὖν</strong> — conclusion ("therefore, then")</li>
+        </ul>
+        <p>Each of these signals a different logical relationship between clauses. A skilled reader asks: <em>what is this conjunction doing?</em> Is the author adding, contrasting, explaining, or concluding? That question changes how you understand the whole sentence.</p>
+        <p>Two types to know:</p>
+        <ul>
+          <li><strong>Coordinating conjunctions</strong> — connect clauses of equal weight: "God loved... and he gave..."</li>
+          <li><strong>Subordinating conjunctions</strong> — attach a dependent clause to a main clause: "he gave his Son <em>so that</em> everyone who believes..."</li>
+        </ul>
+        <p class="highlight">Conjunctions are your argument map. Once you learn to read them, you can follow Paul's logic through a long passage without getting lost in the grammar details.</p>
+      </div>
+    </div>
+
+    <!-- Block 2 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">2 · καί and δέ — Addition and Transition</div>
+      <div class="lesson-block-content">
+        <p><strong>καί</strong> is the most common word in the Greek NT — it appears over 9,000 times. It has two main uses:</p>
+        <ul>
+          <li><strong>Connective</strong> — "and." Joins words, phrases, or clauses: ὁ θεὸς καὶ πατήρ (God and Father); ἐν λόγῳ καὶ ἔργῳ (in word and deed).</li>
+          <li><strong>Adverbial</strong> — "also, even." Adds emphasis to the word that follows: καὶ ὑμεῖς = "you also"; καὶ αὐτός = "even he himself."</li>
+        </ul>
+        <p>John's Gospel is famous for its καί-heavy style — clauses strung together with καί in a way that echoes Hebrew narrative. John 1:1–5 uses καί five times in five verses.</p>
+
+        <p><strong>δέ</strong> is milder and more versatile. It signals that something new is developing — either a continuation of the same thought or a gentle contrast. It is always <strong>postpositive</strong> — it never appears first in its clause. It latches onto the second position.</p>
+        <ul>
+          <li>Transitional: ὁ δὲ λόγος — "and the Word..." / "now the Word..."</li>
+          <li>Contrastive (mild): ἐγὼ μὲν βαπτίζω ὕδατι, <strong>αὐτὸς δὲ</strong> βαπτίσει — "I baptize with water, <em>but he</em> will baptize..." (Matthew 3:11)</li>
+          <li>Narrative switch: ὁ δέ at the start of a new clause introduces a new subject or new episode</li>
+        </ul>
+        <p class="highlight">When you see ὁ δέ or αὐτὸς δέ, it almost always means a new person is now acting or speaking. This is one of the most common narrative devices in the Gospels.</p>
+      </div>
+    </div>
+
+    <!-- Block 3 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">3 · ἀλλά — Strong Contrast and Correction</div>
+      <div class="lesson-block-content">
+        <p><strong>ἀλλά</strong> means "but, rather, on the contrary." It signals a stronger contrast than δέ — not just a new development, but a genuine correction or opposition to what was just said.</p>
+        <p>The classic ἀλλά pattern: <strong>οὐ...ἀλλά</strong> — "not X, but rather Y." This is the standard Greek way of correcting a misunderstanding or replacing one thing with another:</p>
+        <ul>
+          <li>Matthew 5:17: οὐκ ἦλθον καταλῦσαι <strong>ἀλλὰ</strong> πληρῶσαι — "I did not come to abolish but to fulfill."</li>
+          <li>Ephesians 2:8–9: οὐκ ἐξ ὑμῶν... οὐκ ἐξ ἔργων... — "not from you... not from works..." (then implicitly: ἀλλά from grace)</li>
+          <li>Romans 4:20: εἰς δὲ τὴν ἐπαγγελίαν τοῦ θεοῦ οὐ διεκρίθη τῇ ἀπιστίᾳ <strong>ἀλλ'</strong> ἐνεδυναμώθη τῇ πίστει — "he did not waver in unbelief, but was strengthened in faith."</li>
+        </ul>
+        <p>Note: ἀλλά becomes ἀλλ' before a vowel (elision). It is <em>not</em> postpositive — it can begin a clause.</p>
+        <p>Comparison with δέ: if you see a contrast that feels sharp — one thing explicitly ruled out and another substituted — that's ἀλλά territory. If the contrast is softer — a new angle on the same subject — that's δέ territory. English translates both as "but," so the Greek distinctions get flattened. Reading the Greek preserves the difference.</p>
+      </div>
+    </div>
+
+    <!-- Block 4 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">4 · γάρ and οὖν — Explanation and Conclusion</div>
+      <div class="lesson-block-content">
+        <p>These two conjunctions are the engines of Greek argumentation. Both are <strong>postpositive</strong> (always second in their clause) and both signal a logical relationship with the preceding material — but in opposite directions:</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Conjunction</th><th>Direction</th><th>Signal</th><th>English</th></tr></thead>
+            <tbody>
+              <tr><td><strong>γάρ</strong></td><td>Backward — explains the previous statement</td><td>"Here's why that's true"</td><td>for, because, since</td></tr>
+              <tr><td><strong>οὖν</strong></td><td>Forward — draws a conclusion from previous material</td><td>"Here's what follows from that"</td><td>therefore, then, so, consequently</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>γάρ</strong> is the explanation conjunction. When you see it, ask: what just said something that needs a reason given? The clause with γάρ provides that reason. Romans is full of γάρ chains — Paul makes a claim, then a γάρ explains it, then another γάρ explains the explanation:</p>
+        <ul>
+          <li>Romans 1:16–17: οὐ γὰρ ἐπαισχύνομαι τὸ εὐαγγέλιον· δύναμις γὰρ θεοῦ ἐστιν... δικαιοσύνη γὰρ θεοῦ ἐν αὐτῷ ἀποκαλύπτεται — "for I am not ashamed of the gospel, <em>for</em> it is the power of God... <em>for</em> in it the righteousness of God is revealed."</li>
+        </ul>
+
+        <p><strong>οὖν</strong> is the conclusion conjunction. When you see it, ask: what argument or statement has been building that this clause now concludes? Romans 5:1 is a textbook example: δικαιωθέντες <strong>οὖν</strong> ἐκ πίστεως εἰρήνην ἔχομεν — "Therefore, having been justified by faith, we have peace with God." The οὖν signals: here comes the payoff from everything in chapters 1–4.</p>
+        <p>οὖν also appears as a narrative particle in John — sometimes meaning "then/so" rather than "therefore": ὁ οὖν Ἰησοῦς = "So Jesus..." / "Jesus then..."</p>
+      </div>
+    </div>
+
+    <!-- KC 1 -->
+    <div class="knowledge-check" id="kc_adv_conjunctions_1">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">δέ, γάρ, and οὖν are described as "postpositive." What does that mean?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_conjunctions_1', this)">They negate the clause they appear in</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_conjunctions_1', this)">They always appear second in their clause — never first</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_conjunctions_1', this)">They only appear at the very end of sentences</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_conjunctions_1', this)">They can only connect two independent clauses</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_conjunctions_1_fb"></div>
+    </div>
+
+    <!-- Block 5 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">5 · ὅτι — Two Jobs in One Word</div>
+      <div class="lesson-block-content">
+        <p><strong>ὅτι</strong> is one of the most common words in the NT, with two distinct uses that look identical on the page:</p>
+        <ol>
+          <li><strong>"That"</strong> (indirect statement) — introduces the content of what someone said, thought, or knew. Follows verbs of speaking, perceiving, or knowing: λέγω ὅτι, οἶδα ὅτι, πιστεύω ὅτι.</li>
+          <li><strong>"Because"</strong> (causal) — introduces the reason or ground for a preceding statement. Not after a verb of saying — it explains why something is true.</li>
+        </ol>
+        <p>How to tell them apart:</p>
+        <ul>
+          <li>If ὅτι follows a verb of <em>saying, knowing, believing, or seeing</em> → it's "that" introducing indirect speech</li>
+          <li>If ὅτι doesn't follow such a verb — if it's explaining a statement → it's "because"</li>
+        </ul>
+        <p>NT examples:</p>
+        <ul>
+          <li>John 3:16: οὕτως γὰρ ἠγάπησεν ὁ θεὸς τὸν κόσμον, <strong>ὥστε</strong>... — here it's ὥστε (result), not ὅτι. But nearby:</li>
+          <li>John 3:18: ὅτι μὴ πεπίστευκεν εἰς τὸ ὄνομα — "because he has not believed in the name" — causal ὅτι explaining the judgment.</li>
+          <li>John 11:27: πεπίστευκα <strong>ὅτι</strong> σύ εἶ ὁ Χριστός — "I have believed <em>that</em> you are the Christ" — indirect statement after πεπίστευκα (I have believed).</li>
+          <li>1 John 4:8: ὁ μὴ ἀγαπῶν οὐκ ἔγνω τὸν θεόν, <strong>ὅτι</strong> ὁ θεὸς ἀγάπη ἐστίν — "...because God is love" — causal, explaining the previous statement.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Block 6 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">6 · ἵνα, ὥστε, and the Subordinating Conjunctions</div>
+      <div class="lesson-block-content">
+        <p><strong>ἵνα</strong> is one of the most important conjunctions in the NT — you will see it on almost every page. It introduces purpose or result clauses and always takes the <strong>subjunctive</strong> mood.</p>
+        <ul>
+          <li><strong>Purpose</strong>: "in order that, so that" — the goal of an action. ἔδωκεν τὸν υἱὸν <strong>ἵνα</strong> πᾶς ὁ πιστεύων...ἔχῃ ζωὴν αἰώνιον — "he gave his Son so that everyone who believes might have eternal life."</li>
+          <li><strong>Result</strong> (sometimes): "with the result that" — in later Greek especially</li>
+          <li><strong>Epexegetical</strong> (content): "namely that" — ἵνα can sometimes introduce the content of a command or wish</li>
+        </ul>
+        <p>The signal: ἵνα → look for subjunctive verb forms. If you see ἵνα followed by a verb with subjunctive endings, you're in a purpose/result clause.</p>
+
+        <p><strong>ὥστε</strong> introduces result clauses — "so that, with the result that." Unlike ἵνα, it often takes the <strong>indicative</strong> (actual result) or an <strong>infinitive</strong>:</p>
+        <ul>
+          <li>Matthew 12:22: ὥστε τὸν τυφλὸν καὶ κωφὸν λαλεῖν καὶ βλέπειν — "so that the blind and mute man spoke and saw" (infinitive)</li>
+          <li>John 3:16: ὥστε τὸν υἱὸν τὸν μονογενῆ ἔδωκεν — "so that he gave his one-of-a-kind Son" (indicative)</li>
+        </ul>
+
+        <p><strong>Conditional conjunctions</strong> — εἰ and ἐάν:</p>
+        <ul>
+          <li><strong>εἰ</strong> + indicative — a real or assumed condition: "if [and it may be true]"</li>
+          <li><strong>ἐάν</strong> + subjunctive — an uncertain or general condition: "if [and we're not sure whether]" / "whoever"</li>
+        </ul>
+        <p>1 John 1:9: <strong>ἐὰν</strong> ὁμολογῶμεν τὰς ἁμαρτίας ἡμῶν — "if we confess our sins" — ἐάν + subjunctive = uncertain/general condition.</p>
+      </div>
+    </div>
+
+    <!-- KC 2 -->
+    <div class="knowledge-check" id="kc_adv_conjunctions_2">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">ἵνα always introduces what kind of clause, and always takes what mood?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_conjunctions_2', this)">A statement of completed fact — indicative mood</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_conjunctions_2', this)">A purpose or result clause — subjunctive mood always</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_conjunctions_2', this)">A command — imperative mood</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_conjunctions_2', this)">An indirect question — interrogative construction</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_conjunctions_2_fb"></div>
+    </div>
+
+    <!-- Block 7 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">7 · Postpositive Particles and the μέν...δέ Construction</div>
+      <div class="lesson-block-content">
+        <p>Greek particles are small words that don't translate directly but signal logical, emphatic, or structural relationships. The most important ones to recognize:</p>
+
+        <p><strong>The μέν...δέ construction</strong> — "on the one hand...on the other hand." μέν anticipates a contrast; δέ delivers it. Together they create a balanced comparison:</p>
+        <ul>
+          <li>Matthew 3:11: ἐγὼ <strong>μὲν</strong> ὑμᾶς βαπτίζω ἐν ὕδατι... αὐτὸς <strong>δὲ</strong> βαπτίσει ὑμᾶς ἐν πνεύματι ἁγίῳ — "I baptize you with water... but he will baptize you with the Holy Spirit."</li>
+          <li>1 Corinthians 15:42–44: σπείρεται ἐν φθορᾷ... ἐγείρεται ἐν ἀφθαρσίᾳ — the μέν/δέ contrast drives the resurrection body argument.</li>
+        </ul>
+        <p>Note: μέν is often left untranslated in English — only δέ gets the "but." In Greek, whenever you see μέν, expect a δέ soon to complete the contrast.</p>
+
+        <p><strong>Other particles worth knowing:</strong></p>
+        <ul>
+          <li><strong>ἄρα</strong> — "then, therefore" — similar to οὖν but slightly stronger logical consequence. Romans 8:1: Οὐδὲν <strong>ἄρα</strong> νῦν κατάκριμα — "There is therefore now no condemnation."</li>
+          <li><strong>τε</strong> — "and" — closely binds two items that belong together. Acts uses τε...καί ("both...and") frequently.</li>
+          <li><strong>ἰδού</strong> — "behold! look!" — imperative of ὁράω (to see), used as an attention-drawing particle. Extremely common in Matthew, Luke, and Revelation.</li>
+          <li><strong>νῦν</strong> (logical, not temporal) — "as it is, in fact." Romans 7:17: νυνὶ δὲ οὐκέτι ἐγὼ κατεργάζομαι αὐτό — not "now" in time, but "as things actually stand."</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Block 8 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">8 · Negation — οὐ and μή</div>
+      <div class="lesson-block-content">
+        <p>Greek has two negative words, and they are not interchangeable. The rule is clean and consistent:</p>
+        <ul>
+          <li><strong>οὐ</strong> (οὐκ before vowels, οὐχ before rough breathing) — negates the <strong>indicative</strong> mood. It denies facts: "he is not," "he did not," "it will not."</li>
+          <li><strong>μή</strong> — negates <strong>all other moods</strong>: subjunctive, imperative, infinitive, and participle.</li>
+        </ul>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Verb form</th><th>Negative to use</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td>Indicative</td><td>οὐ / οὐκ / οὐχ</td><td>οὐκ ἔρχεται — "he is not coming"</td></tr>
+              <tr><td>Subjunctive</td><td>μή</td><td>ἵνα μὴ ἀπόληται — "so that he might not perish"</td></tr>
+              <tr><td>Imperative</td><td>μή</td><td>μὴ φοβοῦ — "do not be afraid"</td></tr>
+              <tr><td>Infinitive</td><td>μή</td><td>τὸ μὴ ἁμαρτάνειν — "the not sinning / not to sin"</td></tr>
+              <tr><td>Participle</td><td>μή</td><td>ὁ μὴ ἀγαπῶν — "the one not loving"</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Special combinations:</p>
+        <ul>
+          <li><strong>οὐ μή</strong> + subjunctive — emphatic double negative: "absolutely not, certainly not, never." Matthew 5:18: οὐ μὴ παρέλθῃ — "will by no means pass away." Revelation uses this heavily for certainty about end-time events.</li>
+          <li><strong>ἵνα μή</strong> — purpose negation: "in order that...not / so that...not." John 3:16: ἵνα μὴ ἀπόληται — "so that he might not perish."</li>
+          <li><strong>μὴ φοβοῦ / μὴ φοβεῖσθε</strong> — "do not be afraid" — one of the most common commands in the NT (imperative + μή).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- KC 3 -->
+    <div class="knowledge-check" id="kc_adv_conjunctions_3">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">When should you use μή rather than οὐ to negate something in Greek?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_conjunctions_3', this)">When negating a past action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_conjunctions_3', this)">When negating a future action</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_conjunctions_3', this)">When negating a subjunctive, imperative, infinitive, or participle — any non-indicative verb form</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_conjunctions_3', this)">When negating the subject of a sentence</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_conjunctions_3_fb"></div>
+    </div>
+
+    <!-- Block 9 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">9 · Reading Greek Argument — Conjunctions as Navigation Markers</div>
+      <div class="lesson-block-content">
+        <p>Watch how conjunctions structure two famous NT passages:</p>
+
+        <hr>
+        <h4>Ephesians 2:1–9 — The Great Contrast</h4>
+        <p>Verses 1–3: Paul describes human sinfulness — "you were dead in trespasses and sins... we all once lived in the passions of our flesh..."</p>
+        <p>Verse 4: <strong>ὁ δὲ θεός</strong> — "But God." The δέ is one of the most dramatic in the entire NT. Everything in verses 1–3 is the backdrop; δέ turns the whole argument. Rich in mercy, because of his great love...</p>
+        <p>Verse 8: τῇ γὰρ χάριτί ἐστε σεσῳσμένοι — "For by grace you have been saved." The γάρ explains what was just said in verse 5–7. Then: οὐκ ἐξ ὑμῶν... οὐκ ἐξ ἔργων — "not from you... not from works." The double οὐ sets up an implicit ἀλλά (the contrast lands without needing to be said).</p>
+        <p>Conjunctions used: δέ (contrast turning point), γάρ (explanation), οὐ...οὐ (correction setup). Three conjunction types in nine verses, each doing exactly what it's supposed to do.</p>
+
+        <hr>
+        <h4>Romans 5:1–2 — The Conclusion Hinge</h4>
+        <p>δικαιωθέντες <strong>οὖν</strong> ἐκ πίστεως εἰρήνην ἔχομεν πρὸς τὸν θεόν — "Therefore, having been justified by faith, we have peace with God."</p>
+        <p>The οὖν is a hinge. Everything in chapters 1–4 (the diagnosis of sin, the demonstration of righteousness, the argument for justification by faith) lands here. Paul has argued; now he concludes. Whenever you see οὖν in Romans, ask: what has Paul been building toward?</p>
+
+        <hr>
+        <h4>John 3:16–17 — Purpose and Contrast</h4>
+        <p>John 3:16: <strong>ἵνα</strong> πᾶς ὁ πιστεύων εἰς αὐτὸν μὴ ἀπόληται ἀλλ' ἔχῃ ζωὴν αἰώνιον — purpose clause with ἵνα (subjunctive throughout), negated with μή, contrasted with ἀλλ' ("but rather").</p>
+        <p>John 3:17: οὐ γὰρ ἀπέστειλεν ὁ θεὸς τὸν υἱὸν εἰς τὸν κόσμον <strong>ἵνα</strong> κρίνῃ τὸν κόσμον, <strong>ἀλλ'</strong> ἵνα σωθῇ ὁ κόσμος δι' αὐτοῦ — "For God did not send the Son into the world in order to judge the world, but in order that the world might be saved through him." γάρ (explanation of 3:16), ἵνα (purpose), ἀλλ' ἵνα (corrected purpose).</p>
+        <p class="highlight">Two verses. Five conjunctions. Each doing a different logical job. This is Greek precision at work — and you can now read it.</p>
+      </div>
+    </div>
+
+    <!-- KC 4 -->
+    <div class="knowledge-check" id="kc_adv_conjunctions_4">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">In Romans 5:1 — δικαιωθέντες οὖν ἐκ πίστεως — what does οὖν signal?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_conjunctions_4', this)">A contrast with the previous argument — "but by faith"</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_conjunctions_4', this)">A conclusion drawn from the previous argument — "therefore, having been justified..."</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_conjunctions_4', this)">An explanation of why justification happens — "because by faith"</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_conjunctions_4', this)">A new topic unrelated to what precedes</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_conjunctions_4_fb"></div>
+    </div>
+
+    <!-- Block 10 -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">10 · A Conjunction Reference — Reading the Logic at a Glance</div>
+      <div class="lesson-block-content">
+        <p>When you encounter a conjunction, ask one question: <em>what logical job is this word doing?</em> This table is your quick-reference for the most common NT conjunctions:</p>
+
+        <div class="adv-table-wrap">
+          <table class="adv-ref-table">
+            <thead><tr><th>Conjunction</th><th>Signal</th><th>Question to ask</th></tr></thead>
+            <tbody>
+              <tr><td><strong class="adv-cs-gk">καί</strong></td><td>Addition / "and, also, even"</td><td>What is being added?</td></tr>
+              <tr><td><strong class="adv-cs-gk">δέ</strong></td><td>Transition / mild contrast</td><td>What new development is beginning?</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἀλλά</strong></td><td>Strong contrast / correction</td><td>What is being corrected or replaced?</td></tr>
+              <tr><td><strong class="adv-cs-gk">γάρ</strong></td><td>Explanation — "for, because"</td><td>Why is the previous statement true?</td></tr>
+              <tr><td><strong class="adv-cs-gk">οὖν</strong></td><td>Conclusion — "therefore, then"</td><td>What conclusion follows from the argument?</td></tr>
+              <tr><td><strong class="adv-cs-gk">ὅτι</strong></td><td>"that" (indirect) / "because" (causal)</td><td>Indirect statement or explanation?</td></tr>
+              <tr><td><strong class="adv-cs-gk">ἵνα</strong></td><td>Purpose/result + subjunctive</td><td>What was the goal or outcome?</td></tr>
+              <tr><td><strong class="adv-cs-gk">ὥστε</strong></td><td>Result — "so that, with the result"</td><td>What actually resulted?</td></tr>
+              <tr><td><strong class="adv-cs-gk">εἰ / ἐάν</strong></td><td>Condition — "if"</td><td>What is the condition being stated?</td></tr>
+              <tr><td><strong class="adv-cs-gk">μέν...δέ</strong></td><td>Balance — "on the one hand...on the other"</td><td>What two things are being contrasted?</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>With conjunctions and particles in hand, you now have the full toolkit for reading Greek at the sentence and paragraph level: nouns (cases and articles), adjectives (agreement and position), pronouns (antecedent tracking), and conjunctions (logical structure).</p>
+        <p>The next lesson — <strong>How to Read Greek</strong> — is the capstone. It brings everything together into a reading strategy that uses all nine lessons as a unified system. You are ready for it.</p>
+      </div>
+    </div>
+
+    <!-- KC 5 -->
+    <div class="knowledge-check" id="kc_adv_conjunctions_5">
+      <div class="kc-header"><span class="material-symbols-outlined">quiz</span> Knowledge Check</div>
+      <p class="kc-question">What is the functional difference between ἀλλά and δέ when both are translated "but" in English?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerKC('kc_adv_conjunctions_5', this)">ἀλλά is postpositive (always second), δέ is not — they differ in position</button>
+        <button class="kc-opt" data-opt="1" onclick="answerKC('kc_adv_conjunctions_5', this)">ἀλλά signals a strong contrast or correction; δέ signals a milder transition or contrast</button>
+        <button class="kc-opt" data-opt="2" onclick="answerKC('kc_adv_conjunctions_5', this)">ἀλλά introduces subordinate clauses; δέ introduces main clauses only</button>
+        <button class="kc-opt" data-opt="3" onclick="answerKC('kc_adv_conjunctions_5', this)">There is no meaningful difference — both are interchangeable in NT Greek</button>
+      </div>
+      <div class="kc-feedback" id="kc_adv_conjunctions_5_fb"></div>
+    </div>
+
+    <!-- Quiz Start -->
+    <div class="adv-quiz-start-area" id="quizStart_adv_conjunctions">
+      <div class="adv-quiz-locked-msg" id="quizLocked_adv_conjunctions">
+        Complete all lesson blocks and knowledge checks to unlock the quiz.
+      </div>
+      <button class="adv-quiz-start-btn" id="startQuiz_adv_conjunctions" disabled onclick="openAdvQuiz('adv_conjunctions')">
+        Take the Lesson Quiz →
+      </button>
+    </div>
+
+  </div><!-- /lesson-module -->
+</div><!-- /adv_conjunctionsLesson -->
+
 <div id="adv_howToReadLesson" class="adv-learn-lesson">
   <div class="lesson-module">
 
@@ -8716,9 +9060,9 @@ OneSignalDeferred.push(async function(OneSignal) {
 
   </main>
 
-  <script src="vocab.js?v=88"></script>
-  <script src="app.js?v=88"></script>
-  <script type="module" src="firebase-lb.js?v=88"></script>
+  <script src="vocab.js?v=89"></script>
+  <script src="app.js?v=89"></script>
+  <script type="module" src="firebase-lb.js?v=89"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
