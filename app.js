@@ -13862,9 +13862,15 @@ async function saveReminderSettings() {
   const frequency = freqRadio?.value || "daily";
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const token = await window.FCM?.registerToken(user.uid);
+  let token;
+  try {
+    token = await window.FCM?.registerToken(user.uid);
+  } catch (e) {
+    alert("Could not register for notifications:\n\n" + (e?.message || String(e)));
+    return;
+  }
   if (!token) {
-    alert("Could not register this device for notifications. Make sure you are using the installed app.");
+    alert("No notification token returned. Try closing and reopening the app, then try again.");
     return;
   }
 

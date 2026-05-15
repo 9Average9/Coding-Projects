@@ -682,6 +682,7 @@ body.dark .small-btn {
   padding: 24px 20px;
   z-index: 1000;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .modal-overlay.open {
@@ -1734,8 +1735,13 @@ body.dark .progress-collapse-btn {
   display: block;
 }
 .welcome-card {
-  max-width: 520px;
+  max-width: 480px;
   text-align: left;
+  overflow-x: hidden;
+}
+.welcome-card * {
+  max-width: 100%;
+  word-break: break-word;
 }
 
 .welcome-icon {
@@ -10566,12 +10572,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border: 1.5px solid color-mix(in srgb, var(--font-color) 14%, transparent);
   background: color-mix(in srgb, var(--font-color) 5%, transparent);
   color: var(--font-color);
-  font-size: 1.6rem;
+  font-size: 1.1rem;
   font-weight: 700;
   width: 100%;
   box-sizing: border-box;
   text-align: center;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   transition: border-color 0.15s;
 }
 .reminder-time-input:focus {
