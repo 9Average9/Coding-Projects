@@ -13411,6 +13411,7 @@ async function restoreUserFromFirestore(user) {
   if (data.lessonModePromptDismissed) localStorage.setItem("lessonModePromptDismissed", "true");
   if (data.hasSeenLearnWelcome) localStorage.setItem("hasSeenLearnWelcome", "true");
   if (data.hasSeenHomeIntro) localStorage.setItem("hasSeenHomeIntro", "true");
+  if (data.greekVocabStats) localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
 }
 
 async function syncUserData() {
@@ -13455,7 +13456,8 @@ async function syncUserData() {
     translationXPCount: parseInt(localStorage.getItem("translationXPCount") || "0"),
     lessonModePromptDismissed: localStorage.getItem("lessonModePromptDismissed") === "true",
     hasSeenLearnWelcome: localStorage.getItem("hasSeenLearnWelcome") === "true",
-    hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true"
+    hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true",
+    greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })()
   };
 
   await window.Auth.syncUserData(user.uid, data);
