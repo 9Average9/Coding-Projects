@@ -13409,7 +13409,12 @@ async function restoreUserFromFirestore(user) {
     });
   }
   if (data.darkMode != null) localStorage.setItem("darkMode", String(data.darkMode));
-  if (data.appTheme) localStorage.setItem("appTheme", data.appTheme);
+  if (data.appTheme) {
+    localStorage.setItem("appTheme", data.appTheme);
+    applyAppTheme(data.appTheme);
+    const toggle = document.getElementById("darkModeToggle");
+    if (toggle) toggle.checked = data.appTheme === "midnight";
+  }
   if (data.advQuizScores) localStorage.setItem("advQuizScores", JSON.stringify(data.advQuizScores));
   if (data.answeredKCs) localStorage.setItem("answeredKCs", JSON.stringify(data.answeredKCs));
   if (data.openedLessonBlocks) localStorage.setItem("openedLessonBlocks", JSON.stringify(data.openedLessonBlocks));
