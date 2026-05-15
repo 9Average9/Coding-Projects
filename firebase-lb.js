@@ -430,22 +430,17 @@ async function fcmSendPushNotification(toUid, type, fromName, fromUid) {
 }
 
 async function fcmRegisterToken(uid) {
-  if (!messaging) return null;
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    const token = await getToken(messaging, {
-      vapidKey: FCM_VAPID_KEY,
-      serviceWorkerRegistration: reg
-    });
-    if (token) {
-      await setDoc(doc(db, "users", uid), { fcmTokens: arrayUnion(token) }, { merge: true });
-      localStorage.setItem("fcmToken", token);
-    }
-    return token || null;
-  } catch (e) {
-    console.warn("fcmRegisterToken:", e);
-    return null;
+  if (!messaging) throw new Error("Firebase messaging not available on this browser.");
+  const reg = await navigator.serviceWorker.ready;
+  const token = await getToken(messaging, {
+    vapidKey: FCM_VAPID_KEY,
+    serviceWorkerRegistration: reg
+  });
+  if (token) {
+    await setDoc(doc(db, "users", uid), { fcmTokens: arrayUnion(token) }, { merge: true });
+    localStorage.setItem("fcmToken", token);
   }
+  return token || null;
 }
 
 async function fcmRemoveToken(uid, token) {
