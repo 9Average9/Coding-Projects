@@ -21,12 +21,12 @@ messaging.onBackgroundMessage(function (payload) {
   });
 });
 
-const CACHE_NAME = "basic-greek-trainer-v1.8.3";
+const CACHE_NAME = "basic-greek-trainer-v1.8.4";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=100",
+  "./style.css?v=101",
   "./vocab.js?v=89",
   "./app.js?v=99",
   "./firebase-lb.js?v=92",
