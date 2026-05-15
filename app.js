@@ -13192,12 +13192,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.7.6";
+const APP_VERSION = "1.7.7";
 
 const UPDATE_NOTES = [
+  "Account data now fully syncs across devices — theme color, lesson progress, quiz scores, and all settings follow you when you log in on a new device",
   "Lesson progress modal now switches tracks — tapping Basic or Advanced in the progress modal takes you directly to that lesson menu when you close it",
-  "Track 1 and Track 2 labels added below the lesson menu headers",
-  "Settings button replaced with an info button on both lesson menus — tap it to learn what each track covers, what it sets you up for, how long it takes, and which track is right for you"
+  "Track 1 and Track 2 labels added below the lesson menu headers"
 ];
 
 let deferredInstallPrompt = null;
@@ -13402,6 +13402,16 @@ async function restoreUserFromFirestore(user) {
       try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
     });
   }
+  if (data.darkMode != null) localStorage.setItem("darkMode", String(data.darkMode));
+  if (data.appTheme) localStorage.setItem("appTheme", data.appTheme);
+  if (data.advQuizScores) localStorage.setItem("advQuizScores", JSON.stringify(data.advQuizScores));
+  if (data.answeredKCs) localStorage.setItem("answeredKCs", JSON.stringify(data.answeredKCs));
+  if (data.openedLessonBlocks) localStorage.setItem("openedLessonBlocks", JSON.stringify(data.openedLessonBlocks));
+  if (data.translationXPCount) localStorage.setItem("translationXPCount", String(data.translationXPCount));
+  if (data.lessonModePromptDismissed) localStorage.setItem("lessonModePromptDismissed", "true");
+  if (data.hasSeenLearnWelcome) localStorage.setItem("hasSeenLearnWelcome", "true");
+  if (data.hasSeenHomeIntro) localStorage.setItem("hasSeenHomeIntro", "true");
+  if (data.greekVocabStats) localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
 }
 
 async function syncUserData() {
@@ -13437,7 +13447,17 @@ async function syncUserData() {
     lbConsJoined: localStorage.getItem("lbConsJoined") === "true",
     lbScholarJoined: localStorage.getItem("lbScholarJoined") === "true",
     lbScholarBest: parseInt(localStorage.getItem("lbScholarBest") || "0"),
-    lastSeenAppVersion: APP_VERSION
+    lastSeenAppVersion: APP_VERSION,
+    darkMode: localStorage.getItem("darkMode") === "true",
+    appTheme: localStorage.getItem("appTheme") || null,
+    advQuizScores: (() => { try { return JSON.parse(localStorage.getItem("advQuizScores") || "{}"); } catch { return {}; } })(),
+    answeredKCs: (() => { try { return JSON.parse(localStorage.getItem("answeredKCs") || "{}"); } catch { return {}; } })(),
+    openedLessonBlocks: (() => { try { return JSON.parse(localStorage.getItem("openedLessonBlocks") || "{}"); } catch { return {}; } })(),
+    translationXPCount: parseInt(localStorage.getItem("translationXPCount") || "0"),
+    lessonModePromptDismissed: localStorage.getItem("lessonModePromptDismissed") === "true",
+    hasSeenLearnWelcome: localStorage.getItem("hasSeenLearnWelcome") === "true",
+    hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true",
+    greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })()
   };
 
   await window.Auth.syncUserData(user.uid, data);
