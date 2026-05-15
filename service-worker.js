@@ -4,7 +4,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.7.9";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=95",
+  "./style.css?v=96",
   "./vocab.js?v=89",
   "./app.js?v=96",
   "./firebase-lb.js?v=89",

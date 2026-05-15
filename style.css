@@ -1800,6 +1800,30 @@ body.dark .progress-collapse-btn {
   color: var(--font-color) !important;
 }
 
+.welcome-destination {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 30%, transparent);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  color: var(--font-color);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.welcome-destination .material-symbols-outlined {
+  font-size: 18px !important;
+  color: var(--secondary-color);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+body.dark .welcome-destination {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+}
+
 .welcome-start-btn {
   margin-top: 14px;
 }
