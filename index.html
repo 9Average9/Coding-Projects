@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=92" />
+  <link rel="stylesheet" href="style.css?v=93" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -399,8 +399,8 @@ OneSignalDeferred.push(async function(OneSignal) {
     </button>
 
     <div class="nav-title" id="learnLessonTitle">Lessons<small class="nav-subtitle">Track 1 — Basic</small></div>
-    <button id="learnTopAction" class="icon-btn lesson-top-action" onclick="showLessonModeModal()" title="Switch mode">
-  <span class="material-symbols-outlined">tune</span>
+    <button id="learnTopAction" class="icon-btn lesson-top-action" onclick="showBasicTrackInfoModal()" title="About this track">
+  <span class="material-symbols-outlined">info</span>
 </button>
 <!--
    <button id="learnMenuBtn" class="icon-btn" onclick="toggleLearnSideMenu(event)" aria-label="Open lesson menu" title="Lessons">
@@ -5131,8 +5131,8 @@ OneSignalDeferred.push(async function(OneSignal) {
       <span class="material-symbols-outlined">arrow_back</span>
     </button>
     <div class="nav-title" id="advLearnNavTitle">Advanced Lessons<small class="nav-subtitle">Track 2 — Advanced</small></div>
-    <button id="advLearnTopAction" class="icon-btn" onclick="showLessonModeModal()" title="Switch mode">
-      <span class="material-symbols-outlined">tune</span>
+    <button id="advLearnTopAction" class="icon-btn" onclick="showAdvancedTrackInfoModal()" title="About this track">
+      <span class="material-symbols-outlined">info</span>
     </button>
   </div>
 
@@ -10352,6 +10352,108 @@ OneSignalDeferred.push(async function(OneSignal) {
   </div>
 </div>
 
+<!-- Basic Track Info Modal -->
+<div id="basicTrackInfoModal" class="modal-overlay" onclick="closeBasicTrackInfoModal(event)">
+  <div class="modal-card track-info-modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideBasicTrackInfoModal()">×</button>
+
+    <div class="track-info-badge basic-badge">
+      <span class="material-symbols-outlined">menu_book</span>
+      Track 1 — Basic
+    </div>
+
+    <h2>Basic Lessons</h2>
+    <p class="track-info-lead">10 focused lessons that walk you through Greek fundamentals — step by step, with zero prior knowledge required.</p>
+
+    <div class="track-info-section">
+      <div class="track-info-section-title">What you'll learn</div>
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>Alphabet &amp; Pronunciation</strong><span>Read and sound out any Greek word</span></div>
+        <div class="takeaway-step"><strong>Nouns &amp; Cases</strong><span>Understand how Greek words carry their own job descriptions</span></div>
+        <div class="takeaway-step"><strong>Prepositions, Adjectives &amp; Pronouns</strong><span>Follow who's doing what across a passage</span></div>
+        <div class="takeaway-step"><strong>Conjunctions &amp; Reading Strategy</strong><span>A repeatable 5-step method for reading any Greek sentence</span></div>
+      </div>
+    </div>
+
+    <div class="track-info-section">
+      <div class="track-info-section-title">What this sets you up for</div>
+      <p>After completing Track 1 you'll be able to use Greek study tools with real understanding — not just guessing:</p>
+      <div class="track-info-tools">
+        <span class="track-tool-pill">Bible Hub</span>
+        <span class="track-tool-pill">Blue Letter Bible</span>
+        <span class="track-tool-pill">STEP Bible</span>
+        <span class="track-tool-pill">Interlinear Bibles</span>
+        <span class="track-tool-pill">Logos</span>
+      </div>
+      <p style="margin-top:10px">Parsing labels like <strong>N-NSM</strong> (Noun, Nominative, Singular, Masculine) will make complete sense. You'll follow Greek commentary and notice things in verses no translation can show you.</p>
+    </div>
+
+    <div class="track-info-section">
+      <div class="track-info-section-title">How long it takes</div>
+      <p class="highlight">Roughly <strong>2–3 hours</strong> of focused study — or 1–2 lessons per sitting over a couple of weeks.</p>
+    </div>
+
+    <div class="track-info-creator-note">
+      <div class="creator-note-label">A note from the creator</div>
+      <p>If you're looking to start reading, memorizing, and translating faster — <strong>Track 1 is your best starting point.</strong> It's built to get you into the text quickly without overwhelming you. That said, the best path is to do both tracks. Track 2 will fill in everything Track 1 introduced, and the two together give you a complete foundation.</p>
+    </div>
+
+    <button class="main-btn" onclick="hideBasicTrackInfoModal()">Got it</button>
+  </div>
+</div>
+
+<!-- Advanced Track Info Modal -->
+<div id="advancedTrackInfoModal" class="modal-overlay" onclick="closeAdvancedTrackInfoModal(event)">
+  <div class="modal-card track-info-modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideAdvancedTrackInfoModal()">×</button>
+
+    <div class="track-info-badge advanced-badge">
+      <span class="material-symbols-outlined">school</span>
+      Track 2 — Advanced
+    </div>
+
+    <h2>Advanced Lessons</h2>
+    <p class="track-info-lead">The same 10 topics as Track 1, but significantly deeper — full paradigm tables, formal grammar, and required knowledge checks and quizzes before completing each lesson.</p>
+
+    <div class="track-info-section">
+      <div class="track-info-section-title">What goes deeper</div>
+      <div class="takeaway-box">
+        <div class="takeaway-step"><strong>Full declension tables</strong><span>All three declensions, every case, across all genders</span></div>
+        <div class="takeaway-step"><strong>Accent rules &amp; textual criticism</strong><span>Why manuscripts differ and how scholars handle it</span></div>
+        <div class="takeaway-step"><strong>Relative &amp; demonstrative pronouns</strong><span>Track theological arguments across a whole passage</span></div>
+        <div class="takeaway-step"><strong>Verb system preview</strong><span>Aspect, voice, and mood — fully introduced before the verb track</span></div>
+        <div class="takeaway-step"><strong>Argument-level reading</strong><span>Follow the logic of Paul's letters, not just individual sentences</span></div>
+      </div>
+    </div>
+
+    <div class="track-info-section">
+      <div class="track-info-section-title">What this sets you up for</div>
+      <p>Everything Track 1 unlocks, plus the ability to engage Greek study tools at their full depth:</p>
+      <div class="track-info-tools">
+        <span class="track-tool-pill">Bible Hub</span>
+        <span class="track-tool-pill">Blue Letter Bible</span>
+        <span class="track-tool-pill">STEP Bible</span>
+        <span class="track-tool-pill">Interlinear Bibles</span>
+        <span class="track-tool-pill advanced">Logos</span>
+        <span class="track-tool-pill advanced">Scholarly Commentary</span>
+      </div>
+      <p style="margin-top:10px">You'll understand <em>why</em> translators made specific choices, follow detailed Greek commentary, and have enough foundation to move confidently into the full verb lesson series.</p>
+    </div>
+
+    <div class="track-info-section">
+      <div class="track-info-section-title">How long it takes</div>
+      <p class="highlight">Roughly <strong>4–5 hours</strong> of focused study — or 1–2 lessons per sitting over 3–4 weeks.</p>
+    </div>
+
+    <div class="track-info-creator-note">
+      <div class="creator-note-label">A note from the creator</div>
+      <p>If you're going for a well-rounded, rich understanding of Greek — <strong>I recommend Track 2.</strong> It's deeper, it answers more questions, and it prepares you better for everything that comes next. That said, the best path is honestly to do both tracks. Track 1 first to get your footing, then Track 2 to fill everything in properly. You won't regret it.</p>
+    </div>
+
+    <button class="main-btn" onclick="hideAdvancedTrackInfoModal()">Got it</button>
+  </div>
+</div>
+
 <div id="achievementsModal" class="modal-overlay" onclick="closeAchievementsModal(event)">
   <div class="modal-card achievements-card" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="hideAchievementsModal()">×</button>
@@ -10378,7 +10480,7 @@ OneSignalDeferred.push(async function(OneSignal) {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=93"></script>
+  <script src="app.js?v=94"></script>
   <script type="module" src="firebase-lb.js?v=89"></script>
 
 <!-- Leaderboard Intro Modal -->
