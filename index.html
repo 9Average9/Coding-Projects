@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=101" />
+  <link rel="stylesheet" href="style.css?v=102" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10262,14 +10262,15 @@ glacier: {
     <button id="profileSettingsBtn" class="main-btn try-app-btn" onclick="openSettingsFromProfile()">
   Settings
 </button>
-    <button class="main-btn try-app-btn" onclick="signOutAccount()">
-  <span class="material-symbols-outlined">logout</span>
-  <span>Sign Out</span>
-</button>
 
   <button id="profileNotificationBtn" class="main-btn try-app-btn" onclick="openReminderModal()">
   <span class="material-symbols-outlined">alarm</span>
   <span id="profileNotificationBtnText">Set Reminders</span>
+</button>
+
+    <button class="main-btn try-app-btn" onclick="signOutAccount()">
+  <span class="material-symbols-outlined">logout</span>
+  <span>Sign Out</span>
 </button>
 
 <button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
@@ -10656,7 +10657,9 @@ glacier: {
 
     <div class="reminder-field">
       <label class="reminder-label">Reminder Time</label>
-      <input type="time" id="reminderTimeInput" class="reminder-time-input" value="08:00" />
+      <div class="reminder-time-wrapper">
+        <input type="time" id="reminderTimeInput" class="reminder-time-input" value="08:00" />
+      </div>
     </div>
 
     <div class="reminder-field">

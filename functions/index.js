@@ -7,18 +7,16 @@ initializeApp();
 const db = getFirestore();
 const messaging = getMessaging();
 
-// Runs every 15 minutes; sends reminders to users whose local time matches their reminder time.
+// Runs every minute; sends reminders to users whose local time exactly matches their reminder time.
 exports.sendScheduledReminders = functions.pubsub
-  .schedule("every 15 minutes")
+  .schedule("every 1 minutes")
   .onRun(async () => {
     const now = new Date();
-    console.log("sendScheduledReminders fired at", now.toISOString());
 
     const snap = await db.collection("users")
       .where("reminder.enabled", "==", true)
       .get();
 
-    console.log("Users with reminders enabled:", snap.size);
     if (snap.empty) return null;
 
     for (const userDoc of snap.docs) {
@@ -26,10 +24,7 @@ exports.sendScheduledReminders = functions.pubsub
       const reminder = data.reminder || {};
       const tokens = data.fcmTokens || [];
 
-      if (!tokens.length || !reminder.time) {
-        console.log(userDoc.id, "- skipped (no tokens or no time)");
-        continue;
-      }
+      if (!tokens.length || !reminder.time) continue;
 
       const tz = reminder.timezone || "UTC";
       const freq = reminder.frequency || "daily";
@@ -50,33 +45,25 @@ exports.sendScheduledReminders = functions.pubsub
 
       const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
       const isWeekend = ["Sat", "Sun"].includes(weekday);
-      if (freq === "weekdays" && !isWeekday) { console.log(userDoc.id, "- skipped (not a weekday)"); continue; }
-      if (freq === "weekends" && !isWeekend) { console.log(userDoc.id, "- skipped (not a weekend)"); continue; }
+      if (freq === "weekdays" && !isWeekday) continue;
+      if (freq === "weekends" && !isWeekend) continue;
 
       const [rh, rm] = reminder.time.split(":").map(Number);
       const reminderMinutes = rh * 60 + rm;
       const currentMinutes = ch * 60 + cm;
-      const windowStart = Math.floor(currentMinutes / 15) * 15;
 
-      console.log(userDoc.id, `- localTime=${ch}:${String(cm).padStart(2,"0")} tz=${tz} reminderTime=${reminder.time} window=${Math.floor(windowStart/60)}:${String(windowStart%60).padStart(2,"0")}-${Math.floor((windowStart+15)/60)}:${String((windowStart+15)%60).padStart(2,"0")}`);
-
-      if (reminderMinutes < windowStart || reminderMinutes >= windowStart + 15) {
-        console.log(userDoc.id, "- skipped (outside window)");
-        continue;
-      }
+      if (reminderMinutes !== currentMinutes) continue;
 
       if (reminder.lastSent) {
         const lastLocal = reminder.lastSent.toDate().toLocaleDateString("en-US", { timeZone: tz });
         const todayLocal = now.toLocaleDateString("en-US", { timeZone: tz });
-        if (lastLocal === todayLocal) {
-          console.log(userDoc.id, "- skipped (already sent today)");
-          continue;
-        }
+        if (lastLocal === todayLocal) continue;
       }
 
-      // Mark sent FIRST so duplicate runs don't send twice
+      console.log(`Sending reminder to ${userDoc.id} at ${ch}:${String(cm).padStart(2,"0")} ${tz}`);
+
+      // Mark sent before FCM so we always record that the function ran
       await userDoc.ref.update({ "reminder.lastSent": now });
-      console.log(userDoc.id, "- marked lastSent, attempting FCM...");
 
       try {
         const result = await messaging.sendEachForMulticast({
@@ -87,12 +74,12 @@ exports.sendScheduledReminders = functions.pubsub
           },
           webpush: { notification: { icon: "/Greek-Vocab/icon-192.png" } }
         });
-        console.log(userDoc.id, `- FCM: ${result.successCount} success, ${result.failureCount} failed`);
+        console.log(`${userDoc.id}: ${result.successCount} sent, ${result.failureCount} failed`);
         result.responses.forEach((r, i) => {
-          if (!r.success) console.warn(userDoc.id, `token[${i}] error:`, r.error?.code, r.error?.message);
+          if (!r.success) console.warn(`token[${i}]:`, r.error?.code, r.error?.message);
         });
       } catch (e) {
-        console.error(userDoc.id, "- FCM sendEachForMulticast threw:", e.message);
+        console.error(`${userDoc.id} FCM error:`, e.message);
       }
     }
 
@@ -139,9 +126,9 @@ exports.onEncouragementCreated = functions.firestore
         notification: { title, body },
         webpush: { notification: { icon: "/Greek-Vocab/icon-192.png" } }
       });
-      console.log(`onEncouragementCreated for ${targetUid}: ${result.successCount} success, ${result.failureCount} failed`);
+      console.log(`onEncouragementCreated ${targetUid}: ${result.successCount} sent, ${result.failureCount} failed`);
       result.responses.forEach((r, i) => {
-        if (!r.success) console.warn(`token[${i}] error:`, r.error?.code, r.error?.message);
+        if (!r.success) console.warn(`token[${i}]:`, r.error?.code, r.error?.message);
       });
     } catch (e) {
       console.error("sendEachForMulticast threw:", e.message);
