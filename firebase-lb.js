@@ -12,7 +12,10 @@ import {
   limit,
   getDocs,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
   getAuth,
@@ -304,6 +307,102 @@ async function getUserRanks() {
   }
   return ranks;
 }
+
+// ── Friends ───────────────────────────────────────────────────────────────────
+
+async function frGetAllUsers(currentUid) {
+  try {
+    const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(60));
+    const snap = await getDocs(q);
+    return snap.docs
+      .filter(d => d.id !== currentUid)
+      .map(d => ({ uid: d.id, ...d.data() }));
+  } catch { return []; }
+}
+
+async function frSearchUsers(searchQuery, currentUid) {
+  try {
+    const end = searchQuery + "";
+    const q = query(
+      collection(db, "users"),
+      where("displayName", ">=", searchQuery),
+      where("displayName", "<=", end),
+      limit(30)
+    );
+    const snap = await getDocs(q);
+    return snap.docs
+      .filter(d => d.id !== currentUid)
+      .map(d => ({ uid: d.id, ...d.data() }));
+  } catch { return []; }
+}
+
+async function frGetUser(uid) {
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    return snap.exists() ? { uid: snap.id, ...snap.data() } : null;
+  } catch { return null; }
+}
+
+async function frSendRequest(fromUid, toUid) {
+  try {
+    await Promise.all([
+      updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayUnion(toUid),   updatedAt: serverTimestamp() }),
+      updateDoc(doc(db, "users", toUid),   { friendRequestsIn:  arrayUnion(fromUid), updatedAt: serverTimestamp() })
+    ]);
+    return true;
+  } catch { return false; }
+}
+
+async function frCancelRequest(fromUid, toUid) {
+  try {
+    await Promise.all([
+      updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayRemove(toUid),   updatedAt: serverTimestamp() }),
+      updateDoc(doc(db, "users", toUid),   { friendRequestsIn:  arrayRemove(fromUid), updatedAt: serverTimestamp() })
+    ]);
+    return true;
+  } catch { return false; }
+}
+
+async function frAcceptRequest(uid, fromUid) {
+  try {
+    await Promise.all([
+      updateDoc(doc(db, "users", uid),     { friendRequestsIn:  arrayRemove(fromUid), friends: arrayUnion(fromUid), updatedAt: serverTimestamp() }),
+      updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayRemove(uid),     friends: arrayUnion(uid),     updatedAt: serverTimestamp() })
+    ]);
+    return true;
+  } catch { return false; }
+}
+
+async function frDeclineRequest(uid, fromUid) {
+  try {
+    await Promise.all([
+      updateDoc(doc(db, "users", uid),     { friendRequestsIn:  arrayRemove(fromUid), updatedAt: serverTimestamp() }),
+      updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayRemove(uid),     updatedAt: serverTimestamp() })
+    ]);
+    return true;
+  } catch { return false; }
+}
+
+async function frRemoveFriend(uid, friendUid) {
+  try {
+    await Promise.all([
+      updateDoc(doc(db, "users", uid),       { friends: arrayRemove(friendUid), updatedAt: serverTimestamp() }),
+      updateDoc(doc(db, "users", friendUid), { friends: arrayRemove(uid),       updatedAt: serverTimestamp() })
+    ]);
+    return true;
+  } catch { return false; }
+}
+
+window.Friends = {
+  getAllUsers:     frGetAllUsers,
+  searchUsers:    frSearchUsers,
+  getUser:        frGetUser,
+  sendRequest:    frSendRequest,
+  cancelRequest:  frCancelRequest,
+  acceptRequest:  frAcceptRequest,
+  declineRequest: frDeclineRequest,
+  removeFriend:   frRemoveFriend
+};
 
 window.LB = {
   getUserId,
