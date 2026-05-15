@@ -8931,6 +8931,30 @@ function closeLearnInfoModal(event) {
   }
 }
 
+function showBasicTrackInfoModal() {
+  document.getElementById("basicTrackInfoModal")?.classList.add("open");
+}
+
+function hideBasicTrackInfoModal() {
+  document.getElementById("basicTrackInfoModal")?.classList.remove("open");
+}
+
+function closeBasicTrackInfoModal(event) {
+  if (event.target.id === "basicTrackInfoModal") hideBasicTrackInfoModal();
+}
+
+function showAdvancedTrackInfoModal() {
+  document.getElementById("advancedTrackInfoModal")?.classList.add("open");
+}
+
+function hideAdvancedTrackInfoModal() {
+  document.getElementById("advancedTrackInfoModal")?.classList.remove("open");
+}
+
+function closeAdvancedTrackInfoModal(event) {
+  if (event.target.id === "advancedTrackInfoModal") hideAdvancedTrackInfoModal();
+}
+
 function showTranslateMenu() {
   buildChapterCheckboxes("translateChapterList", "translateChapter");
   showScreen("translateMenu");
@@ -9411,12 +9435,12 @@ function showLearnDashboard() {
 
   currentLearnLesson = null;
 
-  if (title) title.textContent = "Lessons";
+  if (title) title.innerHTML = 'Lessons<small class="nav-subtitle">Track 1 — Basic</small>';
 
   if (action) {
     action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
-    action.title = "Info";
-    action.onclick = showLearnInfo;
+    action.title = "About this track";
+    action.onclick = showBasicTrackInfoModal;
   }
 }
 function handleLearnBack() {
@@ -9490,11 +9514,11 @@ function showAdvancedLearnDashboard() {
 
   const title = document.getElementById("advLearnNavTitle");
   const action = document.getElementById("advLearnTopAction");
-  if (title) title.textContent = "Advanced Lessons";
+  if (title) title.innerHTML = 'Advanced Lessons<small class="nav-subtitle">Track 2 — Advanced</small>';
   if (action) {
-    action.innerHTML = `<span class="material-symbols-outlined">tune</span>`;
-    action.title = "Switch mode";
-    action.onclick = showLessonModeModal;
+    action.innerHTML = `<span class="material-symbols-outlined">info</span>`;
+    action.title = "About this track";
+    action.onclick = showAdvancedTrackInfoModal;
   }
   updateLessonMenuProgress();
 }
@@ -13168,14 +13192,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.7.5";
+const APP_VERSION = "1.7.6";
 
 const UPDATE_NOTES = [
-  "Cases lesson fully rewritten — engaging new opening, unified case visual, NT phrase hooks for every case, and a John 3:16 highlight showing nominative/accusative in a real verse",
-  "Adjectives (L7) and Pronouns (L8) now have Big Takeaway sections with summary boxes and final knowledge checks — all 10 basic lessons now have consistent structure",
-  "Grammatical gender teaching added to Nouns (L4), verb framework bridge added to Conjunctions (L9) and How to Read (L10)",
-  "Prepositions lesson (L6) added to both Basic and Advanced tracks",
-  "Various content improvements: pronunciation flow, iota subscript callout in Cases, αὐτός full paradigm table in Pronouns, and multiple knowledge check upgrades"
+  "Lesson progress modal now switches tracks — tapping Basic or Advanced in the progress modal takes you directly to that lesson menu when you close it",
+  "Track 1 and Track 2 labels added below the lesson menu headers",
+  "Settings button replaced with an info button on both lesson menus — tap it to learn what each track covers, what it sets you up for, how long it takes, and which track is right for you"
 ];
 
 let deferredInstallPrompt = null;

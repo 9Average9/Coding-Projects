@@ -8276,6 +8276,121 @@ body.dark-mode .lesson-progress-badge.advanced {
   max-width: 380px;
 }
 
+/* ===== TRACK INFO MODALS ===== */
+
+.track-info-modal-card {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.track-info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  align-self: flex-start;
+}
+
+.track-info-badge.basic-badge {
+  background: rgba(214, 196, 154, 0.35);
+  border: 1px solid rgba(36, 52, 71, 0.15);
+  color: var(--font-color);
+}
+
+.track-info-badge.advanced-badge {
+  background: rgba(201, 162, 39, 0.18);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  color: #8a6d00;
+}
+
+body.dark .track-info-badge.advanced-badge {
+  color: #c9a227;
+  background: rgba(201, 162, 39, 0.12);
+}
+
+.track-info-lead {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+
+.track-info-section {
+  margin-bottom: 16px;
+}
+
+.track-info-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+.track-info-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.track-tool-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(214, 196, 154, 0.3);
+  border: 1px solid rgba(36, 52, 71, 0.12);
+}
+
+.track-tool-pill.advanced {
+  background: rgba(201, 162, 39, 0.15);
+  border-color: rgba(201, 162, 39, 0.3);
+}
+
+.track-info-creator-note {
+  margin: 16px 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 252, 242, 0.8);
+  border: 1px solid rgba(36, 52, 71, 0.1);
+  border-left: 3px solid #c9a227;
+}
+
+.creator-note-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #c9a227;
+  margin-bottom: 6px;
+}
+
+.track-info-creator-note p {
+  font-size: 0.87rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+body.dark .track-info-creator-note {
+  background: rgba(17, 24, 39, 0.6);
+  border-color: #4b5563;
+  border-left-color: #c9a227;
+}
+
+body.dark .track-tool-pill {
+  background: rgba(214, 196, 154, 0.1);
+  border-color: rgba(255,255,255,0.1);
+}
+
 .lesson-breakdown-tabs {
   display: flex;
   gap: 8px;
