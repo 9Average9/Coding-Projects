@@ -337,6 +337,21 @@ input[type="text"] {
   font-weight: 600;
   font-size: 1.1rem;
   color: var(--font-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.nav-subtitle {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-top: 2px;
+  line-height: 1;
 }
 
 /* Icon buttons (cleaner + flatter) */
