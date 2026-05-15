@@ -1,10 +1,10 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const CACHE_NAME = "basic-greek-trainer-v1.7.8";
+const CACHE_NAME = "basic-greek-trainer-v1.7.9";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=94",
+  "./style.css?v=95",
   "./vocab.js?v=89",
   "./app.js?v=96",
   "./firebase-lb.js?v=89",
