@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=94" />
+  <link rel="stylesheet" href="style.css?v=95" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -344,15 +344,16 @@ OneSignalDeferred.push(async function(OneSignal) {
 </head>
 <body>
   <main class="app">
-    <header class="header">
+    <header class="header" onclick="showInfoModal()" role="button" tabindex="0">
       <h1>Basic Greek Trainer</h1>
 <p>Learn the basics of New Testament Greek step by step.</p>
+<small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
     </header>
 
     <section id="homeScreen" class="screen active">
      <div class="nav-bar">
-  <button class="icon-btn" onclick="showInfoModal()">
-    <span class="material-symbols-outlined">info</span>
+  <button class="icon-btn" onclick="openLeaderboard()">
+    <span class="material-symbols-outlined">emoji_events</span>
   </button>
 
   <div class="nav-title">Home</div>
@@ -382,11 +383,6 @@ OneSignalDeferred.push(async function(OneSignal) {
 <button id="testHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('test')">
   <span class="material-symbols-outlined lock-icon">lock</span>
   <span>Test</span>
-</button>
-
-<button class="main-btn home-action lb-home-btn" onclick="openLeaderboard()">
-  <span class="material-symbols-outlined">emoji_events</span>
-  <span>Leaderboard</span>
 </button>
 
 <button class="main-btn home-action friends-home-btn" onclick="showFriendsModal()">
