@@ -10527,32 +10527,52 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 /* ── Reminder Modal ────────────────────────────────────────────────────────── */
-.reminder-modal-card { max-width: 360px; }
-.reminder-modal-card h2 { margin-bottom: 8px; }
-.reminder-modal-card p { font-size: 0.95rem; opacity: 0.75; margin-bottom: 20px; }
+#reminderModal {
+  align-items: center;
+  padding: 16px;
+}
+.reminder-modal-card {
+  max-width: 340px;
+  padding: 22px 20px 18px;
+  overflow: hidden;
+}
+.reminder-modal-card h2 {
+  font-size: 1.15rem;
+  margin: 0 0 5px;
+  padding-right: 24px;
+}
+.reminder-modal-card > p {
+  font-size: 0.86rem;
+  opacity: 0.6;
+  margin: 0 0 16px;
+  line-height: 1.45;
+}
 .reminder-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 .reminder-label {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  opacity: 0.6;
+  opacity: 0.45;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.07em;
 }
 .reminder-time-input {
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: 12px;
-  border: 1.5px solid color-mix(in srgb, var(--font-color) 18%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--font-color) 14%, transparent);
   background: color-mix(in srgb, var(--font-color) 5%, transparent);
   color: var(--font-color);
-  font-size: 1.1rem;
+  font-size: 1.6rem;
   font-weight: 700;
   width: 100%;
   box-sizing: border-box;
+  text-align: center;
+  letter-spacing: 0.05em;
+  transition: border-color 0.15s;
 }
 .reminder-time-input:focus {
   outline: none;
@@ -10560,29 +10580,40 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 .reminder-freq-options {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 .reminder-freq-opt {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1.5px solid color-mix(in srgb, var(--font-color) 18%, transparent);
+  justify-content: center;
+  padding: 9px 6px;
+  border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--font-color) 14%, transparent);
   background: color-mix(in srgb, var(--font-color) 4%, transparent);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
   flex: 1;
-  min-width: 90px;
-  justify-content: center;
+  text-align: center;
+  user-select: none;
 }
 .reminder-freq-opt input[type="radio"] { display: none; }
 .reminder-freq-opt:has(input:checked) {
   border-color: var(--accent-color, #c9a227);
-  background: color-mix(in srgb, var(--accent-color, #c9a227) 12%, transparent);
+  background: color-mix(in srgb, var(--accent-color, #c9a227) 14%, transparent);
   color: var(--accent-color, #c9a227);
+  font-weight: 700;
+}
+.reminder-modal-card .main-btn {
+  margin-top: 6px;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+.reminder-modal-card .text-btn {
+  font-size: 0.84rem;
+  padding: 7px;
+  opacity: 0.55;
+  margin-top: 0;
 }
 .notifications-enabled .material-symbols-outlined { color: #16a34a; }
