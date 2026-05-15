@@ -36,7 +36,6 @@ exports.sendScheduledReminders = functions.pubsub
         hour12: false,
         weekday: "short"
       });
-      // localStr example: "Thu, 08:05"
       const parts = localStr.split(", ");
       const weekday = parts[0];
       const timePart = parts[1];
@@ -54,7 +53,6 @@ exports.sendScheduledReminders = functions.pubsub
 
       if (reminderMinutes < windowStart || reminderMinutes >= windowStart + 15) continue;
 
-      // Don't send more than once per day
       if (reminder.lastSent) {
         const lastLocal = reminder.lastSent.toDate().toLocaleDateString("en-US", { timeZone: tz });
         const todayLocal = now.toLocaleDateString("en-US", { timeZone: tz });
@@ -68,9 +66,7 @@ exports.sendScheduledReminders = functions.pubsub
             title: "Time to study Greek!",
             body: "Take a few minutes to review your vocabulary and lessons."
           },
-          webpush: {
-            notification: { icon: "/Greek-Vocab/icon-192.png" }
-          }
+          webpush: { notification: { icon: "/Greek-Vocab/icon-192.png" } }
         });
         await userDoc.ref.update({ "reminder.lastSent": now });
       } catch (e) {
@@ -81,17 +77,33 @@ exports.sendScheduledReminders = functions.pubsub
     return null;
   });
 
-// Triggers when a new encouragement message doc is created.
+// Triggers on any new doc in encouragements/{targetUid}/messages/{messageId}.
+// Handles: encouragement, friendRequest, friendAccepted notification types.
 exports.onEncouragementCreated = functions.firestore
   .document("encouragements/{targetUid}/messages/{messageId}")
   .onCreate(async (snap, context) => {
-    const { fromName, processed } = snap.data();
+    const { type, fromName, processed } = snap.data();
     if (processed) return null;
 
     const targetUid = context.params.targetUid;
 
+    let title, body;
+    if (type === "friendRequest") {
+      title = "New Friend Request";
+      body = `${fromName} sent you a friend request.`;
+    } else if (type === "friendAccepted") {
+      title = "Friend Request Accepted!";
+      body = `${fromName} accepted your friend request.`;
+    } else {
+      title = "Study reminder from a friend!";
+      body = `${fromName} is reminding you to study your Greek!`;
+    }
+
     const userSnap = await db.collection("users").doc(targetUid).get();
-    if (!userSnap.exists) return null;
+    if (!userSnap.exists) {
+      await snap.ref.update({ processed: true });
+      return null;
+    }
 
     const tokens = userSnap.data().fcmTokens || [];
     if (!tokens.length) {
@@ -102,13 +114,8 @@ exports.onEncouragementCreated = functions.firestore
     try {
       await messaging.sendEachForMulticast({
         tokens,
-        notification: {
-          title: "Study reminder from a friend!",
-          body: `${fromName} is reminding you to study your Greek!`
-        },
-        webpush: {
-          notification: { icon: "/Greek-Vocab/icon-192.png" }
-        }
+        notification: { title, body },
+        webpush: { notification: { icon: "/Greek-Vocab/icon-192.png" } }
       });
     } catch (e) {
       console.warn("sendEachForMulticast failed:", e.message);

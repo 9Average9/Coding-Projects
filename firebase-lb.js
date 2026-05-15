@@ -4,6 +4,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  addDoc,
   deleteDoc,
   collection,
   query,
@@ -30,7 +31,6 @@ import {
   getToken,
   onMessage
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
-import { addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVWKRCtjg7ppR-D8ZNs-TfSwPlWdXXQ5Q",
@@ -44,7 +44,8 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
 const auth = getAuth(fbApp);
-const messaging = getMessaging(fbApp);
+let messaging = null;
+try { messaging = getMessaging(fbApp); } catch (e) { console.warn("FCM unavailable:", e); }
 
 const EMAIL_DOMAIN = "@greek-vocab.app";
 
@@ -350,12 +351,13 @@ async function frGetUser(uid) {
   } catch { return null; }
 }
 
-async function frSendRequest(fromUid, toUid) {
+async function frSendRequest(fromUid, toUid, fromName) {
   try {
     await Promise.all([
       updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayUnion(toUid),   updatedAt: serverTimestamp() }),
       updateDoc(doc(db, "users", toUid),   { friendRequestsIn:  arrayUnion(fromUid), updatedAt: serverTimestamp() })
     ]);
+    if (fromName) fcmSendPushNotification(toUid, "friendRequest", fromName, fromUid);
     return true;
   } catch { return false; }
 }
@@ -370,12 +372,13 @@ async function frCancelRequest(fromUid, toUid) {
   } catch { return false; }
 }
 
-async function frAcceptRequest(uid, fromUid) {
+async function frAcceptRequest(uid, fromUid, myName) {
   try {
     await Promise.all([
       updateDoc(doc(db, "users", uid),     { friendRequestsIn:  arrayRemove(fromUid), friends: arrayUnion(fromUid), updatedAt: serverTimestamp() }),
       updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayRemove(uid),     friends: arrayUnion(uid),     updatedAt: serverTimestamp() })
     ]);
+    if (myName) fcmSendPushNotification(fromUid, "friendAccepted", myName, uid);
     return true;
   } catch { return false; }
 }
@@ -415,7 +418,19 @@ window.Friends = {
 
 const FCM_VAPID_KEY = "BDOeDKo0NmW6-kMwJB9noey7YK1u3raQ5NUvfFhv9kguPXDZfJirp5-ilbwwMCm9_0_hQ_EkiQktFe4f2pLl5VU";
 
+// Generic push notification writer — triggers the Cloud Function onEncouragementCreated.
+async function fcmSendPushNotification(toUid, type, fromName, fromUid) {
+  try {
+    await addDoc(collection(db, "encouragements", toUid, "messages"), {
+      type, fromName, fromUid, processed: false, createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    console.warn("fcmSendPushNotification:", e);
+  }
+}
+
 async function fcmRegisterToken(uid) {
+  if (!messaging) return null;
   try {
     const reg = await navigator.serviceWorker.ready;
     const token = await getToken(messaging, {
@@ -423,7 +438,7 @@ async function fcmRegisterToken(uid) {
       serviceWorkerRegistration: reg
     });
     if (token) {
-      await updateDoc(doc(db, "users", uid), { fcmTokens: arrayUnion(token) });
+      await setDoc(doc(db, "users", uid), { fcmTokens: arrayUnion(token) }, { merge: true });
       localStorage.setItem("fcmToken", token);
     }
     return token || null;
@@ -435,7 +450,7 @@ async function fcmRegisterToken(uid) {
 
 async function fcmRemoveToken(uid, token) {
   try {
-    await updateDoc(doc(db, "users", uid), { fcmTokens: arrayRemove(token) });
+    await setDoc(doc(db, "users", uid), { fcmTokens: arrayRemove(token) }, { merge: true });
     localStorage.removeItem("fcmToken");
   } catch (e) {
     console.warn("fcmRemoveToken:", e);
@@ -469,22 +484,11 @@ async function fcmDisableReminder(uid) {
 }
 
 async function fcmSendEncouragement(fromUid, fromName, toUid) {
-  try {
-    await addDoc(collection(db, "encouragements", toUid, "messages"), {
-      fromName,
-      fromUid,
-      processed: false,
-      createdAt: serverTimestamp()
-    });
-    return true;
-  } catch (e) {
-    console.warn("fcmSendEncouragement:", e);
-    return false;
-  }
+  return fcmSendPushNotification(toUid, "encouragement", fromName, fromUid);
 }
 
 function fcmListenForeground(callback) {
-  onMessage(messaging, callback);
+  if (messaging) onMessage(messaging, callback);
 }
 
 window.FCM = {

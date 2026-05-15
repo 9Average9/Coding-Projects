@@ -14640,7 +14640,8 @@ function closeFriendSheet() {
 async function sendRequestAction(uid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  if (await window.Friends.sendRequest(me.uid, uid)) {
+  const myName = localStorage.getItem("authDisplayName") || "Someone";
+  if (await window.Friends.sendRequest(me.uid, uid, myName)) {
     friendRequestsOut = [...new Set([...friendRequestsOut, uid])];
     updateFriendsBadge();
     if (_friendsTab === "find")     renderFindFriends(_browseSearch);
@@ -14662,7 +14663,8 @@ async function cancelRequestAction(uid) {
 async function acceptRequestAction(uid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  if (await window.Friends.acceptRequest(me.uid, uid)) {
+  const myName = localStorage.getItem("authDisplayName") || "Someone";
+  if (await window.Friends.acceptRequest(me.uid, uid, myName)) {
     friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
     friendsList = [...new Set([...friendsList, uid])];
     updateFriendsBadge();
