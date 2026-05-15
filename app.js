@@ -25,6 +25,13 @@ let answeredKCs = JSON.parse(localStorage.getItem("answeredKCs")) || {};
 let openedLessonBlocks =
   JSON.parse(localStorage.getItem("openedLessonBlocks")) || {};
 
+let friendsList = [];
+let friendRequestsIn = [];
+let friendRequestsOut = [];
+let _friendsTab = "friends";
+let _browseSearch = "";
+let _currentFriendSheetUid = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
 
@@ -13192,12 +13199,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.7.7";
+const APP_VERSION = "1.7.8";
 
 const UPDATE_NOTES = [
-  "Account data now fully syncs across devices — theme color, lesson progress, quiz scores, and all settings follow you when you log in on a new device",
-  "Lesson progress modal now switches tracks — tapping Basic or Advanced in the progress modal takes you directly to that lesson menu when you close it",
-  "Track 1 and Track 2 labels added below the lesson menu headers"
+  "Friends — find other learners, send friend requests, view their stats, and build your study community from the home screen",
+  "Account data now fully syncs across devices — theme color, lesson progress, quiz scores, and all settings follow you when you log in on a new device"
 ];
 
 let deferredInstallPrompt = null;
@@ -13412,6 +13418,10 @@ async function restoreUserFromFirestore(user) {
   if (data.hasSeenLearnWelcome) localStorage.setItem("hasSeenLearnWelcome", "true");
   if (data.hasSeenHomeIntro) localStorage.setItem("hasSeenHomeIntro", "true");
   if (data.greekVocabStats) localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
+  friendsList = data.friends || [];
+  friendRequestsIn = data.friendRequestsIn || [];
+  friendRequestsOut = data.friendRequestsOut || [];
+  updateFriendsBadge();
 }
 
 async function syncUserData() {
@@ -14473,4 +14483,261 @@ function showLbUserInfo(id) {
 
 function closeLbUserModal() {
   document.getElementById("lbUserModal").classList.remove("open");
+}
+
+// ── Friends ───────────────────────────────────────────────────────────────────
+
+const FRIEND_RANKS = [
+  { xp: 0,    title: "Beginner" },
+  { xp: 250,  title: "Letter Reader" },
+  { xp: 600,  title: "Word Builder" },
+  { xp: 1000, title: "Phrase Reader" },
+  { xp: 1500, title: "Text Apprentice" },
+  { xp: 2200, title: "Koine Reader" },
+  { xp: 3000, title: "NT Greek Reader" },
+  { xp: 4000, title: "Greek Interpreter" }
+];
+
+function _frRank(xp) {
+  let title = FRIEND_RANKS[0].title;
+  for (const r of FRIEND_RANKS) { if ((xp || 0) >= r.xp) title = r.title; }
+  return title;
+}
+
+function _frEsc(str) {
+  return String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function _frIcon(u) {
+  const v = u?.avatar;
+  return (v && /^[a-z_]+$/.test(v)) ? v : "school";
+}
+
+function _frStatus(uid) {
+  if (friendsList.includes(uid))       return "friend";
+  if (friendRequestsOut.includes(uid)) return "outgoing";
+  if (friendRequestsIn.includes(uid))  return "incoming";
+  return "none";
+}
+
+function updateFriendsBadge() {
+  const count = friendRequestsIn.length;
+  [document.getElementById("friendsHomeBadge"), document.getElementById("friendsReqTabBadge")].forEach(el => {
+    if (!el) return;
+    el.textContent = count > 0 ? String(count) : "";
+    el.classList.toggle("hidden", count === 0);
+  });
+}
+
+function showFriendsModal() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) { showAuthModal?.(); return; }
+  document.getElementById("friendsModal")?.classList.add("open");
+  switchFriendsTab(_friendsTab);
+}
+
+function hideFriendsModal() {
+  document.getElementById("friendsModal")?.classList.remove("open");
+}
+
+function friendsOverlayClick(e) {
+  if (e.target.id === "friendsModal") hideFriendsModal();
+}
+
+function switchFriendsTab(tab) {
+  _friendsTab = tab;
+  document.querySelectorAll(".friends-tab-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.tab === tab)
+  );
+  document.querySelectorAll(".friends-tab-pane").forEach(p =>
+    p.classList.toggle("active", p.dataset.tab === tab)
+  );
+  const sw = document.getElementById("friendsSearchWrap");
+  if (sw) sw.style.display = tab === "find" ? "" : "none";
+  if (tab === "friends")  renderFriendsList();
+  if (tab === "find")     renderFindFriends(_browseSearch);
+  if (tab === "requests") renderFriendRequests();
+}
+
+function _frCardHTML(u, status) {
+  const icon = _frIcon(u);
+  const name = _frEsc(u.displayName || u.username || "User");
+  const rank = _frRank(u.xp);
+  let actions = "";
+  if (status === "friend") {
+    actions = `<button class="fr-action-btn fr-remove" onclick="event.stopPropagation();removeFriendAction('${u.uid}')">Remove</button>`;
+  } else if (status === "outgoing") {
+    actions = `<button class="fr-action-btn fr-pending" onclick="event.stopPropagation();cancelRequestAction('${u.uid}')">Pending ×</button>`;
+  } else if (status === "incoming") {
+    actions = `<button class="fr-action-btn fr-accept" onclick="event.stopPropagation();acceptRequestAction('${u.uid}')">Accept</button>
+               <button class="fr-action-btn fr-decline" onclick="event.stopPropagation();declineRequestAction('${u.uid}')">Decline</button>`;
+  } else {
+    actions = `<button class="fr-action-btn fr-add" onclick="event.stopPropagation();sendRequestAction('${u.uid}')"><span class="material-symbols-outlined">person_add</span></button>`;
+  }
+  return `<div class="fr-card" onclick="showFriendSheet('${u.uid}')">
+    <div class="fr-card-avatar"><span class="material-symbols-outlined">${icon}</span></div>
+    <div class="fr-card-info"><span class="fr-card-name">${name}</span><span class="fr-card-rank">${rank}</span></div>
+    <div class="fr-card-actions">${actions}</div>
+  </div>`;
+}
+
+async function renderFriendsList() {
+  const el = document.getElementById("friendsListEl");
+  if (!el) return;
+  if (!friendsList.length) {
+    el.innerHTML = `<div class="fr-empty"><span class="material-symbols-outlined">group_off</span><p>No friends yet</p><p class="fr-empty-sub">Tap Find to discover people</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="fr-loading">Loading...</div>`;
+  const users = (await Promise.all(friendsList.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+  el.innerHTML = users.map(u => _frCardHTML(u, "friend")).join("") || `<div class="fr-empty"><p>Couldn't load friends</p></div>`;
+}
+
+async function renderFindFriends(q = "") {
+  const el = document.getElementById("findFriendsList");
+  if (!el) return;
+  el.innerHTML = `<div class="fr-loading">Loading...</div>`;
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  const users = q.trim()
+    ? await (window.Friends?.searchUsers(q.trim(), me.uid) || Promise.resolve([]))
+    : await (window.Friends?.getAllUsers(me.uid) || Promise.resolve([]));
+  if (!users.length) {
+    el.innerHTML = `<div class="fr-empty"><span class="material-symbols-outlined">search_off</span><p>No users found</p></div>`;
+    return;
+  }
+  el.innerHTML = users.map(u => _frCardHTML(u, _frStatus(u.uid))).join("");
+}
+
+async function renderFriendRequests() {
+  const inEl  = document.getElementById("requestsInList");
+  const outEl = document.getElementById("requestsOutList");
+  const outLabel = document.getElementById("frOutgoingLabel");
+  if (!inEl || !outEl) return;
+
+  if (!friendRequestsIn.length) {
+    inEl.innerHTML = `<div class="fr-empty-sm">No incoming requests</div>`;
+  } else {
+    inEl.innerHTML = `<div class="fr-loading">Loading...</div>`;
+    const users = (await Promise.all(friendRequestsIn.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+    inEl.innerHTML = users.map(u => _frCardHTML(u, "incoming")).join("");
+  }
+
+  if (outLabel) outLabel.style.display = friendRequestsOut.length ? "" : "none";
+  if (!friendRequestsOut.length) {
+    outEl.innerHTML = "";
+  } else {
+    outEl.innerHTML = `<div class="fr-loading">Loading...</div>`;
+    const users = (await Promise.all(friendRequestsOut.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+    outEl.innerHTML = users.map(u => _frCardHTML(u, "outgoing")).join("");
+  }
+}
+
+async function showFriendSheet(uid) {
+  const u = await window.Friends?.getUser(uid);
+  if (!u) return;
+  _currentFriendSheetUid = uid;
+
+  document.getElementById("friendSheetAvatar").innerHTML = `<span class="material-symbols-outlined">${_frIcon(u)}</span>`;
+  document.getElementById("friendSheetName").textContent  = u.displayName || u.username || "User";
+  document.getElementById("friendSheetRank").textContent  = _frRank(u.xp);
+
+  const joinDate = u.joinDate ? new Date(u.joinDate).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "—";
+  const secs     = Number(u.totalStudySeconds) || 0;
+  const timeStr  = secs >= 3600 ? `${Math.floor(secs/3600)}h ${Math.floor((secs%3600)/60)}m` : `${Math.floor(secs/60)}m`;
+  const lessons  = Object.values(u.completedLessons || {}).filter(Boolean).length
+                 + Object.values(u.completedAdvancedLessons || {}).filter(Boolean).length;
+  const known    = (u.knownWords || []).length;
+
+  document.getElementById("friendSheetStats").innerHTML = `
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">bolt</span><div><strong>XP</strong><span>${(u.xp||0).toLocaleString()}</span></div></div>
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">local_fire_department</span><div><strong>Streak</strong><span>${u.streak||0} day${u.streak!==1?"s":""}</span></div></div>
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">menu_book</span><div><strong>Lessons Done</strong><span>${lessons}</span></div></div>
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">translate</span><div><strong>Known Words</strong><span>${known}</span></div></div>
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">schedule</span><div><strong>Time in App</strong><span>${timeStr}</span></div></div>
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">calendar_today</span><div><strong>Member Since</strong><span>${joinDate}</span></div></div>
+  `;
+
+  const status = _frStatus(uid);
+  let actHTML = "";
+  if (status === "friend") {
+    actHTML = `<button class="fr-sheet-btn fr-sheet-remove" onclick="removeFriendAction('${uid}');closeFriendSheet()">Remove Friend</button>`;
+  } else if (status === "outgoing") {
+    actHTML = `<button class="fr-sheet-btn fr-sheet-pending" disabled>Request Sent</button>
+               <button class="fr-sheet-cancel" onclick="cancelRequestAction('${uid}');closeFriendSheet()">Cancel Request</button>`;
+  } else if (status === "incoming") {
+    actHTML = `<button class="fr-sheet-btn fr-sheet-accept" onclick="acceptRequestAction('${uid}');closeFriendSheet()"><span class="material-symbols-outlined">check</span> Accept Request</button>
+               <button class="fr-sheet-cancel" onclick="declineRequestAction('${uid}');closeFriendSheet()">Decline</button>`;
+  } else {
+    actHTML = `<button class="fr-sheet-btn fr-sheet-add" onclick="sendRequestAction('${uid}');closeFriendSheet()"><span class="material-symbols-outlined">person_add</span> Add Friend</button>`;
+  }
+  document.getElementById("friendSheetActions").innerHTML = actHTML;
+  document.getElementById("friendProfileSheet").classList.add("open");
+}
+
+function closeFriendSheet() {
+  document.getElementById("friendProfileSheet")?.classList.remove("open");
+  _currentFriendSheetUid = null;
+}
+
+async function sendRequestAction(uid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  if (await window.Friends.sendRequest(me.uid, uid)) {
+    friendRequestsOut = [...new Set([...friendRequestsOut, uid])];
+    updateFriendsBadge();
+    if (_friendsTab === "find")     renderFindFriends(_browseSearch);
+    if (_friendsTab === "requests") renderFriendRequests();
+  }
+}
+
+async function cancelRequestAction(uid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  if (await window.Friends.cancelRequest(me.uid, uid)) {
+    friendRequestsOut = friendRequestsOut.filter(id => id !== uid);
+    updateFriendsBadge();
+    if (_friendsTab === "find")     renderFindFriends(_browseSearch);
+    if (_friendsTab === "requests") renderFriendRequests();
+  }
+}
+
+async function acceptRequestAction(uid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  if (await window.Friends.acceptRequest(me.uid, uid)) {
+    friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
+    friendsList = [...new Set([...friendsList, uid])];
+    updateFriendsBadge();
+    if (_friendsTab === "friends")  renderFriendsList();
+    if (_friendsTab === "requests") renderFriendRequests();
+  }
+}
+
+async function declineRequestAction(uid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  if (await window.Friends.declineRequest(me.uid, uid)) {
+    friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
+    updateFriendsBadge();
+    renderFriendRequests();
+  }
+}
+
+async function removeFriendAction(uid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  if (await window.Friends.removeFriend(me.uid, uid)) {
+    friendsList = friendsList.filter(id => id !== uid);
+    updateFriendsBadge();
+    if (_friendsTab === "friends") renderFriendsList();
+    if (_friendsTab === "find")    renderFindFriends(_browseSearch);
+  }
+}
+
+let _frSearchTimer = null;
+function onFriendsSearch(val) {
+  _browseSearch = val;
+  clearTimeout(_frSearchTimer);
+  _frSearchTimer = setTimeout(() => renderFindFriends(val), 380);
 }
