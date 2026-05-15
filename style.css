@@ -10568,20 +10568,30 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
-.reminder-time-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px 14px;
+.reminder-time-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 11px 14px;
   border-radius: 12px;
   border: 1.5px solid color-mix(in srgb, var(--font-color) 18%, transparent);
   background: color-mix(in srgb, var(--font-color) 5%, transparent);
+  overflow: hidden;
+}
+.reminder-time-wrapper:focus-within {
+  border-color: var(--accent-color, #c9a227);
+}
+.reminder-time-input {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
   color: var(--font-color);
   font-size: 1rem;
   font-family: inherit;
-}
-.reminder-time-input:focus {
-  outline: none;
-  border-color: var(--accent-color, #c9a227);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
 }
 .reminder-freq-options {
   display: flex;
