@@ -12985,6 +12985,15 @@ function switchLessonBreakdownTab(tab) {
   if (basicTab) basicTab.classList.toggle("active", tab === "basic");
   if (advTab) advTab.classList.toggle("active", tab === "advanced");
   if (card) card.classList.toggle("adv-tab-active", tab === "advanced");
+
+  // Switch the underlying lesson menu so closing the modal lands on the right track
+  localStorage.setItem("lessonMode", tab);
+  if (tab === "advanced") {
+    showAdvancedLearnMenu();
+  } else {
+    _openBasicLearnMenu();
+  }
+
   renderLessonsBreakdown(tab);
 }
 
