@@ -1,5 +1,4 @@
-const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const functions = require("firebase-functions/v1");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -9,98 +8,95 @@ const db = getFirestore();
 const messaging = getMessaging();
 
 // Runs every 15 minutes; sends reminders to users whose local time matches their reminder time.
-exports.sendScheduledReminders = onSchedule("every 15 minutes", async () => {
-  const now = new Date();
+exports.sendScheduledReminders = functions.pubsub
+  .schedule("every 15 minutes")
+  .onRun(async () => {
+    const now = new Date();
 
-  const snap = await db.collection("users")
-    .where("reminder.enabled", "==", true)
-    .get();
+    const snap = await db.collection("users")
+      .where("reminder.enabled", "==", true)
+      .get();
 
-  if (snap.empty) return;
+    if (snap.empty) return null;
 
-  const sends = [];
+    for (const userDoc of snap.docs) {
+      const data = userDoc.data();
+      const reminder = data.reminder || {};
+      const tokens = data.fcmTokens || [];
 
-  for (const userDoc of snap.docs) {
-    const data = userDoc.data();
-    const reminder = data.reminder || {};
-    const tokens = data.fcmTokens || [];
+      if (!tokens.length || !reminder.time) continue;
 
-    if (!tokens.length || !reminder.time) continue;
+      const tz = reminder.timezone || "UTC";
+      const freq = reminder.frequency || "daily";
 
-    const tz = reminder.timezone || "UTC";
-    const freq = reminder.frequency || "daily";
-
-    // Get current time in user's timezone
-    const localStr = now.toLocaleString("en-US", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: false, weekday: "short" });
-    // localStr example: "Thu, 08:05"
-    const parts = localStr.split(", ");
-    const weekday = parts[0]; // "Mon", "Tue", etc.
-    const timePart = parts[1]; // "08:05"
-
-    // Check frequency
-    const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
-    const isWeekend = ["Sat", "Sun"].includes(weekday);
-    if (freq === "weekdays" && !isWeekday) continue;
-    if (freq === "weekends" && !isWeekend) continue;
-
-    // Check if reminder time is within this 15-min window
-    const [rh, rm] = reminder.time.split(":").map(Number);
-    const [ch, cm] = timePart.split(":").map(Number);
-    const reminderMinutes = rh * 60 + rm;
-    const currentMinutes = ch * 60 + cm;
-    const windowMin = currentMinutes % 15 === 0 ? currentMinutes : Math.floor(currentMinutes / 15) * 15;
-
-    if (reminderMinutes < windowMin || reminderMinutes >= windowMin + 15) continue;
-
-    // Check lastSent — don't send more than once per day
-    if (reminder.lastSent) {
-      const lastSentDate = reminder.lastSent.toDate();
-      const lastLocal = lastSentDate.toLocaleDateString("en-US", { timeZone: tz });
-      const todayLocal = now.toLocaleDateString("en-US", { timeZone: tz });
-      if (lastLocal === todayLocal) continue;
-    }
-
-    sends.push({ uid: userDoc.id, tokens, ref: userDoc.ref });
-  }
-
-  for (const { uid, tokens, ref } of sends) {
-    try {
-      await messaging.sendEachForMulticast({
-        tokens,
-        notification: {
-          title: "Time to study Greek!",
-          body: "Take a few minutes to review your vocabulary and lessons."
-        },
-        webpush: {
-          notification: { icon: "/Greek-Vocab/icon-192.png" }
-        }
+      const localStr = now.toLocaleString("en-US", {
+        timeZone: tz,
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        weekday: "short"
       });
-      await ref.update({ "reminder.lastSent": now });
-    } catch (e) {
-      console.warn(`Failed to send reminder for ${uid}:`, e.message);
+      // localStr example: "Thu, 08:05"
+      const parts = localStr.split(", ");
+      const weekday = parts[0];
+      const timePart = parts[1];
+
+      const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
+      const isWeekend = ["Sat", "Sun"].includes(weekday);
+      if (freq === "weekdays" && !isWeekday) continue;
+      if (freq === "weekends" && !isWeekend) continue;
+
+      const [rh, rm] = reminder.time.split(":").map(Number);
+      const [ch, cm] = timePart.split(":").map(Number);
+      const reminderMinutes = rh * 60 + rm;
+      const currentMinutes = ch * 60 + cm;
+      const windowStart = Math.floor(currentMinutes / 15) * 15;
+
+      if (reminderMinutes < windowStart || reminderMinutes >= windowStart + 15) continue;
+
+      // Don't send more than once per day
+      if (reminder.lastSent) {
+        const lastLocal = reminder.lastSent.toDate().toLocaleDateString("en-US", { timeZone: tz });
+        const todayLocal = now.toLocaleDateString("en-US", { timeZone: tz });
+        if (lastLocal === todayLocal) continue;
+      }
+
+      try {
+        await messaging.sendEachForMulticast({
+          tokens,
+          notification: {
+            title: "Time to study Greek!",
+            body: "Take a few minutes to review your vocabulary and lessons."
+          },
+          webpush: {
+            notification: { icon: "/Greek-Vocab/icon-192.png" }
+          }
+        });
+        await userDoc.ref.update({ "reminder.lastSent": now });
+      } catch (e) {
+        console.warn(`Reminder failed for ${userDoc.id}:`, e.message);
+      }
     }
-  }
-});
+
+    return null;
+  });
 
 // Triggers when a new encouragement message doc is created.
-exports.onEncouragementCreated = onDocumentCreated(
-  "encouragements/{targetUid}/messages/{messageId}",
-  async (event) => {
-    const snap = event.data;
-    if (!snap) return;
-
+exports.onEncouragementCreated = functions.firestore
+  .document("encouragements/{targetUid}/messages/{messageId}")
+  .onCreate(async (snap, context) => {
     const { fromName, processed } = snap.data();
-    if (processed) return;
+    if (processed) return null;
 
-    const targetUid = event.params.targetUid;
+    const targetUid = context.params.targetUid;
 
     const userSnap = await db.collection("users").doc(targetUid).get();
-    if (!userSnap.exists) return;
+    if (!userSnap.exists) return null;
 
     const tokens = userSnap.data().fcmTokens || [];
     if (!tokens.length) {
       await snap.ref.update({ processed: true });
-      return;
+      return null;
     }
 
     try {
@@ -119,5 +115,5 @@ exports.onEncouragementCreated = onDocumentCreated(
     }
 
     await snap.ref.update({ processed: true });
-  }
-);
+    return null;
+  });
