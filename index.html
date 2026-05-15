@@ -313,33 +313,10 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=96" />
+  <link rel="stylesheet" href="style.css?v=97" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-
-
-
-<script>
- window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({
-    appId: "768c709f-a4e3-4a1d-9b39-40fa1b447fc9",
-    safari_web_id: "web.onesignal.auto.195e7e66-9dea-4e11-b56c-b4a654da5ab7",
-
-    serviceWorkerPath: "Greek-Vocab/service-worker.js",
-    serviceWorkerParam: {
-      scope: "/Greek-Vocab/"
-    },
-
-    notifyButton: {
-      enable: false
-    }
-  });
-});
-</script>
   
 </head>
 <body>
@@ -10290,9 +10267,9 @@ OneSignalDeferred.push(async function(OneSignal) {
   <span>Sign Out</span>
 </button>
 
-  <button id="profileNotificationBtn" class="main-btn try-app-btn" onclick="openNotificationSettings()">
-  <span class="material-symbols-outlined">notifications</span>
-  <span id="profileNotificationBtnText">Enable Study Reminders</span>
+  <button id="profileNotificationBtn" class="main-btn try-app-btn" onclick="openReminderModal()">
+  <span class="material-symbols-outlined">alarm</span>
+  <span id="profileNotificationBtnText">Set Reminders</span>
 </button>
 
 <button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
@@ -10486,8 +10463,8 @@ OneSignalDeferred.push(async function(OneSignal) {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=96"></script>
-  <script type="module" src="firebase-lb.js?v=89"></script>
+  <script src="app.js?v=97"></script>
+  <script type="module" src="firebase-lb.js?v=90"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -10670,40 +10647,39 @@ OneSignalDeferred.push(async function(OneSignal) {
 
 <div id="profileFocusOverlay" class="profile-focus-overlay hidden"></div>
 
-<div id="notificationPromptModal" class="modal-overlay" onclick="closeNotificationPromptModal(event)">
-  <div class="modal-card notification-prompt-card" onclick="event.stopPropagation()">
-    
+<div id="reminderModal" class="modal-overlay" onclick="closeReminderModal(event)">
+  <div class="modal-card reminder-modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeReminderModalDirect()">×</button>
 
-    <h2>Stay Consistent</h2>
+    <h2>Set Study Reminders</h2>
+    <p>Pick a time to receive a daily push notification reminding you to study Greek.</p>
 
-    <p>
-      Would you like simple Greek study reminders and app update notifications?
-    </p>
+    <div class="reminder-field">
+      <label class="reminder-label">Reminder Time</label>
+      <input type="time" id="reminderTimeInput" class="reminder-time-input" value="08:00" />
+    </div>
 
-    <div class="welcome-route">
-      <div>
-        <strong>Study reminders</strong>
-        <span>Get quick reminders to review Greek for a few minutes.</span>
-      </div>
-
-      <div>
-        <strong>Progress nudges</strong>
-        <span>Stay encouraged as you build consistency.</span>
-      </div>
-
-      <div>
-        <strong>App updates</strong>
-        <span>Know when new lessons or features are added.</span>
+    <div class="reminder-field">
+      <label class="reminder-label">Frequency</label>
+      <div class="reminder-freq-options">
+        <label class="reminder-freq-opt">
+          <input type="radio" name="reminderFreq" value="daily" checked />
+          <span>Every Day</span>
+        </label>
+        <label class="reminder-freq-opt">
+          <input type="radio" name="reminderFreq" value="weekdays" />
+          <span>Weekdays</span>
+        </label>
+        <label class="reminder-freq-opt">
+          <input type="radio" name="reminderFreq" value="weekends" />
+          <span>Weekends</span>
+        </label>
       </div>
     </div>
 
-    <button class="main-btn" onclick="enablePushNotifications()">
-      Enable Notifications
-    </button>
-
-    <button class="text-btn" onclick="dismissNotificationPrompt()">
-      Maybe Later
-    </button>
+    <button class="main-btn" onclick="saveReminderSettings()">Save Reminder</button>
+    <button id="disableReminderBtn" class="text-btn" onclick="disableReminders()" style="display:none">Disable Reminders</button>
+    <button class="text-btn" onclick="closeReminderModalDirect()">Cancel</button>
   </div>
 </div>
 
