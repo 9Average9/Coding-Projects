@@ -10558,6 +10558,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex-direction: column;
   gap: 6px;
   margin-bottom: 14px;
+  width: 100%;
+  overflow: hidden;
 }
 .reminder-label {
   font-size: 0.72rem;
@@ -10567,6 +10569,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   letter-spacing: 0.07em;
 }
 .reminder-time-input {
+  display: block;
   padding: 10px 14px;
   border-radius: 12px;
   border: 1.5px solid color-mix(in srgb, var(--font-color) 14%, transparent);
@@ -10575,6 +10578,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   font-size: 1.1rem;
   font-weight: 700;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   text-align: center;
   letter-spacing: 0.02em;
