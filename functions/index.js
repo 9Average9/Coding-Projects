@@ -29,16 +29,20 @@ exports.sendScheduledReminders = functions.pubsub
       const tz = reminder.timezone || "UTC";
       const freq = reminder.frequency || "daily";
 
-      const localStr = now.toLocaleString("en-US", {
+      // Use formatToParts for reliable parsing across all Node.js versions
+      const fmt = new Intl.DateTimeFormat("en-US", {
         timeZone: tz,
+        weekday: "short",
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false,
-        weekday: "short"
+        hour12: false
       });
-      const parts = localStr.split(", ");
-      const weekday = parts[0];
-      const timePart = parts[1];
+      const parts = fmt.formatToParts(now);
+      const weekday = parts.find(p => p.type === "weekday")?.value;
+      const ch = parseInt(parts.find(p => p.type === "hour")?.value || "0");
+      const cm = parseInt(parts.find(p => p.type === "minute")?.value || "0");
+
+      if (!weekday) continue;
 
       const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
       const isWeekend = ["Sat", "Sun"].includes(weekday);
@@ -46,7 +50,6 @@ exports.sendScheduledReminders = functions.pubsub
       if (freq === "weekends" && !isWeekend) continue;
 
       const [rh, rm] = reminder.time.split(":").map(Number);
-      const [ch, cm] = timePart.split(":").map(Number);
       const reminderMinutes = rh * 60 + rm;
       const currentMinutes = ch * 60 + cm;
       const windowStart = Math.floor(currentMinutes / 15) * 15;
