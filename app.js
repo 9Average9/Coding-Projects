@@ -12452,7 +12452,6 @@ function saveProfileName() {
   saveProfileData();
   updateProfileUI();
 updateProfileAttention();
-maybeShowNotificationPromptAfterProfile();
   const message = document.getElementById("profileValidationMessage");
   if (message) message.remove();
 }
@@ -12615,7 +12614,7 @@ function updateProfileUI() {
   }
 
   updateProfileAttention();
-  updateNotificationButtonUI();
+  updateReminderButtonUI();
 }
 
 async function resetAllAppData() {
@@ -13199,11 +13198,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.7.8";
+const APP_VERSION = "1.8.0";
 
 const UPDATE_NOTES = [
-  "Friends — find other learners, send friend requests, view their stats, and build your study community from the home screen",
-  "Account data now fully syncs across devices — theme color, lesson progress, quiz scores, and all settings follow you when you log in on a new device"
+  "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
+  "Encourage friends — tap any friend's profile and send them a push notification to remind them to study Greek",
+  "Friends — find other learners, send friend requests, view their stats, and build your study community from the home screen"
 ];
 
 let deferredInstallPrompt = null;
@@ -13613,7 +13613,6 @@ async function submitCreateAccount() {
     updateProfileUI();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
-    maybeShowNotificationPromptAfterProfile();
   } catch (e) {
     errEl.textContent = e.message || "Something went wrong. Please try again.";
   } finally {
@@ -13673,7 +13672,7 @@ if (window.__pendingAuthResolved) {
 
 document.addEventListener("DOMContentLoaded", () => {
   registerServiceWorker();
-syncOneSignalPushState();
+  initFCMForeground();
   setTimeout(() => {
     if (shouldShowInstallModal()) {
       showInstallAppModal();
@@ -13804,173 +13803,124 @@ function completeProfileFocusIfProfileMade() {
 
 
 
-function getPushStatus() {
-  return localStorage.getItem("pushNotificationsEnabled") === "true";
-}
+// ── FCM Reminders ────────────────────────────────────────────────────────────
 
-function updateNotificationButtonUI() {
-  const btn = document.getElementById("profileNotificationBtn");
+function updateReminderButtonUI() {
+  const btn  = document.getElementById("profileNotificationBtn");
   const text = document.getElementById("profileNotificationBtnText");
   const icon = btn?.querySelector(".material-symbols-outlined");
-
   if (!btn || !text) return;
 
-  const enabled = getPushStatus();
-
-  text.textContent = enabled ? "Disable Study Reminders" : "Enable Study Reminders";
-  if (icon) icon.textContent = enabled ? "notifications_off" : "notifications";
+  const enabled = localStorage.getItem("reminderEnabled") === "true";
+  text.textContent = enabled ? "Reminders On" : "Set Reminders";
+  if (icon) icon.textContent = enabled ? "alarm_on" : "alarm";
   btn.classList.toggle("notifications-enabled", enabled);
 }
 
-function showNotificationPromptModal() {
-  document.getElementById("notificationPromptModal")?.classList.add("open");
+function openReminderModal() {
+  const modal = document.getElementById("reminderModal");
+  if (!modal) return;
+
+  const savedTime = localStorage.getItem("reminderTime") || "08:00";
+  const savedFreq = localStorage.getItem("reminderFrequency") || "daily";
+  const input = document.getElementById("reminderTimeInput");
+  if (input) input.value = savedTime;
+  const radios = modal.querySelectorAll("input[name='reminderFreq']");
+  radios.forEach(r => { r.checked = r.value === savedFreq; });
+
+  const disableBtn = document.getElementById("disableReminderBtn");
+  if (disableBtn) disableBtn.style.display = localStorage.getItem("reminderEnabled") === "true" ? "block" : "none";
+
+  modal.classList.add("open");
 }
 
-function hideNotificationPromptModal() {
-  document.getElementById("notificationPromptModal")?.classList.remove("open");
+function closeReminderModal(event) {
+  if (event && event.target?.id !== "reminderModal") return;
+  document.getElementById("reminderModal")?.classList.remove("open");
 }
 
-function closeNotificationPromptModal(event) {
-  if (event.target.id === "notificationPromptModal") {
-    hideNotificationPromptModal();
-  }
+function closeReminderModalDirect() {
+  document.getElementById("reminderModal")?.classList.remove("open");
 }
 
-function dismissNotificationPrompt() {
-  localStorage.setItem("notificationPromptDismissed", "true");
-  hideNotificationPromptModal();
-}
-
-function maybeShowNotificationPromptAfterProfile() {
-  const enabled = localStorage.getItem("pushNotificationsEnabled") === "true";
-  const dismissed = localStorage.getItem("notificationPromptDismissed") === "true";
-
-  if (!profileData?.isCreated) return;
-  if (enabled || dismissed) return;
-  if (!isInstalledAppMode()) return;
-
-  setTimeout(() => {
-    showNotificationPromptModal();
-  }, 600);
-}
-function openNotificationSettings() {
-  if (!isInstalledAppMode()) {
-    alert("For notifications, open the installed app from your Home Screen first.");
+async function saveReminderSettings() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) {
+    alert("Sign in to set reminders.");
     return;
   }
 
-  const enabled = getPushStatus();
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") {
+    alert("Please allow notifications in your browser or device settings to enable reminders.");
+    return;
+  }
 
-  if (enabled) {
-    disablePushNotifications();
+  const timeInput = document.getElementById("reminderTimeInput");
+  const freqRadio = document.querySelector("input[name='reminderFreq']:checked");
+  const time = timeInput?.value || "08:00";
+  const frequency = freqRadio?.value || "daily";
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const token = await window.FCM?.registerToken(user.uid);
+  if (!token) {
+    alert("Could not register this device for notifications. Make sure you are using the installed app.");
+    return;
+  }
+
+  const saved = await window.FCM?.saveReminder(user.uid, { time, frequency, timezone });
+  if (!saved) {
+    alert("Could not save reminder. Please try again.");
+    return;
+  }
+
+  localStorage.setItem("reminderEnabled", "true");
+  localStorage.setItem("reminderTime", time);
+  localStorage.setItem("reminderFrequency", frequency);
+
+  closeReminderModalDirect();
+  updateReminderButtonUI();
+  alert(`Reminder set for ${time} (${frequency})!`);
+}
+
+async function disableReminders() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) return;
+  if (!confirm("Disable Greek study reminders?")) return;
+
+  const token = localStorage.getItem("fcmToken");
+  if (token) await window.FCM?.removeToken(user.uid, token);
+  await window.FCM?.disableReminder(user.uid);
+
+  localStorage.setItem("reminderEnabled", "false");
+  localStorage.removeItem("reminderTime");
+  localStorage.removeItem("reminderFrequency");
+
+  closeReminderModalDirect();
+  updateReminderButtonUI();
+  alert("Reminders disabled.");
+}
+
+function initFCMForeground() {
+  window.FCM?.listenForeground(payload => {
+    const title = payload.notification?.title || "Basic Greek Trainer";
+    const body  = payload.notification?.body  || "Time to study Greek!";
+    if (Notification.permission === "granted") {
+      new Notification(title, { body, icon: "./icon-192.png" });
+    }
+  });
+}
+
+async function sendEncouragementToFriend(uid, displayName) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  const myName = localStorage.getItem("authDisplayName") || "A friend";
+  const ok = await window.FCM?.sendEncouragement(me.uid, myName, uid);
+  if (ok) {
+    alert(`Encouragement sent to ${displayName}!`);
   } else {
-    showNotificationPromptModal();
+    alert("Could not send encouragement. Try again.");
   }
-}
-
-
-async function disablePushNotifications() {
-  if (!window.OneSignalDeferred) {
-    alert("Notifications are still loading.");
-    return;
-  }
-
-  const confirmed = confirm(
-    "Disable Greek study reminders and notifications?"
-  );
-
-  if (!confirmed) return;
-
-  window.OneSignalDeferred.push(async function (OneSignal) {
-    try {
-      await OneSignal.User.PushSubscription.optOut();
-
-      localStorage.setItem("pushNotificationsEnabled", "false");
-
-      updateNotificationButtonUI();
-
-      alert("Study reminders disabled.");
-    } catch (error) {
-      console.error(error);
-      alert("Could not disable notifications.");
-    }
-  });
-}
-
-
-async function enablePushNotifications() {
-  if (!isInstalledAppMode()) {
-    alert("For notifications, open the installed app from your Home Screen first.");
-    return;
-  }
-
-  if (!window.OneSignalDeferred) {
-    alert("Notifications are still loading. Try again in a moment.");
-    return;
-  }
-
-  window.OneSignalDeferred.push(async function (OneSignal) {
-    try {
-      await OneSignal.Notifications.requestPermission();
-
-      const permission = OneSignal.Notifications.permission;
-
-      if (permission !== true) {
-        localStorage.setItem("pushNotificationsEnabled", "false");
-        updateNotificationButtonUI();
-        alert("Notifications were not enabled.");
-        return;
-      }
-
-      await OneSignal.User.PushSubscription.optIn();
-
-      const optedIn = OneSignal.User.PushSubscription.optedIn === true;
-
-      if (optedIn) {
-        localStorage.setItem("pushNotificationsEnabled", "true");
-        localStorage.removeItem("notificationPromptDismissed");
-        hideNotificationPromptModal();
-        updateNotificationButtonUI();
-        alert("Notifications enabled!");
-      } else {
-        localStorage.setItem("pushNotificationsEnabled", "false");
-        updateNotificationButtonUI();
-        alert("Permission granted, but OneSignal subscription did not complete. Try again.");
-      }
-    } catch (error) {
-      console.error("Notification permission error:", error);
-      alert("Notifications could not be enabled on this device.");
-    }
-  });
-}
-
-function syncOneSignalPushState() {
-  if (!window.OneSignalDeferred) return;
-
-  window.OneSignalDeferred.push(function (OneSignal) {
-    try {
-      const permission = OneSignal.Notifications.permission === true;
-      const optedIn = OneSignal.User.PushSubscription.optedIn === true;
-
-      const enabled = permission && optedIn;
-
-      localStorage.setItem("pushNotificationsEnabled", enabled ? "true" : "false");
-      updateNotificationButtonUI();
-
-      OneSignal.User.PushSubscription.addEventListener("change", function (event) {
-        const nowEnabled =
-          OneSignal.Notifications.permission === true &&
-          event.current.optedIn === true;
-
-        localStorage.setItem("pushNotificationsEnabled", nowEnabled ? "true" : "false");
-        updateNotificationButtonUI();
-
-        console.log("OneSignal subscription changed:", event.current);
-      });
-    } catch (error) {
-      console.warn("Could not sync OneSignal push state:", error);
-    }
-  });
 }
 
 (function () {
@@ -14664,9 +14614,11 @@ async function showFriendSheet(uid) {
   `;
 
   const status = _frStatus(uid);
+  const friendName = u.displayName || u.username || "your friend";
   let actHTML = "";
   if (status === "friend") {
-    actHTML = `<button class="fr-sheet-btn fr-sheet-remove" onclick="removeFriendAction('${uid}');closeFriendSheet()">Remove Friend</button>`;
+    actHTML = `<button class="fr-sheet-btn fr-sheet-encourage" onclick="sendEncouragementToFriend('${uid}', '${friendName.replace(/'/g, "\\'")}')"><span class="material-symbols-outlined">notifications_active</span> Encourage to Study</button>
+               <button class="fr-sheet-btn fr-sheet-remove" onclick="removeFriendAction('${uid}');closeFriendSheet()">Remove Friend</button>`;
   } else if (status === "outgoing") {
     actHTML = `<button class="fr-sheet-btn fr-sheet-pending" disabled>Request Sent</button>
                <button class="fr-sheet-cancel" onclick="cancelRequestAction('${uid}');closeFriendSheet()">Cancel Request</button>`;

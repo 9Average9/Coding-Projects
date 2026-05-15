@@ -1,13 +1,35 @@
-importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-const CACHE_NAME = "basic-greek-trainer-v1.7.9";
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
+
+firebase.initializeApp({
+  apiKey: "AIzaSyDVWKRCtjg7ppR-D8ZNs-TfSwPlWdXXQ5Q",
+  authDomain: "greek-vocab-leaderboard.firebaseapp.com",
+  projectId: "greek-vocab-leaderboard",
+  storageBucket: "greek-vocab-leaderboard.firebasestorage.app",
+  messagingSenderId: "473409624300",
+  appId: "1:473409624300:web:8288c792af4f3c32586dc9"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(function (payload) {
+  const title = payload.notification?.title || "Basic Greek Trainer";
+  const body  = payload.notification?.body  || "Time to study Greek!";
+  self.registration.showNotification(title, {
+    body,
+    icon: "./icon-192.png"
+  });
+});
+
+const CACHE_NAME = "basic-greek-trainer-v1.8.0";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=96",
+  "./style.css?v=97",
   "./vocab.js?v=89",
-  "./app.js?v=96",
-  "./firebase-lb.js?v=89",
+  "./app.js?v=97",
+  "./firebase-lb.js?v=90",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"
@@ -43,11 +65,12 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Let OneSignal handle its own requests
+  // Let Firebase and external CDN requests pass through
   if (
-    event.request.url.includes("onesignal") ||
-    event.request.url.includes("os.tc") ||
-    event.request.url.includes("cdn.onesignal.com")
+    event.request.url.includes("firebaseapp.com") ||
+    event.request.url.includes("googleapis.com") ||
+    event.request.url.includes("gstatic.com") ||
+    event.request.url.includes("fcmregistrations.googleapis.com")
   ) {
     return;
   }

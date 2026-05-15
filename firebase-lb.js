@@ -25,6 +25,12 @@ import {
   deleteUser,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+  getMessaging,
+  getToken,
+  onMessage
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
+import { addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVWKRCtjg7ppR-D8ZNs-TfSwPlWdXXQ5Q",
@@ -38,6 +44,7 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
 const auth = getAuth(fbApp);
+const messaging = getMessaging(fbApp);
 
 const EMAIL_DOMAIN = "@greek-vocab.app";
 
@@ -402,6 +409,91 @@ window.Friends = {
   acceptRequest:  frAcceptRequest,
   declineRequest: frDeclineRequest,
   removeFriend:   frRemoveFriend
+};
+
+// ── FCM ───────────────────────────────────────────────────────────────────────
+
+const FCM_VAPID_KEY = "BDOeDKo0NmW6-kMwJB9noey7YK1u3raQ5NUvfFhv9kguPXDZfJirp5-ilbwwMCm9_0_hQ_EkiQktFe4f2pLl5VU";
+
+async function fcmRegisterToken(uid) {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const token = await getToken(messaging, {
+      vapidKey: FCM_VAPID_KEY,
+      serviceWorkerRegistration: reg
+    });
+    if (token) {
+      await updateDoc(doc(db, "users", uid), { fcmTokens: arrayUnion(token) });
+      localStorage.setItem("fcmToken", token);
+    }
+    return token || null;
+  } catch (e) {
+    console.warn("fcmRegisterToken:", e);
+    return null;
+  }
+}
+
+async function fcmRemoveToken(uid, token) {
+  try {
+    await updateDoc(doc(db, "users", uid), { fcmTokens: arrayRemove(token) });
+    localStorage.removeItem("fcmToken");
+  } catch (e) {
+    console.warn("fcmRemoveToken:", e);
+  }
+}
+
+async function fcmSaveReminder(uid, { time, frequency, timezone }) {
+  try {
+    await setDoc(doc(db, "users", uid), {
+      reminder: { enabled: true, time, frequency, timezone, lastSent: null },
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return true;
+  } catch (e) {
+    console.warn("fcmSaveReminder:", e);
+    return false;
+  }
+}
+
+async function fcmDisableReminder(uid) {
+  try {
+    await setDoc(doc(db, "users", uid), {
+      reminder: { enabled: false },
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return true;
+  } catch (e) {
+    console.warn("fcmDisableReminder:", e);
+    return false;
+  }
+}
+
+async function fcmSendEncouragement(fromUid, fromName, toUid) {
+  try {
+    await addDoc(collection(db, "encouragements", toUid, "messages"), {
+      fromName,
+      fromUid,
+      processed: false,
+      createdAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) {
+    console.warn("fcmSendEncouragement:", e);
+    return false;
+  }
+}
+
+function fcmListenForeground(callback) {
+  onMessage(messaging, callback);
+}
+
+window.FCM = {
+  registerToken:     fcmRegisterToken,
+  removeToken:       fcmRemoveToken,
+  saveReminder:      fcmSaveReminder,
+  disableReminder:   fcmDisableReminder,
+  sendEncouragement: fcmSendEncouragement,
+  listenForeground:  fcmListenForeground
 };
 
 window.LB = {

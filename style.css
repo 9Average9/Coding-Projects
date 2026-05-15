@@ -10521,3 +10521,68 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   cursor: pointer;
   text-align: center;
 }
+.fr-sheet-encourage {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+}
+
+/* ── Reminder Modal ────────────────────────────────────────────────────────── */
+.reminder-modal-card { max-width: 360px; }
+.reminder-modal-card h2 { margin-bottom: 8px; }
+.reminder-modal-card p { font-size: 0.95rem; opacity: 0.75; margin-bottom: 20px; }
+.reminder-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.reminder-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.reminder-time-input {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--font-color) 18%, transparent);
+  background: color-mix(in srgb, var(--font-color) 5%, transparent);
+  color: var(--font-color);
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 100%;
+  box-sizing: border-box;
+}
+.reminder-time-input:focus {
+  outline: none;
+  border-color: var(--accent-color, #c9a227);
+}
+.reminder-freq-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.reminder-freq-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--font-color) 18%, transparent);
+  background: color-mix(in srgb, var(--font-color) 4%, transparent);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.15s, background 0.15s;
+  flex: 1;
+  min-width: 90px;
+  justify-content: center;
+}
+.reminder-freq-opt input[type="radio"] { display: none; }
+.reminder-freq-opt:has(input:checked) {
+  border-color: var(--accent-color, #c9a227);
+  background: color-mix(in srgb, var(--accent-color, #c9a227) 12%, transparent);
+  color: var(--accent-color, #c9a227);
+}
+.notifications-enabled .material-symbols-outlined { color: #16a34a; }
