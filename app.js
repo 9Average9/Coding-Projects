@@ -13198,11 +13198,12 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.8.0";
+const APP_VERSION = "1.8.2";
 
 const UPDATE_NOTES = [
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
   "Encourage friends — tap any friend's profile and send them a push notification to remind them to study Greek",
+  "Friend request notifications — get a push when someone sends or accepts your friend request",
   "Friends — find other learners, send friend requests, view their stats, and build your study community from the home screen"
 ];
 
