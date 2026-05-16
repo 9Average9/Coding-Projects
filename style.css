@@ -8111,48 +8111,6 @@ button[onclick="showInstallSteps('iphone')"]::after {
   color: white !important;
   border-color: var(--profile-color) !important;
 }
-.theme-preset.moss span {
-  background: #556b4f;
-}
-
-.theme-preset.storm span {
-  background: #4b5563;
-}
-
-.theme-preset.coffee span {
-  background: #6f4e37;
-}
-
-.theme-preset.forest span {
-  background: #2f5d50;
-}
-
-.theme-preset.obsidian span {
-  background: #d4a93a;
-}
-
-.theme-preset.wine span {
-  background: #7a1f3d;
-}
-
-.theme-preset.ocean span {
-  background: #1f4f6b;
-}
-
-.theme-preset.charcoal span {
-  background: #9ca3af;
-}
-
-.theme-preset.antique span {
-  background: #70543e;
-}
-
-.theme-preset.glacier span {
-  background: #3b6b8c;
-}
-
-
-
 .modal-card.has-scroll-fade {
   padding-bottom: 0 !important;
 }
@@ -11751,10 +11709,10 @@ body .app:has(#settingsScreen.screen.active) {
   font-size: 1.2rem !important;
   color: var(--secondary-color) !important;
   margin-left: auto;
-  display: none;
+  display: none !important;
   flex-shrink: 0;
 }
-.theme-preset.selected .sett-theme-check { display: block; }
+.theme-preset.selected .sett-theme-check { display: block !important; }
 
 /* Collapse content inside sett-card */
 .sett-collapse-content {
@@ -11776,4 +11734,59 @@ body .app:has(#settingsScreen.screen.active) {
   align-self: flex-start;
   padding: 9px 18px;
   font-size: 0.85rem;
+}
+
+/* ══ Profile menu action card (Settings / Reminders / Sign Out) ══════════ */
+.prof-menu-card {
+  background: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 14px 0 0;
+}
+.prof-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 16px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.prof-menu-row:active { background: color-mix(in srgb, var(--border-color) 60%, transparent); }
+.prof-menu-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--profile-color, #4f8cff) 14%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.prof-menu-icon-wrap .material-symbols-outlined {
+  font-size: 1.25rem !important;
+  color: var(--profile-color, #4f8cff) !important;
+}
+.prof-menu-name {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--font-color);
+}
+.prof-menu-chev {
+  font-size: 1.3rem !important;
+  color: var(--muted-color) !important;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+.prof-menu-sep {
+  height: 1px;
+  background: var(--border-color);
+  opacity: 0.5;
+  margin: 0 16px;
 }
