@@ -10827,14 +10827,16 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   background: var(--primary-light);
   padding: 0 !important;
   opacity: 0;
+  transform: translateY(100%);
   pointer-events: none;
-  transition: opacity 0.22s ease;
+  transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: none;
 }
 .rhema-modal-overlay.open {
   opacity: 1;
+  transform: translateY(0);
   pointer-events: all;
 }
 
