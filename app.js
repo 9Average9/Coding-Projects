@@ -14740,8 +14740,10 @@ let _rhemaVerse = '16';
 let _rhemaShowKjv = false;
 let _rhemaActiveTab = 'parsing';
 let _rhemaActiveWord = null;
-let _rhemaHistory = [];
+let _rhemaTrail = [];       // full cross-ref trail — never auto-shrinks
+let _rhemaTrailPos = -1;   // cursor into trail (-1 = at tip, not in trail)
 let _rhemaHighlightStrongs = null;
+let _rhemaSavedScrollY = 0;
 
 const RHEMA_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
 
@@ -14906,7 +14908,10 @@ async function showRhema() {
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  _rhemaSavedScrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${_rhemaSavedScrollY}px`;
+  document.body.style.width = '100%';
 
   const loading = document.getElementById('rhemaLoadingMsg');
   const hint    = document.getElementById('rhemaTapHint');
@@ -14927,18 +14932,30 @@ async function showRhema() {
 function closeRhema() {
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
-  document.body.style.overflow = '';
-  _rhemaHistory = [];
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, _rhemaSavedScrollY);
+  _rhemaTrail = [];
+  _rhemaTrailPos = -1;
   _rhemaHighlightStrongs = null;
   updateRhemaBreadcrumb();
 }
 
 function rhemaGoBack() {
-  if (_rhemaHistory.length === 0) { closeRhema(); return; }
-  const prev = _rhemaHistory.pop();
-  _rhemaBook = prev.book;
-  _rhemaChapter = prev.chapter;
-  _rhemaVerse = prev.verse;
+  if (_rhemaTrail.length === 0) { closeRhema(); return; }
+  // Move cursor back without removing any items
+  if (_rhemaTrailPos === -1) {
+    _rhemaTrailPos = _rhemaTrail.length - 1;
+  } else if (_rhemaTrailPos > 0) {
+    _rhemaTrailPos--;
+  } else {
+    closeRhema(); return;
+  }
+  const target = _rhemaTrail[_rhemaTrailPos];
+  _rhemaBook = target.book;
+  _rhemaChapter = target.chapter;
+  _rhemaVerse = target.verse;
   _rhemaHighlightStrongs = null;
   closeRhemaSheet();
   syncRhemaPicker();
@@ -15100,7 +15117,12 @@ function rhemaNextVerse() {
 // ── Cross-reference jumping ───────────────────────────────────────────────────
 
 function jumpToRhemaVerse(book, chapter, verse, highlightStrongs) {
-  _rhemaHistory.push({ book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse });
+  // First jump: also record the origin verse so the trail starts from the beginning
+  if (_rhemaTrail.length === 0) {
+    _rhemaTrail.push({ book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse });
+  }
+  _rhemaTrail.push({ book, chapter: String(chapter), verse: String(verse) });
+  _rhemaTrailPos = _rhemaTrail.length - 1;
   _rhemaBook = book;
   _rhemaChapter = String(chapter);
   _rhemaVerse = String(verse);
@@ -15114,22 +15136,31 @@ function jumpToRhemaVerse(book, chapter, verse, highlightStrongs) {
 function updateRhemaBreadcrumb() {
   const el = document.getElementById('rhemaBreadcrumb');
   if (!el) return;
-  if (_rhemaHistory.length === 0) { el.classList.add('hidden'); return; }
+  if (_rhemaTrail.length === 0) { el.classList.add('hidden'); return; }
   el.classList.remove('hidden');
-  const items = _rhemaHistory.map((h, i) => {
+  const items = _rhemaTrail.map((h, i) => {
     const abbr = RHEMA_BOOK_ABBR[h.book] || h.book;
-    return `<span class="rhema-breadcrumb-item" onclick="rhemaJumpHistory(${i})">${abbr} ${h.chapter}:${h.verse}</span>`;
+    const isActive = i === _rhemaTrailPos;
+    const cls = isActive
+      ? 'rhema-breadcrumb-current rhema-breadcrumb-active'
+      : 'rhema-breadcrumb-item';
+    return isActive
+      ? `<span class="${cls}">${abbr} ${h.chapter}:${h.verse}</span>`
+      : `<span class="${cls}" onclick="rhemaJumpHistory(${i})">${abbr} ${h.chapter}:${h.verse}</span>`;
   });
-  const curAbbr = RHEMA_BOOK_ABBR[_rhemaBook] || _rhemaBook;
-  items.push(`<span class="rhema-breadcrumb-current">${curAbbr} ${_rhemaChapter}:${_rhemaVerse}</span>`);
+  // If off-trail (tip), show current verse appended
+  if (_rhemaTrailPos === -1) {
+    const curAbbr = RHEMA_BOOK_ABBR[_rhemaBook] || _rhemaBook;
+    items.push(`<span class="rhema-breadcrumb-current rhema-breadcrumb-active">${curAbbr} ${_rhemaChapter}:${_rhemaVerse}</span>`);
+  }
   el.innerHTML = items.join('<span class="rhema-breadcrumb-arrow"> › </span>') +
     `<button class="rhema-breadcrumb-clear" onclick="rhemaClearHistory()">✕ Clear</button>`;
 }
 
 function rhemaJumpHistory(idx) {
-  const target = _rhemaHistory[idx];
+  const target = _rhemaTrail[idx];
   if (!target) return;
-  _rhemaHistory = _rhemaHistory.slice(0, idx);
+  _rhemaTrailPos = idx;
   _rhemaBook = target.book;
   _rhemaChapter = target.chapter;
   _rhemaVerse = target.verse;
@@ -15141,7 +15172,8 @@ function rhemaJumpHistory(idx) {
 }
 
 function rhemaClearHistory() {
-  _rhemaHistory = [];
+  _rhemaTrail = [];
+  _rhemaTrailPos = -1;
   _rhemaHighlightStrongs = null;
   updateRhemaBreadcrumb();
 }
@@ -15234,25 +15266,40 @@ function initRhemaSwipeDown(sheet) {
   if (!sheet || sheet._swipeInit) return;
   sheet._swipeInit = true;
   let startY = 0, currentY = 0, dragging = false;
-  const handle = sheet.querySelector('.rhema-sheet-handle');
-  const target = handle || sheet;
-  target.addEventListener('touchstart', (e) => {
+
+  // Attach to handle + sheet-top so the whole header area is a drag target
+  const handle   = sheet.querySelector('.rhema-sheet-handle');
+  const sheetTop = sheet.querySelector('.rhema-sheet-top');
+  const targets  = [handle, sheetTop].filter(Boolean);
+
+  const onStart = (e) => {
     startY = e.touches[0].clientY;
+    currentY = startY;
     dragging = true;
     sheet.style.transition = 'none';
-  }, { passive: true });
-  target.addEventListener('touchmove', (e) => {
+  };
+  const onMove = (e) => {
     if (!dragging) return;
     currentY = e.touches[0].clientY;
-    sheet.style.transform = `translateY(${Math.max(0, currentY - startY)}px)`;
-  }, { passive: true });
-  target.addEventListener('touchend', () => {
+    const dy = currentY - startY;
+    if (dy > 0) {
+      e.preventDefault(); // block browser scroll during downward drag
+      sheet.style.transform = `translateY(${dy}px)`;
+    }
+  };
+  const onEnd = () => {
     if (!dragging) return;
     dragging = false;
     sheet.style.transition = '';
     if (currentY - startY > 80) { sheet.style.transform = ''; closeRhemaSheet(); }
     else sheet.style.transform = '';
-  });
+  };
+
+  for (const t of targets) {
+    t.addEventListener('touchstart', onStart, { passive: true });
+    t.addEventListener('touchmove',  onMove,  { passive: false });
+    t.addEventListener('touchend',   onEnd);
+  }
 }
 
 function showRhemaTab(tab, word) {

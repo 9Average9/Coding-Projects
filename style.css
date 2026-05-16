@@ -10648,7 +10648,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   transition: opacity 0.22s ease;
   overflow: hidden;
   overscroll-behavior: contain;
-  touch-action: pan-y;
 }
 .rhema-modal-overlay.open {
   opacity: 1;
@@ -10694,7 +10693,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   font-weight: 500;
   letter-spacing: 0.1em;
   color: var(--muted-color);
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .rhema-swap-btn {
@@ -10808,6 +10807,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   align-items: center;
   flex-wrap: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
   gap: 2px;
   padding: 6px 14px;
   background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
@@ -10815,6 +10816,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   font-size: 0.71rem;
   flex-shrink: 0;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 .rhema-breadcrumb::-webkit-scrollbar { display: none; }
 .rhema-breadcrumb.hidden { display: none; }
@@ -10833,6 +10835,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--muted-color);
   white-space: nowrap;
   padding: 2px 4px;
+}
+.rhema-breadcrumb-active {
+  font-weight: 800;
+  color: var(--secondary-color) !important;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  border-radius: 6px;
 }
 .rhema-breadcrumb-clear {
   margin-left: auto;
@@ -11011,6 +11019,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   margin: 12px auto 8px;
   flex-shrink: 0;
   cursor: grab;
+  touch-action: none;
 }
 
 .rhema-sheet-top {
