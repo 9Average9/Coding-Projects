@@ -10647,6 +10647,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   pointer-events: none;
   transition: opacity 0.22s ease;
   overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 .rhema-modal-overlay.open {
   opacity: 1;
@@ -10799,6 +10801,167 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex-shrink: 0;
 }
 .rhema-tap-hint.hidden { display: none; }
+
+/* ── Breadcrumb trail ── */
+.rhema-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 2px;
+  padding: 6px 14px;
+  background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+  font-size: 0.71rem;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.rhema-breadcrumb::-webkit-scrollbar { display: none; }
+.rhema-breadcrumb.hidden { display: none; }
+.rhema-breadcrumb-item {
+  color: var(--secondary-color);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+.rhema-breadcrumb-item:active { opacity: 0.6; }
+.rhema-breadcrumb-arrow { color: var(--muted-color); opacity: 0.5; }
+.rhema-breadcrumb-current {
+  font-weight: 500;
+  color: var(--muted-color);
+  white-space: nowrap;
+  padding: 2px 4px;
+}
+.rhema-breadcrumb-clear {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 0.67rem;
+  color: var(--muted-color);
+  cursor: pointer;
+}
+
+/* ── Verse nav bar ── */
+.rhema-verse-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  flex-shrink: 0;
+}
+.rhema-verse-nav.hidden { display: none; }
+.rhema-nav-btn {
+  background: color-mix(in srgb, var(--card-color) 55%, transparent);
+  border: 1.5px solid var(--border-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--font-color);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+.rhema-nav-btn:active {
+  background: color-mix(in srgb, var(--secondary-color) 20%, transparent);
+}
+.rhema-nav-btn .material-symbols-outlined { font-size: 1.35rem; }
+.rhema-verse-ref {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted-color);
+  opacity: 0.75;
+  text-align: center;
+  flex: 1;
+  padding: 0 8px;
+}
+
+/* ── Cross-reference word highlight ── */
+.rhema-word.xref {
+  background: color-mix(in srgb, var(--accent-color) 25%, transparent);
+  border-radius: 6px;
+  animation: xrefPulse 0.55s ease forwards;
+}
+@keyframes xrefPulse {
+  0%   { background: color-mix(in srgb, var(--accent-color) 55%, transparent); }
+  100% { background: color-mix(in srgb, var(--accent-color) 25%, transparent); }
+}
+
+/* ── Tappable occ rows ── */
+.rhema-occ-row.tappable {
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 0 -8px;
+  padding: 7px 8px;
+  transition: background 0.12s;
+}
+.rhema-occ-row.tappable:active {
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+}
+
+/* ── Cross-ref verse list ── */
+.rhema-xref-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.rhema-xref-back-btn {
+  background: none;
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--font-color);
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.rhema-xref-back-btn:active { opacity: 0.6; }
+.rhema-xref-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--font-color);
+}
+.rhema-xref-verse-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+  transition: background 0.12s;
+}
+.rhema-xref-verse-row:active {
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+}
+.rhema-xref-verse-ref {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  min-width: 48px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.rhema-xref-verse-text {
+  font-size: 0.82rem;
+  color: var(--muted-color);
+  line-height: 1.55;
+}
+.xref-match {
+  color: var(--font-color);
+  font-weight: 700;
+}
 
 /* ── Bottom sheet ── */
 .rhema-sheet-backdrop {
