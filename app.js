@@ -13196,9 +13196,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 
 const UPDATE_NOTES = [
+  "Rhēma word highlight — the cross-reference word stays highlighted as you flip through verses; only clears when you press Clear",
+  "Rhēma layout — verse nav sits right below the last word row instead of floating at the bottom of a fixed-height area",
   "Rhēma occurrences — KJV button in the book verse list switches all preview snippets to English with the matching word bolded",
   "Rhēma interlinear — structured 4-column grid with English gloss under each Greek word; tap 'Just Greek' to instantly switch back to clean flowing Greek text",
   "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
@@ -15117,7 +15119,6 @@ function rhemaPrevVerse() {
       _rhemaVerse = prevVerses[prevVerses.length - 1];
     } else return;
   }
-  _rhemaHighlightStrongs = null;
   syncRhemaPicker();
   renderRhemaVerse();
 }
@@ -15136,7 +15137,6 @@ function rhemaNextVerse() {
       _rhemaVerse = '1';
     } else return;
   }
-  _rhemaHighlightStrongs = null;
   syncRhemaPicker();
   renderRhemaVerse();
 }

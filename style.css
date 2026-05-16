@@ -11095,22 +11095,26 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 /* ── Verse display ── */
-/* ── Stable content wrapper — flex:1 box that never changes size ── */
-.rhema-content-area {
+/* ── Scrollable body — contains content-area + verse nav in normal flow ── */
+.rhema-body {
   flex: 1;
   min-height: 0;
-  position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: none;
 }
 
-/* Loading, verse, KJV, and tap hint all live absolutely inside this box.
-   None of them affect the outer flex layout when they show or hide. */
+.rhema-content-area {
+  width: 100%;
+}
+
 .rhema-loading {
-  position: absolute;
-  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 160px;
   text-align: center;
   color: var(--muted-color);
   font-size: 0.9rem;
@@ -11118,25 +11122,18 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-verse-display {
-  position: absolute;
-  inset: 0;
-  padding: 8px 0 16px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  overscroll-behavior: none;
-  /* Interlinear 4-column grid */
+  width: 100%;
+  padding: 16px 0 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-content: start;
   column-gap: 0;
   row-gap: 20px;
 }
-/* Greek-only mode: flowing inline text, exactly as before interlinear was added */
+/* Greek-only mode: flowing inline text */
 .rhema-verse-display.greek-only {
   display: block;
-  padding: 24px 20px 16px;
+  padding: 24px 20px 20px;
   line-height: 2.6;
   font-size: 1.3rem;
   letter-spacing: 0.03em;
@@ -11208,14 +11205,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-kjv-display {
-  flex: 1;
-  min-height: 0;
-  padding: 24px 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  overscroll-behavior: none;
+  width: 100%;
+  padding: 24px 20px 20px;
   font-size: 1rem;
   line-height: 1.9;
   font-style: italic;
@@ -11322,12 +11313,10 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Verse nav bar — always in-flow so it never causes layout shifts ── */
 .rhema-verse-nav {
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
-  padding: 18px 16px calc(env(safe-area-inset-bottom, 0px) + 22px);
+  padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 22px);
   background: var(--primary-light);
   border-top: 1px solid var(--border-color);
   touch-action: none;
@@ -11339,9 +11328,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   justify-content: space-between;
   width: 100%;
 }
-/* Use visibility so the bar always occupies its space — no layout shift */
-.rhema-verse-nav.hidden { visibility: hidden; pointer-events: none; }
-/* Hide verse nav while a picker sheet is open (picker is semi-transparent) */
+.rhema-verse-nav.hidden { display: none; }
 .rhema-modal-overlay.picker-open .rhema-verse-nav { visibility: hidden; pointer-events: none; }
 .rhema-nav-btn {
   background: color-mix(in srgb, var(--card-color) 55%, transparent);
