@@ -13196,13 +13196,13 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.4";
+const APP_VERSION = "1.9.5";
 
 const UPDATE_NOTES = [
-  "Rhēma fixes — word study screen slides up cleanly, verse text now scrolls, and the word detail sheet no longer ghosts at the bottom",
-  "Swipe to close pickers — drag the book, chapter, or verse picker downward to dismiss it",
-  "Cleaner settings — theme selector rows and Reminders button now match the rest of the settings style",
-  "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile"
+  "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
+  "Rhēma fixes — word study screen slides up cleanly and verse text now scrolls",
+  "Cleaner settings — no more tan background, theme rows look clean, Reminders button matches the style",
+  "Study reminders — set a daily push notification at any time you choose right from your profile"
 ];
 
 let deferredInstallPrompt = null;
@@ -14923,6 +14923,7 @@ async function showRhema() {
 function closeRhema() {
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
+  closeRhemaPickerSheet();
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.width = '';

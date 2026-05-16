@@ -6214,13 +6214,7 @@ body #settingsScreen * {
 
 /* Main screen */
 body #settingsScreen.screen.active {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--profile-color, #4f8cff) 12%, var(--primary-color)),
-      var(--primary-light)
-    ) !important;
-
+  background: var(--primary-light) !important;
   color: var(--font-color) !important;
 }
 
@@ -6297,8 +6291,17 @@ body #settingsScreen .collapse-btn:hover {
     !important;
 }
 
-/* Theme buttons */
-body #settingsScreen .theme-preset {
+/* Theme buttons — strip card styles from the new list-row design */
+body #settingsScreen .sett-theme-row.theme-preset {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 14px 16px !important;
+}
+
+/* Old grid-style theme buttons (not used in settings any more, kept for safety) */
+body #settingsScreen .theme-preset:not(.sett-theme-row) {
   padding: 14px 16px !important;
 }
 
@@ -6420,7 +6423,7 @@ body:not(.home-active) {
   align-items: center !important;
   justify-content: center !important;
 }
-.home-nav-btn .material-symbols-outlined { font-size: 28px !important; color: var(--secondary-color) !important; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 28 !important; }
+.home-nav-btn .material-symbols-outlined { font-size: 32px !important; color: var(--secondary-color) !important; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 32 !important; }
 
 /* Hero text block */
 .home-hero {
@@ -6465,7 +6468,7 @@ body:not(.home-active) {
   border: none;
   border-radius: 22px;
   padding: 22px 20px;
-  margin: 0;
+  margin: 0 0 12px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   box-shadow: 0 6px 24px rgba(0,0,0,0.16);
@@ -8214,7 +8217,13 @@ body.dark button.continue-learning-btn {
 #profileNotificationBtn {
   transition: transform 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
-
+/* Use theme colour for reminder icon, not the user's profile avatar colour */
+#profileNotificationBtn .prof-menu-icon-wrap {
+  background: color-mix(in srgb, var(--secondary-color) 14%, transparent) !important;
+}
+#profileNotificationBtn .prof-menu-icon-wrap .material-symbols-outlined {
+  color: var(--secondary-color) !important;
+}
 #profileNotificationBtn.notifications-enabled .material-symbols-outlined {
   color: #16a34a !important;
 }
@@ -10934,12 +10943,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Picker overlay backdrop ── */
 .rhema-picker-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  z-index: 150;
+  z-index: 1050;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -11088,7 +11097,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-verse-display {
   flex: 1;
   min-height: 0;
-  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  padding: 24px 20px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   line-height: 2.6;
@@ -11114,7 +11123,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-kjv-display {
   flex: 1;
   min-height: 0;
-  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  padding: 24px 20px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   font-size: 1rem;
@@ -11123,17 +11132,14 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--muted-color);
 }
 
-/* Tap hint + nav bar are pinned to the bottom */
+/* Tap hint sits in-flow between verse display and verse nav */
 .rhema-tap-hint {
-  position: absolute;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   text-align: center;
   font-size: 0.75rem;
   color: var(--muted-color);
   opacity: 0.55;
-  padding: 0 20px;
+  padding: 6px 20px 4px;
   margin: 0;
   pointer-events: none;
 }
@@ -11217,17 +11223,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   cursor: pointer;
 }
 
-/* ── Verse nav bar — pinned to bottom ── */
+/* ── Verse nav bar — flex child, sits at the natural bottom of the column ── */
 .rhema-verse-nav {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
   background: var(--primary-light);
+  border-top: 1px solid var(--border-color);
 }
 .rhema-verse-nav.hidden { display: none; }
 .rhema-nav-btn {
@@ -11340,7 +11344,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Bottom sheet ── */
 .rhema-sheet-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(2px);
@@ -11348,7 +11352,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s;
-  z-index: 100;
+  z-index: 1050;
 }
 .rhema-sheet-backdrop.visible {
   opacity: 1;
@@ -11356,7 +11360,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-sheet {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
@@ -11364,9 +11368,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-radius: 22px 22px 0 0;
   box-shadow: 0 -6px 40px rgba(0,0,0,0.18);
   border-top: 1.5px solid var(--border-color);
-  z-index: 101;
+  z-index: 1051;
   transform: translateY(100%);
-  /* delay visibility change until slide-out finishes; avoids iOS overflow:hidden bleed */
   visibility: hidden;
   transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1),
               visibility 0s linear 0.32s;
@@ -11380,7 +11383,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-sheet.open {
   transform: translateY(0);
   visibility: visible;
-  /* no delay on visibility when opening */
   transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1),
               visibility 0s linear 0s;
 }
