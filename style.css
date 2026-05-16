@@ -10804,22 +10804,41 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 /* ── Breadcrumb trail ── */
 .rhema-breadcrumb {
   display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  max-width: 100%;
-  gap: 2px;
-  padding: 6px 14px;
+  align-items: stretch;
+  gap: 8px;
+  padding: 0 14px 0 14px;
   background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
   font-size: 0.71rem;
   flex-shrink: 0;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
 }
-.rhema-breadcrumb::-webkit-scrollbar { display: none; }
 .rhema-breadcrumb.hidden { display: none; }
+
+/* scrollable trail portion — items scroll, Clear stays pinned */
+.rhema-breadcrumb-scroll {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 0 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary-color) transparent;
+}
+.rhema-breadcrumb-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+.rhema-breadcrumb-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rhema-breadcrumb-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--secondary-color) 55%, transparent);
+  border-radius: 2px;
+}
+
 .rhema-breadcrumb-item {
   color: var(--secondary-color);
   font-weight: 700;
@@ -10827,14 +10846,20 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   white-space: nowrap;
   padding: 2px 4px;
   border-radius: 6px;
+  flex-shrink: 0;
 }
 .rhema-breadcrumb-item:active { opacity: 0.6; }
-.rhema-breadcrumb-arrow { color: var(--muted-color); opacity: 0.5; }
+.rhema-breadcrumb-arrow {
+  color: var(--muted-color);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
 .rhema-breadcrumb-current {
   font-weight: 500;
   color: var(--muted-color);
   white-space: nowrap;
   padding: 2px 4px;
+  flex-shrink: 0;
 }
 .rhema-breadcrumb-active {
   font-weight: 800;
@@ -10843,12 +10868,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-radius: 6px;
 }
 .rhema-breadcrumb-clear {
-  margin-left: auto;
   flex-shrink: 0;
+  align-self: center;
   background: none;
   border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
   border-radius: 8px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   font-size: 0.67rem;
   color: var(--muted-color);
   cursor: pointer;
@@ -10973,7 +10998,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Bottom sheet ── */
 .rhema-sheet-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(2px);
@@ -10989,7 +11014,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-sheet {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;

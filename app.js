@@ -15138,6 +15138,7 @@ function updateRhemaBreadcrumb() {
   if (!el) return;
   if (_rhemaTrail.length === 0) { el.classList.add('hidden'); return; }
   el.classList.remove('hidden');
+
   const items = _rhemaTrail.map((h, i) => {
     const abbr = RHEMA_BOOK_ABBR[h.book] || h.book;
     const isActive = i === _rhemaTrailPos;
@@ -15148,13 +15149,20 @@ function updateRhemaBreadcrumb() {
       ? `<span class="${cls}">${abbr} ${h.chapter}:${h.verse}</span>`
       : `<span class="${cls}" onclick="rhemaJumpHistory(${i})">${abbr} ${h.chapter}:${h.verse}</span>`;
   });
-  // If off-trail (tip), show current verse appended
   if (_rhemaTrailPos === -1) {
     const curAbbr = RHEMA_BOOK_ABBR[_rhemaBook] || _rhemaBook;
     items.push(`<span class="rhema-breadcrumb-current rhema-breadcrumb-active">${curAbbr} ${_rhemaChapter}:${_rhemaVerse}</span>`);
   }
-  el.innerHTML = items.join('<span class="rhema-breadcrumb-arrow"> › </span>') +
+
+  el.innerHTML =
+    `<div class="rhema-breadcrumb-scroll">${items.join('<span class="rhema-breadcrumb-arrow"> › </span>')}</div>` +
     `<button class="rhema-breadcrumb-clear" onclick="rhemaClearHistory()">✕ Clear</button>`;
+
+  // Scroll to show the active/current item
+  requestAnimationFrame(() => {
+    const scroll = el.querySelector('.rhema-breadcrumb-scroll');
+    if (scroll) scroll.scrollLeft = scroll.scrollWidth;
+  });
 }
 
 function rhemaJumpHistory(idx) {
