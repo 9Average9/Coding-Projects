@@ -10783,39 +10783,184 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--btn-text-color);
 }
 
-/* ── Verse picker ── */
+/* ── Verse picker pills ── */
 .rhema-picker {
   display: flex;
   gap: 8px;
-  padding: 12px 16px;
-  background: color-mix(in srgb, var(--card-color) 70%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+  padding: 10px 14px;
+  background: var(--card-color);
+  border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
-.rhema-sel {
+.rhema-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   flex: 1;
   min-width: 0;
+  background: var(--primary-color);
   border: 1.5px solid var(--border-color);
   border-radius: 12px;
-  padding: 8px 6px;
+  padding: 8px 10px;
   font-size: 0.82rem;
   font-weight: 600;
-  background: var(--card-color);
   color: var(--font-color);
-  appearance: none;
-  -webkit-appearance: none;
-  text-align: center;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.rhema-sel:focus {
+.rhema-pill:first-child { flex: 2.2; }
+.rhema-pill:active { background: var(--border-color); }
+.rhema-pill-icon { font-size: 1rem; color: var(--secondary-color); flex-shrink: 0; }
+.rhema-pill-chev { font-size: 1rem; color: var(--muted-color); flex-shrink: 0; margin-left: auto; }
+
+/* ── Picker overlay backdrop ── */
+.rhema-picker-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.rhema-picker-overlay.hidden { display: none; }
+
+/* ── Picker sheet (slides from bottom) ── */
+.rhema-picker-sheet {
+  background: var(--card-color);
+  border-radius: 22px 22px 0 0;
+  border-top: 1.5px solid var(--border-color);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.rhema-picker-sheet--grid {
+  max-height: 62vh;
+}
+
+.rhema-picker-handle {
+  width: 36px;
+  height: 4px;
+  background: color-mix(in srgb, var(--muted-color) 35%, transparent);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+.rhema-picker-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+  flex-shrink: 0;
+}
+.rhema-picker-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--font-color);
+}
+.rhema-picker-x {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--muted-color);
+  cursor: pointer;
+  padding: 2px 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Book search bar ── */
+.rhema-picker-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 10px;
+  background: var(--primary-color);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+.rhema-picker-search-icon { font-size: 1.1rem; color: var(--muted-color); }
+.rhema-picker-search-input {
+  flex: 1;
+  background: none;
+  border: none;
   outline: none;
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color) 20%, transparent);
+  font-size: 0.9rem;
+  color: var(--font-color);
 }
-.rhema-sel:first-child { flex: 2; }
+.rhema-picker-search-input::placeholder { color: var(--muted-color); opacity: 0.7; }
+
+/* ── Book list ── */
+.rhema-book-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.rhema-book-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+  transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.rhema-book-row:active { background: var(--primary-color); }
+.rhema-book-row.selected {
+  background: color-mix(in srgb, var(--secondary-color) 9%, transparent);
+}
+.rhema-book-icon { font-size: 1.1rem; color: var(--muted-color); flex-shrink: 0; }
+.rhema-book-row.selected .rhema-book-icon { color: var(--secondary-color); }
+.rhema-book-name { flex: 1; font-size: 0.95rem; font-weight: 600; color: var(--font-color); }
+.rhema-book-row.selected .rhema-book-name { color: var(--secondary-color); }
+.rhema-book-check {
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+  visibility: hidden;
+  flex-shrink: 0;
+}
+.rhema-book-row.selected .rhema-book-check { visibility: visible; }
+
+/* ── Chapter / Verse number grid ── */
+.rhema-num-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.rhema-num-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--font-color);
+  background: var(--primary-color);
+  border: 1.5px solid var(--border-color);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+.rhema-num-cell:active { opacity: 0.65; }
+.rhema-num-cell.selected {
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  border-color: var(--secondary-color);
+}
 
 /* ── Verse display ── */
 .rhema-loading {
