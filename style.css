@@ -6967,10 +6967,10 @@ body:not(.home-active) {
 /* ── Rhēma Hero Card ── */
 /* ── Rhēma featured button ── */
 #homeScreen .main-btn.home-action.rhema-featured-btn {
-  background: linear-gradient(130deg, var(--primary-color) 0%, var(--primary-light) 100%) !important;
+  background: var(--secondary-color) !important;
   color: var(--btn-text-color) !important;
   border-color: transparent !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.14) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18) !important;
 }
 #homeScreen .main-btn.home-action.rhema-featured-btn .material-symbols-outlined {
   color: var(--btn-text-color) !important;
@@ -10711,7 +10711,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  background: var(--card-color);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
@@ -10828,7 +10828,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-verse-display {
   flex: 1;
   padding: 24px 20px 12px;
-  overflow-y: auto;
+  overflow: hidden;
   line-height: 2.6;
   font-size: 1.3rem;
   letter-spacing: 0.03em;
@@ -10852,7 +10852,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-kjv-display {
   flex: 1;
   padding: 24px 20px;
-  overflow-y: auto;
+  overflow: hidden;
   font-size: 1rem;
   line-height: 1.9;
   font-style: italic;

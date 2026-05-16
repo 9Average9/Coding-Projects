@@ -8567,6 +8567,7 @@ function toggleDarkMode() {
     localStorage.setItem("appTheme", "parchment");
     applyAppTheme("parchment");
   }
+  syncUserData();
 }
 
 
@@ -8863,6 +8864,7 @@ function setAppTheme(themeName) {
   localStorage.removeItem("fontColor");
 
   applyAppTheme(themeName);
+  syncUserData();
 }
 
 
