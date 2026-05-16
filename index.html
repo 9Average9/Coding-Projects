@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=127" />
+  <link rel="stylesheet" href="style.css?v=128" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10593,25 +10593,27 @@ glacier: {
 
     <div id="rhemaBreadcrumb" class="rhema-breadcrumb hidden"></div>
 
-    <!-- Stable flex child — loading/verse/KJV/hint all live inside so
-         nothing outside this box ever shifts when they show/hide -->
-    <div class="rhema-content-area">
-      <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
-      <div id="rhemaVerseDisplay" class="rhema-verse-display"></div>
-      <div id="rhemaKjvDisplay" class="rhema-kjv-display hidden"></div>
-    </div>
-
-    <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
-      <div class="rhema-verse-nav-row">
-        <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
-          <span class="material-symbols-outlined">chevron_left</span>
-        </button>
-        <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
-        <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
+    <!-- Scrollable body — content + nav are in-flow so nav sits right below
+         the last word row instead of floating at the bottom of the screen -->
+    <div class="rhema-body">
+      <div class="rhema-content-area">
+        <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
+        <div id="rhemaVerseDisplay" class="rhema-verse-display"></div>
+        <div id="rhemaKjvDisplay" class="rhema-kjv-display hidden"></div>
       </div>
-      <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
+
+      <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
+        <div class="rhema-verse-nav-row">
+          <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
+          <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+        <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
+      </div>
     </div>
 
   </div>
@@ -10676,7 +10678,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=123"></script>
+  <script src="app.js?v=124"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->

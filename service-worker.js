@@ -17,14 +17,14 @@ const messaging = firebase.messaging();
 // two notifications (APNs auto-display + our manual call).
 messaging.onBackgroundMessage(function () {});
 
-const CACHE_NAME = "basic-greek-trainer-v2.1.3";
+const CACHE_NAME = "basic-greek-trainer-v2.1.4";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=127",
+  "./style.css?v=128",
   "./vocab.js?v=89",
-  "./app.js?v=123",
+  "./app.js?v=124",
   "./firebase-lb.js?v=93",
   "./manifest.json",
   "./icon-192.png",
