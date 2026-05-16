@@ -12291,32 +12291,21 @@ function unlockPracticeToolsManually() {
 
 function updatePracticeToolLocks() {
   const featureMap = {
-    vocabHomeBtn: "vocab",
-    translateHomeBtn: "translate",
-    testHomeBtn: "test"
+    vocabHomeBtn:     { feature: "vocab",     unlockedIcon: "spellcheck" },
+    translateHomeBtn: { feature: "translate", unlockedIcon: "translate"  },
+    testHomeBtn:      { feature: "test",      unlockedIcon: "quiz"       }
   };
 
-  Object.keys(featureMap).forEach(id => {
+  Object.entries(featureMap).forEach(([id, { feature, unlockedIcon }]) => {
     const btn = document.getElementById(id);
     if (!btn) return;
 
-    const feature = featureMap[id];
     const unlocked = isFeatureUnlocked(feature);
-
     btn.classList.toggle("unlocked", unlocked);
 
     const icon = btn.querySelector(".lock-icon");
-
     if (icon) {
-      const openedKey = `openedUnlocked_${id}`;
-      const alreadyOpened = localStorage.getItem(openedKey) === "true";
-
-      if (unlocked && alreadyOpened) {
-        icon.style.display = "none";
-      } else {
-        icon.style.display = "";
-        icon.textContent = unlocked ? "lock_open" : "lock";
-      }
+      icon.textContent = unlocked ? unlockedIcon : "lock";
     }
   });
 }

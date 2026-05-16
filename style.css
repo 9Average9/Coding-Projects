@@ -6388,73 +6388,233 @@ body:not(.home-active) {
   overflow-y: auto;
 }
 /* HOME SCREEN CLEANUP */
+/* ══ Home screen ═══════════════════════════════════════════════════════════ */
+
 #homeScreen.screen.active {
-  padding: 26px !important;
-  border-radius: 28px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Top nav row: icons flush left/right, no center title */
+.home-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top, 14px) + 10px) 20px 0;
+}
+.home-nav-btn {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
   background: var(--card-color) !important;
   border: 1px solid var(--border-color) !important;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.12) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
+.home-nav-btn .material-symbols-outlined { font-size: 26px !important; color: var(--secondary-color) !important; }
 
-/* Make the top app title less webpage-ish */
-.header {
-  border-bottom: none !important;
-  margin-bottom: 16px !important;
-  padding-bottom: 0 !important;
+/* Hero text block */
+.home-hero {
+  padding: 28px 22px 20px;
 }
-
-.header h1 {
-  font-size: 2.35rem !important;
-  line-height: 1 !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.06em !important;
-  margin-bottom: 8px !important;
+.home-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.0;
+  color: var(--font-color);
+  margin: 0 0 10px;
 }
-
-.header p {
-  max-width: 320px;
-  margin: 0 auto;
+.home-subtitle {
   font-size: 1rem;
-  line-height: 1.35;
+  line-height: 1.45;
+  color: var(--muted-color);
+  margin: 0 0 14px;
+}
+.home-about-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+  opacity: 0.75;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.home-about-link .material-symbols-outlined { font-size: 16px !important; }
+
+/* Rhēma featured card */
+.home-rhema-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: var(--secondary-color);
+  border: none;
+  border-radius: 22px;
+  padding: 22px 20px;
+  margin: 0 0 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.16);
+  transition: opacity 0.12s;
+}
+.home-rhema-card:active { opacity: 0.88; }
+.home-rhema-icon {
+  font-size: 2.2rem;
+  color: var(--btn-text-color);
+  flex-shrink: 0;
+}
+.home-rhema-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.home-rhema-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--btn-text-color);
+  line-height: 1;
+}
+.home-rhema-sub {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--btn-text-color);
+  opacity: 0.75;
+  line-height: 1;
+}
+
+/* Section label */
+.home-section-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+  opacity: 0.55;
+  margin: 22px 0 10px;
+}
+
+/* Shared card base for Lessons + grid cards */
+.home-feature-card,
+.home-grid-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 16px 16px;
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.home-feature-card:active,
+.home-grid-card:active { background: color-mix(in srgb, var(--border-color) 60%, var(--card-color)); }
+
+/* Circular icon background */
+.home-feat-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.home-feat-icon-wrap .material-symbols-outlined {
+  font-size: 1.55rem !important;
+  color: var(--secondary-color) !important;
+}
+
+/* Text column */
+.home-feat-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.home-feat-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--font-color);
+  line-height: 1.1;
+}
+.home-feat-sub {
+  font-size: 0.76rem;
+  color: var(--muted-color);
+  line-height: 1.3;
+}
+
+/* Right chevron */
+.home-card-chev {
+  font-size: 1.3rem !important;
   color: var(--muted-color) !important;
+  opacity: 0.5;
+  flex-shrink: 0;
 }
 
-/* Home nav row */
-#homeScreen .nav-bar {
-  margin-top: 0 !important;
-  margin-bottom: 22px !important;
-  grid-template-columns: 50px 1fr 50px !important;
+/* Lessons card sits alone, full width */
+.home-feature-card {
+  margin: 0 0 0;
 }
 
-#homeScreen .nav-title {
-  font-size: 1.2rem !important;
-  font-weight: 850 !important;
+/* 2-col grid */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.home-grid-card {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 14px 14px;
+}
+.home-grid-card .home-feat-text { width: 100%; }
+.home-grid-card .home-card-chev { display: none; }
+
+/* Locked state mutes the icon wrap slightly */
+.home-grid-card.locked-feature-btn .home-feat-icon-wrap {
+  background: color-mix(in srgb, var(--muted-color) 10%, transparent);
+}
+.home-grid-card.locked-feature-btn .home-feat-icon-wrap .material-symbols-outlined {
+  color: var(--muted-color) !important;
+  opacity: 0.6;
 }
 
-/* Home top icons */
-#homeScreen .icon-btn {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 16px !important;
+/* Outer screen wrapper — full-height scroll container */
+#homeScreen.screen.active {
+  overflow-y: auto;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px) !important;
 }
 
-#homeScreen .icon-btn .material-symbols-outlined {
-  font-size: 28px !important;
-}
-
-/* Bigger main home buttons */
-#homeScreen .main-btn.home-action {
-  min-height: 74px !important;
-  padding: 20px 22px !important;
-  margin: 12px 0 !important;
-  border-radius: 22px !important;
-  font-size: 1.16rem !important;
-  font-weight: 850 !important;
-  gap: 12px !important;
-}
-
-#homeScreen .main-btn.home-action .material-symbols-outlined {
-  font-size: 30px !important;
+/* Rhēma button + grid sit inside horizontal padding */
+#homeScreen .home-rhema-card,
+#homeScreen .home-feature-card,
+#homeScreen .home-grid,
+#homeScreen .home-section-label {
+  margin-left: 20px;
+  margin-right: 20px;
 }
 /* BIGGER MODALS — BETTER SCREEN FIT */
 .modal-card {
@@ -10711,12 +10871,13 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  background: var(--card-color);
+  background: var(--primary-light);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
   overflow: hidden;
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 .rhema-modal-overlay.open {
   opacity: 1;
@@ -10724,6 +10885,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -10972,7 +11134,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 .rhema-verse-display {
   flex: 1;
-  padding: 24px 20px 12px;
+  min-height: 0;
+  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 110px);
   overflow: hidden;
   line-height: 2.6;
   font-size: 1.3rem;
@@ -10996,6 +11159,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 .rhema-kjv-display {
   flex: 1;
+  min-height: 0;
   padding: 24px 20px;
   overflow: hidden;
   font-size: 1rem;
@@ -11004,14 +11168,19 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--muted-color);
 }
 
+/* Tap hint + nav bar are pinned to the bottom */
 .rhema-tap-hint {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+  left: 0;
+  right: 0;
   text-align: center;
   font-size: 0.75rem;
   color: var(--muted-color);
-  opacity: 0.6;
-  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
+  opacity: 0.55;
+  padding: 0 20px;
   margin: 0;
-  flex-shrink: 0;
+  pointer-events: none;
 }
 .rhema-tap-hint.hidden { display: none; }
 
@@ -11093,13 +11262,17 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   cursor: pointer;
 }
 
-/* ── Verse nav bar ── */
+/* ── Verse nav bar — pinned to bottom ── */
 .rhema-verse-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 14px calc(env(safe-area-inset-bottom, 0px) + 8px);
-  flex-shrink: 0;
+  padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  background: var(--primary-light);
 }
 .rhema-verse-nav.hidden { display: none; }
 .rhema-nav-btn {
