@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=113" />
+  <link rel="stylesheet" href="style.css?v=114" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -321,64 +321,95 @@ glacier: {
 </head>
 <body>
   <main class="app">
-    <header class="header" onclick="showInfoModal()" role="button" tabindex="0">
-      <h1>Basic Greek Trainer</h1>
-<p>Study the Greek New Testament — down to every word.</p>
-<small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
-    </header>
 
     <section id="homeScreen" class="screen active">
-     <div class="nav-bar">
-  <button class="icon-btn" onclick="openLeaderboard()">
-    <span class="material-symbols-outlined">emoji_events</span>
-  </button>
 
-  <div class="nav-title">Home</div>
+      <div class="home-nav">
+        <button class="icon-btn home-nav-btn" onclick="openLeaderboard()">
+          <span class="material-symbols-outlined">emoji_events</span>
+        </button>
+        <button id="profileButton" class="icon-btn home-nav-btn" onclick="showProfileMenu()">
+          <span class="material-symbols-outlined">account_circle</span>
+        </button>
+      </div>
 
- <button id="profileButton" class="icon-btn" onclick="showProfileMenu()">
-  <span class="material-symbols-outlined">account_circle</span>
-</button>
-</div>
+      <div class="home-hero">
+        <h1 class="home-title">Basic Greek Trainer</h1>
+        <p class="home-subtitle">Study the Greek New Testament —<br>down to every word.</p>
+        <button class="home-about-link" onclick="showInfoModal()">
+          <span class="material-symbols-outlined">info</span>
+          About this app
+        </button>
+      </div>
 
+      <!-- Rhēma — featured card -->
+      <button class="home-rhema-card" onclick="showRhema()">
+        <span class="material-symbols-outlined home-rhema-icon">menu_book</span>
+        <span class="home-rhema-text">
+          <span class="home-rhema-name">Rhēma</span>
+          <span class="home-rhema-sub">NT Word Study</span>
+        </span>
+        <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+      </button>
 
+      <!-- Learning path -->
+      <div class="home-section-label">Your Learning Path</div>
 
-<!-- Rhēma — featured button -->
-<button class="main-btn home-action rhema-featured-btn" onclick="showRhema()">
-  <span class="material-symbols-outlined">auto_stories</span>
-  <span class="rhema-btn-label">
-    <span class="rhema-btn-name">Rhēma</span>
-    <span class="rhema-btn-sub">ῥῆμα · NT Word Study</span>
-  </span>
-</button>
+      <button class="home-feature-card" onclick="showNewLearnMenu()">
+        <span class="home-feat-icon-wrap">
+          <span class="material-symbols-outlined">menu_book</span>
+        </span>
+        <span class="home-feat-text">
+          <span class="home-feat-name">Lessons</span>
+          <span class="home-feat-sub">Step-by-step Greek learning</span>
+        </span>
+        <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+      </button>
 
-<!-- Lessons — the foundation -->
-<div class="home-section-label">Your Learning Path</div>
-
-<button class="main-btn home-action" onclick="showNewLearnMenu()">
-  <span class="material-symbols-outlined">menu_book</span>
-  <span>Lessons</span>
-</button>
-
-<!-- Secondary features -->
-<div class="home-actions-grid">
-  <button id="vocabHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
-    <span class="material-symbols-outlined lock-icon">lock</span>
-    <span>Vocab</span>
-  </button>
-  <button id="translateHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
-    <span class="material-symbols-outlined lock-icon">lock</span>
-    <span>Translate</span>
-  </button>
-  <button id="testHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('test')">
-    <span class="material-symbols-outlined lock-icon">lock</span>
-    <span>Test</span>
-  </button>
-  <button class="main-btn home-action friends-home-btn" onclick="showFriendsModal()">
-    <span class="material-symbols-outlined">group</span>
-    <span>Friends</span>
-    <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
-  </button>
-</div>
+      <!-- Secondary features grid -->
+      <div class="home-grid">
+        <button id="vocabHomeBtn" class="home-grid-card locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
+          <span class="home-feat-icon-wrap">
+            <span class="material-symbols-outlined lock-icon">lock</span>
+          </span>
+          <span class="home-feat-text">
+            <span class="home-feat-name">Vocab</span>
+            <span class="home-feat-sub">Build your vocabulary</span>
+          </span>
+          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+        </button>
+        <button id="translateHomeBtn" class="home-grid-card locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
+          <span class="home-feat-icon-wrap">
+            <span class="material-symbols-outlined lock-icon">lock</span>
+          </span>
+          <span class="home-feat-text">
+            <span class="home-feat-name">Translate</span>
+            <span class="home-feat-sub">Practice translation</span>
+          </span>
+          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+        </button>
+        <button id="testHomeBtn" class="home-grid-card locked-feature-btn" onclick="tryOpenLockedFeature('test')">
+          <span class="home-feat-icon-wrap">
+            <span class="material-symbols-outlined lock-icon">lock</span>
+          </span>
+          <span class="home-feat-text">
+            <span class="home-feat-name">Test</span>
+            <span class="home-feat-sub">Challenge yourself</span>
+          </span>
+          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+        </button>
+        <button class="home-grid-card" onclick="showFriendsModal()">
+          <span class="home-feat-icon-wrap">
+            <span class="material-symbols-outlined">group</span>
+          </span>
+          <span class="home-feat-text">
+            <span class="home-feat-name">Friends</span>
+            <span class="home-feat-sub">Learn together</span>
+          </span>
+          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+          <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
+        </button>
+      </div>
 
     </section>
  <section id="newLearnMenu" class="screen">
@@ -10478,7 +10509,7 @@ glacier: {
       </button>
       <div class="rhema-title-block">
         <span class="rhema-title">Rhēma</span>
-        <span class="rhema-title-greek">ῥῆμα · Word Study</span>
+        <span class="rhema-title-greek">Word Study</span>
       </div>
       <button id="rhemaSwapBtn" class="rhema-swap-btn" onclick="toggleRhemaKjv()">KJV</button>
     </div>
@@ -10579,7 +10610,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=113"></script>
+  <script src="app.js?v=114"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
