@@ -30,6 +30,7 @@ let friendRequestsIn = [];
 let friendRequestsOut = [];
 let _unsubUserDoc = null;
 let _friendsTab = "friends";
+let _lessonBreakdownNavigate = true;
 let _browseSearch = "";
 let _currentFriendSheetUid = null;
 
@@ -13001,6 +13002,7 @@ function renderAchievements() {
 function showLessonsBreakdownModal(tab, navigate = true) {
   const modal = document.getElementById("lessonsBreakdownModal");
   if (!modal) return;
+  _lessonBreakdownNavigate = navigate;
   switchLessonBreakdownTab(tab || getLessonMode(), navigate);
   modal.classList.add("open");
 }
@@ -13011,7 +13013,8 @@ function closeLessonsBreakdownModal(event) {
   }
 }
 
-function switchLessonBreakdownTab(tab, navigate = true) {
+function switchLessonBreakdownTab(tab, navigate) {
+  if (navigate === undefined) navigate = _lessonBreakdownNavigate;
   const basicTab = document.getElementById("breakdownBasicTab");
   const advTab = document.getElementById("breakdownAdvancedTab");
   const card = document.querySelector(".lessons-breakdown-card");
@@ -13202,7 +13205,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.8.7";
+const APP_VERSION = "1.8.9";
 
 const UPDATE_NOTES = [
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
@@ -14725,4 +14728,443 @@ function onFriendsSearch(val) {
   _browseSearch = val;
   clearTimeout(_frSearchTimer);
   _frSearchTimer = setTimeout(() => renderFindFriends(val), 380);
+}
+
+// ══ Rhēma Word Study ══════════════════════════════════════════════════════════
+
+let _rhemaLoaded = false;
+let _rhemaLoading = false;
+let _rhemaBook = 'JOH';
+let _rhemaChapter = '3';
+let _rhemaVerse = '16';
+let _rhemaShowKjv = false;
+let _rhemaActiveTab = 'parsing';
+let _rhemaActiveWord = null;
+
+const RHEMA_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
+
+// ── Morphology decoder ───────────────────────────────────────────────────────
+
+const MORPH_POS = {
+  N:'Noun', V:'Verb', T:'Article', ADJ:'Adjective', A:'Adjective',
+  PREP:'Preposition', CONJ:'Conjunction', ADV:'Adverb', PART:'Particle',
+  INJ:'Interjection', PRT:'Particle', COND:'Conditional Particle',
+  HEB:'Hebrew/Aramaic', ARAM:'Aramaic', INF:'Infinitive',
+  P:'Pronoun', PRON:'Pronoun', R:'Pronoun', RI:'Proper Noun',
+};
+const MORPH_CASE = {
+  N:{l:'Nominative', d:'subject of the verb'},
+  G:{l:'Genitive',   d:'possession or relationship'},
+  D:{l:'Dative',     d:'indirect object, location, or means'},
+  A:{l:'Accusative', d:'direct object'},
+  V:{l:'Vocative',   d:'direct address'},
+};
+const MORPH_NUM  = { S:'Singular', P:'Plural' };
+const MORPH_GEN  = { M:'Masculine', F:'Feminine', N:'Neuter' };
+const MORPH_TENSE = {
+  P:{l:'Present',     d:'ongoing action'},
+  I:{l:'Imperfect',   d:'ongoing past action'},
+  F:{l:'Future',      d:'future action'},
+  A:{l:'Aorist',      d:'completed past action'},
+  R:{l:'Perfect',     d:'completed with present result'},
+  L:{l:'Pluperfect',  d:'completed past with past result'},
+  '2A':{l:'2nd Aorist', d:'completed past action (2nd form)'},
+  '2R':{l:'2nd Perfect',d:'completed with present result (2nd form)'},
+};
+const MORPH_VOICE = {
+  A:{l:'Active',         d:'subject performs the action'},
+  M:{l:'Middle',         d:'subject acts for itself'},
+  P:{l:'Passive',        d:'subject receives the action'},
+  D:{l:'Middle/Deponent',d:'active meaning, middle form'},
+  O:{l:'Middle-Passive', d:'middle or passive'},
+  N:{l:'Middle or Passive',d:'voice ambiguous'},
+  Q:{l:'Middle Deponent', d:'deponent with middle form'},
+};
+const MORPH_MOOD = {
+  I:{l:'Indicative',  d:'stating a fact'},
+  S:{l:'Subjunctive', d:'possibility or contingency'},
+  O:{l:'Optative',    d:'wish or remote possibility'},
+  M:{l:'Imperative',  d:'command'},
+  N:{l:'Infinitive',  d:'verbal noun'},
+  P:{l:'Participle',  d:'verbal adjective'},
+};
+const MORPH_PERSON = { '1':'1st Person', '2':'2nd Person', '3':'3rd Person' };
+
+function decodeMorph(code) {
+  if (!code) return [];
+  const rows = [];
+
+  const INDECLINABLE = { PREP:1, CONJ:1, ADV:1, PART:1, INJ:1, PRT:1, COND:1, HEB:1, ARAM:1 };
+  if (INDECLINABLE[code]) {
+    return [{ label:'Part of Speech', value: MORPH_POS[code] || code, desc:'' }];
+  }
+
+  const segs = code.split('-');
+  let posRaw = segs[0];
+
+  // strip numeric prefix like "P-" that sometimes appears
+  let tensePrefix = '';
+  let vSegs = segs.slice(1);
+
+  // Detect 2nd aorist/perfect: V-2AAI-3S or segment[1] === '2...'
+  if (vSegs[0] && /^2[ARILP]/.test(vSegs[0])) {
+    tensePrefix = '2';
+    vSegs[0] = vSegs[0].substring(1);
+  }
+
+  const posLabel = MORPH_POS[posRaw];
+  if (posLabel) {
+    rows.push({ label:'Part of Speech', value: posLabel, desc:'' });
+  }
+
+  if (posRaw === 'V') {
+    // Verb: [TVM]-[PN or CNG]
+    const tvm = vSegs[0] || '';
+    const pn  = vSegs[1] || '';
+    const t = tensePrefix + tvm[0];
+    const v = tvm[1];
+    const m = tvm[2];
+    const tObj = MORPH_TENSE[t] || MORPH_TENSE[tvm[0]];
+    if (tObj) rows.push({ label:'Tense', value: tObj.l, desc: tObj.d });
+    const vObj = MORPH_VOICE[v];
+    if (vObj) rows.push({ label:'Voice', value: vObj.l, desc: vObj.d });
+    const mObj = MORPH_MOOD[m];
+    if (mObj) rows.push({ label:'Mood',  value: mObj.l, desc: mObj.d });
+    if (m === 'N') {
+      // infinitive — no person/number
+    } else if (m === 'P') {
+      // participle — case/number/gender
+      const c = MORPH_CASE[pn[0]];
+      const n = MORPH_NUM[pn[1]];
+      const g = MORPH_GEN[pn[2]];
+      if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+      if (n) rows.push({ label:'Number', value: n,   desc: '' });
+      if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+    } else if (pn) {
+      const person = MORPH_PERSON[pn[0]];
+      const num    = MORPH_NUM[pn[1]];
+      if (person) rows.push({ label:'Person', value: person, desc:'' });
+      if (num)    rows.push({ label:'Number', value: num,    desc:'' });
+    }
+  } else if (['N','T','ADJ','A','P','PRON','R'].includes(posRaw)) {
+    // Noun-like: CNG
+    const cng = vSegs[0] || '';
+    const c = MORPH_CASE[cng[0]];
+    const n = MORPH_NUM[cng[1]];
+    const g = MORPH_GEN[cng[2]];
+    if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+    if (n) rows.push({ label:'Number', value: n,   desc: '' });
+    if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+  }
+
+  return rows;
+}
+
+// ── Data loading ──────────────────────────────────────────────────────────────
+
+function loadRhemaScripts() {
+  return new Promise((resolve, reject) => {
+    if (_rhemaLoaded) { resolve(); return; }
+    if (_rhemaLoading) {
+      const check = setInterval(() => {
+        if (_rhemaLoaded) { clearInterval(check); resolve(); }
+      }, 100);
+      return;
+    }
+    _rhemaLoading = true;
+    let loaded = 0;
+    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-kjv.js'];
+    let failed = false;
+    for (const file of files) {
+      const s = document.createElement('script');
+      s.src = file + '?v=1';
+      s.onload = () => {
+        loaded++;
+        if (loaded === files.length) { _rhemaLoaded = true; resolve(); }
+      };
+      s.onerror = (e) => {
+        if (!failed) { failed = true; reject(new Error('Failed to load ' + file)); }
+      };
+      document.head.appendChild(s);
+    }
+  });
+}
+
+// ── Modal open/close ──────────────────────────────────────────────────────────
+
+async function showRhema() {
+  const modal = document.getElementById('rhemaModal');
+  if (!modal) return;
+  modal.classList.add('open');
+
+  const loading = document.getElementById('rhemaLoadingMsg');
+  const hint    = document.getElementById('rhemaTapHint');
+  if (loading) loading.style.display = 'block';
+  if (hint)    hint.classList.add('hidden');
+
+  try {
+    await loadRhemaScripts();
+    if (loading) loading.style.display = 'none';
+    if (hint)    hint.classList.remove('hidden');
+    initRhemaPicker();
+    renderRhemaVerse();
+  } catch (e) {
+    if (loading) loading.textContent = 'Failed to load data. Check your connection.';
+  }
+}
+
+function closeRhema() {
+  document.getElementById('rhemaModal')?.classList.remove('open');
+  closeRhemaSheet();
+}
+
+// ── Verse picker ──────────────────────────────────────────────────────────────
+
+function initRhemaPicker() {
+  if (!window.RhemaNT) return;
+  const bookSel = document.getElementById('rhemaBookSel');
+  if (!bookSel || bookSel.children.length > 0) return; // already initialised
+
+  RHEMA_BOOK_ORDER.forEach(code => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = window.RhemaNT.names[code] || code;
+    if (code === _rhemaBook) opt.selected = true;
+    bookSel.appendChild(opt);
+  });
+  populateRhemaChapters();
+  populateRhemaVerses();
+}
+
+function populateRhemaChapters() {
+  const chapSel = document.getElementById('rhemaChapSel');
+  if (!chapSel || !window.RhemaNT) return;
+  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {})
+    .sort((a,b) => +a - +b);
+  chapSel.innerHTML = '';
+  chapters.forEach(ch => {
+    const opt = document.createElement('option');
+    opt.value = ch;
+    opt.textContent = 'Ch ' + ch;
+    if (ch === _rhemaChapter) opt.selected = true;
+    chapSel.appendChild(opt);
+  });
+  if (!chapters.includes(_rhemaChapter)) _rhemaChapter = chapters[0];
+}
+
+function populateRhemaVerses() {
+  const verseSel = document.getElementById('rhemaVerseSel');
+  if (!verseSel || !window.RhemaNT) return;
+  const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {})
+    .sort((a,b) => +a - +b);
+  verseSel.innerHTML = '';
+  verses.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = 'v' + v;
+    if (v === _rhemaVerse) opt.selected = true;
+    verseSel.appendChild(opt);
+  });
+  if (!verses.includes(_rhemaVerse)) _rhemaVerse = verses[0];
+}
+
+function rhemaBookChanged() {
+  _rhemaBook = document.getElementById('rhemaBookSel')?.value || _rhemaBook;
+  _rhemaChapter = '1';
+  _rhemaVerse = '1';
+  populateRhemaChapters();
+  populateRhemaVerses();
+  renderRhemaVerse();
+}
+
+function rhemaChapChanged() {
+  _rhemaChapter = document.getElementById('rhemaChapSel')?.value || _rhemaChapter;
+  _rhemaVerse = '1';
+  populateRhemaVerses();
+  renderRhemaVerse();
+}
+
+function rhemaVerseChanged() {
+  _rhemaVerse = document.getElementById('rhemaVerseSel')?.value || _rhemaVerse;
+  renderRhemaVerse();
+}
+
+// ── Verse rendering ───────────────────────────────────────────────────────────
+
+function renderRhemaVerse() {
+  if (!window.RhemaNT) return;
+  closeRhemaSheet();
+
+  const display = document.getElementById('rhemaVerseDisplay');
+  const kjvDiv  = document.getElementById('rhemaKjvDisplay');
+  if (!display) return;
+
+  const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+
+  display.innerHTML = words.map((w, i) =>
+    `<span class="rhema-word" data-idx="${i}" onclick="openRhemaSheet(${i})">${w[0]}</span>` +
+    (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '')
+  ).join('');
+
+  if (kjvDiv && window.RhemaKJV) {
+    const kjvText = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
+    kjvDiv.textContent = kjvText;
+  }
+
+  updateRhemaSwapVisibility();
+}
+
+function toggleRhemaKjv() {
+  _rhemaShowKjv = !_rhemaShowKjv;
+  updateRhemaSwapVisibility();
+  closeRhemaSheet();
+}
+
+function updateRhemaSwapVisibility() {
+  const gr  = document.getElementById('rhemaVerseDisplay');
+  const kjv = document.getElementById('rhemaKjvDisplay');
+  const btn = document.getElementById('rhemaSwapBtn');
+  const hint = document.getElementById('rhemaTapHint');
+  if (gr)   gr.classList.toggle('hidden', _rhemaShowKjv);
+  if (kjv)  kjv.classList.toggle('hidden', !_rhemaShowKjv);
+  if (btn)  btn.classList.toggle('active', _rhemaShowKjv);
+  if (hint) hint.classList.toggle('hidden', _rhemaShowKjv);
+}
+
+// ── Word detail sheet ─────────────────────────────────────────────────────────
+
+function openRhemaSheet(wordIdx) {
+  if (!window.RhemaNT) return;
+  const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  const word  = words[wordIdx];
+  if (!word) return;
+
+  _rhemaActiveWord = word;
+
+  // Highlight selected word
+  document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.rhema-word[data-idx="${wordIdx}"]`)?.classList.add('selected');
+
+  // Populate header
+  const [surface, strongs, morph] = word;
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+
+  document.getElementById('rhemaSheetSurface').textContent = surface;
+  document.getElementById('rhemaSheetStrongs').textContent = 'G' + strongs;
+  document.getElementById('rhemaSheetLemma').textContent   =
+    lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
+
+  showRhemaTab(_rhemaActiveTab, word);
+
+  document.getElementById('rhemaSheet')?.classList.add('open');
+  document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
+}
+
+function closeRhemaSheet() {
+  document.getElementById('rhemaSheet')?.classList.remove('open');
+  document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
+  document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
+  _rhemaActiveWord = null;
+}
+
+function showRhemaTab(tab, word) {
+  _rhemaActiveTab = tab;
+  word = word || _rhemaActiveWord;
+  if (!word) return;
+
+  const [surface, strongs, morph] = word;
+
+  document.querySelectorAll('.rhema-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(`rhemaTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`)?.classList.add('active');
+  // handle id mismatch for 'occurrences'
+  if (tab === 'occurrences') {
+    document.getElementById('rhemaTabOcc')?.classList.add('active');
+  }
+
+  const content = document.getElementById('rhemaTabContent');
+  if (!content) return;
+
+  if (tab === 'parsing') {
+    content.innerHTML = renderRhemaParsing(surface, strongs, morph);
+  } else if (tab === 'definition') {
+    content.innerHTML = renderRhemaDefinition(strongs);
+  } else {
+    content.innerHTML = renderRhemaOccurrences(strongs);
+  }
+}
+
+// ── Tab content renderers ─────────────────────────────────────────────────────
+
+function renderRhemaParsing(surface, strongs, morph) {
+  const rows = decodeMorph(morph);
+  if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No parsing data for "${morph}".</p>`;
+  return `<div class="rhema-parsing-grid">` +
+    rows.map(r => `
+      <div class="rhema-parse-row">
+        <div class="rhema-parse-label">${r.label}</div>
+        <div>
+          <div class="rhema-parse-value">${r.value}</div>
+          ${r.desc ? `<div class="rhema-parse-desc">${r.desc}</div>` : ''}
+        </div>
+      </div>`).join('') +
+    `</div>`;
+}
+
+function renderRhemaDefinition(strongs) {
+  const lex = (window.RhemaLexicon || {})[strongs];
+  if (!lex) return `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
+
+  let html = '';
+
+  if (lex.lemma) {
+    html += `<div class="rhema-def-section">
+      <div class="rhema-def-label">Root Word</div>
+      <div class="rhema-def-text" style="font-size:1.1rem;font-weight:700">${lex.lemma}</div>
+      ${lex.translit ? `<div class="rhema-def-text" style="opacity:.6;font-style:italic">${lex.translit}</div>` : ''}
+    </div>`;
+    html += `<div class="rhema-def-sep"></div>`;
+  }
+
+  if (lex.strongs_def) {
+    html += `<div class="rhema-def-section">
+      <div class="rhema-def-label">Strong's Definition</div>
+      <div class="rhema-def-text">${lex.strongs_def}</div>
+      ${lex.kjv_def ? `<div class="rhema-def-kjv">KJV: ${lex.kjv_def}</div>` : ''}
+    </div>`;
+  }
+
+  if (lex.extended || lex.brief) {
+    html += `<div class="rhema-def-sep"></div>`;
+    html += `<div class="rhema-def-section">
+      <div class="rhema-def-label">Lexical Definition</div>
+      <div class="rhema-def-text">${lex.extended || lex.brief}</div>
+    </div>`;
+  }
+
+  if (lex.deriv) {
+    html += `<div class="rhema-def-sep"></div>`;
+    html += `<div class="rhema-def-section">
+      <div class="rhema-def-label">Etymology</div>
+      <div class="rhema-def-text" style="opacity:.7">${lex.deriv}</div>
+    </div>`;
+  }
+
+  return html || `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
+}
+
+function renderRhemaOccurrences(strongs) {
+  const occ = (window.RhemaOcc || {})[strongs];
+  if (!occ) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
+
+  const bookRows = RHEMA_BOOK_ORDER
+    .filter(code => occ.books[code])
+    .map(code => `
+      <div class="rhema-occ-row">
+        <span class="rhema-occ-book">${window.RhemaNT?.names[code] || code}</span>
+        <span class="rhema-occ-count">${occ.books[code]}×</span>
+      </div>`).join('');
+
+  return `
+    <div class="rhema-occ-total">Appears <span>${occ.total}</span>× in the New Testament</div>
+    <div class="rhema-occ-list">${bookRows}</div>`;
 }

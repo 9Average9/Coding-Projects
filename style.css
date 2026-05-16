@@ -10632,3 +10632,331 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   margin-top: 0;
 }
 .notifications-enabled .material-symbols-outlined { color: #16a34a; }
+
+/* ══ Rhēma Word Study ═══════════════════════════════════════════════════════ */
+
+.rhema-modal-overlay {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg, #fff);
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  inset: 0;
+}
+.rhema-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.rhema-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Header */
+.rhema-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 12px 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  flex-shrink: 0;
+}
+.rhema-title-block {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.rhema-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.rhema-subtitle {
+  font-size: 0.78rem;
+  opacity: 0.55;
+  font-weight: 400;
+}
+.rhema-swap-btn {
+  background: none;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.rhema-swap-btn.active {
+  opacity: 1;
+  background: var(--accent, #3b82f6);
+  border-color: var(--accent, #3b82f6);
+  color: #fff;
+}
+
+/* Verse picker */
+.rhema-picker {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  flex-shrink: 0;
+}
+.rhema-sel {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 6px 4px;
+  font-size: 0.82rem;
+  background: var(--card-bg, #f8f8f8);
+  color: inherit;
+  appearance: none;
+  text-align: center;
+}
+.rhema-sel:first-child { flex: 2; }
+
+/* Verse display */
+.rhema-loading {
+  padding: 40px;
+  text-align: center;
+  opacity: 0.5;
+  font-size: 0.9rem;
+}
+.rhema-verse-display {
+  flex: 1;
+  padding: 20px 18px 12px;
+  overflow-y: auto;
+  line-height: 2.4;
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+}
+.rhema-word {
+  display: inline;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 1px;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.rhema-word:active,
+.rhema-word.selected {
+  background: rgba(59,130,246,0.18);
+}
+.rhema-word-space {
+  display: inline;
+}
+.rhema-kjv-display {
+  flex: 1;
+  padding: 20px 18px;
+  overflow-y: auto;
+  font-size: 1rem;
+  line-height: 1.8;
+  font-style: italic;
+  opacity: 0.85;
+}
+.rhema-tap-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.4;
+  padding: 0 0 10px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.rhema-tap-hint.hidden { display: none; }
+
+/* Bottom sheet */
+.rhema-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  z-index: 100;
+}
+.rhema-sheet-backdrop.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.rhema-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg, #fff);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.rhema-sheet.open {
+  transform: translateY(0);
+}
+.rhema-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(0,0,0,0.18);
+  border-radius: 2px;
+  margin: 10px auto 6px;
+  flex-shrink: 0;
+}
+.rhema-sheet-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 20px 2px;
+  flex-shrink: 0;
+}
+.rhema-sheet-surface {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.rhema-sheet-strongs {
+  font-size: 0.78rem;
+  opacity: 0.45;
+  font-weight: 500;
+}
+.rhema-sheet-lemma {
+  padding: 0 20px 8px;
+  font-size: 0.82rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.rhema-sheet-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding: 0 16px;
+  gap: 0;
+  flex-shrink: 0;
+}
+.rhema-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  padding: 8px 4px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rhema-tab.active {
+  opacity: 1;
+  border-bottom-color: var(--accent, #3b82f6);
+  color: var(--accent, #3b82f6);
+}
+.rhema-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 20px 20px;
+}
+
+/* Parsing tab */
+.rhema-parsing-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rhema-parse-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: start;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.rhema-parse-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.45;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 1px;
+}
+.rhema-parse-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.rhema-parse-desc {
+  font-size: 0.76rem;
+  opacity: 0.55;
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+/* Definition tab */
+.rhema-def-section {
+  margin-bottom: 14px;
+}
+.rhema-def-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.4;
+  margin-bottom: 4px;
+}
+.rhema-def-text {
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.rhema-def-kjv {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  font-style: italic;
+  margin-top: 3px;
+}
+.rhema-def-sep {
+  height: 1px;
+  background: rgba(0,0,0,0.07);
+  margin: 12px 0;
+}
+
+/* Occurrences tab */
+.rhema-occ-total {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.rhema-occ-total span {
+  font-size: 1.5rem;
+  color: var(--accent, #3b82f6);
+}
+.rhema-occ-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rhema-occ-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 0.85rem;
+}
+.rhema-occ-book { font-weight: 500; }
+.rhema-occ-count {
+  font-weight: 700;
+  opacity: 0.65;
+  min-width: 28px;
+  text-align: right;
+}

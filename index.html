@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=102" />
+  <link rel="stylesheet" href="style.css?v=103" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -366,6 +366,11 @@ glacier: {
   <span class="material-symbols-outlined">group</span>
   <span>Friends</span>
   <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
+</button>
+
+<button class="main-btn home-action" onclick="showRhema()">
+  <span class="material-symbols-outlined">auto_stories</span>
+  <span>Rhēma</span>
 </button>
 
     </section>
@@ -10461,10 +10466,60 @@ glacier: {
   </div>
 </div>
 
+
+<!-- ══ Rhēma Word Study ══════════════════════════════════════════════════════ -->
+<div id="rhemaModal" class="modal-overlay rhema-modal-overlay">
+  <div class="rhema-container">
+
+    <div class="rhema-header">
+      <button class="icon-btn rhema-back-btn" onclick="closeRhema()">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <div class="rhema-title-block">
+        <span class="rhema-title">Rhēma</span>
+        <span class="rhema-subtitle">Word Study</span>
+      </div>
+      <button id="rhemaSwapBtn" class="rhema-swap-btn" onclick="toggleRhemaKjv()">KJV</button>
+    </div>
+
+    <div class="rhema-picker">
+      <select id="rhemaBookSel" class="rhema-sel" onchange="rhemaBookChanged()"></select>
+      <select id="rhemaChapSel" class="rhema-sel" onchange="rhemaChapChanged()"></select>
+      <select id="rhemaVerseSel" class="rhema-sel" onchange="rhemaVerseChanged()"></select>
+    </div>
+
+    <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
+
+    <div id="rhemaVerseDisplay" class="rhema-verse-display"></div>
+
+    <div id="rhemaKjvDisplay" class="rhema-kjv-display hidden"></div>
+
+    <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word to study it</p>
+
+  </div>
+
+  <!-- Word detail bottom sheet -->
+  <div id="rhemaSheet" class="rhema-sheet">
+    <div class="rhema-sheet-handle"></div>
+    <div class="rhema-sheet-top">
+      <span class="rhema-sheet-surface" id="rhemaSheetSurface"></span>
+      <span class="rhema-sheet-strongs" id="rhemaSheetStrongs"></span>
+    </div>
+    <div class="rhema-sheet-lemma" id="rhemaSheetLemma"></div>
+    <div class="rhema-sheet-tabs">
+      <button class="rhema-tab active" id="rhemaTabParsing"    onclick="showRhemaTab('parsing')">Parsing</button>
+      <button class="rhema-tab"        id="rhemaTabDefinition" onclick="showRhemaTab('definition')">Definition</button>
+      <button class="rhema-tab"        id="rhemaTabOcc"        onclick="showRhemaTab('occurrences')">Occurrences</button>
+    </div>
+    <div id="rhemaTabContent" class="rhema-tab-content"></div>
+  </div>
+  <div id="rhemaSheetBackdrop" class="rhema-sheet-backdrop" onclick="closeRhemaSheet()"></div>
+</div>
+
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=101"></script>
+  <script src="app.js?v=103"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
