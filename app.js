@@ -28,6 +28,7 @@ let openedLessonBlocks =
 let friendsList = [];
 let friendRequestsIn = [];
 let friendRequestsOut = [];
+let _unsubUserDoc = null;
 let _friendsTab = "friends";
 let _browseSearch = "";
 let _currentFriendSheetUid = null;
@@ -12631,6 +12632,8 @@ async function resetAllAppData() {
 
 function signOutAccount() {
   if (!confirm("Sign out of your account?")) return;
+  _unsubUserDoc?.();
+  _unsubUserDoc = null;
   window.Auth.logout().then(() => {
     localStorage.clear();
     location.reload();
@@ -13199,7 +13202,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.8.6";
+const APP_VERSION = "1.8.7";
 
 const UPDATE_NOTES = [
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
@@ -13660,7 +13663,22 @@ window.__onAuthStateReady = async (user) => {
     updateProfileBadges?.();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
+
+    _unsubUserDoc?.();
+    _unsubUserDoc = window.Auth.listenUserDoc(user.uid, (data) => {
+      friendsList = data.friends || [];
+      friendRequestsIn = data.friendRequestsIn || [];
+      friendRequestsOut = data.friendRequestsOut || [];
+      updateFriendsBadge();
+      const modal = document.getElementById("friendsModal");
+      if (modal?.classList.contains("open")) {
+        if (_friendsTab === "friends") renderFriendsList();
+        else renderFriendRequests();
+      }
+    });
   } else {
+    _unsubUserDoc?.();
+    _unsubUserDoc = null;
     showAuthModal();
   }
 };
