@@ -8217,13 +8217,6 @@ body.dark button.continue-learning-btn {
 #profileNotificationBtn {
   transition: transform 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
-/* Use theme colour for reminder icon, not the user's profile avatar colour */
-#profileNotificationBtn .prof-menu-icon-wrap {
-  background: color-mix(in srgb, var(--secondary-color) 14%, transparent) !important;
-}
-#profileNotificationBtn .prof-menu-icon-wrap .material-symbols-outlined {
-  color: var(--secondary-color) !important;
-}
 #profileNotificationBtn.notifications-enabled .material-symbols-outlined {
   color: #16a34a !important;
 }
@@ -10852,6 +10845,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  touch-action: none;           /* block stray swipes on the container itself */
+  overscroll-behavior: none;
 }
 
 /* ── Header ── */
@@ -11099,7 +11097,10 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   min-height: 0;
   padding: 24px 20px;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: none;
   line-height: 2.6;
   font-size: 1.3rem;
   letter-spacing: 0.03em;
@@ -11125,7 +11126,10 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   min-height: 0;
   padding: 24px 20px;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: none;
   font-size: 1rem;
   line-height: 1.9;
   font-style: italic;
@@ -11155,6 +11159,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-bottom: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
   font-size: 0.71rem;
   flex-shrink: 0;
+  /* Hard containment — never let breadcrumb content stretch the screen width */
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .rhema-breadcrumb.hidden { display: none; }
 
@@ -11162,6 +11172,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-breadcrumb-scroll {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -11169,6 +11180,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   overflow-y: hidden;
   padding: 6px 0 4px;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   scrollbar-width: thin;
   scrollbar-color: var(--secondary-color) transparent;
 }
@@ -11223,7 +11235,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   cursor: pointer;
 }
 
-/* ── Verse nav bar — flex child, sits at the natural bottom of the column ── */
+/* ── Verse nav bar — always in-flow so it never causes layout shifts ── */
 .rhema-verse-nav {
   flex-shrink: 0;
   display: flex;
@@ -11232,8 +11244,13 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
   background: var(--primary-light);
   border-top: 1px solid var(--border-color);
+  touch-action: none;           /* not draggable */
+  user-select: none;
 }
-.rhema-verse-nav.hidden { display: none; }
+/* Use visibility so the bar always occupies its space — no layout shift */
+.rhema-verse-nav.hidden { visibility: hidden; pointer-events: none; }
+/* Hide verse nav while a picker sheet is open (picker is semi-transparent) */
+.rhema-modal-overlay.picker-open .rhema-verse-nav { visibility: hidden; pointer-events: none; }
 .rhema-nav-btn {
   background: color-mix(in srgb, var(--card-color) 55%, transparent);
   border: 1.5px solid var(--border-color);
@@ -11792,6 +11809,16 @@ body .app:has(#settingsScreen.screen.active) {
 .prof-menu-icon-wrap .material-symbols-outlined {
   font-size: 1.25rem !important;
   color: var(--profile-color, #4f8cff) !important;
+}
+/* Reminder button uses theme secondary colour, not the user's avatar colour */
+#profileNotificationBtn .prof-menu-icon-wrap {
+  background: color-mix(in srgb, var(--secondary-color) 14%, transparent) !important;
+}
+#profileNotificationBtn .prof-menu-icon-wrap .material-symbols-outlined {
+  color: var(--secondary-color) !important;
+}
+#profileNotificationBtn.notifications-enabled .prof-menu-icon-wrap .material-symbols-outlined {
+  color: #16a34a !important;
 }
 .prof-menu-name {
   flex: 1;

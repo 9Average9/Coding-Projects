@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.5";
+const APP_VERSION = "1.9.6";
 
 const UPDATE_NOTES = [
   "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
@@ -14990,6 +14990,7 @@ function openRhemaBookPicker() {
   const search = document.getElementById('rhemaBookSearch');
   if (search) search.value = '';
   overlay.classList.remove('hidden');
+  document.getElementById('rhemaModal')?.classList.add('picker-open');
   initRhemaPickerSwipeDown('rhemaBookPickerOverlay');
   requestAnimationFrame(() => {
     list.querySelector('.selected')?.scrollIntoView({ block: 'center' });
@@ -15007,6 +15008,7 @@ function openRhemaChapPicker() {
     return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectChap('${ch}')">${ch}</div>`;
   }).join('');
   overlay.classList.remove('hidden');
+  document.getElementById('rhemaModal')?.classList.add('picker-open');
   initRhemaPickerSwipeDown('rhemaChapPickerOverlay');
 }
 
@@ -15021,10 +15023,12 @@ function openRhemaVersePicker() {
     return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectVerse('${v}')">${v}</div>`;
   }).join('');
   overlay.classList.remove('hidden');
+  document.getElementById('rhemaModal')?.classList.add('picker-open');
   initRhemaPickerSwipeDown('rhemaVersePickerOverlay');
 }
 
 function closeRhemaPickerSheet() {
+  document.getElementById('rhemaModal')?.classList.remove('picker-open');
   ['rhemaBookPickerOverlay','rhemaChapPickerOverlay','rhemaVersePickerOverlay'].forEach(id => {
     document.getElementById(id)?.classList.add('hidden');
   });
