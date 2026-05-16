@@ -13205,7 +13205,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.8.9";
+const APP_VERSION = "1.9.1";
 
 const UPDATE_NOTES = [
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
@@ -15056,8 +15056,10 @@ function openRhemaSheet(wordIdx) {
 
   showRhemaTab(_rhemaActiveTab, word);
 
-  document.getElementById('rhemaSheet')?.classList.add('open');
+  const sheet = document.getElementById('rhemaSheet');
+  sheet?.classList.add('open');
   document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
+  initRhemaSwipeDown(sheet);
 }
 
 function closeRhemaSheet() {
@@ -15065,6 +15067,31 @@ function closeRhemaSheet() {
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
   document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
   _rhemaActiveWord = null;
+}
+
+function initRhemaSwipeDown(sheet) {
+  if (!sheet || sheet._swipeInit) return;
+  sheet._swipeInit = true;
+  let startY = 0, currentY = 0, dragging = false;
+  const handle = sheet.querySelector('.rhema-sheet-handle');
+  const target = handle || sheet;
+  target.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+  target.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    currentY = e.touches[0].clientY;
+    sheet.style.transform = `translateY(${Math.max(0, currentY - startY)}px)`;
+  }, { passive: true });
+  target.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (currentY - startY > 80) { sheet.style.transform = ''; closeRhemaSheet(); }
+    else sheet.style.transform = '';
+  });
 }
 
 function showRhemaTab(tab, word) {
