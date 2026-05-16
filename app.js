@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.8";
+const APP_VERSION = "1.9.9";
 
 const UPDATE_NOTES = [
   "Rhēma interlinear — structured 4-column grid with English gloss under each Greek word; tap 'Just Greek' to instantly switch back to clean flowing Greek text",
@@ -15238,7 +15238,8 @@ function renderRhemaVerse() {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
       const cls = isXref ? 'rhema-word xref' : 'rhema-word';
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
-      const gloss = lex.brief || '';
+      const rawGloss = lex.brief || '';
+      const gloss = rawGloss.split(',')[0].split(';')[0].trim();
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
       return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
     }).join('');
