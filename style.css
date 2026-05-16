@@ -11579,3 +11579,201 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   min-width: 28px;
   text-align: right;
 }
+
+/* ══ Home screen — app padding fix + app-header visibility ══════════════════ */
+
+/* Remove .app side padding when home screen is active so it fills edge-to-edge */
+body .app:has(#homeScreen.screen.active) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Hide the app-header on home screen (home-hero has the title) */
+body .app:has(#homeScreen.screen.active) .app-header {
+  display: none !important;
+}
+
+/* Also remove margin-top on homeScreen that was added in older media queries */
+body .app:has(#homeScreen.screen.active) #homeScreen {
+  margin-top: 0 !important;
+}
+
+/* ══ Settings screen redesign ════════════════════════════════════════════════ */
+
+#settingsScreen.screen.active {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Remove app padding when settings is active */
+body .app:has(#settingsScreen.screen.active) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Settings nav bar stays at top */
+#settingsScreen .nav-bar {
+  flex-shrink: 0;
+}
+
+/* Scrollable body */
+.sett-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Section label */
+.sett-section-label {
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+  opacity: 0.7;
+  margin: 20px 4px 8px;
+}
+.sett-section-label:first-child { margin-top: 8px; }
+
+.sett-section-desc {
+  font-size: 0.82rem;
+  color: var(--muted-color);
+  margin: -4px 4px 8px;
+  line-height: 1.4;
+}
+
+/* Card container */
+.sett-card {
+  background: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Separator */
+.sett-sep {
+  height: 1px;
+  background: var(--border-color);
+  opacity: 0.5;
+  margin: 0 16px;
+  flex-shrink: 0;
+}
+
+/* Row */
+.sett-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  color: var(--font-color);
+}
+.sett-row:active { background: color-mix(in srgb, var(--border-color) 50%, transparent); }
+
+.sett-row-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sett-row-icon-wrap .material-symbols-outlined {
+  font-size: 1.3rem !important;
+  color: var(--secondary-color) !important;
+}
+
+.sett-row-text { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.sett-row-name { font-size: 0.95rem; font-weight: 700; color: var(--font-color); }
+.sett-row-sub  { font-size: 0.78rem; color: var(--muted-color); }
+
+.sett-row-chev {
+  font-size: 1.25rem !important;
+  color: var(--muted-color) !important;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+/* Danger row */
+.sett-icon-danger { background: color-mix(in srgb, #ef4444 10%, transparent) !important; }
+.sett-icon-danger .material-symbols-outlined { color: #ef4444 !important; }
+.sett-name-danger { color: #ef4444 !important; }
+
+/* Theme rows */
+.sett-theme-card { overflow: visible; }  /* let sett-sep extend slightly */
+.sett-theme-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.sett-theme-row:active { background: color-mix(in srgb, var(--border-color) 50%, transparent); }
+
+.sett-theme-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  display: block;
+}
+
+.sett-theme-check {
+  font-size: 1.2rem !important;
+  color: var(--secondary-color) !important;
+  margin-left: auto;
+  display: none;
+  flex-shrink: 0;
+}
+.theme-preset.selected .sett-theme-check { display: block; }
+
+/* Collapse content inside sett-card */
+.sett-collapse-content {
+  display: none;
+  padding: 0 16px 14px;
+  flex-direction: column;
+  gap: 10px;
+}
+.sett-collapse-content.open {
+  display: flex;
+}
+.sett-collapse-content p {
+  font-size: 0.85rem;
+  color: var(--muted-color);
+  line-height: 1.5;
+  margin: 0;
+}
+.sett-collapse-content .danger-btn {
+  align-self: flex-start;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+}
