@@ -72,7 +72,7 @@ exports.sendScheduledReminders = functions.pubsub
             title: "Time to study Greek!",
             body: "Take a few minutes to review your vocabulary and lessons."
           },
-          webpush: { notification: { icon: "/Greek-Vocab/icon-192.png" } }
+          webpush: { notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
         });
         console.log(`${userDoc.id}: ${result.successCount} sent, ${result.failureCount} failed`);
         result.responses.forEach((r, i) => {
@@ -124,7 +124,7 @@ exports.onEncouragementCreated = functions.firestore
       const result = await messaging.sendEachForMulticast({
         tokens,
         notification: { title, body },
-        webpush: { notification: { icon: "/Greek-Vocab/icon-192.png" } }
+        webpush: { notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
       });
       console.log(`onEncouragementCreated ${targetUid}: ${result.successCount} sent, ${result.failureCount} failed`);
       result.responses.forEach((r, i) => {
