@@ -6391,7 +6391,7 @@ body:not(.home-active) {
 /* ══ Home screen ═══════════════════════════════════════════════════════════ */
 
 #homeScreen.screen.active {
-  padding: 0 !important;
+  padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 32px) !important;
   border-radius: 0 !important;
   background: transparent !important;
   border: none !important;
@@ -6399,6 +6399,8 @@ body:not(.home-active) {
   display: flex;
   flex-direction: column;
   gap: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Top nav row: icons flush left/right, no center title */
@@ -6411,21 +6413,21 @@ body:not(.home-active) {
 .home-nav-btn {
   width: 44px !important;
   height: 44px !important;
-  border-radius: 14px !important;
-  background: var(--card-color) !important;
-  border: 1px solid var(--border-color) !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
-.home-nav-btn .material-symbols-outlined { font-size: 26px !important; color: var(--secondary-color) !important; }
+.home-nav-btn .material-symbols-outlined { font-size: 28px !important; color: var(--secondary-color) !important; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 28 !important; }
 
 /* Hero text block */
 .home-hero {
-  padding: 28px 22px 20px;
+  padding: 24px 22px 18px;
 }
 .home-title {
-  font-size: 2.5rem;
+  font-size: 2.85rem;
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1.0;
@@ -6436,7 +6438,7 @@ body:not(.home-active) {
   font-size: 1rem;
   line-height: 1.45;
   color: var(--muted-color);
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 }
 .home-about-link {
   display: inline-flex;
@@ -6459,12 +6461,11 @@ body:not(.home-active) {
   display: flex;
   align-items: center;
   gap: 16px;
-  width: 100%;
   background: var(--secondary-color);
   border: none;
   border-radius: 22px;
   padding: 22px 20px;
-  margin: 0 0 0;
+  margin: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   box-shadow: 0 6px 24px rgba(0,0,0,0.16);
@@ -6472,9 +6473,10 @@ body:not(.home-active) {
 }
 .home-rhema-card:active { opacity: 0.88; }
 .home-rhema-icon {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   color: var(--btn-text-color);
   flex-shrink: 0;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
 }
 .home-rhema-text {
   flex: 1;
@@ -6514,11 +6516,10 @@ body:not(.home-active) {
   display: flex;
   align-items: center;
   gap: 14px;
-  width: 100%;
   background: var(--card-color);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 16px 16px;
+  padding: 16px;
   cursor: pointer;
   text-align: left;
   -webkit-tap-highlight-color: transparent;
@@ -6532,7 +6533,7 @@ body:not(.home-active) {
 .home-feat-icon-wrap {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 50%;
   background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
   display: flex;
   align-items: center;
@@ -6540,8 +6541,9 @@ body:not(.home-active) {
   flex-shrink: 0;
 }
 .home-feat-icon-wrap .material-symbols-outlined {
-  font-size: 1.55rem !important;
+  font-size: 1.5rem !important;
   color: var(--secondary-color) !important;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24 !important;
 }
 
 /* Text column */
@@ -6559,23 +6561,21 @@ body:not(.home-active) {
   line-height: 1.1;
 }
 .home-feat-sub {
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   color: var(--muted-color);
   line-height: 1.3;
 }
 
 /* Right chevron */
 .home-card-chev {
-  font-size: 1.3rem !important;
+  font-size: 1.5rem !important;
   color: var(--muted-color) !important;
-  opacity: 0.5;
+  opacity: 0.35;
   flex-shrink: 0;
 }
 
-/* Lessons card sits alone, full width */
-.home-feature-card {
-  margin: 0 0 0;
-}
+/* Lessons card sits alone */
+.home-feature-card { margin: 0; }
 
 /* 2-col grid */
 .home-grid {
@@ -6584,14 +6584,15 @@ body:not(.home-active) {
   gap: 10px;
   margin-top: 10px;
 }
+/* Grid cards: row layout matching Lessons card */
 .home-grid-card {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 16px 14px 14px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
 }
-.home-grid-card .home-feat-text { width: 100%; }
-.home-grid-card .home-card-chev { display: none; }
+.home-grid-card .home-feat-text { width: auto; }
+.home-grid-card .home-card-chev { display: block; }
 
 /* Locked state mutes the icon wrap slightly */
 .home-grid-card.locked-feature-btn .home-feat-icon-wrap {
@@ -6602,13 +6603,7 @@ body:not(.home-active) {
   opacity: 0.6;
 }
 
-/* Outer screen wrapper — full-height scroll container */
-#homeScreen.screen.active {
-  overflow-y: auto;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px) !important;
-}
-
-/* Rhēma button + grid sit inside horizontal padding */
+/* Rhēma button + cards sit inside horizontal padding */
 #homeScreen .home-rhema-card,
 #homeScreen .home-feature-card,
 #homeScreen .home-grid,
@@ -11542,11 +11537,10 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ══ Home screen — app padding fix + app-header visibility ══════════════════ */
 
-/* Remove .app side padding when home screen is active so it fills edge-to-edge */
+/* Remove all .app padding when home screen is active so it fills edge-to-edge */
 body .app:has(#homeScreen.screen.active) {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  padding-top: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden;
 }
 
 /* Hide the app-header on home screen (home-hero has the title) */
