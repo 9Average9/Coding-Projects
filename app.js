@@ -13196,13 +13196,13 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.2";
+const APP_VERSION = "1.9.3";
 
 const UPDATE_NOTES = [
+  "Rhēma slide-up — the word study screen now animates in from the bottom instead of fading over the page",
+  "Swipe to close pickers — drag the book, chapter, or verse picker downward to dismiss it",
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
-  "Encourage friends — tap any friend's profile and send them a push notification to remind them to study Greek",
-  "Friend request notifications — get a push when someone sends or accepts your friend request",
-  "Friends — find other learners, send friend requests, view their stats, and build your study community from the home screen"
+  "Encourage friends — tap any friend's profile and send them a push notification to remind them to study Greek"
 ];
 
 let deferredInstallPrompt = null;
@@ -14988,6 +14988,7 @@ function openRhemaBookPicker() {
   const search = document.getElementById('rhemaBookSearch');
   if (search) search.value = '';
   overlay.classList.remove('hidden');
+  initRhemaPickerSwipeDown('rhemaBookPickerOverlay');
   requestAnimationFrame(() => {
     list.querySelector('.selected')?.scrollIntoView({ block: 'center' });
   });
@@ -15003,6 +15004,7 @@ function openRhemaChapPicker() {
     return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectChap('${ch}')">${ch}</div>`;
   }).join('');
   overlay.classList.remove('hidden');
+  initRhemaPickerSwipeDown('rhemaChapPickerOverlay');
 }
 
 function openRhemaVersePicker() {
@@ -15015,6 +15017,7 @@ function openRhemaVersePicker() {
     return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectVerse('${v}')">${v}</div>`;
   }).join('');
   overlay.classList.remove('hidden');
+  initRhemaPickerSwipeDown('rhemaVersePickerOverlay');
 }
 
 function closeRhemaPickerSheet() {
@@ -15318,6 +15321,52 @@ function initRhemaSwipeDown(sheet) {
     else sheet.style.transform = '';
   };
 
+  for (const t of targets) {
+    t.addEventListener('touchstart', onStart, { passive: true });
+    t.addEventListener('touchmove',  onMove,  { passive: false });
+    t.addEventListener('touchend',   onEnd);
+  }
+}
+
+function initRhemaPickerSwipeDown(overlayId) {
+  const overlay = document.getElementById(overlayId);
+  if (!overlay || overlay._swipeInit) return;
+  overlay._swipeInit = true;
+  const sheet = overlay.querySelector('.rhema-picker-sheet');
+  if (!sheet) return;
+  let startY = 0, currentY = 0, dragging = false;
+
+  const onStart = (e) => {
+    startY = e.touches[0].clientY;
+    currentY = startY;
+    dragging = true;
+    sheet.style.transition = 'none';
+  };
+  const onMove = (e) => {
+    if (!dragging) return;
+    currentY = e.touches[0].clientY;
+    const dy = currentY - startY;
+    if (dy > 0) {
+      e.preventDefault();
+      sheet.style.transform = `translateY(${dy}px)`;
+    }
+  };
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (currentY - startY > 80) {
+      sheet.style.transform = '';
+      closeRhemaPickerSheet();
+    } else {
+      sheet.style.transform = '';
+    }
+  };
+
+  // Drag from handle or header area
+  const handle = sheet.querySelector('.rhema-picker-handle');
+  const hdr    = sheet.querySelector('.rhema-picker-hdr');
+  const targets = [handle, hdr].filter(Boolean);
   for (const t of targets) {
     t.addEventListener('touchstart', onStart, { passive: true });
     t.addEventListener('touchmove',  onMove,  { passive: false });
