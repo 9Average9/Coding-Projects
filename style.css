@@ -6573,6 +6573,10 @@ body:not(.home-active) {
   opacity: 0.35;
   flex-shrink: 0;
 }
+.home-rhema-card .home-card-chev {
+  color: var(--btn-text-color) !important;
+  opacity: 0.6;
+}
 
 /* Lessons card sits alone */
 .home-feature-card { margin: 0; }
@@ -6582,7 +6586,7 @@ body:not(.home-active) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 18px;
 }
 /* Grid cards: row layout matching Lessons card */
 .home-grid-card {
@@ -8211,16 +8215,8 @@ body.dark button.continue-learning-btn {
   transition: transform 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
-#profileNotificationBtn.notifications-enabled {
-  background: #2f6f4e;
-  color: white;
-  box-shadow: 0 10px 22px rgba(47, 111, 78, 0.28);
-  animation: notificationEnabledPop 0.35s ease;
-}
-
-#profileNotificationBtn.notifications-enabled .material-symbols-outlined,
-#profileNotificationBtn.notifications-enabled span {
-  color: white;
+#profileNotificationBtn.notifications-enabled .material-symbols-outlined {
+  color: #16a34a !important;
 }
 
 @keyframes notificationEnabledPop {
@@ -11711,6 +11707,22 @@ body .app:has(#settingsScreen.screen.active) {
   flex-shrink: 0;
 }
 .theme-preset.selected .sett-theme-check { display: block !important; }
+
+/* Reset old theme-preset span rules that bleed onto text/check spans in settings rows */
+.sett-theme-row .sett-theme-swatch {
+  width: 32px !important;
+  height: 32px !important;
+  box-shadow: none !important;
+}
+.sett-theme-row .sett-row-name,
+.sett-theme-row .sett-theme-check {
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
 
 /* Collapse content inside sett-card */
 .sett-collapse-content {
