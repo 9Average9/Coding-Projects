@@ -1834,6 +1834,14 @@ body.dark .welcome-destination {
   margin-top: 14px;
 }
 
+/* Rhēma entry in About modal — visually elevated */
+.welcome-route-feature {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--primary-color) 18%, transparent),
+    color-mix(in srgb, var(--secondary-color) 10%, transparent)) !important;
+  border: 1.5px solid color-mix(in srgb, var(--secondary-color) 30%, transparent) !important;
+}
+
 body.dark .welcome-route div {
   background: rgba(17, 24, 39, 0.75);
   border-color: #4b5563;
@@ -6954,6 +6962,131 @@ body:not(.home-active) {
 
 #homeScreen {
   margin-top: 4vh !important;
+}
+
+/* ── Rhēma Hero Card ── */
+.rhema-hero-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(140deg, var(--primary-color) 0%, var(--primary-light) 55%, var(--secondary-color) 160%);
+  border-radius: 24px;
+  padding: 26px 22px 22px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.14s, box-shadow 0.14s;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.18);
+}
+.rhema-hero-card:active {
+  transform: scale(0.984);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+.rhema-hero-watermark {
+  position: absolute;
+  right: -12px;
+  bottom: -20px;
+  font-size: 8.5rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.09);
+  letter-spacing: -0.05em;
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+}
+.rhema-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.rhema-hero-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.20);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--btn-text-color);
+  letter-spacing: 0.03em;
+}
+.rhema-hero-badge-pill .material-symbols-outlined { font-size: 1rem; }
+.rhema-hero-new-tag {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 10px;
+  padding: 3px 9px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--btn-text-color);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.rhema-hero-subtitle {
+  font-size: 0.9rem;
+  color: var(--btn-text-color);
+  opacity: 0.88;
+  line-height: 1.45;
+  margin: 0 0 16px;
+  max-width: 290px;
+}
+.rhema-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--btn-text-color);
+  opacity: 0.65;
+  margin-bottom: 18px;
+  letter-spacing: 0.04em;
+}
+.rhema-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.22);
+  border: 1.5px solid rgba(255,255,255,0.38);
+  border-radius: 14px;
+  padding: 10px 18px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--btn-text-color);
+}
+.rhema-hero-cta .material-symbols-outlined { font-size: 1.05rem; }
+
+/* ── Home section label ── */
+.home-section-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+  opacity: 0.6;
+  margin: 6px 2px 8px;
+}
+
+/* ── Secondary features 2-col grid ── */
+.home-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+#homeScreen .home-actions-grid .main-btn.home-action {
+  min-height: 62px !important;
+  padding: 14px 12px !important;
+  margin: 0 !important;
+  font-size: 1rem !important;
+  border-radius: 18px !important;
+  gap: 8px !important;
+}
+#homeScreen .home-actions-grid .main-btn.home-action .material-symbols-outlined {
+  font-size: 24px !important;
 }
 
 /* ===== LOWER XP BANNER / TOAST ===== */
