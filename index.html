@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=115" />
+  <link rel="stylesheet" href="style.css?v=117" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10347,19 +10347,25 @@ glacier: {
   />
 </div>
 
-    <button id="profileSettingsBtn" class="main-btn try-app-btn" onclick="openSettingsFromProfile()">
-  Settings
-</button>
-
-  <button id="profileNotificationBtn" class="main-btn try-app-btn" onclick="openReminderModal()">
-  <span class="material-symbols-outlined">alarm</span>
-  <span id="profileNotificationBtnText">Set Reminders</span>
-</button>
-
-    <button class="main-btn try-app-btn" onclick="signOutAccount()">
-  <span class="material-symbols-outlined">logout</span>
-  <span>Sign Out</span>
-</button>
+    <div class="prof-menu-card">
+      <button id="profileSettingsBtn" class="prof-menu-row" onclick="openSettingsFromProfile()">
+        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">settings</span></span>
+        <span class="prof-menu-name">Settings</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+      <div class="prof-menu-sep"></div>
+      <button id="profileNotificationBtn" class="prof-menu-row" onclick="openReminderModal()">
+        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">notifications</span></span>
+        <span class="prof-menu-name" id="profileNotificationBtnText">Reminders</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+      <div class="prof-menu-sep"></div>
+      <button class="prof-menu-row" onclick="signOutAccount()">
+        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">logout</span></span>
+        <span class="prof-menu-name">Sign Out</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+    </div>
 
 <button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
   <span class="material-symbols-outlined">install_mobile</span>
