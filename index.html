@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=112" />
+  <link rel="stylesheet" href="style.css?v=113" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10484,9 +10484,19 @@ glacier: {
     </div>
 
     <div class="rhema-picker">
-      <select id="rhemaBookSel" class="rhema-sel" onchange="rhemaBookChanged()"></select>
-      <select id="rhemaChapSel" class="rhema-sel" onchange="rhemaChapChanged()"></select>
-      <select id="rhemaVerseSel" class="rhema-sel" onchange="rhemaVerseChanged()"></select>
+      <button class="rhema-pill" onclick="openRhemaBookPicker()">
+        <span class="material-symbols-outlined rhema-pill-icon">menu_book</span>
+        <span id="rhemaPillBook">John</span>
+        <span class="material-symbols-outlined rhema-pill-chev">expand_more</span>
+      </button>
+      <button class="rhema-pill" onclick="openRhemaChapPicker()">
+        <span id="rhemaPillChap">Ch 3</span>
+        <span class="material-symbols-outlined rhema-pill-chev">expand_more</span>
+      </button>
+      <button class="rhema-pill" onclick="openRhemaVersePicker()">
+        <span id="rhemaPillVerse">v16</span>
+        <span class="material-symbols-outlined rhema-pill-chev">expand_more</span>
+      </button>
     </div>
 
     <div id="rhemaBreadcrumb" class="rhema-breadcrumb hidden"></div>
@@ -10527,12 +10537,49 @@ glacier: {
     <div id="rhemaTabContent" class="rhema-tab-content"></div>
   </div>
   <div id="rhemaSheetBackdrop" class="rhema-sheet-backdrop" onclick="closeRhemaSheet()"></div>
+
+  <!-- ── Book picker ── -->
+  <div id="rhemaBookPickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
+    <div class="rhema-picker-sheet" onclick="event.stopPropagation()">
+      <div class="rhema-picker-handle"></div>
+      <div class="rhema-picker-hdr">
+        <span class="rhema-picker-title">Select Book</span>
+      </div>
+      <div class="rhema-picker-search-row">
+        <span class="material-symbols-outlined rhema-picker-search-icon">search</span>
+        <input id="rhemaBookSearch" class="rhema-picker-search-input" placeholder="Search books…" oninput="rhemaFilterBooks(this.value)">
+      </div>
+      <div id="rhemaBookList" class="rhema-book-list"></div>
+    </div>
+  </div>
+
+  <!-- ── Chapter picker ── -->
+  <div id="rhemaChapPickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
+    <div class="rhema-picker-sheet rhema-picker-sheet--grid" onclick="event.stopPropagation()">
+      <div class="rhema-picker-hdr">
+        <span class="rhema-picker-title">Select Chapter</span>
+        <button class="rhema-picker-x" onclick="closeRhemaPickerSheet()">✕</button>
+      </div>
+      <div id="rhemaChapGrid" class="rhema-num-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── Verse picker ── -->
+  <div id="rhemaVersePickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
+    <div class="rhema-picker-sheet rhema-picker-sheet--grid" onclick="event.stopPropagation()">
+      <div class="rhema-picker-hdr">
+        <span class="rhema-picker-title">Select Verse</span>
+        <button class="rhema-picker-x" onclick="closeRhemaPickerSheet()">✕</button>
+      </div>
+      <div id="rhemaVerseGrid" class="rhema-num-grid"></div>
+    </div>
+  </div>
 </div>
 
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=112"></script>
+  <script src="app.js?v=113"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
