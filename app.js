@@ -13196,9 +13196,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.9";
+const APP_VERSION = "2.0.0";
 
 const UPDATE_NOTES = [
+  "Rhēma occurrences — KJV button in the book verse list switches all preview snippets to English with the matching word bolded",
   "Rhēma interlinear — structured 4-column grid with English gloss under each Greek word; tap 'Just Greek' to instantly switch back to clean flowing Greek text",
   "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
   "Cleaner settings — no more tan background, theme rows look clean, Reminders button matches the style",
@@ -15512,10 +15513,14 @@ function renderRhemaOccurrences(strongs) {
     <div class="rhema-occ-list">${bookRows}</div>`;
 }
 
+let _rhemaBVCode    = null;
+let _rhemaBVStrongs = null;
+let _rhemaBVRefs    = [];
+let _rhemaBVKjv     = false;
+
 function openRhemaBookVerses(code, strongs) {
   const bookText = (window.RhemaNT?.text || {})[code];
   if (!bookText) return;
-  const bookName = window.RhemaNT.names[code] || code;
 
   const refs = [];
   const chapters = Object.keys(bookText).sort((a,b) => +a - +b);
@@ -15528,26 +15533,67 @@ function openRhemaBookVerses(code, strongs) {
     }
   }
 
+  _rhemaBVCode    = code;
+  _rhemaBVStrongs = strongs;
+  _rhemaBVRefs    = refs;
+  _rhemaBVKjv     = false;
+  renderRhemaBookVerses();
+}
+
+function toggleRhemaBookViewKjv() {
+  _rhemaBVKjv = !_rhemaBVKjv;
+  renderRhemaBookVerses();
+}
+
+function _kjvHighlight(kjvText, strongs) {
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const raw = (lex.kjv_def || '').replace(/^-+/, '').trim();
+  if (!raw) return kjvText;
+  // Try full phrase then first word; skip tiny function words
+  const candidates = [raw, raw.split(' ')[0]].filter(c => c.length > 2);
+  for (const term of candidates) {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`\\b(${escaped}\\w{0,4})\\b`, 'i');
+    const result = kjvText.replace(re, '<span class="xref-match">$1</span>');
+    if (result !== kjvText) return result;
+  }
+  return kjvText;
+}
+
+function renderRhemaBookVerses() {
+  const code    = _rhemaBVCode;
+  const strongs = _rhemaBVStrongs;
+  const refs    = _rhemaBVRefs;
+  const bookName = window.RhemaNT?.names[code] || code;
+
   const rows = refs.map(({ ch, v, wordIdx, words }) => {
-    const start = Math.max(0, wordIdx - 3);
-    const end   = Math.min(words.length - 1, wordIdx + 4);
-    const preview = words.slice(start, end + 1).map((w, i) => {
-      return (start + i) === wordIdx
-        ? `<span class="xref-match">${w[0]}</span>`
-        : w[0];
-    }).join(' ');
+    let previewHtml;
+    if (_rhemaBVKjv) {
+      const raw = (window.RhemaKJV?.[code]?.[ch]?.[v]) || '';
+      const highlighted = _kjvHighlight(raw, strongs);
+      previewHtml = `<span class="rhema-xref-verse-text">${highlighted}</span>`;
+    } else {
+      const start = Math.max(0, wordIdx - 3);
+      const end   = Math.min(words.length - 1, wordIdx + 4);
+      const preview = words.slice(start, end + 1).map((w, i) =>
+        (start + i) === wordIdx ? `<span class="xref-match">${w[0]}</span>` : w[0]
+      ).join(' ');
+      previewHtml = `<span class="rhema-xref-verse-text">…${preview}…</span>`;
+    }
     return `<div class="rhema-xref-verse-row" onclick="jumpToRhemaVerse('${code}','${ch}','${v}',${strongs})">
       <span class="rhema-xref-verse-ref">${ch}:${v}</span>
-      <span class="rhema-xref-verse-text">…${preview}…</span>
+      ${previewHtml}
     </div>`;
   }).join('');
 
   const content = document.getElementById('rhemaTabContent');
   if (!content) return;
+  const kjvCls = `rhema-xref-kjv-btn${_rhemaBVKjv ? ' active' : ''}`;
   content.innerHTML = `
     <div class="rhema-xref-header">
       <button class="rhema-xref-back-btn" onclick="showRhemaTab('occurrences')">← Occurrences</button>
       <span class="rhema-xref-title">${bookName} · ${refs.length} verse${refs.length !== 1 ? 's' : ''}</span>
+      <button class="${kjvCls}" onclick="toggleRhemaBookViewKjv()">KJV</button>
     </div>
     <div>${rows}</div>`;
 }

@@ -11413,6 +11413,26 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--font-color);
+  flex: 1;
+}
+.rhema-xref-kjv-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.rhema-xref-kjv-btn.active {
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--btn-text-color);
 }
 .rhema-xref-verse-row {
   display: flex;
