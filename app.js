@@ -13196,10 +13196,10 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.7";
+const APP_VERSION = "1.9.8";
 
 const UPDATE_NOTES = [
-  "Rhēma interlinear — English gloss now appears under each Greek word so you can read the text at a glance",
+  "Rhēma interlinear — structured 4-column grid with English gloss under each Greek word; tap 'Just Greek' to instantly switch back to clean flowing Greek text",
   "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
   "Cleaner settings — no more tan background, theme rows look clean, Reminders button matches the style",
   "Study reminders — set a daily push notification at any time you choose right from your profile"
@@ -14728,7 +14728,8 @@ let _rhemaLoading = false;
 let _rhemaBook = 'JOH';
 let _rhemaChapter = '3';
 let _rhemaVerse = '16';
-let _rhemaShowKjv = false;
+let _rhemaShowKjv    = false;
+let _rhemaGreekOnly  = false;
 let _rhemaActiveTab = 'parsing';
 let _rhemaActiveWord = null;
 let _rhemaTrail = [];       // full cross-ref trail — never auto-shrinks
@@ -15223,14 +15224,25 @@ function renderRhemaVerse() {
 
   const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
 
-  display.innerHTML = words.map((w, i) => {
-    const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
-    const cls = isXref ? 'rhema-word xref' : 'rhema-word';
-    const lex = (window.RhemaLexicon || {})[w[1]] || {};
-    const gloss = lex.brief || '';
-    const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
-    return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
-  }).join('');
+  if (_rhemaGreekOnly) {
+    display.classList.add('greek-only');
+    display.innerHTML = words.map((w, i) => {
+      const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
+      const cls = isXref ? 'rhema-word xref' : 'rhema-word';
+      return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span></span>` +
+             (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '');
+    }).join('');
+  } else {
+    display.classList.remove('greek-only');
+    display.innerHTML = words.map((w, i) => {
+      const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
+      const cls = isXref ? 'rhema-word xref' : 'rhema-word';
+      const lex = (window.RhemaLexicon || {})[w[1]] || {};
+      const gloss = lex.brief || '';
+      const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
+      return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
+    }).join('');
+  }
 
   if (kjvDiv && window.RhemaKJV) {
     const kjvText = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
@@ -15246,6 +15258,16 @@ function toggleRhemaKjv() {
   _rhemaShowKjv = !_rhemaShowKjv;
   updateRhemaSwapVisibility();
   closeRhemaSheet();
+}
+
+function toggleRhemaMode() {
+  _rhemaGreekOnly = !_rhemaGreekOnly;
+  const btn = document.getElementById('rhemaGreekModeBtn');
+  if (btn) {
+    btn.textContent = _rhemaGreekOnly ? 'Interlinear' : 'Just Greek';
+    btn.classList.toggle('active', _rhemaGreekOnly);
+  }
+  renderRhemaVerse();
 }
 
 function updateRhemaSwapVisibility() {
