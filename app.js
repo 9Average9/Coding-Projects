@@ -12995,10 +12995,10 @@ function renderAchievements() {
   });
 }
 
-function showLessonsBreakdownModal(tab) {
+function showLessonsBreakdownModal(tab, navigate = true) {
   const modal = document.getElementById("lessonsBreakdownModal");
   if (!modal) return;
-  switchLessonBreakdownTab(tab || getLessonMode());
+  switchLessonBreakdownTab(tab || getLessonMode(), navigate);
   modal.classList.add("open");
 }
 
@@ -13008,7 +13008,7 @@ function closeLessonsBreakdownModal(event) {
   }
 }
 
-function switchLessonBreakdownTab(tab) {
+function switchLessonBreakdownTab(tab, navigate = true) {
   const basicTab = document.getElementById("breakdownBasicTab");
   const advTab = document.getElementById("breakdownAdvancedTab");
   const card = document.querySelector(".lessons-breakdown-card");
@@ -13016,12 +13016,13 @@ function switchLessonBreakdownTab(tab) {
   if (advTab) advTab.classList.toggle("active", tab === "advanced");
   if (card) card.classList.toggle("adv-tab-active", tab === "advanced");
 
-  // Switch the underlying lesson menu so closing the modal lands on the right track
   localStorage.setItem("lessonMode", tab);
-  if (tab === "advanced") {
-    showAdvancedLearnMenu();
-  } else {
-    _openBasicLearnMenu();
+  if (navigate) {
+    if (tab === "advanced") {
+      showAdvancedLearnMenu();
+    } else {
+      _openBasicLearnMenu();
+    }
   }
 
   renderLessonsBreakdown(tab);
