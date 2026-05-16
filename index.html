@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=122" />
+  <link rel="stylesheet" href="style.css?v=123" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10590,13 +10590,14 @@ glacier: {
 
     <div id="rhemaBreadcrumb" class="rhema-breadcrumb hidden"></div>
 
-    <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
-
-    <div id="rhemaVerseDisplay" class="rhema-verse-display"></div>
-
-    <div id="rhemaKjvDisplay" class="rhema-kjv-display hidden"></div>
-
-    <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
+    <!-- Stable flex child — loading/verse/KJV/hint all live inside so
+         nothing outside this box ever shifts when they show/hide -->
+    <div class="rhema-content-area">
+      <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
+      <div id="rhemaVerseDisplay" class="rhema-verse-display"></div>
+      <div id="rhemaKjvDisplay" class="rhema-kjv-display hidden"></div>
+      <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
+    </div>
 
     <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
       <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
@@ -10670,7 +10671,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=119"></script>
+  <script src="app.js?v=120"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->

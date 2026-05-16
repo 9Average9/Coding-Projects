@@ -11026,6 +11026,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: none;
 }
 .rhema-book-row {
   display: flex;
@@ -11061,6 +11063,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: none;
 }
 .rhema-num-cell {
   aspect-ratio: 1;
@@ -11085,33 +11089,51 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 /* ── Verse display ── */
+/* ── Stable content wrapper — flex:1 box that never changes size ── */
+.rhema-content-area {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Loading, verse, KJV, and tap hint all live absolutely inside this box.
+   None of them affect the outer flex layout when they show or hide. */
 .rhema-loading {
-  padding: 48px 24px;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   color: var(--muted-color);
   font-size: 0.9rem;
+  pointer-events: none;
 }
 
 .rhema-verse-display {
-  flex: 1;
-  min-height: 0;
-  padding: 24px 20px;
+  position: absolute;
+  inset: 0;
+  padding: 20px 14px 16px;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   overscroll-behavior: none;
-  line-height: 2.6;
-  font-size: 1.3rem;
-  letter-spacing: 0.03em;
-  color: var(--font-color);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 4px 8px;
 }
 
 .rhema-word {
-  display: inline;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
   cursor: pointer;
-  border-radius: 6px;
-  padding: 2px 2px;
+  border-radius: 8px;
+  padding: 6px 8px 5px;
   transition: background 0.12s;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -11119,6 +11141,26 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-word:active,
 .rhema-word.selected {
   background: color-mix(in srgb, var(--secondary-color) 18%, transparent);
+}
+.rhema-greek-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+  color: var(--font-color);
+}
+.rhema-gloss {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: var(--muted-color);
+  opacity: 0.72;
+  margin-top: 3px;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  max-width: 88px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .rhema-kjv-display {
