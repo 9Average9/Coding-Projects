@@ -14969,81 +14969,104 @@ function rhemaGoBack() {
 
 function initRhemaPicker() {
   if (!window.RhemaNT) return;
-  const bookSel = document.getElementById('rhemaBookSel');
-  if (!bookSel || bookSel.children.length > 0) return; // already initialised
-
-  RHEMA_BOOK_ORDER.forEach(code => {
-    const opt = document.createElement('option');
-    opt.value = code;
-    opt.textContent = window.RhemaNT.names[code] || code;
-    if (code === _rhemaBook) opt.selected = true;
-    bookSel.appendChild(opt);
-  });
-  populateRhemaChapters();
-  populateRhemaVerses();
-}
-
-function populateRhemaChapters() {
-  const chapSel = document.getElementById('rhemaChapSel');
-  if (!chapSel || !window.RhemaNT) return;
-  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {})
-    .sort((a,b) => +a - +b);
-  chapSel.innerHTML = '';
-  chapters.forEach(ch => {
-    const opt = document.createElement('option');
-    opt.value = ch;
-    opt.textContent = 'Ch ' + ch;
-    if (ch === _rhemaChapter) opt.selected = true;
-    chapSel.appendChild(opt);
-  });
-  if (!chapters.includes(_rhemaChapter)) _rhemaChapter = chapters[0];
-}
-
-function populateRhemaVerses() {
-  const verseSel = document.getElementById('rhemaVerseSel');
-  if (!verseSel || !window.RhemaNT) return;
-  const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {})
-    .sort((a,b) => +a - +b);
-  verseSel.innerHTML = '';
-  verses.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v;
-    opt.textContent = 'v' + v;
-    if (v === _rhemaVerse) opt.selected = true;
-    verseSel.appendChild(opt);
-  });
-  if (!verses.includes(_rhemaVerse)) _rhemaVerse = verses[0];
-}
-
-function rhemaBookChanged() {
-  _rhemaBook = document.getElementById('rhemaBookSel')?.value || _rhemaBook;
-  _rhemaChapter = '1';
-  _rhemaVerse = '1';
-  _rhemaHighlightStrongs = null;
-  populateRhemaChapters();
-  populateRhemaVerses();
-  renderRhemaVerse();
-}
-
-function rhemaChapChanged() {
-  _rhemaChapter = document.getElementById('rhemaChapSel')?.value || _rhemaChapter;
-  _rhemaVerse = '1';
-  _rhemaHighlightStrongs = null;
-  populateRhemaVerses();
-  renderRhemaVerse();
-}
-
-function rhemaVerseChanged() {
-  _rhemaVerse = document.getElementById('rhemaVerseSel')?.value || _rhemaVerse;
-  _rhemaHighlightStrongs = null;
-  renderRhemaVerse();
+  syncRhemaPicker();
 }
 
 function syncRhemaPicker() {
-  const bookSel = document.getElementById('rhemaBookSel');
-  if (bookSel) bookSel.value = _rhemaBook;
-  populateRhemaChapters();
-  populateRhemaVerses();
+  const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook;
+  const b = document.getElementById('rhemaPillBook');
+  const c = document.getElementById('rhemaPillChap');
+  const v = document.getElementById('rhemaPillVerse');
+  if (b) b.textContent = bookName;
+  if (c) c.textContent = 'Ch ' + _rhemaChapter;
+  if (v) v.textContent = 'v' + _rhemaVerse;
+}
+
+function openRhemaBookPicker() {
+  closeRhemaPickerSheet();
+  const overlay = document.getElementById('rhemaBookPickerOverlay');
+  if (!overlay || !window.RhemaNT) return;
+  const list = document.getElementById('rhemaBookList');
+  list.innerHTML = RHEMA_BOOK_ORDER.map(code => {
+    const name = window.RhemaNT.names[code] || code;
+    const sel  = code === _rhemaBook ? ' selected' : '';
+    return `<div class="rhema-book-row${sel}" onclick="rhemaSelectBook('${code}')">
+      <span class="material-symbols-outlined rhema-book-icon">menu_book</span>
+      <span class="rhema-book-name">${name}</span>
+      <span class="material-symbols-outlined rhema-book-check">check</span>
+    </div>`;
+  }).join('');
+  const search = document.getElementById('rhemaBookSearch');
+  if (search) search.value = '';
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    list.querySelector('.selected')?.scrollIntoView({ block: 'center' });
+  });
+}
+
+function openRhemaChapPicker() {
+  closeRhemaPickerSheet();
+  const overlay = document.getElementById('rhemaChapPickerOverlay');
+  if (!overlay || !window.RhemaNT) return;
+  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a-+b);
+  document.getElementById('rhemaChapGrid').innerHTML = chapters.map(ch => {
+    const sel = ch === _rhemaChapter ? ' selected' : '';
+    return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectChap('${ch}')">${ch}</div>`;
+  }).join('');
+  overlay.classList.remove('hidden');
+}
+
+function openRhemaVersePicker() {
+  closeRhemaPickerSheet();
+  const overlay = document.getElementById('rhemaVersePickerOverlay');
+  if (!overlay || !window.RhemaNT) return;
+  const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a-+b);
+  document.getElementById('rhemaVerseGrid').innerHTML = verses.map(v => {
+    const sel = v === _rhemaVerse ? ' selected' : '';
+    return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectVerse('${v}')">${v}</div>`;
+  }).join('');
+  overlay.classList.remove('hidden');
+}
+
+function closeRhemaPickerSheet() {
+  ['rhemaBookPickerOverlay','rhemaChapPickerOverlay','rhemaVersePickerOverlay'].forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
+  });
+}
+
+function rhemaFilterBooks(query) {
+  const q = query.toLowerCase().trim();
+  document.getElementById('rhemaBookList')?.querySelectorAll('.rhema-book-row').forEach(row => {
+    const name = row.querySelector('.rhema-book-name')?.textContent?.toLowerCase() || '';
+    row.style.display = (!q || name.includes(q)) ? '' : 'none';
+  });
+}
+
+function rhemaSelectBook(code) {
+  _rhemaBook    = code;
+  _rhemaChapter = '1';
+  _rhemaVerse   = '1';
+  _rhemaHighlightStrongs = null;
+  closeRhemaPickerSheet();
+  syncRhemaPicker();
+  renderRhemaVerse();
+}
+
+function rhemaSelectChap(ch) {
+  _rhemaChapter = ch;
+  _rhemaVerse   = '1';
+  _rhemaHighlightStrongs = null;
+  closeRhemaPickerSheet();
+  syncRhemaPicker();
+  renderRhemaVerse();
+}
+
+function rhemaSelectVerse(v) {
+  _rhemaVerse = v;
+  _rhemaHighlightStrongs = null;
+  closeRhemaPickerSheet();
+  syncRhemaPicker();
+  renderRhemaVerse();
 }
 
 // ── Verse swipe navigation ────────────────────────────────────────────────────
@@ -15242,6 +15265,7 @@ function openRhemaSheet(wordIdx) {
   const word  = words[wordIdx];
   if (!word) return;
 
+  closeRhemaPickerSheet();
   _rhemaActiveWord = word;
 
   // Highlight selected word
