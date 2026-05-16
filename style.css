@@ -10634,7 +10634,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .notifications-enabled .material-symbols-outlined { color: #16a34a; }
 
 
-/* ══ Rhēma Word Study ═══════════════════════════════════════════════════════ */
+
+/* ══ Rhēma Word Study — all colors via CSS variables, theme-aware ════════════ */
 
 .rhema-modal-overlay {
   position: fixed;
@@ -10642,7 +10643,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, #dbeafe 0%, #eff6ff 60%, #fef9ee 100%);
+  background: linear-gradient(160deg, var(--primary-color) 0%, var(--primary-light) 100%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
@@ -10653,11 +10654,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   pointer-events: all;
 }
 
-body.dark .rhema-modal-overlay {
-  background: linear-gradient(160deg, #0f1e3a 0%, #111827 100%);
-}
-
-/* ── Container ── */
 .rhema-container {
   display: flex;
   flex-direction: column;
@@ -10672,43 +10668,37 @@ body.dark .rhema-modal-overlay {
   align-items: center;
   gap: 8px;
   padding: calc(env(safe-area-inset-top, 20px) + 14px) 14px 14px;
-  background: rgba(255, 252, 242, 0.85);
+  background: var(--card-color);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(211, 196, 163, 0.6);
+  border-bottom: 1.5px solid var(--border-color);
   flex-shrink: 0;
-}
-body.dark .rhema-header {
-  background: rgba(17, 24, 39, 0.85);
-  border-bottom-color: rgba(255,255,255,0.08);
 }
 
 .rhema-title-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
 }
 .rhema-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--secondary-color);
   line-height: 1;
 }
-body.dark .rhema-title { color: #93c5fd; }
-
 .rhema-title-greek {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
-  opacity: 0.5;
+  letter-spacing: 0.1em;
+  color: var(--muted-color);
   text-transform: uppercase;
 }
 
 .rhema-swap-btn {
-  background: rgba(255,255,255,0.7);
-  border: 1.5px solid #d3c4a3;
+  background: var(--card-color);
+  border: 1.5px solid var(--border-color);
   border-radius: 10px;
   padding: 6px 10px;
   font-size: 0.75rem;
@@ -10721,12 +10711,7 @@ body.dark .rhema-title { color: #93c5fd; }
 .rhema-swap-btn.active {
   background: var(--secondary-color);
   border-color: var(--secondary-color);
-  color: #fff;
-}
-body.dark .rhema-swap-btn {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.15);
-  color: #93c5fd;
+  color: var(--btn-text-color);
 }
 
 /* ── Verse picker ── */
@@ -10734,24 +10719,20 @@ body.dark .rhema-swap-btn {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255, 252, 242, 0.6);
-  border-bottom: 1px solid rgba(211, 196, 163, 0.4);
+  background: color-mix(in srgb, var(--card-color) 70%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
   flex-shrink: 0;
-}
-body.dark .rhema-picker {
-  background: rgba(255,255,255,0.04);
-  border-bottom-color: rgba(255,255,255,0.06);
 }
 
 .rhema-sel {
   flex: 1;
   min-width: 0;
-  border: 1.5px solid #d3c4a3;
+  border: 1.5px solid var(--border-color);
   border-radius: 12px;
   padding: 8px 6px;
   font-size: 0.82rem;
   font-weight: 600;
-  background: rgba(255, 252, 242, 0.95);
+  background: var(--card-color);
   color: var(--font-color);
   appearance: none;
   -webkit-appearance: none;
@@ -10763,21 +10744,15 @@ body.dark .rhema-picker {
 .rhema-sel:focus {
   outline: none;
   border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color) 20%, transparent);
 }
 .rhema-sel:first-child { flex: 2; }
-
-body.dark .rhema-sel {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.12);
-  color: #f1f5f9;
-}
 
 /* ── Verse display ── */
 .rhema-loading {
   padding: 48px 24px;
   text-align: center;
-  opacity: 0.5;
+  color: var(--muted-color);
   font-size: 0.9rem;
 }
 
@@ -10788,6 +10763,7 @@ body.dark .rhema-sel {
   line-height: 2.6;
   font-size: 1.3rem;
   letter-spacing: 0.03em;
+  color: var(--font-color);
 }
 
 .rhema-word {
@@ -10801,12 +10777,7 @@ body.dark .rhema-sel {
 }
 .rhema-word:active,
 .rhema-word.selected {
-  background: rgba(29, 78, 216, 0.15);
-  border-radius: 6px;
-}
-body.dark .rhema-word:active,
-body.dark .rhema-word.selected {
-  background: rgba(147, 197, 253, 0.2);
+  background: color-mix(in srgb, var(--secondary-color) 18%, transparent);
 }
 
 .rhema-kjv-display {
@@ -10818,23 +10789,23 @@ body.dark .rhema-word.selected {
   font-style: italic;
   color: var(--muted-color);
 }
-body.dark .rhema-kjv-display { color: #94a3b8; }
 
 .rhema-tap-hint {
   text-align: center;
   font-size: 0.75rem;
-  opacity: 0.4;
+  color: var(--muted-color);
+  opacity: 0.6;
   padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
   margin: 0;
   flex-shrink: 0;
 }
 .rhema-tap-hint.hidden { display: none; }
 
-/* ── Bottom sheet backdrop ── */
+/* ── Bottom sheet ── */
 .rhema-sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(0,0,0,0.4);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   opacity: 0;
@@ -10847,16 +10818,15 @@ body.dark .rhema-kjv-display { color: #94a3b8; }
   pointer-events: all;
 }
 
-/* ── Bottom sheet ── */
 .rhema-sheet {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 252, 242, 0.98);
+  background: var(--card-color);
   border-radius: 22px 22px 0 0;
-  box-shadow: 0 -6px 40px rgba(0,0,0,0.16);
-  border-top: 1px solid rgba(211, 196, 163, 0.5);
+  box-shadow: 0 -6px 40px rgba(0,0,0,0.18);
+  border-top: 1.5px solid var(--border-color);
   z-index: 101;
   transform: translateY(100%);
   transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1);
@@ -10870,24 +10840,17 @@ body.dark .rhema-kjv-display { color: #94a3b8; }
 .rhema-sheet.open {
   transform: translateY(0);
 }
-body.dark .rhema-sheet {
-  background: rgba(17, 24, 39, 0.98);
-  border-top-color: rgba(255,255,255,0.08);
-}
 
-/* drag handle */
 .rhema-sheet-handle {
   width: 40px;
   height: 4px;
-  background: rgba(0,0,0,0.15);
+  background: color-mix(in srgb, var(--muted-color) 40%, transparent);
   border-radius: 2px;
   margin: 12px auto 8px;
   flex-shrink: 0;
   cursor: grab;
 }
-body.dark .rhema-sheet-handle { background: rgba(255,255,255,0.2); }
 
-/* Word header */
 .rhema-sheet-top {
   display: flex;
   align-items: baseline;
@@ -10902,11 +10865,9 @@ body.dark .rhema-sheet-handle { background: rgba(255,255,255,0.2); }
   letter-spacing: 0.03em;
   line-height: 1.1;
 }
-body.dark .rhema-sheet-surface { color: #93c5fd; }
-
 .rhema-sheet-strongs {
   font-size: 0.75rem;
-  opacity: 0.4;
+  color: var(--muted-color);
   font-weight: 600;
   letter-spacing: 0.05em;
 }
@@ -10921,12 +10882,10 @@ body.dark .rhema-sheet-surface { color: #93c5fd; }
 /* Tabs */
 .rhema-sheet-tabs {
   display: flex;
-  border-bottom: 1.5px solid rgba(211, 196, 163, 0.5);
+  border-bottom: 1.5px solid var(--border-color);
   padding: 0 18px;
   flex-shrink: 0;
 }
-body.dark .rhema-sheet-tabs { border-bottom-color: rgba(255,255,255,0.08); }
-
 .rhema-tab {
   flex: 1;
   background: none;
@@ -10945,10 +10904,7 @@ body.dark .rhema-sheet-tabs { border-bottom-color: rgba(255,255,255,0.08); }
   color: var(--secondary-color);
   border-bottom-color: var(--secondary-color);
 }
-body.dark .rhema-tab { color: #64748b; }
-body.dark .rhema-tab.active { color: #93c5fd; border-bottom-color: #93c5fd; }
 
-/* Tab content */
 .rhema-tab-content {
   flex: 1;
   overflow-y: auto;
@@ -10956,21 +10912,15 @@ body.dark .rhema-tab.active { color: #93c5fd; border-bottom-color: #93c5fd; }
 }
 
 /* ── Parsing tab ── */
-.rhema-parsing-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+.rhema-parsing-grid { display: flex; flex-direction: column; }
 .rhema-parse-row {
   display: grid;
   grid-template-columns: 100px 1fr;
   align-items: start;
   gap: 8px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(211, 196, 163, 0.3);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
 }
-body.dark .rhema-parse-row { border-bottom-color: rgba(255,255,255,0.05); }
-
 .rhema-parse-label {
   font-size: 0.68rem;
   font-weight: 700;
@@ -10984,8 +10934,6 @@ body.dark .rhema-parse-row { border-bottom-color: rgba(255,255,255,0.05); }
   font-weight: 700;
   color: var(--font-color);
 }
-body.dark .rhema-parse-value { color: #f1f5f9; }
-
 .rhema-parse-desc {
   font-size: 0.75rem;
   color: var(--muted-color);
@@ -11008,8 +10956,6 @@ body.dark .rhema-parse-value { color: #f1f5f9; }
   line-height: 1.6;
   color: var(--font-color);
 }
-body.dark .rhema-def-text { color: #e2e8f0; }
-
 .rhema-def-kjv {
   font-size: 0.78rem;
   color: var(--muted-color);
@@ -11018,10 +10964,9 @@ body.dark .rhema-def-text { color: #e2e8f0; }
 }
 .rhema-def-sep {
   height: 1px;
-  background: rgba(211, 196, 163, 0.4);
+  background: color-mix(in srgb, var(--border-color) 60%, transparent);
   margin: 14px 0;
 }
-body.dark .rhema-def-sep { background: rgba(255,255,255,0.06); }
 
 /* ── Occurrences tab ── */
 .rhema-occ-total {
@@ -11030,33 +10975,24 @@ body.dark .rhema-def-sep { background: rgba(255,255,255,0.06); }
   margin-bottom: 14px;
   color: var(--font-color);
 }
-body.dark .rhema-occ-total { color: #e2e8f0; }
-
 .rhema-occ-total span {
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--secondary-color);
 }
-body.dark .rhema-occ-total span { color: #93c5fd; }
-
 .rhema-occ-list { display: flex; flex-direction: column; }
 .rhema-occ-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 7px 0;
-  border-bottom: 1px solid rgba(211, 196, 163, 0.3);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
   font-size: 0.87rem;
 }
-body.dark .rhema-occ-row { border-bottom-color: rgba(255,255,255,0.05); }
-
 .rhema-occ-book { font-weight: 500; color: var(--font-color); }
-body.dark .rhema-occ-book { color: #e2e8f0; }
-
 .rhema-occ-count {
   font-weight: 800;
   color: var(--secondary-color);
   min-width: 28px;
   text-align: right;
 }
-body.dark .rhema-occ-count { color: #93c5fd; }

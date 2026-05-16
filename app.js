@@ -13205,7 +13205,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.0";
+const APP_VERSION = "1.9.1";
 
 const UPDATE_NOTES = [
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
