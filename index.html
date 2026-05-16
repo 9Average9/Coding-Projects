@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=109" />
+  <link rel="stylesheet" href="style.css?v=110" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -323,7 +323,7 @@ glacier: {
   <main class="app">
     <header class="header" onclick="showInfoModal()" role="button" tabindex="0">
       <h1>Basic Greek Trainer</h1>
-<p>Learn the basics of New Testament Greek step by step.</p>
+<p>Study the Greek New Testament — down to every word.</p>
 <small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
     </header>
 
@@ -342,36 +342,58 @@ glacier: {
 
 
 
+<!-- Rhēma hero card — the centrepiece of the app -->
+<div class="rhema-hero-card" onclick="showRhema()">
+  <div class="rhema-hero-watermark">ῥῆμα</div>
+  <div class="rhema-hero-top">
+    <span class="rhema-hero-badge-pill">
+      <span class="material-symbols-outlined">auto_stories</span>
+      Rhēma · Word Study
+    </span>
+    <span class="rhema-hero-new-tag">Majority Text</span>
+  </div>
+  <p class="rhema-hero-subtitle">Tap any Greek word — instant parsing, two lexicons, and every cross-reference across all 27 NT books. Offline.</p>
+  <div class="rhema-hero-stats">
+    <span>27 books</span>
+    <span>·</span>
+    <span>7,956 verses</span>
+    <span>·</span>
+    <span>2 lexicons</span>
+  </div>
+  <div class="rhema-hero-cta">
+    Open Rhēma
+    <span class="material-symbols-outlined">arrow_forward</span>
+  </div>
+</div>
+
+<!-- Lessons — the path to unlocking Rhēma -->
+<div class="home-section-label">Your Learning Path</div>
+
 <button class="main-btn home-action" onclick="showNewLearnMenu()">
   <span class="material-symbols-outlined">menu_book</span>
   <span>Lessons</span>
 </button>
 
+<!-- Secondary features -->
+<div class="home-actions-grid">
   <button id="vocabHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
-  <span class="material-symbols-outlined lock-icon">lock</span>
-  <span>Vocab</span>
-</button>
-
-<button id="translateHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
-  <span class="material-symbols-outlined lock-icon">lock</span>
-  <span>Translate</span>
-</button>
-
-<button id="testHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('test')">
-  <span class="material-symbols-outlined lock-icon">lock</span>
-  <span>Test</span>
-</button>
-
-<button class="main-btn home-action friends-home-btn" onclick="showFriendsModal()">
-  <span class="material-symbols-outlined">group</span>
-  <span>Friends</span>
-  <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
-</button>
-
-<button class="main-btn home-action" onclick="showRhema()">
-  <span class="material-symbols-outlined">auto_stories</span>
-  <span>Rhēma</span>
-</button>
+    <span class="material-symbols-outlined lock-icon">lock</span>
+    <span>Vocab</span>
+  </button>
+  <button id="translateHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
+    <span class="material-symbols-outlined lock-icon">lock</span>
+    <span>Translate</span>
+  </button>
+  <button id="testHomeBtn" class="main-btn home-action locked-feature-btn" onclick="tryOpenLockedFeature('test')">
+    <span class="material-symbols-outlined lock-icon">lock</span>
+    <span>Test</span>
+  </button>
+  <button class="main-btn home-action friends-home-btn" onclick="showFriendsModal()">
+    <span class="material-symbols-outlined">group</span>
+    <span>Friends</span>
+    <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
+  </button>
+</div>
 
     </section>
  <section id="newLearnMenu" class="screen">
@@ -9422,43 +9444,38 @@ glacier: {
     <h2>About This App</h2>
 
     <p class="welcome-lead">
-      The New Testament was written in Greek. This app exists to close the gap between you and the text — no seminary required, no prior knowledge assumed.
-    </p>
-
-    <p>
-      Most believers read the Bible in translation their whole lives and never realize how much texture, nuance, and meaning exists in the original language. A single Greek word can carry weight that takes an entire English sentence to explain. This app is built to change that — one step at a time.
+      The New Testament was written in Greek. Every word choice matters. This app puts those words — and everything behind them — in your hands.
     </p>
 
     <div class="welcome-route">
-      <div>
-        <strong>Two lesson tracks — same topics, different depths</strong>
-        <span>Both tracks cover the same core material: the alphabet, grammar, nouns, cases, verbs, and how Greek sentences work. Track 1 moves through each topic efficiently and gets you engaging with Greek fast. Track 2 covers all the same topics but goes significantly deeper — fuller grammar tables, more nuance, required quizzes. Think of them as two different lenses on the same foundation. The best path is to do both.</span>
+      <div class="welcome-route-feature">
+        <strong>Rhēma — The Heart of This App</strong>
+        <span>Rhēma (ῥῆμα) is the Greek word for a specific, spoken word — the exact utterance. It is also the word study feature that makes this app unique.</span>
+        <span style="margin-top:6px;display:block">Open any of the 7,956 verses across all 27 NT books. Tap any Greek word and instantly see its full grammatical parsing, root word, two complete lexicons (Strong's &amp; Dodson), etymology, and every other verse where that exact word appears — with cross-reference jumping and a full navigation trail.</span>
+        <span style="margin-top:6px;display:block;font-style:italic;opacity:0.75">Tools like Bible Hub and Blue Letter Bible offer similar word study — but they require an internet connection, work from the Critical Text (Nestle-Aland/UBS), and live outside your app. Rhēma is built in, works offline after the first load, and is built on the <strong>Byzantine Majority Text</strong> — the text tradition behind the KJV and NKJV, supported by over 80% of surviving Greek manuscripts. This is one of the first word-study tools of its depth built specifically on the Majority Text.</span>
       </div>
 
       <div>
-        <strong>Vocab — 300 words, 80% of the New Testament</strong>
-        <span>The Greek New Testament contains thousands of unique words — but a small set of them appear over and over again. The 300 words in this app are the most frequently used words in the entire NT. Memorize just these 300 words and you will recognize over 80% of every Greek word you encounter in the New Testament. That is not just a head start — that is the foundation for actual reading.</span>
+        <strong>The Lessons — Your Path to Rhēma</strong>
+        <span>The lessons are not a detour. They are the key. Once you understand cases, parsing, and how Greek sentences work, opening Rhēma changes everything — you are not looking at symbols anymore, you are reading.</span>
+        <span style="margin-top:6px;display:block"><strong>Track 1 (Basic)</strong> — 10 lessons, ~2–3 hours. Alphabet, nouns, cases, conjunctions, and a repeatable reading strategy. After this, Rhēma's parsing labels mean something.</span>
+        <span style="margin-top:6px;display:block"><strong>Track 2 (Advanced)</strong> — 10 deeper lessons, ~4–5 hours. Full declension tables, accent rules, textual criticism, verb system preview. After this, Rhēma shows you things commentaries spend paragraphs on.</span>
       </div>
 
       <div>
-        <strong>Translate</strong>
-        <span>Work through real Greek sentences from the NT and build reading confidence one phrase at a time.</span>
-      </div>
-
-      <div>
-        <strong>Test</strong>
-        <span>Quiz yourself by chapter, track your weak words, and measure progress over time.</span>
+        <strong>Vocab — 300 Words, 80% of the NT</strong>
+        <span>Memorize the 300 most frequent Greek NT words and you will recognize over 80% of every word you encounter in the New Testament. Pair this with Rhēma and you can work through real passages with real comprehension.</span>
       </div>
 
       <div>
         <strong>Friends &amp; Leaderboard</strong>
-        <span>Learn alongside your church community, track each other's progress, and stay motivated together.</span>
+        <span>Learn alongside your church community. See each other's progress and stay motivated together.</span>
       </div>
     </div>
 
     <p class="welcome-destination">
       <span class="material-symbols-outlined">travel_explore</span>
-      <span>Complete both tracks and you will be equipped to open <strong>Bible Hub</strong>, <strong>Logos</strong>, and <strong>Blue Letter Bible</strong> and read Greek alongside your English Bible — catching things most readers never see.</span>
+      <span>Everything in this app leads to the same place: sitting with the Greek New Testament, understanding what you are reading, word by word. <strong>Rhēma is that moment — built in, always available, always free.</strong></span>
     </p>
 
     <button class="main-btn welcome-start-btn" onclick="hideInfoModal()">
@@ -10366,15 +10383,16 @@ glacier: {
 
     <div class="track-info-section">
       <div class="track-info-section-title">What this sets you up for</div>
-      <p>After completing Track 1 you'll be able to use Greek study tools with real understanding — not just guessing:</p>
+      <p>After completing Track 1 you'll be able to use Rhēma and other Greek study tools with real understanding — not just guessing:</p>
       <div class="track-info-tools">
+        <span class="track-tool-pill" style="background:color-mix(in srgb, var(--secondary-color) 15%, transparent);border-color:var(--secondary-color);color:var(--secondary-color);font-weight:800">Rhēma ✦</span>
         <span class="track-tool-pill">Bible Hub</span>
         <span class="track-tool-pill">Blue Letter Bible</span>
         <span class="track-tool-pill">STEP Bible</span>
         <span class="track-tool-pill">Interlinear Bibles</span>
         <span class="track-tool-pill">Logos</span>
       </div>
-      <p style="margin-top:10px">Parsing labels like <strong>N-NSM</strong> (Noun, Nominative, Singular, Masculine) will make complete sense. You'll follow Greek commentary and notice things in verses no translation can show you.</p>
+      <p style="margin-top:10px">Parsing labels like <strong>N-NSM</strong> (Noun, Nominative, Singular, Masculine) will make complete sense. Tap any word in Rhēma and you'll actually understand what you're reading — not just copying labels.</p>
     </div>
 
     <div class="track-info-section">
@@ -10417,16 +10435,16 @@ glacier: {
 
     <div class="track-info-section">
       <div class="track-info-section-title">What this sets you up for</div>
-      <p>Everything Track 1 unlocks, plus the ability to engage Greek study tools at their full depth:</p>
+      <p>Everything Track 1 unlocks, plus the ability to engage Rhēma and Greek study tools at their full depth:</p>
       <div class="track-info-tools">
+        <span class="track-tool-pill" style="background:color-mix(in srgb, var(--secondary-color) 15%, transparent);border-color:var(--secondary-color);color:var(--secondary-color);font-weight:800">Rhēma ✦</span>
         <span class="track-tool-pill">Bible Hub</span>
         <span class="track-tool-pill">Blue Letter Bible</span>
         <span class="track-tool-pill">STEP Bible</span>
-        <span class="track-tool-pill">Interlinear Bibles</span>
         <span class="track-tool-pill advanced">Logos</span>
         <span class="track-tool-pill advanced">Scholarly Commentary</span>
       </div>
-      <p style="margin-top:10px">You'll understand <em>why</em> translators made specific choices, follow detailed Greek commentary, and have enough foundation to move confidently into the full verb lesson series.</p>
+      <p style="margin-top:10px">You'll understand <em>why</em> translators made specific choices, follow detailed Greek commentary, and have the foundation to use Rhēma to trace a word through the entire NT — seeing how an author's vocabulary builds an argument across chapters.</p>
     </div>
 
     <div class="track-info-section">
@@ -10531,7 +10549,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=109"></script>
+  <script src="app.js?v=110"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
