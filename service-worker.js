@@ -12,16 +12,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function (payload) {
-  const title = payload.notification?.title || "Basic Greek Trainer";
-  const body  = payload.notification?.body  || "Time to study Greek!";
-  self.registration.showNotification(title, {
-    body,
-    icon: "./icon-192.png"
-  });
-});
+// No manual showNotification — Firebase auto-displays from the notification
+// field in the payload. Calling showNotification here caused iOS to show
+// two notifications (APNs auto-display + our manual call).
+messaging.onBackgroundMessage(function () {});
 
-const CACHE_NAME = "basic-greek-trainer-v1.8.5";
+const CACHE_NAME = "basic-greek-trainer-v1.8.6";
 
 const FILES_TO_CACHE = [
   "./",
