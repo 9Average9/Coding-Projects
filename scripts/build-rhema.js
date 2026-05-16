@@ -150,7 +150,36 @@ function parseDodson(tsvText) {
   return result;
 }
 
-// ── Parse KJV JSON ────────────────────────────────────────────────────────────
+// ── Parse CCAT accented CSV ───────────────────────────────────────────────────
+// Format: chapter,verse,Βίβλος γενέσεως Ἰησοῦ ... (full accented words, space-separated)
+
+const GREEK_LETTER = /\p{Script=Greek}/u;
+
+function parseCcatCsv(csvText) {
+  const result = {};
+  const lines = csvText.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const firstComma = trimmed.indexOf(',');
+    const secondComma = trimmed.indexOf(',', firstComma + 1);
+    if (firstComma < 0 || secondComma < 0) continue;
+    const chapter = trimmed.substring(0, firstComma).trim();
+    const verse   = trimmed.substring(firstComma + 1, secondComma).trim();
+    const text    = trimmed.substring(secondComma + 1).trim();
+    if (!chapter || !verse || !text) continue;
+    // Split on whitespace, strip leading/trailing non-Greek characters, keep only tokens with at least one Greek letter
+    const words = text.split(/\s+/)
+      .map(w => w.replace(/^[^\p{Script=Greek}]+|[^\p{Script=Greek}]+$/gu, ''))
+      .filter(w => GREEK_LETTER.test(w));
+    if (words.length) {
+      if (!result[chapter]) result[chapter] = {};
+      result[chapter][verse] = words;
+    }
+  }
+  return result;
+}
+
 
 function parseKjvBook(bookJson) {
   const result = {};
@@ -204,19 +233,52 @@ async function main() {
     }
   }
 
-  // 2. Strong's lexicon
+  // 2. Apply accents from CCAT files (same repo, same word order, full Unicode)
+  console.log('\nDownloading accented text (CCAT/RP2018)...');
+  const CCAT_BASE = 'https://raw.githubusercontent.com/byztxt/byzantine-majority-text/master/csv-unicode/ccat/no-variants/';
+  let accentMismatches = 0;
+
+  for (const book of NT_BOOKS) {
+    process.stdout.write(`  ${book.code}... `);
+    try {
+      const csv = await fetchText(`${CCAT_BASE}${book.code}.csv`);
+      const accented = parseCcatCsv(csv);
+      let swapped = 0, mismatched = 0;
+      for (const [ch, verses] of Object.entries(ntText[book.code] || {})) {
+        for (const [v, words] of Object.entries(verses)) {
+          const acc = (accented[ch] || {})[v] || [];
+          if (acc.length === words.length) {
+            words.forEach((w, i) => { w[0] = acc[i]; });
+            swapped += words.length;
+          } else if (acc.length > 0) {
+            // Counts differ — apply what aligns, leave rest unaccented
+            const min = Math.min(words.length, acc.length);
+            for (let i = 0; i < min; i++) words[i][0] = acc[i];
+            mismatched++;
+            accentMismatches++;
+          }
+        }
+      }
+      process.stdout.write(`✓ (${swapped} words accented${mismatched ? ', ' + mismatched + ' verse mismatches' : ''})\n`);
+    } catch (e) {
+      process.stdout.write(`✗ ${e.message}\n`);
+    }
+  }
+  if (accentMismatches) console.log(`  Total verse mismatches: ${accentMismatches}`);
+
+  // 3. Strong's lexicon
   console.log('\nDownloading Strong\'s Greek lexicon...');
   const strongsRaw = await fetchText('https://raw.githubusercontent.com/openscriptures/strongs/master/greek/strongs-greek-dictionary.js');
   const strongs = parseStrongs(strongsRaw);
   console.log(`  ${Object.keys(strongs).length} entries`);
 
-  // 3. Dodson lexicon
+  // 4. Dodson lexicon
   console.log('\nDownloading Dodson lexicon...');
   const dodsonRaw = await fetchText('https://raw.githubusercontent.com/biblicalhumanities/Dodson-Greek-Lexicon/master/dodson.csv');
   const dodson = parseDodson(dodsonRaw);
   console.log(`  ${Object.keys(dodson).length} entries`);
 
-  // 4. KJV NT
+  // 5. KJV NT
   console.log('\nDownloading KJV New Testament...');
   const kjvText = {};
   const KJV_BASE = 'https://raw.githubusercontent.com/aruljohn/Bible-kjv/master/';
