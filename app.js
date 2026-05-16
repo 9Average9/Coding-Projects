@@ -13196,13 +13196,13 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.3";
+const APP_VERSION = "1.9.4";
 
 const UPDATE_NOTES = [
-  "Rhēma slide-up — the word study screen now animates in from the bottom instead of fading over the page",
+  "Rhēma fixes — word study screen slides up cleanly, verse text now scrolls, and the word detail sheet no longer ghosts at the bottom",
   "Swipe to close pickers — drag the book, chapter, or verse picker downward to dismiss it",
-  "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
-  "Encourage friends — tap any friend's profile and send them a push notification to remind them to study Greek"
+  "Cleaner settings — theme selector rows and Reminders button now match the rest of the settings style",
+  "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile"
 ];
 
 let deferredInstallPrompt = null;
