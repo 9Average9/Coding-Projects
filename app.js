@@ -30,6 +30,7 @@ let friendRequestsIn = [];
 let friendRequestsOut = [];
 let _unsubUserDoc = null;
 let _friendsTab = "friends";
+let _lessonBreakdownNavigate = true;
 let _browseSearch = "";
 let _currentFriendSheetUid = null;
 
@@ -13001,6 +13002,7 @@ function renderAchievements() {
 function showLessonsBreakdownModal(tab, navigate = true) {
   const modal = document.getElementById("lessonsBreakdownModal");
   if (!modal) return;
+  _lessonBreakdownNavigate = navigate;
   switchLessonBreakdownTab(tab || getLessonMode(), navigate);
   modal.classList.add("open");
 }
@@ -13011,7 +13013,8 @@ function closeLessonsBreakdownModal(event) {
   }
 }
 
-function switchLessonBreakdownTab(tab, navigate = true) {
+function switchLessonBreakdownTab(tab, navigate) {
+  if (navigate === undefined) navigate = _lessonBreakdownNavigate;
   const basicTab = document.getElementById("breakdownBasicTab");
   const advTab = document.getElementById("breakdownAdvancedTab");
   const card = document.querySelector(".lessons-breakdown-card");
@@ -13202,7 +13205,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.8.7";
+const APP_VERSION = "1.8.8";
 
 const UPDATE_NOTES = [
   "Study reminders — set a daily push notification at any time you choose (daily, weekdays, or weekends) right from your profile",
