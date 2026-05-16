@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=114" />
+  <link rel="stylesheet" href="style.css?v=115" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -321,6 +321,11 @@ glacier: {
 </head>
 <body>
   <main class="app">
+    <header class="header app-header" onclick="showInfoModal()" role="button" tabindex="0">
+      <h1>Basic Greek Trainer</h1>
+      <p>Study the Greek New Testament — down to every word.</p>
+      <small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
+    </header>
 
     <section id="homeScreen" class="screen active">
 
@@ -9249,200 +9254,247 @@ glacier: {
 
     <section id="settingsScreen" class="screen">
       <div class="nav-bar">
-       <button class="icon-btn" onclick="closeSettingsMenu()">
+        <button class="icon-btn" onclick="closeSettingsMenu()">
           <span class="material-symbols-outlined">arrow_back</span>
         </button>
         <div class="nav-title">Settings</div>
         <div></div>
       </div>
- <div class="settings-card">
-  <h3>Appearance</h3>
 
-  <div class="toggle-row">
-    <span>Dark Mode</span>
+      <div class="sett-scroll">
 
-    <label class="switch">
-      <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
-      <span class="slider"></span>
-    </label>
-  </div>
+        <!-- APPEARANCE -->
+        <div class="sett-section-label">Appearance</div>
+        <div class="sett-card">
+          <div class="sett-row">
+            <span class="sett-row-icon-wrap">
+              <span class="material-symbols-outlined">dark_mode</span>
+            </span>
+            <span class="sett-row-text">
+              <span class="sett-row-name">Dark Mode</span>
+              <span class="sett-row-sub">Use a dark color scheme</span>
+            </span>
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
 
- <div class="theme-settings">
-  <h4>App Theme</h4>
-  <p class="helper-text">Choose a polished preset theme.</p>
+        <!-- APP THEME -->
+        <div class="sett-section-label">App Theme</div>
+        <p class="sett-section-desc">Choose a polished preset theme.</p>
+        <div class="sett-card sett-theme-card">
+          <button class="theme-preset sett-theme-row parchment" onclick="setAppTheme('parchment')">
+            <span class="sett-theme-swatch" style="background:#efe4c8;border-color:#d6c49a"></span>
+            <span class="sett-row-name">Classic Parchment</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row midnight" onclick="setAppTheme('midnight')">
+            <span class="sett-theme-swatch" style="background:#111827;border-color:#374151"></span>
+            <span class="sett-row-name">Midnight Study</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row royal" onclick="setAppTheme('royal')">
+            <span class="sett-theme-swatch" style="background:#1d4ed8;border-color:#1e40af"></span>
+            <span class="sett-row-name">Royal Blue</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row emerald" onclick="setAppTheme('emerald')">
+            <span class="sett-theme-swatch" style="background:#047857;border-color:#065f46"></span>
+            <span class="sett-row-name">Emerald Scroll</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row crimson" onclick="setAppTheme('crimson')">
+            <span class="sett-theme-swatch" style="background:#9f1239;border-color:#881337"></span>
+            <span class="sett-row-name">Crimson Ink</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row violet" onclick="setAppTheme('violet')">
+            <span class="sett-theme-swatch" style="background:#6d28d9;border-color:#5b21b6"></span>
+            <span class="sett-row-name">Byzantine Violet</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row slate" onclick="setAppTheme('slate')">
+            <span class="sett-theme-swatch" style="background:#334155;border-color:#1e293b"></span>
+            <span class="sett-row-name">Clean Slate</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row olive" onclick="setAppTheme('olive')">
+            <span class="sett-theme-swatch" style="background:#4d5d2f;border-color:#3a4522"></span>
+            <span class="sett-row-name">Olive Grove</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row orange" onclick="setAppTheme('orange')">
+            <span class="sett-theme-swatch" style="background:#ea580c;border-color:#c2410c"></span>
+            <span class="sett-row-name">Orange Flame</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row pink" onclick="setAppTheme('pink')">
+            <span class="sett-theme-swatch" style="background:#db2777;border-color:#be185d"></span>
+            <span class="sett-row-name">Rose Pink</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row teal" onclick="setAppTheme('teal')">
+            <span class="sett-theme-swatch" style="background:#0f766e;border-color:#0d5c56"></span>
+            <span class="sett-row-name">Teal Sea</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row sand" onclick="setAppTheme('sand')">
+            <span class="sett-theme-swatch" style="background:#92400e;border-color:#78350f"></span>
+            <span class="sett-row-name">Desert Sand</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row moss" onclick="setAppTheme('moss')">
+            <span class="sett-theme-swatch" style="background:#355e3b;border-color:#264a2b"></span>
+            <span class="sett-row-name">Moss Study</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row storm" onclick="setAppTheme('storm')">
+            <span class="sett-theme-swatch" style="background:#60a5fa;border-color:#3b82f6"></span>
+            <span class="sett-row-name">Storm Gray</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row coffee" onclick="setAppTheme('coffee')">
+            <span class="sett-theme-swatch" style="background:#7b4b2a;border-color:#6b3a1f"></span>
+            <span class="sett-row-name">Coffee House</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row forest" onclick="setAppTheme('forest')">
+            <span class="sett-theme-swatch" style="background:#14532d;border-color:#0d3d21"></span>
+            <span class="sett-row-name">Forest Scroll</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row obsidian" onclick="setAppTheme('obsidian')">
+            <span class="sett-theme-swatch" style="background:#facc15;border-color:#eab308"></span>
+            <span class="sett-row-name">Obsidian Gold</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row wine" onclick="setAppTheme('wine')">
+            <span class="sett-theme-swatch" style="background:#881337;border-color:#6f0f2d"></span>
+            <span class="sett-row-name">Vintage Wine</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row ocean" onclick="setAppTheme('ocean')">
+            <span class="sett-theme-swatch" style="background:#0369a1;border-color:#0c5a8a"></span>
+            <span class="sett-row-name">Ocean Study</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row charcoal" onclick="setAppTheme('charcoal')">
+            <span class="sett-theme-swatch" style="background:#4b5563;border-color:#374151"></span>
+            <span class="sett-row-name">Charcoal Night</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row antique" onclick="setAppTheme('antique')">
+            <span class="sett-theme-swatch" style="background:#8b5e34;border-color:#7a4f28"></span>
+            <span class="sett-row-name">Antique Pages</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+          <div class="sett-sep"></div>
+          <button class="theme-preset sett-theme-row glacier" onclick="setAppTheme('glacier')">
+            <span class="sett-theme-swatch" style="background:#2563eb;border-color:#1d4ed8"></span>
+            <span class="sett-row-name">Glacier Blue</span>
+            <span class="material-symbols-outlined sett-theme-check">check</span>
+          </button>
+        </div>
 
-  <div class="theme-preset-grid">
-    <button class="theme-preset parchment" onclick="setAppTheme('parchment')">
-      <span></span> Classic Parchment
-    </button>
+        <!-- LESSON MODE -->
+        <div class="sett-section-label">Lesson Mode</div>
+        <p class="sett-section-desc">Choose how you want to study through the lessons.</p>
+        <div class="sett-card">
+          <button class="sett-row" onclick="showLessonModeModal()">
+            <span class="sett-row-icon-wrap">
+              <span class="material-symbols-outlined">menu_book</span>
+            </span>
+            <span class="sett-row-text">
+              <span class="sett-row-name" id="currentLessonModeLabel">Basic Lessons</span>
+            </span>
+            <span class="material-symbols-outlined sett-row-chev">chevron_right</span>
+          </button>
+          <div id="lessonModeResetRow" style="display:none"></div>
+        </div>
 
-    <button class="theme-preset midnight" onclick="setAppTheme('midnight')">
-      <span></span> Midnight Study
-    </button>
+        <!-- DATA & PROGRESS -->
+        <div class="sett-section-label">Data &amp; Progress</div>
+        <div class="sett-card">
+          <button class="sett-row" onclick="toggleResetSection()">
+            <span class="sett-row-icon-wrap">
+              <span class="material-symbols-outlined">restart_alt</span>
+            </span>
+            <span class="sett-row-text">
+              <span class="sett-row-name">Reset Test Data</span>
+            </span>
+            <span class="material-symbols-outlined sett-row-chev">chevron_right</span>
+          </button>
+          <div id="resetContent" class="sett-collapse-content">
+            <p>This will permanently delete your saved test scores, progress stats, and weak-word tracking. Your vocabulary list will not be affected.</p>
+            <button class="danger-btn" onclick="resetTestData()">Confirm Reset</button>
+          </div>
+          <div class="sett-sep"></div>
+          <button class="sett-row" onclick="toggleTranslationResetSection()">
+            <span class="sett-row-icon-wrap">
+              <span class="material-symbols-outlined">language</span>
+            </span>
+            <span class="sett-row-text">
+              <span class="sett-row-name">Reset Translation Data</span>
+            </span>
+            <span class="material-symbols-outlined sett-row-chev">chevron_right</span>
+          </button>
+          <div id="translationResetContent" class="sett-collapse-content">
+            <p>This will permanently delete your saved translation progress, including all "got it", "almost", and "missed it" data.</p>
+            <button class="danger-btn" onclick="resetTranslationData()">Confirm Reset</button>
+          </div>
+          <div class="sett-sep"></div>
+          <button class="sett-row" onclick="toggleLessonResetSection()">
+            <span class="sett-row-icon-wrap">
+              <span class="material-symbols-outlined">refresh</span>
+            </span>
+            <span class="sett-row-text">
+              <span class="sett-row-name">Start Lessons Over</span>
+            </span>
+            <span class="material-symbols-outlined sett-row-chev">chevron_right</span>
+          </button>
+          <div id="lessonResetContent" class="sett-collapse-content">
+            <p>This will reset completed lessons and opened lesson sections. Vocab, tests, and translation progress will not be affected.</p>
+            <button class="danger-btn" onclick="resetLessonData()">Confirm Start Over</button>
+          </div>
+        </div>
 
-    <button class="theme-preset royal" onclick="setAppTheme('royal')">
-      <span></span> Royal Blue
-    </button>
+        <!-- ACCOUNT -->
+        <div class="sett-section-label">Account</div>
+        <div class="sett-card">
+          <button class="sett-row sett-row-danger" id="profileResetBtn" onclick="resetAllAppData()">
+            <span class="sett-row-icon-wrap sett-icon-danger">
+              <span class="material-symbols-outlined">person_off</span>
+            </span>
+            <span class="sett-row-text">
+              <span class="sett-row-name sett-name-danger">Delete Account</span>
+            </span>
+            <span class="material-symbols-outlined sett-row-chev">chevron_right</span>
+          </button>
+        </div>
 
-    <button class="theme-preset emerald" onclick="setAppTheme('emerald')">
-      <span></span> Emerald Scroll
-    </button>
-
-    <button class="theme-preset crimson" onclick="setAppTheme('crimson')">
-      <span></span> Crimson Ink
-    </button>
-
-    <button class="theme-preset violet" onclick="setAppTheme('violet')">
-      <span></span> Byzantine Violet
-    </button>
-
-    <button class="theme-preset slate" onclick="setAppTheme('slate')">
-      <span></span> Clean Slate
-    </button>
-
-    <button class="theme-preset olive" onclick="setAppTheme('olive')">
-      <span></span> Olive Grove
-    </button>
-
-    <button class="theme-preset orange" onclick="setAppTheme('orange')">
-  <span></span> Orange Flame
-</button>
-
-<button class="theme-preset pink" onclick="setAppTheme('pink')">
-  <span></span> Rose Pink
-</button>
-
-<button class="theme-preset teal" onclick="setAppTheme('teal')">
-  <span></span> Teal Sea
-</button>
-
-<button class="theme-preset sand" onclick="setAppTheme('sand')">
-  <span></span> Desert Sand
-</button>
-
-<button class="theme-preset moss" onclick="setAppTheme('moss')">
-  <span></span> Moss Study
-</button>
-
-<button class="theme-preset storm" onclick="setAppTheme('storm')">
-  <span></span> Storm Gray
-</button>
-
-<button class="theme-preset coffee" onclick="setAppTheme('coffee')">
-  <span></span> Coffee House
-</button>
-
-<button class="theme-preset forest" onclick="setAppTheme('forest')">
-  <span></span> Forest Scroll
-</button>
-
-<button class="theme-preset obsidian" onclick="setAppTheme('obsidian')">
-  <span></span> Obsidian Gold
-</button>
-
-<button class="theme-preset wine" onclick="setAppTheme('wine')">
-  <span></span> Vintage Wine
-</button>
-
-<button class="theme-preset ocean" onclick="setAppTheme('ocean')">
-  <span></span> Ocean Study
-</button>
-
-<button class="theme-preset charcoal" onclick="setAppTheme('charcoal')">
-  <span></span> Charcoal Night
-</button>
-
-<button class="theme-preset antique" onclick="setAppTheme('antique')">
-  <span></span> Antique Pages
-</button>
-
-<button class="theme-preset glacier" onclick="setAppTheme('glacier')">
-  <span></span> Glacier Blue
-</button>
-
-  </div>
-</div>
-</div>
-
-<div class="settings-card">
-  <h3>Lesson Mode</h3>
-  <p class="helper-text">Choose how you want to study through the lessons.</p>
-
-  <div class="lesson-mode-settings-row">
-    <span class="lesson-mode-settings-label" id="currentLessonModeLabel">Basic Lessons</span>
-    <button class="lesson-mode-pill-btn" onclick="showLessonModeModal()">Change</button>
-  </div>
-
-  <div class="lesson-mode-settings-row" id="lessonModeResetRow" style="display:none">
-    <span class="lesson-mode-settings-label">Reset lesson prompt</span>
-    <button class="lesson-mode-pill-btn muted" onclick="resetLessonModePrompt()">Reset</button>
-  </div>
-</div>
-
-     <div class="settings-card">
-  <button class="collapse-btn" onclick="toggleResetSection()">
-    Reset Test Data
-  </button>
-
-  <div id="resetContent" class="collapse-content">
-    <p>
-      This will permanently delete your saved test scores, progress stats,
-      and weak-word tracking. Your vocabulary list will not be affected.
-    </p>
-
-    <button class="danger-btn" onclick="resetTestData()">
-      Confirm Reset
-    </button>
-  </div>
-  
-</div>
-
-<div class="settings-card">
-  <button class="collapse-btn" onclick="toggleTranslationResetSection()">
-    Reset Translation Data
-  </button>
-
-  <div id="translationResetContent" class="collapse-content">
-    <p>
-      This will permanently delete your saved translation progress,
-      including all "got it", "almost", and "missed it" data.
-    </p>
-
-    <button class="danger-btn" onclick="resetTranslationData()">
-      Confirm Reset
-    </button>
-  </div>
-</div>
-
-<div class="settings-card">
-  <button class="collapse-btn" onclick="toggleLessonResetSection()">
-    Start Lessons Over
-  </button>
-
-  <div id="lessonResetContent" class="collapse-content">
-    <p>
-      This will reset completed lessons and opened lesson sections.
-      Vocab, tests, and translation progress will not be affected.
-    </p>
-
-    <button class="danger-btn" onclick="resetLessonData()">
-      Confirm Start Over
-    </button>
-  </div>
-</div>
-
-<div class="settings-card">
-  <button id="profileResetBtn" class="danger-btn" onclick="resetAllAppData()">
-  Delete Account
-</button>
-
-</div>
-
-
-
-
-
- 
+      </div>
     </section>
 
 
@@ -10610,7 +10662,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=114"></script>
+  <script src="app.js?v=115"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
