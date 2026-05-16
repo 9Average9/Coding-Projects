@@ -13196,9 +13196,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.0.1";
+const APP_VERSION = "2.0.2";
 
 const UPDATE_NOTES = [
+  "Rhēma breadcrumb — highlighted cross-reference word now stays highlighted as you navigate trail entries; only clears when you press Clear",
+  "Rhēma layout — removed bottom white space bar; verse nav now sits flush below the last word row",
   "Rhēma word highlight — the cross-reference word stays highlighted as you flip through verses; only clears when you press Clear",
   "Rhēma layout — verse nav sits right below the last word row instead of floating at the bottom of a fixed-height area",
   "Rhēma occurrences — KJV button in the book verse list switches all preview snippets to English with the matching word bolded",
@@ -14952,7 +14954,7 @@ function rhemaGoBack() {
   _rhemaBook = target.book;
   _rhemaChapter = target.chapter;
   _rhemaVerse = target.verse;
-  _rhemaHighlightStrongs = null;
+  _rhemaHighlightStrongs = target.strongs || null;
   closeRhemaSheet();
   syncRhemaPicker();
   renderRhemaVerse();
@@ -15146,9 +15148,9 @@ function rhemaNextVerse() {
 function jumpToRhemaVerse(book, chapter, verse, highlightStrongs) {
   // First jump: also record the origin verse so the trail starts from the beginning
   if (_rhemaTrail.length === 0) {
-    _rhemaTrail.push({ book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse });
+    _rhemaTrail.push({ book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, strongs: null });
   }
-  _rhemaTrail.push({ book, chapter: String(chapter), verse: String(verse) });
+  _rhemaTrail.push({ book, chapter: String(chapter), verse: String(verse), strongs: highlightStrongs || null });
   _rhemaTrailPos = _rhemaTrail.length - 1;
   _rhemaBook = book;
   _rhemaChapter = String(chapter);
@@ -15199,7 +15201,7 @@ function rhemaJumpHistory(idx) {
   _rhemaBook = target.book;
   _rhemaChapter = target.chapter;
   _rhemaVerse = target.verse;
-  _rhemaHighlightStrongs = null;
+  _rhemaHighlightStrongs = target.strongs || null;
   closeRhemaSheet();
   syncRhemaPicker();
   renderRhemaVerse();

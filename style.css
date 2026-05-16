@@ -10830,7 +10830,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
   overflow: hidden;
   overscroll-behavior: none;
-  touch-action: none;
+  touch-action: pan-y;
 }
 .rhema-modal-overlay.open {
   opacity: 1;
@@ -10848,7 +10848,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  touch-action: none;           /* block stray swipes on the container itself */
   overscroll-behavior: none;
 }
 
