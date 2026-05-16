@@ -13196,11 +13196,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "1.9.6";
+const APP_VERSION = "1.9.7";
 
 const UPDATE_NOTES = [
+  "Rhēma interlinear — English gloss now appears under each Greek word so you can read the text at a glance",
   "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
-  "Rhēma fixes — word study screen slides up cleanly and verse text now scrolls",
   "Cleaner settings — no more tan background, theme rows look clean, Reminders button matches the style",
   "Study reminders — set a daily push notification at any time you choose right from your profile"
 ];
@@ -15226,8 +15226,10 @@ function renderRhemaVerse() {
   display.innerHTML = words.map((w, i) => {
     const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
     const cls = isXref ? 'rhema-word xref' : 'rhema-word';
-    return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})">${w[0]}</span>` +
-           (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '');
+    const lex = (window.RhemaLexicon || {})[w[1]] || {};
+    const gloss = lex.brief || '';
+    const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
+    return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
   }).join('');
 
   if (kjvDiv && window.RhemaKJV) {
