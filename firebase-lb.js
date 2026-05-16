@@ -160,6 +160,12 @@ async function loadUserData(uid) {
   } catch { return null; }
 }
 
+function listenUserDoc(uid, callback) {
+  return onSnapshot(doc(db, "users", uid), snap => {
+    if (snap.exists()) callback(snap.data());
+  });
+}
+
 async function syncUserData(uid, data) {
   try {
     await setDoc(doc(db, "users", uid), { ...data, updatedAt: serverTimestamp() }, { merge: true });
@@ -525,7 +531,8 @@ window.Auth = {
   loadUserData,
   syncUserData,
   checkUsernameTaken,
-  checkDisplayNameTaken
+  checkDisplayNameTaken,
+  listenUserDoc
 };
 
 // Notify app.js when Firebase auth state is resolved
