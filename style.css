@@ -11088,8 +11088,9 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-verse-display {
   flex: 1;
   min-height: 0;
-  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 110px);
-  overflow: hidden;
+  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   line-height: 2.6;
   font-size: 1.3rem;
   letter-spacing: 0.03em;
@@ -11113,8 +11114,9 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-kjv-display {
   flex: 1;
   min-height: 0;
-  padding: 24px 20px;
-  overflow: hidden;
+  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   font-size: 1rem;
   line-height: 1.9;
   font-style: italic;
@@ -11364,7 +11366,10 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-top: 1.5px solid var(--border-color);
   z-index: 101;
   transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1);
+  /* delay visibility change until slide-out finishes; avoids iOS overflow:hidden bleed */
+  visibility: hidden;
+  transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1),
+              visibility 0s linear 0.32s;
   min-height: 68vh;
   max-height: 80vh;
   display: flex;
@@ -11374,6 +11379,10 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 .rhema-sheet.open {
   transform: translateY(0);
+  visibility: visible;
+  /* no delay on visibility when opening */
+  transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1),
+              visibility 0s linear 0s;
 }
 
 .rhema-sheet-handle {

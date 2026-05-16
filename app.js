@@ -14973,6 +14973,7 @@ function syncRhemaPicker() {
 
 function openRhemaBookPicker() {
   closeRhemaPickerSheet();
+  closeRhemaSheet();
   const overlay = document.getElementById('rhemaBookPickerOverlay');
   if (!overlay || !window.RhemaNT) return;
   const list = document.getElementById('rhemaBookList');
@@ -14996,6 +14997,7 @@ function openRhemaBookPicker() {
 
 function openRhemaChapPicker() {
   closeRhemaPickerSheet();
+  closeRhemaSheet();
   const overlay = document.getElementById('rhemaChapPickerOverlay');
   if (!overlay || !window.RhemaNT) return;
   const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a-+b);
@@ -15009,6 +15011,7 @@ function openRhemaChapPicker() {
 
 function openRhemaVersePicker() {
   closeRhemaPickerSheet();
+  closeRhemaSheet();
   const overlay = document.getElementById('rhemaVersePickerOverlay');
   if (!overlay || !window.RhemaNT) return;
   const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a-+b);
