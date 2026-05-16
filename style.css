@@ -10830,6 +10830,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   display: flex;
   flex-direction: column;
   background: var(--primary-light);
+  padding: 0 !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
@@ -10846,7 +10847,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
