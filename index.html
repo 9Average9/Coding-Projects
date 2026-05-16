@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=123" />
+  <link rel="stylesheet" href="style.css?v=124" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10569,7 +10569,10 @@ glacier: {
         <span class="rhema-title">Rhēma</span>
         <span class="rhema-title-greek">Word Study</span>
       </div>
-      <button id="rhemaSwapBtn" class="rhema-swap-btn" onclick="toggleRhemaKjv()">KJV</button>
+      <div class="rhema-header-actions">
+        <button id="rhemaGreekModeBtn" class="rhema-swap-btn" onclick="toggleRhemaMode()">Just Greek</button>
+        <button id="rhemaSwapBtn" class="rhema-swap-btn" onclick="toggleRhemaKjv()">KJV</button>
+      </div>
     </div>
 
     <div class="rhema-picker">
@@ -10596,17 +10599,19 @@ glacier: {
       <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
       <div id="rhemaVerseDisplay" class="rhema-verse-display"></div>
       <div id="rhemaKjvDisplay" class="rhema-kjv-display hidden"></div>
-      <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
     </div>
 
     <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
-      <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
-        <span class="material-symbols-outlined">chevron_left</span>
-      </button>
-      <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
-      <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
+      <div class="rhema-verse-nav-row">
+        <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
+        <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+      <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
     </div>
 
   </div>
@@ -10671,7 +10676,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=120"></script>
+  <script src="app.js?v=121"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
