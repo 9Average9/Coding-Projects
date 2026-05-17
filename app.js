@@ -13196,19 +13196,18 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.1.0";
+const APP_VERSION = "2.2.0";
 
 const UPDATE_NOTES = [
-  "Rhēma layout — nav bar now pinned at the bottom on all devices including PWA; no more white space gap below it",
-  "Lesson cards — advanced and basic lesson content no longer overflows off the right edge of the screen",
-  "Lexicons explained — both lesson tracks now teach what a lexicon is and why the vocabulary you memorize is the lexical (dictionary) form",
-  "Daily streak — your profile streak now syncs live from the server so it always matches what friends see",
-  "Encourage button — fixed; tapping 'Encourage to Study' on a friend's profile now correctly sends the push notification",
-  "Notifications — new account creation now prompts you to enable push notifications (the creator highly recommends it!); reminders also work on desktop",
-  "Offline icons — when the app opens without internet, Material Symbol icons now hide gracefully instead of showing raw icon names",
-  "Reminder icon — the notification bell icon now matches your chosen theme color when reminders are enabled",
-  "Rhēma breadcrumb — highlighted cross-reference word stays highlighted as you navigate trail entries; only clears when you press Clear",
-  "Rhēma occurrences — KJV button in the book verse list switches preview snippets to English with the matching word bolded"
+  "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
+  "Rhēma 'Why this form?' — parsing tab now explains which endings/morphemes produced each parsed form, with inline 'What is Aorist?' chips that open a clean modal with an English example and explanation",
+  "Rhēma layout — nav bar pinned at bottom on all devices including PWA; no more white space gap",
+  "Lesson cards — content no longer overflows off screen horizontally",
+  "Lexicons explained — both basic and advanced lesson tracks teach what a lexicon is and why memorized vocab is the lexical form",
+  "Daily streak — profile streak now syncs live from the server",
+  "Encourage button — fixed so success alert fires correctly",
+  "Notifications — new accounts prompted to enable push notifications on signup",
+  "Offline icons — icons hide gracefully when font fails to load without internet"
 ];
 
 let deferredInstallPrompt = null;
@@ -14778,6 +14777,78 @@ const RHEMA_BOOK_ABBR = {
   '3JO':'3Jn', JUD:'Jd', REV:'Re'
 };
 
+// ── POS Highlight system ──────────────────────────────────────────────────────
+
+let _rhemaPosHighlights  = new Set(); // active category keys
+let _rhemaHighlightBarOn = false;     // whether the bar is visible
+
+// Maps morph-code prefix → canonical highlight key
+function normalizePosKey(morphCode) {
+  if (!morphCode) return null;
+  const raw = morphCode.split('-')[0];
+  if (raw === 'A') return 'ADJ';
+  if (raw === 'R' || raw === 'PRON') return 'PRON';
+  if (raw === 'RI') return 'N';            // proper noun → noun
+  if (['PART','PRT','INJ','COND'].includes(raw)) return 'PART';
+  return raw;
+}
+
+const HIGHLIGHT_CATS = {
+  V:    { color:'rgba(251,146,60,0.32)'  },
+  N:    { color:'rgba(96,165,250,0.32)'  },
+  ADJ:  { color:'rgba(74,222,128,0.32)'  },
+  T:    { color:'rgba(167,139,250,0.32)' },
+  PRON: { color:'rgba(251,113,133,0.32)' },
+  PREP: { color:'rgba(45,212,191,0.32)'  },
+  CONJ: { color:'rgba(250,204,21,0.32)'  },
+};
+
+function toggleRhemaHighlightBar() {
+  _rhemaHighlightBarOn = !_rhemaHighlightBarOn;
+  const bar = document.getElementById('rhemaHighlightBar');
+  const btn = document.getElementById('rhemaHighlightToggleBtn');
+  if (bar) bar.classList.toggle('hidden', !_rhemaHighlightBarOn);
+  if (btn) btn.classList.toggle('active', _rhemaHighlightBarOn);
+  if (!_rhemaHighlightBarOn) {
+    _rhemaPosHighlights.clear();
+    renderRhemaVerse();
+  } else {
+    updateHighlightToolbar();
+  }
+}
+
+function toggleRhemaHighlight(cat) {
+  const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  const hasMatch = words.some(w => normalizePosKey(w[2]) === cat);
+
+  if (_rhemaPosHighlights.has(cat)) {
+    _rhemaPosHighlights.delete(cat);
+  } else {
+    if (!hasMatch) {
+      // shake the button and bail
+      const btn = document.querySelector(`.rhema-hl-pill[data-cat="${cat}"]`);
+      if (btn) { btn.classList.add('shake'); setTimeout(() => btn.classList.remove('shake'), 500); }
+      return;
+    }
+    _rhemaPosHighlights.add(cat);
+  }
+  renderRhemaVerse();
+}
+
+function updateHighlightToolbar() {
+  if (!_rhemaHighlightBarOn) return;
+  const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  for (const cat of Object.keys(HIGHLIGHT_CATS)) {
+    const btn = document.querySelector(`.rhema-hl-pill[data-cat="${cat}"]`);
+    if (!btn) continue;
+    const hasMatch = words.some(w => normalizePosKey(w[2]) === cat);
+    const isActive = _rhemaPosHighlights.has(cat);
+    btn.classList.toggle('hl-active',  isActive && hasMatch);
+    btn.classList.toggle('hl-dimmed',  isActive && !hasMatch);
+    btn.classList.toggle('hl-present', !isActive && hasMatch);
+  }
+}
+
 // ── Morphology decoder ───────────────────────────────────────────────────────
 
 const MORPH_POS = {
@@ -14963,6 +15034,10 @@ function closeRhema() {
   _rhemaTrail = [];
   _rhemaTrailPos = -1;
   _rhemaHighlightStrongs = null;
+  _rhemaPosHighlights.clear();
+  _rhemaHighlightBarOn = false;
+  document.getElementById('rhemaHighlightBar')?.classList.add('hidden');
+  document.getElementById('rhemaHighlightToggleBtn')?.classList.remove('active');
   updateRhemaBreadcrumb();
 }
 
@@ -15257,20 +15332,26 @@ function renderRhemaVerse() {
     display.classList.add('greek-only');
     display.innerHTML = words.map((w, i) => {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
+      const posKey = normalizePosKey(w[2]);
+      const hlColor = _rhemaPosHighlights.has(posKey) ? HIGHLIGHT_CATS[posKey]?.color : null;
+      const style = hlColor ? ` style="background:${hlColor};border-radius:4px"` : '';
       const cls = isXref ? 'rhema-word xref' : 'rhema-word';
-      return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span></span>` +
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span></span>` +
              (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '');
     }).join('');
   } else {
     display.classList.remove('greek-only');
     display.innerHTML = words.map((w, i) => {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
+      const posKey = normalizePosKey(w[2]);
+      const hlColor = _rhemaPosHighlights.has(posKey) ? HIGHLIGHT_CATS[posKey]?.color : null;
+      const style = hlColor ? ` style="background:${hlColor};border-radius:4px"` : '';
       const cls = isXref ? 'rhema-word xref' : 'rhema-word';
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
       const rawGloss = lex.brief || '';
       const gloss = rawGloss.split(',')[0].split(';')[0].trim();
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
-      return `<span class="${cls}" data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
     }).join('');
   }
 
@@ -15282,6 +15363,7 @@ function renderRhemaVerse() {
   updateRhemaSwapVisibility();
   updateRhemaVerseNav();
   initRhemaVerseSwipe();
+  updateHighlightToolbar();
 }
 
 function toggleRhemaKjv() {
@@ -15464,6 +15546,150 @@ function showRhemaTab(tab, word) {
 
 // ── Tab content renderers ─────────────────────────────────────────────────────
 
+// ── Grammar examples for the "Why this form?" modal ─────────────────────────
+
+const GRAMMAR_EXAMPLES = {
+  tense: {
+    'Present':     { title:'Present Tense', en:'"He is writing" or "He writes"', body:'The present tense describes action happening now or as an ongoing habit. In Greek it emphasizes the continuous or repeated nature of the action. ὁ ἄνθρωπος γράφει — "The man is writing (right now / habitually)."' },
+    'Imperfect':   { title:'Imperfect Tense', en:'"He was writing"', body:'The imperfect describes continuous or repeated action in past time. It paints a scene of ongoing activity. ἔγραφεν — "He was writing (over and over, or for a period of time)."' },
+    'Aorist':      { title:'Aorist Tense', en:'"He wrote" or "He wrote it (once)"', body:'The aorist views an action as a simple completed event without stressing duration. It\'s the default "past tense" of Greek narrative. ἔγραψεν — "He wrote" — a single point event.' },
+    '2nd Aorist':  { title:'2nd Aorist Tense', en:'"He threw" (irregular stem)', body:'Same meaning as the aorist — a completed past event — but the verb uses a different stem form (like English "throw/threw"). The grammar is identical; only the form differs.' },
+    'Perfect':     { title:'Perfect Tense', en:'"He has written" (and the letter still exists)', body:'The perfect describes a past completed action whose results are still felt now. λέλυκεν — "He has loosed" — it\'s done and the loosing matters now. Theologically powerful: τετέλεσται, "It is finished."' },
+    '2nd Perfect': { title:'2nd Perfect Tense', en:'"He has become" (irregular stem)', body:'Same meaning as the perfect — past action with present result — using an alternate stem. οἶδα ("I know") is technically a perfect-tense form meaning "I have come to know = I know."' },
+    'Pluperfect':  { title:'Pluperfect Tense', en:'"He had written" (before something else happened)', body:'The pluperfect describes a completed action in the past whose result was felt at a prior past point. Rare in the NT. ᾔδει — "He had known (before that moment)."' },
+    'Future':      { title:'Future Tense', en:'"He will write"', body:'The future describes expected or anticipated action. It can be predictive (will happen), deliberate (planning), or imperatival. σώσει — "He will save."' },
+  },
+  voice: {
+    'Active':          { title:'Active Voice', en:'"Paul wrote the letter"', body:'The subject performs the action on something or someone outside itself. The most common voice. ἔγραψεν Παῦλος — Paul (subject) acted.' },
+    'Middle':          { title:'Middle Voice', en:'"He washed himself" or "He had himself healed"', body:'The subject participates in or benefits from the action. Often means the subject acts for its own interest. No exact English equivalent — sometimes translated active, sometimes reflexive.' },
+    'Passive':         { title:'Passive Voice', en:'"He was healed" or "The letter was written"', body:'The subject receives the action from an outside agent. ἐθεραπεύθη — "He was healed (by someone)." Greek passive is often used for divine action: "was justified," "was saved."' },
+    'Middle/Deponent': { title:'Middle/Deponent', en:'"He answered" or "He came"', body:'Deponent verbs have middle or passive form but active meaning — they never appear in the active voice. ἔρχομαι — "I come" — looks middle/passive but means active. Common deponents: ἔρχομαι, ἀποκρίνομαι, γίνομαι.' },
+    'Middle-Passive':  { title:'Middle-Passive Voice', en:'Could be "he washed himself" or "he was washed"', body:'Some forms are identical in the middle and passive. Context and the tense system determine which is meant. In the present/imperfect, middle and passive forms are identical.' },
+    'Middle or Passive':{ title:'Middle or Passive Voice', en:'Context determines: "he washed" or "he was washed"', body:'Form is ambiguous between middle and passive. Check the tense, context, and lexical notes to determine which nuance applies.' },
+    'Middle Deponent':  { title:'Middle Deponent', en:'"He asked" or "He came"', body:'A deponent using specifically the middle form. Active meaning, middle form. Common in NT Greek.' },
+  },
+  mood: {
+    'Indicative':   { title:'Indicative Mood', en:'"He goes to the temple" (stating a fact)', body:'The indicative asserts something as actual — a statement of reality. The most common mood. ὑπάγει — "He goes." Negated with οὐ (not μή).' },
+    'Subjunctive':  { title:'Subjunctive Mood', en:'"that he might go" or "if he goes"', body:'The subjunctive expresses possibility, purpose, condition, or contingency. Always with ἵνα (purpose), ἐάν (if), or μή (prohibition). ἵνα σωθῶσιν — "that they might be saved."' },
+    'Optative':     { title:'Optative Mood', en:'"May it never be!" (μὴ γένοιτο)', body:'The optative expresses a wish, prayer, or remote possibility. Rare in the NT (67 occurrences). Paul\'s famous μὴ γένοιτο — "May it never be!" / "God forbid!" — is optative.' },
+    'Imperative':   { title:'Imperative Mood', en:'"Go!" or "Love one another!"', body:'The imperative gives a command or prohibition. 2nd person imperative is most common. ἀγαπᾶτε ἀλλήλους — "Love one another!" Prohibitions use μή + imperative or subjunctive.' },
+    'Infinitive':   { title:'Infinitive Mood', en:'"to go" or "going"', body:'The infinitive is a verbal noun — it can be a subject, object, or complement. θέλω πιστεύειν — "I want to believe." Often used in purpose or result clauses.' },
+    'Participle':   { title:'Participle Mood', en:'"the one going" or "while going"', body:'The participle is a verbal adjective — it has tense and voice like a verb, plus case/number/gender like a noun. It modifies nouns or expresses attendant circumstances. Often translated "while Xing," "after Xing," or "the one who X."' },
+  },
+};
+
+function showRhemaGrammarExample(category, value) {
+  const entry = GRAMMAR_EXAMPLES[category]?.[value];
+  if (!entry) return;
+  const modal = document.getElementById('rhemaGrammarModal');
+  const title = document.getElementById('rhemaGrammarTitle');
+  const body  = document.getElementById('rhemaGrammarBody');
+  if (!modal || !title || !body) return;
+  title.textContent = entry.title;
+  body.innerHTML = `
+    <div class="rhema-grammar-example-sentence">${entry.en}</div>
+    <div class="rhema-grammar-example-body">${entry.body}</div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+function closeRhemaGrammarModal(e) {
+  if (e && e.target !== document.getElementById('rhemaGrammarModal')) return;
+  document.getElementById('rhemaGrammarModal')?.classList.add('hidden');
+}
+
+// ── "Why this form?" helper ───────────────────────────────────────────────────
+
+const WHY_CASE = {
+  Nominative: 'marks this word as the <strong>subject</strong> of its clause.',
+  Genitive:   'marks <strong>possession or relationship</strong> — "of ___" or "belonging to ___."',
+  Dative:     'marks the <strong>indirect object, location, or means</strong> — "to/for/in/by ___."',
+  Accusative: 'marks this word as the <strong>direct object</strong> — the thing directly receiving the action.',
+  Vocative:   'marks <strong>direct address</strong> — the person being spoken to.',
+};
+const WHY_TENSE = {
+  Present:    'The <strong>present stem</strong> (no tense prefix) with active/middle endings signals present tense.',
+  Imperfect:  'The <strong>augment</strong> (ε- prefix) + present stem + secondary endings signal imperfect.',
+  Aorist:     'The <strong>aorist stem</strong> (often with σ- suffix: ἔλυσα) + augment + secondary endings signal aorist.',
+  '2nd Aorist':'The <strong>2nd aorist stem</strong> (irregular stem change: ἔβαλον from βάλλω) signals 2nd aorist.',
+  Perfect:    'The <strong>reduplication</strong> (first consonant + ε repeated at the start: λέλυκα) signals perfect.',
+  '2nd Perfect':'<strong>Reduplication</strong> with an alternate stem form signals 2nd perfect.',
+  Pluperfect: '<strong>Augment + reduplication</strong> together signal the pluperfect.',
+  Future:     'The <strong>σ- suffix</strong> inserted before the personal endings (λύ<strong>σ</strong>ω) signals the future.',
+};
+const WHY_VOICE = {
+  Active:          'The <strong>active endings</strong> (-ω, -εις, -ει… or -μι forms) signal active voice.',
+  Middle:          'The <strong>middle endings</strong> (-ομαι, -ῃ/ει, -εται…) signal middle voice.',
+  Passive:         'The <strong>passive morpheme</strong> (θη- in aorist/future passive; shared with middle in present) signals passive.',
+  'Middle/Deponent':'<strong>Middle form with active meaning</strong> — this verb only occurs in middle/passive forms (deponent).',
+  'Middle-Passive': 'The form is <strong>identical for middle and passive</strong> in this tense — context determines voice.',
+  'Middle or Passive':'Form is <strong>ambiguous</strong> between middle and passive here.',
+  'Middle Deponent':'<strong>Middle form, active meaning</strong> — a deponent verb.',
+};
+const WHY_MOOD = {
+  Indicative:  'The <strong>indicative endings</strong> (no modal marker) state the action as real.',
+  Subjunctive: 'The <strong>lengthened connecting vowel</strong> (ο→ω, ε→η) marks subjunctive mood.',
+  Optative:    'The <strong>optative suffix</strong> (-οι-, -αι-, -ει-) before personal endings marks optative mood.',
+  Imperative:  'The <strong>imperative endings</strong> (-ε, -ετε, -ου, -εσθε etc.) signal a command.',
+  Infinitive:  'The <strong>infinitive ending</strong> (-ειν, -αι, -ναι, -εσθαι) makes this a verbal noun.',
+  Participle:  'The <strong>participial suffix</strong> (-ων/-ουσα/-ον, -ας/-ασα/-αν, etc.) makes this a verbal adjective.',
+};
+
+function buildWhyThisForm(morph) {
+  if (!morph) return '';
+  const rows = decodeMorph(morph);
+  if (!rows.length) return '';
+  const parts = [];
+  const segs = morph.split('-');
+  const posRaw = segs[0];
+
+  // POS
+  const posRow = rows.find(r => r.label === 'Part of Speech');
+  if (posRow) parts.push(`This word is a <strong>${posRow.value}</strong>.`);
+
+  // Case explanation for noun-like
+  const caseRow = rows.find(r => r.label === 'Case');
+  if (caseRow && WHY_CASE[caseRow.value]) {
+    parts.push(`The <strong>${caseRow.value}</strong> case ${WHY_CASE[caseRow.value]}`);
+  }
+
+  // Verb morphology explanation
+  const tenseRow = rows.find(r => r.label === 'Tense');
+  if (tenseRow && WHY_TENSE[tenseRow.value]) {
+    parts.push(WHY_TENSE[tenseRow.value]);
+  }
+  const voiceRow = rows.find(r => r.label === 'Voice');
+  if (voiceRow && WHY_VOICE[voiceRow.value]) {
+    parts.push(WHY_VOICE[voiceRow.value]);
+  }
+  const moodRow = rows.find(r => r.label === 'Mood');
+  if (moodRow && WHY_MOOD[moodRow.value]) {
+    parts.push(WHY_MOOD[moodRow.value]);
+  }
+
+  if (!parts.length) return '';
+
+  // Build example chips for tense/voice/mood
+  let chips = '';
+  if (tenseRow && GRAMMAR_EXAMPLES.tense[tenseRow.value]) {
+    chips += `<button class="rhema-example-chip" onclick="showRhemaGrammarExample('tense','${tenseRow.value}')">What is ${tenseRow.value}? <span class="rhema-chip-arrow">→</span></button>`;
+  }
+  if (voiceRow && GRAMMAR_EXAMPLES.voice[voiceRow.value]) {
+    chips += `<button class="rhema-example-chip" onclick="showRhemaGrammarExample('voice','${voiceRow.value.replace(/'/g,'\\\'').replace(/\//g,'\\/')}')">What is ${voiceRow.value}? <span class="rhema-chip-arrow">→</span></button>`;
+  }
+  if (moodRow && GRAMMAR_EXAMPLES.mood[moodRow.value]) {
+    chips += `<button class="rhema-example-chip" onclick="showRhemaGrammarExample('mood','${moodRow.value}')">What is ${moodRow.value}? <span class="rhema-chip-arrow">→</span></button>`;
+  }
+
+  return `
+    <div class="rhema-def-sep"></div>
+    <div class="rhema-why-section">
+      <div class="rhema-why-header">Why this form?</div>
+      <div class="rhema-why-body">${parts.map(p => `<p>${p}</p>`).join('')}</div>
+      ${chips ? `<div class="rhema-why-chips">${chips}</div>` : ''}
+    </div>`;
+}
+
 function renderRhemaParsing(surface, strongs, morph) {
   const rows = decodeMorph(morph);
   if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No parsing data for "${morph}".</p>`;
@@ -15476,7 +15702,8 @@ function renderRhemaParsing(surface, strongs, morph) {
           ${r.desc ? `<div class="rhema-parse-desc">${r.desc}</div>` : ''}
         </div>
       </div>`).join('') +
-    `</div>`;
+    `</div>` +
+    buildWhyThisForm(morph);
 }
 
 function renderRhemaDefinition(strongs) {
