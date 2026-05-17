@@ -13196,18 +13196,19 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.0.2";
+const APP_VERSION = "2.1.0";
 
 const UPDATE_NOTES = [
-  "Rhēma breadcrumb — highlighted cross-reference word now stays highlighted as you navigate trail entries; only clears when you press Clear",
-  "Rhēma layout — removed bottom white space bar; verse nav now sits flush below the last word row",
-  "Rhēma word highlight — the cross-reference word stays highlighted as you flip through verses; only clears when you press Clear",
-  "Rhēma layout — verse nav sits right below the last word row instead of floating at the bottom of a fixed-height area",
-  "Rhēma occurrences — KJV button in the book verse list switches all preview snippets to English with the matching word bolded",
-  "Rhēma interlinear — structured 4-column grid with English gloss under each Greek word; tap 'Just Greek' to instantly switch back to clean flowing Greek text",
-  "Rhēma stability — fully reworked the bottom layout so the word sheet, pickers, and nav bar no longer cause gaps or ghost elements",
-  "Cleaner settings — no more tan background, theme rows look clean, Reminders button matches the style",
-  "Study reminders — set a daily push notification at any time you choose right from your profile"
+  "Rhēma layout — nav bar now pinned at the bottom on all devices including PWA; no more white space gap below it",
+  "Lesson cards — advanced and basic lesson content no longer overflows off the right edge of the screen",
+  "Lexicons explained — both lesson tracks now teach what a lexicon is and why the vocabulary you memorize is the lexical (dictionary) form",
+  "Daily streak — your profile streak now syncs live from the server so it always matches what friends see",
+  "Encourage button — fixed; tapping 'Encourage to Study' on a friend's profile now correctly sends the push notification",
+  "Notifications — new account creation now prompts you to enable push notifications (the creator highly recommends it!); reminders also work on desktop",
+  "Offline icons — when the app opens without internet, Material Symbol icons now hide gracefully instead of showing raw icon names",
+  "Reminder icon — the notification bell icon now matches your chosen theme color when reminders are enabled",
+  "Rhēma breadcrumb — highlighted cross-reference word stays highlighted as you navigate trail entries; only clears when you press Clear",
+  "Rhēma occurrences — KJV button in the book verse list switches preview snippets to English with the matching word bolded"
 ];
 
 let deferredInstallPrompt = null;
@@ -13617,6 +13618,15 @@ async function submitCreateAccount() {
     updateProfileUI();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
+
+    // Prompt for notifications — creator recommends enabling to stay connected with friends
+    setTimeout(() => {
+      if (Notification?.permission === "default") {
+        if (confirm("🔔 The creator highly recommends enabling notifications!\n\nThey help you stay connected and motivated with friends — you can encourage each other and get reminded to study.\n\nEnable push notifications?")) {
+          openReminderModal();
+        }
+      }
+    }, 1200);
   } catch (e) {
     errEl.textContent = e.message || "Something went wrong. Please try again.";
   } finally {
@@ -13674,6 +13684,13 @@ window.__onAuthStateReady = async (user) => {
         if (_friendsTab === "friends") renderFriendsList();
         else renderFriendRequests();
       }
+
+      // Sync server streak → localStorage + profile display
+      if (typeof data.streak === "number") {
+        localStorage.setItem("studyStreakDays", String(data.streak));
+        const streakStat = document.getElementById("profileStreakStat");
+        if (streakStat) streakStat.textContent = data.streak;
+      }
     });
   } else {
     _unsubUserDoc?.();
@@ -13692,6 +13709,15 @@ if (window.__pendingAuthResolved) {
 document.addEventListener("DOMContentLoaded", () => {
   registerServiceWorker();
   initFCMForeground();
+
+  // Detect if Material Symbols font failed to load (e.g., offline on first launch)
+  // and hide icon ligature text so the UI doesn't show raw icon names
+  document.fonts.ready.then(() => {
+    const loaded = [...document.fonts].some(
+      f => f.family.includes("Material Symbols") && f.status === "loaded"
+    );
+    if (!loaded) document.body.classList.add("no-icon-font");
+  });
   setTimeout(() => {
     if (shouldShowInstallModal()) {
       showInstallAppModal();

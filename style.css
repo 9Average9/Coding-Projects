@@ -311,6 +311,17 @@ input[type="text"] {
   color: var(--font-color);
 }
 
+/* When Material Symbols font fails to load (no internet on first launch),
+   hide the ligature text so icons degrade invisibly instead of showing raw names */
+body.no-icon-font .material-symbols-outlined {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .icon-btn {
   width: 46px;
   height: 46px;
@@ -1670,13 +1681,32 @@ body.dark .lesson-interactive {
 
 .lesson-block-content {
   display: none;
-  overflow: visible;
+  overflow: hidden;
   padding: 0 16px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .lesson-block.open .lesson-block-content {
   display: block;
   padding: 0 16px 18px;
+  overflow-x: hidden;
+}
+
+.lesson-block-content p,
+.lesson-block-content li,
+.lesson-block-content td,
+.lesson-block-content th {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.lesson-block-content .paradigm-table,
+.lesson-block-content table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+  max-width: 100%;
 }
 body.dark .lesson-module {
   background: rgba(31, 41, 55, 0.96);
@@ -8218,7 +8248,7 @@ body.dark button.continue-learning-btn {
   transition: transform 0.2s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 #profileNotificationBtn.notifications-enabled .material-symbols-outlined {
-  color: #16a34a !important;
+  color: var(--secondary-color) !important;
 }
 
 @keyframes notificationEnabledPop {
@@ -11094,8 +11124,16 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 /* ── Verse display ── */
-/* ── Scrollable body — contains content-area + verse nav in normal flow ── */
+/* ── Scrollable body: flex column so content-area scrolls and nav pins at bottom ── */
 .rhema-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rhema-content-area {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -11103,9 +11141,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   overscroll-behavior: none;
-}
-
-.rhema-content-area {
   width: 100%;
 }
 
@@ -11910,7 +11945,7 @@ body .app:has(#settingsScreen.screen.active) {
   color: var(--secondary-color) !important;
 }
 #profileNotificationBtn.notifications-enabled .prof-menu-icon-wrap .material-symbols-outlined {
-  color: #16a34a !important;
+  color: var(--secondary-color) !important;
 }
 .prof-menu-name {
   flex: 1;
