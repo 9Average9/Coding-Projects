@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=136" />
+  <link rel="stylesheet" href="style.css?v=137" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10648,9 +10648,12 @@ glacier: {
         <span id="rhemaPillChap">Ch 3</span>
         <span class="material-symbols-outlined rhema-pill-chev">expand_more</span>
       </button>
-      <button class="rhema-pill" onclick="openRhemaVersePicker()">
+      <button id="rhemaVersePillBtn" class="rhema-pill" onclick="openRhemaVersePicker()">
         <span id="rhemaPillVerse">v16</span>
         <span class="material-symbols-outlined rhema-pill-chev">expand_more</span>
+      </button>
+      <button id="rhemaChapterModeBtn" class="rhema-pill rhema-chapter-mode-pill" onclick="toggleRhemaChapterMode()" title="Show full chapter">
+        <span class="material-symbols-outlined" style="font-size:15px;vertical-align:middle">article</span>
       </button>
     </div>
 
@@ -10762,7 +10765,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=135"></script>
+  <script src="app.js?v=136"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->

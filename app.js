@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.8";
+const APP_VERSION = "2.3.0";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -14771,6 +14771,7 @@ let _rhemaTrail = [];       // full cross-ref trail — never auto-shrinks
 let _rhemaTrailPos = -1;   // cursor into trail (-1 = at tip, not in trail)
 let _rhemaHighlightStrongs = null;
 let _rhemaSavedScrollY = 0;
+let _rhemaFullChapter = false;
 
 const RHEMA_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
 
@@ -14844,7 +14845,13 @@ function toggleRhemaHighlight(cat) {
 
 function updateHighlightToolbar() {
   if (!_rhemaHighlightBarOn) return;
-  const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  let words;
+  if (_rhemaFullChapter) {
+    const chData = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter] || {};
+    words = Object.values(chData).flat();
+  } else {
+    words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  }
   for (const cat of Object.keys(HIGHLIGHT_CATS)) {
     const btn = document.querySelector(`.rhema-hl-pill[data-cat="${cat}"]`);
     if (!btn) continue;
@@ -15192,7 +15199,9 @@ function updateRhemaVerseNav() {
   nav.classList.remove('hidden');
   if (ref && window.RhemaNT) {
     const bookName = window.RhemaNT.names[_rhemaBook] || _rhemaBook;
-    ref.textContent = `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
+    ref.textContent = _rhemaFullChapter
+      ? `${bookName} ${_rhemaChapter}`
+      : `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
   }
 }
 
@@ -15216,18 +15225,25 @@ function initRhemaVerseSwipe() {
 
 function rhemaPrevVerse() {
   if (!window.RhemaNT) return;
-  const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
-  const idx = verses.indexOf(_rhemaVerse);
-  if (idx > 0) {
-    _rhemaVerse = verses[idx - 1];
-  } else {
-    const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a - +b);
-    const chIdx = chapters.indexOf(_rhemaChapter);
+  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a - +b);
+  const chIdx = chapters.indexOf(_rhemaChapter);
+  if (_rhemaFullChapter) {
     if (chIdx > 0) {
       _rhemaChapter = chapters[chIdx - 1];
-      const prevVerses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
-      _rhemaVerse = prevVerses[prevVerses.length - 1];
+      _rhemaVerse = '1';
     } else return;
+  } else {
+    const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
+    const idx = verses.indexOf(_rhemaVerse);
+    if (idx > 0) {
+      _rhemaVerse = verses[idx - 1];
+    } else {
+      if (chIdx > 0) {
+        _rhemaChapter = chapters[chIdx - 1];
+        const prevVerses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
+        _rhemaVerse = prevVerses[prevVerses.length - 1];
+      } else return;
+    }
   }
   syncRhemaPicker();
   renderRhemaVerse();
@@ -15235,17 +15251,24 @@ function rhemaPrevVerse() {
 
 function rhemaNextVerse() {
   if (!window.RhemaNT) return;
-  const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
-  const idx = verses.indexOf(_rhemaVerse);
-  if (idx < verses.length - 1) {
-    _rhemaVerse = verses[idx + 1];
-  } else {
-    const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a - +b);
-    const chIdx = chapters.indexOf(_rhemaChapter);
+  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a - +b);
+  const chIdx = chapters.indexOf(_rhemaChapter);
+  if (_rhemaFullChapter) {
     if (chIdx < chapters.length - 1) {
       _rhemaChapter = chapters[chIdx + 1];
       _rhemaVerse = '1';
     } else return;
+  } else {
+    const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
+    const idx = verses.indexOf(_rhemaVerse);
+    if (idx < verses.length - 1) {
+      _rhemaVerse = verses[idx + 1];
+    } else {
+      if (chIdx < chapters.length - 1) {
+        _rhemaChapter = chapters[chIdx + 1];
+        _rhemaVerse = '1';
+      } else return;
+    }
   }
   syncRhemaPicker();
   renderRhemaVerse();
@@ -15325,30 +15348,20 @@ function rhemaClearHistory() {
 
 // ── Verse rendering ───────────────────────────────────────────────────────────
 
-function renderRhemaVerse() {
-  if (!window.RhemaNT) return;
-  closeRhemaSheet();
-
-  const display = document.getElementById('rhemaVerseDisplay');
-  const kjvDiv  = document.getElementById('rhemaKjvDisplay');
-  if (!display) return;
-
-  const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
-
+function _renderVerseWords(words, verse) {
+  const vArg = verse ? `, '${verse}'` : '';
   if (_rhemaGreekOnly) {
-    display.classList.add('greek-only');
-    display.innerHTML = words.map((w, i) => {
+    return words.map((w, i) => {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
       const posKey = normalizePosKey(w[2]);
       const hlColor = _rhemaPosHighlights.has(posKey) ? HIGHLIGHT_CATS[posKey]?.color : null;
       const style = hlColor ? ` style="background:${hlColor};border-radius:4px"` : '';
       const cls = isXref ? 'rhema-word xref' : 'rhema-word';
-      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span></span>` +
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span></span>` +
              (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '');
     }).join('');
   } else {
-    display.classList.remove('greek-only');
-    display.innerHTML = words.map((w, i) => {
+    return words.map((w, i) => {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
       const posKey = normalizePosKey(w[2]);
       const hlColor = _rhemaPosHighlights.has(posKey) ? HIGHLIGHT_CATS[posKey]?.color : null;
@@ -15358,13 +15371,56 @@ function renderRhemaVerse() {
       const rawGloss = lex.brief || '';
       const gloss = rawGloss.split(',')[0].split(';')[0].trim();
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
-      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
     }).join('');
   }
+}
 
-  if (kjvDiv && window.RhemaKJV) {
-    const kjvText = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
-    kjvDiv.textContent = kjvText;
+function renderRhemaVerse() {
+  if (!window.RhemaNT) return;
+  closeRhemaSheet();
+
+  const display = document.getElementById('rhemaVerseDisplay');
+  const kjvDiv  = document.getElementById('rhemaKjvDisplay');
+  if (!display) return;
+
+  if (_rhemaFullChapter) {
+    const chapterData = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {};
+    const verseNums = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
+
+    display.classList.toggle('greek-only', _rhemaGreekOnly);
+    display.innerHTML = verseNums.map(vn => {
+      const v = String(vn);
+      const words = chapterData[v] || [];
+      const isTarget = v === _rhemaVerse && _rhemaHighlightStrongs !== null;
+      return `<span class="rhema-chapter-verse${isTarget ? ' rhema-chapter-verse-target' : ''}" data-verse="${v}">` +
+             `<sup class="rhema-chapter-verse-num">${vn}</sup>` +
+             _renderVerseWords(words, v) +
+             `</span>`;
+    }).join(' ');
+
+    if (kjvDiv && window.RhemaKJV) {
+      const kjvChap = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter] || {};
+      kjvDiv.innerHTML = verseNums.map(vn => {
+        const v = String(vn);
+        return `<span class="rhema-chapter-verse" data-verse="${v}"><sup class="rhema-chapter-verse-num">${vn}</sup>${kjvChap[v] || ''}</span>`;
+      }).join(' ');
+    }
+
+    // Scroll to the target verse after render (cross-ref jump or chapter entry)
+    requestAnimationFrame(() => {
+      const target = display.querySelector(`.rhema-chapter-verse[data-verse="${_rhemaVerse}"]`);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  } else {
+    const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+    display.classList.toggle('greek-only', _rhemaGreekOnly);
+    display.innerHTML = _renderVerseWords(words, null);
+
+    if (kjvDiv && window.RhemaKJV) {
+      const kjvText = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
+      kjvDiv.textContent = kjvText;
+    }
   }
 
   updateRhemaSwapVisibility();
@@ -15389,6 +15445,15 @@ function toggleRhemaMode() {
   renderRhemaVerse();
 }
 
+function toggleRhemaChapterMode() {
+  _rhemaFullChapter = !_rhemaFullChapter;
+  document.getElementById('rhemaChapterModeBtn')?.classList.toggle('active', _rhemaFullChapter);
+  document.getElementById('rhemaVersePillBtn')?.classList.toggle('hidden', _rhemaFullChapter);
+  closeRhemaSheet();
+  syncRhemaPicker();
+  renderRhemaVerse();
+}
+
 function updateRhemaSwapVisibility() {
   const gr  = document.getElementById('rhemaVerseDisplay');
   const kjv = document.getElementById('rhemaKjvDisplay');
@@ -15402,8 +15467,9 @@ function updateRhemaSwapVisibility() {
 
 // ── Word detail sheet ─────────────────────────────────────────────────────────
 
-function openRhemaSheet(wordIdx) {
+function openRhemaSheet(wordIdx, verse) {
   if (!window.RhemaNT) return;
+  if (verse) { _rhemaVerse = verse; syncRhemaPicker(); }
   const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
   const word  = words[wordIdx];
   if (!word) return;

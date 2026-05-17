@@ -11131,6 +11131,21 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-pill:active { background: var(--border-color); }
 .rhema-pill-icon { font-size: 1rem; color: var(--secondary-color); flex-shrink: 0; }
 .rhema-pill-chev { font-size: 1rem; color: var(--muted-color); flex-shrink: 0; margin-left: auto; }
+.rhema-pill.hidden { display: none; }
+.rhema-chapter-mode-pill { flex: 0 0 auto; padding: 0 10px; color: var(--muted-color); }
+.rhema-chapter-mode-pill.active { background: color-mix(in srgb, var(--secondary-color) 18%, transparent); color: var(--secondary-color); }
+
+/* ── Full chapter rendering ── */
+.rhema-chapter-verse { display: inline; }
+.rhema-chapter-verse-target { background: color-mix(in srgb, var(--secondary-color) 10%, transparent); border-radius: 4px; }
+.rhema-chapter-verse-num {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--muted-color);
+  vertical-align: super;
+  margin-right: 1px;
+  user-select: none;
+}
 
 /* ── Picker overlay backdrop ── */
 .rhema-picker-overlay {
