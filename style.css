@@ -11648,8 +11648,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s;
@@ -11672,8 +11670,9 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   z-index: 1051;
   transform: translateY(100%);
   visibility: hidden;
-  transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1),
-              visibility 0s linear 0.32s;
+  will-change: transform;
+  transition: transform 0.28s cubic-bezier(0.32, 0, 0.67, 0),
+              visibility 0s linear 0.28s;
   min-height: 68vh;
   max-height: 80vh;
   display: flex;
@@ -12097,16 +12096,7 @@ body .app:has(#settingsScreen.screen.active) {
   font-size: 1.25rem !important;
   color: var(--profile-color, #4f8cff) !important;
 }
-/* Reminder button uses theme secondary colour, not the user's avatar colour */
-#profileNotificationBtn .prof-menu-icon-wrap {
-  background: color-mix(in srgb, var(--secondary-color) 14%, transparent) !important;
-}
-#profileNotificationBtn .prof-menu-icon-wrap .material-symbols-outlined {
-  color: var(--secondary-color) !important;
-}
-#profileNotificationBtn.notifications-enabled .prof-menu-icon-wrap .material-symbols-outlined {
-  color: var(--secondary-color) !important;
-}
+
 .prof-menu-name {
   flex: 1;
   font-size: 0.95rem;

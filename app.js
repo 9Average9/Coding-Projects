@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.3";
+const APP_VERSION = "2.2.4";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -15460,9 +15460,19 @@ function initRhemaSwipeDown(sheet) {
   const onEnd = () => {
     if (!dragging) return;
     dragging = false;
-    sheet.style.transition = '';
-    if (currentY - startY > 80) { sheet.style.transform = ''; closeRhemaSheet(); }
-    else sheet.style.transform = '';
+    if (currentY - startY > 80) {
+      // Animate from current drag position to fully off-screen, then clean up
+      sheet.style.transition = 'transform 0.22s cubic-bezier(0.32, 0, 0.67, 0)';
+      sheet.style.transform = 'translateY(110%)';
+      sheet.addEventListener('transitionend', () => {
+        sheet.style.transition = '';
+        sheet.style.transform = '';
+        closeRhemaSheet();
+      }, { once: true });
+    } else {
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+    }
   };
 
   for (const t of targets) {
