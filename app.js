@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.0";
+const APP_VERSION = "2.3.1";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -15388,32 +15388,38 @@ function renderRhemaVerse() {
     const chapterData = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {};
     const verseNums = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
 
-    display.classList.toggle('greek-only', _rhemaGreekOnly);
+    // chapter-mode overrides the grid on the outer div
+    display.classList.remove('greek-only');
+    display.classList.add('chapter-mode');
     display.innerHTML = verseNums.map(vn => {
       const v = String(vn);
       const words = chapterData[v] || [];
       const isTarget = v === _rhemaVerse && _rhemaHighlightStrongs !== null;
-      return `<span class="rhema-chapter-verse${isTarget ? ' rhema-chapter-verse-target' : ''}" data-verse="${v}">` +
-             `<sup class="rhema-chapter-verse-num">${vn}</sup>` +
+      return `<div class="rhema-chapter-block${isTarget ? ' rhema-chapter-block-target' : ''}" data-verse="${v}">` +
+             `<div class="rhema-chapter-verse-label">${vn}</div>` +
+             `<div class="rhema-chapter-word-grid${_rhemaGreekOnly ? ' greek-only' : ''}">` +
              _renderVerseWords(words, v) +
-             `</span>`;
-    }).join(' ');
+             `</div></div>`;
+    }).join('');
 
     if (kjvDiv && window.RhemaKJV) {
       const kjvChap = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter] || {};
       kjvDiv.innerHTML = verseNums.map(vn => {
         const v = String(vn);
-        return `<span class="rhema-chapter-verse" data-verse="${v}"><sup class="rhema-chapter-verse-num">${vn}</sup>${kjvChap[v] || ''}</span>`;
-      }).join(' ');
+        return `<div class="rhema-chapter-block" data-verse="${v}">` +
+               `<div class="rhema-chapter-verse-label">${vn}</div>` +
+               `<div class="rhema-chapter-kjv">${kjvChap[v] || ''}</div></div>`;
+      }).join('');
     }
 
     // Scroll to the target verse after render (cross-ref jump or chapter entry)
     requestAnimationFrame(() => {
-      const target = display.querySelector(`.rhema-chapter-verse[data-verse="${_rhemaVerse}"]`);
+      const target = display.querySelector(`.rhema-chapter-block[data-verse="${_rhemaVerse}"]`);
       target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   } else {
     const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+    display.classList.remove('chapter-mode');
     display.classList.toggle('greek-only', _rhemaGreekOnly);
     display.innerHTML = _renderVerseWords(words, null);
 
@@ -15449,6 +15455,17 @@ function toggleRhemaChapterMode() {
   _rhemaFullChapter = !_rhemaFullChapter;
   document.getElementById('rhemaChapterModeBtn')?.classList.toggle('active', _rhemaFullChapter);
   document.getElementById('rhemaVersePillBtn')?.classList.toggle('hidden', _rhemaFullChapter);
+  // Toast feedback
+  const toast = document.getElementById('rhemaChapterToast');
+  if (toast) {
+    toast.textContent = _rhemaFullChapter ? 'Full chapter mode on' : 'Full chapter mode off';
+    toast.classList.remove('hidden');
+    toast.style.animation = 'none';
+    void toast.offsetWidth;
+    toast.style.animation = '';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.add('hidden'), 1800);
+  }
   closeRhemaSheet();
   syncRhemaPicker();
   renderRhemaVerse();
