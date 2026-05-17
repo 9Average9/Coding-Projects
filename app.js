@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.0";
+const APP_VERSION = "2.2.1";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -15600,110 +15600,115 @@ function closeRhemaGrammarModal(e) {
 
 // ── "Why this form?" helper ───────────────────────────────────────────────────
 
-const WHY_CASE = {
-  Nominative: 'marks this word as the <strong>subject</strong> of its clause.',
-  Genitive:   'marks <strong>possession or relationship</strong> — "of ___" or "belonging to ___."',
-  Dative:     'marks the <strong>indirect object, location, or means</strong> — "to/for/in/by ___."',
-  Accusative: 'marks this word as the <strong>direct object</strong> — the thing directly receiving the action.',
-  Vocative:   'marks <strong>direct address</strong> — the person being spoken to.',
-};
 const WHY_TENSE = {
-  Present:    'The <strong>present stem</strong> (no tense prefix) with active/middle endings signals present tense.',
-  Imperfect:  'The <strong>augment</strong> (ε- prefix) + present stem + secondary endings signal imperfect.',
-  Aorist:     'The <strong>aorist stem</strong> (often with σ- suffix: ἔλυσα) + augment + secondary endings signal aorist.',
-  '2nd Aorist':'The <strong>2nd aorist stem</strong> (irregular stem change: ἔβαλον from βάλλω) signals 2nd aorist.',
-  Perfect:    'The <strong>reduplication</strong> (first consonant + ε repeated at the start: λέλυκα) signals perfect.',
-  '2nd Perfect':'<strong>Reduplication</strong> with an alternate stem form signals 2nd perfect.',
-  Pluperfect: '<strong>Augment + reduplication</strong> together signal the pluperfect.',
-  Future:     'The <strong>σ- suffix</strong> inserted before the personal endings (λύ<strong>σ</strong>ω) signals the future.',
+  Present:     'The <strong>present stem</strong> with active/middle endings — no tense prefix added.',
+  Imperfect:   'The <strong>augment</strong> (ε- prefix) on the present stem with secondary endings.',
+  Aorist:      'The <strong>aorist stem</strong> (often a σ- suffix, e.g. ἔλυ<strong>σ</strong>α) plus the augment and secondary endings.',
+  '2nd Aorist':'An <strong>irregular stem change</strong> (like ἔβαλον from βάλλω) with secondary endings — same meaning as aorist.',
+  Perfect:     '<strong>Reduplication</strong> at the front of the word (first consonant + ε repeated, e.g. <strong>λέ</strong>λυκα).',
+  '2nd Perfect':'<strong>Reduplication</strong> with an alternate stem — same meaning as perfect.',
+  Pluperfect:  'Both <strong>augment + reduplication</strong> together before the stem.',
+  Future:      'A <strong>σ- suffix</strong> inserted between the stem and the personal ending (λύ<strong>σ</strong>ω).',
 };
 const WHY_VOICE = {
-  Active:          'The <strong>active endings</strong> (-ω, -εις, -ει… or -μι forms) signal active voice.',
-  Middle:          'The <strong>middle endings</strong> (-ομαι, -ῃ/ει, -εται…) signal middle voice.',
-  Passive:         'The <strong>passive morpheme</strong> (θη- in aorist/future passive; shared with middle in present) signals passive.',
-  'Middle/Deponent':'<strong>Middle form with active meaning</strong> — this verb only occurs in middle/passive forms (deponent).',
-  'Middle-Passive': 'The form is <strong>identical for middle and passive</strong> in this tense — context determines voice.',
-  'Middle or Passive':'Form is <strong>ambiguous</strong> between middle and passive here.',
+  Active:           'The <strong>active personal endings</strong> (-ω, -εις, -ει… or -μι forms).',
+  Middle:           'The <strong>middle endings</strong> (-ομαι, -ῃ/ει, -εται…).',
+  Passive:          'The <strong>θη- morpheme</strong> (aorist/future passive) or shared middle endings (present/imperfect).',
+  'Middle/Deponent':'<strong>Middle form, active meaning</strong> — this verb only exists in middle/passive form (deponent).',
+  'Middle-Passive': 'The ending is <strong>identical for middle and passive</strong> in this tense — context decides.',
+  'Middle or Passive':'Form is <strong>ambiguous</strong> between middle and passive in this slot.',
   'Middle Deponent':'<strong>Middle form, active meaning</strong> — a deponent verb.',
 };
 const WHY_MOOD = {
-  Indicative:  'The <strong>indicative endings</strong> (no modal marker) state the action as real.',
-  Subjunctive: 'The <strong>lengthened connecting vowel</strong> (ο→ω, ε→η) marks subjunctive mood.',
-  Optative:    'The <strong>optative suffix</strong> (-οι-, -αι-, -ει-) before personal endings marks optative mood.',
-  Imperative:  'The <strong>imperative endings</strong> (-ε, -ετε, -ου, -εσθε etc.) signal a command.',
-  Infinitive:  'The <strong>infinitive ending</strong> (-ειν, -αι, -ναι, -εσθαι) makes this a verbal noun.',
-  Participle:  'The <strong>participial suffix</strong> (-ων/-ουσα/-ον, -ας/-ασα/-αν, etc.) makes this a verbal adjective.',
+  Indicative:  'The <strong>standard personal endings</strong> with no modal marker.',
+  Subjunctive: 'A <strong>lengthened connecting vowel</strong> (ο→ω, ε→η) before the ending.',
+  Optative:    'An <strong>optative suffix</strong> (-οι-, -αι-, or -ει-) inserted before the personal ending.',
+  Imperative:  'The <strong>imperative endings</strong> (-ε, -ετε, -ου, -εσθε, etc.).',
+  Infinitive:  'The <strong>infinitive ending</strong> (-ειν, -αι, -ναι, or -εσθαι).',
+  Participle:  'The <strong>participial suffix</strong> (-ων/-ουσα/-ον, -ας/-ασα/-αν, etc.).',
 };
 
-function buildWhyThisForm(morph) {
+function extractWordEnding(surface, lemma) {
+  if (!surface || !lemma) return null;
+  let i = 0;
+  while (i < surface.length && i < lemma.length && surface[i] === lemma[i]) i++;
+  if (i === 0) return null; // no common prefix — irregular
+  const stem = surface.slice(0, i);
+  const ending = surface.slice(i);
+  return { stem, ending: ending || null };
+}
+
+function buildWhyThisForm(surface, strongs, morph) {
   if (!morph) return '';
   const rows = decodeMorph(morph);
   if (!rows.length) return '';
   const parts = [];
-  const segs = morph.split('-');
-  const posRaw = segs[0];
 
-  // POS
-  const posRow = rows.find(r => r.label === 'Part of Speech');
-  if (posRow) parts.push(`This word is a <strong>${posRow.value}</strong>.`);
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const lemma = lex.lemma || '';
 
-  // Case explanation for noun-like
+  // Case explanation — show the ending, not the meaning (meaning is already in the parse row)
   const caseRow = rows.find(r => r.label === 'Case');
-  if (caseRow && WHY_CASE[caseRow.value]) {
-    parts.push(`The <strong>${caseRow.value}</strong> case ${WHY_CASE[caseRow.value]}`);
+  const numRow  = rows.find(r => r.label === 'Number');
+  const genRow  = rows.find(r => r.label === 'Gender');
+  if (caseRow) {
+    const parsed = extractWordEnding(surface, lemma);
+    const caseLabel = [caseRow.value, numRow?.value, genRow?.value].filter(Boolean).join(' ');
+    if (parsed?.ending) {
+      parts.push(`The ending <strong>-${parsed.ending}</strong> makes <em>${surface}</em> ${caseLabel}.`);
+    } else if (surface && lemma && surface === lemma) {
+      parts.push(`<em>${surface}</em> is unchanged from its lexical form — it appears here in ${caseLabel}.`);
+    } else if (parsed) {
+      parts.push(`<em>${surface}</em> appears here as ${caseLabel}.`);
+    }
   }
 
-  // Verb morphology explanation
+  // Verb morphology — explain the morpheme causing each feature
   const tenseRow = rows.find(r => r.label === 'Tense');
-  if (tenseRow && WHY_TENSE[tenseRow.value]) {
-    parts.push(WHY_TENSE[tenseRow.value]);
-  }
+  if (tenseRow && WHY_TENSE[tenseRow.value]) parts.push(WHY_TENSE[tenseRow.value]);
   const voiceRow = rows.find(r => r.label === 'Voice');
-  if (voiceRow && WHY_VOICE[voiceRow.value]) {
-    parts.push(WHY_VOICE[voiceRow.value]);
-  }
-  const moodRow = rows.find(r => r.label === 'Mood');
-  if (moodRow && WHY_MOOD[moodRow.value]) {
-    parts.push(WHY_MOOD[moodRow.value]);
-  }
+  if (voiceRow && WHY_VOICE[voiceRow.value]) parts.push(WHY_VOICE[voiceRow.value]);
+  const moodRow  = rows.find(r => r.label === 'Mood');
+  if (moodRow  && WHY_MOOD[moodRow.value])  parts.push(WHY_MOOD[moodRow.value]);
 
   if (!parts.length) return '';
-
-  // Build example chips for tense/voice/mood
-  let chips = '';
-  if (tenseRow && GRAMMAR_EXAMPLES.tense[tenseRow.value]) {
-    chips += `<button class="rhema-example-chip" onclick="showRhemaGrammarExample('tense','${tenseRow.value}')">What is ${tenseRow.value}? <span class="rhema-chip-arrow">→</span></button>`;
-  }
-  if (voiceRow && GRAMMAR_EXAMPLES.voice[voiceRow.value]) {
-    chips += `<button class="rhema-example-chip" onclick="showRhemaGrammarExample('voice','${voiceRow.value.replace(/'/g,'\\\'').replace(/\//g,'\\/')}')">What is ${voiceRow.value}? <span class="rhema-chip-arrow">→</span></button>`;
-  }
-  if (moodRow && GRAMMAR_EXAMPLES.mood[moodRow.value]) {
-    chips += `<button class="rhema-example-chip" onclick="showRhemaGrammarExample('mood','${moodRow.value}')">What is ${moodRow.value}? <span class="rhema-chip-arrow">→</span></button>`;
-  }
 
   return `
     <div class="rhema-def-sep"></div>
     <div class="rhema-why-section">
       <div class="rhema-why-header">Why this form?</div>
       <div class="rhema-why-body">${parts.map(p => `<p>${p}</p>`).join('')}</div>
-      ${chips ? `<div class="rhema-why-chips">${chips}</div>` : ''}
     </div>`;
 }
 
 function renderRhemaParsing(surface, strongs, morph) {
   const rows = decodeMorph(morph);
   if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No parsing data for "${morph}".</p>`;
+
+  const safeVoice = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
+
   return `<div class="rhema-parsing-grid">` +
-    rows.map(r => `
+    rows.map(r => {
+      let defineBtn = '';
+      if (r.label === 'Tense' && GRAMMAR_EXAMPLES.tense[r.value]) {
+        defineBtn = `<button class="rhema-inline-define" onclick="showRhemaGrammarExample('tense','${r.value}')">define</button>`;
+      } else if (r.label === 'Voice' && GRAMMAR_EXAMPLES.voice[r.value]) {
+        defineBtn = `<button class="rhema-inline-define" onclick="showRhemaGrammarExample('voice','${safeVoice(r.value)}')">define</button>`;
+      } else if (r.label === 'Mood' && GRAMMAR_EXAMPLES.mood[r.value]) {
+        defineBtn = `<button class="rhema-inline-define" onclick="showRhemaGrammarExample('mood','${r.value}')">define</button>`;
+      }
+      return `
       <div class="rhema-parse-row">
         <div class="rhema-parse-label">${r.label}</div>
         <div>
           <div class="rhema-parse-value">${r.value}</div>
           ${r.desc ? `<div class="rhema-parse-desc">${r.desc}</div>` : ''}
+          ${defineBtn}
         </div>
-      </div>`).join('') +
+      </div>`;
+    }).join('') +
     `</div>` +
-    buildWhyThisForm(morph);
+    buildWhyThisForm(surface, strongs, morph);
 }
 
 function renderRhemaDefinition(strongs) {
