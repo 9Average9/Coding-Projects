@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.1";
+const APP_VERSION = "2.3.2";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -13559,7 +13559,7 @@ async function submitCreateAccount() {
     errEl.textContent = "Username must be at least 3 characters."; return;
   }
   if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    errEl.textContent = "Username can only contain letters, numbers, and underscores."; return;
+    errEl.textContent = "Username can only contain letters, numbers, and underscores — no email addresses."; return;
   }
   if (displayName.length < 2) {
     errEl.textContent = "Display name must be at least 2 characters."; return;
