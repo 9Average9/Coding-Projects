@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.5";
+const APP_VERSION = "2.2.6";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -13671,6 +13671,11 @@ window.__onAuthStateReady = async (user) => {
     updateProfileBadges?.();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
+
+    // Silently refresh FCM token on login if permission already granted (handles expired tokens)
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      window.FCM?.registerToken(user.uid).catch(() => {});
+    }
 
     _unsubUserDoc?.();
     _unsubUserDoc = window.Auth.listenUserDoc(user.uid, (data) => {
