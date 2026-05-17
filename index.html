@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=130" />
+  <link rel="stylesheet" href="style.css?v=131" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10632,6 +10632,7 @@ glacier: {
         <span class="rhema-title-greek">Word Study</span>
       </div>
       <div class="rhema-header-actions">
+        <button id="rhemaHighlightToggleBtn" class="rhema-swap-btn rhema-hl-toggle-btn" onclick="toggleRhemaHighlightBar()" title="Highlight by part of speech"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">ink_highlighter</span></button>
         <button id="rhemaGreekModeBtn" class="rhema-swap-btn" onclick="toggleRhemaMode()">Just Greek</button>
         <button id="rhemaSwapBtn" class="rhema-swap-btn" onclick="toggleRhemaKjv()">KJV</button>
       </div>
@@ -10654,6 +10655,17 @@ glacier: {
     </div>
 
     <div id="rhemaBreadcrumb" class="rhema-breadcrumb hidden"></div>
+
+    <!-- POS highlight toolbar -->
+    <div id="rhemaHighlightBar" class="rhema-highlight-bar hidden">
+      <button class="rhema-hl-pill" data-cat="V"    onclick="toggleRhemaHighlight('V')"   ><span class="rhema-hl-dot" style="background:rgba(251,146,60,1)"></span>Verb</button>
+      <button class="rhema-hl-pill" data-cat="N"    onclick="toggleRhemaHighlight('N')"   ><span class="rhema-hl-dot" style="background:rgba(96,165,250,1)"></span>Noun</button>
+      <button class="rhema-hl-pill" data-cat="ADJ"  onclick="toggleRhemaHighlight('ADJ')" ><span class="rhema-hl-dot" style="background:rgba(74,222,128,1)"></span>Adj</button>
+      <button class="rhema-hl-pill" data-cat="T"    onclick="toggleRhemaHighlight('T')"   ><span class="rhema-hl-dot" style="background:rgba(167,139,250,1)"></span>Article</button>
+      <button class="rhema-hl-pill" data-cat="PRON" onclick="toggleRhemaHighlight('PRON')"><span class="rhema-hl-dot" style="background:rgba(251,113,133,1)"></span>Pronoun</button>
+      <button class="rhema-hl-pill" data-cat="PREP" onclick="toggleRhemaHighlight('PREP')"><span class="rhema-hl-dot" style="background:rgba(45,212,191,1)"></span>Prep</button>
+      <button class="rhema-hl-pill" data-cat="CONJ" onclick="toggleRhemaHighlight('CONJ')"><span class="rhema-hl-dot" style="background:rgba(250,204,21,1)"></span>Conj</button>
+    </div>
 
     <!-- Scrollable body — content + nav are in-flow so nav sits right below
          the last word row instead of floating at the bottom of the screen -->
@@ -10695,6 +10707,15 @@ glacier: {
     </div>
     <div id="rhemaTabContent" class="rhema-tab-content"></div>
   </div>
+  <!-- Grammar example modal (inside rhema overlay so z-index stacks correctly) -->
+  <div id="rhemaGrammarModal" class="rhema-grammar-modal hidden" onclick="closeRhemaGrammarModal(event)">
+    <div class="rhema-grammar-card" onclick="event.stopPropagation()">
+      <button class="rhema-grammar-close" onclick="closeRhemaGrammarModal()">✕</button>
+      <div id="rhemaGrammarTitle" class="rhema-grammar-title"></div>
+      <div id="rhemaGrammarBody"  class="rhema-grammar-body"></div>
+    </div>
+  </div>
+
   <div id="rhemaSheetBackdrop" class="rhema-sheet-backdrop" onclick="closeRhemaSheet()"></div>
 
   <!-- ── Book picker ── -->
@@ -10740,7 +10761,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=126"></script>
+  <script src="app.js?v=127"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->

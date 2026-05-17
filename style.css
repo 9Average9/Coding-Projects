@@ -10940,6 +10940,190 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--btn-text-color);
 }
 
+/* ── POS Highlight toolbar ── */
+.rhema-highlight-bar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--primary-light);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.rhema-highlight-bar::-webkit-scrollbar { display: none; }
+.rhema-highlight-bar.hidden { display: none; }
+
+.rhema-hl-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 7px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border-color);
+  background: var(--card-color);
+  color: var(--secondary-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+}
+.rhema-hl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+/* Present in verse but not selected — subtle highlight to show availability */
+.rhema-hl-pill.hl-present {
+  border-color: color-mix(in srgb, var(--border-color) 60%, currentColor);
+}
+/* Selected AND has matches in this verse — fully active */
+.rhema-hl-pill.hl-active {
+  border-color: transparent;
+  color: #fff;
+}
+/* V = orange */
+.rhema-hl-pill[data-cat="V"].hl-active    { background: rgba(251,146,60,0.85); }
+/* N = blue */
+.rhema-hl-pill[data-cat="N"].hl-active    { background: rgba(96,165,250,0.85); }
+/* ADJ = green */
+.rhema-hl-pill[data-cat="ADJ"].hl-active  { background: rgba(74,222,128,0.75); color: #14532d; }
+/* T = purple */
+.rhema-hl-pill[data-cat="T"].hl-active    { background: rgba(167,139,250,0.85); }
+/* PRON = pink */
+.rhema-hl-pill[data-cat="PRON"].hl-active { background: rgba(251,113,133,0.85); }
+/* PREP = teal */
+.rhema-hl-pill[data-cat="PREP"].hl-active { background: rgba(45,212,191,0.8); color: #134e4a; }
+/* CONJ = amber */
+.rhema-hl-pill[data-cat="CONJ"].hl-active { background: rgba(250,204,21,0.8); color: #78350f; }
+
+/* Selected but no matches in this verse — dimmed */
+.rhema-hl-pill.hl-dimmed {
+  opacity: 0.45;
+  border-style: dashed;
+}
+
+/* Shake animation when tapping a category with no matches */
+@keyframes rhema-hl-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-4px); }
+  40%      { transform: translateX(4px); }
+  60%      { transform: translateX(-3px); }
+  80%      { transform: translateX(3px); }
+}
+.rhema-hl-pill.shake { animation: rhema-hl-shake 0.4s ease; }
+
+/* ── Grammar example modal ── */
+.rhema-grammar-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1060;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 env(safe-area-inset-bottom, 16px);
+}
+.rhema-grammar-modal.hidden { display: none; }
+.rhema-grammar-card {
+  background: var(--card-color);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  width: 100%;
+  position: relative;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.rhema-grammar-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: color-mix(in srgb, var(--border-color) 50%, transparent);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--font-color);
+  font-weight: 700;
+}
+.rhema-grammar-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--font-color);
+  margin-bottom: 14px;
+  padding-right: 36px;
+}
+.rhema-grammar-example-sentence {
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+  border-radius: 10px;
+}
+.rhema-grammar-example-body {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--font-color);
+  opacity: 0.9;
+}
+
+/* ── "Why this form?" section ── */
+.rhema-why-section {
+  padding: 14px 0 4px;
+}
+.rhema-why-header {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+  margin-bottom: 8px;
+}
+.rhema-why-body p {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--font-color);
+  opacity: 0.85;
+  margin: 0 0 6px;
+}
+.rhema-why-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.rhema-example-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--secondary-color) 30%, transparent);
+  border-radius: 20px;
+  padding: 5px 12px 5px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.rhema-example-chip:active {
+  background: color-mix(in srgb, var(--secondary-color) 20%, transparent);
+}
+.rhema-chip-arrow {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
 /* ── Verse picker pills ── */
 .rhema-picker {
   display: flex;
