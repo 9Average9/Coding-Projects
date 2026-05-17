@@ -10999,6 +10999,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-hl-pill[data-cat="PREP"].hl-active { background: rgba(45,212,191,0.8); color: #134e4a; }
 /* CONJ = amber */
 .rhema-hl-pill[data-cat="CONJ"].hl-active { background: rgba(250,204,21,0.8); color: #78350f; }
+.rhema-hl-pill[data-cat="ADV"].hl-active  { background: rgba(253,186,116,0.85); color: #7c2d12; }
 
 /* Selected but no matches in this verse — dimmed */
 .rhema-hl-pill.hl-dimmed {
