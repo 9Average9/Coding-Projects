@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.3";
+const APP_VERSION = "2.2.5";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -13392,7 +13392,7 @@ async function restoreUserFromFirestore(user) {
     totalStudySeconds = data.totalStudySeconds;
     localStorage.setItem("totalStudySeconds", String(data.totalStudySeconds));
   }
-  if (data.streak) localStorage.setItem("studyStreakDays", String(data.streak));
+  if (typeof data.streak === "number") localStorage.setItem("studyStreakDays", String(data.streak));
   if (data.lastStudyDate) localStorage.setItem("lastStudyDate", data.lastStudyDate);
   if (data.lessonMode) localStorage.setItem("lessonMode", data.lessonMode);
   if (data.practiceToolsUnlocked) {
@@ -13684,12 +13684,12 @@ window.__onAuthStateReady = async (user) => {
         else renderFriendRequests();
       }
 
-      // Sync server streak → localStorage + profile display
-      if (typeof data.streak === "number") {
-        localStorage.setItem("studyStreakDays", String(data.streak));
-        const streakStat = document.getElementById("profileStreakStat");
-        if (streakStat) streakStat.textContent = data.streak;
-      }
+      // Sync server streak + lastStudyDate → localStorage, then advance for today's login
+      if (typeof data.streak === "number") localStorage.setItem("studyStreakDays", String(data.streak));
+      if (data.lastStudyDate) localStorage.setItem("lastStudyDate", data.lastStudyDate);
+      updateStudyStreak(); // idempotent — advances to today if not yet recorded
+      const streakStat = document.getElementById("profileStreakStat");
+      if (streakStat) streakStat.textContent = getStreakDays();
     });
   } else {
     _unsubUserDoc?.();
@@ -15460,9 +15460,19 @@ function initRhemaSwipeDown(sheet) {
   const onEnd = () => {
     if (!dragging) return;
     dragging = false;
-    sheet.style.transition = '';
-    if (currentY - startY > 80) { sheet.style.transform = ''; closeRhemaSheet(); }
-    else sheet.style.transform = '';
+    if (currentY - startY > 80) {
+      // Animate from current drag position to fully off-screen, then clean up
+      sheet.style.transition = 'transform 0.22s cubic-bezier(0.32, 0, 0.67, 0)';
+      sheet.style.transform = 'translateY(110%)';
+      sheet.addEventListener('transitionend', () => {
+        sheet.style.transition = '';
+        sheet.style.transform = '';
+        closeRhemaSheet();
+      }, { once: true });
+    } else {
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+    }
   };
 
   for (const t of targets) {
