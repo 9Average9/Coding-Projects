@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.2";
+const APP_VERSION = "2.2.3";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -15598,36 +15598,6 @@ function closeRhemaGrammarModal(e) {
   document.getElementById('rhemaGrammarModal')?.classList.add('hidden');
 }
 
-// ── "Why this form?" helper ───────────────────────────────────────────────────
-
-const WHY_TENSE = {
-  Present:     'The <strong>present stem</strong> with active/middle endings — no tense prefix added.',
-  Imperfect:   'The <strong>augment</strong> (ε- prefix) on the present stem with secondary endings.',
-  Aorist:      'The <strong>aorist stem</strong> (often a σ- suffix, e.g. ἔλυ<strong>σ</strong>α) plus the augment and secondary endings.',
-  '2nd Aorist':'An <strong>irregular stem change</strong> (like ἔβαλον from βάλλω) with secondary endings — same meaning as aorist.',
-  Perfect:     '<strong>Reduplication</strong> at the front of the word (first consonant + ε repeated, e.g. <strong>λέ</strong>λυκα).',
-  '2nd Perfect':'<strong>Reduplication</strong> with an alternate stem — same meaning as perfect.',
-  Pluperfect:  'Both <strong>augment + reduplication</strong> together before the stem.',
-  Future:      'A <strong>σ- suffix</strong> inserted between the stem and the personal ending (λύ<strong>σ</strong>ω).',
-};
-const WHY_VOICE = {
-  Active:           'The <strong>active personal endings</strong> (-ω, -εις, -ει… or -μι forms).',
-  Middle:           'The <strong>middle endings</strong> (-ομαι, -ῃ/ει, -εται…).',
-  Passive:          'The <strong>θη- morpheme</strong> (aorist/future passive) or shared middle endings (present/imperfect).',
-  'Middle/Deponent':'<strong>Middle form, active meaning</strong> — this verb only exists in middle/passive form (deponent).',
-  'Middle-Passive': 'The ending is <strong>identical for middle and passive</strong> in this tense — context decides.',
-  'Middle or Passive':'Form is <strong>ambiguous</strong> between middle and passive in this slot.',
-  'Middle Deponent':'<strong>Middle form, active meaning</strong> — a deponent verb.',
-};
-const WHY_MOOD = {
-  Indicative:  'The <strong>standard personal endings</strong> with no modal marker.',
-  Subjunctive: 'A <strong>lengthened connecting vowel</strong> (ο→ω, ε→η) before the ending.',
-  Optative:    'An <strong>optative suffix</strong> (-οι-, -αι-, or -ει-) inserted before the personal ending.',
-  Imperative:  'The <strong>imperative endings</strong> (-ε, -ετε, -ου, -εσθε, etc.).',
-  Infinitive:  'The <strong>infinitive ending</strong> (-ειν, -αι, -ναι, or -εσθαι).',
-  Participle:  'The <strong>participial suffix</strong> (-ων/-ουσα/-ον, -ας/-ασα/-αν, etc.).',
-};
-
 function extractWordEnding(surface, lemma) {
   if (!surface || !lemma) return null;
   let i = 0;
@@ -15638,52 +15608,25 @@ function extractWordEnding(surface, lemma) {
   return { stem, ending: ending || null };
 }
 
-function buildWhyThisForm(surface, strongs, morph) {
+function buildFormHint(surface, strongs, morph) {
   if (!morph) return '';
-  const rows = decodeMorph(morph);
-  if (!rows.length) return '';
-  const parts = [];
-
   const posRaw = morph.split('-')[0];
-  const isVerb = posRaw === 'V';
-
+  if (posRaw === 'V') return ''; // verbs/participles — skip
+  const rows = decodeMorph(morph);
+  const caseRow = rows.find(r => r.label === 'Case');
+  if (!caseRow) return '';
+  const numRow = rows.find(r => r.label === 'Number');
   const lex = (window.RhemaLexicon || {})[strongs] || {};
   const lemma = lex.lemma || '';
-
-  // Case ending explanation — only for true noun-like words, NOT verbs/participles
-  if (!isVerb) {
-    const caseRow = rows.find(r => r.label === 'Case');
-    const numRow  = rows.find(r => r.label === 'Number');
-    const genRow  = rows.find(r => r.label === 'Gender');
-    if (caseRow) {
-      const parsed = extractWordEnding(surface, lemma);
-      const caseLabel = [caseRow.value, numRow?.value, genRow?.value].filter(Boolean).join(' ');
-      if (parsed?.ending) {
-        parts.push(`The ending <strong>-${parsed.ending}</strong> makes <em>${surface}</em> ${caseLabel}.`);
-      } else if (surface && lemma && surface === lemma) {
-        parts.push(`<em>${surface}</em> is unchanged from its lexical form — it appears here in ${caseLabel}.`);
-      } else if (parsed) {
-        parts.push(`<em>${surface}</em> appears here as ${caseLabel}.`);
-      }
-    }
+  const parsed = extractWordEnding(surface, lemma);
+  const caseLabel = [caseRow.value, numRow?.value].filter(Boolean).join(' ');
+  let hint;
+  if (parsed?.ending) {
+    hint = `${parsed.stem}<strong>-${parsed.ending}</strong> → ${caseLabel}`;
+  } else {
+    hint = `${surface} → ${caseLabel}`;
   }
-
-  // Verb morphology — explain the morpheme causing each feature
-  const tenseRow = rows.find(r => r.label === 'Tense');
-  if (tenseRow && WHY_TENSE[tenseRow.value]) parts.push(WHY_TENSE[tenseRow.value]);
-  const voiceRow = rows.find(r => r.label === 'Voice');
-  if (voiceRow && WHY_VOICE[voiceRow.value]) parts.push(WHY_VOICE[voiceRow.value]);
-  const moodRow  = rows.find(r => r.label === 'Mood');
-  if (moodRow  && WHY_MOOD[moodRow.value])  parts.push(WHY_MOOD[moodRow.value]);
-
-  if (!parts.length) return '';
-
-  return `
-    <div class="rhema-def-sep"></div>
-    <div class="rhema-why-section">
-      <div class="rhema-why-header">Why this form?</div>
-      <div class="rhema-why-body">${parts.map(p => `<p>${p}</p>`).join('')}</div>
-    </div>`;
+  return `<div class="rhema-def-sep"></div><div class="rhema-form-hint">${hint}</div>`;
 }
 
 function renderRhemaParsing(surface, strongs, morph) {
@@ -15713,7 +15656,7 @@ function renderRhemaParsing(surface, strongs, morph) {
       </div>`;
     }).join('') +
     `</div>` +
-    buildWhyThisForm(surface, strongs, morph);
+    buildFormHint(surface, strongs, morph);
 }
 
 function renderRhemaDefinition(strongs) {

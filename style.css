@@ -11077,24 +11077,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   opacity: 0.9;
 }
 
-/* ── "Why this form?" section ── */
-.rhema-why-section {
-  padding: 14px 0 4px;
-}
-.rhema-why-header {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+/* ── Form ending hint ── */
+.rhema-form-hint {
+  font-size: 0.85rem;
   color: var(--muted-color);
-  margin-bottom: 8px;
-}
-.rhema-why-body p {
-  font-size: 0.82rem;
-  line-height: 1.6;
-  color: var(--font-color);
-  opacity: 0.85;
-  margin: 0 0 6px;
+  padding: 10px 0 2px;
 }
 /* Tappable value — Tense/Voice/Mood values that open the grammar example modal */
 .rhema-value-link {
