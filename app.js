@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.6";
+const APP_VERSION = "2.2.7";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -14792,7 +14792,8 @@ function normalizePosKey(morphCode) {
   if (!morphCode) return null;
   const raw = morphCode.split('-')[0];
   if (raw === 'A') return 'ADJ';
-  if (raw === 'R' || raw === 'PRON') return 'PRON';
+  // All pronoun subtypes → PRON
+  if (['P','R','C','D','F','I','K','Q','X','PRON'].includes(raw)) return 'PRON';
   if (raw === 'RI') return 'N';            // proper noun → noun
   if (['PART','PRT','INJ','COND'].includes(raw)) return 'PART';
   return raw;
@@ -14806,6 +14807,7 @@ const HIGHLIGHT_CATS = {
   PRON: { color:'rgba(251,113,133,0.32)' },
   PREP: { color:'rgba(45,212,191,0.32)'  },
   CONJ: { color:'rgba(250,204,21,0.32)'  },
+  ADV:  { color:'rgba(253,186,116,0.32)' },
 };
 
 function toggleRhemaHighlightBar() {
