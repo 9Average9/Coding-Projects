@@ -430,8 +430,10 @@ async function fcmSendPushNotification(toUid, type, fromName, fromUid) {
     await addDoc(collection(db, "encouragements", toUid, "messages"), {
       type, fromName, fromUid, processed: false, createdAt: serverTimestamp()
     });
+    return true;
   } catch (e) {
     console.warn("fcmSendPushNotification:", e);
+    return false;
   }
 }
 

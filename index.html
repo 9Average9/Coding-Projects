@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=129" />
+  <link rel="stylesheet" href="style.css?v=130" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -1698,6 +1698,31 @@ glacier: {
       <br><br>
       This lesson will help you understand what a noun is, what subjects and objects are, and why Greek noun endings matter so much.
     </p>
+
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">
+        What you're memorizing: the lexical form
+      </div>
+      <div class="lesson-block-content">
+        <p>
+          Every word in this app is a <strong>lexical form</strong> — the dictionary form of the word. This is the exact form you look up in a Greek dictionary (called a <strong>lexicon</strong>).
+        </p>
+        <p>
+          A <strong>lexicon</strong> is simply a Greek dictionary. The most common one used in New Testament studies is <em>BDAG (A Greek-English Lexicon of the New Testament)</em>. When you look up any Greek word — in a lexicon, an interlinear Bible, or a study tool like Logos or Bible Gateway — you look it up by its lexical form.
+        </p>
+        <p>
+          For nouns, the lexical form is the <strong>nominative singular</strong> — the bare, base form of the noun before any case endings are added. For example:
+        </p>
+        <ul>
+          <li><strong>λόγος</strong> — the lexical form meaning "word" (you might see it as λόγου, λόγῳ, λόγον in the text — all forms of the same word)</li>
+          <li><strong>ἀγάπη</strong> — the lexical form meaning "love"</li>
+          <li><strong>θεός</strong> — the lexical form meaning "God"</li>
+        </ul>
+        <p class="highlight">
+          This is why vocabulary memorization is so valuable: when you see any form of a Greek word in the text, knowing the lexical form lets you immediately find it in a lexicon, an interlinear, or a study tool — and understand exactly what it means.
+        </p>
+      </div>
+    </div>
 
     <div class="lesson-block" onclick="toggleLessonBlock(this)">
       <div class="lesson-block-header">
@@ -5657,6 +5682,43 @@ glacier: {
           <li>How to read a Greek sentence — parsing, structure, and what to look for first</li>
         </ul>
         <p class="highlight">By the end of this track, you will have the foundation to open a Greek NT, identify words, recognize grammatical forms, and begin reading. That is a real skill — and it starts here.</p>
+      </div>
+    </div>
+
+    <!-- Lexicon block -->
+    <div class="lesson-block" onclick="toggleLessonBlock(this)">
+      <div class="lesson-block-header">Lexicons and the Lexical Form — What You're Memorizing</div>
+      <div class="lesson-block-content">
+        <p>
+          Every word you memorize in this app is a <strong>lexical form</strong> — the dictionary entry form of the word. Understanding what that means is foundational to using Greek correctly.
+        </p>
+        <hr>
+        <h4>What Is a Lexicon?</h4>
+        <p>
+          A <strong>lexicon</strong> is a Greek dictionary. Unlike a typical English dictionary, a Greek lexicon does far more than define words — it explains their range of meaning, their usage in literature, their theological significance, and how they function grammatically.
+        </p>
+        <p>The standard lexicon used in NT scholarship is:</p>
+        <ul>
+          <li><strong>BDAG</strong> — <em>A Greek-English Lexicon of the New Testament and Other Early Christian Literature</em> by Bauer, Danker, Arndt, and Gingrich. Every serious student eventually needs this.</li>
+          <li><strong>Thayer's</strong> — An older, accessible lexicon. Free online. Less precise than BDAG but very readable.</li>
+          <li><strong>Strong's</strong> — A concordance with basic definitions, referenced by number. Widely used; not as precise for nuanced word study.</li>
+        </ul>
+        <hr>
+        <h4>What Is the Lexical Form?</h4>
+        <p>
+          Greek words change their endings constantly based on their grammatical role in the sentence. The same word can appear in dozens of different forms in the text. The <strong>lexical form</strong> is the base form — the one the lexicon lists — from which all other forms are built.
+        </p>
+        <ul>
+          <li>For <strong>nouns</strong>: the nominative singular (e.g., <em>λόγος</em>, <em>ἀγάπη</em>, <em>σάρξ</em>)</li>
+          <li>For <strong>verbs</strong>: the first person singular present active indicative (e.g., <em>λύω</em> — "I loose")</li>
+          <li>For <strong>adjectives</strong>: the masculine nominative singular (e.g., <em>ἀγαθός</em>)</li>
+        </ul>
+        <p>
+          When you encounter <em>λόγον</em>, <em>λόγου</em>, or <em>λόγῳ</em> in the Greek NT, they are all forms of the same lexical entry: <em>λόγος</em>. Knowing the lexical form lets you immediately look it up, find it in an interlinear, or recognize it in a parsing tool.
+        </p>
+        <p class="highlight">
+          This is the practical payoff of vocabulary memorization: you are training yourself to recognize which lexical form any inflected word belongs to — and that is the exact skill that unlocks real Greek word study.
+        </p>
       </div>
     </div>
 
@@ -10678,7 +10740,7 @@ glacier: {
   </main>
 
   <script src="vocab.js?v=89"></script>
-  <script src="app.js?v=125"></script>
+  <script src="app.js?v=126"></script>
   <script type="module" src="firebase-lb.js?v=93"></script>
 
 <!-- Leaderboard Intro Modal -->
