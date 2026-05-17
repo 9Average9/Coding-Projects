@@ -104,7 +104,7 @@ exports.onEncouragementCreated = functions.firestore
       title = "Friend Request Accepted!";
       body = `${fromName} accepted your friend request.`;
     } else {
-      title = "Study reminder from a friend!";
+      title = "Basic Greek study reminder:";
       body = `${fromName} is reminding you to study your Greek!`;
     }
 
