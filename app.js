@@ -13196,7 +13196,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.2.1";
+const APP_VERSION = "2.2.2";
 
 const UPDATE_NOTES = [
   "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
@@ -15644,22 +15644,27 @@ function buildWhyThisForm(surface, strongs, morph) {
   if (!rows.length) return '';
   const parts = [];
 
+  const posRaw = morph.split('-')[0];
+  const isVerb = posRaw === 'V';
+
   const lex = (window.RhemaLexicon || {})[strongs] || {};
   const lemma = lex.lemma || '';
 
-  // Case explanation — show the ending, not the meaning (meaning is already in the parse row)
-  const caseRow = rows.find(r => r.label === 'Case');
-  const numRow  = rows.find(r => r.label === 'Number');
-  const genRow  = rows.find(r => r.label === 'Gender');
-  if (caseRow) {
-    const parsed = extractWordEnding(surface, lemma);
-    const caseLabel = [caseRow.value, numRow?.value, genRow?.value].filter(Boolean).join(' ');
-    if (parsed?.ending) {
-      parts.push(`The ending <strong>-${parsed.ending}</strong> makes <em>${surface}</em> ${caseLabel}.`);
-    } else if (surface && lemma && surface === lemma) {
-      parts.push(`<em>${surface}</em> is unchanged from its lexical form — it appears here in ${caseLabel}.`);
-    } else if (parsed) {
-      parts.push(`<em>${surface}</em> appears here as ${caseLabel}.`);
+  // Case ending explanation — only for true noun-like words, NOT verbs/participles
+  if (!isVerb) {
+    const caseRow = rows.find(r => r.label === 'Case');
+    const numRow  = rows.find(r => r.label === 'Number');
+    const genRow  = rows.find(r => r.label === 'Gender');
+    if (caseRow) {
+      const parsed = extractWordEnding(surface, lemma);
+      const caseLabel = [caseRow.value, numRow?.value, genRow?.value].filter(Boolean).join(' ');
+      if (parsed?.ending) {
+        parts.push(`The ending <strong>-${parsed.ending}</strong> makes <em>${surface}</em> ${caseLabel}.`);
+      } else if (surface && lemma && surface === lemma) {
+        parts.push(`<em>${surface}</em> is unchanged from its lexical form — it appears here in ${caseLabel}.`);
+      } else if (parsed) {
+        parts.push(`<em>${surface}</em> appears here as ${caseLabel}.`);
+      }
     }
   }
 
@@ -15685,23 +15690,24 @@ function renderRhemaParsing(surface, strongs, morph) {
   const rows = decodeMorph(morph);
   if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No parsing data for "${morph}".</p>`;
 
-  const safeVoice = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
+  const safeStr = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
 
   return `<div class="rhema-parsing-grid">` +
     rows.map(r => {
-      let defineBtn = '';
+      // Render the value as a tappable link when a grammar example exists for it
+      let valueHtml = `<div class="rhema-parse-value">${r.value}</div>`;
       if (r.label === 'Tense' && GRAMMAR_EXAMPLES.tense[r.value]) {
-        defineBtn = `<button class="rhema-inline-define" onclick="showRhemaGrammarExample('tense','${r.value}')">define</button>`;
+        valueHtml = `<button class="rhema-parse-value rhema-value-link" onclick="showRhemaGrammarExample('tense','${r.value}')">${r.value}</button>`;
       } else if (r.label === 'Voice' && GRAMMAR_EXAMPLES.voice[r.value]) {
-        defineBtn = `<button class="rhema-inline-define" onclick="showRhemaGrammarExample('voice','${safeVoice(r.value)}')">define</button>`;
+        valueHtml = `<button class="rhema-parse-value rhema-value-link" onclick="showRhemaGrammarExample('voice','${safeStr(r.value)}')">${r.value}</button>`;
       } else if (r.label === 'Mood' && GRAMMAR_EXAMPLES.mood[r.value]) {
-        defineBtn = `<button class="rhema-inline-define" onclick="showRhemaGrammarExample('mood','${r.value}')">define</button>`;
+        valueHtml = `<button class="rhema-parse-value rhema-value-link" onclick="showRhemaGrammarExample('mood','${r.value}')">${r.value}</button>`;
       }
       return `
       <div class="rhema-parse-row">
-        <div class="rhema-parse-label">${r.label}${defineBtn ? `<br>${defineBtn}` : ''}</div>
+        <div class="rhema-parse-label">${r.label}</div>
         <div>
-          <div class="rhema-parse-value">${r.value}</div>
+          ${valueHtml}
           ${r.desc ? `<div class="rhema-parse-desc">${r.desc}</div>` : ''}
         </div>
       </div>`;
