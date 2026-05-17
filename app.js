@@ -15699,11 +15699,10 @@ function renderRhemaParsing(surface, strongs, morph) {
       }
       return `
       <div class="rhema-parse-row">
-        <div class="rhema-parse-label">${r.label}</div>
+        <div class="rhema-parse-label">${r.label}${defineBtn ? `<br>${defineBtn}` : ''}</div>
         <div>
           <div class="rhema-parse-value">${r.value}</div>
           ${r.desc ? `<div class="rhema-parse-desc">${r.desc}</div>` : ''}
-          ${defineBtn}
         </div>
       </div>`;
     }).join('') +
