@@ -22,10 +22,10 @@ const CACHE_NAME = "basic-greek-trainer-v2.3.8";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=138",
-  "./vocab.js?v=89",
-  "./app.js?v=138",
-  "./firebase-lb.js?v=93",
+  "./style.css?v=2.3.8",
+  "./vocab.js?v=2.3.8",
+  "./app.js?v=2.3.8",
+  "./firebase-lb.js?v=2.3.8",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"

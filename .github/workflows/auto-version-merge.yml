@@ -43,8 +43,9 @@ jobs:
           OLD_CACHE=$(grep -oP 'basic-greek-trainer-v\K[0-9]+\.[0-9]+\.[0-9]+' service-worker.js)
           sed -i "s/basic-greek-trainer-v$OLD_CACHE/basic-greek-trainer-v$NEW_VERSION/" service-worker.js
 
-          # Update ?v= cache-busters in index.html (style.css, app.js, vocab.js, firebase-lb.js)
+          # Update ?v= cache-busters in index.html and FILES_TO_CACHE in service-worker.js
           sed -i "s/?v=[0-9][^\"']*/?v=$NEW_VERSION/g" index.html
+          sed -i "s/?v=[0-9][^\"']*/?v=$NEW_VERSION/g" service-worker.js
 
       - name: Update UPDATE_NOTES from commit messages
         run: |
