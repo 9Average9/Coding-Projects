@@ -7964,9 +7964,6 @@ function hideBottomNav() {
 function setNavActive(page) {
   document.querySelectorAll('.bn-item').forEach(b =>
     b.classList.toggle('active', b.dataset.page === page));
-  // dot only shows on home
-  const homeBtn = document.querySelector('.bn-home');
-  if (homeBtn) homeBtn.classList.toggle('active', page === 'home');
 }
 
 function showNavPage(page) {

@@ -12431,21 +12431,25 @@ body .app:has(#settingsScreen.screen.active) {
   width: 5px; height: 5px; border-radius: 50%; background: var(--secondary-color);
   display: none;
 }
-.bn-home.active .bn-dot { display: block; }
+.bn-item.active .bn-dot { display: block; }
 
 /* ── Home Screen ─────────────────────────────────────────────────────────── */
-.home-topbar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: calc(env(safe-area-inset-top, 20px) + 16px) 20px 0;
+/* Greeting row — greeting text left, settings icon right, at same baseline */
+.home-top-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 20px) + 12px) 0 0;
 }
+.home-top-row .home-greeting-wrap { margin: 0; }
 .ht-btn {
-  background: none; border: none; cursor: pointer; padding: 8px;
-  color: var(--font-color); position: relative;
+  background: none; border: none; cursor: pointer; padding: 6px;
+  color: var(--font-color); position: relative; flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
 }
-.ht-btn .material-symbols-outlined { font-size: 1.6rem; }
+.ht-btn .material-symbols-outlined { font-size: 1.5rem; }
+/* Badge on notification tile icon */
+.hat-notif-icon { position: relative; }
 .notif-badge {
-  position: absolute; top: 6px; right: 6px; width: 9px; height: 9px;
+  position: absolute; top: -3px; right: -3px; width: 9px; height: 9px;
   background: #ef4444; border-radius: 50%; border: 2px solid var(--primary-color);
 }
 /* Scroll container — full height, topbar scrolls with content */
@@ -12467,7 +12471,7 @@ body .app:has(#settingsScreen.screen.active) {
   z-index: 10; pointer-events: none;
 }
 #homeScreen.scrolled-top::before { opacity: 1; }
-.home-greeting-wrap { margin: 18px 0 10px; }
+.home-greeting-wrap { margin: 12px 0 8px; }
 .home-greeting {
   font-size: 2rem; font-weight: 900; color: var(--font-color);
   line-height: 1.15; margin: 0;
@@ -12578,8 +12582,11 @@ body .app:has(#settingsScreen.screen.active) {
 .hcs-deco { font-size: 2rem !important; color: var(--muted-color); opacity: 0.3; }
 
 /* ── Profile Page ────────────────────────────────────────────────────────── */
-#profilePage .nav-bar { position: sticky; top: 0; background: var(--primary-color); z-index: 10; }
-.profile-page-scroll { overflow-y: auto; height: calc(100vh - 56px); padding: 0 16px 20px; -webkit-overflow-scrolling: touch; }
+#profilePage .nav-bar {
+  background: var(--primary-color); z-index: 10; flex-shrink: 0;
+  padding-top: max(10px, env(safe-area-inset-top));
+}
+.profile-page-scroll { overflow-y: auto; flex: 1; padding: 0 16px 20px; -webkit-overflow-scrolling: touch; }
 .profile-page-scroll .profile-card { box-shadow: none; border-radius: 0; background: transparent; padding: 0; max-height: none; overflow: visible; }
 
 /* ── Community Page ──────────────────────────────────────────────────────── */

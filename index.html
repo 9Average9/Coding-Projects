@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.15" />
+  <link rel="stylesheet" href="style.css?v=2.3.16" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -330,18 +330,14 @@ glacier: {
 
     <section id="homeScreen" class="screen active">
       <div class="home-scroll" id="homeScroll">
-        <div class="home-topbar">
+        <div class="home-top-row">
+          <div class="home-greeting-wrap">
+            <h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
+            <h1 class="home-greeting home-greeting-name" id="homeGreetingName">Friend</h1>
+          </div>
           <button class="ht-btn" onclick="openHomeSettings()">
             <span class="material-symbols-outlined">settings</span>
           </button>
-          <button class="ht-btn ht-notif" id="notifBtn" onclick="openNotifications()">
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="notif-badge hidden" id="notifBadge"></span>
-          </button>
-        </div>
-        <div class="home-greeting-wrap">
-          <h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
-          <h1 class="home-greeting home-greeting-name" id="homeGreetingName">Friend</h1>
         </div>
         <div class="home-verse-wrap">
           <p class="home-verse-text" id="homeVerseText">Your word I have treasured in my heart, that I may not sin against you.</p>
@@ -373,9 +369,12 @@ glacier: {
         </div>
         <div class="home-section-label">Quick Actions</div>
         <div class="home-actions-grid">
-          <button class="home-action-tile" onclick="showNavPage('lessons')">
-            <div class="hat-icon"><span class="material-symbols-outlined">local_library</span></div>
-            <div class="hat-text"><strong>Lessons</strong><small>Step-by-step Greek learning</small></div>
+          <button id="notifBtn" class="home-action-tile" onclick="openNotifications()">
+            <div class="hat-icon hat-notif-icon">
+              <span class="material-symbols-outlined">campaign</span>
+              <span class="notif-badge hidden" id="notifBadge"></span>
+            </div>
+            <div class="hat-text"><strong>What's Going On</strong><small>Updates &amp; activity</small></div>
             <span class="material-symbols-outlined hat-chev">chevron_right</span>
           </button>
           <button id="vocabHomeBtn" class="home-action-tile locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
@@ -9555,15 +9554,12 @@ glacier: {
   <div class="nav-bar">
     <div></div>
     <div class="nav-title">Profile</div>
-    <div></div>
+    <button id="profileNewsBtn" class="icon-btn profile-news-icon-btn" onclick="openNewsFromProfile()" title="News &amp; Updates">
+      <span class="material-symbols-outlined">campaign</span>
+      <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
+    </button>
   </div>
   <div class="profile-page-scroll">
-
-<button id="profileNewsBtn" class="icon-btn profile-news-icon-btn" onclick="openNewsFromProfile()" title="News &amp; Updates">
-    <span class="material-symbols-outlined">campaign</span>
-    <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
-  </button>
-
     <div class="profile-header">
       <div class="profile-avatar-wrap">
         <div class="profile-avatar" id="profileAvatar">
@@ -10804,10 +10800,12 @@ glacier: {
   <button class="bn-item" data-page="profile" onclick="showNavPage('profile')">
     <span class="material-symbols-outlined">person</span>
     <span>Profile</span>
+    <span class="bn-dot"></span>
   </button>
   <button class="bn-item" data-page="rhema" onclick="showNavPage('rhema')">
     <span class="material-symbols-outlined">auto_stories</span>
     <span>Rhema</span>
+    <span class="bn-dot"></span>
   </button>
   <button class="bn-item bn-home active" data-page="home" onclick="showNavPage('home')">
     <span class="material-symbols-outlined">home</span>
@@ -10817,6 +10815,7 @@ glacier: {
   <button class="bn-item" data-page="community" onclick="showNavPage('community')">
     <span class="material-symbols-outlined">groups</span>
     <span>Community</span>
+    <span class="bn-dot"></span>
     <span class="comm-nav-dot hidden" id="commNavDot"></span>
   </button>
   <button class="bn-item" data-page="lessons" onclick="showNavPage('lessons')">
@@ -10837,9 +10836,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.15"></script>
-  <script src="app.js?v=2.3.15"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.15"></script>
+  <script src="vocab.js?v=2.3.16"></script>
+  <script src="app.js?v=2.3.16"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.16"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
