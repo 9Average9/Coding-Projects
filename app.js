@@ -14492,59 +14492,112 @@ function _csStudyTypeName(type) {
   return type === "word" ? "Word Study" : type === "passage" ? "Passage" : "Topical";
 }
 
+function _csIconHtml(type) {
+  if (type === "word") return `<span class="cs-greek-text">αβγ</span>`;
+  if (type === "passage") return `<span class="material-symbols-outlined">menu_book</span>`;
+  return `<span class="material-symbols-outlined">local_library</span>`;
+}
+
+function _csTypeLabelClass(type) {
+  if (type === "word")    return "cs-badge-word";
+  if (type === "passage") return "cs-badge-passage";
+  return "cs-badge-topical";
+}
+
+function _csFeaturedHtml(s, me) {
+  const memberCount = (s.memberUids || []).length;
+  const totalContribs = Object.values(s.contributionCounts || {}).reduce((a, c) => a + (c.total || 0), 0);
+  const isMember = me && (s.memberUids || []).includes(me.uid);
+  const desc = s.description || s.topic || "";
+  const visibleCount = Math.min(memberCount, 3);
+  const overflow = Math.max(0, memberCount - 3);
+  const avatarsHtml = Array.from({length: visibleCount}, () =>
+    `<span class="cs-feat-avatar"><span class="material-symbols-outlined">person</span></span>`
+  ).join('') + (overflow > 0 ? `<span class="cs-feat-overflow">+${overflow}</span>` : '');
+
+  const joinLabel = isMember ? 'Open Study' : 'Join Study';
+  return `<div class="cs-featured-card" onclick="openStudyDetail('${s.id}')">
+    <div class="cs-featured-badge">FEATURED STUDY</div>
+    <div class="cs-featured-title">${_lbEscape(s.title)}</div>
+    ${desc ? `<div class="cs-featured-desc">${_lbEscape(desc.slice(0, 120))}${desc.length > 120 ? '…' : ''}</div>` : ''}
+    <div class="cs-featured-footer">
+      <div class="cs-featured-avatars">${avatarsHtml}</div>
+      <div class="cs-featured-stats">
+        <div class="cs-feat-stat"><span class="material-symbols-outlined">group</span>${memberCount} studying now</div>
+        <div class="cs-feat-stat"><span class="material-symbols-outlined">lightbulb</span>${totalContribs} insights shared</div>
+      </div>
+      <button class="cs-join-btn" onclick="event.stopPropagation();openStudyDetail('${s.id}')">${joinLabel} →</button>
+    </div>
+  </div>`;
+}
+
+function _csStudyCardHtml(s, me) {
+  const memberCount = (s.memberUids || []).length;
+  const totalContribs = Object.values(s.contributionCounts || {}).reduce((a, c) => a + (c.total || 0), 0);
+  const isMember  = me && (s.memberUids || []).includes(me.uid);
+  const isPending = me && (s.pendingUids || []).includes(me.uid);
+  const isOwner   = me && s.creatorUid === me.uid;
+  const pending   = isOwner ? (s.pendingUids || []).length : 0;
+  const desc = s.description || s.topic || "";
+  const type = s.type || "topical";
+
+  const visibleCount = Math.min(memberCount, 3);
+  const overflow = Math.max(0, memberCount - 3);
+  const avatarsHtml = Array.from({length: visibleCount}, (_, i) =>
+    `<span class="cs-avatar-chip" style="z-index:${3-i}"><span class="material-symbols-outlined">person</span></span>`
+  ).join('') + (overflow > 0 ? `<span class="cs-side-overflow">+${overflow}</span>` : '');
+
+  return `<div class="cs-study-card" onclick="openStudyDetail('${s.id}')">
+    <div class="cs-card-icon-sq cs-icon-${_lbEscape(type)}">${_csIconHtml(type)}</div>
+    <div class="cs-card-main">
+      <span class="cs-type-badge ${_csTypeLabelClass(type)}">${_csStudyTypeName(type).toUpperCase()}</span>
+      <div class="cs-card-title">${_lbEscape(s.title)}</div>
+      <div class="cs-card-creator">by ${_lbEscape(s.creatorName)}</div>
+      ${desc ? `<div class="cs-card-quote">"${_lbEscape(desc.slice(0, 50))}${desc.length > 50 ? '…' : ''}"</div>` : ''}
+    </div>
+    <div class="cs-card-side">
+      <div class="cs-avatar-stack">${avatarsHtml}</div>
+      <div class="cs-side-stats">
+        <span class="cs-side-stat"><span class="material-symbols-outlined">group</span>${memberCount} Members</span>
+        <span class="cs-side-stat"><span class="material-symbols-outlined">notes</span>${totalContribs} Notes</span>
+        ${isMember  ? `<span class="cs-card-badge cs-badge-member">Member</span>` : ""}
+        ${isPending ? `<span class="cs-card-badge cs-badge-pending">Pending</span>` : ""}
+        ${pending   ? `<span class="cs-card-badge cs-badge-requests">${pending} req</span>` : ""}
+      </div>
+    </div>
+    <span class="material-symbols-outlined cs-card-chevron">chevron_right</span>
+  </div>`;
+}
+
 function _renderStudyList(el, studies) {
   const me = window.Auth?.getCurrentUser();
-
-  // Update active discussions count
-  const countEl = document.getElementById('commActiveCount');
-  if (countEl) {
-    const n = studies.length;
-    countEl.textContent = `${n} active discussion${n !== 1 ? 's' : ''}`;
-  }
-
   _checkCommunityDot();
 
   if (!studies.length) {
-    el.innerHTML = `<div class="cs-empty"><span class="material-symbols-outlined">groups</span><p>No studies yet</p><p class="cs-empty-sub">Be the first to post what you're studying!</p></div>`;
+    el.innerHTML = `<div class="cs-empty"><span class="material-symbols-outlined">groups</span><p>No studies yet</p><p class="cs-empty-sub">Be the first to post what you're studying!</p></div>
+      <button class="cs-create-dashed" onclick="openCreateStudy()">
+        <div class="cs-create-icon"><span class="material-symbols-outlined">add</span></div>
+        <div class="cs-create-text"><p class="cs-create-title">Create a New Study</p><p class="cs-create-sub">Start a discussion and grow together.</p></div>
+      </button>`;
     return;
   }
-  el.innerHTML = studies.map(s => {
-    const memberCount = (s.memberUids || []).length;
-    const totalContribs = Object.values(s.contributionCounts || {}).reduce((sum, c) => sum + (c.total || 0), 0);
-    const isMember  = me && (s.memberUids || []).includes(me.uid);
-    const isPending = me && (s.pendingUids || []).includes(me.uid);
-    const isOwner   = me && s.creatorUid === me.uid;
-    const pending   = isOwner ? (s.pendingUids || []).length : 0;
-    const desc = s.description || s.topic || "";
 
-    const visibleCount = Math.min(memberCount, 3);
-    const overflow = Math.max(0, memberCount - 3);
-    const avatarsHtml = Array.from({length: visibleCount}, (_, i) =>
-      `<span class="cs-avatar-chip" style="z-index:${3-i}"><span class="material-symbols-outlined">person</span></span>`
-    ).join('') + (overflow > 0 ? `<span class="cs-avatar-overflow">+${overflow}</span>` : '');
+  const [featured, ...rest] = studies;
+  let html = _csFeaturedHtml(featured, me);
 
-    return `<div class="cs-study-card" onclick="openStudyDetail('${s.id}')">
-      <div class="cs-card-top">
-        <div class="cs-card-icon-sq cs-icon-${_lbEscape(s.type || 'topical')}">
-          <span class="material-symbols-outlined">${_csStudyTypeIcon(s.type)}</span>
-        </div>
-        <div class="cs-card-header">
-          <span class="cs-type-badge">${_csStudyTypeName(s.type).toUpperCase()}</span>
-          <div class="cs-card-title">${_lbEscape(s.title)}</div>
-          <div class="cs-card-creator">by ${_lbEscape(s.creatorName)}</div>
-        </div>
-        ${isMember ? `<span class="cs-card-badge cs-badge-member" style="margin-left:auto;flex-shrink:0">Member</span>` : ""}
-      </div>
-      ${desc ? `<div class="cs-card-desc">${_lbEscape(desc.slice(0, 100))}${desc.length > 100 ? '…' : ''}</div>` : ''}
-      <div class="cs-card-footer">
-        <div class="cs-avatar-stack">${avatarsHtml}</div>
-        <span class="cs-footer-stat"><span class="material-symbols-outlined">group</span>${memberCount}</span>
-        <span class="cs-footer-stat"><span class="material-symbols-outlined">lightbulb</span>${totalContribs}</span>
-        ${isPending ? `<span class="cs-card-badge cs-badge-pending">Pending</span>` : ""}
-        ${pending   ? `<span class="cs-card-badge cs-badge-requests">${pending} req${pending > 1 ? "s" : ""}</span>` : ""}
-      </div>
-    </div>`;
-  }).join("");
+  if (rest.length > 0) {
+    html += `<div class="cs-section-header">
+      <h3 class="cs-section-title">Recent Studies</h3>
+    </div>
+    <div class="cs-cards-list">${rest.map(s => _csStudyCardHtml(s, me)).join('')}</div>`;
+  }
+
+  html += `<button class="cs-create-dashed" onclick="openCreateStudy()">
+    <div class="cs-create-icon"><span class="material-symbols-outlined">add</span></div>
+    <div class="cs-create-text"><p class="cs-create-title">Create a New Study</p><p class="cs-create-sub">Start a discussion and grow together.</p></div>
+  </button>`;
+
+  el.innerHTML = html;
 }
 
 function _checkCommunityDot() {

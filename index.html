@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.14" />
+  <link rel="stylesheet" href="style.css?v=2.3.15" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -9730,24 +9730,21 @@ glacier: {
         <span>Friends</span>
       </button>
     </div>
-    <div class="comm-active-row">
-      <span class="comm-active-dot"></span>
-      <span id="commActiveCount" class="comm-active-text">Loading discussions…</span>
-      <span class="material-symbols-outlined comm-active-arrow">chevron_right</span>
-    </div>
     <div class="lb-tabs comm-tabs">
-      <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">Study</button>
-      <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">XP</button>
-      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">Scholar</button>
+      <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">
+        <span class="material-symbols-outlined">auto_stories</span> Study
+      </button>
+      <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
+        <span class="material-symbols-outlined">bolt</span> XP
+      </button>
+      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
+        <span class="material-symbols-outlined">school</span> Scholar
+      </button>
     </div>
     <div id="lbPaneStudy" class="lb-tab-pane active" data-tab="study">
       <div id="csStudyList" class="cs-study-list">
         <p class="lb-loading">Loading…</p>
       </div>
-      <button class="cs-create-dashed" onclick="openCreateStudy()">
-        <span class="material-symbols-outlined">add_circle</span>
-        <span>Create a New Study</span>
-      </button>
     </div>
     <div id="lbPaneXP" class="lb-tab-pane" data-tab="xp">
       <div class="lb-podium-wrap" id="lbPodiumXP"></div>
@@ -10840,9 +10837,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.14"></script>
-  <script src="app.js?v=2.3.14"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.14"></script>
+  <script src="vocab.js?v=2.3.15"></script>
+  <script src="app.js?v=2.3.15"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.15"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
