@@ -751,7 +751,7 @@ async function csCheckIn(studyId, uid, displayName) {
 
 async function csGetCheckIns(studyId) {
   try {
-    const q = query(collection(db, "community_studies", studyId, "checkins"), orderBy("ts", "desc"), limit(100));
+    const q = query(collection(db, "community_studies", studyId, "checkins"), orderBy("date", "desc"), limit(100));
     return (await getDocs(q)).docs.map(d => d.data());
   } catch { return []; }
 }
