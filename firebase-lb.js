@@ -526,35 +526,35 @@ window.LB = {
 // ── Community Study Board ─────────────────────────────────────────────────────
 
 async function csCreateStudy(uid, { type, title, description, greekWord, creatorName, creatorAvatar }) {
-  try {
-    const ref = await addDoc(collection(db, "community_studies"), {
-      creatorUid: uid,
-      creatorName: creatorName || "User",
-      creatorAvatar: creatorAvatar || "person",
-      type,           // "topical" | "word" | "passage"
-      title,
-      description: description || "",
-      greekWord: greekWord || null,
-      createdAt: serverTimestamp(),
-      memberUids: [uid],
-      pendingUids: [],
-      contributionCounts: {},
-      isActive: true
-    });
-    return ref.id;
-  } catch (e) { console.warn("csCreateStudy:", e); return null; }
+  const ref = await addDoc(collection(db, "community_studies"), {
+    creatorUid: uid,
+    creatorName: creatorName || "User",
+    creatorAvatar: creatorAvatar || "person",
+    type,
+    title,
+    description: description || "",
+    greekWord: greekWord || null,
+    createdAt: serverTimestamp(),
+    memberUids: [uid],
+    pendingUids: [],
+    contributionCounts: {},
+    isActive: true
+  });
+  return ref.id;
 }
 
 function csListenStudies(callback, limitN = 40) {
+  // Order by createdAt only — no composite index needed. Filter isActive client-side.
   const q = query(
     collection(db, "community_studies"),
-    where("isActive", "==", true),
     orderBy("createdAt", "desc"),
     limit(limitN)
   );
-  return onSnapshot(q, snap => {
-    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-  });
+  return onSnapshot(
+    q,
+    snap => callback(snap.docs.filter(d => d.data().isActive !== false).map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("listenStudies:", err); callback([]); }
+  );
 }
 
 async function csGetStudy(studyId) {

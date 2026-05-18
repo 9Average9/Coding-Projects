@@ -43,8 +43,9 @@ jobs:
           OLD_CACHE=$(grep -oP 'basic-greek-trainer-v\K[0-9]+\.[0-9]+\.[0-9]+' service-worker.js)
           sed -i "s/basic-greek-trainer-v$OLD_CACHE/basic-greek-trainer-v$NEW_VERSION/" service-worker.js
 
-          # Update ?v= cache-busters in index.html (style.css, app.js, vocab.js, firebase-lb.js)
+          # Update ?v= cache-busters in index.html and FILES_TO_CACHE in service-worker.js
           sed -i "s/?v=[0-9][^\"']*/?v=$NEW_VERSION/g" index.html
+          sed -i "s/?v=[0-9][^\"']*/?v=$NEW_VERSION/g" service-worker.js
 
       - name: Update UPDATE_NOTES from commit messages
         run: |
@@ -108,3 +109,9 @@ jobs:
           git merge --no-ff "origin/${{ github.ref_name }}" \
             -m "Merge ${{ github.ref_name }} into main (v${{ steps.bump.outputs.new_version }})"
           git push origin main
+
+      - name: Deploy Firestore rules
+        if: ${{ secrets.FIREBASE_TOKEN != '' }}
+        run: |
+          npm install -g firebase-tools
+          firebase deploy --only firestore:rules --token "${{ secrets.FIREBASE_TOKEN }}" --project greek-vocab-leaderboard

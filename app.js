@@ -13195,7 +13195,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.8";
+const APP_VERSION = "2.3.9";
 
 const UPDATE_NOTES = [
   "Ignore .claude/ directory"
@@ -13668,6 +13668,13 @@ window.__onAuthStateReady = async (user) => {
       switchFriendsTab(_friendsTab);
     }
 
+    // Auto opt-in to XP board for all logged-in users
+    if (window.LB && !window.LB.isXpJoined()) {
+      window.LB.joinXPBoard(profileData?.xp || 0).catch(() => {});
+      localStorage.setItem("lbXpJoined", "true");
+      syncUserData();
+    }
+
     // Silently refresh FCM token on login if permission already granted (handles expired tokens)
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
       window.FCM?.registerToken(user.uid).catch(() => {});
@@ -14107,11 +14114,7 @@ function _renderXPBoard() {
     updateProfileBadges();
   });
 
-  if (window.LB.isXpJoined()) {
-    joinEl.innerHTML = `<p class="lb-joined-note"><span class="material-symbols-outlined">star</span> You're on the board — your XP syncs automatically.</p>`;
-  } else {
-    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinXP()">Join XP Board</button>`;
-  }
+  joinEl.innerHTML = "";
 }
 
 function _renderScholarBoard() {
@@ -14321,15 +14324,19 @@ async function submitCreateStudy() {
   }
   const description = document.getElementById("csDescInput").value.trim();
   btn.disabled = true; btn.textContent = "Posting…";
-  const id = await window.Community?.createStudy(user.uid, {
-    type: _csStudyType, title, description,
-    greekWord: _csSelectedWord || null,
-    creatorName: localStorage.getItem("authDisplayName") || "User",
-    creatorAvatar: localStorage.getItem("profilePicType") === "icon" ? (localStorage.getItem("profilePicValue") || "person") : "person"
-  });
-  btn.disabled = false; btn.textContent = "Post to Board";
-  if (id) { closeCreateStudy(); }
-  else { errEl.textContent = "Something went wrong. Please try again."; }
+  try {
+    const id = await window.Community.createStudy(user.uid, {
+      type: _csStudyType, title, description,
+      greekWord: _csSelectedWord || null,
+      creatorName: localStorage.getItem("authDisplayName") || "User",
+      creatorAvatar: localStorage.getItem("profilePicType") === "icon" ? (localStorage.getItem("profilePicValue") || "person") : "person"
+    });
+    closeCreateStudy();
+  } catch (e) {
+    errEl.textContent = e?.message || "Something went wrong. Please try again.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Post to Board";
+  }
 }
 
 async function openStudyDetail(studyId) {
