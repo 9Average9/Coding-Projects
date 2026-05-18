@@ -46,6 +46,51 @@ jobs:
           # Update ?v= cache-busters in index.html (style.css, app.js, vocab.js, firebase-lb.js)
           sed -i "s/?v=[0-9][^\"']*/?v=$NEW_VERSION/g" index.html
 
+      - name: Update UPDATE_NOTES from commit messages
+        run: |
+          python3 << 'PYEOF'
+          import subprocess, re, json
+
+          # Collect subjects of commits on this branch not yet on main,
+          # excluding meta-commits about the tooling itself
+          SKIP_PREFIXES = (
+              "Bump version to",
+              "Merge ",
+              "Update release notes",
+              "Sync ?v=",
+              "Add GitHub Action",
+          )
+
+          result = subprocess.run(
+              ["git", "log", "origin/main..HEAD", "--no-merges", "--pretty=format:%s"],
+              capture_output=True, text=True
+          )
+          subjects = [
+              line.strip() for line in result.stdout.splitlines()
+              if line.strip() and not any(line.strip().startswith(p) for p in SKIP_PREFIXES)
+          ]
+
+          if not subjects:
+              print("No user-facing commits found — leaving UPDATE_NOTES unchanged")
+              exit(0)
+
+          notes_js = "const UPDATE_NOTES = [\n"
+          notes_js += ",\n".join(f"  {json.dumps(s)}" for s in subjects)
+          notes_js += "\n];"
+
+          content = open("app.js").read()
+          updated = re.sub(
+              r"const UPDATE_NOTES = \[.*?\];",
+              notes_js,
+              content,
+              flags=re.DOTALL
+          )
+          open("app.js", "w").write(updated)
+          print(f"Updated UPDATE_NOTES with {len(subjects)} entries:")
+          for s in subjects:
+              print(f"  • {s}")
+          PYEOF
+
       - name: Commit and push version bump
         run: |
           git config user.name "github-actions[bot]"

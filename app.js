@@ -13188,20 +13188,17 @@ const APP_VERSION = "1.0.1";
 Update notes:
 
 const UPDATE_NOTES = [
-  "Added new lesson content.",
-  "Improved profile design.",
-  "Fixed progress screen behavior."
+  "Auto-generate UPDATE_NOTES from branch commit messages"
 ];
 In service-worker.js
 const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.5";
+const APP_VERSION = "2.3.6";
 
 const UPDATE_NOTES = [
-  "Friends — fixed a glitch where the sign-in screen would briefly flash when opening Friends right after launching the app",
-  "Friends — tapping a friend card now opens their profile sheet immediately with a loading indicator instead of a short unresponsive pause"
+  "Auto-generate UPDATE_NOTES from branch commit messages"
 ];
 
 let deferredInstallPrompt = null;
