@@ -10476,7 +10476,9 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
   transition: transform 0.15s; gap: 5px; text-decoration: none;
 }
 .lb-pod-card:active { transform: scale(0.97); }
-.lb-pod-first { border-color: var(--accent); padding-top: 26px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+.lb-pod-first  { border-color: var(--accent); padding-top: 26px; min-height: 168px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+.lb-pod-second { min-height: 142px; }
+.lb-pod-third  { min-height: 124px; }
 .lb-pod-me { border-color: var(--secondary) !important; }
 .lb-pod-crown {
   position: absolute; top: -16px; left: 50%; transform: translateX(-50%);

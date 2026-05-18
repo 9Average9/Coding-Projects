@@ -108,3 +108,9 @@ jobs:
           git merge --no-ff "origin/${{ github.ref_name }}" \
             -m "Merge ${{ github.ref_name }} into main (v${{ steps.bump.outputs.new_version }})"
           git push origin main
+
+      - name: Deploy Firestore rules
+        if: ${{ secrets.FIREBASE_TOKEN != '' }}
+        run: |
+          npm install -g firebase-tools
+          firebase deploy --only firestore:rules --token "${{ secrets.FIREBASE_TOKEN }}" --project greek-vocab-leaderboard
