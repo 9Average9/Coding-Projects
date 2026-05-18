@@ -13188,17 +13188,17 @@ const APP_VERSION = "1.0.1";
 Update notes:
 
 const UPDATE_NOTES = [
-  "Add Community Board with Study Board, podium layout, remove Streak tab"
+  "Ignore .claude/ directory"
 ];
 In service-worker.js
 const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.7";
+const APP_VERSION = "2.3.8";
 
 const UPDATE_NOTES = [
-  "Add Community Board with Study Board, podium layout, remove Streak tab"
+  "Ignore .claude/ directory"
 ];
 
 let deferredInstallPrompt = null;
