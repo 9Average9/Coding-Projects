@@ -103,6 +103,12 @@ exports.onEncouragementCreated = functions.firestore
     } else if (type === "friendAccepted") {
       title = "Friend Request Accepted!";
       body = `${fromName} accepted your friend request.`;
+    } else if (type === "studyJoinRequest") {
+      title = "Study Join Request";
+      body = `${fromName} wants to join your study group.`;
+    } else if (type === "studyJoinApproved") {
+      title = "Study Request Approved!";
+      body = `${fromName} approved your request to join their study.`;
     } else {
       title = "Basic Greek study reminder:";
       body = `${fromName} is reminding you to study your Greek!`;
