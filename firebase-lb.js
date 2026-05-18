@@ -506,6 +506,12 @@ window.FCM = {
   listenForeground:  fcmListenForeground
 };
 
+async function saveRhemaPosition(uid, pos) {
+  try {
+    await setDoc(doc(db, "users", uid), { rhemaLastPos: pos }, { merge: true });
+  } catch (e) { console.warn("saveRhemaPosition:", e); }
+}
+
 window.LB = {
   getUserId,
   checkNameTaken,
@@ -521,6 +527,7 @@ window.LB = {
   deleteUserData,
   deleteEntriesForId,
   getUserRanks,
+  saveRhemaPosition,
   isXpJoined: () => localStorage.getItem("lbXpJoined") === "true",
   isScholarJoined: () => localStorage.getItem("lbScholarJoined") === "true",
   isConsJoined: () => localStorage.getItem("lbConsJoined") === "true"

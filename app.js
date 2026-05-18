@@ -7947,19 +7947,48 @@ let currentSentence = null;
 
 
 const screens = [
-  "homeScreen",
-  "newLearnMenu",
-  "advancedLearnMenu",
-  "learnMenu",
-  "learnScreen",
-  "translateMenu",
-  "translateScreen",
-  "testMenu",
-  "testScreen",
-  "resultsScreen",
-  "progressScreen",
-  "settingsScreen"
+  "homeScreen", "profilePage", "communityPage",
+  "newLearnMenu", "advancedLearnMenu",
+  "learnMenu", "learnScreen", "translateMenu", "translateScreen",
+  "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
 ];
+
+const NAV_SCREENS = ['homeScreen', 'profilePage', 'communityPage'];
+
+function showBottomNav() {
+  document.getElementById('bottomNav')?.classList.remove('hidden');
+}
+function hideBottomNav() {
+  document.getElementById('bottomNav')?.classList.add('hidden');
+}
+function setNavActive(page) {
+  document.querySelectorAll('.bn-item').forEach(b =>
+    b.classList.toggle('active', b.dataset.page === page));
+  // dot only shows on home
+  const homeBtn = document.querySelector('.bn-home');
+  if (homeBtn) homeBtn.classList.toggle('active', page === 'home');
+}
+
+function showNavPage(page) {
+  setNavActive(page);
+  showBottomNav();
+  if (page === 'home') {
+    showScreen('homeScreen');
+    populateHomeScreen();
+  } else if (page === 'profile') {
+    showScreen('profilePage');
+    updateProfileUI();
+  } else if (page === 'community') {
+    showScreen('communityPage');
+    showLbTab('study');
+    _renderStudyBoard();
+  } else if (page === 'lessons') {
+    hideBottomNav();
+    showNewLearnMenu();
+  } else if (page === 'rhema') {
+    showRhema();
+  }
+}
 
 function showScreen(id) {
   closeLearnSideMenu();
@@ -7976,8 +8005,219 @@ function showScreen(id) {
 
 function showHome() {
   showScreen("homeScreen");
+  setNavActive('home');
+  showBottomNav();
+  populateHomeScreen();
+}
 
-  document.body.classList.toggle("home-active", screenId === "homeScreen");
+const HOME_VERSES = [
+  { text: "Your word I have treasured in my heart, that I may not sin against you.", ref: "Psalm 119:11" },
+  { text: "The grass withers, the flower fades, but the word of our God will stand forever.", ref: "Isaiah 40:8" },
+  { text: "Do not let this Book of the Law depart from your mouth; meditate on it day and night.", ref: "Joshua 1:8" },
+  { text: "For the word of God is alive and active, sharper than any double-edged sword.", ref: "Hebrews 4:12" },
+  { text: "Blessed is the one who reads aloud the words of this prophecy, and blessed are those who hear it.", ref: "Revelation 1:3" },
+  { text: "Let the word of Christ dwell in you richly as you teach and admonish one another with all wisdom.", ref: "Colossians 3:16" }
+];
+
+function populateHomeScreen() {
+  // Greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning,' : hour < 17 ? 'Good afternoon,' : 'Good evening,';
+  const displayName = localStorage.getItem('displayName') || localStorage.getItem('username') || 'Friend';
+  const el1 = document.getElementById('homeGreetingLine1');
+  const el2 = document.getElementById('homeGreetingName');
+  if (el1) el1.textContent = greeting;
+  if (el2) el2.textContent = displayName;
+
+  // Verse (rotate daily by day of year)
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const verse = HOME_VERSES[dayOfYear % HOME_VERSES.length];
+  const vt = document.getElementById('homeVerseText');
+  if (vt) vt.textContent = verse.text;
+  const vref = document.querySelector('.home-verse-ref');
+  if (vref) vref.textContent = '— ' + verse.ref;
+
+  // Continue Studying
+  _updateHomeContinueCard();
+
+  // Your Studies
+  _renderHomeStudies();
+
+  // Notifications dot
+  _updateNotifBadge();
+}
+
+function _saveRhemaPosition() {
+  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now() };
+  localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
+  // Sync to Firestore if logged in
+  const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
+  if (uid && window.LB) {
+    window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
+  }
+}
+
+function _updateHomeContinueCard() {
+  const savedRaw = localStorage.getItem('rhemaLastPos');
+  const card = document.getElementById('homeContinueCard');
+  const empty = document.getElementById('homeContinueEmpty');
+  if (!card || !empty) return;
+  if (!savedRaw) {
+    card.style.display = 'none';
+    empty.style.display = 'flex';
+    return;
+  }
+  try {
+    const pos = JSON.parse(savedRaw);
+    const bookName = RHEMA_BOOK_ABBR?.[pos.book] || pos.book || 'NT';
+    const passageText = `${bookName} ${pos.chapter}:${pos.verse}`;
+    const passageEl = document.getElementById('hccPassage');
+    if (passageEl) passageEl.textContent = passageText;
+    card.style.display = '';
+    empty.style.display = 'none';
+  } catch {
+    card.style.display = 'none';
+    empty.style.display = 'flex';
+  }
+}
+
+function resumeRhema() {
+  const savedRaw = localStorage.getItem('rhemaLastPos');
+  if (savedRaw) {
+    try {
+      const pos = JSON.parse(savedRaw);
+      _rhemaBook = pos.book || 'JOH';
+      _rhemaChapter = pos.chapter || '3';
+      _rhemaVerse = pos.verse || '16';
+    } catch {}
+  }
+  showRhema();
+}
+
+function _renderHomeStudies() {
+  const el = document.getElementById('homeStudiesList');
+  if (!el) return;
+  const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
+  if (!uid || !window.Community || !_csStudies || !_csStudies.length) {
+    el.innerHTML = '';
+    return;
+  }
+  const myStudies = _csStudies.filter(s =>
+    s.creatorUid === uid || (s.members || s.memberUids || []).includes(uid)
+  ).slice(0, 2);
+  if (!myStudies.length) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = myStudies.map(s => {
+    const icon = s.type === 'word' ? 'translate' : s.type === 'passage' ? 'menu_book' : 'topic';
+    const typeLabel = s.type === 'word' ? 'Word Study' : s.type === 'passage' ? 'Passage' : 'Topical';
+    const memberCount = (s.members || s.memberUids || []).length;
+    const contribCount = s.totalContribs || 0;
+    return `<div class="home-study-card" onclick="showNavPage('community');setTimeout(()=>openStudyDetail('${s.id}'),150)">
+      <div class="hsc-icon"><span class="material-symbols-outlined">${icon}</span></div>
+      <div class="hsc-body">
+        <div class="hsc-type">${typeLabel}</div>
+        <div class="hsc-title">${s.title || s.topic || s.word?.greek || s.passage || 'Study'}</div>
+        <div class="hsc-meta">
+          <span><span class="material-symbols-outlined">group</span>${memberCount}</span>
+          <span><span class="material-symbols-outlined">lightbulb</span>${contribCount}</span>
+        </div>
+      </div>
+      <span class="material-symbols-outlined" style="color:var(--muted-color);font-size:1.1rem">chevron_right</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+let _notifItems = [];
+
+function openNotifications() {
+  const panel = document.getElementById('notifPanel');
+  if (panel) panel.classList.add('open');
+  _loadNotifications();
+}
+function closeNotifications() {
+  document.getElementById('notifPanel')?.classList.remove('open');
+}
+
+function _updateNotifBadge() {
+  const unread = _notifItems.filter(n => !n.read).length;
+  const badge = document.getElementById('notifBadge');
+  if (badge) {
+    badge.classList.toggle('hidden', unread === 0);
+  }
+}
+
+function _loadNotifications() {
+  const listEl = document.getElementById('notifList');
+  if (!listEl) return;
+  const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
+  if (!uid) {
+    listEl.innerHTML = '<p class="notif-empty">Sign in to see notifications.</p>';
+    return;
+  }
+  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+
+  const notifications = [];
+
+  // Friend requests
+  (friendRequestsIn || []).forEach(reqUid => {
+    notifications.push({
+      id: 'fr_' + reqUid,
+      type: 'friend_request',
+      icon: 'person_add',
+      title: 'New friend request',
+      sub: 'Someone wants to connect with you',
+      read: false,
+      action: () => { closeNotifications(); showFriendsModal(); }
+    });
+  });
+
+  // Study join requests (user is creator)
+  (_csStudies || []).filter(s => s.creatorUid === uid && (s.pendingUids || []).length > 0).forEach(s => {
+    (s.pendingUids || []).forEach(puid => {
+      notifications.push({
+        id: 'sjr_' + s.id + '_' + puid,
+        type: 'study_request',
+        icon: 'group_add',
+        title: 'Join request for your study',
+        sub: `Someone wants to join "${s.title || s.topic || 'your study'}"`,
+        read: false,
+        action: () => { closeNotifications(); showNavPage('community'); setTimeout(() => openStudyDetail(s.id), 150); }
+      });
+    });
+  });
+
+  _notifItems = notifications;
+  _updateNotifBadge();
+
+  if (!notifications.length) {
+    listEl.innerHTML = '<p class="notif-empty">No notifications yet.</p>';
+    return;
+  }
+  listEl.innerHTML = notifications.map((n, i) => `
+    <div class="notif-item${n.read ? '' : ' unread'}" onclick="_notifTap(${i})">
+      <div class="notif-icon"><span class="material-symbols-outlined">${n.icon}</span></div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.sub}</div>
+      </div>
+      ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+    </div>`).join('');
+}
+
+function _notifTap(i) {
+  const n = _notifItems[i];
+  if (!n) return;
+  n.read = true;
+  _updateNotifBadge();
+  if (n.action) n.action();
+}
+
+function openHomeSettings() {
+  hideBottomNav();
+  showSettings();
 }
 
 
@@ -8032,6 +8272,7 @@ function setAllChapters(name, checked) {
 }
 
 function showLearnMenu() {
+  hideBottomNav();
   buildChapterCheckboxes("learnChapterList", "learnChapter");
   showScreen("learnMenu");
 }
@@ -8123,6 +8364,7 @@ learnCard.addEventListener("touchend", e => {
 });
 
 function showTestMenu() {
+  hideBottomNav();
   buildChapterCheckboxes("testChapterList", "testChapter");
   showScreen("testMenu");
 }
@@ -8537,6 +8779,7 @@ html += `</div>`;
 }
 
 function showSettings() {
+  hideBottomNav();
   showScreen("settingsScreen");
   updateLessonModeSettingsUI();
 }
@@ -8968,6 +9211,7 @@ function closeAdvancedTrackInfoModal(event) {
 }
 
 function showTranslateMenu() {
+  hideBottomNav();
   buildChapterCheckboxes("translateChapterList", "translateChapter");
   showScreen("translateMenu");
 }
@@ -9343,6 +9587,7 @@ function showLearnLesson(lesson) {
 }, 500);
 
 function showNewLearnMenu() {
+  hideBottomNav();
   const dismissed = localStorage.getItem("lessonModePromptDismissed") === "true";
   if (dismissed) {
     const savedMode = localStorage.getItem("lessonMode") || "basic";
@@ -12393,14 +12638,16 @@ let profileData = JSON.parse(localStorage.getItem("profileData")) || {
 };
 
 function showProfileMenu() {
-  updateProfileUI();
-
-  document.getElementById("profileModal")?.classList.add("open");
-
+  showNavPage('profile');
 }
 
 function hideProfileMenu() {
-  document.getElementById("profileModal")?.classList.remove("open");
+  // Go back to home if we're on the profile page
+  if (document.getElementById('profilePage')?.classList.contains('active')) {
+    showNavPage('home');
+  }
+  // Also close the modal if it somehow got opened
+  document.getElementById('profileModal')?.classList.remove('open');
 }
 
 function closeProfileModal(event) {
@@ -12633,7 +12880,8 @@ function signOutAccount() {
   });
 }
 function openSettingsFromProfile() {
-  hideProfileMenu();
+  // Don't call hideProfileMenu (which navigates home) — just show settings screen
+  hideBottomNav();
   showSettings();
 }
 
@@ -13195,7 +13443,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.11";
+const APP_VERSION = "2.3.12";
 
 const UPDATE_NOTES = [
   "Ignore .claude/ directory"
@@ -13663,6 +13911,7 @@ window.__onAuthStateReady = async (user) => {
     updateProfileBadges?.();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
+    populateHomeScreen();
     // If friends modal was opened while auth was still loading, populate it now
     if (document.getElementById("friendsModal")?.classList.contains("open")) {
       switchFriendsTab(_friendsTab);
@@ -13686,6 +13935,7 @@ window.__onAuthStateReady = async (user) => {
       friendRequestsIn = data.friendRequestsIn || [];
       friendRequestsOut = data.friendRequestsOut || [];
       updateFriendsBadge();
+      _updateNotifBadge();
       const modal = document.getElementById("friendsModal");
       if (modal?.classList.contains("open")) {
         if (_friendsTab === "friends") renderFriendsList();
@@ -13744,6 +13994,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tryAppBtn.classList.toggle("hidden", !shouldShow);
   }
+
+  // Initialize home screen and bottom nav state
+  populateHomeScreen();
+  setNavActive('home');
+  showBottomNav();
 });
 
 
@@ -13759,8 +14014,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 function closeSettingsMenu() {
-  showScreen("homeScreen");
-  showProfileMenu();
+  showNavPage('home');
 }
 function openNewsFromProfile() {
   const modal = document.getElementById("updateModal");
@@ -14017,12 +14271,7 @@ async function sendEncouragementToFriend(uid, displayName) {
 // ── Leaderboard ───────────────────────────────────────────────────────────────
 
 function openLeaderboard() {
-  if (!localStorage.getItem("lbHasSeenIntro")) {
-    localStorage.setItem("lbHasSeenIntro", "true");
-    document.getElementById("lbIntroModal").classList.add("open");
-    return;
-  }
-  showLbModal();
+  showNavPage('community');
 }
 
 function closeLbIntro() {
@@ -14034,14 +14283,13 @@ let _lbUnsub = null;
 let _lbActiveTab = "xp";
 
 function showLbModal() {
-  document.getElementById("lbModal").classList.add("open");
-  showLbTab("study");
+  showNavPage('community');
 }
 
 function closeLbModal() {
-  document.getElementById("lbModal").classList.remove("open");
+  document.getElementById("lbModal")?.classList.remove("open");
   if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
-  if (_csUnsub) { _csUnsub(); _csUnsub = null; }
+  showNavPage('home');
 }
 
 function lbOverlayClick(e) {
@@ -14219,6 +14467,7 @@ function _renderStudyBoard() {
     if (err) { el.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderStudyBoard()">Retry</button></p>'; return; }
     _csStudies = studies;
     _renderStudyList(el, studies);
+    _updateNotifBadge();
   });
 }
 
@@ -15393,6 +15642,7 @@ function loadRhemaScripts() {
 // ── Modal open/close ──────────────────────────────────────────────────────────
 
 async function showRhema() {
+  hideBottomNav();
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
@@ -15418,6 +15668,7 @@ async function showRhema() {
 }
 
 function closeRhema() {
+  _saveRhemaPosition();
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
   closeRhemaPickerSheet();
@@ -15433,6 +15684,7 @@ function closeRhema() {
   document.getElementById('rhemaHighlightBar')?.classList.add('hidden');
   document.getElementById('rhemaHighlightToggleBtn')?.classList.remove('active');
   updateRhemaBreadcrumb();
+  showBottomNav();
 }
 
 function rhemaGoBack() {
@@ -15813,6 +16065,7 @@ function renderRhemaVerse() {
   updateRhemaVerseNav();
   initRhemaVerseSwipe();
   updateHighlightToolbar();
+  _saveRhemaPosition();
 }
 
 function toggleRhemaKjv() {

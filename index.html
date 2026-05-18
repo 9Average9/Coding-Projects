@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.11" />
+  <link rel="stylesheet" href="style.css?v=2.3.12" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -9550,10 +9550,219 @@ glacier: {
       </div>
     </section>
 
+<section id="profilePage" class="screen">
+  <div class="nav-bar">
+    <div></div>
+    <div class="nav-title">Profile</div>
+    <div></div>
+  </div>
+  <div class="profile-page-scroll">
+
+<button id="profileNewsBtn" class="icon-btn profile-news-icon-btn" onclick="openNewsFromProfile()" title="News &amp; Updates">
+    <span class="material-symbols-outlined">campaign</span>
+    <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
+  </button>
+
+    <div class="profile-header">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <button class="profile-avatar-edit" onclick="openAvatarPicker()" title="Change avatar">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+      </div>
+
+      <h2 id="profileDisplayName">Greek Student</h2>
+      <p id="profileUsername" class="profile-username-label"></p>
+      <div id="profileBadgeRow" class="profile-badge-row"></div>
+
+     <div class="profile-title-row">
+  <div class="profile-title" id="profileTitle">
+    Beginner
+  </div>
+
+  <button class="rank-info-btn" onclick="showRanksModal()" title="View ranks">
+    <span class="material-symbols-outlined">military_tech</span>
+  </button>
+</div>
+    <div class="profile-mode-badge" id="profileModeBadge">Basic Track</div>
+    </div>
+
+    <div class="xp-section">
+      <div class="xp-top-row">
+        <span>XP</span>
+        <span id="profileXPText">0 XP</span>
+      </div>
+
+      <div class="xp-bar">
+        <div class="xp-fill" id="xpFill"></div>
+      </div>
+    </div>
+
+<div id="profileJourneySection" class="profile-journey-card">
+  <div class="journey-header">
+    <span class="material-symbols-outlined">map</span>
+    <strong>Your Greek Journey</strong>
+  </div>
+
+  <div class="journey-stats-grid">
+    <button class="journey-stat clickable-stat" onclick="showLessonsBreakdownModal(getLessonMode(), false)">
+      <strong id="profileLessonsStat">0 / 6</strong>
+      <span>Lessons <span class="stat-tap-hint">tap for details</span></span>
+    </button>
+
+    <div class="journey-stat">
+      <strong id="profileStreakStat">0</strong>
+      <span>Day Streak 🔥</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileVocabStat">0</strong>
+      <span>Vocab Chapters</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileTranslationsStat">0</strong>
+      <span>Translations</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileTestsStat">0</strong>
+      <span>Tests</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileKnownWordsStat">0</strong>
+      <span>Known Words</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileTimeStat">0m</strong>
+      <span>Time Studied</span>
+    </div>
+
+    <div class="journey-stat">
+      <strong id="profileJoinStat">—</strong>
+      <span>Member Since</span>
+    </div>
+  </div>
+
+  <div class="profile-action-row">
+  <button class="profile-action-card" onclick="showProgress()">
+    <span class="material-symbols-outlined">trending_up</span>
+    <div>
+      <strong>Full Progress</strong>
+      <small>View detailed stats</small>
+    </div>
+  </button>
+
+  <button class="profile-action-card" onclick="showAchievementsModal()">
+    <span class="material-symbols-outlined">emoji_events</span>
+    <div>
+      <strong>Achievements</strong>
+      <small>View milestones</small>
+    </div>
+  </button>
+</div>
+</div>
+
+
+    <label class="label">Profile Color</label>
+
+    <div class="profile-color-grid">
+  <button class="color-dot blue" onclick="setProfileColor('#4f8cff')" title="Blue"></button>
+  <button class="color-dot green" onclick="setProfileColor('#22c55e')" title="Green"></button>
+  <button class="color-dot purple" onclick="setProfileColor('#8b5cf6')" title="Purple"></button>
+  <button class="color-dot gold" onclick="setProfileColor('#d6a700')" title="Gold"></button>
+  <button class="color-dot red" onclick="setProfileColor('#ef4444')" title="Red"></button>
+  <button class="color-dot orange" onclick="setProfileColor('#f97316')" title="Orange"></button>
+  <button class="color-dot pink" onclick="setProfileColor('#ec4899')" title="Pink"></button>
+
+  <input
+    type="color"
+    id="customProfileColorInput"
+    class="hidden-color-input"
+    inputmode="none"
+    onchange="setProfileColor(this.value)"
+  />
+</div>
+
+    <div class="prof-menu-card">
+      <button id="profileSettingsBtn" class="prof-menu-row" onclick="openSettingsFromProfile()">
+        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">settings</span></span>
+        <span class="prof-menu-name">Settings</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+      <div class="prof-menu-sep"></div>
+      <button id="profileNotificationBtn" class="prof-menu-row" onclick="openReminderModal()">
+        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">notifications</span></span>
+        <span class="prof-menu-name" id="profileNotificationBtnText">Reminders</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+      <div class="prof-menu-sep"></div>
+      <button class="prof-menu-row" onclick="signOutAccount()">
+        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">logout</span></span>
+        <span class="prof-menu-name">Sign Out</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+    </div>
+
+<button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
+  <span class="material-symbols-outlined">install_mobile</span>
+  <span>Try the App Version!</span>
+</button>
+
+  </div>
+  <div style="height:88px"></div>
+</section>
+
+<section id="communityPage" class="screen">
+  <div class="comm-page-header">
+    <span class="material-symbols-outlined comm-page-icon">groups</span>
+    <span class="comm-page-title">Community</span>
+  </div>
+  <div class="lb-tabs">
+    <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">
+      <span class="material-symbols-outlined">local_library</span> Study
+    </button>
+    <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
+      <span class="material-symbols-outlined">bolt</span> XP
+    </button>
+    <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
+      <span class="material-symbols-outlined">menu_book</span> Scholar
+    </button>
+  </div>
+  <div class="lb-tab-content-wrap">
+    <div id="lbPaneStudy" class="lb-tab-pane active" data-tab="study">
+      <div class="cs-board-header">
+        <p class="cs-board-desc">See what fellow believers are studying — join a group to share thoughts and discoveries together.</p>
+        <button class="cs-add-study-btn" onclick="openCreateStudy()">
+          <span class="material-symbols-outlined">add</span> Add a Study
+        </button>
+      </div>
+      <div id="csStudyList" class="cs-study-list">
+        <p class="lb-loading">Loading…</p>
+      </div>
+    </div>
+    <div id="lbPaneXP" class="lb-tab-pane" data-tab="xp">
+      <div class="lb-podium-wrap" id="lbPodiumXP"></div>
+      <div class="lb-list-below" id="lbListXP"></div>
+      <div class="lb-join-area" id="lbJoinXP"></div>
+    </div>
+    <div id="lbPaneScholar" class="lb-tab-pane" data-tab="scholar">
+      <div class="lb-podium-wrap" id="lbPodiumScholar"></div>
+      <div class="lb-list-below" id="lbListScholar"></div>
+      <div class="lb-join-area" id="lbJoinScholar"></div>
+    </div>
+  </div>
+  <div style="height:88px"></div>
+</section>
 
 
 
-    
+
+
   <div id="infoModal" class="modal-overlay" onclick="closeInfoModal(event)">
   <div class="modal-card welcome-card">
     <button class="modal-close" onclick="hideInfoModal()">×</button>
@@ -10261,172 +10470,8 @@ glacier: {
   </div>
 </div>
 
-<div id="profileModal" class="modal-overlay" onclick="closeProfileModal(event)">
-  <div class="modal-card profile-card" onclick="event.stopPropagation()">
-
-
-
-<button id="profileNewsBtn" class="icon-btn profile-news-icon-btn" onclick="openNewsFromProfile()" title="News & Updates">
-    <span class="material-symbols-outlined">campaign</span>
-    <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
-  </button>
-
-    <button class="modal-close" onclick="hideProfileMenu()">×</button>
-
-    <div class="profile-header">
-      <div class="profile-avatar-wrap">
-        <div class="profile-avatar" id="profileAvatar">
-          <span class="material-symbols-outlined">school</span>
-        </div>
-        <button class="profile-avatar-edit" onclick="openAvatarPicker()" title="Change avatar">
-          <span class="material-symbols-outlined">edit</span>
-        </button>
-      </div>
-
-      <h2 id="profileDisplayName">Greek Student</h2>
-      <p id="profileUsername" class="profile-username-label"></p>
-      <div id="profileBadgeRow" class="profile-badge-row"></div>
-
-     <div class="profile-title-row">
-  <div class="profile-title" id="profileTitle">
-    Beginner
-  </div>
-
-  <button class="rank-info-btn" onclick="showRanksModal()" title="View ranks">
-    <span class="material-symbols-outlined">military_tech</span>
-  </button>
-</div>
-    <div class="profile-mode-badge" id="profileModeBadge">Basic Track</div>
-    </div>
-
-    <div class="xp-section">
-      <div class="xp-top-row">
-        <span>XP</span>
-        <span id="profileXPText">0 XP</span>
-      </div>
-
-      <div class="xp-bar">
-        <div class="xp-fill" id="xpFill"></div>
-      </div>
-    </div>
-
-<div id="profileJourneySection" class="profile-journey-card">
-  <div class="journey-header">
-    <span class="material-symbols-outlined">map</span>
-    <strong>Your Greek Journey</strong>
-  </div>
-
-  <div class="journey-stats-grid">
-    <button class="journey-stat clickable-stat" onclick="showLessonsBreakdownModal(getLessonMode(), false)">
-      <strong id="profileLessonsStat">0 / 6</strong>
-      <span>Lessons <span class="stat-tap-hint">tap for details</span></span>
-    </button>
-
-    <div class="journey-stat">
-      <strong id="profileStreakStat">0</strong>
-      <span>Day Streak 🔥</span>
-    </div>
-
-    <div class="journey-stat">
-      <strong id="profileVocabStat">0</strong>
-      <span>Vocab Chapters</span>
-    </div>
-
-    <div class="journey-stat">
-      <strong id="profileTranslationsStat">0</strong>
-      <span>Translations</span>
-    </div>
-
-    <div class="journey-stat">
-      <strong id="profileTestsStat">0</strong>
-      <span>Tests</span>
-    </div>
-
-    <div class="journey-stat">
-      <strong id="profileKnownWordsStat">0</strong>
-      <span>Known Words</span>
-    </div>
-
-    <div class="journey-stat">
-      <strong id="profileTimeStat">0m</strong>
-      <span>Time Studied</span>
-    </div>
-
-    <div class="journey-stat">
-      <strong id="profileJoinStat">—</strong>
-      <span>Member Since</span>
-    </div>
-  </div>
-
-  <div class="profile-action-row">
-  <button class="profile-action-card" onclick="hideProfileMenu(); showProgress();">
-    <span class="material-symbols-outlined">trending_up</span>
-    <div>
-      <strong>Full Progress</strong>
-      <small>View detailed stats</small>
-    </div>
-  </button>
-
-  <button class="profile-action-card" onclick="showAchievementsModal()">
-    <span class="material-symbols-outlined">emoji_events</span>
-    <div>
-      <strong>Achievements</strong>
-      <small>View milestones</small>
-    </div>
-  </button>
-</div>
-</div>
-
-
-    <label class=”label”>Profile Color</label>
-
-    <div class="profile-color-grid">
-  <button class="color-dot blue" onclick="setProfileColor('#4f8cff')" title="Blue"></button>
-  <button class="color-dot green" onclick="setProfileColor('#22c55e')" title="Green"></button>
-  <button class="color-dot purple" onclick="setProfileColor('#8b5cf6')" title="Purple"></button>
-  <button class="color-dot gold" onclick="setProfileColor('#d6a700')" title="Gold"></button>
-  <button class="color-dot red" onclick="setProfileColor('#ef4444')" title="Red"></button>
-  <button class="color-dot orange" onclick="setProfileColor('#f97316')" title="Orange"></button>
-  <button class="color-dot pink" onclick="setProfileColor('#ec4899')" title="Pink"></button>
-
- 
-
-  <input
-    type="color"
-    id="customProfileColorInput"
-    class="hidden-color-input"
-    inputmode="none"
-    onchange="setProfileColor(this.value)"
-  />
-</div>
-
-    <div class="prof-menu-card">
-      <button id="profileSettingsBtn" class="prof-menu-row" onclick="openSettingsFromProfile()">
-        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">settings</span></span>
-        <span class="prof-menu-name">Settings</span>
-        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
-      </button>
-      <div class="prof-menu-sep"></div>
-      <button id="profileNotificationBtn" class="prof-menu-row" onclick="openReminderModal()">
-        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">notifications</span></span>
-        <span class="prof-menu-name" id="profileNotificationBtnText">Reminders</span>
-        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
-      </button>
-      <div class="prof-menu-sep"></div>
-      <button class="prof-menu-row" onclick="signOutAccount()">
-        <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">logout</span></span>
-        <span class="prof-menu-name">Sign Out</span>
-        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
-      </button>
-    </div>
-
-<button id="tryAppVersionBtn" class="main-btn try-app-btn" onclick="openInstallModalFromProfile()">
-  <span class="material-symbols-outlined">install_mobile</span>
-  <span>Try the App Version!</span>
-</button>
-
-
-  </div>
+<div id=”profileModal” class=”modal-overlay” onclick=”closeProfileModal(event)”>
+  <!-- moved to profilePage screen -->
 </div>
 
 
@@ -10754,11 +10799,45 @@ glacier: {
   </div>
 </div>
 
+<nav id="bottomNav" class="bottom-nav">
+  <button class="bn-item" data-page="profile" onclick="showNavPage('profile')">
+    <span class="material-symbols-outlined">person</span>
+    <span>Profile</span>
+  </button>
+  <button class="bn-item" data-page="rhema" onclick="showNavPage('rhema')">
+    <span class="material-symbols-outlined">auto_stories</span>
+    <span>Rhema</span>
+  </button>
+  <button class="bn-item bn-home active" data-page="home" onclick="showNavPage('home')">
+    <span class="material-symbols-outlined">home</span>
+    <span>Home</span>
+    <span class="bn-dot"></span>
+  </button>
+  <button class="bn-item" data-page="community" onclick="showNavPage('community')">
+    <span class="material-symbols-outlined">groups</span>
+    <span>Community</span>
+  </button>
+  <button class="bn-item" data-page="lessons" onclick="showNavPage('lessons')">
+    <span class="material-symbols-outlined">local_library</span>
+    <span>Lessons</span>
+  </button>
+</nav>
+
+<div id="notifPanel" class="modal-overlay notif-panel-overlay" onclick="if(event.target===this)closeNotifications()">
+  <div class="notif-panel" onclick="event.stopPropagation()">
+    <div class="notif-panel-header">
+      <h3>Notifications</h3>
+      <button onclick="closeNotifications()" class="notif-close-btn"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div id="notifList" class="notif-list"><p class="lb-loading">Loading…</p></div>
+  </div>
+</div>
+
   </main>
 
-  <script src="vocab.js?v=2.3.11"></script>
-  <script src="app.js?v=2.3.11"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.11"></script>
+  <script src="vocab.js?v=2.3.12"></script>
+  <script src="app.js?v=2.3.12"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.12"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -10789,49 +10868,7 @@ glacier: {
 
 <!-- Main Leaderboard Modal -->
 <div id="lbModal" class="modal-overlay lb-modal-overlay" onclick="lbOverlayClick(event)">
-  <div class="lb-modal">
-    <div class="lb-modal-header">
-      <div class="lb-modal-title-wrap">
-        <span class="material-symbols-outlined lb-header-icon">groups</span>
-        <span class="lb-modal-title">Community</span>
-      </div>
-    </div>
-    <div class="lb-tabs">
-      <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">
-        <span class="material-symbols-outlined">local_library</span> Study
-      </button>
-      <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
-        <span class="material-symbols-outlined">bolt</span> XP
-      </button>
-      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
-        <span class="material-symbols-outlined">menu_book</span> Scholar
-      </button>
-    </div>
-
-    <div id="lbPaneStudy" class="lb-tab-pane active" data-tab="study">
-      <div class="cs-board-header">
-        <p class="cs-board-desc">See what fellow believers are studying — join a group to share thoughts and discoveries together.</p>
-        <button class="cs-add-study-btn" onclick="openCreateStudy()">
-          <span class="material-symbols-outlined">add</span> Add a Study
-        </button>
-      </div>
-      <div id="csStudyList" class="cs-study-list">
-        <p class="lb-loading">Loading…</p>
-      </div>
-    </div>
-
-    <div id="lbPaneXP" class="lb-tab-pane" data-tab="xp">
-      <div class="lb-podium-wrap" id="lbPodiumXP"></div>
-      <div class="lb-list-below" id="lbListXP"></div>
-      <div class="lb-join-area" id="lbJoinXP"></div>
-    </div>
-
-    <div id="lbPaneScholar" class="lb-tab-pane" data-tab="scholar">
-      <div class="lb-podium-wrap" id="lbPodiumScholar"></div>
-      <div class="lb-list-below" id="lbListScholar"></div>
-      <div class="lb-join-area" id="lbJoinScholar"></div>
-    </div>
-  </div>
+  <!-- moved to communityPage screen -->
 </div>
 
 <!-- Create Study Sheet -->
