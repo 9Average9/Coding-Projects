@@ -12441,15 +12441,29 @@ body .app:has(#settingsScreen.screen.active) {
   -webkit-tap-highlight-color: transparent;
 }
 .ht-btn .material-symbols-outlined { font-size: 1.6rem; }
-.ht-notif { }
 .notif-badge {
   position: absolute; top: 6px; right: 6px; width: 9px; height: 9px;
   background: #ef4444; border-radius: 50%; border: 2px solid var(--primary-color);
 }
+/* Scroll container — full height, topbar scrolls with content */
 .home-scroll {
-  overflow-y: auto; height: calc(100vh - 100px);
+  overflow-y: auto; height: 100%;
   padding: 0 20px; -webkit-overflow-scrolling: touch;
+  position: relative;
 }
+/* Fog overlays — pointer-events:none so they don't block taps */
+#homeScreen { position: relative; }
+#homeScreen::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 56px;
+  background: linear-gradient(to bottom, var(--primary-color) 30%, transparent);
+  z-index: 10; pointer-events: none; opacity: 0; transition: opacity 0.2s;
+}
+#homeScreen::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 72px;
+  background: linear-gradient(to top, var(--primary-color) 20%, transparent);
+  z-index: 10; pointer-events: none;
+}
+#homeScreen.scrolled-top::before { opacity: 1; }
 .home-greeting-wrap { margin: 18px 0 10px; }
 .home-greeting {
   font-size: 2rem; font-weight: 900; color: var(--font-color);
@@ -12609,3 +12623,11 @@ body .app:has(#settingsScreen.screen.active) {
 .notif-time { font-size: 0.7rem; color: var(--muted-color); margin-top: 2px; }
 .notif-unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary-color); flex-shrink: 0; margin-top: 6px; }
 .notif-empty { text-align: center; padding: 32px 20px; color: var(--muted-color); font-size: 0.88rem; }
+
+/* ── Theme-aware nav back buttons ───────────────────────────────────────── */
+.nav-bar .icon-btn {
+  background: var(--card-color);
+  border-color: var(--border-color);
+  color: var(--font-color);
+}
+.nav-bar .icon-btn:active { opacity: 0.7; }

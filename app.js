@@ -8007,6 +8007,14 @@ function showHome() {
   setNavActive('home');
   showBottomNav();
   populateHomeScreen();
+  // Wire fog scroll listener once
+  const scr = document.getElementById('homeScroll');
+  if (scr && !scr._fogBound) {
+    scr._fogBound = true;
+    scr.addEventListener('scroll', () => {
+      document.getElementById('homeScreen')?.classList.toggle('scrolled-top', scr.scrollTop > 10);
+    }, { passive: true });
+  }
 }
 
 const HOME_VERSES = [
@@ -8022,7 +8030,7 @@ function populateHomeScreen() {
   // Greeting
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning,' : hour < 17 ? 'Good afternoon,' : 'Good evening,';
-  const displayName = localStorage.getItem('displayName') || localStorage.getItem('username') || 'Friend';
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('username') || 'Friend';
   const el1 = document.getElementById('homeGreetingLine1');
   const el2 = document.getElementById('homeGreetingName');
   if (el1) el1.textContent = greeting;
@@ -9621,6 +9629,11 @@ function showLessonModeModal() {
 
 function hideLessonModeModal() {
   document.getElementById("lessonModeModal")?.classList.remove("open");
+  // If no screen is active (nav was hidden to show this modal), go home safely
+  const anyActive = document.querySelector('.screen.active');
+  if (!anyActive || anyActive.id === 'homeScreen') {
+    showNavPage('home');
+  }
 }
 
 function selectLessonMode(mode) {
@@ -13442,7 +13455,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.12";
+const APP_VERSION = "2.3.13";
 
 const UPDATE_NOTES = [
   "Ignore .claude/ directory"
@@ -15689,6 +15702,8 @@ function closeRhema() {
     document.getElementById('communityPage')?.classList.contains('active') ? 'community' : 'home';
   setNavActive(activePage);
   showBottomNav();
+  // Refresh continue card immediately so it shows updated passage
+  _updateHomeContinueCard();
 }
 
 function rhemaGoBack() {

@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.12" />
+  <link rel="stylesheet" href="style.css?v=2.3.13" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -328,16 +328,16 @@ glacier: {
     </header>
 
     <section id="homeScreen" class="screen active">
-      <div class="home-topbar">
-        <button class="ht-btn" onclick="openHomeSettings()">
-          <span class="material-symbols-outlined">settings</span>
-        </button>
-        <button class="ht-btn ht-notif" id="notifBtn" onclick="openNotifications()">
-          <span class="material-symbols-outlined">notifications</span>
-          <span class="notif-badge hidden" id="notifBadge"></span>
-        </button>
-      </div>
-      <div class="home-scroll">
+      <div class="home-scroll" id="homeScroll">
+        <div class="home-topbar">
+          <button class="ht-btn" onclick="openHomeSettings()">
+            <span class="material-symbols-outlined">settings</span>
+          </button>
+          <button class="ht-btn ht-notif" id="notifBtn" onclick="openNotifications()">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="notif-badge hidden" id="notifBadge"></span>
+          </button>
+        </div>
         <div class="home-greeting-wrap">
           <h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
           <h1 class="home-greeting home-greeting-name" id="homeGreetingName">Friend</h1>
@@ -10835,9 +10835,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.12"></script>
-  <script src="app.js?v=2.3.12"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.12"></script>
+  <script src="vocab.js?v=2.3.13"></script>
+  <script src="app.js?v=2.3.13"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.13"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11134,7 +11134,7 @@ glacier: {
 </div>
 
 <!-- Lesson Mode Selection Modal -->
-<div id="lessonModeModal" class="modal-overlay" onclick="hideLessonModeModal()">
+<div id="lessonModeModal" class="modal-overlay">
   <div class="modal-card lesson-mode-modal-card" onclick="event.stopPropagation()">
     <h2>Choose Your Lesson Path</h2>
 
