@@ -13435,7 +13435,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.24";
+const APP_VERSION = "2.3.25";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
@@ -14844,8 +14844,9 @@ async function openStudyDetail(studyId) {
 
 function switchDetailTab(tab) {
   _csDetailTab = tab;
-  document.querySelectorAll(".cs-detail-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-  document.querySelectorAll(".cs-detail-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
+  const root = document.getElementById("csDetailContent") || document;
+  root.querySelectorAll(".cs-detail-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  root.querySelectorAll(".cs-detail-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
 }
 
 function toggleMembersCollapsed(studyId) {
