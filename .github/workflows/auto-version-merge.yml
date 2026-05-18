@@ -43,11 +43,14 @@ jobs:
           OLD_CACHE=$(grep -oP 'basic-greek-trainer-v\K[0-9]+\.[0-9]+\.[0-9]+' service-worker.js)
           sed -i "s/basic-greek-trainer-v$OLD_CACHE/basic-greek-trainer-v$NEW_VERSION/" service-worker.js
 
+          # Update ?v= cache-busters in index.html (style.css, app.js, vocab.js, firebase-lb.js)
+          sed -i "s/?v=[0-9][^\"']*/?v=$NEW_VERSION/g" index.html
+
       - name: Commit and push version bump
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.js service-worker.js
+          git add app.js service-worker.js index.html
           # Only commit if something actually changed
           git diff --staged --quiet || git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}"
           git push
