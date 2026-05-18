@@ -7981,7 +7981,6 @@ function showNavPage(page) {
   } else if (page === 'community') {
     showScreen('communityPage');
     showLbTab('study');
-    _renderStudyBoard();
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -8775,6 +8774,7 @@ function showProgress() {
   }
 html += `</div>`;
   container.innerHTML = html;
+  hideBottomNav();
   showScreen("progressScreen");
 }
 
@@ -13417,8 +13417,7 @@ function renderRanksList() {
 }
 
 function backToProfileFromProgress() {
-  showScreen("homeScreen");
-  showProfileMenu();
+  showNavPage('profile');
 }
 
 /* =========================
@@ -15684,6 +15683,11 @@ function closeRhema() {
   document.getElementById('rhemaHighlightBar')?.classList.add('hidden');
   document.getElementById('rhemaHighlightToggleBtn')?.classList.remove('active');
   updateRhemaBreadcrumb();
+  // Restore nav — determine active page from which screen is visible
+  const activePage =
+    document.getElementById('profilePage')?.classList.contains('active') ? 'profile' :
+    document.getElementById('communityPage')?.classList.contains('active') ? 'community' : 'home';
+  setNavActive(activePage);
   showBottomNav();
 }
 
