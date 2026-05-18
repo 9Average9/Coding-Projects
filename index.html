@@ -328,94 +328,85 @@ glacier: {
     </header>
 
     <section id="homeScreen" class="screen active">
-
-      <div class="home-nav">
-        <button class="icon-btn home-nav-btn" onclick="openLeaderboard()">
-          <span class="material-symbols-outlined">groups</span>
+      <div class="home-topbar">
+        <button class="ht-btn" onclick="openHomeSettings()">
+          <span class="material-symbols-outlined">settings</span>
         </button>
-        <button id="profileButton" class="icon-btn home-nav-btn" onclick="showProfileMenu()">
-          <span class="material-symbols-outlined">account_circle</span>
-        </button>
-      </div>
-
-      <div class="home-hero">
-        <h1 class="home-title">Basic Greek Trainer</h1>
-        <p class="home-subtitle">Study the Greek New Testament —<br>down to every word.</p>
-        <button class="home-about-link" onclick="showInfoModal()">
-          <span class="material-symbols-outlined">info</span>
-          About this app
+        <button class="ht-btn ht-notif" id="notifBtn" onclick="openNotifications()">
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="notif-badge hidden" id="notifBadge"></span>
         </button>
       </div>
-
-      <!-- Rhēma — featured card -->
-      <button class="home-rhema-card" onclick="showRhema()">
-        <span class="material-symbols-outlined home-rhema-icon">menu_book</span>
-        <span class="home-rhema-text">
-          <span class="home-rhema-name">Rhēma</span>
-          <span class="home-rhema-sub">NT Word Study</span>
-        </span>
-        <span class="material-symbols-outlined home-card-chev">chevron_right</span>
-      </button>
-
-      <!-- Learning path -->
-      <div class="home-section-label">Your Learning Path</div>
-
-      <button class="home-feature-card" onclick="showNewLearnMenu()">
-        <span class="home-feat-icon-wrap">
-          <span class="material-symbols-outlined">menu_book</span>
-        </span>
-        <span class="home-feat-text">
-          <span class="home-feat-name">Lessons</span>
-          <span class="home-feat-sub">Step-by-step Greek learning</span>
-        </span>
-        <span class="material-symbols-outlined home-card-chev">chevron_right</span>
-      </button>
-
-      <!-- Secondary features grid -->
-      <div class="home-grid">
-        <button id="vocabHomeBtn" class="home-grid-card locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
-          <span class="home-feat-icon-wrap">
-            <span class="material-symbols-outlined lock-icon">lock</span>
-          </span>
-          <span class="home-feat-text">
-            <span class="home-feat-name">Vocab</span>
-            <span class="home-feat-sub">Build your vocabulary</span>
-          </span>
-          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
+      <div class="home-scroll">
+        <div class="home-greeting-wrap">
+          <h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
+          <h1 class="home-greeting home-greeting-name" id="homeGreetingName">Friend</h1>
+        </div>
+        <div class="home-verse-wrap">
+          <p class="home-verse-text" id="homeVerseText">Your word I have treasured in my heart, that I may not sin against you.</p>
+          <span class="home-verse-ref">— Psalm 119:11</span>
+        </div>
+        <!-- Continue Studying card (shown after first Rhema use) -->
+        <div id="homeContinueCard" class="home-continue-card" onclick="resumeRhema()" style="display:none">
+          <div class="hcc-body">
+            <div class="hcc-icon-wrap"><span class="material-symbols-outlined">auto_stories</span></div>
+            <div class="hcc-info">
+              <span class="hcc-label">Continue Studying</span>
+              <span class="hcc-passage" id="hccPassage">John 1:1</span>
+              <span class="hcc-sub">Rhema NT Word Study</span>
+            </div>
+            <span class="material-symbols-outlined hcc-book-deco">menu_book</span>
+          </div>
+          <div class="hcc-footer">
+            <div class="hcc-bar-wrap"><div class="hcc-bar-fill" id="hccFill" style="width:0%"></div></div>
+            <button class="hcc-resume-btn" onclick="event.stopPropagation();resumeRhema()">Resume</button>
+          </div>
+        </div>
+        <!-- First-time prompt (shown before any Rhema use) -->
+        <div id="homeContinueEmpty" class="home-continue-card home-continue-empty" onclick="showRhema()">
+          <span class="material-symbols-outlined hce-icon">auto_stories</span>
+          <div class="hce-text">
+            <strong>You haven't started a Rhema study yet</strong>
+            <span>Start a study →</span>
+          </div>
+        </div>
+        <div class="home-section-label">Quick Actions</div>
+        <div class="home-actions-grid">
+          <button class="home-action-tile" onclick="showNavPage('lessons')">
+            <div class="hat-icon"><span class="material-symbols-outlined">local_library</span></div>
+            <div class="hat-text"><strong>Lessons</strong><small>Step-by-step Greek learning</small></div>
+            <span class="material-symbols-outlined hat-chev">chevron_right</span>
+          </button>
+          <button id="vocabHomeBtn" class="home-action-tile locked-feature-btn" onclick="tryOpenLockedFeature('vocab')">
+            <div class="hat-icon"><span class="material-symbols-outlined lock-icon">sort_by_alpha</span></div>
+            <div class="hat-text"><strong>Vocab</strong><small>Build your vocabulary</small></div>
+            <span class="material-symbols-outlined hat-chev">chevron_right</span>
+          </button>
+          <button id="translateHomeBtn" class="home-action-tile locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
+            <div class="hat-icon"><span class="material-symbols-outlined lock-icon">translate</span></div>
+            <div class="hat-text"><strong>Translate</strong><small>Practice translation</small></div>
+            <span class="material-symbols-outlined hat-chev">chevron_right</span>
+          </button>
+          <button id="testHomeBtn" class="home-action-tile locked-feature-btn" onclick="tryOpenLockedFeature('test')">
+            <div class="hat-icon"><span class="material-symbols-outlined lock-icon">quiz</span></div>
+            <div class="hat-text"><strong>Test</strong><small>Challenge yourself</small></div>
+            <span class="material-symbols-outlined hat-chev">chevron_right</span>
+          </button>
+        </div>
+        <div class="home-studies-header">
+          <span class="home-section-label">Your Studies</span>
+          <button class="home-viewall-btn" onclick="showNavPage('community')">View all <span class="material-symbols-outlined">chevron_right</span></button>
+        </div>
+        <div id="homeStudiesList" class="home-studies-list"></div>
+        <button class="home-create-study-tile" onclick="showNavPage('community');setTimeout(openCreateStudy,150)">
+          <div class="hcs-icon"><span class="material-symbols-outlined">add</span></div>
+          <div class="hcs-text"><strong>Create a New Study</strong><small>Start a discussion and grow together.</small></div>
+          <span class="material-symbols-outlined hcs-deco">edit_note</span>
         </button>
-        <button id="translateHomeBtn" class="home-grid-card locked-feature-btn" onclick="tryOpenLockedFeature('translate')">
-          <span class="home-feat-icon-wrap">
-            <span class="material-symbols-outlined lock-icon">lock</span>
-          </span>
-          <span class="home-feat-text">
-            <span class="home-feat-name">Translate</span>
-            <span class="home-feat-sub">Practice translation</span>
-          </span>
-          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
-        </button>
-        <button id="testHomeBtn" class="home-grid-card locked-feature-btn" onclick="tryOpenLockedFeature('test')">
-          <span class="home-feat-icon-wrap">
-            <span class="material-symbols-outlined lock-icon">lock</span>
-          </span>
-          <span class="home-feat-text">
-            <span class="home-feat-name">Test</span>
-            <span class="home-feat-sub">Challenge yourself</span>
-          </span>
-          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
-        </button>
-        <button class="home-grid-card" onclick="showFriendsModal()">
-          <span class="home-feat-icon-wrap">
-            <span class="material-symbols-outlined">group</span>
-          </span>
-          <span class="home-feat-text">
-            <span class="home-feat-name">Friends</span>
-            <span class="home-feat-sub">Learn together</span>
-          </span>
-          <span class="material-symbols-outlined home-card-chev">chevron_right</span>
-          <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
-        </button>
+        <div style="height:88px"></div>
       </div>
-
+      <!-- Hidden badge kept for backward compatibility -->
+      <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
     </section>
  <section id="newLearnMenu" class="screen">
   <div class="nav-bar">
