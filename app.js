@@ -13435,7 +13435,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.25";
+const APP_VERSION = "2.3.26";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
@@ -14847,6 +14847,7 @@ function switchDetailTab(tab) {
   const root = document.getElementById("csDetailContent") || document;
   root.querySelectorAll(".cs-detail-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   root.querySelectorAll(".cs-detail-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
+  root.querySelectorAll(".cs-tab-action-btn").forEach(b => b.classList.toggle("active", b.dataset.forTab === tab));
 }
 
 function toggleMembersCollapsed(studyId) {
@@ -14986,7 +14987,7 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
     </div>`;
   }).join("");
 
-  // ── Action grid ─────────────────────────────────────────────────────────
+  // ── Action buttons (tab-contextual) ──────────────────────────────────────
   let actionContent = "";
   if (!myUid) {
     actionContent = `<button class="cs-action-btn cs-join-btn" onclick="showAuthModal()">Sign in to Join</button>`;
@@ -14994,34 +14995,30 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
     actionContent = `<button class="cs-action-btn cs-join-btn" onclick="csAcceptInvite('${study.id}')"><span class="material-symbols-outlined">check</span> Accept Invite</button>`;
   } else if (isOwner) {
     actionContent = `
-      <div class="cs-action-grid">
-        <button class="cs-grid-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')">
-          <span class="material-symbols-outlined">add_circle</span><span>Post</span>
-        </button>
-        <button class="cs-grid-btn cs-poll-btn" onclick="openPollSheet('${study.id}')">
-          <span class="material-symbols-outlined">poll</span><span>Poll</span>
-        </button>
-        <button class="cs-grid-btn cs-pray-btn" onclick="openPrayerSheet('${study.id}')">
-          <span class="material-symbols-outlined">volunteer_activism</span><span>Prayer</span>
-        </button>
-        <button class="cs-grid-btn cs-plan-btn" onclick="openPlanSheet('${study.id}')">
-          <span class="material-symbols-outlined">checklist</span><span>Plan</span>
-        </button>
-      </div>
+      <button class="cs-tab-action-btn active" data-for-tab="posts" onclick="openContribSheet('${study.id}')">
+        <span class="material-symbols-outlined">add_circle</span> Add Post
+      </button>
+      <button class="cs-tab-action-btn" data-for-tab="polls" onclick="openPollSheet('${study.id}')">
+        <span class="material-symbols-outlined">poll</span> Add Poll
+      </button>
+      <button class="cs-tab-action-btn" data-for-tab="prayer" onclick="openPrayerSheet('${study.id}')">
+        <span class="material-symbols-outlined">volunteer_activism</span> Add Prayer Request
+      </button>
+      <button class="cs-tab-action-btn" data-for-tab="plan" onclick="openPlanSheet('${study.id}')">
+        <span class="material-symbols-outlined">checklist</span> Set Reading Plan
+      </button>
       <div class="cs-action-secondary">
         ${study.visibility === 'private' ? `<button class="cs-action-btn cs-invite-btn" onclick="openInviteSheet('${study.id}')"><span class="material-symbols-outlined">person_add</span> Invite</button>` : ""}
         <button class="cs-action-btn cs-delete-btn" onclick="csDeleteMyStudy('${study.id}')">Delete Study</button>
       </div>`;
   } else if (isMember) {
     actionContent = `
-      <div class="cs-action-grid">
-        <button class="cs-grid-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')">
-          <span class="material-symbols-outlined">add_circle</span><span>Post</span>
-        </button>
-        <button class="cs-grid-btn cs-pray-btn" onclick="openPrayerSheet('${study.id}')">
-          <span class="material-symbols-outlined">volunteer_activism</span><span>Prayer</span>
-        </button>
-      </div>
+      <button class="cs-tab-action-btn active" data-for-tab="posts" onclick="openContribSheet('${study.id}')">
+        <span class="material-symbols-outlined">add_circle</span> Add Post
+      </button>
+      <button class="cs-tab-action-btn" data-for-tab="prayer" onclick="openPrayerSheet('${study.id}')">
+        <span class="material-symbols-outlined">volunteer_activism</span> Add Prayer Request
+      </button>
       <div class="cs-action-secondary">
         <button class="cs-action-btn cs-leave-btn" onclick="csLeave('${study.id}')">Leave Study</button>
       </div>`;

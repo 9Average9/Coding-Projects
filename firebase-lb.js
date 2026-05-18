@@ -733,8 +733,7 @@ async function csPollVote(studyId, pollId, optionIndex, uid) {
 
 async function csGetPolls(studyId) {
   try {
-    const q = query(collection(db, "community_studies", studyId, "polls"), orderBy("createdAt", "asc"));
-    return (await getDocs(q)).docs.map(d => ({ id: d.id, ...d.data() }));
+    return (await getDocs(collection(db, "community_studies", studyId, "polls"))).docs.map(d => ({ id: d.id, ...d.data() }));
   } catch { return []; }
 }
 
@@ -775,8 +774,7 @@ async function csPrayerAnswered(studyId, prayerId) {
 
 async function csGetPrayers(studyId) {
   try {
-    const q = query(collection(db, "community_studies", studyId, "prayers"), orderBy("createdAt", "asc"));
-    return (await getDocs(q)).docs.map(d => ({ id: d.id, ...d.data() }));
+    return (await getDocs(collection(db, "community_studies", studyId, "prayers"))).docs.map(d => ({ id: d.id, ...d.data() }));
   } catch { return []; }
 }
 
