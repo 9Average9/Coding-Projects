@@ -12874,6 +12874,36 @@ body .app:has(#settingsScreen.screen.active) {
 .hcs-text small { font-size: 0.76rem; color: var(--muted-color); }
 .hcs-deco { font-size: 2rem !important; color: var(--muted-color); opacity: 0.3; }
 
+/* ── Study Detail Page ───────────────────────────────────────────────────── */
+body .app:has(#csDetailPage.screen.active) {
+  padding: 0 !important; overflow-x: hidden;
+}
+body .app:has(#csDetailPage.screen.active) .app-header { display: none !important; }
+body .app:has(#csDetailPage.screen.active) #csDetailPage { margin-top: 0 !important; }
+#csDetailPage.screen.active {
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+  background: var(--primary-color) !important;
+  border-radius: 0 !important; box-shadow: none !important;
+  border: none !important; padding: 0 !important; position: relative;
+}
+.cs-detail-nav {
+  background: var(--primary-color); z-index: 10; flex-shrink: 0;
+  padding-top: max(10px, env(safe-area-inset-top));
+}
+.cs-detail-back {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  display: flex; align-items: center; color: var(--font-color);
+  -webkit-tap-highlight-color: transparent;
+}
+.cs-detail-back .material-symbols-outlined { font-size: 1.5rem; }
+.cs-detail-scroll {
+  overflow-y: auto; overflow-x: hidden;
+  flex: 1 1 0; min-height: 0;
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
+  -webkit-overflow-scrolling: touch;
+}
+
 /* ── Profile Page ────────────────────────────────────────────────────────── */
 #profilePage .nav-bar {
   background: var(--primary-color); z-index: 10; flex-shrink: 0;

@@ -7947,7 +7947,7 @@ let currentSentence = null;
 
 
 const screens = [
-  "homeScreen", "profilePage", "communityPage",
+  "homeScreen", "profilePage", "communityPage", "csDetailPage",
   "newLearnMenu", "advancedLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
   "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
@@ -14827,7 +14827,8 @@ async function openStudyDetail(studyId) {
   _csMembersCollapsed = false;
   const el = document.getElementById("csDetailContent");
   el.innerHTML = '<p class="lb-loading">Loading…</p>';
-  document.getElementById("csDetailSheet").classList.add("open");
+  hideBottomNav();
+  showScreen("csDetailPage");
   const [study, contribs, polls, prayers, plan, checkIns] = await Promise.all([
     window.Community?.getStudy(studyId),
     window.Community?.getContributions(studyId) || [],
@@ -15067,8 +15068,10 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
 }
 
 function closeStudyDetail() {
-  document.getElementById("csDetailSheet").classList.remove("open");
   _csActiveStudyId = null;
+  showScreen("communityPage");
+  setNavActive("community");
+  showBottomNav();
 }
 
 async function csJoin(studyId, creatorUid) {

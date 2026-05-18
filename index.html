@@ -11056,13 +11056,19 @@ glacier: {
   </div>
 </div>
 
-<!-- Study Detail Sheet -->
-<div id="csDetailSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeStudyDetail()">
-  <div class="cs-sheet cs-detail-sheet" onclick="event.stopPropagation()">
-    <button class="cs-sheet-close" onclick="closeStudyDetail()">×</button>
-    <div id="csDetailContent"><p class="lb-loading">Loading…</p></div>
+<!-- Study Detail Page -->
+<section id="csDetailPage" class="screen">
+  <div class="nav-bar cs-detail-nav">
+    <button class="cs-detail-back" onclick="closeStudyDetail()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="nav-title">Study</div>
+    <div></div>
   </div>
-</div>
+  <div class="cs-detail-scroll" id="csDetailContent">
+    <p class="lb-loading">Loading…</p>
+  </div>
+</section>
 
 <!-- Add Contribution Sheet -->
 <div id="csContribSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeContribSheet()">
