@@ -7980,6 +7980,8 @@ function showNavPage(page) {
     updateProfileUI();
   } else if (page === 'community') {
     showScreen('communityPage');
+    localStorage.setItem('communityLastVisit', Date.now().toString());
+    document.getElementById('commNavDot')?.classList.add('hidden');
     showLbTab('study');
   } else if (page === 'lessons') {
     hideBottomNav();
@@ -14492,6 +14494,16 @@ function _csStudyTypeName(type) {
 
 function _renderStudyList(el, studies) {
   const me = window.Auth?.getCurrentUser();
+
+  // Update active discussions count
+  const countEl = document.getElementById('commActiveCount');
+  if (countEl) {
+    const n = studies.length;
+    countEl.textContent = `${n} active discussion${n !== 1 ? 's' : ''}`;
+  }
+
+  _checkCommunityDot();
+
   if (!studies.length) {
     el.innerHTML = `<div class="cs-empty"><span class="material-symbols-outlined">groups</span><p>No studies yet</p><p class="cs-empty-sub">Be the first to post what you're studying!</p></div>`;
     return;
@@ -14503,23 +14515,53 @@ function _renderStudyList(el, studies) {
     const isPending = me && (s.pendingUids || []).includes(me.uid);
     const isOwner   = me && s.creatorUid === me.uid;
     const pending   = isOwner ? (s.pendingUids || []).length : 0;
+    const desc = s.description || s.topic || "";
+
+    const visibleCount = Math.min(memberCount, 3);
+    const overflow = Math.max(0, memberCount - 3);
+    const avatarsHtml = Array.from({length: visibleCount}, (_, i) =>
+      `<span class="cs-avatar-chip" style="z-index:${3-i}"><span class="material-symbols-outlined">person</span></span>`
+    ).join('') + (overflow > 0 ? `<span class="cs-avatar-overflow">+${overflow}</span>` : '');
+
     return `<div class="cs-study-card" onclick="openStudyDetail('${s.id}')">
-      <div class="cs-card-type-icon"><span class="material-symbols-outlined">${_csStudyTypeIcon(s.type)}</span></div>
-      <div class="cs-card-body">
-        <div class="cs-card-type-label">${_csStudyTypeName(s.type)}</div>
-        <div class="cs-card-title">${_lbEscape(s.title)}</div>
-        <div class="cs-card-creator">by ${_lbEscape(s.creatorName)}</div>
-        <div class="cs-card-meta">
-          <span><span class="material-symbols-outlined">group</span>${memberCount}</span>
-          <span><span class="material-symbols-outlined">lightbulb</span>${totalContribs}</span>
-          ${isMember  ? `<span class="cs-card-badge cs-badge-member">Member</span>` : ""}
-          ${isPending ? `<span class="cs-card-badge cs-badge-pending">Pending</span>` : ""}
-          ${pending   ? `<span class="cs-card-badge cs-badge-requests">${pending} request${pending > 1 ? "s" : ""}</span>` : ""}
+      <div class="cs-card-top">
+        <div class="cs-card-icon-sq cs-icon-${_lbEscape(s.type || 'topical')}">
+          <span class="material-symbols-outlined">${_csStudyTypeIcon(s.type)}</span>
         </div>
+        <div class="cs-card-header">
+          <span class="cs-type-badge">${_csStudyTypeName(s.type).toUpperCase()}</span>
+          <div class="cs-card-title">${_lbEscape(s.title)}</div>
+          <div class="cs-card-creator">by ${_lbEscape(s.creatorName)}</div>
+        </div>
+        ${isMember ? `<span class="cs-card-badge cs-badge-member" style="margin-left:auto;flex-shrink:0">Member</span>` : ""}
       </div>
-      <span class="material-symbols-outlined cs-card-arrow">chevron_right</span>
+      ${desc ? `<div class="cs-card-desc">${_lbEscape(desc.slice(0, 100))}${desc.length > 100 ? '…' : ''}</div>` : ''}
+      <div class="cs-card-footer">
+        <div class="cs-avatar-stack">${avatarsHtml}</div>
+        <span class="cs-footer-stat"><span class="material-symbols-outlined">group</span>${memberCount}</span>
+        <span class="cs-footer-stat"><span class="material-symbols-outlined">lightbulb</span>${totalContribs}</span>
+        ${isPending ? `<span class="cs-card-badge cs-badge-pending">Pending</span>` : ""}
+        ${pending   ? `<span class="cs-card-badge cs-badge-requests">${pending} req${pending > 1 ? "s" : ""}</span>` : ""}
+      </div>
     </div>`;
   }).join("");
+}
+
+function _checkCommunityDot() {
+  const lastVisit = parseInt(localStorage.getItem('communityLastVisit') || '0');
+  const isCommActive = document.getElementById('communityPage')?.classList.contains('active');
+  const dot = document.getElementById('commNavDot');
+  if (!dot) return;
+  if (isCommActive) {
+    localStorage.setItem('communityLastVisit', Date.now().toString());
+    dot.classList.add('hidden');
+    return;
+  }
+  const hasNew = (_csStudies || []).some(s => {
+    const ts = s.createdAt?.toMillis?.() || (s.createdAt?.seconds ? s.createdAt.seconds * 1000 : 0);
+    return ts > lastVisit;
+  });
+  dot.classList.toggle('hidden', !hasNew);
 }
 
 function openCreateStudy() {

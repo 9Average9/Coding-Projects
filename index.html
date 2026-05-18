@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.13" />
+  <link rel="stylesheet" href="style.css?v=2.3.14" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -321,6 +321,7 @@ glacier: {
 </head>
 <body>
   <main class="app">
+    <div id="statusBarBg"></div>
     <header class="header app-header" onclick="showInfoModal()" role="button" tabindex="0">
       <h1>Basic Greek Trainer</h1>
       <p>Study the Greek New Testament — down to every word.</p>
@@ -9718,32 +9719,35 @@ glacier: {
 </section>
 
 <section id="communityPage" class="screen">
-  <div class="comm-page-header">
-    <span class="material-symbols-outlined comm-page-icon">groups</span>
-    <span class="comm-page-title">Community</span>
-  </div>
-  <div class="lb-tabs">
-    <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">
-      <span class="material-symbols-outlined">local_library</span> Study
-    </button>
-    <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
-      <span class="material-symbols-outlined">bolt</span> XP
-    </button>
-    <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
-      <span class="material-symbols-outlined">menu_book</span> Scholar
-    </button>
-  </div>
-  <div class="lb-tab-content-wrap">
-    <div id="lbPaneStudy" class="lb-tab-pane active" data-tab="study">
-      <div class="cs-board-header">
-        <p class="cs-board-desc">See what fellow believers are studying — join a group to share thoughts and discoveries together.</p>
-        <button class="cs-add-study-btn" onclick="openCreateStudy()">
-          <span class="material-symbols-outlined">add</span> Add a Study
-        </button>
+  <div class="comm-scroll" id="commScroll">
+    <div class="comm-hero">
+      <div class="comm-hero-text">
+        <h1 class="comm-hero-title">Community</h1>
+        <p class="comm-hero-sub">Learn together. Share insights. Grow as one.</p>
       </div>
+      <button class="comm-friends-btn" onclick="showFriendsModal()">
+        <span class="material-symbols-outlined">people</span>
+        <span>Friends</span>
+      </button>
+    </div>
+    <div class="comm-active-row">
+      <span class="comm-active-dot"></span>
+      <span id="commActiveCount" class="comm-active-text">Loading discussions…</span>
+      <span class="material-symbols-outlined comm-active-arrow">chevron_right</span>
+    </div>
+    <div class="lb-tabs comm-tabs">
+      <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">Study</button>
+      <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">XP</button>
+      <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">Scholar</button>
+    </div>
+    <div id="lbPaneStudy" class="lb-tab-pane active" data-tab="study">
       <div id="csStudyList" class="cs-study-list">
         <p class="lb-loading">Loading…</p>
       </div>
+      <button class="cs-create-dashed" onclick="openCreateStudy()">
+        <span class="material-symbols-outlined">add_circle</span>
+        <span>Create a New Study</span>
+      </button>
     </div>
     <div id="lbPaneXP" class="lb-tab-pane" data-tab="xp">
       <div class="lb-podium-wrap" id="lbPodiumXP"></div>
@@ -9755,8 +9759,8 @@ glacier: {
       <div class="lb-list-below" id="lbListScholar"></div>
       <div class="lb-join-area" id="lbJoinScholar"></div>
     </div>
+    <div style="height:88px"></div>
   </div>
-  <div style="height:88px"></div>
 </section>
 
 
@@ -10816,6 +10820,7 @@ glacier: {
   <button class="bn-item" data-page="community" onclick="showNavPage('community')">
     <span class="material-symbols-outlined">groups</span>
     <span>Community</span>
+    <span class="comm-nav-dot hidden" id="commNavDot"></span>
   </button>
   <button class="bn-item" data-page="lessons" onclick="showNavPage('lessons')">
     <span class="material-symbols-outlined">local_library</span>
@@ -10835,9 +10840,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.13"></script>
-  <script src="app.js?v=2.3.13"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.13"></script>
+  <script src="vocab.js?v=2.3.14"></script>
+  <script src="app.js?v=2.3.14"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.14"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">

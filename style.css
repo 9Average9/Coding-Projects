@@ -39,6 +39,14 @@ body {
   color: var(--font-color);
 }
 
+/* Status bar background — solid bar behind iOS status bar so content never bleeds under the notch */
+#statusBarBg {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--primary-color);
+  pointer-events: none;
+}
+
 .app {
   max-width: 900px;
   margin: 0 auto;
@@ -10541,31 +10549,10 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 .cs-empty-sub { font-size: 0.8rem !important; margin-top: 4px !important; opacity: 0.8; }
 .cs-empty-sm { font-size: 0.82rem; color: var(--muted-color); padding: 6px 0; }
 
-.cs-study-card {
-  display: flex; align-items: center; gap: 12px;
-  background: var(--card-color); border: 1.5px solid var(--border-color);
-  border-radius: 14px; padding: 12px 10px 12px 14px; cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
-}
-.cs-study-card:active { transform: scale(0.99); border-color: var(--secondary); }
-.cs-card-type-icon {
-  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-  background: color-mix(in srgb, var(--secondary) 14%, transparent);
-  display: flex; align-items: center; justify-content: center;
-}
-.cs-card-type-icon .material-symbols-outlined { font-size: 1.3rem; color: var(--secondary); }
-.cs-card-body { flex: 1; min-width: 0; }
-.cs-card-type-label { font-size: 0.68rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; }
-.cs-card-title { font-size: 0.9rem; font-weight: 700; color: var(--font-color); margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cs-card-creator { font-size: 0.74rem; color: var(--muted-color); }
-.cs-card-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
-.cs-card-meta > span { display: flex; align-items: center; gap: 3px; font-size: 0.74rem; color: var(--muted-color); }
-.cs-card-meta .material-symbols-outlined { font-size: 0.92rem; }
 .cs-card-badge { font-size: 0.67rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
 .cs-badge-member   { background: color-mix(in srgb, var(--secondary) 14%, transparent); color: var(--secondary); }
 .cs-badge-pending  { background: color-mix(in srgb, #f59e0b 14%, transparent); color: #b45309; }
 .cs-badge-requests { background: color-mix(in srgb, #ef4444 12%, transparent); color: #dc2626; }
-.cs-card-arrow { color: var(--muted-color); font-size: 1.1rem; flex-shrink: 0; }
 
 /* ── Community Sheets ───────────────────────────────────────────────────── */
 .cs-sheet-overlay { align-items: flex-end; }
@@ -12433,7 +12420,7 @@ body .app:has(#settingsScreen.screen.active) {
 /* ── Home Screen ─────────────────────────────────────────────────────────── */
 .home-topbar {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 52px 20px 0;
+  padding: calc(env(safe-area-inset-top, 20px) + 16px) 20px 0;
 }
 .ht-btn {
   background: none; border: none; cursor: pointer; padding: 8px;
@@ -12580,14 +12567,118 @@ body .app:has(#settingsScreen.screen.active) {
 .profile-page-scroll .profile-card { box-shadow: none; border-radius: 0; background: transparent; padding: 0; max-height: none; overflow: visible; }
 
 /* ── Community Page ──────────────────────────────────────────────────────── */
-.comm-page-header {
-  display: flex; align-items: center; gap: 10px; padding: 52px 20px 16px;
+.comm-scroll {
+  overflow-y: auto; height: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+.comm-hero {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 20px) + 16px) 20px 12px;
   background: var(--primary-color);
 }
-.comm-page-icon { font-size: 1.5rem; color: var(--secondary-color); }
-.comm-page-title { font-size: 1.3rem; font-weight: 800; color: var(--font-color); }
-#communityPage .lb-tabs { padding: 0 16px; }
-.lb-tab-content-wrap { overflow-y: auto; height: calc(100vh - 180px); padding: 16px 16px 0; -webkit-overflow-scrolling: touch; }
+.comm-hero-text { flex: 1; min-width: 0; }
+.comm-hero-title {
+  font-size: 2rem; font-weight: 900; color: var(--font-color);
+  margin: 0 0 4px; line-height: 1.1;
+}
+.comm-hero-sub {
+  font-size: 0.8rem; color: var(--muted-color); margin: 0; line-height: 1.4;
+}
+.comm-friends-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: var(--card-color); border: 1px solid var(--border-color);
+  border-radius: 14px; padding: 10px 14px; cursor: pointer;
+  color: var(--secondary-color); font-size: 0.65rem; font-weight: 700;
+  flex-shrink: 0; margin-left: 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+.comm-friends-btn .material-symbols-outlined { font-size: 1.3rem; }
+.comm-active-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; background: var(--primary-color);
+}
+.comm-active-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #22c55e; flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(34,197,94,0.6);
+}
+.comm-active-text { font-size: 0.82rem; color: var(--font-color); font-weight: 600; flex: 1; }
+.comm-active-arrow { font-size: 1rem; color: var(--muted-color); }
+.comm-tabs { padding: 12px 16px; background: var(--primary-color); }
+.comm-tabs .lb-tab-btn { border-radius: 20px; padding: 8px 6px; font-size: 0.78rem; }
+#communityPage .lb-tab-pane {
+  display: none; padding: 12px 16px 0; overflow: visible;
+}
+#communityPage .lb-tab-pane.active { display: block; }
+/* Richer study cards */
+.cs-study-card {
+  background: var(--card-color); border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 14px 14px 12px; margin-bottom: 10px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.cs-study-card:active { transform: scale(0.99); border-color: var(--secondary-color); }
+.cs-card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+.cs-card-icon-sq {
+  width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--secondary-color);
+}
+.cs-card-icon-sq.cs-icon-word { background: #7c3aed; }
+.cs-card-icon-sq.cs-icon-passage { background: #0891b2; }
+.cs-card-icon-sq.cs-icon-topical { background: var(--secondary-color); }
+.cs-card-icon-sq .material-symbols-outlined { font-size: 1.3rem; color: #fff; }
+.cs-card-header { flex: 1; min-width: 0; }
+.cs-type-badge {
+  display: inline-block; font-size: 0.6rem; font-weight: 800;
+  color: var(--secondary-color); letter-spacing: 0.07em; margin-bottom: 3px;
+}
+.cs-card-title { font-size: 0.92rem; font-weight: 700; color: var(--font-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cs-card-creator { font-size: 0.72rem; color: var(--muted-color); margin-top: 2px; }
+.cs-card-desc {
+  font-size: 0.78rem; color: var(--muted-color); line-height: 1.4;
+  margin-bottom: 10px; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.cs-card-footer {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.cs-avatar-stack { display: flex; align-items: center; margin-right: 2px; }
+.cs-avatar-chip {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--secondary-color); border: 2px solid var(--card-color);
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -6px; position: relative;
+}
+.cs-avatar-chip:first-child { margin-left: 0; }
+.cs-avatar-chip .material-symbols-outlined { font-size: 0.75rem; color: #fff; }
+.cs-avatar-overflow {
+  font-size: 0.62rem; font-weight: 700; color: var(--muted-color);
+  margin-left: 4px;
+}
+.cs-footer-stat {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 0.72rem; color: var(--muted-color);
+}
+.cs-footer-stat .material-symbols-outlined { font-size: 0.88rem; }
+/* Dashed create button */
+.cs-create-dashed {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 18px; margin: 4px 0 0;
+  border: 2px dashed var(--border-color); border-radius: 16px;
+  background: transparent; cursor: pointer; color: var(--secondary-color);
+  font-size: 0.88rem; font-weight: 700;
+  -webkit-tap-highlight-color: transparent; transition: border-color 0.15s;
+}
+.cs-create-dashed:active { border-color: var(--secondary-color); }
+.cs-create-dashed .material-symbols-outlined { font-size: 1.3rem; }
+/* Community nav red dot */
+.comm-nav-dot {
+  position: absolute; top: 8px; right: calc(50% - 10px);
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ef4444; border: 2px solid var(--card-color);
+}
+.comm-nav-dot.hidden { display: none; }
 
 /* ── Notification Panel ──────────────────────────────────────────────────── */
 .notif-panel-overlay { align-items: flex-start; padding-top: 60px; }
