@@ -5949,8 +5949,37 @@ body.dark .rank-item {
 
 .install-modal-card,
 .update-modal-card {
-  text-align: center;
+  text-align: left;
+  max-height: 80vh;
+  overflow-y: auto;
 }
+.update-modal-card h2 { text-align: center; }
+.update-modal-card .main-btn { width: 100%; }
+
+.un-version-label {
+  text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--secondary); margin-bottom: 14px;
+}
+.un-section { margin-bottom: 16px; }
+.un-section-title {
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--muted-color); margin-bottom: 8px;
+}
+.un-list {
+  padding-left: 18px; margin: 0; line-height: 1.65; color: var(--font-color);
+}
+.un-list li { margin-bottom: 5px; font-size: 0.86rem; }
+.un-list strong { color: var(--font-color); }
+
+/* ── Profile menu What's New badge ──────────────────────────────────────── */
+.prof-news-icon-wrap { position: relative; overflow: visible !important; }
+.prof-news-badge {
+  position: absolute; top: -3px; right: -3px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #ef4444; border: 2px solid var(--card-color);
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.2);
+}
+.prof-news-badge.hidden { display: none; }
 
 .install-modal-card .main-btn,
 .install-modal-card .small-btn {
@@ -8120,35 +8149,6 @@ button[onclick="showInstallSteps('iphone')"]::after {
   }
 }
 
-.profile-news-icon-btn {
-  position: relative;
-  overflow: visible !important;
-  background: color-mix(in srgb, var(--profile-color, #d6a700) 14%, var(--card-color)) !important;
-  border-color: color-mix(in srgb, var(--profile-color, #d6a700) 38%, var(--border-color)) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.10);
-}
-
-.profile-news-icon-btn .material-symbols-outlined {
-  font-size: 23px !important;
-  color: var(--profile-color, #d6a700) !important;
-}
-
-.profile-news-icon-btn .profile-news-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 11px;
-  height: 11px;
-  margin: 0;
-  border-radius: 999px;
-  background: #ef4444;
-  border: 2px solid var(--card-color);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
-}
-
-.profile-news-icon-btn .profile-news-badge.hidden {
-  display: none;
-}
 .main-btn.secondary,
 .try-app-btn {
   background: var(--profile-color) !important;
@@ -10661,6 +10661,181 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 .cs-contrib-btn, .cs-join-btn { background: var(--secondary); color: white; }
 .cs-pending-btn { background: var(--primary); color: var(--muted-color); border: 1.5px solid var(--border-color); cursor: not-allowed; opacity: 0.7; }
 .cs-delete-btn, .cs-leave-btn { background: transparent; color: #dc2626; border: 1.5px solid #fca5a5; font-size: 0.85rem; }
+.cs-poll-btn  { background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; border: 1.5px solid #c4b5fd; }
+.cs-invite-btn { background: color-mix(in srgb, #0891b2 12%, transparent); color: #0891b2; border: 1.5px solid #a5f3fc; }
+.cs-plan-btn  { background: color-mix(in srgb, #15803d 12%, transparent); color: #15803d; border: 1.5px solid #86efac; }
+.cs-pray-btn  { background: color-mix(in srgb, #db2777 12%, transparent); color: #db2777; border: 1.5px solid #fbcfe8; }
+
+/* ── Create Study wide sheet ─────────────────────────────────────────────── */
+.cs-create-sheet-wide { max-height: 94vh; }
+
+/* ── Visibility buttons ──────────────────────────────────────────────────── */
+.cs-vis-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.cs-vis-btn {
+  flex: 1; min-width: 90px; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 10px; border: 1.5px solid var(--border-color); border-radius: 10px;
+  background: transparent; color: var(--muted-color); cursor: pointer;
+  font-size: 0.78rem; font-weight: 700; transition: all 0.15s;
+}
+.cs-vis-btn .material-symbols-outlined { font-size: 1rem; }
+.cs-vis-btn.active { border-color: var(--secondary); color: var(--secondary); background: color-mix(in srgb, var(--secondary) 10%, transparent); }
+
+/* ── Color swatches ──────────────────────────────────────────────────────── */
+.cs-color-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.cs-color-swatch {
+  width: 28px; height: 28px; border-radius: 50%; border: 3px solid transparent;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; flex-shrink: 0;
+}
+.cs-color-swatch:hover { transform: scale(1.15); }
+.cs-color-swatch.active { border-color: var(--font-color); box-shadow: 0 0 0 2px var(--card-color), 0 0 0 4px var(--font-color); }
+
+/* ── Icon picker ─────────────────────────────────────────────────────────── */
+.cs-icon-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.cs-icon-btn {
+  width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--border-color); border-radius: 10px; background: transparent;
+  color: var(--muted-color); cursor: pointer; transition: all 0.15s;
+}
+.cs-icon-btn .material-symbols-outlined { font-size: 1.3rem; }
+.cs-icon-btn.active { border-color: var(--secondary); color: var(--secondary); background: color-mix(in srgb, var(--secondary) 12%, transparent); }
+
+/* ── Tag pills ───────────────────────────────────────────────────────────── */
+.cs-tags-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+.cs-tag-pill {
+  padding: 5px 12px; border: 1.5px solid var(--border-color); border-radius: 20px;
+  background: transparent; color: var(--muted-color); font-size: 0.76rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.cs-tag-pill.active { border-color: var(--secondary); color: var(--secondary); background: color-mix(in srgb, var(--secondary) 10%, transparent); }
+
+/* ── Format / Duration buttons ───────────────────────────────────────────── */
+.cs-fmt-row, .cs-dur-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+.cs-fmt-btn, .cs-dur-btn {
+  padding: 6px 13px; border: 1.5px solid var(--border-color); border-radius: 10px;
+  background: transparent; color: var(--muted-color); font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.cs-fmt-btn.active, .cs-dur-btn.active { border-color: var(--secondary); color: var(--secondary); background: color-mix(in srgb, var(--secondary) 10%, transparent); }
+
+/* ── Poll opt inputs ─────────────────────────────────────────────────────── */
+.cs-poll-opt-input { margin-bottom: 8px; }
+
+/* ── Detail header ───────────────────────────────────────────────────────── */
+.cs-detail-header {
+  --study-accent: var(--secondary);
+  background: color-mix(in srgb, var(--study-accent) 8%, transparent);
+  border-left: 3px solid var(--study-accent);
+  border-radius: 12px; padding: 14px; margin-bottom: 14px;
+}
+.cs-detail-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.cs-detail-vis-icon { font-size: 1rem !important; color: var(--study-accent, var(--secondary)); }
+.cs-detail-vis-label { font-size: 0.73rem; font-weight: 700; color: var(--study-accent, var(--secondary)); }
+.cs-detail-focus { font-size: 0.73rem; color: var(--muted-color); }
+.cs-detail-fmt { font-size: 0.72rem; color: var(--muted-color); margin-left: auto; }
+.cs-detail-type-row { display: flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.cs-detail-type-row .material-symbols-outlined { font-size: 1rem; }
+.cs-detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.cs-detail-tag {
+  padding: 3px 10px; border: 1px solid var(--study-accent, var(--secondary));
+  border-radius: 20px; font-size: 0.7rem; font-weight: 600;
+  color: var(--study-accent, var(--secondary));
+  background: color-mix(in srgb, var(--study-accent, var(--secondary)) 10%, transparent);
+}
+
+/* ── Check-in banner ─────────────────────────────────────────────────────── */
+.cs-checkin-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: color-mix(in srgb, #15803d 10%, transparent);
+  border: 1.5px solid #86efac; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+}
+.cs-checkin-info { display: flex; align-items: center; gap: 6px; font-size: 0.84rem; color: #15803d; font-weight: 600; }
+.cs-checkin-info .material-symbols-outlined { font-size: 1.1rem; }
+.cs-checkin-btn {
+  padding: 6px 16px; border: none; border-radius: 10px;
+  background: #15803d; color: white; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+}
+.cs-checkin-btn.checked { background: color-mix(in srgb, #15803d 30%, transparent); color: #15803d; border: 1.5px solid #86efac; cursor: default; }
+.cs-checkin-dot { width: 8px; height: 8px; border-radius: 50%; background: #15803d; flex-shrink: 0; }
+
+/* ── Detail tabs ─────────────────────────────────────────────────────────── */
+.cs-detail-tabs { display: flex; gap: 4px; margin: 14px 0 10px; background: var(--primary); border-radius: 10px; padding: 3px; }
+.cs-detail-tab {
+  flex: 1; padding: 7px 4px; border: none; border-radius: 8px;
+  background: transparent; color: var(--muted-color); font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.cs-detail-tab.active { background: var(--card-color); color: var(--secondary); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.cs-detail-pane { display: none; }
+.cs-detail-pane.active { display: block; }
+
+/* ── Emoji reactions ─────────────────────────────────────────────────────── */
+.cs-react-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.cs-react-btn {
+  display: flex; align-items: center; gap: 3px; padding: 3px 9px;
+  border: 1.5px solid var(--border-color); border-radius: 20px;
+  background: transparent; font-size: 0.88rem; cursor: pointer; transition: all 0.15s;
+  color: var(--font-color);
+}
+.cs-react-btn span { font-size: 0.76rem; font-weight: 700; }
+.cs-react-btn.active { border-color: var(--secondary); background: color-mix(in srgb, var(--secondary) 12%, transparent); }
+.cs-react-btn:disabled { cursor: default; opacity: 0.7; }
+
+/* ── Join announcement ───────────────────────────────────────────────────── */
+.cs-join-announce {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; color: var(--muted-color); font-style: italic;
+  padding: 6px 8px; border-radius: 8px; background: color-mix(in srgb, var(--secondary) 6%, transparent);
+}
+.cs-join-announce .material-symbols-outlined { font-size: 0.95rem; color: var(--secondary); }
+
+/* ── Verse / Spotlight types ─────────────────────────────────────────────── */
+.cs-verse-ref { font-size: 0.76rem; font-weight: 700; color: var(--secondary); margin-bottom: 3px; }
+.cs-spotlight-word { font-size: 1.1rem; font-weight: 800; color: var(--secondary); font-style: italic; margin-bottom: 3px; }
+
+/* ── Poll cards ──────────────────────────────────────────────────────────── */
+.cs-polls-list { display: flex; flex-direction: column; gap: 12px; }
+.cs-poll-card { background: var(--primary); border-radius: 12px; padding: 12px 14px; }
+.cs-poll-q { font-size: 0.9rem; font-weight: 700; color: var(--font-color); margin-bottom: 10px; }
+.cs-poll-opt {
+  position: relative; width: 100%; overflow: hidden;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border: 1.5px solid var(--border-color); border-radius: 8px;
+  background: transparent; cursor: pointer; margin-bottom: 6px; transition: border-color 0.15s;
+  font-size: 0.84rem; font-weight: 600; color: var(--font-color);
+}
+.cs-poll-opt.voted { border-color: var(--secondary); }
+.cs-poll-opt:disabled { cursor: default; }
+.cs-poll-bar {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: color-mix(in srgb, var(--secondary) 14%, transparent);
+  border-radius: 6px; transition: width 0.4s ease; pointer-events: none;
+}
+.cs-poll-label { position: relative; z-index: 1; text-align: left; flex: 1; }
+.cs-poll-pct { position: relative; z-index: 1; font-size: 0.75rem; color: var(--muted-color); font-weight: 700; }
+.cs-poll-total { font-size: 0.74rem; color: var(--muted-color); margin-top: 4px; }
+
+/* ── Prayer cards ────────────────────────────────────────────────────────── */
+.cs-prayers-list { display: flex; flex-direction: column; gap: 10px; }
+.cs-prayer-card { background: var(--primary); border-radius: 12px; padding: 12px 14px; }
+.cs-prayer-card.answered { opacity: 0.7; }
+.cs-prayer-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.cs-prayer-header .material-symbols-outlined { font-size: 1.1rem; color: #db2777; }
+.cs-prayer-card.answered .cs-prayer-header .material-symbols-outlined { color: #15803d; }
+.cs-prayer-author { font-size: 0.78rem; font-weight: 700; color: var(--font-color); flex: 1; }
+.cs-answered-badge { font-size: 0.7rem; font-weight: 700; color: #15803d; background: color-mix(in srgb, #15803d 12%, transparent); border: 1px solid #86efac; border-radius: 20px; padding: 2px 8px; }
+.cs-answered-btn { font-size: 0.72rem; font-weight: 700; color: var(--secondary); background: transparent; border: 1.5px solid var(--secondary); border-radius: 8px; padding: 3px 9px; cursor: pointer; }
+.cs-prayer-text { font-size: 0.86rem; color: var(--font-color); margin: 0; line-height: 1.5; }
+
+/* ── Reading plan ────────────────────────────────────────────────────────── */
+.cs-plan-list { display: flex; flex-direction: column; gap: 6px; }
+.cs-task-row { display: flex; align-items: center; gap: 10px; background: var(--primary); border-radius: 10px; padding: 10px 12px; }
+.cs-task-row.done { opacity: 0.6; }
+.cs-task-check { background: none; border: none; cursor: pointer; color: var(--secondary); padding: 0; display: flex; align-items: center; }
+.cs-task-check .material-symbols-outlined { font-size: 1.2rem; }
+.cs-task-check:disabled { cursor: default; color: var(--muted-color); }
+.cs-task-label { flex: 1; font-size: 0.86rem; color: var(--font-color); }
+.cs-task-row.done .cs-task-label { text-decoration: line-through; color: var(--muted-color); }
+.cs-task-done-count { font-size: 0.72rem; color: var(--muted-color); font-weight: 700; }
 
 /* ── Friends ─────────────────────────────────────────────────────────────── */
 
