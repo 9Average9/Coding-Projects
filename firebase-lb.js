@@ -535,18 +535,27 @@ window.LB = {
 
 // ── Community Study Board ─────────────────────────────────────────────────────
 
-async function csCreateStudy(uid, { type, title, description, greekWord, creatorName, creatorAvatar }) {
+async function csCreateStudy(uid, { type, title, description, greekWord, creatorName, creatorAvatar,
+    visibility, color, icon, tags, format, duration, focusRef }) {
   const ref = await addDoc(collection(db, "community_studies"), {
     creatorUid: uid,
     creatorName: creatorName || "User",
     creatorAvatar: creatorAvatar || "person",
-    type,
-    title,
+    type, title,
     description: description || "",
     greekWord: greekWord || null,
+    visibility: visibility || "public",
+    color: color || null,
+    icon: icon || null,
+    tags: tags || [],
+    format: format || "casual",
+    duration: duration || "ongoing",
+    focusRef: focusRef || "",
     createdAt: serverTimestamp(),
+    lastActivityAt: serverTimestamp(),
     memberUids: [uid],
     pendingUids: [],
+    invitedUids: [],
     contributionCounts: {},
     isActive: true
   });
@@ -614,16 +623,19 @@ async function csDeleteStudy(studyId) {
   } catch (e) { return false; }
 }
 
-async function csAddContribution(studyId, uid, displayName, avatar, type, text) {
+async function csAddContribution(studyId, uid, displayName, avatar, type, text, extra = {}) {
   try {
     await addDoc(collection(db, "community_studies", studyId, "contributions"), {
       uid, displayName, avatar: avatar || "person", type, text,
+      reactions: {}, parentId: null, ...extra,
       createdAt: serverTimestamp()
     });
-    await updateDoc(doc(db, "community_studies", studyId), {
-      [`contributionCounts.${uid}.total`]: increment(1),
-      [`contributionCounts.${uid}.${type}s`]: increment(1)
-    });
+    const updates = { lastActivityAt: serverTimestamp() };
+    if (!["joined", "verse", "spotlight"].includes(type)) {
+      updates[`contributionCounts.${uid}.total`] = increment(1);
+      updates[`contributionCounts.${uid}.${type}s`] = increment(1);
+    }
+    await updateDoc(doc(db, "community_studies", studyId), updates);
     return true;
   } catch (e) { console.warn("csAddContribution:", e); return false; }
 }
@@ -640,17 +652,187 @@ async function csGetContributions(studyId, limitN = 60) {
   } catch { return []; }
 }
 
+// ── Instant join (public / friends-only) ─────────────────────────────────
+async function csInstantJoin(studyId, uid, displayName, avatar) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), {
+      memberUids: arrayUnion(uid), lastActivityAt: serverTimestamp()
+    });
+    await addDoc(collection(db, "community_studies", studyId, "contributions"), {
+      uid, displayName, avatar: avatar || "person", type: "joined",
+      text: `${displayName} joined the study.`,
+      reactions: {}, parentId: null, createdAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) { console.warn("csInstantJoin:", e); return false; }
+}
+
+// ── Invite / accept (private studies) ────────────────────────────────────
+async function csInviteUser(studyId, targetUid, myDisplayName, myUid) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), { invitedUids: arrayUnion(targetUid) });
+    fcmSendPushNotification(targetUid, "studyInvite", myDisplayName, myUid);
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csAcceptInvite(studyId, uid, displayName, avatar) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), {
+      invitedUids: arrayRemove(uid), memberUids: arrayUnion(uid),
+      lastActivityAt: serverTimestamp()
+    });
+    await addDoc(collection(db, "community_studies", studyId, "contributions"), {
+      uid, displayName, avatar: avatar || "person", type: "joined",
+      text: `${displayName} joined the study.`,
+      reactions: {}, parentId: null, createdAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) { return false; }
+}
+
+// ── Reactions ─────────────────────────────────────────────────────────────
+async function csToggleReaction(studyId, contribId, uid, emoji) {
+  const ref = doc(db, "community_studies", studyId, "contributions", contribId);
+  try {
+    const snap = await getDoc(ref);
+    const voters = (snap.data()?.reactions || {})[emoji] || [];
+    const had = voters.includes(uid);
+    await updateDoc(ref, { [`reactions.${emoji}`]: had ? arrayRemove(uid) : arrayUnion(uid) });
+    return !had;
+  } catch (e) { return false; }
+}
+
+// ── Polls ─────────────────────────────────────────────────────────────────
+async function csAddPoll(studyId, uid, displayName, question, options) {
+  try {
+    await addDoc(collection(db, "community_studies", studyId, "polls"), {
+      uid, displayName, question,
+      options: options.map(text => ({ text, voters: [] })),
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db, "community_studies", studyId), { lastActivityAt: serverTimestamp() });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csPollVote(studyId, pollId, optionIndex, uid) {
+  const ref = doc(db, "community_studies", studyId, "polls", pollId);
+  try {
+    const snap = await getDoc(ref);
+    const options = snap.data()?.options || [];
+    const updates = {};
+    options.forEach((opt, i) => {
+      if ((opt.voters || []).includes(uid)) updates[`options.${i}.voters`] = arrayRemove(uid);
+    });
+    updates[`options.${optionIndex}.voters`] = arrayUnion(uid);
+    await updateDoc(ref, updates);
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csGetPolls(studyId) {
+  try {
+    const q = query(collection(db, "community_studies", studyId, "polls"), orderBy("createdAt", "asc"));
+    return (await getDocs(q)).docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch { return []; }
+}
+
+// ── Check-ins ─────────────────────────────────────────────────────────────
+async function csCheckIn(studyId, uid, displayName) {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    await setDoc(doc(db, "community_studies", studyId, "checkins", `${uid}_${today}`), {
+      uid, displayName, date: today, ts: serverTimestamp()
+    }, { merge: true });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csGetCheckIns(studyId) {
+  try {
+    const q = query(collection(db, "community_studies", studyId, "checkins"), orderBy("ts", "desc"), limit(100));
+    return (await getDocs(q)).docs.map(d => d.data());
+  } catch { return []; }
+}
+
+// ── Prayer Requests ───────────────────────────────────────────────────────
+async function csAddPrayer(studyId, uid, displayName, text) {
+  try {
+    await addDoc(collection(db, "community_studies", studyId, "prayers"), {
+      uid, displayName, text, answered: false, createdAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csPrayerAnswered(studyId, prayerId) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId, "prayers", prayerId), { answered: true });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csGetPrayers(studyId) {
+  try {
+    const q = query(collection(db, "community_studies", studyId, "prayers"), orderBy("createdAt", "asc"));
+    return (await getDocs(q)).docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch { return []; }
+}
+
+// ── Reading Plan ──────────────────────────────────────────────────────────
+async function csSetReadingPlan(studyId, tasks) {
+  try {
+    await setDoc(doc(db, "community_studies", studyId, "plan", "main"), {
+      tasks: tasks.map(label => ({ label, completedBy: [] })),
+      updatedAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csToggleTask(studyId, taskIndex, uid, isDone) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId, "plan", "main"), {
+      [`tasks.${taskIndex}.completedBy`]: isDone ? arrayUnion(uid) : arrayRemove(uid)
+    });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csGetReadingPlan(studyId) {
+  try {
+    const snap = await getDoc(doc(db, "community_studies", studyId, "plan", "main"));
+    return snap.exists() ? snap.data() : null;
+  } catch { return null; }
+}
+
 window.Community = {
   createStudy: csCreateStudy,
   listenStudies: csListenStudies,
   getStudy: csGetStudy,
   requestJoin: csRequestJoin,
+  instantJoin: csInstantJoin,
+  inviteUser: csInviteUser,
+  acceptInvite: csAcceptInvite,
   approveJoin: csApproveJoin,
   denyJoin: csDenyJoin,
   leaveStudy: csLeaveStudy,
   deleteStudy: csDeleteStudy,
   addContribution: csAddContribution,
-  getContributions: csGetContributions
+  getContributions: csGetContributions,
+  toggleReaction: csToggleReaction,
+  addPoll: csAddPoll,
+  pollVote: csPollVote,
+  getPolls: csGetPolls,
+  checkIn: csCheckIn,
+  getCheckIns: csGetCheckIns,
+  addPrayer: csAddPrayer,
+  prayerAnswered: csPrayerAnswered,
+  getPrayers: csGetPrayers,
+  setReadingPlan: csSetReadingPlan,
+  toggleTask: csToggleTask,
+  getReadingPlan: csGetReadingPlan
 };
 
 window.Auth = {

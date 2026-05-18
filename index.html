@@ -10874,10 +10874,12 @@ glacier: {
 
 <!-- Create Study Sheet -->
 <div id="csCreateSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeCreateStudy()">
-  <div class="cs-sheet" onclick="event.stopPropagation()">
+  <div class="cs-sheet cs-create-sheet-wide" onclick="event.stopPropagation()">
     <button class="cs-sheet-close" onclick="closeCreateStudy()">×</button>
     <h3 class="cs-sheet-title">Add a Study</h3>
     <p class="cs-sheet-sub">Share what you're exploring with the community</p>
+
+    <!-- Study Type -->
     <div class="cs-type-row">
       <button class="cs-type-btn active" data-type="topical" onclick="selectStudyType('topical')">
         <span class="material-symbols-outlined">topic</span><span>Topical</span>
@@ -10903,10 +10905,148 @@ glacier: {
       <label class="cs-label">Passage</label>
       <input id="csPassageInput" class="cs-input" type="text" placeholder="e.g. John 3:16, Romans 8, Philippians 4:4–7…" maxlength="60">
     </div>
+
+    <!-- Description -->
     <label class="cs-label">Description <span class="cs-optional">optional</span></label>
     <textarea id="csDescInput" class="cs-textarea" placeholder="What are you focusing on or hoping to discover?" maxlength="200" rows="3"></textarea>
+
+    <!-- Focus Reference -->
+    <label class="cs-label">Focus Reference <span class="cs-optional">optional</span></label>
+    <input id="csFocusRefInput" class="cs-input" type="text" placeholder="e.g. John 1:1–14, Romans 5" maxlength="60">
+
+    <!-- Visibility -->
+    <label class="cs-label">Visibility</label>
+    <div class="cs-vis-row">
+      <button class="cs-vis-btn active" data-vis="public" onclick="selectStudyVisibility('public')">
+        <span class="material-symbols-outlined">public</span> Public
+      </button>
+      <button class="cs-vis-btn" data-vis="friends" onclick="selectStudyVisibility('friends')">
+        <span class="material-symbols-outlined">group</span> Friends Only
+      </button>
+      <button class="cs-vis-btn" data-vis="private" onclick="selectStudyVisibility('private')">
+        <span class="material-symbols-outlined">lock</span> Private
+      </button>
+    </div>
+
+    <!-- Color -->
+    <label class="cs-label">Color <span class="cs-optional">optional</span></label>
+    <div class="cs-color-row">
+      <button class="cs-color-swatch" data-color="blue" style="background:#1d4ed8" onclick="selectStudyColor('blue')" title="Blue"></button>
+      <button class="cs-color-swatch" data-color="purple" style="background:#7c3aed" onclick="selectStudyColor('purple')" title="Purple"></button>
+      <button class="cs-color-swatch" data-color="green" style="background:#15803d" onclick="selectStudyColor('green')" title="Green"></button>
+      <button class="cs-color-swatch" data-color="teal" style="background:#0891b2" onclick="selectStudyColor('teal')" title="Teal"></button>
+      <button class="cs-color-swatch" data-color="red" style="background:#dc2626" onclick="selectStudyColor('red')" title="Red"></button>
+      <button class="cs-color-swatch" data-color="orange" style="background:#ea580c" onclick="selectStudyColor('orange')" title="Orange"></button>
+      <button class="cs-color-swatch" data-color="amber" style="background:#d97706" onclick="selectStudyColor('amber')" title="Amber"></button>
+      <button class="cs-color-swatch" data-color="pink" style="background:#db2777" onclick="selectStudyColor('pink')" title="Pink"></button>
+      <button class="cs-color-swatch" data-color="slate" style="background:#475569" onclick="selectStudyColor('slate')" title="Slate"></button>
+      <button class="cs-color-swatch" data-color="dark" style="background:#1e293b" onclick="selectStudyColor('dark')" title="Dark"></button>
+    </div>
+
+    <!-- Icon -->
+    <label class="cs-label">Icon <span class="cs-optional">optional</span></label>
+    <div class="cs-icon-row">
+      <button class="cs-icon-btn" data-icon="local_library" onclick="selectStudyIcon('local_library')"><span class="material-symbols-outlined">local_library</span></button>
+      <button class="cs-icon-btn" data-icon="auto_stories" onclick="selectStudyIcon('auto_stories')"><span class="material-symbols-outlined">auto_stories</span></button>
+      <button class="cs-icon-btn" data-icon="church" onclick="selectStudyIcon('church')"><span class="material-symbols-outlined">church</span></button>
+      <button class="cs-icon-btn" data-icon="emoji_objects" onclick="selectStudyIcon('emoji_objects')"><span class="material-symbols-outlined">emoji_objects</span></button>
+      <button class="cs-icon-btn" data-icon="whatshot" onclick="selectStudyIcon('whatshot')"><span class="material-symbols-outlined">whatshot</span></button>
+      <button class="cs-icon-btn" data-icon="spa" onclick="selectStudyIcon('spa')"><span class="material-symbols-outlined">spa</span></button>
+      <button class="cs-icon-btn" data-icon="menu_book" onclick="selectStudyIcon('menu_book')"><span class="material-symbols-outlined">menu_book</span></button>
+      <button class="cs-icon-btn" data-icon="school" onclick="selectStudyIcon('school')"><span class="material-symbols-outlined">school</span></button>
+    </div>
+
+    <!-- Tags -->
+    <label class="cs-label">Tags <span class="cs-optional">select any</span></label>
+    <div class="cs-tags-row">
+      <button class="cs-tag-pill" data-tag="Prophecy" onclick="toggleStudyTag('Prophecy')">Prophecy</button>
+      <button class="cs-tag-pill" data-tag="Doctrine" onclick="toggleStudyTag('Doctrine')">Doctrine</button>
+      <button class="cs-tag-pill" data-tag="Prayer" onclick="toggleStudyTag('Prayer')">Prayer</button>
+      <button class="cs-tag-pill" data-tag="Greek" onclick="toggleStudyTag('Greek')">Greek</button>
+      <button class="cs-tag-pill" data-tag="Book Study" onclick="toggleStudyTag('Book Study')">Book Study</button>
+      <button class="cs-tag-pill" data-tag="NT Survey" onclick="toggleStudyTag('NT Survey')">NT Survey</button>
+      <button class="cs-tag-pill" data-tag="OT Survey" onclick="toggleStudyTag('OT Survey')">OT Survey</button>
+      <button class="cs-tag-pill" data-tag="Apologetics" onclick="toggleStudyTag('Apologetics')">Apologetics</button>
+      <button class="cs-tag-pill" data-tag="History" onclick="toggleStudyTag('History')">History</button>
+      <button class="cs-tag-pill" data-tag="Language" onclick="toggleStudyTag('Language')">Language</button>
+    </div>
+
+    <!-- Format -->
+    <label class="cs-label">Format</label>
+    <div class="cs-fmt-row">
+      <button class="cs-fmt-btn active" data-fmt="casual" onclick="selectStudyFormat('casual')">Casual</button>
+      <button class="cs-fmt-btn" data-fmt="deep" onclick="selectStudyFormat('deep')">Deep Study</button>
+      <button class="cs-fmt-btn" data-fmt="memorization" onclick="selectStudyFormat('memorization')">Memorization</button>
+      <button class="cs-fmt-btn" data-fmt="prayer" onclick="selectStudyFormat('prayer')">Prayer Focus</button>
+    </div>
+
+    <!-- Duration -->
+    <label class="cs-label">Duration</label>
+    <div class="cs-dur-row">
+      <button class="cs-dur-btn" data-dur="weekly" onclick="selectStudyDuration('weekly')">Weekly</button>
+      <button class="cs-dur-btn" data-dur="30day" onclick="selectStudyDuration('30day')">30 Days</button>
+      <button class="cs-dur-btn" data-dur="90day" onclick="selectStudyDuration('90day')">90 Days</button>
+      <button class="cs-dur-btn active" data-dur="ongoing" onclick="selectStudyDuration('ongoing')">Ongoing</button>
+    </div>
+
     <div id="csCreateError" class="cs-error"></div>
     <button class="cs-submit-btn" id="csSubmitBtn" onclick="submitCreateStudy()">Post to Board</button>
+  </div>
+</div>
+
+<!-- Poll Sheet -->
+<div id="csPollSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closePollSheet()">
+  <div class="cs-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closePollSheet()">×</button>
+    <h3 class="cs-sheet-title">Add a Poll</h3>
+    <label class="cs-label">Question</label>
+    <input id="csPollQuestion" class="cs-input" type="text" placeholder="Ask the group something…" maxlength="120">
+    <label class="cs-label">Options</label>
+    <input id="csPollOpt1" class="cs-input cs-poll-opt-input" type="text" placeholder="Option 1" maxlength="60">
+    <input id="csPollOpt2" class="cs-input cs-poll-opt-input" type="text" placeholder="Option 2" maxlength="60">
+    <input id="csPollOpt3" class="cs-input cs-poll-opt-input" type="text" placeholder="Option 3 (optional)" maxlength="60">
+    <input id="csPollOpt4" class="cs-input cs-poll-opt-input" type="text" placeholder="Option 4 (optional)" maxlength="60">
+    <div id="csPollError" class="cs-error"></div>
+    <button class="cs-submit-btn" id="csPollSubmitBtn" onclick="submitPoll()">Add Poll</button>
+  </div>
+</div>
+
+<!-- Prayer Sheet -->
+<div id="csPrayerSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closePrayerSheet()">
+  <div class="cs-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closePrayerSheet()">×</button>
+    <h3 class="cs-sheet-title">Prayer Request</h3>
+    <p class="cs-sheet-sub">Share what you'd like the group to pray for</p>
+    <label class="cs-label">Request</label>
+    <textarea id="csPrayerText" class="cs-textarea" placeholder="What would you like prayer for?" maxlength="400" rows="5"></textarea>
+    <div id="csPrayerError" class="cs-error"></div>
+    <button class="cs-submit-btn" id="csPrayerSubmitBtn" onclick="submitPrayer()">Post Request</button>
+  </div>
+</div>
+
+<!-- Plan Sheet -->
+<div id="csPlanSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closePlanSheet()">
+  <div class="cs-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closePlanSheet()">×</button>
+    <h3 class="cs-sheet-title">Set Reading Plan</h3>
+    <p class="cs-sheet-sub">Enter one task per line — members will check them off as they go</p>
+    <label class="cs-label">Tasks (one per line)</label>
+    <textarea id="csPlanTasks" class="cs-textarea" placeholder="Read John 1&#10;Read John 2&#10;Read John 3" maxlength="1000" rows="8"></textarea>
+    <div id="csPlanError" class="cs-error"></div>
+    <button class="cs-submit-btn" id="csPlanSubmitBtn" onclick="submitPlan()">Save Plan</button>
+  </div>
+</div>
+
+<!-- Invite Sheet -->
+<div id="csInviteSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeInviteSheet()">
+  <div class="cs-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closeInviteSheet()">×</button>
+    <h3 class="cs-sheet-title">Invite a Friend</h3>
+    <p class="cs-sheet-sub">Invite someone from your friends list to join this private study</p>
+    <label class="cs-label">Friend's display name</label>
+    <input id="csInviteUsername" class="cs-input" type="text" placeholder="Enter their display name…" maxlength="40" autocomplete="off">
+    <div id="csInviteError" class="cs-error"></div>
+    <button class="cs-submit-btn" id="csInviteSubmitBtn" onclick="submitInvite()">Send Invite</button>
   </div>
 </div>
 

@@ -14460,6 +14460,49 @@ let _csStudyType = "topical";
 let _csSelectedWord = null;
 let _csContribType = "thought";
 let _csActiveStudyId = null;
+// Create form new fields
+let _csVisibility = "public";
+let _csColor = null;
+let _csIcon = null;
+let _csTags = [];
+let _csFormat = "casual";
+let _csDuration = "ongoing";
+// Detail tab state
+let _csDetailTab = "posts";
+
+const CS_COLORS = [
+  { key: "blue",    hex: "#1d4ed8" },
+  { key: "purple",  hex: "#7c3aed" },
+  { key: "green",   hex: "#15803d" },
+  { key: "teal",    hex: "#0891b2" },
+  { key: "red",     hex: "#dc2626" },
+  { key: "orange",  hex: "#ea580c" },
+  { key: "amber",   hex: "#d97706" },
+  { key: "pink",    hex: "#db2777" },
+  { key: "slate",   hex: "#475569" },
+  { key: "dark",    hex: "#1e293b" }
+];
+
+const CS_ICONS = [
+  { key: "local_library", label: "Library" },
+  { key: "auto_stories",  label: "Stories" },
+  { key: "church",        label: "Church" },
+  { key: "emoji_objects", label: "Lamp" },
+  { key: "whatshot",      label: "Fire" },
+  { key: "spa",           label: "Leaf" },
+  { key: "menu_book",     label: "Book" },
+  { key: "school",        label: "Scholar" }
+];
+
+const CS_TAGS = ["Prophecy","Doctrine","Prayer","Greek","Book Study","NT Survey","OT Survey","Apologetics","History","Language"];
+
+function _csActivityScore(s) {
+  const members = (s.memberUids || []).length;
+  const contribs = Object.values(s.contributionCounts || {}).reduce((a, c) => a + (c.total || 0), 0);
+  const lastTs = s.lastActivityAt?.toMillis?.() || s.createdAt?.toMillis?.() || 0;
+  const ageH = (Date.now() - lastTs) / 3600000;
+  return members * 3 + contribs * 2 - ageH * 0.05;
+}
 
 function _renderStudyBoard() {
   const el = document.getElementById("csStudyList");
@@ -14476,8 +14519,22 @@ function _renderStudyBoard() {
   _csUnsub = window.Community.listenStudies((studies, err) => {
     clearTimeout(t);
     if (err) { el.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderStudyBoard()">Retry</button></p>'; return; }
-    _csStudies = studies;
-    _renderStudyList(el, studies);
+    // Filter by visibility
+    const myUid = window.Auth?.getCurrentUser()?.uid;
+    const visible = (studies || []).filter(s => {
+      if (s.visibility === 'private') {
+        return myUid && ((s.invitedUids || []).includes(myUid) || (s.memberUids || []).includes(myUid));
+      }
+      if (s.visibility === 'friends') {
+        if (!myUid) return false;
+        return s.creatorUid === myUid || (friendsList || []).includes(s.creatorUid);
+      }
+      return true;
+    });
+    // Sort by activity score for featured logic
+    visible.sort((a, b) => _csActivityScore(b) - _csActivityScore(a));
+    _csStudies = visible;
+    _renderStudyList(el, visible);
     _updateNotifBadge();
   });
 }
@@ -14617,20 +14674,61 @@ function _checkCommunityDot() {
 function openCreateStudy() {
   const user = window.Auth?.getCurrentUser();
   if (!user) { showAuthModal(); return; }
-  _csStudyType = "topical";
-  _csSelectedWord = null;
+  _csStudyType = "topical"; _csSelectedWord = null;
+  _csVisibility = "public"; _csColor = null; _csIcon = null;
+  _csTags = []; _csFormat = "casual"; _csDuration = "ongoing";
   document.getElementById("csTopicInput").value = "";
   document.getElementById("csWordSearch").value = "";
   document.getElementById("csWordResults").innerHTML = "";
   document.getElementById("csWordSelected").style.display = "none";
   document.getElementById("csPassageInput").value = "";
   document.getElementById("csDescInput").value = "";
+  document.getElementById("csFocusRefInput").value = "";
   document.getElementById("csCreateError").textContent = "";
   document.querySelectorAll(".cs-type-btn[data-type]").forEach(b => b.classList.toggle("active", b.dataset.type === "topical"));
   document.getElementById("csTopicalFields").style.display = "";
   document.getElementById("csWordFields").style.display = "none";
   document.getElementById("csPassageFields").style.display = "none";
+  // Reset visibility buttons
+  document.querySelectorAll(".cs-vis-btn").forEach(b => b.classList.toggle("active", b.dataset.vis === "public"));
+  // Reset color/icon/tag/format/duration selections
+  document.querySelectorAll(".cs-color-swatch").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".cs-icon-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".cs-tag-pill").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".cs-fmt-btn").forEach(b => b.classList.toggle("active", b.dataset.fmt === "casual"));
+  document.querySelectorAll(".cs-dur-btn").forEach(b => b.classList.toggle("active", b.dataset.dur === "ongoing"));
   document.getElementById("csCreateSheet").classList.add("open");
+}
+
+function selectStudyVisibility(v) {
+  _csVisibility = v;
+  document.querySelectorAll(".cs-vis-btn").forEach(b => b.classList.toggle("active", b.dataset.vis === v));
+}
+function selectStudyColor(key) {
+  _csColor = key;
+  document.querySelectorAll(".cs-color-swatch").forEach(s => s.classList.toggle("active", s.dataset.color === key));
+}
+function selectStudyIcon(key) {
+  _csIcon = key;
+  document.querySelectorAll(".cs-icon-btn").forEach(b => b.classList.toggle("active", b.dataset.icon === key));
+}
+function toggleStudyTag(tag) {
+  const el = document.querySelector(`.cs-tag-pill[data-tag="${CSS.escape(tag)}"]`);
+  if (_csTags.includes(tag)) {
+    _csTags = _csTags.filter(t => t !== tag);
+    el?.classList.remove("active");
+  } else {
+    _csTags.push(tag);
+    el?.classList.add("active");
+  }
+}
+function selectStudyFormat(f) {
+  _csFormat = f;
+  document.querySelectorAll(".cs-fmt-btn").forEach(b => b.classList.toggle("active", b.dataset.fmt === f));
+}
+function selectStudyDuration(d) {
+  _csDuration = d;
+  document.querySelectorAll(".cs-dur-btn").forEach(b => b.classList.toggle("active", b.dataset.dur === d));
 }
 
 function closeCreateStudy() {
@@ -14693,11 +14791,15 @@ async function submitCreateStudy() {
     if (!title) { errEl.textContent = "Please enter a passage reference."; return; }
   }
   const description = document.getElementById("csDescInput").value.trim();
+  const focusRef    = document.getElementById("csFocusRefInput")?.value.trim() || "";
   btn.disabled = true; btn.textContent = "Posting…";
   try {
-    const id = await window.Community.createStudy(user.uid, {
-      type: _csStudyType, title, description,
+    await window.Community.createStudy(user.uid, {
+      type: _csStudyType, title, description, focusRef,
       greekWord: _csSelectedWord || null,
+      visibility: _csVisibility,
+      color: _csColor, icon: _csIcon,
+      tags: _csTags, format: _csFormat, duration: _csDuration,
       creatorName: localStorage.getItem("authDisplayName") || "User",
       creatorAvatar: localStorage.getItem("profilePicType") === "icon" ? (localStorage.getItem("profilePicValue") || "person") : "person"
     });
@@ -14711,40 +14813,120 @@ async function submitCreateStudy() {
 
 async function openStudyDetail(studyId) {
   _csActiveStudyId = studyId;
+  _csDetailTab = "posts";
   const el = document.getElementById("csDetailContent");
   el.innerHTML = '<p class="lb-loading">Loading…</p>';
   document.getElementById("csDetailSheet").classList.add("open");
-  const study   = await window.Community?.getStudy(studyId);
+  const [study, contribs, polls, prayers, plan, checkIns] = await Promise.all([
+    window.Community?.getStudy(studyId),
+    window.Community?.getContributions(studyId) || [],
+    window.Community?.getPolls(studyId) || [],
+    window.Community?.getPrayers(studyId) || [],
+    window.Community?.getReadingPlan(studyId),
+    window.Community?.getCheckIns(studyId) || []
+  ]);
   if (_csActiveStudyId !== studyId) return;
   if (!study) { el.innerHTML = '<p class="lb-empty">Study not found.</p>'; return; }
-  const contribs = await window.Community?.getContributions(studyId) || [];
-  if (_csActiveStudyId !== studyId) return;
-  _renderStudyDetail(el, study, contribs);
+  _renderStudyDetail(el, study, contribs || [], polls || [], prayers || [], plan, checkIns || []);
 }
 
-function _renderStudyDetail(el, study, contribs) {
-  const me      = window.Auth?.getCurrentUser();
-  const myUid   = me?.uid;
+function switchDetailTab(tab) {
+  _csDetailTab = tab;
+  document.querySelectorAll(".cs-detail-tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".cs-detail-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
+}
+
+function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns) {
+  const me        = window.Auth?.getCurrentUser();
+  const myUid     = me?.uid;
   const isMember  = myUid && (study.memberUids || []).includes(myUid);
   const isPending = myUid && (study.pendingUids || []).includes(myUid);
+  const isInvited = myUid && (study.invitedUids || []).includes(myUid);
   const isOwner   = myUid && study.creatorUid === myUid;
   const counts    = study.contributionCounts || {};
+  const studyColor = study.color ? (CS_COLORS.find(c => c.key === study.color)?.hex || null) : null;
+  const accentStyle = studyColor ? `style="--study-accent:${studyColor}"` : '';
 
-  const memberRows = (study.memberUids || []).map(uid => {
-    const c = counts[uid] || {};
-    const parts = [];
-    if (c.thoughts) parts.push(`${c.thoughts} thought${c.thoughts !== 1 ? "s" : ""}`);
-    if (c.finds)    parts.push(`${c.finds} find${c.finds !== 1 ? "s" : ""}`);
-    if (c.points)   parts.push(`${c.points} key point${c.points !== 1 ? "s" : ""}`);
-    return `<div class="cs-member-row">
-      <span class="material-symbols-outlined cs-member-icon">person</span>
-      <div class="cs-member-info">
-        <span class="cs-member-name">${uid === study.creatorUid ? `${_lbEscape(study.creatorName)} <span class="cs-creator-tag">host</span>` : uid === myUid ? "You" : "Member"}</span>
-        ${parts.length ? `<span class="cs-member-contribs">${parts.join(" · ")}</span>` : ""}
+  // ── Header ──────────────────────────────────────────────────────────────
+  const visLabel  = { public: "Public", friends: "Friends Only", private: "Private" }[study.visibility || "public"] || "Public";
+  const visIcon   = { public: "public", friends: "group", private: "lock" }[study.visibility || "public"] || "public";
+  const tags      = (study.tags || []).map(t => `<span class="cs-detail-tag">${_lbEscape(t)}</span>`).join("");
+  const fmtLabel  = { casual: "Casual", deep: "Deep Study", memorization: "Memorization", prayer: "Prayer Focus" }[study.format || "casual"] || "Casual";
+  const durLabel  = { weekly: "Weekly", "30day": "30 Days", "90day": "90 Days", ongoing: "Ongoing" }[study.duration || "ongoing"] || "Ongoing";
+
+  // Check-in today?
+  const today     = new Date().toISOString().slice(0, 10);
+  const myCheckin = myUid && checkIns.some(c => c.uid === myUid && c.date === today);
+  const checkedInToday = checkIns.filter(c => c.date === today);
+
+  // ── Posts tab ───────────────────────────────────────────────────────────
+  const REACTIONS = ["🔥","💡","🙏","❓"];
+  const contribTypeIcon = t => ({ find: "search", point: "flag", joined: "person_add", verse: "format_quote", spotlight: "translate" }[t] || "psychology");
+  const postsHtml = contribs.length ? contribs.map(c => {
+    const isJoin = c.type === "joined";
+    if (isJoin) return `<div class="cs-join-announce"><span class="material-symbols-outlined">person_add</span>${_lbEscape(c.text)}</div>`;
+    const reactionMap = c.reactions || {};
+    const reactionBar = REACTIONS.map(emoji => {
+      const voters = reactionMap[emoji] || [];
+      const active = myUid && voters.includes(myUid);
+      return `<button class="cs-react-btn${active ? " active" : ""}" onclick="csReact('${study.id}','${c.id}','${emoji}')" ${!myUid ? "disabled" : ""}>${emoji}${voters.length > 0 ? `<span>${voters.length}</span>` : ""}</button>`;
+    }).join("");
+    return `<div class="cs-contrib-item">
+      <div class="cs-contrib-header">
+        <span class="cs-contrib-type-icon material-symbols-outlined">${contribTypeIcon(c.type)}</span>
+        <span class="cs-contrib-author">${_lbEscape(c.displayName || "Member")}</span>
       </div>
+      ${c.type === "verse" ? `<div class="cs-verse-ref">${_lbEscape(c.verseRef || "")}</div>` : ""}
+      ${c.type === "spotlight" ? `<div class="cs-spotlight-word">${_lbEscape(c.wordGreek || "")}</div>` : ""}
+      <p class="cs-contrib-text">${_lbEscape(c.text)}</p>
+      <div class="cs-react-row">${reactionBar}</div>
     </div>`;
-  }).join("");
+  }).join("") : `<p class="cs-empty-sm">No posts yet — be the first to contribute.</p>`;
 
+  // ── Polls tab ───────────────────────────────────────────────────────────
+  const pollsHtml = (polls.length ? polls.map(p => {
+    const totalVotes = p.options.reduce((s, o) => s + (o.voters || []).length, 0);
+    return `<div class="cs-poll-card">
+      <div class="cs-poll-q">${_lbEscape(p.question)}</div>
+      ${p.options.map((opt, i) => {
+        const votes = (opt.voters || []).length;
+        const pct   = totalVotes ? Math.round(votes / totalVotes * 100) : 0;
+        const voted = myUid && (opt.voters || []).includes(myUid);
+        return `<button class="cs-poll-opt${voted ? " voted" : ""}" onclick="csPollVoteUI('${study.id}','${p.id}',${i})" ${!myUid || !isMember ? "disabled" : ""}>
+          <div class="cs-poll-bar" style="width:${pct}%"></div>
+          <span class="cs-poll-label">${_lbEscape(opt.text)}</span>
+          <span class="cs-poll-pct">${pct}%</span>
+        </button>`;
+      }).join("")}
+      <div class="cs-poll-total">${totalVotes} vote${totalVotes !== 1 ? "s" : ""} · by ${_lbEscape(p.displayName)}</div>
+    </div>`;
+  }).join("") : `<p class="cs-empty-sm">No polls yet.</p>`);
+
+  // ── Prayer tab ──────────────────────────────────────────────────────────
+  const prayerHtml = (prayers.length ? prayers.map(pr => `
+    <div class="cs-prayer-card${pr.answered ? " answered" : ""}">
+      <div class="cs-prayer-header">
+        <span class="material-symbols-outlined">${pr.answered ? "check_circle" : "volunteer_activism"}</span>
+        <span class="cs-prayer-author">${_lbEscape(pr.displayName)}</span>
+        ${pr.answered ? `<span class="cs-answered-badge">Answered ✓</span>` : (isOwner && !pr.answered ? `<button class="cs-answered-btn" onclick="csAnswerPrayer('${study.id}','${pr.id}')">Mark Answered</button>` : "")}
+      </div>
+      <p class="cs-prayer-text">${_lbEscape(pr.text)}</p>
+    </div>`).join("") : `<p class="cs-empty-sm">No prayer requests yet.</p>`);
+
+  // ── Plan tab ────────────────────────────────────────────────────────────
+  const planHtml = plan ? plan.tasks.map((task, i) => {
+    const done = myUid && (task.completedBy || []).includes(myUid);
+    const doneCount = (task.completedBy || []).length;
+    return `<div class="cs-task-row${done ? " done" : ""}">
+      <button class="cs-task-check" onclick="csToggleTaskUI('${study.id}',${i})" ${!myUid || !isMember ? "disabled" : ""}>
+        <span class="material-symbols-outlined">${done ? "check_circle" : "radio_button_unchecked"}</span>
+      </button>
+      <span class="cs-task-label">${_lbEscape(task.label)}</span>
+      <span class="cs-task-done-count">${doneCount}/${(study.memberUids || []).length}</span>
+    </div>`;
+  }).join("") : `<p class="cs-empty-sm">No reading plan set yet.</p>`;
+
+  // ── Pending requests section ─────────────────────────────────────────────
   const pendingSection = isOwner && (study.pendingUids || []).length ? `
     <div class="cs-section-title">Join Requests <span class="cs-req-count">${study.pendingUids.length}</span></div>
     <div class="cs-pending-list">${study.pendingUids.map(uid => `
@@ -14752,48 +14934,91 @@ function _renderStudyDetail(el, study, contribs) {
         <span class="material-symbols-outlined">person</span>
         <span class="cs-pending-name">User (${uid.slice(0,6)}…)</span>
         <button class="cs-approve-btn" onclick="csApprove('${study.id}','${uid}')">Accept</button>
-        <button class="cs-deny-btn"    onclick="csDeny('${study.id}','${uid}')">Decline</button>
+        <button class="cs-deny-btn" onclick="csDeny('${study.id}','${uid}')">Decline</button>
       </div>`).join("")}
     </div>` : "";
 
-  let actionBtn = "";
+  // ── Action bar ────────────────────────────────────────────────────────
+  let actionBar = "";
   if (!myUid) {
-    actionBtn = `<button class="cs-action-btn cs-join-btn" onclick="showAuthModal()">Sign in to Join</button>`;
+    actionBar = `<button class="cs-action-btn cs-join-btn" onclick="showAuthModal()">Sign in to Join</button>`;
+  } else if (isInvited && !isMember) {
+    actionBar = `<button class="cs-action-btn cs-join-btn" onclick="csAcceptInvite('${study.id}')"><span class="material-symbols-outlined">check</span> Accept Invite</button>`;
   } else if (isOwner) {
-    actionBtn = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Contribution</button>
-                 <button class="cs-action-btn cs-delete-btn" onclick="csDeleteMyStudy('${study.id}')">Delete Study</button>`;
+    actionBar = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Post</button>
+      <button class="cs-action-btn cs-poll-btn" onclick="openPollSheet('${study.id}')"><span class="material-symbols-outlined">poll</span> Poll</button>
+      ${study.visibility === 'private' ? `<button class="cs-action-btn cs-invite-btn" onclick="openInviteSheet('${study.id}')"><span class="material-symbols-outlined">person_add</span> Invite</button>` : ""}
+      <button class="cs-action-btn cs-plan-btn" onclick="openPlanSheet('${study.id}')"><span class="material-symbols-outlined">checklist</span> Set Plan</button>
+      <button class="cs-action-btn cs-delete-btn" onclick="csDeleteMyStudy('${study.id}')">Delete</button>`;
   } else if (isMember) {
-    actionBtn = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Contribution</button>
-                 <button class="cs-action-btn cs-leave-btn"  onclick="csLeave('${study.id}')">Leave Study</button>`;
+    actionBar = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Post</button>
+      <button class="cs-action-btn cs-pray-btn" onclick="openPrayerSheet('${study.id}')"><span class="material-symbols-outlined">volunteer_activism</span> Prayer</button>
+      <button class="cs-action-btn cs-leave-btn" onclick="csLeave('${study.id}')">Leave</button>`;
   } else if (isPending) {
-    actionBtn = `<button class="cs-action-btn cs-pending-btn" disabled>Request Sent</button>`;
+    actionBar = `<button class="cs-action-btn cs-pending-btn" disabled>Request Sent</button>`;
+  } else if (study.visibility === 'private') {
+    actionBar = `<button class="cs-action-btn cs-pending-btn" disabled>Private — Invite Only</button>`;
   } else {
-    actionBtn = `<button class="cs-action-btn cs-join-btn" onclick="csJoin('${study.id}','${study.creatorUid}')"><span class="material-symbols-outlined">group_add</span> Request to Join</button>`;
+    actionBar = `<button class="cs-action-btn cs-join-btn" onclick="csJoin('${study.id}','${study.creatorUid}')"><span class="material-symbols-outlined">group_add</span> Join Study</button>`;
   }
 
-  const contribTypeIcon = t => t === "find" ? "search" : t === "point" ? "flag" : "psychology";
-  const contribSection = contribs.length ? `
-    <div class="cs-section-title">Contributions <span class="cs-req-count">${contribs.length}</span></div>
-    <div class="cs-contrib-list">${contribs.map(c => `
-      <div class="cs-contrib-item">
-        <div class="cs-contrib-header">
-          <span class="cs-contrib-type-icon material-symbols-outlined">${contribTypeIcon(c.type)}</span>
-          <span class="cs-contrib-type-label">${c.type}</span>
-          <span class="cs-contrib-author">${_lbEscape(c.displayName || "Member")}</span>
-        </div>
-        <p class="cs-contrib-text">${_lbEscape(c.text)}</p>
-      </div>`).join("")}
-    </div>` : "";
+  // ── Members section ──────────────────────────────────────────────────────
+  const memberRows = (study.memberUids || []).map(uid => {
+    const c = counts[uid] || {};
+    const parts = [c.thoughts && `${c.thoughts}t`, c.finds && `${c.finds}f`, c.points && `${c.points}k`].filter(Boolean).join("·") || "";
+    const checkedIn = checkIns.some(ci => ci.uid === uid && ci.date === today);
+    return `<div class="cs-member-row">
+      <span class="material-symbols-outlined cs-member-icon">person</span>
+      <div class="cs-member-info">
+        <span class="cs-member-name">${uid === study.creatorUid ? `${_lbEscape(study.creatorName)} <span class="cs-creator-tag">host</span>` : uid === myUid ? "You" : "Member"}</span>
+        ${parts ? `<span class="cs-member-contribs">${parts}</span>` : ""}
+      </div>
+      ${checkedIn ? `<span class="cs-checkin-dot" title="Checked in today"></span>` : ""}
+    </div>`;
+  }).join("");
+
+  // ── Check-in banner (members only) ──────────────────────────────────────
+  const checkinBanner = (myUid && isMember) ? `<div class="cs-checkin-banner">
+    <div class="cs-checkin-info">
+      <span class="material-symbols-outlined">today</span>
+      <span>${checkedInToday.length} member${checkedInToday.length !== 1 ? "s" : ""} studied today</span>
+    </div>
+    <button class="cs-checkin-btn${myCheckin ? " checked" : ""}" onclick="csCheckInStudy('${study.id}')" ${myCheckin ? "disabled" : ""}>
+      ${myCheckin ? "✓ Checked In" : "Check In"}
+    </button>
+  </div>` : "";
 
   el.innerHTML = `
-    <div class="cs-detail-type"><span class="material-symbols-outlined">${_csStudyTypeIcon(study.type)}</span>${_csStudyTypeName(study.type)}</div>
-    <h2 class="cs-detail-title">${_lbEscape(study.title)}</h2>
-    ${study.description ? `<p class="cs-detail-desc">${_lbEscape(study.description)}</p>` : ""}
+    <div class="cs-detail-header" ${accentStyle}>
+      <div class="cs-detail-meta">
+        <span class="material-symbols-outlined cs-detail-vis-icon">${visIcon}</span>
+        <span class="cs-detail-vis-label">${visLabel}</span>
+        ${study.focusRef ? `<span class="cs-detail-focus">· ${_lbEscape(study.focusRef)}</span>` : ""}
+        <span class="cs-detail-fmt">${fmtLabel} · ${durLabel}</span>
+      </div>
+      <div class="cs-detail-type-row">
+        <span class="material-symbols-outlined">${study.icon || _csStudyTypeIcon(study.type)}</span>
+        <span>${_csStudyTypeName(study.type)}</span>
+      </div>
+      <h2 class="cs-detail-title">${_lbEscape(study.title)}</h2>
+      ${study.description ? `<p class="cs-detail-desc">${_lbEscape(study.description)}</p>` : ""}
+      ${tags ? `<div class="cs-detail-tags">${tags}</div>` : ""}
+    </div>
+    ${checkinBanner}
     ${pendingSection}
     <div class="cs-section-title">Members <span class="cs-req-count">${(study.memberUids || []).length}</span></div>
     <div class="cs-members-list">${memberRows || '<p class="cs-empty-sm">No members yet</p>'}</div>
-    ${contribSection}
-    <div class="cs-detail-actions">${actionBtn}</div>`;
+    <div class="cs-detail-tabs">
+      <button class="cs-detail-tab active" data-tab="posts" onclick="switchDetailTab('posts')">Posts</button>
+      <button class="cs-detail-tab" data-tab="polls" onclick="switchDetailTab('polls')">Polls</button>
+      <button class="cs-detail-tab" data-tab="prayer" onclick="switchDetailTab('prayer')">Prayer</button>
+      <button class="cs-detail-tab" data-tab="plan" onclick="switchDetailTab('plan')">Plan</button>
+    </div>
+    <div class="cs-detail-pane active" data-tab="posts"><div class="cs-contrib-list">${postsHtml}</div></div>
+    <div class="cs-detail-pane" data-tab="polls"><div class="cs-polls-list">${pollsHtml}</div></div>
+    <div class="cs-detail-pane" data-tab="prayer"><div class="cs-prayers-list">${prayerHtml}</div></div>
+    <div class="cs-detail-pane" data-tab="plan"><div class="cs-plan-list">${planHtml}</div></div>
+    <div class="cs-detail-actions">${actionBar}</div>`;
 }
 
 function closeStudyDetail() {
@@ -14804,8 +15029,193 @@ function closeStudyDetail() {
 async function csJoin(studyId, creatorUid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  const ok = await window.Community?.requestJoin(studyId, me.uid, localStorage.getItem("authDisplayName") || "Someone", creatorUid);
+  const study = await window.Community?.getStudy(studyId);
+  const name = localStorage.getItem("authDisplayName") || "Someone";
+  let ok;
+  if (study?.visibility === "private") {
+    ok = await window.Community?.requestJoin(studyId, me.uid, name, creatorUid);
+  } else {
+    ok = await window.Community?.instantJoin(studyId, me.uid, name);
+  }
   if (ok) openStudyDetail(studyId);
+}
+
+async function csAcceptInvite(studyId) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  const name = localStorage.getItem("authDisplayName") || "Someone";
+  const ok = await window.Community?.acceptInvite(studyId, me.uid, name);
+  if (ok) openStudyDetail(studyId);
+}
+
+async function csCheckInStudy(studyId) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  const name = localStorage.getItem("authDisplayName") || "Member";
+  await window.Community?.checkIn(studyId, me.uid, name);
+  openStudyDetail(studyId);
+}
+
+async function csReact(studyId, contribId, emoji) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  await window.Community?.toggleReaction(studyId, contribId, emoji, me.uid);
+  openStudyDetail(studyId);
+}
+
+async function csPollVoteUI(studyId, pollId, optionIndex) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  await window.Community?.pollVote(studyId, pollId, optionIndex, me.uid);
+  openStudyDetail(studyId);
+}
+
+async function csAnswerPrayer(studyId, prayerId) {
+  await window.Community?.prayerAnswered(studyId, prayerId);
+  openStudyDetail(studyId);
+}
+
+async function csToggleTaskUI(studyId, taskIndex) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  const plan = await window.Community?.getReadingPlan(studyId);
+  const task = plan?.tasks?.[taskIndex];
+  const isDone = task ? (task.completedBy || []).includes(me.uid) : false;
+  await window.Community?.toggleTask(studyId, taskIndex, me.uid, !isDone);
+  openStudyDetail(studyId);
+}
+
+// ── Poll Sheet ────────────────────────────────────────────────────────────────
+let _csPollStudyId = null;
+
+function openPollSheet(studyId) {
+  _csPollStudyId = studyId;
+  document.getElementById("csPollQuestion").value = "";
+  document.getElementById("csPollOpt1").value = "";
+  document.getElementById("csPollOpt2").value = "";
+  document.getElementById("csPollOpt3").value = "";
+  document.getElementById("csPollOpt4").value = "";
+  document.getElementById("csPollError").textContent = "";
+  document.getElementById("csPollSheet").classList.add("open");
+}
+
+function closePollSheet() {
+  document.getElementById("csPollSheet").classList.remove("open");
+}
+
+async function submitPoll() {
+  const me = window.Auth?.getCurrentUser();
+  if (!me || !_csPollStudyId) return;
+  const question = document.getElementById("csPollQuestion").value.trim();
+  const errEl = document.getElementById("csPollError");
+  const btn = document.getElementById("csPollSubmitBtn");
+  errEl.textContent = "";
+  if (!question) { errEl.textContent = "Please enter a question."; return; }
+  const opts = [
+    document.getElementById("csPollOpt1").value.trim(),
+    document.getElementById("csPollOpt2").value.trim(),
+    document.getElementById("csPollOpt3").value.trim(),
+    document.getElementById("csPollOpt4").value.trim()
+  ].filter(Boolean);
+  if (opts.length < 2) { errEl.textContent = "Add at least 2 options."; return; }
+  btn.disabled = true; btn.textContent = "Adding…";
+  const name = localStorage.getItem("authDisplayName") || "User";
+  const ok = await window.Community?.addPoll(_csPollStudyId, me.uid, name, question, opts);
+  btn.disabled = false; btn.textContent = "Add Poll";
+  if (ok) { closePollSheet(); openStudyDetail(_csPollStudyId); }
+  else errEl.textContent = "Something went wrong.";
+}
+
+// ── Prayer Sheet ──────────────────────────────────────────────────────────────
+let _csPrayerStudyId = null;
+
+function openPrayerSheet(studyId) {
+  _csPrayerStudyId = studyId;
+  document.getElementById("csPrayerText").value = "";
+  document.getElementById("csPrayerError").textContent = "";
+  document.getElementById("csPrayerSheet").classList.add("open");
+}
+
+function closePrayerSheet() {
+  document.getElementById("csPrayerSheet").classList.remove("open");
+}
+
+async function submitPrayer() {
+  const me = window.Auth?.getCurrentUser();
+  if (!me || !_csPrayerStudyId) return;
+  const text = document.getElementById("csPrayerText").value.trim();
+  const errEl = document.getElementById("csPrayerError");
+  const btn = document.getElementById("csPrayerSubmitBtn");
+  errEl.textContent = "";
+  if (!text) { errEl.textContent = "Please write a prayer request."; return; }
+  btn.disabled = true; btn.textContent = "Posting…";
+  const name = localStorage.getItem("authDisplayName") || "User";
+  const ok = await window.Community?.addPrayer(_csPrayerStudyId, me.uid, name, text);
+  btn.disabled = false; btn.textContent = "Post Request";
+  if (ok) { closePrayerSheet(); openStudyDetail(_csPrayerStudyId); }
+  else errEl.textContent = "Something went wrong.";
+}
+
+// ── Plan Sheet ────────────────────────────────────────────────────────────────
+let _csPlanStudyId = null;
+
+function openPlanSheet(studyId) {
+  _csPlanStudyId = studyId;
+  document.getElementById("csPlanTasks").value = "";
+  document.getElementById("csPlanError").textContent = "";
+  document.getElementById("csPlanSheet").classList.add("open");
+}
+
+function closePlanSheet() {
+  document.getElementById("csPlanSheet").classList.remove("open");
+}
+
+async function submitPlan() {
+  const me = window.Auth?.getCurrentUser();
+  if (!me || !_csPlanStudyId) return;
+  const raw = document.getElementById("csPlanTasks").value.trim();
+  const errEl = document.getElementById("csPlanError");
+  const btn = document.getElementById("csPlanSubmitBtn");
+  errEl.textContent = "";
+  if (!raw) { errEl.textContent = "Enter at least one task."; return; }
+  const tasks = raw.split("\n").map(l => l.trim()).filter(Boolean);
+  if (!tasks.length) { errEl.textContent = "Enter at least one task."; return; }
+  btn.disabled = true; btn.textContent = "Saving…";
+  const ok = await window.Community?.setReadingPlan(_csPlanStudyId, tasks);
+  btn.disabled = false; btn.textContent = "Save Plan";
+  if (ok) { closePlanSheet(); openStudyDetail(_csPlanStudyId); }
+  else errEl.textContent = "Something went wrong.";
+}
+
+// ── Invite Sheet ──────────────────────────────────────────────────────────────
+let _csInviteStudyId = null;
+
+function openInviteSheet(studyId) {
+  _csInviteStudyId = studyId;
+  document.getElementById("csInviteUsername").value = "";
+  document.getElementById("csInviteError").textContent = "";
+  document.getElementById("csInviteSheet").classList.add("open");
+}
+
+function closeInviteSheet() {
+  document.getElementById("csInviteSheet").classList.remove("open");
+}
+
+async function submitInvite() {
+  const me = window.Auth?.getCurrentUser();
+  if (!me || !_csInviteStudyId) return;
+  const username = document.getElementById("csInviteUsername").value.trim();
+  const errEl = document.getElementById("csInviteError");
+  const btn = document.getElementById("csInviteSubmitBtn");
+  errEl.textContent = "";
+  if (!username) { errEl.textContent = "Enter a username."; return; }
+  const friend = friendsList.find(f => (f.displayName || "").toLowerCase() === username.toLowerCase());
+  if (!friend) { errEl.textContent = "User not found in your friends list."; return; }
+  btn.disabled = true; btn.textContent = "Inviting…";
+  const ok = await window.Community?.inviteUser(_csInviteStudyId, friend.uid);
+  btn.disabled = false; btn.textContent = "Send Invite";
+  if (ok) { closeInviteSheet(); }
+  else errEl.textContent = "Something went wrong.";
 }
 
 async function csApprove(studyId, uid) {
