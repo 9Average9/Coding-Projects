@@ -16,7 +16,8 @@ import {
   serverTimestamp,
   updateDoc,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
   getAuth,
@@ -305,8 +306,7 @@ async function getUserRanks() {
   const uid = getUserId();
   const boards = [
     { key: "xp_board", field: "xp" },
-    { key: "scholar_board", field: "bestScore" },
-    { key: "consistency_board", field: "streak" }
+    { key: "scholar_board", field: "bestScore" }
   ];
   const ranks = {};
   for (const { key, field } of boards) {
@@ -521,6 +521,126 @@ window.LB = {
   isXpJoined: () => localStorage.getItem("lbXpJoined") === "true",
   isScholarJoined: () => localStorage.getItem("lbScholarJoined") === "true",
   isConsJoined: () => localStorage.getItem("lbConsJoined") === "true"
+};
+
+// ── Community Study Board ─────────────────────────────────────────────────────
+
+async function csCreateStudy(uid, { type, title, description, greekWord, creatorName, creatorAvatar }) {
+  try {
+    const ref = await addDoc(collection(db, "community_studies"), {
+      creatorUid: uid,
+      creatorName: creatorName || "User",
+      creatorAvatar: creatorAvatar || "person",
+      type,           // "topical" | "word" | "passage"
+      title,
+      description: description || "",
+      greekWord: greekWord || null,
+      createdAt: serverTimestamp(),
+      memberUids: [uid],
+      pendingUids: [],
+      contributionCounts: {},
+      isActive: true
+    });
+    return ref.id;
+  } catch (e) { console.warn("csCreateStudy:", e); return null; }
+}
+
+function csListenStudies(callback, limitN = 40) {
+  const q = query(
+    collection(db, "community_studies"),
+    where("isActive", "==", true),
+    orderBy("createdAt", "desc"),
+    limit(limitN)
+  );
+  return onSnapshot(q, snap => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+}
+
+async function csGetStudy(studyId) {
+  try {
+    const snap = await getDoc(doc(db, "community_studies", studyId));
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  } catch { return null; }
+}
+
+async function csRequestJoin(studyId, uid, displayName, creatorUid) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), { pendingUids: arrayUnion(uid) });
+    fcmSendPushNotification(creatorUid, "studyJoinRequest", displayName, uid);
+    return true;
+  } catch (e) { console.warn("csRequestJoin:", e); return false; }
+}
+
+async function csApproveJoin(studyId, uid, myDisplayName, creatorUid) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), {
+      pendingUids: arrayRemove(uid),
+      memberUids: arrayUnion(uid)
+    });
+    fcmSendPushNotification(uid, "studyJoinApproved", myDisplayName, creatorUid);
+    return true;
+  } catch (e) { console.warn("csApproveJoin:", e); return false; }
+}
+
+async function csDenyJoin(studyId, uid) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), { pendingUids: arrayRemove(uid) });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csLeaveStudy(studyId, uid) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), { memberUids: arrayRemove(uid) });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csDeleteStudy(studyId) {
+  try {
+    await updateDoc(doc(db, "community_studies", studyId), { isActive: false });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function csAddContribution(studyId, uid, displayName, avatar, type, text) {
+  try {
+    await addDoc(collection(db, "community_studies", studyId, "contributions"), {
+      uid, displayName, avatar: avatar || "person", type, text,
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db, "community_studies", studyId), {
+      [`contributionCounts.${uid}.total`]: increment(1),
+      [`contributionCounts.${uid}.${type}s`]: increment(1)
+    });
+    return true;
+  } catch (e) { console.warn("csAddContribution:", e); return false; }
+}
+
+async function csGetContributions(studyId, limitN = 60) {
+  try {
+    const q = query(
+      collection(db, "community_studies", studyId, "contributions"),
+      orderBy("createdAt", "desc"),
+      limit(limitN)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch { return []; }
+}
+
+window.Community = {
+  createStudy: csCreateStudy,
+  listenStudies: csListenStudies,
+  getStudy: csGetStudy,
+  requestJoin: csRequestJoin,
+  approveJoin: csApproveJoin,
+  denyJoin: csDenyJoin,
+  leaveStudy: csLeaveStudy,
+  deleteStudy: csDeleteStudy,
+  addContribution: csAddContribution,
+  getContributions: csGetContributions
 };
 
 window.Auth = {

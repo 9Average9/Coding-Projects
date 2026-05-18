@@ -13188,17 +13188,17 @@ const APP_VERSION = "1.0.1";
 Update notes:
 
 const UPDATE_NOTES = [
-  "Auto-generate UPDATE_NOTES from branch commit messages"
+  "Add Community Board with Study Board, podium layout, remove Streak tab"
 ];
 In service-worker.js
 const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.6";
+const APP_VERSION = "2.3.7";
 
 const UPDATE_NOTES = [
-  "Auto-generate UPDATE_NOTES from branch commit messages"
+  "Add Community Board with Study Board, podium layout, remove Streak tab"
 ];
 
 let deferredInstallPrompt = null;
@@ -14028,12 +14028,13 @@ let _lbActiveTab = "xp";
 
 function showLbModal() {
   document.getElementById("lbModal").classList.add("open");
-  showLbTab("xp");
+  showLbTab("study");
 }
 
 function closeLbModal() {
   document.getElementById("lbModal").classList.remove("open");
   if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
+  if (_csUnsub) { _csUnsub(); _csUnsub = null; }
 }
 
 function lbOverlayClick(e) {
@@ -14045,9 +14046,9 @@ function showLbTab(tab) {
   document.querySelectorAll(".lb-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   document.querySelectorAll(".lb-tab-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
   if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
-  if (tab === "xp") _renderXPBoard();
+  if (tab === "study")   _renderStudyBoard();
+  else if (tab === "xp")      _renderXPBoard();
   else if (tab === "scholar") _renderScholarBoard();
-  else if (tab === "cons") _renderConsBoard();
 }
 
 function _lbEscape(str) {
@@ -14092,71 +14093,402 @@ function _renderLbEntries(listEl, entries, field, myUid) {
 }
 
 function _renderXPBoard() {
-  const listEl = document.getElementById("lbListXP");
-  const joinEl = document.getElementById("lbJoinXP");
+  const podiumEl = document.getElementById("lbPodiumXP");
+  const listEl   = document.getElementById("lbListXP");
+  const joinEl   = document.getElementById("lbJoinXP");
   const uid = window.LB?.getUserId();
-  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+  podiumEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+  listEl.innerHTML = "";
 
-  if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
+  if (!window.LB) { podiumEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
 
   _lbUnsub = window.LB.listenBoard("xp_board", "xp", entries => {
-    _renderLbEntries(listEl, entries, "xp", uid);
+    _renderPodiumBoard(podiumEl, listEl, entries, "xp", uid);
     updateProfileBadges();
   });
 
   if (window.LB.isXpJoined()) {
-    joinEl.innerHTML = `<p class="lb-joined-note">✓ You're on the board — your XP syncs automatically.</p>`;
+    joinEl.innerHTML = `<p class="lb-joined-note"><span class="material-symbols-outlined">star</span> You're on the board — your XP syncs automatically.</p>`;
   } else {
     joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinXP()">Join XP Board</button>`;
   }
 }
 
 function _renderScholarBoard() {
-  const listEl = document.getElementById("lbListScholar");
-  const joinEl = document.getElementById("lbJoinScholar");
+  const podiumEl = document.getElementById("lbPodiumScholar");
+  const listEl   = document.getElementById("lbListScholar");
+  const joinEl   = document.getElementById("lbJoinScholar");
   const uid = window.LB?.getUserId();
-  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+  podiumEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+  listEl.innerHTML = "";
 
-  if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
+  if (!window.LB) { podiumEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
 
   window.LB.getBoard("scholar_board", "bestScore").then(entries => {
-    _renderLbEntries(listEl, entries, "bestScore", uid);
+    _renderPodiumBoard(podiumEl, listEl, entries, "bestScore", uid);
     updateProfileBadges();
   });
 
   if (window.LB.isScholarJoined()) {
     const best = localStorage.getItem("lbScholarBest") || "0";
-    joinEl.innerHTML = `
-      <p class="lb-joined-note">✓ Your best: <strong>${best} correct</strong></p>
+    joinEl.innerHTML = `<p class="lb-joined-note"><span class="material-symbols-outlined">star</span> Your best: <strong>${best} correct</strong></p>
       <button class="lb-join-btn lb-retake-btn" onclick="startScholarTest()">📖 Retake Scholar Test</button>`;
   } else {
     joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinScholar()">Join Scholar Board</button>`;
   }
 }
 
-function _renderConsBoard() {
-  const listEl = document.getElementById("lbListCons");
-  const joinEl = document.getElementById("lbJoinCons");
-  const uid = window.LB?.getUserId();
-  listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
-
-  if (!window.LB) { listEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
-
-  window.LB.getBoard("consistency_board", "streak").then(entries => {
-    // Tiebreaker: same streak → rank by total study time
-    entries.sort((a, b) => {
-      if (b.streak !== a.streak) return b.streak - a.streak;
-      return (b.studySeconds || 0) - (a.studySeconds || 0);
-    });
-    _renderLbEntries(listEl, entries, "streak", uid);
-    updateProfileBadges();
-  });
-
-  if (window.LB.isConsJoined()) {
-    joinEl.innerHTML = `<p class="lb-joined-note">✓ Your streak syncs automatically. Keep it up! 🔥</p>`;
-  } else {
-    joinEl.innerHTML = `<button class="lb-join-btn" onclick="promptJoinCons()">Join Consistency Board</button>`;
+function _renderPodiumBoard(podiumEl, listEl, entries, field, myUid) {
+  if (!entries.length) {
+    podiumEl.innerHTML = '<p class="lb-empty">No entries yet — be the first!</p>';
+    listEl.innerHTML = "";
+    return;
   }
+  entries.forEach(e => { _lbEntryCache[e.id] = e; });
+
+  const valStr = e => field === "xp"
+    ? `${(e.xp || 0).toLocaleString()} XP`
+    : `${e.bestScore || 0} correct`;
+
+  // Podium order: 2nd left, 1st center, 3rd right
+  const top = entries.slice(0, 3);
+  const order = [top[1], top[0], top[2]].filter(Boolean);
+  const ranks = top[1] ? [2, 1, 3] : top[0] ? [1, 3] : [1];
+
+  podiumEl.innerHTML = `<div class="lb-podium">${order.map((e, i) => {
+    const rank = ranks[i];
+    const isMe = e.id === myUid;
+    const icon = (e.avatar && /^[a-z_]+$/.test(e.avatar)) ? e.avatar : "person";
+    return `<div class="lb-pod-card lb-pod-${rank === 1 ? "first" : rank === 2 ? "second" : "third"}${isMe ? " lb-pod-me" : ""}" onclick="showLbUserInfo('${_lbEscape(e.id)}')">
+      ${rank === 1 ? `<span class="lb-pod-crown material-symbols-outlined">emoji_events</span>` : ""}
+      <div class="lb-pod-rank">${rank}</div>
+      <div class="lb-pod-avatar"><span class="material-symbols-outlined">${icon}</span></div>
+      <div class="lb-pod-name">${_lbEscape(e.name || "User")}</div>
+      <div class="lb-pod-score">${valStr(e)}</div>
+    </div>`;
+  }).join("")}</div>`;
+
+  const rest = entries.slice(3);
+  listEl.innerHTML = rest.map((e, i) => {
+    const isMe = e.id === myUid;
+    const icon = (e.avatar && /^[a-z_]+$/.test(e.avatar)) ? e.avatar : "person";
+    return `<div class="lb-row${isMe ? " lb-row-me" : ""}" onclick="showLbUserInfo('${_lbEscape(e.id)}')">
+      <span class="lb-row-rank">#${i + 4}</span>
+      <span class="lb-row-avatar"><span class="material-symbols-outlined">${icon}</span></span>
+      <span class="lb-row-name">${_lbEscape(e.name || "User")}</span>
+      <span class="lb-row-score">${valStr(e)}</span>
+    </div>`;
+  }).join("");
+}
+
+// ── Community Study Board ─────────────────────────────────────────────────────
+
+let _csUnsub = null;
+let _csStudies = [];
+let _csStudyType = "topical";
+let _csSelectedWord = null;
+let _csContribType = "thought";
+let _csActiveStudyId = null;
+
+function _renderStudyBoard() {
+  const el = document.getElementById("csStudyList");
+  if (!el) return;
+  el.innerHTML = '<p class="lb-loading">Loading…</p>';
+  if (_csUnsub) { _csUnsub(); _csUnsub = null; }
+  if (!window.Community) { el.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
+  _csUnsub = window.Community.listenStudies(studies => {
+    _csStudies = studies;
+    _renderStudyList(el, studies);
+  });
+}
+
+function _csStudyTypeIcon(type) {
+  return type === "word" ? "translate" : type === "passage" ? "menu_book" : "topic";
+}
+function _csStudyTypeName(type) {
+  return type === "word" ? "Word Study" : type === "passage" ? "Passage" : "Topical";
+}
+
+function _renderStudyList(el, studies) {
+  const me = window.Auth?.getCurrentUser();
+  if (!studies.length) {
+    el.innerHTML = `<div class="cs-empty"><span class="material-symbols-outlined">groups</span><p>No studies yet</p><p class="cs-empty-sub">Be the first to post what you're studying!</p></div>`;
+    return;
+  }
+  el.innerHTML = studies.map(s => {
+    const memberCount = (s.memberUids || []).length;
+    const totalContribs = Object.values(s.contributionCounts || {}).reduce((sum, c) => sum + (c.total || 0), 0);
+    const isMember  = me && (s.memberUids || []).includes(me.uid);
+    const isPending = me && (s.pendingUids || []).includes(me.uid);
+    const isOwner   = me && s.creatorUid === me.uid;
+    const pending   = isOwner ? (s.pendingUids || []).length : 0;
+    return `<div class="cs-study-card" onclick="openStudyDetail('${s.id}')">
+      <div class="cs-card-type-icon"><span class="material-symbols-outlined">${_csStudyTypeIcon(s.type)}</span></div>
+      <div class="cs-card-body">
+        <div class="cs-card-type-label">${_csStudyTypeName(s.type)}</div>
+        <div class="cs-card-title">${_lbEscape(s.title)}</div>
+        <div class="cs-card-creator">by ${_lbEscape(s.creatorName)}</div>
+        <div class="cs-card-meta">
+          <span><span class="material-symbols-outlined">group</span>${memberCount}</span>
+          <span><span class="material-symbols-outlined">lightbulb</span>${totalContribs}</span>
+          ${isMember  ? `<span class="cs-card-badge cs-badge-member">Member</span>` : ""}
+          ${isPending ? `<span class="cs-card-badge cs-badge-pending">Pending</span>` : ""}
+          ${pending   ? `<span class="cs-card-badge cs-badge-requests">${pending} request${pending > 1 ? "s" : ""}</span>` : ""}
+        </div>
+      </div>
+      <span class="material-symbols-outlined cs-card-arrow">chevron_right</span>
+    </div>`;
+  }).join("");
+}
+
+function openCreateStudy() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) { showAuthModal(); return; }
+  _csStudyType = "topical";
+  _csSelectedWord = null;
+  document.getElementById("csTopicInput").value = "";
+  document.getElementById("csWordSearch").value = "";
+  document.getElementById("csWordResults").innerHTML = "";
+  document.getElementById("csWordSelected").style.display = "none";
+  document.getElementById("csPassageInput").value = "";
+  document.getElementById("csDescInput").value = "";
+  document.getElementById("csCreateError").textContent = "";
+  document.querySelectorAll(".cs-type-btn[data-type]").forEach(b => b.classList.toggle("active", b.dataset.type === "topical"));
+  document.getElementById("csTopicalFields").style.display = "";
+  document.getElementById("csWordFields").style.display = "none";
+  document.getElementById("csPassageFields").style.display = "none";
+  document.getElementById("csCreateSheet").classList.add("open");
+}
+
+function closeCreateStudy() {
+  document.getElementById("csCreateSheet").classList.remove("open");
+}
+
+function selectStudyType(type) {
+  _csStudyType = type;
+  _csSelectedWord = null;
+  document.querySelectorAll(".cs-type-btn[data-type]").forEach(b => b.classList.toggle("active", b.dataset.type === type));
+  document.getElementById("csTopicalFields").style.display  = type === "topical" ? "" : "none";
+  document.getElementById("csWordFields").style.display     = type === "word"    ? "" : "none";
+  document.getElementById("csPassageFields").style.display  = type === "passage" ? "" : "none";
+  document.getElementById("csCreateError").textContent = "";
+}
+
+function csSearchWord(q) {
+  const resultsEl  = document.getElementById("csWordResults");
+  const selectedEl = document.getElementById("csWordSelected");
+  _csSelectedWord  = null;
+  selectedEl.style.display = "none";
+  if (!q.trim()) { resultsEl.innerHTML = ""; return; }
+  const lower = q.toLowerCase();
+  const matches = (typeof VOCAB !== "undefined" ? VOCAB : [])
+    .filter(w => w.greek.toLowerCase().includes(lower) || w.meaning.toLowerCase().includes(lower))
+    .slice(0, 10);
+  if (!matches.length) { resultsEl.innerHTML = `<div class="cs-word-none">No matches found</div>`; return; }
+  resultsEl.innerHTML = matches.map(w =>
+    `<div class="cs-word-result-item" onclick='csSelectWord(${JSON.stringify(w).replace(/'/g, "&#39;")})'>
+      <span class="cs-word-greek">${w.greek}</span>
+      <span class="cs-word-meaning">${w.meaning.split(",")[0].trim()}</span>
+    </div>`
+  ).join("");
+}
+
+function csSelectWord(w) {
+  _csSelectedWord = w;
+  document.getElementById("csWordSearch").value = `${w.greek} — ${w.meaning.split(",")[0].trim()}`;
+  document.getElementById("csWordResults").innerHTML = "";
+  const sel = document.getElementById("csWordSelected");
+  sel.innerHTML = `<div class="cs-word-chip"><span class="cs-word-chip-greek">${w.greek}</span><span class="cs-word-chip-meaning">${w.meaning.split(",")[0].trim()}</span></div>`;
+  sel.style.display = "";
+}
+
+async function submitCreateStudy() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) return;
+  const btn   = document.getElementById("csSubmitBtn");
+  const errEl = document.getElementById("csCreateError");
+  errEl.textContent = "";
+  let title = "";
+  if (_csStudyType === "topical") {
+    title = document.getElementById("csTopicInput").value.trim();
+    if (!title) { errEl.textContent = "Please enter a topic."; return; }
+  } else if (_csStudyType === "word") {
+    if (!_csSelectedWord) { errEl.textContent = "Please search and select a Greek word."; return; }
+    title = `${_csSelectedWord.greek} (${_csSelectedWord.meaning.split(",")[0].trim()})`;
+  } else {
+    title = document.getElementById("csPassageInput").value.trim();
+    if (!title) { errEl.textContent = "Please enter a passage reference."; return; }
+  }
+  const description = document.getElementById("csDescInput").value.trim();
+  btn.disabled = true; btn.textContent = "Posting…";
+  const id = await window.Community?.createStudy(user.uid, {
+    type: _csStudyType, title, description,
+    greekWord: _csSelectedWord || null,
+    creatorName: localStorage.getItem("authDisplayName") || "User",
+    creatorAvatar: localStorage.getItem("profilePicType") === "icon" ? (localStorage.getItem("profilePicValue") || "person") : "person"
+  });
+  btn.disabled = false; btn.textContent = "Post to Board";
+  if (id) { closeCreateStudy(); }
+  else { errEl.textContent = "Something went wrong. Please try again."; }
+}
+
+async function openStudyDetail(studyId) {
+  _csActiveStudyId = studyId;
+  const el = document.getElementById("csDetailContent");
+  el.innerHTML = '<p class="lb-loading">Loading…</p>';
+  document.getElementById("csDetailSheet").classList.add("open");
+  const study   = await window.Community?.getStudy(studyId);
+  if (_csActiveStudyId !== studyId) return;
+  if (!study) { el.innerHTML = '<p class="lb-empty">Study not found.</p>'; return; }
+  const contribs = await window.Community?.getContributions(studyId) || [];
+  if (_csActiveStudyId !== studyId) return;
+  _renderStudyDetail(el, study, contribs);
+}
+
+function _renderStudyDetail(el, study, contribs) {
+  const me      = window.Auth?.getCurrentUser();
+  const myUid   = me?.uid;
+  const isMember  = myUid && (study.memberUids || []).includes(myUid);
+  const isPending = myUid && (study.pendingUids || []).includes(myUid);
+  const isOwner   = myUid && study.creatorUid === myUid;
+  const counts    = study.contributionCounts || {};
+
+  const memberRows = (study.memberUids || []).map(uid => {
+    const c = counts[uid] || {};
+    const parts = [];
+    if (c.thoughts) parts.push(`${c.thoughts} thought${c.thoughts !== 1 ? "s" : ""}`);
+    if (c.finds)    parts.push(`${c.finds} find${c.finds !== 1 ? "s" : ""}`);
+    if (c.points)   parts.push(`${c.points} key point${c.points !== 1 ? "s" : ""}`);
+    return `<div class="cs-member-row">
+      <span class="material-symbols-outlined cs-member-icon">person</span>
+      <div class="cs-member-info">
+        <span class="cs-member-name">${uid === study.creatorUid ? `${_lbEscape(study.creatorName)} <span class="cs-creator-tag">host</span>` : uid === myUid ? "You" : "Member"}</span>
+        ${parts.length ? `<span class="cs-member-contribs">${parts.join(" · ")}</span>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+
+  const pendingSection = isOwner && (study.pendingUids || []).length ? `
+    <div class="cs-section-title">Join Requests <span class="cs-req-count">${study.pendingUids.length}</span></div>
+    <div class="cs-pending-list">${study.pendingUids.map(uid => `
+      <div class="cs-pending-row">
+        <span class="material-symbols-outlined">person</span>
+        <span class="cs-pending-name">User (${uid.slice(0,6)}…)</span>
+        <button class="cs-approve-btn" onclick="csApprove('${study.id}','${uid}')">Accept</button>
+        <button class="cs-deny-btn"    onclick="csDeny('${study.id}','${uid}')">Decline</button>
+      </div>`).join("")}
+    </div>` : "";
+
+  let actionBtn = "";
+  if (!myUid) {
+    actionBtn = `<button class="cs-action-btn cs-join-btn" onclick="showAuthModal()">Sign in to Join</button>`;
+  } else if (isOwner) {
+    actionBtn = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Contribution</button>
+                 <button class="cs-action-btn cs-delete-btn" onclick="csDeleteMyStudy('${study.id}')">Delete Study</button>`;
+  } else if (isMember) {
+    actionBtn = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Contribution</button>
+                 <button class="cs-action-btn cs-leave-btn"  onclick="csLeave('${study.id}')">Leave Study</button>`;
+  } else if (isPending) {
+    actionBtn = `<button class="cs-action-btn cs-pending-btn" disabled>Request Sent</button>`;
+  } else {
+    actionBtn = `<button class="cs-action-btn cs-join-btn" onclick="csJoin('${study.id}','${study.creatorUid}')"><span class="material-symbols-outlined">group_add</span> Request to Join</button>`;
+  }
+
+  const contribTypeIcon = t => t === "find" ? "search" : t === "point" ? "flag" : "psychology";
+  const contribSection = contribs.length ? `
+    <div class="cs-section-title">Contributions <span class="cs-req-count">${contribs.length}</span></div>
+    <div class="cs-contrib-list">${contribs.map(c => `
+      <div class="cs-contrib-item">
+        <div class="cs-contrib-header">
+          <span class="cs-contrib-type-icon material-symbols-outlined">${contribTypeIcon(c.type)}</span>
+          <span class="cs-contrib-type-label">${c.type}</span>
+          <span class="cs-contrib-author">${_lbEscape(c.displayName || "Member")}</span>
+        </div>
+        <p class="cs-contrib-text">${_lbEscape(c.text)}</p>
+      </div>`).join("")}
+    </div>` : "";
+
+  el.innerHTML = `
+    <div class="cs-detail-type"><span class="material-symbols-outlined">${_csStudyTypeIcon(study.type)}</span>${_csStudyTypeName(study.type)}</div>
+    <h2 class="cs-detail-title">${_lbEscape(study.title)}</h2>
+    ${study.description ? `<p class="cs-detail-desc">${_lbEscape(study.description)}</p>` : ""}
+    ${pendingSection}
+    <div class="cs-section-title">Members <span class="cs-req-count">${(study.memberUids || []).length}</span></div>
+    <div class="cs-members-list">${memberRows || '<p class="cs-empty-sm">No members yet</p>'}</div>
+    ${contribSection}
+    <div class="cs-detail-actions">${actionBtn}</div>`;
+}
+
+function closeStudyDetail() {
+  document.getElementById("csDetailSheet").classList.remove("open");
+  _csActiveStudyId = null;
+}
+
+async function csJoin(studyId, creatorUid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  const ok = await window.Community?.requestJoin(studyId, me.uid, localStorage.getItem("authDisplayName") || "Someone", creatorUid);
+  if (ok) openStudyDetail(studyId);
+}
+
+async function csApprove(studyId, uid) {
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  await window.Community?.approveJoin(studyId, uid, localStorage.getItem("authDisplayName") || "The host", me.uid);
+  openStudyDetail(studyId);
+}
+
+async function csDeny(studyId, uid) {
+  await window.Community?.denyJoin(studyId, uid);
+  openStudyDetail(studyId);
+}
+
+async function csLeave(studyId) {
+  if (!confirm("Leave this study group?")) return;
+  const me = window.Auth?.getCurrentUser();
+  if (!me) return;
+  await window.Community?.leaveStudy(studyId, me.uid);
+  closeStudyDetail();
+}
+
+async function csDeleteMyStudy(studyId) {
+  if (!confirm("Delete this study? This can't be undone.")) return;
+  await window.Community?.deleteStudy(studyId);
+  closeStudyDetail();
+}
+
+function openContribSheet(studyId) {
+  _csActiveStudyId = studyId;
+  _csContribType = "thought";
+  document.querySelectorAll(".cs-type-btn[data-ctype]").forEach(b => b.classList.toggle("active", b.dataset.ctype === "thought"));
+  document.getElementById("csContribText").value = "";
+  document.getElementById("csContribError").textContent = "";
+  document.getElementById("csContribSheet").classList.add("open");
+}
+
+function closeContribSheet() {
+  document.getElementById("csContribSheet").classList.remove("open");
+}
+
+function selectContribType(type) {
+  _csContribType = type;
+  document.querySelectorAll(".cs-type-btn[data-ctype]").forEach(b => b.classList.toggle("active", b.dataset.ctype === type));
+}
+
+async function submitContribution() {
+  const me = window.Auth?.getCurrentUser();
+  if (!me || !_csActiveStudyId) return;
+  const text  = document.getElementById("csContribText").value.trim();
+  const errEl = document.getElementById("csContribError");
+  const btn   = document.getElementById("csContribSubmitBtn");
+  errEl.textContent = "";
+  if (!text) { errEl.textContent = "Please write something first."; return; }
+  btn.disabled = true; btn.textContent = "Posting…";
+  const avatar = localStorage.getItem("profilePicType") === "icon" ? (localStorage.getItem("profilePicValue") || "person") : "person";
+  const ok = await window.Community?.addContribution(_csActiveStudyId, me.uid, localStorage.getItem("authDisplayName") || "User", avatar, _csContribType, text);
+  btn.disabled = false; btn.textContent = "Post";
+  if (ok) { closeContribSheet(); openStudyDetail(_csActiveStudyId); }
+  else { errEl.textContent = "Something went wrong. Try again."; }
 }
 
 // ── Opt-in flows ──────────────────────────────────────────────────────────────
@@ -14165,7 +14497,6 @@ let _lbNameTarget = null;
 
 function promptJoinXP() { _lbNameTarget = "xp"; _showLbConfirmModal("Join the Global XP Board"); }
 function promptJoinScholar() { _lbNameTarget = "scholar"; _showLbConfirmModal("Join the Scholar Board"); }
-function promptJoinCons() { _lbNameTarget = "cons"; _showLbConfirmModal("Join the Consistency Board"); }
 
 function _showLbConfirmModal(title) {
   const displayName = localStorage.getItem("authDisplayName") || "You";
@@ -14193,10 +14524,6 @@ async function confirmLbJoin() {
       syncUserData();
       startScholarTest();
       return;
-    } else if (_lbNameTarget === "cons") {
-      await window.LB.joinConsistencyBoard(getStreakDays());
-      syncUserData();
-      _renderConsBoard();
     }
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Join →"; }
@@ -14329,9 +14656,8 @@ async function _endScholarTest() {
 
 // Board badge definitions — each board has its own icon and color class
 const LB_BADGE_DEFS = [
-  { key: "xp_board",           label: "Global XP Board",     icon: "bolt",                 cls: "lb-badge-xp" },
-  { key: "scholar_board",      label: "Scholar Board",        icon: "menu_book",            cls: "lb-badge-scholar" },
-  { key: "consistency_board",  label: "Consistency Board",    icon: "local_fire_department", cls: "lb-badge-cons" }
+  { key: "xp_board",      label: "Global XP Board", icon: "bolt",      cls: "lb-badge-xp" },
+  { key: "scholar_board", label: "Scholar Board",    icon: "menu_book", cls: "lb-badge-scholar" }
 ];
 const LB_RANK_LABELS = ["1st Place", "2nd Place", "3rd Place"];
 

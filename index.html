@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.6" />
+  <link rel="stylesheet" href="style.css?v=2.3.7" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -331,7 +331,7 @@ glacier: {
 
       <div class="home-nav">
         <button class="icon-btn home-nav-btn" onclick="openLeaderboard()">
-          <span class="material-symbols-outlined">emoji_events</span>
+          <span class="material-symbols-outlined">groups</span>
         </button>
         <button id="profileButton" class="icon-btn home-nav-btn" onclick="showProfileMenu()">
           <span class="material-symbols-outlined">account_circle</span>
@@ -10765,9 +10765,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.6"></script>
-  <script src="app.js?v=2.3.6"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.6"></script>
+  <script src="vocab.js?v=2.3.7"></script>
+  <script src="app.js?v=2.3.7"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.7"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -10801,40 +10801,118 @@ glacier: {
   <div class="lb-modal">
     <div class="lb-modal-header">
       <div class="lb-modal-title-wrap">
-        <span class="material-symbols-outlined lb-header-icon">emoji_events</span>
-        <span class="lb-modal-title">Leaderboard</span>
+        <span class="material-symbols-outlined lb-header-icon">groups</span>
+        <span class="lb-modal-title">Community</span>
       </div>
       <button class="modal-close" onclick="closeLbModal()">×</button>
     </div>
     <div class="lb-tabs">
-      <button class="lb-tab-btn active" data-tab="xp" onclick="showLbTab('xp')">
+      <button class="lb-tab-btn active" data-tab="study" onclick="showLbTab('study')">
+        <span class="material-symbols-outlined">local_library</span> Study
+      </button>
+      <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
         <span class="material-symbols-outlined">bolt</span> XP
       </button>
       <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
         <span class="material-symbols-outlined">menu_book</span> Scholar
       </button>
-      <button class="lb-tab-btn" data-tab="cons" onclick="showLbTab('cons')">
-        <span class="material-symbols-outlined">local_fire_department</span> Streak
-      </button>
     </div>
 
-    <div id="lbPaneXP" class="lb-tab-pane active" data-tab="xp">
+    <div id="lbPaneStudy" class="lb-tab-pane active" data-tab="study">
+      <div class="cs-board-header">
+        <p class="cs-board-desc">See what fellow believers are studying — join a group to share thoughts and discoveries together.</p>
+        <button class="cs-add-study-btn" onclick="openCreateStudy()">
+          <span class="material-symbols-outlined">add</span> Add a Study
+        </button>
+      </div>
+      <div id="csStudyList" class="cs-study-list">
+        <p class="lb-loading">Loading…</p>
+      </div>
+    </div>
+
+    <div id="lbPaneXP" class="lb-tab-pane" data-tab="xp">
       <p class="lb-board-desc">Ranked by total XP earned. Your XP syncs live if you opt in.</p>
-      <div class="lb-list" id="lbListXP"></div>
+      <div class="lb-podium-wrap" id="lbPodiumXP"></div>
+      <div class="lb-list-below" id="lbListXP"></div>
       <div class="lb-join-area" id="lbJoinXP"></div>
     </div>
 
     <div id="lbPaneScholar" class="lb-tab-pane" data-tab="scholar">
       <p class="lb-board-desc">Most vocab words correctly identified in 3 minutes wins.</p>
-      <div class="lb-list" id="lbListScholar"></div>
+      <div class="lb-podium-wrap" id="lbPodiumScholar"></div>
+      <div class="lb-list-below" id="lbListScholar"></div>
       <div class="lb-join-area" id="lbJoinScholar"></div>
     </div>
+  </div>
+</div>
 
-    <div id="lbPaneCons" class="lb-tab-pane" data-tab="cons">
-      <p class="lb-board-desc">Ranked by longest consecutive daily study streak.</p>
-      <div class="lb-list" id="lbListCons"></div>
-      <div class="lb-join-area" id="lbJoinCons"></div>
+<!-- Create Study Sheet -->
+<div id="csCreateSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeCreateStudy()">
+  <div class="cs-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closeCreateStudy()">×</button>
+    <h3 class="cs-sheet-title">Add a Study</h3>
+    <p class="cs-sheet-sub">Share what you're exploring with the community</p>
+    <div class="cs-type-row">
+      <button class="cs-type-btn active" data-type="topical" onclick="selectStudyType('topical')">
+        <span class="material-symbols-outlined">topic</span><span>Topical</span>
+      </button>
+      <button class="cs-type-btn" data-type="word" onclick="selectStudyType('word')">
+        <span class="material-symbols-outlined">translate</span><span>Word Study</span>
+      </button>
+      <button class="cs-type-btn" data-type="passage" onclick="selectStudyType('passage')">
+        <span class="material-symbols-outlined">menu_book</span><span>Passage</span>
+      </button>
     </div>
+    <div id="csTopicalFields" class="cs-fields">
+      <label class="cs-label">Topic</label>
+      <input id="csTopicInput" class="cs-input" type="text" placeholder="e.g. Grace, The Trinity, Forgiveness…" maxlength="60">
+    </div>
+    <div id="csWordFields" class="cs-fields" style="display:none">
+      <label class="cs-label">Greek Word</label>
+      <input id="csWordSearch" class="cs-input" type="text" placeholder="Search by English meaning or spelling…" oninput="csSearchWord(this.value)" autocomplete="off">
+      <div id="csWordResults" class="cs-word-results"></div>
+      <div id="csWordSelected" class="cs-word-selected" style="display:none"></div>
+    </div>
+    <div id="csPassageFields" class="cs-fields" style="display:none">
+      <label class="cs-label">Passage</label>
+      <input id="csPassageInput" class="cs-input" type="text" placeholder="e.g. John 3:16, Romans 8, Philippians 4:4–7…" maxlength="60">
+    </div>
+    <label class="cs-label">Description <span class="cs-optional">optional</span></label>
+    <textarea id="csDescInput" class="cs-textarea" placeholder="What are you focusing on or hoping to discover?" maxlength="200" rows="3"></textarea>
+    <div id="csCreateError" class="cs-error"></div>
+    <button class="cs-submit-btn" id="csSubmitBtn" onclick="submitCreateStudy()">Post to Board</button>
+  </div>
+</div>
+
+<!-- Study Detail Sheet -->
+<div id="csDetailSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeStudyDetail()">
+  <div class="cs-sheet cs-detail-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closeStudyDetail()">×</button>
+    <div id="csDetailContent"><p class="lb-loading">Loading…</p></div>
+  </div>
+</div>
+
+<!-- Add Contribution Sheet -->
+<div id="csContribSheet" class="modal-overlay cs-sheet-overlay" onclick="if(event.target===this)closeContribSheet()">
+  <div class="cs-sheet" onclick="event.stopPropagation()">
+    <button class="cs-sheet-close" onclick="closeContribSheet()">×</button>
+    <h3 class="cs-sheet-title">Add a Contribution</h3>
+    <p class="cs-sheet-sub">What have you found, thought about, or want to highlight?</p>
+    <div class="cs-type-row cs-contrib-type-row">
+      <button class="cs-type-btn active" data-ctype="thought" onclick="selectContribType('thought')">
+        <span class="material-symbols-outlined">psychology</span><span>Thought</span>
+      </button>
+      <button class="cs-type-btn" data-ctype="find" onclick="selectContribType('find')">
+        <span class="material-symbols-outlined">search</span><span>Find</span>
+      </button>
+      <button class="cs-type-btn" data-ctype="point" onclick="selectContribType('point')">
+        <span class="material-symbols-outlined">flag</span><span>Key Point</span>
+      </button>
+    </div>
+    <label class="cs-label">Your contribution</label>
+    <textarea id="csContribText" class="cs-textarea" placeholder="Share your thought, discovery, or key point…" maxlength="500" rows="5"></textarea>
+    <div id="csContribError" class="cs-error"></div>
+    <button class="cs-submit-btn" id="csContribSubmitBtn" onclick="submitContribution()">Post</button>
   </div>
 </div>
 
