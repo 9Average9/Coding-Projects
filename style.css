@@ -6035,6 +6035,11 @@ body.dark .update-notes-list {
   background: rgba(17, 24, 39, 0.55);
   border-color: #4b5563;
 }
+body.dark .update-modal-card { background: #1f2937; }
+body.dark .un-version-label { color: #60a5fa; }
+body.dark .un-section-title { color: #6b7280; }
+body.dark .un-list { color: #e5e7eb; }
+body.dark .un-list strong { color: #f3f4f6; }
 :root {
   --accent-color: #c8a24a;
   --card-color: rgba(255, 252, 242, 0.92);
@@ -10661,10 +10666,10 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 .cs-contrib-btn, .cs-join-btn { background: var(--secondary); color: white; }
 .cs-pending-btn { background: var(--primary); color: var(--muted-color); border: 1.5px solid var(--border-color); cursor: not-allowed; opacity: 0.7; }
 .cs-delete-btn, .cs-leave-btn { background: transparent; color: #dc2626; border: 1.5px solid #fca5a5; font-size: 0.85rem; }
-.cs-poll-btn  { background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; border: 1.5px solid #c4b5fd; }
-.cs-invite-btn { background: color-mix(in srgb, #0891b2 12%, transparent); color: #0891b2; border: 1.5px solid #a5f3fc; }
-.cs-plan-btn  { background: color-mix(in srgb, #15803d 12%, transparent); color: #15803d; border: 1.5px solid #86efac; }
-.cs-pray-btn  { background: color-mix(in srgb, #db2777 12%, transparent); color: #db2777; border: 1.5px solid #fbcfe8; }
+.cs-poll-btn  { background: color-mix(in srgb, #1d4ed8 10%, transparent); color: #1d4ed8; border: 1.5px solid #93c5fd; }
+.cs-invite-btn { background: color-mix(in srgb, #f59e0b 10%, transparent); color: #b45309; border: 1.5px solid #fcd34d; }
+.cs-plan-btn  { background: color-mix(in srgb, #15803d 10%, transparent); color: #15803d; border: 1.5px solid #6ee7b7; }
+.cs-pray-btn  { background: color-mix(in srgb, #db2777 10%, transparent); color: #db2777; border: 1.5px solid #fbcfe8; }
 
 /* ── Create Study wide sheet ─────────────────────────────────────────────── */
 .cs-create-sheet-wide { max-height: 94vh; }
@@ -10836,6 +10841,83 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 .cs-task-label { flex: 1; font-size: 0.86rem; color: var(--font-color); }
 .cs-task-row.done .cs-task-label { text-decoration: line-through; color: var(--muted-color); }
 .cs-task-done-count { font-size: 0.72rem; color: var(--muted-color); font-weight: 700; }
+
+/* ── Community dark mode ─────────────────────────────────────────────────── */
+body.dark .cs-sheet { background: #1f2937; }
+body.dark .cs-sheet-title, body.dark .cs-sheet h3 { color: #f3f4f6; }
+body.dark .cs-sheet-sub { color: #9ca3af; }
+body.dark .cs-label { color: #e5e7eb; }
+body.dark .cs-input { background: #111827; color: #f3f4f6; border-color: #374151; }
+body.dark .cs-input:focus { border-color: #3b82f6; }
+body.dark .cs-textarea { background: #111827; color: #f3f4f6; border-color: #374151; }
+body.dark .cs-textarea:focus { border-color: #3b82f6; }
+body.dark .cs-type-btn { border-color: #374151; color: #9ca3af; }
+body.dark .cs-vis-btn { border-color: #374151; color: #9ca3af; }
+body.dark .cs-icon-btn { border-color: #374151; color: #9ca3af; }
+body.dark .cs-tag-pill { border-color: #374151; color: #9ca3af; }
+body.dark .cs-fmt-btn, body.dark .cs-dur-btn { border-color: #374151; color: #9ca3af; }
+body.dark .cs-color-swatch.active { box-shadow: 0 0 0 2px #1f2937, 0 0 0 4px #f3f4f6; border-color: #f3f4f6; }
+body.dark .cs-word-result-item:hover { background: #111827; }
+body.dark .cs-word-chip { background: rgba(96,165,250,0.12); border-color: #3b82f6; }
+body.dark .cs-word-chip-greek { color: #60a5fa; }
+body.dark .cs-word-none, body.dark .cs-word-meaning { color: #6b7280; }
+body.dark .cs-error { color: #f87171; }
+body.dark .cs-detail-header { background: color-mix(in srgb, var(--study-accent, #3b82f6) 12%, #1e2535); }
+body.dark .cs-detail-title { color: #f3f4f6; }
+body.dark .cs-detail-desc { color: #9ca3af; }
+body.dark .cs-detail-tag { background: color-mix(in srgb, var(--study-accent, #3b82f6) 12%, transparent); }
+body.dark .cs-detail-focus, body.dark .cs-detail-fmt { color: #6b7280; }
+body.dark .cs-detail-tabs { background: #111827; }
+body.dark .cs-detail-tab { color: #9ca3af; }
+body.dark .cs-detail-tab.active { background: #1f2937; color: #60a5fa; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+body.dark .cs-section-title { color: #6b7280; }
+body.dark .cs-checkin-banner { background: rgba(21,128,61,0.15); border-color: #166534; }
+body.dark .cs-checkin-info { color: #4ade80; }
+body.dark .cs-checkin-btn { background: #166534; }
+body.dark .cs-checkin-btn.checked { background: transparent; color: #4ade80; border-color: #166534; }
+body.dark .cs-member-row, body.dark .cs-pending-row { background: #111827; }
+body.dark .cs-member-name { color: #f3f4f6; }
+body.dark .cs-pending-name { color: #e5e7eb; }
+body.dark .cs-contrib-item { background: #111827; }
+body.dark .cs-contrib-text { color: #e5e7eb; }
+body.dark .cs-contrib-author { color: #6b7280; }
+body.dark .cs-react-btn { border-color: #374151; color: #e5e7eb; background: transparent; }
+body.dark .cs-react-btn.active { border-color: #3b82f6; background: rgba(59,130,246,0.15); }
+body.dark .cs-join-announce { background: rgba(59,130,246,0.08); color: #9ca3af; }
+body.dark .cs-verse-ref, body.dark .cs-spotlight-word { color: #60a5fa; }
+body.dark .cs-poll-card { background: #111827; }
+body.dark .cs-poll-q { color: #f3f4f6; }
+body.dark .cs-poll-opt { border-color: #374151; color: #e5e7eb; }
+body.dark .cs-poll-opt.voted { border-color: #3b82f6; }
+body.dark .cs-poll-total { color: #6b7280; }
+body.dark .cs-prayer-card { background: #111827; }
+body.dark .cs-prayer-text { color: #e5e7eb; }
+body.dark .cs-prayer-author { color: #f3f4f6; }
+body.dark .cs-answered-badge { background: rgba(74,222,128,0.12); border-color: #166534; color: #4ade80; }
+body.dark .cs-answered-btn { color: #60a5fa; border-color: #3b82f6; }
+body.dark .cs-task-row { background: #111827; }
+body.dark .cs-task-label { color: #e5e7eb; }
+body.dark .cs-task-row.done .cs-task-label { color: #6b7280; }
+body.dark .cs-task-done-count { color: #6b7280; }
+body.dark .cs-task-check:not(:disabled) { color: #3b82f6; }
+body.dark .cs-task-check:disabled { color: #4b5563; }
+body.dark .cs-empty-sm { color: #6b7280; }
+body.dark .cs-cards-list { background: #1f2937; border-color: #374151; }
+body.dark .cs-study-card { border-bottom-color: #374151; }
+body.dark .cs-study-card:active { background: rgba(96,165,250,0.06); }
+body.dark .cs-card-title { color: #f3f4f6; }
+body.dark .cs-card-creator { color: #9ca3af; }
+body.dark .cs-badge-member { background: rgba(96,165,250,0.16); color: #60a5fa; }
+body.dark .cs-badge-pending { background: rgba(251,191,36,0.14); color: #fbbf24; }
+body.dark .cs-badge-requests { background: rgba(248,113,113,0.14); color: #f87171; }
+body.dark .cs-approve-btn { background: #1d4ed8; }
+body.dark .cs-deny-btn { border-color: #374151; color: #9ca3af; }
+body.dark .cs-poll-btn { background: rgba(96,165,250,0.12); color: #60a5fa; border-color: rgba(96,165,250,0.3); }
+body.dark .cs-invite-btn { background: rgba(251,191,36,0.12); color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+body.dark .cs-plan-btn { background: rgba(74,222,128,0.10); color: #4ade80; border-color: rgba(74,222,128,0.25); }
+body.dark .cs-pray-btn { background: rgba(244,114,182,0.10); color: #f472b6; border-color: rgba(244,114,182,0.25); }
+body.dark .cs-delete-btn, body.dark .cs-leave-btn { color: #f87171; border-color: rgba(248,113,113,0.35); }
+body.dark .cs-pending-btn { background: #111827; border-color: #374151; color: #6b7280; }
 
 /* ── Friends ─────────────────────────────────────────────────────────────── */
 
@@ -12327,6 +12409,7 @@ body .app:has(#communityPage.screen.active) #communityPage {
   background: var(--primary-color) !important;
   border-radius: 0 !important; box-shadow: none !important;
   border: none !important; padding: 0 !important;
+  position: relative;
 }
 
 /* ══ Settings screen redesign ════════════════════════════════════════════════ */
@@ -12761,7 +12844,12 @@ body .app:has(#settingsScreen.screen.active) {
   background: var(--primary-color); z-index: 10; flex-shrink: 0;
   padding-top: max(10px, env(safe-area-inset-top));
 }
-.profile-page-scroll { overflow-y: auto; flex: 1; padding: 0 16px 20px; -webkit-overflow-scrolling: touch; }
+.profile-page-scroll {
+  overflow-y: auto; overflow-x: hidden;
+  flex: 1 1 0; min-height: 0;
+  padding: 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
 .profile-page-scroll .profile-card { box-shadow: none; border-radius: 0; background: transparent; padding: 0; max-height: none; overflow: visible; }
 
 /* ── Community Page ──────────────────────────────────────────────────────── */
@@ -12887,9 +12975,9 @@ body .app:has(#settingsScreen.screen.active) {
   display: flex; align-items: center; justify-content: center;
   font-size: 1.1rem; font-weight: 700; color: #fff;
 }
-.cs-card-icon-sq.cs-icon-word    { background: #1a4d3a; }
-.cs-card-icon-sq.cs-icon-passage { background: #5b21b6; }
-.cs-card-icon-sq.cs-icon-topical { background: #92400e; }
+.cs-card-icon-sq.cs-icon-word    { background: #1d4ed8; }
+.cs-card-icon-sq.cs-icon-passage { background: #6d28d9; }
+.cs-card-icon-sq.cs-icon-topical { background: #b45309; }
 .cs-card-icon-sq .material-symbols-outlined { font-size: 1.5rem; color: #fff; }
 .cs-card-icon-sq .cs-greek-text { font-size: 1.1rem; font-weight: 700; color: #fff; font-style: italic; }
 .cs-card-main { flex: 1; min-width: 0; }
@@ -12897,9 +12985,9 @@ body .app:has(#settingsScreen.screen.active) {
   display: inline-block; font-size: 0.58rem; font-weight: 800;
   letter-spacing: 0.08em; margin-bottom: 3px;
 }
-.cs-type-badge.cs-badge-word    { color: #1a4d3a; }
-.cs-type-badge.cs-badge-passage { color: #5b21b6; }
-.cs-type-badge.cs-badge-topical { color: #92400e; }
+.cs-type-badge.cs-badge-word    { color: #1d4ed8; }
+.cs-type-badge.cs-badge-passage { color: #6d28d9; }
+.cs-type-badge.cs-badge-topical { color: #b45309; }
 .cs-card-title { font-size: 0.9rem; font-weight: 700; color: var(--font-color); line-height: 1.2; }
 .cs-card-creator { font-size: 0.72rem; color: var(--muted-color); margin: 1px 0 3px; }
 .cs-card-quote {
