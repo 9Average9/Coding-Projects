@@ -27,6 +27,10 @@ select,
   --font-color: #172033;
   --muted-color: #475569;
   --btn-text-color: #ffffff;
+  /* shorthand aliases used by new UI components */
+  --primary: var(--primary-color);
+  --secondary: var(--secondary-color);
+  --accent: var(--accent-color);
 }
 body {
   margin: 0;
