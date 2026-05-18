@@ -33,6 +33,7 @@ let _friendsTab = "friends";
 let _lessonBreakdownNavigate = true;
 let _browseSearch = "";
 let _currentFriendSheetUid = null;
+let _authReady = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
@@ -13664,6 +13665,7 @@ async function submitLogin() {
 
 // Register auth state handler (called by firebase-lb.js when auth resolves)
 window.__onAuthStateReady = async (user) => {
+  _authReady = true;
   if (user) {
     await restoreUserFromFirestore(user);
     hideAuthModal();
@@ -13671,6 +13673,10 @@ window.__onAuthStateReady = async (user) => {
     updateProfileBadges?.();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
+    // If friends modal was opened while auth was still loading, populate it now
+    if (document.getElementById("friendsModal")?.classList.contains("open")) {
+      switchFriendsTab(_friendsTab);
+    }
 
     // Silently refresh FCM token on login if permission already granted (handles expired tokens)
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
@@ -14541,7 +14547,17 @@ function updateFriendsBadge() {
 
 function showFriendsModal() {
   const user = window.Auth?.getCurrentUser();
-  if (!user) { showAuthModal?.(); return; }
+  if (!user) {
+    if (!_authReady) {
+      // Firebase auth still initializing — show modal with loading placeholder
+      document.getElementById("friendsModal")?.classList.add("open");
+      const activePane = document.querySelector(".friends-tab-pane.active");
+      if (activePane) activePane.innerHTML = '<div class="fr-loading">Loading...</div>';
+      return;
+    }
+    showAuthModal?.();
+    return;
+  }
   document.getElementById("friendsModal")?.classList.add("open");
   switchFriendsTab(_friendsTab);
 }
@@ -14644,9 +14660,20 @@ async function renderFriendRequests() {
 }
 
 async function showFriendSheet(uid) {
-  const u = await window.Friends?.getUser(uid);
-  if (!u) return;
   _currentFriendSheetUid = uid;
+  document.getElementById("friendSheetAvatar").innerHTML = `<span class="material-symbols-outlined">person</span>`;
+  document.getElementById("friendSheetName").textContent = "";
+  document.getElementById("friendSheetRank").textContent = "";
+  document.getElementById("friendSheetStats").innerHTML = `<div class="fr-loading">Loading...</div>`;
+  document.getElementById("friendSheetActions").innerHTML = "";
+  document.getElementById("friendProfileSheet").classList.add("open");
+
+  const u = await window.Friends?.getUser(uid);
+  if (_currentFriendSheetUid !== uid) return;
+  if (!u) {
+    document.getElementById("friendSheetStats").innerHTML = `<div class="fr-loading">Could not load profile</div>`;
+    return;
+  }
 
   document.getElementById("friendSheetAvatar").innerHTML = `<span class="material-symbols-outlined">${_frIcon(u)}</span>`;
   document.getElementById("friendSheetName").textContent  = u.displayName || u.username || "User";
