@@ -14469,6 +14469,7 @@ let _csStudyType = "topical";
 let _csSelectedWord = null;
 let _csContribType = "thought";
 let _csActiveStudyId = null;
+let _csMembersCollapsed = false;
 // Create form new fields
 let _csVisibility = "public";
 let _csColor = null;
@@ -14823,6 +14824,7 @@ async function submitCreateStudy() {
 async function openStudyDetail(studyId) {
   _csActiveStudyId = studyId;
   _csDetailTab = "posts";
+  _csMembersCollapsed = false;
   const el = document.getElementById("csDetailContent");
   el.innerHTML = '<p class="lb-loading">Loading…</p>';
   document.getElementById("csDetailSheet").classList.add("open");
@@ -14845,6 +14847,14 @@ function switchDetailTab(tab) {
   document.querySelectorAll(".cs-detail-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
 }
 
+function toggleMembersCollapsed(studyId) {
+  _csMembersCollapsed = !_csMembersCollapsed;
+  const list = document.getElementById(`csMembersList_${studyId}`);
+  const icon = document.getElementById(`csMembersToggleIcon_${studyId}`);
+  if (list) list.classList.toggle("collapsed", _csMembersCollapsed);
+  if (icon) icon.textContent = _csMembersCollapsed ? "expand_more" : "expand_less";
+}
+
 function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns) {
   const me        = window.Auth?.getCurrentUser();
   const myUid     = me?.uid;
@@ -14856,24 +14866,36 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
   const studyColor = study.color ? (CS_COLORS.find(c => c.key === study.color)?.hex || null) : null;
   const accentStyle = studyColor ? `style="--study-accent:${studyColor}"` : '';
 
-  // ── Header ──────────────────────────────────────────────────────────────
-  const visLabel  = { public: "Public", friends: "Friends Only", private: "Private" }[study.visibility || "public"] || "Public";
-  const visIcon   = { public: "public", friends: "group", private: "lock" }[study.visibility || "public"] || "public";
-  const tags      = (study.tags || []).map(t => `<span class="cs-detail-tag">${_lbEscape(t)}</span>`).join("");
-  const fmtLabel  = { casual: "Casual", deep: "Deep Study", memorization: "Memorization", prayer: "Prayer Focus" }[study.format || "casual"] || "Casual";
-  const durLabel  = { weekly: "Weekly", "30day": "30 Days", "90day": "90 Days", ongoing: "Ongoing" }[study.duration || "ongoing"] || "Ongoing";
+  // ── Header ─────────────────────────────────────────────────────────────
+  const visLabel = { public: "Public", friends: "Friends Only", private: "Private" }[study.visibility || "public"] || "Public";
+  const visIcon  = { public: "public", friends: "group", private: "lock" }[study.visibility || "public"] || "public";
+  const tags     = (study.tags || []).map(t => `<span class="cs-detail-tag">${_lbEscape(t)}</span>`).join("");
+  const fmtLabel = { casual: "Casual", deep: "Deep Study", memorization: "Memorization", prayer: "Prayer Focus" }[study.format || "casual"] || "Casual";
+  const durLabel = { weekly: "Weekly", "30day": "30 Days", "90day": "90 Days", ongoing: "Ongoing" }[study.duration || "ongoing"] || "Ongoing";
 
-  // Check-in today?
-  const today     = new Date().toISOString().slice(0, 10);
-  const myCheckin = myUid && checkIns.some(c => c.uid === myUid && c.date === today);
-  const checkedInToday = checkIns.filter(c => c.date === today);
+  // ── Check-in state ──────────────────────────────────────────────────────
+  const today       = new Date().toISOString().slice(0, 10);
+  const myCheckin   = myUid && checkIns.some(c => c.uid === myUid && c.date === today);
+  const sessionKey  = `cs_ci_asked_${study.id}_${today}`;
+  const alreadyAsked = sessionStorage.getItem(sessionKey);
+  const showCheckinPrompt = myUid && isMember && !myCheckin && !alreadyAsked;
+  if (showCheckinPrompt) sessionStorage.setItem(sessionKey, "1");
+
+  const checkinPrompt = showCheckinPrompt ? `
+    <div class="cs-checkin-prompt" id="csCheckinPrompt">
+      <span class="material-symbols-outlined">today</span>
+      <span class="cs-checkin-prompt-text">Studying today?</span>
+      <div class="cs-checkin-prompt-btns">
+        <button class="cs-checkin-yes" onclick="csCheckInStudy('${study.id}')">Check In ✓</button>
+        <button class="cs-checkin-no" onclick="document.getElementById('csCheckinPrompt').remove()">Not Now</button>
+      </div>
+    </div>` : "";
 
   // ── Posts tab ───────────────────────────────────────────────────────────
   const REACTIONS = ["🔥","💡","🙏","❓"];
   const contribTypeIcon = t => ({ find: "search", point: "flag", joined: "person_add", verse: "format_quote", spotlight: "translate" }[t] || "psychology");
   const postsHtml = contribs.length ? contribs.map(c => {
-    const isJoin = c.type === "joined";
-    if (isJoin) return `<div class="cs-join-announce"><span class="material-symbols-outlined">person_add</span>${_lbEscape(c.text)}</div>`;
+    if (c.type === "joined") return `<div class="cs-join-announce"><span class="material-symbols-outlined">person_add</span>${_lbEscape(c.text)}</div>`;
     const reactionMap = c.reactions || {};
     const reactionBar = REACTIONS.map(emoji => {
       const voters = reactionMap[emoji] || [];
@@ -14893,7 +14915,7 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
   }).join("") : `<p class="cs-empty-sm">No posts yet — be the first to contribute.</p>`;
 
   // ── Polls tab ───────────────────────────────────────────────────────────
-  const pollsHtml = (polls.length ? polls.map(p => {
+  const pollsHtml = polls.length ? polls.map(p => {
     const totalVotes = p.options.reduce((s, o) => s + (o.voters || []).length, 0);
     return `<div class="cs-poll-card">
       <div class="cs-poll-q">${_lbEscape(p.question)}</div>
@@ -14909,18 +14931,18 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
       }).join("")}
       <div class="cs-poll-total">${totalVotes} vote${totalVotes !== 1 ? "s" : ""} · by ${_lbEscape(p.displayName)}</div>
     </div>`;
-  }).join("") : `<p class="cs-empty-sm">No polls yet.</p>`);
+  }).join("") : `<p class="cs-empty-sm">No polls yet.</p>`;
 
   // ── Prayer tab ──────────────────────────────────────────────────────────
-  const prayerHtml = (prayers.length ? prayers.map(pr => `
+  const prayerHtml = prayers.length ? prayers.map(pr => `
     <div class="cs-prayer-card${pr.answered ? " answered" : ""}">
       <div class="cs-prayer-header">
         <span class="material-symbols-outlined">${pr.answered ? "check_circle" : "volunteer_activism"}</span>
         <span class="cs-prayer-author">${_lbEscape(pr.displayName)}</span>
-        ${pr.answered ? `<span class="cs-answered-badge">Answered ✓</span>` : (isOwner && !pr.answered ? `<button class="cs-answered-btn" onclick="csAnswerPrayer('${study.id}','${pr.id}')">Mark Answered</button>` : "")}
+        ${pr.answered ? `<span class="cs-answered-badge">Answered ✓</span>` : ((isOwner || (myUid && pr.uid === myUid)) && !pr.answered ? `<button class="cs-answered-btn" onclick="csAnswerPrayer('${study.id}','${pr.id}')">Mark Answered</button>` : "")}
       </div>
       <p class="cs-prayer-text">${_lbEscape(pr.text)}</p>
-    </div>`).join("") : `<p class="cs-empty-sm">No prayer requests yet.</p>`);
+    </div>`).join("") : `<p class="cs-empty-sm">No prayer requests yet.</p>`;
 
   // ── Plan tab ────────────────────────────────────────────────────────────
   const planHtml = plan ? plan.tasks.map((task, i) => {
@@ -14935,7 +14957,7 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
     </div>`;
   }).join("") : `<p class="cs-empty-sm">No reading plan set yet.</p>`;
 
-  // ── Pending requests section ─────────────────────────────────────────────
+  // ── Pending requests ────────────────────────────────────────────────────
   const pendingSection = isOwner && (study.pendingUids || []).length ? `
     <div class="cs-section-title">Join Requests <span class="cs-req-count">${study.pendingUids.length}</span></div>
     <div class="cs-pending-list">${study.pendingUids.map(uid => `
@@ -14947,55 +14969,67 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
       </div>`).join("")}
     </div>` : "";
 
-  // ── Action bar ────────────────────────────────────────────────────────
-  let actionBar = "";
-  if (!myUid) {
-    actionBar = `<button class="cs-action-btn cs-join-btn" onclick="showAuthModal()">Sign in to Join</button>`;
-  } else if (isInvited && !isMember) {
-    actionBar = `<button class="cs-action-btn cs-join-btn" onclick="csAcceptInvite('${study.id}')"><span class="material-symbols-outlined">check</span> Accept Invite</button>`;
-  } else if (isOwner) {
-    actionBar = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Post</button>
-      <button class="cs-action-btn cs-poll-btn" onclick="openPollSheet('${study.id}')"><span class="material-symbols-outlined">poll</span> Poll</button>
-      ${study.visibility === 'private' ? `<button class="cs-action-btn cs-invite-btn" onclick="openInviteSheet('${study.id}')"><span class="material-symbols-outlined">person_add</span> Invite</button>` : ""}
-      <button class="cs-action-btn cs-plan-btn" onclick="openPlanSheet('${study.id}')"><span class="material-symbols-outlined">checklist</span> Set Plan</button>
-      <button class="cs-action-btn cs-delete-btn" onclick="csDeleteMyStudy('${study.id}')">Delete</button>`;
-  } else if (isMember) {
-    actionBar = `<button class="cs-action-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')"><span class="material-symbols-outlined">add</span> Add Post</button>
-      <button class="cs-action-btn cs-pray-btn" onclick="openPrayerSheet('${study.id}')"><span class="material-symbols-outlined">volunteer_activism</span> Prayer</button>
-      <button class="cs-action-btn cs-leave-btn" onclick="csLeave('${study.id}')">Leave</button>`;
-  } else if (isPending) {
-    actionBar = `<button class="cs-action-btn cs-pending-btn" disabled>Request Sent</button>`;
-  } else if (study.visibility === 'private') {
-    actionBar = `<button class="cs-action-btn cs-pending-btn" disabled>Private — Invite Only</button>`;
-  } else {
-    actionBar = `<button class="cs-action-btn cs-join-btn" onclick="csJoin('${study.id}','${study.creatorUid}')"><span class="material-symbols-outlined">group_add</span> Join Study</button>`;
-  }
-
-  // ── Members section ──────────────────────────────────────────────────────
-  const memberRows = (study.memberUids || []).map(uid => {
-    const c = counts[uid] || {};
-    const parts = [c.thoughts && `${c.thoughts}t`, c.finds && `${c.finds}f`, c.points && `${c.points}k`].filter(Boolean).join("·") || "";
+  // ── Members section (host first, collapsible) ───────────────────────────
+  const sortedMembers = [...(study.memberUids || [])].sort((a, b) =>
+    a === study.creatorUid ? -1 : b === study.creatorUid ? 1 : 0);
+  const memberRows = sortedMembers.map(uid => {
     const checkedIn = checkIns.some(ci => ci.uid === uid && ci.date === today);
+    const name = uid === study.creatorUid
+      ? `${_lbEscape(study.creatorName)} <span class="cs-creator-tag">host</span>`
+      : uid === myUid ? "You" : "Member";
     return `<div class="cs-member-row">
       <span class="material-symbols-outlined cs-member-icon">person</span>
-      <div class="cs-member-info">
-        <span class="cs-member-name">${uid === study.creatorUid ? `${_lbEscape(study.creatorName)} <span class="cs-creator-tag">host</span>` : uid === myUid ? "You" : "Member"}</span>
-        ${parts ? `<span class="cs-member-contribs">${parts}</span>` : ""}
-      </div>
-      ${checkedIn ? `<span class="cs-checkin-dot" title="Checked in today"></span>` : ""}
+      <span class="cs-member-name">${name}</span>
+      ${checkedIn ? `<span class="material-symbols-outlined cs-checkin-check">check_circle</span>` : ""}
     </div>`;
   }).join("");
 
-  // ── Check-in banner (members only) ──────────────────────────────────────
-  const checkinBanner = (myUid && isMember) ? `<div class="cs-checkin-banner">
-    <div class="cs-checkin-info">
-      <span class="material-symbols-outlined">today</span>
-      <span>${checkedInToday.length} member${checkedInToday.length !== 1 ? "s" : ""} studied today</span>
-    </div>
-    <button class="cs-checkin-btn${myCheckin ? " checked" : ""}" onclick="csCheckInStudy('${study.id}')" ${myCheckin ? "disabled" : ""}>
-      ${myCheckin ? "✓ Checked In" : "Check In"}
-    </button>
-  </div>` : "";
+  // ── Action grid ─────────────────────────────────────────────────────────
+  let actionContent = "";
+  if (!myUid) {
+    actionContent = `<button class="cs-action-btn cs-join-btn" onclick="showAuthModal()">Sign in to Join</button>`;
+  } else if (isInvited && !isMember) {
+    actionContent = `<button class="cs-action-btn cs-join-btn" onclick="csAcceptInvite('${study.id}')"><span class="material-symbols-outlined">check</span> Accept Invite</button>`;
+  } else if (isOwner) {
+    actionContent = `
+      <div class="cs-action-grid">
+        <button class="cs-grid-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')">
+          <span class="material-symbols-outlined">add_circle</span><span>Post</span>
+        </button>
+        <button class="cs-grid-btn cs-poll-btn" onclick="openPollSheet('${study.id}')">
+          <span class="material-symbols-outlined">poll</span><span>Poll</span>
+        </button>
+        <button class="cs-grid-btn cs-pray-btn" onclick="openPrayerSheet('${study.id}')">
+          <span class="material-symbols-outlined">volunteer_activism</span><span>Prayer</span>
+        </button>
+        <button class="cs-grid-btn cs-plan-btn" onclick="openPlanSheet('${study.id}')">
+          <span class="material-symbols-outlined">checklist</span><span>Plan</span>
+        </button>
+      </div>
+      <div class="cs-action-secondary">
+        ${study.visibility === 'private' ? `<button class="cs-action-btn cs-invite-btn" onclick="openInviteSheet('${study.id}')"><span class="material-symbols-outlined">person_add</span> Invite</button>` : ""}
+        <button class="cs-action-btn cs-delete-btn" onclick="csDeleteMyStudy('${study.id}')">Delete Study</button>
+      </div>`;
+  } else if (isMember) {
+    actionContent = `
+      <div class="cs-action-grid">
+        <button class="cs-grid-btn cs-contrib-btn" onclick="openContribSheet('${study.id}')">
+          <span class="material-symbols-outlined">add_circle</span><span>Post</span>
+        </button>
+        <button class="cs-grid-btn cs-pray-btn" onclick="openPrayerSheet('${study.id}')">
+          <span class="material-symbols-outlined">volunteer_activism</span><span>Prayer</span>
+        </button>
+      </div>
+      <div class="cs-action-secondary">
+        <button class="cs-action-btn cs-leave-btn" onclick="csLeave('${study.id}')">Leave Study</button>
+      </div>`;
+  } else if (isPending) {
+    actionContent = `<button class="cs-action-btn cs-pending-btn" disabled>Request Sent</button>`;
+  } else if (study.visibility === 'private') {
+    actionContent = `<button class="cs-action-btn cs-pending-btn" disabled>Private — Invite Only</button>`;
+  } else {
+    actionContent = `<button class="cs-action-btn cs-join-btn" onclick="csJoin('${study.id}','${study.creatorUid}')"><span class="material-symbols-outlined">group_add</span> Join Study</button>`;
+  }
 
   el.innerHTML = `
     <div class="cs-detail-header" ${accentStyle}>
@@ -15005,18 +15039,20 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
         ${study.focusRef ? `<span class="cs-detail-focus">· ${_lbEscape(study.focusRef)}</span>` : ""}
         <span class="cs-detail-fmt">${fmtLabel} · ${durLabel}</span>
       </div>
-      <div class="cs-detail-type-row">
-        <span class="material-symbols-outlined">${study.icon || _csStudyTypeIcon(study.type)}</span>
-        <span>${_csStudyTypeName(study.type)}</span>
+      <div class="cs-detail-title-row">
+        <span class="material-symbols-outlined cs-detail-type-icon">${study.icon || _csStudyTypeIcon(study.type)}</span>
+        <h2 class="cs-detail-title">${_lbEscape(study.title)}</h2>
       </div>
-      <h2 class="cs-detail-title">${_lbEscape(study.title)}</h2>
       ${study.description ? `<p class="cs-detail-desc">${_lbEscape(study.description)}</p>` : ""}
       ${tags ? `<div class="cs-detail-tags">${tags}</div>` : ""}
     </div>
-    ${checkinBanner}
+    ${checkinPrompt}
     ${pendingSection}
-    <div class="cs-section-title">Members <span class="cs-req-count">${(study.memberUids || []).length}</span></div>
-    <div class="cs-members-list">${memberRows || '<p class="cs-empty-sm">No members yet</p>'}</div>
+    <div class="cs-members-header" onclick="toggleMembersCollapsed('${study.id}')">
+      <div class="cs-section-title" style="margin:0">Members <span class="cs-req-count">${sortedMembers.length}</span></div>
+      <span class="material-symbols-outlined cs-members-toggle" id="csMembersToggleIcon_${study.id}">expand_less</span>
+    </div>
+    <div class="cs-members-list" id="csMembersList_${study.id}">${memberRows || '<p class="cs-empty-sm">No members yet</p>'}</div>
     <div class="cs-detail-tabs">
       <button class="cs-detail-tab active" data-tab="posts" onclick="switchDetailTab('posts')">Posts</button>
       <button class="cs-detail-tab" data-tab="polls" onclick="switchDetailTab('polls')">Polls</button>
@@ -15027,7 +15063,7 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
     <div class="cs-detail-pane" data-tab="polls"><div class="cs-polls-list">${pollsHtml}</div></div>
     <div class="cs-detail-pane" data-tab="prayer"><div class="cs-prayers-list">${prayerHtml}</div></div>
     <div class="cs-detail-pane" data-tab="plan"><div class="cs-plan-list">${planHtml}</div></div>
-    <div class="cs-detail-actions">${actionBar}</div>`;
+    <div class="cs-detail-actions">${actionContent}</div>`;
 }
 
 function closeStudyDetail() {
