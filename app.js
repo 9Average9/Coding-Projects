@@ -13454,11 +13454,42 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.13";
+const APP_VERSION = "2.3.18";
 
-const UPDATE_NOTES = [
-  "Ignore .claude/ directory"
-];
+const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.17 — Study Groups</div>
+<div class="un-section">
+  <div class="un-section-title">Creating a Study</div>
+  <ul class="un-list">
+    <li><strong>Visibility</strong> — Public (anyone can join instantly), Friends Only (only your friends can see and join), or Private (invite-only, completely hidden from others)</li>
+    <li><strong>Color &amp; Icon</strong> — Give your study its own identity with 10 accent colors and 8 icons</li>
+    <li><strong>Tags</strong> — Label your study with topics like Prophecy, Greek, Book Study, NT Survey, and more</li>
+    <li><strong>Format</strong> — Casual, Deep Study, Memorization, or Prayer Focus</li>
+    <li><strong>Duration</strong> — Weekly, 30 Days, 90 Days, or Ongoing</li>
+    <li><strong>Focus Reference</strong> — Pin a scripture range so members always know what passage you're in</li>
+  </ul>
+</div>
+<div class="un-section">
+  <div class="un-section-title">Inside a Study</div>
+  <ul class="un-list">
+    <li><strong>Daily Check-In</strong> — Tap once a day to register that you studied; green dots show who's active today</li>
+    <li><strong>Tabbed View</strong> — Switch between Posts, Polls, Prayer, and Plan tabs</li>
+    <li><strong>Emoji Reactions</strong> — React to any post with 🔥 💡 🙏 ❓</li>
+    <li><strong>Polls</strong> — Create polls with live percentage bars; change your vote anytime</li>
+    <li><strong>Prayer Requests</strong> — Share requests with the group; hosts can mark them Answered ✓</li>
+    <li><strong>Reading Plan</strong> — Hosts set a task checklist; each member checks off items on their own</li>
+    <li><strong>Join Announcements</strong> — An automatic post appears in the feed when someone joins</li>
+    <li><strong>Invite System</strong> — Private studies: hosts invite friends directly by display name</li>
+  </ul>
+</div>
+<div class="un-section">
+  <div class="un-section-title">Community Board</div>
+  <ul class="un-list">
+    <li><strong>Featured Study</strong> — The most active group rises to the top, scored by members, posts, and how recently it's been active</li>
+    <li><strong>Friends Only visibility</strong> — Studies set to Friends Only are invisible to people who aren't your friends</li>
+  </ul>
+</div>
+`;
 
 let deferredInstallPrompt = null;
 
@@ -14034,19 +14065,16 @@ function openNewsFromProfile() {
 
   if (!modal || !title || !notes) return;
 
-  title.textContent = `What’s New in Version ${APP_VERSION}`;
-
-  notes.innerHTML = `
-    <ul class="update-notes-list">
-      ${UPDATE_NOTES.map((note) => `<li>${note}</li>`).join("")}
-    </ul>
-  `;
+  title.textContent = "What’s New";
+  notes.innerHTML = UPDATE_NOTES_HTML;
 
   localStorage.setItem("lastSeenAppVersion", APP_VERSION);
   localStorage.setItem("hasUnreadUpdate", "false");
 
-  updateProfileAttention();
+  const badge = document.getElementById("profileNewsBadge");
+  if (badge) badge.classList.add("hidden");
 
+  updateProfileAttention();
   modal.classList.add("open");
 }
 

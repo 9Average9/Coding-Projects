@@ -9554,10 +9554,7 @@ glacier: {
   <div class="nav-bar">
     <div></div>
     <div class="nav-title">Profile</div>
-    <button id="profileNewsBtn" class="icon-btn profile-news-icon-btn" onclick="openNewsFromProfile()" title="News &amp; Updates">
-      <span class="material-symbols-outlined">campaign</span>
-      <span id="profileNewsBadge" class="profile-news-badge hidden"></span>
-    </button>
+    <div></div>
   </div>
   <div class="profile-page-scroll">
     <div class="profile-header">
@@ -9686,6 +9683,15 @@ glacier: {
 </div>
 
     <div class="prof-menu-card">
+      <button id="profileNewsBtn" class="prof-menu-row" onclick="openNewsFromProfile()">
+        <span class="prof-menu-icon-wrap prof-news-icon-wrap">
+          <span class="material-symbols-outlined">campaign</span>
+          <span id="profileNewsBadge" class="prof-news-badge hidden"></span>
+        </span>
+        <span class="prof-menu-name">What's New</span>
+        <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+      </button>
+      <div class="prof-menu-sep"></div>
       <button id="profileSettingsBtn" class="prof-menu-row" onclick="openSettingsFromProfile()">
         <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">settings</span></span>
         <span class="prof-menu-name">Settings</span>

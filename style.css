@@ -5949,8 +5949,37 @@ body.dark .rank-item {
 
 .install-modal-card,
 .update-modal-card {
-  text-align: center;
+  text-align: left;
+  max-height: 80vh;
+  overflow-y: auto;
 }
+.update-modal-card h2 { text-align: center; }
+.update-modal-card .main-btn { width: 100%; }
+
+.un-version-label {
+  text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--secondary); margin-bottom: 14px;
+}
+.un-section { margin-bottom: 16px; }
+.un-section-title {
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--muted-color); margin-bottom: 8px;
+}
+.un-list {
+  padding-left: 18px; margin: 0; line-height: 1.65; color: var(--font-color);
+}
+.un-list li { margin-bottom: 5px; font-size: 0.86rem; }
+.un-list strong { color: var(--font-color); }
+
+/* ── Profile menu What's New badge ──────────────────────────────────────── */
+.prof-news-icon-wrap { position: relative; overflow: visible !important; }
+.prof-news-badge {
+  position: absolute; top: -3px; right: -3px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #ef4444; border: 2px solid var(--card-color);
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.2);
+}
+.prof-news-badge.hidden { display: none; }
 
 .install-modal-card .main-btn,
 .install-modal-card .small-btn {
@@ -8120,35 +8149,6 @@ button[onclick="showInstallSteps('iphone')"]::after {
   }
 }
 
-.profile-news-icon-btn {
-  position: relative;
-  overflow: visible !important;
-  background: color-mix(in srgb, var(--profile-color, #d6a700) 14%, var(--card-color)) !important;
-  border-color: color-mix(in srgb, var(--profile-color, #d6a700) 38%, var(--border-color)) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.10);
-}
-
-.profile-news-icon-btn .material-symbols-outlined {
-  font-size: 23px !important;
-  color: var(--profile-color, #d6a700) !important;
-}
-
-.profile-news-icon-btn .profile-news-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 11px;
-  height: 11px;
-  margin: 0;
-  border-radius: 999px;
-  background: #ef4444;
-  border: 2px solid var(--card-color);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
-}
-
-.profile-news-icon-btn .profile-news-badge.hidden {
-  display: none;
-}
 .main-btn.secondary,
 .try-app-btn {
   background: var(--profile-color) !important;
