@@ -12875,17 +12875,17 @@ body .app:has(#settingsScreen.screen.active) {
 .hcs-deco { font-size: 2rem !important; color: var(--muted-color); opacity: 0.3; }
 
 /* ── Study Detail Page ───────────────────────────────────────────────────── */
-body .app:has(#csDetailPage.screen.active) {
-  padding: 0 !important; overflow-x: hidden;
-}
 body .app:has(#csDetailPage.screen.active) .app-header { display: none !important; }
-body .app:has(#csDetailPage.screen.active) #csDetailPage { margin-top: 0 !important; }
 #csDetailPage.screen.active {
+  position: fixed !important;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 200;
   display: flex; flex-direction: column;
-  height: 100vh; overflow: hidden;
+  overflow: hidden;
   background: var(--primary-color) !important;
   border-radius: 0 !important; box-shadow: none !important;
-  border: none !important; padding: 0 !important; position: relative;
+  border: none !important; padding: 0 !important;
+  margin: 0 !important;
 }
 .cs-detail-nav {
   background: var(--primary-color); z-index: 10; flex-shrink: 0;
