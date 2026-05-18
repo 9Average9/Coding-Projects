@@ -13195,7 +13195,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.10";
+const APP_VERSION = "2.3.11";
 
 const UPDATE_NOTES = [
   "Ignore .claude/ directory"
@@ -14109,7 +14109,14 @@ function _renderXPBoard() {
 
   if (!window.LB) { podiumEl.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
 
-  _lbUnsub = window.LB.listenBoard("xp_board", "xp", entries => {
+  const t = setTimeout(() => {
+    if (podiumEl.querySelector(".lb-loading"))
+      podiumEl.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderXPBoard()">Retry</button></p>';
+  }, 8000);
+
+  _lbUnsub = window.LB.listenBoard("xp_board", "xp", (entries, err) => {
+    clearTimeout(t);
+    if (err) { podiumEl.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderXPBoard()">Retry</button></p>'; return; }
     _renderPodiumBoard(podiumEl, listEl, entries, "xp", uid);
     updateProfileBadges();
   });
@@ -14130,6 +14137,8 @@ function _renderScholarBoard() {
   window.LB.getBoard("scholar_board", "bestScore").then(entries => {
     _renderPodiumBoard(podiumEl, listEl, entries, "bestScore", uid);
     updateProfileBadges();
+  }).catch(() => {
+    podiumEl.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderScholarBoard()">Retry</button></p>';
   });
 
   if (window.LB.isScholarJoined()) {
@@ -14199,7 +14208,15 @@ function _renderStudyBoard() {
   el.innerHTML = '<p class="lb-loading">Loading…</p>';
   if (_csUnsub) { _csUnsub(); _csUnsub = null; }
   if (!window.Community) { el.innerHTML = '<p class="lb-empty">Connecting…</p>'; return; }
-  _csUnsub = window.Community.listenStudies(studies => {
+
+  const t = setTimeout(() => {
+    if (el.querySelector(".lb-loading"))
+      el.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderStudyBoard()">Retry</button></p>';
+  }, 8000);
+
+  _csUnsub = window.Community.listenStudies((studies, err) => {
+    clearTimeout(t);
+    if (err) { el.innerHTML = '<p class="lb-empty">Couldn\'t load — <button class="lb-retry-btn" onclick="_renderStudyBoard()">Retry</button></p>'; return; }
     _csStudies = studies;
     _renderStudyList(el, studies);
   });
@@ -14938,8 +14955,12 @@ async function renderFriendsList() {
     return;
   }
   el.innerHTML = `<div class="fr-loading">Loading...</div>`;
-  const users = (await Promise.all(friendsList.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
-  el.innerHTML = users.map(u => _frCardHTML(u, "friend")).join("") || `<div class="fr-empty"><p>Couldn't load friends</p></div>`;
+  try {
+    const users = (await Promise.all(friendsList.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+    el.innerHTML = users.map(u => _frCardHTML(u, "friend")).join("") || `<div class="fr-empty"><p>Couldn't load friends</p></div>`;
+  } catch {
+    el.innerHTML = `<div class="fr-empty"><p>Couldn't load — <button class="lb-retry-btn" onclick="renderFriendsList()">Retry</button></p></div>`;
+  }
 }
 
 async function renderFindFriends(q = "") {
@@ -14948,14 +14969,18 @@ async function renderFindFriends(q = "") {
   el.innerHTML = `<div class="fr-loading">Loading...</div>`;
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  const users = q.trim()
-    ? await (window.Friends?.searchUsers(q.trim(), me.uid) || Promise.resolve([]))
-    : await (window.Friends?.getAllUsers(me.uid) || Promise.resolve([]));
-  if (!users.length) {
-    el.innerHTML = `<div class="fr-empty"><span class="material-symbols-outlined">search_off</span><p>No users found</p></div>`;
-    return;
+  try {
+    const users = q.trim()
+      ? await (window.Friends?.searchUsers(q.trim(), me.uid) || Promise.resolve([]))
+      : await (window.Friends?.getAllUsers(me.uid) || Promise.resolve([]));
+    if (!users.length) {
+      el.innerHTML = `<div class="fr-empty"><span class="material-symbols-outlined">search_off</span><p>No users found</p></div>`;
+      return;
+    }
+    el.innerHTML = users.map(u => _frCardHTML(u, _frStatus(u.uid))).join("");
+  } catch {
+    el.innerHTML = `<div class="fr-empty"><p>Couldn't load — <button class="lb-retry-btn" onclick="renderFindFriends('${q}')">Retry</button></p></div>`;
   }
-  el.innerHTML = users.map(u => _frCardHTML(u, _frStatus(u.uid))).join("");
 }
 
 async function renderFriendRequests() {
@@ -14968,8 +14993,10 @@ async function renderFriendRequests() {
     inEl.innerHTML = `<div class="fr-empty-sm">No incoming requests</div>`;
   } else {
     inEl.innerHTML = `<div class="fr-loading">Loading...</div>`;
-    const users = (await Promise.all(friendRequestsIn.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
-    inEl.innerHTML = users.map(u => _frCardHTML(u, "incoming")).join("");
+    try {
+      const users = (await Promise.all(friendRequestsIn.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+      inEl.innerHTML = users.map(u => _frCardHTML(u, "incoming")).join("");
+    } catch { inEl.innerHTML = `<div class="fr-empty-sm">Couldn't load — <button class="lb-retry-btn" onclick="renderFriendRequests()">Retry</button></div>`; }
   }
 
   if (outLabel) outLabel.style.display = friendRequestsOut.length ? "" : "none";
@@ -14977,8 +15004,10 @@ async function renderFriendRequests() {
     outEl.innerHTML = "";
   } else {
     outEl.innerHTML = `<div class="fr-loading">Loading...</div>`;
-    const users = (await Promise.all(friendRequestsOut.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
-    outEl.innerHTML = users.map(u => _frCardHTML(u, "outgoing")).join("");
+    try {
+      const users = (await Promise.all(friendRequestsOut.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+      outEl.innerHTML = users.map(u => _frCardHTML(u, "outgoing")).join("");
+    } catch { outEl.innerHTML = `<div class="fr-empty-sm">Couldn't load</div>`; }
   }
 }
 
@@ -14991,10 +15020,11 @@ async function showFriendSheet(uid) {
   document.getElementById("friendSheetActions").innerHTML = "";
   document.getElementById("friendProfileSheet").classList.add("open");
 
-  const u = await window.Friends?.getUser(uid);
+  let u;
+  try { u = await window.Friends?.getUser(uid); } catch { u = null; }
   if (_currentFriendSheetUid !== uid) return;
   if (!u) {
-    document.getElementById("friendSheetStats").innerHTML = `<div class="fr-loading">Could not load profile</div>`;
+    document.getElementById("friendSheetStats").innerHTML = `<div class="fr-empty-sm">Couldn't load profile — <button class="lb-retry-btn" onclick="showFriendSheet('${uid}')">Retry</button></div>`;
     return;
   }
 

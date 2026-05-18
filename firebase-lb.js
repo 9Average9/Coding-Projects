@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
-  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
   doc,
   setDoc,
   getDoc,
@@ -43,7 +44,7 @@ const firebaseConfig = {
 };
 
 const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
+const db = initializeFirestore(fbApp, { localCache: persistentLocalCache() });
 const auth = getAuth(fbApp);
 let messaging = null;
 try { messaging = getMessaging(fbApp); } catch (e) { console.warn("FCM unavailable:", e); }
@@ -280,9 +281,11 @@ async function getBoard(boardName, field, topN = 100) {
 
 function listenBoard(boardName, field, callback, topN = 100) {
   const q = query(collection(db, boardName), orderBy(field, "desc"), limit(topN));
-  return onSnapshot(q, snap => {
-    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-  });
+  return onSnapshot(
+    q,
+    snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("listenBoard:", boardName, err); callback(null, err); }
+  );
 }
 
 async function deleteUserData() {
@@ -553,7 +556,7 @@ function csListenStudies(callback, limitN = 40) {
   return onSnapshot(
     q,
     snap => callback(snap.docs.filter(d => d.data().isActive !== false).map(d => ({ id: d.id, ...d.data() }))),
-    err => { console.warn("listenStudies:", err); callback([]); }
+    err => { console.warn("listenStudies:", err); callback(null, err); }
   );
 }
 

@@ -10023,6 +10023,7 @@ body.dark #advancedLearnMenu .icon-btn:hover {
 .lb-name { flex: 1; font-weight: 700; font-size: 0.95rem; color: var(--font-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-value { font-size: 0.82rem; font-weight: 700; color: var(--secondary-color); white-space: nowrap; flex-shrink: 0; }
 .lb-loading, .lb-empty { text-align: center; color: var(--font-color); opacity: 0.5; font-size: 0.9rem; padding: 24px 0; }
+.lb-retry-btn { background: none; border: 1.5px solid var(--secondary-color); color: var(--secondary-color); border-radius: 20px; padding: 3px 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; margin-left: 4px; }
 
 /* Join area */
 .lb-join-area {
