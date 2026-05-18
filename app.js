@@ -13197,7 +13197,7 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.4";
+const APP_VERSION = "2.3.5";
 
 const UPDATE_NOTES = [
   "Friends — fixed a glitch where the sign-in screen would briefly flash when opening Friends right after launching the app",
