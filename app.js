@@ -13197,18 +13197,11 @@ const CACHE_NAME = "basic-greek-trainer-v1.0.1";
 
 That forces the app to refresh its cached files.
 */
-const APP_VERSION = "2.3.3";
+const APP_VERSION = "2.3.4";
 
 const UPDATE_NOTES = [
-  "Rhēma highlight mode — tap the highlighter button to color-code words by part of speech (verb=orange, noun=blue, adjective=green, article=purple, pronoun=pink, preposition=teal, conjunction=yellow); multiple types active at once, persists across verses",
-  "Rhēma 'Why this form?' — parsing tab now explains which endings/morphemes produced each parsed form, with inline 'What is Aorist?' chips that open a clean modal with an English example and explanation",
-  "Rhēma layout — nav bar pinned at bottom on all devices including PWA; no more white space gap",
-  "Lesson cards — content no longer overflows off screen horizontally",
-  "Lexicons explained — both basic and advanced lesson tracks teach what a lexicon is and why memorized vocab is the lexical form",
-  "Daily streak — profile streak now syncs live from the server",
-  "Encourage button — fixed so success alert fires correctly",
-  "Notifications — new accounts prompted to enable push notifications on signup",
-  "Offline icons — icons hide gracefully when font fails to load without internet"
+  "Friends — fixed a glitch where the sign-in screen would briefly flash when opening Friends right after launching the app",
+  "Friends — tapping a friend card now opens their profile sheet immediately with a loading indicator instead of a short unresponsive pause"
 ];
 
 let deferredInstallPrompt = null;
