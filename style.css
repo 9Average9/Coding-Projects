@@ -12889,7 +12889,8 @@ body .app:has(#csDetailPage.screen.active) #csDetailPage { margin-top: 0 !import
 }
 .cs-detail-nav {
   background: var(--primary-color); z-index: 10; flex-shrink: 0;
-  padding-top: max(10px, env(safe-area-inset-top));
+  padding: max(10px, env(safe-area-inset-top)) 12px 8px;
+  margin: 0 !important;
 }
 .cs-detail-back {
   background: none; border: none; cursor: pointer; padding: 4px;
