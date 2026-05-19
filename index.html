@@ -9723,6 +9723,20 @@ glacier: {
         <span class="comm-friends-badge hidden" id="commFriendsBadge"></span>
       </button>
     </div>
+    <!-- My Studies -->
+    <div class="studies-section">
+      <div class="studies-section-header">
+        <span class="studies-section-title">My Studies</span>
+        <button class="studies-add-btn" onclick="openStudyCreateSheet()">
+          <span class="material-symbols-outlined">add</span>
+          New Study
+        </button>
+      </div>
+      <div class="study-grid" id="myStudiesGrid">
+        <p class="studies-empty">No studies yet. Create your first one!</p>
+      </div>
+    </div>
+
     <div class="lb-tabs comm-tabs">
       <button class="lb-tab-btn active" data-tab="xp" onclick="showLbTab('xp')">
         <span class="material-symbols-outlined">bolt</span> XP
@@ -10984,6 +10998,72 @@ glacier: {
 </div>
 
 
+
+<!-- Study Create Sheet -->
+<div id="studyCreateSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyCreateSheet()">
+  <div class="study-sheet" onclick="event.stopPropagation()">
+    <div class="study-sheet-handle"></div>
+    <h2 class="study-sheet-title">New Study</h2>
+    <p class="study-sheet-sub">Give your study a name and style.</p>
+
+    <div class="study-create-field">
+      <label>Study Name</label>
+      <input type="text" id="studyCreateName" placeholder="e.g. Morning Devotional" maxlength="40" />
+    </div>
+
+    <div class="study-create-field">
+      <label>Color</label>
+      <div class="study-color-grid">
+        <div class="study-color-swatch selected" style="background:#4f8cff" data-color="#4f8cff" onclick="selectStudyColor(this)"></div>
+        <div class="study-color-swatch" style="background:#22c55e" data-color="#22c55e" onclick="selectStudyColor(this)"></div>
+        <div class="study-color-swatch" style="background:#f59e0b" data-color="#f59e0b" onclick="selectStudyColor(this)"></div>
+        <div class="study-color-swatch" style="background:#ef4444" data-color="#ef4444" onclick="selectStudyColor(this)"></div>
+        <div class="study-color-swatch" style="background:#a855f7" data-color="#a855f7" onclick="selectStudyColor(this)"></div>
+        <div class="study-color-swatch" style="background:#f97316" data-color="#f97316" onclick="selectStudyColor(this)"></div>
+      </div>
+    </div>
+
+    <div class="study-create-field">
+      <label>Icon</label>
+      <div class="study-icon-grid">
+        <button class="study-icon-btn selected" data-icon="menu_book" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">menu_book</span></button>
+        <button class="study-icon-btn" data-icon="auto_stories" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">auto_stories</span></button>
+        <button class="study-icon-btn" data-icon="church" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">church</span></button>
+        <button class="study-icon-btn" data-icon="star" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">star</span></button>
+        <button class="study-icon-btn" data-icon="psychology" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">psychology</span></button>
+        <button class="study-icon-btn" data-icon="favorite" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">favorite</span></button>
+        <button class="study-icon-btn" data-icon="bolt" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">bolt</span></button>
+        <button class="study-icon-btn" data-icon="local_fire_department" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">local_fire_department</span></button>
+      </div>
+    </div>
+
+    <div class="study-share-toggle">
+      <div class="study-share-label">
+        Share with Friends
+        <small>Friends get a push when you open a session (once per day)</small>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="studyCreateShareToggle" onchange="toggleStudyShareFriends(this)">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <button class="main-btn" style="width:100%;margin-bottom:10px" onclick="submitStudyCreate()">Create Study</button>
+    <button class="text-btn" style="width:100%" onclick="closeStudyCreateSheet()">Cancel</button>
+  </div>
+</div>
+
+<!-- Study Session Sheet -->
+<div id="studySessionSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudySessionSheet()">
+  <div class="study-sheet" onclick="event.stopPropagation()">
+    <div class="study-sheet-handle"></div>
+    <span class="study-sheet-icon-big material-symbols-outlined" id="studySessionIcon">menu_book</span>
+    <h2 class="study-sheet-title" id="studySessionTitle">Study</h2>
+    <p class="study-sheet-sub" id="studySessionMeta">0 sessions total</p>
+    <button class="study-session-btn" id="studySessionLogBtn" onclick="logStudySession()">Log Today's Session</button>
+    <button class="study-session-delete-btn" onclick="deleteCurrentStudy()">Delete Study</button>
+  </div>
+</div>
 
 <div id="profileFocusOverlay" class="profile-focus-overlay hidden"></div>
 

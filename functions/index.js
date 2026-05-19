@@ -109,6 +109,10 @@ exports.onEncouragementCreated = functions.firestore
     } else if (type === "studyJoinApproved") {
       title = "Study Request Approved!";
       body = `${fromName} approved your request to join their study.`;
+    } else if (type === "studySession") {
+      const studyName = snap.data().studyName || "Greek";
+      title = "Studying Now 📖";
+      body = `${fromName} is working on their ${studyName} study!`;
     } else {
       title = "Basic Greek study reminder:";
       body = `${fromName} is reminding you to study your Greek!`;

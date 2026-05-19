@@ -43,5 +43,10 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Personal studies — private to owner only
+    match /users/{uid}/studies/{studyId} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
   }
 }
