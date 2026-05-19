@@ -12923,25 +12923,27 @@ body .app:has(#settingsScreen.screen.active) {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Keep sandbox tab bar visible on top of the Rhema modal */
-body.sandbox-open .ss-tabs {
+/* Study tab bar — fixed at bottom, in root stacking context, always above Rhema modal */
+#studyTabBar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 1100;
 }
+#studyTabBar.hidden { display: none; }
 
-/* Push pane content up so nothing hides behind the fixed tab bar */
+/* Push sandbox pane content up so nothing hides behind the fixed tab bar */
 body.sandbox-open .ss-pane {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Push Rhema body content up so it isn't hidden behind the fixed tab bar */
+/* Push Rhema content up so verses aren't hidden behind the tab bar */
 body.sandbox-open .rhema-content-area {
   padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 body.sandbox-open .rhema-verse-nav {
   margin-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
 }
+
 .ss-tab {
   flex: 1; padding: 10px 4px 8px;
   background: none; border: none; border-top: 2px solid transparent;

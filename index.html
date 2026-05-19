@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.46" />
+  <link rel="stylesheet" href="style.css?v=2.3.47" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10866,9 +10866,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.46"></script>
-  <script src="app.js?v=2.3.46"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.46"></script>
+  <script src="vocab.js?v=2.3.47"></script>
+  <script src="app.js?v=2.3.47"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.47"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11051,24 +11051,26 @@ glacier: {
       </div>
     </div>
   </div>
-  <div class="ss-tabs">
-    <button class="ss-tab active" data-tab="rhema" onclick="switchSandboxTab('rhema')">
-      <span class="material-symbols-outlined ss-tab-icon">auto_stories</span>
-      <span>Rhema</span>
-    </button>
-    <button class="ss-tab" data-tab="verses" onclick="switchSandboxTab('verses')">
-      <span class="material-symbols-outlined ss-tab-icon">bookmark</span>
-      <span>Verses</span>
-    </button>
-    <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">
-      <span class="material-symbols-outlined ss-tab-icon">dictionary</span>
-      <span>Word Log</span>
-    </button>
-    <button class="ss-tab" data-tab="notes" onclick="switchSandboxTab('notes')">
-      <span class="material-symbols-outlined ss-tab-icon">edit_note</span>
-      <span>Notes</span>
-    </button>
-  </div>
+</div>
+
+<!-- Study tab bar — lives outside #studySandbox so z-index works above the Rhema modal -->
+<div id="studyTabBar" class="ss-tabs hidden">
+  <button class="ss-tab active" data-tab="rhema" onclick="switchSandboxTab('rhema')">
+    <span class="material-symbols-outlined ss-tab-icon">auto_stories</span>
+    <span>Rhema</span>
+  </button>
+  <button class="ss-tab" data-tab="verses" onclick="switchSandboxTab('verses')">
+    <span class="material-symbols-outlined ss-tab-icon">bookmark</span>
+    <span>Verses</span>
+  </button>
+  <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">
+    <span class="material-symbols-outlined ss-tab-icon">dictionary</span>
+    <span>Word Log</span>
+  </button>
+  <button class="ss-tab" data-tab="notes" onclick="switchSandboxTab('notes')">
+    <span class="material-symbols-outlined ss-tab-icon">edit_note</span>
+    <span>Notes</span>
+  </button>
 </div>
 
 <!-- View All Studies Modal -->
