@@ -13454,7 +13454,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.31";
+const APP_VERSION = "2.3.32";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
@@ -14844,9 +14844,9 @@ async function submitCreateStudy() {
   }
 }
 
-async function openStudyDetail(studyId) {
+async function openStudyDetail(studyId, preserveTab = false) {
   _csActiveStudyId = studyId;
-  _csDetailTab = "posts";
+  if (!preserveTab) _csDetailTab = "posts";
   _csMembersCollapsed = false;
   const el = document.getElementById("csDetailContent");
   el.innerHTML = '<p class="lb-loading">Loading…</p>';
@@ -14873,7 +14873,12 @@ async function openStudyDetail(studyId) {
     </div>`;
     return;
   }
-  _renderStudyDetail(el, study, contribs || [], polls || [], prayers || [], plan, checkIns || []);
+  try {
+    _renderStudyDetail(el, study, contribs || [], polls || [], prayers || [], plan, checkIns || []);
+    switchDetailTab(_csDetailTab);
+  } catch (e) {
+    el.innerHTML = `<div style="padding:24px;text-align:center"><p style="color:var(--muted-color)">Something went wrong loading the study. Please go back and try again.</p></div>`;
+  }
 }
 
 function switchDetailTab(tab) {
@@ -14960,7 +14965,7 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
         const votes = (opt.voters || []).length;
         const pct   = totalVotes ? Math.round(votes / totalVotes * 100) : 0;
         const voted = myUid && (opt.voters || []).includes(myUid);
-        return `<button class="cs-poll-opt${voted ? " voted" : ""}" onclick="csPollVoteUI('${study.id}','${p.id}',${i})" ${!myUid || !isMember ? "disabled" : ""}>
+        return `<button class="cs-poll-opt${voted ? " voted" : ""}" onclick="csPollVoteUI('${study.id}','${p.id}',${i},${p.options.length})" ${!myUid || !isMember ? "disabled" : ""}>
           <div class="cs-poll-bar" style="width:${pct}%"></div>
           <span class="cs-poll-label">${_lbEscape(opt.text)}</span>
           <span class="cs-poll-pct">${pct}%</span>
@@ -15143,11 +15148,11 @@ async function csReact(studyId, contribId, emoji) {
   openStudyDetail(studyId);
 }
 
-async function csPollVoteUI(studyId, pollId, optionIndex) {
+async function csPollVoteUI(studyId, pollId, optionIndex, optionCount) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  await window.Community?.pollVote(studyId, pollId, optionIndex, me.uid);
-  openStudyDetail(studyId);
+  await window.Community?.pollVote(studyId, pollId, optionIndex, me.uid, optionCount);
+  openStudyDetail(studyId, true);
 }
 
 async function csAnswerPrayer(studyId, prayerId) {
