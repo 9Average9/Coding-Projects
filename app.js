@@ -13457,6 +13457,12 @@ function backToProfileFromProgress() {
 const APP_VERSION = "2.3.34";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.34 — Reading Plan Fix</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Task Toggle</strong> — Fixed the loading glitch when checking off reading plan tasks; no more hang or being sent back to the Posts tab</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.33 — Social &amp; Study Fixes</div>
 <div class="un-section">
   <ul class="un-list">
