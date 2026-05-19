@@ -718,16 +718,13 @@ async function csAddPoll(studyId, uid, displayName, question, options) {
   } catch (e) { return false; }
 }
 
-async function csPollVote(studyId, pollId, optionIndex, uid) {
+async function csPollVote(studyId, pollId, optionIndex, uid, optionCount) {
   const ref = doc(db, "community_studies", studyId, "polls", pollId);
   try {
-    const snap = await getDoc(ref);
-    const options = snap.data()?.options || [];
     const updates = {};
-    options.forEach((opt, i) => {
-      if ((opt.voters || []).includes(uid)) updates[`options.${i}.voters`] = arrayRemove(uid);
-    });
-    updates[`options.${optionIndex}.voters`] = arrayUnion(uid);
+    for (let i = 0; i < optionCount; i++) {
+      updates[`options.${i}.voters`] = i === optionIndex ? arrayUnion(uid) : arrayRemove(uid);
+    }
     await updateDoc(ref, updates);
     return true;
   } catch (e) { return false; }
