@@ -12528,16 +12528,6 @@ body .app:has(#settingsScreen.screen.active) {
   padding: 0 2px;
   margin-bottom: 10px;
 }
-.hs-new-btn {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(79,140,255,0.12);
-  color: #4f8cff;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-}
-.hs-new-btn .material-symbols-outlined { font-size: 18px; }
 .hs-view-all-btn {
   font-size: 0.78rem; font-weight: 600;
   color: #4f8cff;
@@ -12575,6 +12565,18 @@ body .app:has(#settingsScreen.screen.active) {
   background: var(--study-color, #4f8cff); opacity: 0.06; pointer-events: none;
 }
 .hs-study-card:active { transform: scale(0.97); }
+.hs-add-card {
+  background: var(--card-color);
+  border: 1.5px dashed var(--border-color);
+  border-radius: 16px;
+  padding: 12px 10px 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  cursor: pointer; color: var(--muted-color);
+  transition: transform 0.15s;
+}
+.hs-add-card:active { transform: scale(0.97); }
+.hs-add-card .material-symbols-outlined { font-size: 22px; color: #4f8cff; }
+.hs-add-card span:last-child { font-size: 0.72rem; font-weight: 600; }
 .hs-study-icon { font-size: 20px; color: var(--study-color, #4f8cff); }
 .hs-study-name {
   font-size: 0.82rem; font-weight: 700;
