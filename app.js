@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.61";
+const APP_VERSION = "2.3.62";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.61 — Verse Nav Pinned to Screen Bottom</div>
+<div class="un-version-label">v2.3.62 — Verse Nav Pinned to Screen Bottom</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
@@ -15036,11 +15036,6 @@ window.addEventListener("pagehide", () => {
   syncUserData();
 });
 
-// Keep rhema modal height correct on orientation change
-window.addEventListener("resize", () => {
-  const modal = document.getElementById('rhemaModal');
-  if (modal?.classList.contains('open')) modal.style.height = window.innerHeight + 'px';
-});
 
 function openInstallModalFromProfile() {
   showInstallAppModal();
@@ -16331,9 +16326,6 @@ async function showRhema() {
   hideBottomNav();
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
-  // Set height from JS — the only reliable way to match the true visible viewport on iOS Safari.
-  // CSS units (dvh/svh) and inset:0 can all be defeated by .modal-overlay class conflicts.
-  modal.style.height = window.innerHeight + 'px';
   modal.classList.add('open');
   if (!_studySandboxId) {
     _rhemaSavedScrollY = window.scrollY;
@@ -16384,8 +16376,7 @@ function closeRhema(keepSandbox = false) {
     }
     if (!keepSandbox) _studySandboxId = null;
   }
-  const _rm = document.getElementById('rhemaModal');
-  if (_rm) { _rm.classList.remove('open'); _rm.style.height = ''; }
+  document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
   closeRhemaPickerSheet();
   document.body.style.position = '';
