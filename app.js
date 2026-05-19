@@ -13540,7 +13540,7 @@ function openCustomProfileColor() {
   const picker = document.getElementById("customProfileColorInput");
   if (!picker) return;
   picker.value = profileData.color || "#4f8cff";
-  picker.click();
+  picker.click(); // fallback for programmatic calls
 }
 
 function saveProfileData() {
