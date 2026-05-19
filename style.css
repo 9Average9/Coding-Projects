@@ -10750,9 +10750,6 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 }
 .cs-fmt-btn.active, .cs-dur-btn.active { border-color: var(--secondary); color: var(--secondary); background: color-mix(in srgb, var(--secondary) 10%, transparent); }
 
-/* ── Poll opt inputs ─────────────────────────────────────────────────────── */
-.cs-poll-opt-input { margin-bottom: 8px; }
-
 /* ── Detail header (compact) ──────────────────────────────────────────────── */
 .cs-detail-header {
   --study-accent: var(--secondary);
@@ -10828,28 +10825,6 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 .cs-verse-ref { font-size: 0.76rem; font-weight: 700; color: var(--secondary); margin-bottom: 3px; }
 .cs-spotlight-word { font-size: 1.1rem; font-weight: 800; color: var(--secondary); font-style: italic; margin-bottom: 3px; }
 
-/* ── Poll cards ──────────────────────────────────────────────────────────── */
-.cs-polls-list { display: flex; flex-direction: column; gap: 12px; }
-.cs-poll-card { background: var(--primary); border-radius: 12px; padding: 12px 14px; }
-.cs-poll-q { font-size: 0.9rem; font-weight: 700; color: var(--font-color); margin-bottom: 10px; }
-.cs-poll-opt {
-  position: relative; width: 100%; overflow: hidden;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px; border: 1.5px solid var(--border-color); border-radius: 8px;
-  background: transparent; cursor: pointer; margin-bottom: 6px; transition: border-color 0.15s;
-  font-size: 0.84rem; font-weight: 600; color: var(--font-color);
-}
-.cs-poll-opt.voted { border-color: var(--secondary); }
-.cs-poll-opt:disabled { cursor: default; }
-.cs-poll-bar {
-  position: absolute; left: 0; top: 0; bottom: 0;
-  background: color-mix(in srgb, var(--secondary) 14%, transparent);
-  border-radius: 6px; transition: width 0.4s ease; pointer-events: none;
-}
-.cs-poll-label { position: relative; z-index: 1; text-align: left; flex: 1; }
-.cs-poll-pct { position: relative; z-index: 1; font-size: 0.75rem; color: var(--muted-color); font-weight: 700; }
-.cs-poll-total { font-size: 0.74rem; color: var(--muted-color); margin-top: 4px; }
-
 /* ── Prayer cards ────────────────────────────────────────────────────────── */
 .cs-prayers-list { display: flex; flex-direction: column; gap: 10px; }
 .cs-prayer-card { background: var(--primary); border-radius: 12px; padding: 12px 14px; }
@@ -10920,11 +10895,6 @@ body.dark .cs-react-btn { border-color: #374151; color: #e5e7eb; background: tra
 body.dark .cs-react-btn.active { border-color: #3b82f6; background: rgba(59,130,246,0.15); }
 body.dark .cs-join-announce { background: rgba(59,130,246,0.08); color: #9ca3af; }
 body.dark .cs-verse-ref, body.dark .cs-spotlight-word { color: #60a5fa; }
-body.dark .cs-poll-card { background: #111827; }
-body.dark .cs-poll-q { color: #f3f4f6; }
-body.dark .cs-poll-opt { border-color: #374151; color: #e5e7eb; }
-body.dark .cs-poll-opt.voted { border-color: #3b82f6; }
-body.dark .cs-poll-total { color: #6b7280; }
 body.dark .cs-prayer-card { background: #111827; }
 body.dark .cs-prayer-text { color: #e5e7eb; }
 body.dark .cs-prayer-author { color: #f3f4f6; }
@@ -10948,7 +10918,6 @@ body.dark .cs-badge-requests { background: rgba(248,113,113,0.14); color: #f8717
 body.dark .cs-approve-btn { background: #1d4ed8; }
 body.dark .cs-deny-btn { border-color: #374151; color: #9ca3af; }
 body.dark .cs-contrib-btn { background: #1d4ed8; }
-body.dark .cs-poll-btn { background: rgba(96,165,250,0.12); color: #60a5fa; border-color: rgba(96,165,250,0.3); }
 body.dark .cs-invite-btn { background: rgba(251,191,36,0.12); color: #fbbf24; border-color: rgba(251,191,36,0.3); }
 body.dark .cs-plan-btn { background: rgba(74,222,128,0.10); color: #4ade80; border-color: rgba(74,222,128,0.25); }
 body.dark .cs-pray-btn { background: rgba(244,114,182,0.10); color: #f472b6; border-color: rgba(244,114,182,0.25); }

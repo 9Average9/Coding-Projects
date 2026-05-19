@@ -13454,9 +13454,19 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.32";
+const APP_VERSION = "2.3.33";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.33 — Social &amp; Study Fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Friend Requests</strong> — Sending a request now turns the button to Pending instantly; the other person sees it right away without refreshing</li>
+    <li><strong>Accepting Friends</strong> — Accepting a request adds them to your friends list immediately</li>
+    <li><strong>Study Join</strong> — Fixed joining studies as a non-host; now works instantly with proper feedback if something goes wrong</li>
+    <li><strong>Your Studies on Home</strong> — Your active studies now appear on the home screen the moment you log in, without having to visit the Community tab first</li>
+    <li><strong>Polls Removed</strong> — Simplified the study group to Posts, Prayer, and Reading Plan</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.17 — Study Groups</div>
 <div class="un-section">
   <div class="un-section-title">Creating a Study</div>
@@ -13473,9 +13483,8 @@ const UPDATE_NOTES_HTML = `
   <div class="un-section-title">Inside a Study</div>
   <ul class="un-list">
     <li><strong>Daily Check-In</strong> — Tap once a day to register that you studied; green dots show who's active today</li>
-    <li><strong>Tabbed View</strong> — Switch between Posts, Polls, Prayer, and Plan tabs</li>
+    <li><strong>Tabbed View</strong> — Switch between Posts, Prayer, and Plan tabs</li>
     <li><strong>Emoji Reactions</strong> — React to any post with 🔥 💡 🙏 ❓</li>
-    <li><strong>Polls</strong> — Create polls with live percentage bars; change your vote anytime</li>
     <li><strong>Prayer Requests</strong> — Share requests with the group; hosts can mark them Answered ✓</li>
     <li><strong>Reading Plan</strong> — Hosts set a task checklist; each member checks off items on their own</li>
     <li><strong>Join Announcements</strong> — An automatic post appears in the feed when someone joins</li>
@@ -13954,6 +13963,8 @@ window.__onAuthStateReady = async (user) => {
     updatePracticeToolLocks();
     updateLessonCompletionUI();
     populateHomeScreen();
+    // Start studies listener early so home screen shows studies without visiting community
+    _ensureStudiesListener();
     // If friends modal was opened while auth was still loading, populate it now
     if (document.getElementById("friendsModal")?.classList.contains("open")) {
       switchFriendsTab(_friendsTab);
@@ -14537,6 +14548,26 @@ function _csActivityScore(s) {
   return members * 3 + contribs * 2 - ageH * 0.05;
 }
 
+// Start the studies real-time listener without rendering the community board.
+// Called on login so the home screen "Your Studies" section is populated immediately.
+function _ensureStudiesListener() {
+  if (_csUnsub) return;
+  if (!window.Community) return;
+  _csUnsub = window.Community.listenStudies((studies, err) => {
+    if (err || !studies) return;
+    const myUid = window.Auth?.getCurrentUser()?.uid;
+    const visible = studies.filter(s => {
+      if (s.visibility === 'private') return myUid && ((s.invitedUids || []).includes(myUid) || (s.memberUids || []).includes(myUid));
+      if (s.visibility === 'friends') return myUid && (s.creatorUid === myUid || (friendsList || []).includes(s.creatorUid));
+      return true;
+    });
+    visible.sort((a, b) => _csActivityScore(b) - _csActivityScore(a));
+    _csStudies = visible;
+    _renderHomeStudies();
+    _updateNotifBadge();
+  });
+}
+
 function _renderStudyBoard() {
   const el = document.getElementById("csStudyList");
   if (!el) return;
@@ -14568,6 +14599,7 @@ function _renderStudyBoard() {
     visible.sort((a, b) => _csActivityScore(b) - _csActivityScore(a));
     _csStudies = visible;
     _renderStudyList(el, visible);
+    _renderHomeStudies();
     _updateNotifBadge();
   });
 }
@@ -14856,10 +14888,9 @@ async function openStudyDetail(studyId, preserveTab = false) {
   const timeout = ms => new Promise(r => setTimeout(() => r(null), ms));
   const safe = p => Promise.race([Promise.resolve(p).catch(() => null), timeout(8000)]);
 
-  const [study, contribs, polls, prayers, plan, checkIns] = await Promise.all([
+  const [study, contribs, prayers, plan, checkIns] = await Promise.all([
     safe(window.Community?.getStudy(studyId)),
     safe(window.Community?.getContributions(studyId)),
-    safe(window.Community?.getPolls(studyId)),
     safe(window.Community?.getPrayers(studyId)),
     safe(window.Community?.getReadingPlan(studyId)),
     safe(window.Community?.getCheckIns(studyId))
@@ -14874,7 +14905,7 @@ async function openStudyDetail(studyId, preserveTab = false) {
     return;
   }
   try {
-    _renderStudyDetail(el, study, contribs || [], polls || [], prayers || [], plan, checkIns || []);
+    _renderStudyDetail(el, study, contribs || [], prayers || [], plan, checkIns || []);
     switchDetailTab(_csDetailTab);
   } catch (e) {
     el.innerHTML = `<div style="padding:24px;text-align:center"><p style="color:var(--muted-color)">Something went wrong loading the study. Please go back and try again.</p></div>`;
@@ -14897,7 +14928,7 @@ function toggleMembersCollapsed(studyId) {
   if (icon) icon.textContent = _csMembersCollapsed ? "expand_more" : "expand_less";
 }
 
-function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns) {
+function _renderStudyDetail(el, study, contribs, prayers, plan, checkIns) {
   const me        = window.Auth?.getCurrentUser();
   const myUid     = me?.uid;
   const isMember  = myUid && (study.memberUids || []).includes(myUid);
@@ -14955,25 +14986,6 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
       <div class="cs-react-row">${reactionBar}</div>
     </div>`;
   }).join("") : `<p class="cs-empty-sm">No posts yet — be the first to contribute.</p>`;
-
-  // ── Polls tab ───────────────────────────────────────────────────────────
-  const pollsHtml = polls.length ? polls.map(p => {
-    const totalVotes = p.options.reduce((s, o) => s + (o.voters || []).length, 0);
-    return `<div class="cs-poll-card">
-      <div class="cs-poll-q">${_lbEscape(p.question)}</div>
-      ${p.options.map((opt, i) => {
-        const votes = (opt.voters || []).length;
-        const pct   = totalVotes ? Math.round(votes / totalVotes * 100) : 0;
-        const voted = myUid && (opt.voters || []).includes(myUid);
-        return `<button class="cs-poll-opt${voted ? " voted" : ""}" onclick="csPollVoteUI('${study.id}','${p.id}',${i},${p.options.length})" ${!myUid || !isMember ? "disabled" : ""}>
-          <div class="cs-poll-bar" style="width:${pct}%"></div>
-          <span class="cs-poll-label">${_lbEscape(opt.text)}</span>
-          <span class="cs-poll-pct">${pct}%</span>
-        </button>`;
-      }).join("")}
-      <div class="cs-poll-total">${totalVotes} vote${totalVotes !== 1 ? "s" : ""} · by ${_lbEscape(p.displayName)}</div>
-    </div>`;
-  }).join("") : `<p class="cs-empty-sm">No polls yet.</p>`;
 
   // ── Prayer tab ──────────────────────────────────────────────────────────
   const prayerHtml = prayers.length ? prayers.map(pr => `
@@ -15037,9 +15049,6 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
       <button class="cs-tab-action-btn active" data-for-tab="posts" onclick="openContribSheet('${study.id}')">
         <span class="material-symbols-outlined">add_circle</span> Add Post
       </button>
-      <button class="cs-tab-action-btn" data-for-tab="polls" onclick="openPollSheet('${study.id}')">
-        <span class="material-symbols-outlined">poll</span> Add Poll
-      </button>
       <button class="cs-tab-action-btn" data-for-tab="prayer" onclick="openPrayerSheet('${study.id}')">
         <span class="material-symbols-outlined">volunteer_activism</span> Add Prayer Request
       </button>
@@ -15093,12 +15102,10 @@ function _renderStudyDetail(el, study, contribs, polls, prayers, plan, checkIns)
     <div class="cs-members-list" id="csMembersList_${study.id}">${memberRows || '<p class="cs-empty-sm">No members yet</p>'}</div>
     <div class="cs-detail-tabs">
       <button class="cs-detail-tab active" data-tab="posts" onclick="switchDetailTab('posts')">Posts</button>
-      <button class="cs-detail-tab" data-tab="polls" onclick="switchDetailTab('polls')">Polls</button>
       <button class="cs-detail-tab" data-tab="prayer" onclick="switchDetailTab('prayer')">Prayer</button>
       <button class="cs-detail-tab" data-tab="plan" onclick="switchDetailTab('plan')">Plan</button>
     </div>
     <div class="cs-detail-pane active" data-tab="posts"><div class="cs-contrib-list">${postsHtml}</div></div>
-    <div class="cs-detail-pane" data-tab="polls"><div class="cs-polls-list">${pollsHtml}</div></div>
     <div class="cs-detail-pane" data-tab="prayer"><div class="cs-prayers-list">${prayerHtml}</div></div>
     <div class="cs-detail-pane" data-tab="plan"><div class="cs-plan-list">${planHtml}</div></div>
     <div class="cs-detail-actions">${actionContent}</div>`;
@@ -15114,15 +15121,30 @@ function closeStudyDetail() {
 async function csJoin(studyId, creatorUid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  const study = await window.Community?.getStudy(studyId);
-  const name = localStorage.getItem("authDisplayName") || "Someone";
-  let ok;
-  if (study?.visibility === "private") {
-    ok = await window.Community?.requestJoin(studyId, me.uid, name, creatorUid);
-  } else {
-    ok = await window.Community?.instantJoin(studyId, me.uid, name);
+  const btn = event?.currentTarget;
+  if (btn) { btn.disabled = true; btn.textContent = "Joining…"; }
+  try {
+    const study = await window.Community?.getStudy(studyId);
+    const name = localStorage.getItem("authDisplayName") || "Someone";
+    const avatar = localStorage.getItem("profilePicType") === "icon"
+      ? (localStorage.getItem("profilePicValue") || "person") : "person";
+    let ok;
+    if (study?.visibility === "private") {
+      ok = await window.Community?.requestJoin(studyId, me.uid, name, creatorUid);
+    } else {
+      ok = await window.Community?.instantJoin(studyId, me.uid, name, avatar);
+    }
+    if (ok) { openStudyDetail(studyId); return; }
+    if (btn) { btn.disabled = false; btn.textContent = "Join Study"; }
+    const el = document.getElementById("csDetailContent");
+    const err = document.createElement("p");
+    err.style.cssText = "color:var(--muted-color);text-align:center;padding:8px;font-size:0.85rem";
+    err.textContent = "Couldn't join right now. Check your connection and try again.";
+    el?.appendChild(err);
+    setTimeout(() => err.remove(), 4000);
+  } catch {
+    if (btn) { btn.disabled = false; btn.textContent = "Join Study"; }
   }
-  if (ok) openStudyDetail(studyId);
 }
 
 async function csAcceptInvite(studyId) {
@@ -15148,13 +15170,6 @@ async function csReact(studyId, contribId, emoji) {
   openStudyDetail(studyId);
 }
 
-async function csPollVoteUI(studyId, pollId, optionIndex, optionCount) {
-  const me = window.Auth?.getCurrentUser();
-  if (!me) return;
-  await window.Community?.pollVote(studyId, pollId, optionIndex, me.uid, optionCount);
-  openStudyDetail(studyId, true);
-}
-
 async function csAnswerPrayer(studyId, prayerId) {
   await window.Community?.prayerAnswered(studyId, prayerId);
   openStudyDetail(studyId);
@@ -15168,47 +15183,6 @@ async function csToggleTaskUI(studyId, taskIndex) {
   const isDone = task ? (task.completedBy || []).includes(me.uid) : false;
   await window.Community?.toggleTask(studyId, taskIndex, me.uid, !isDone);
   openStudyDetail(studyId);
-}
-
-// ── Poll Sheet ────────────────────────────────────────────────────────────────
-let _csPollStudyId = null;
-
-function openPollSheet(studyId) {
-  _csPollStudyId = studyId;
-  document.getElementById("csPollQuestion").value = "";
-  document.getElementById("csPollOpt1").value = "";
-  document.getElementById("csPollOpt2").value = "";
-  document.getElementById("csPollOpt3").value = "";
-  document.getElementById("csPollOpt4").value = "";
-  document.getElementById("csPollError").textContent = "";
-  document.getElementById("csPollSheet").classList.add("open");
-}
-
-function closePollSheet() {
-  document.getElementById("csPollSheet").classList.remove("open");
-}
-
-async function submitPoll() {
-  const me = window.Auth?.getCurrentUser();
-  if (!me || !_csPollStudyId) return;
-  const question = document.getElementById("csPollQuestion").value.trim();
-  const errEl = document.getElementById("csPollError");
-  const btn = document.getElementById("csPollSubmitBtn");
-  errEl.textContent = "";
-  if (!question) { errEl.textContent = "Please enter a question."; return; }
-  const opts = [
-    document.getElementById("csPollOpt1").value.trim(),
-    document.getElementById("csPollOpt2").value.trim(),
-    document.getElementById("csPollOpt3").value.trim(),
-    document.getElementById("csPollOpt4").value.trim()
-  ].filter(Boolean);
-  if (opts.length < 2) { errEl.textContent = "Add at least 2 options."; return; }
-  btn.disabled = true; btn.textContent = "Adding…";
-  const name = localStorage.getItem("authDisplayName") || "User";
-  const ok = await window.Community?.addPoll(_csPollStudyId, me.uid, name, question, opts);
-  btn.disabled = false; btn.textContent = "Add Poll";
-  if (ok) { closePollSheet(); openStudyDetail(_csPollStudyId); }
-  else errEl.textContent = "Something went wrong.";
 }
 
 // ── Prayer Sheet ──────────────────────────────────────────────────────────────
@@ -15941,9 +15915,16 @@ function closeFriendSheet() {
 async function sendRequestAction(uid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
+  // Optimistic update — show Pending immediately
+  friendRequestsOut = [...new Set([...friendRequestsOut, uid])];
+  updateFriendsBadge();
+  if (_friendsTab === "find")     renderFindFriends(_browseSearch);
+  if (_friendsTab === "requests") renderFriendRequests();
   const myName = localStorage.getItem("authDisplayName") || "Someone";
-  if (await window.Friends.sendRequest(me.uid, uid, myName)) {
-    friendRequestsOut = [...new Set([...friendRequestsOut, uid])];
+  const ok = await window.Friends.sendRequest(me.uid, uid, myName);
+  if (!ok) {
+    // Rollback on failure
+    friendRequestsOut = friendRequestsOut.filter(id => id !== uid);
     updateFriendsBadge();
     if (_friendsTab === "find")     renderFindFriends(_browseSearch);
     if (_friendsTab === "requests") renderFriendRequests();
@@ -15964,10 +15945,18 @@ async function cancelRequestAction(uid) {
 async function acceptRequestAction(uid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
+  // Optimistic update — add to friends instantly
+  friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
+  friendsList = [...new Set([...friendsList, uid])];
+  updateFriendsBadge();
+  if (_friendsTab === "friends")  renderFriendsList();
+  if (_friendsTab === "requests") renderFriendRequests();
   const myName = localStorage.getItem("authDisplayName") || "Someone";
-  if (await window.Friends.acceptRequest(me.uid, uid, myName)) {
-    friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
-    friendsList = [...new Set([...friendsList, uid])];
+  const ok = await window.Friends.acceptRequest(me.uid, uid, myName);
+  if (!ok) {
+    // Rollback on failure
+    friendRequestsIn = [...new Set([...friendRequestsIn, uid])];
+    friendsList = friendsList.filter(id => id !== uid);
     updateFriendsBadge();
     if (_friendsTab === "friends")  renderFriendsList();
     if (_friendsTab === "requests") renderFriendRequests();

@@ -705,37 +705,6 @@ async function csToggleReaction(studyId, contribId, uid, emoji) {
   } catch (e) { return false; }
 }
 
-// ── Polls ─────────────────────────────────────────────────────────────────
-async function csAddPoll(studyId, uid, displayName, question, options) {
-  try {
-    await addDoc(collection(db, "community_studies", studyId, "polls"), {
-      uid, displayName, question,
-      options: options.map(text => ({ text, voters: [] })),
-      createdAt: serverTimestamp()
-    });
-    await updateDoc(doc(db, "community_studies", studyId), { lastActivityAt: serverTimestamp() });
-    return true;
-  } catch (e) { return false; }
-}
-
-async function csPollVote(studyId, pollId, optionIndex, uid, optionCount) {
-  const ref = doc(db, "community_studies", studyId, "polls", pollId);
-  try {
-    const updates = {};
-    for (let i = 0; i < optionCount; i++) {
-      updates[`options.${i}.voters`] = i === optionIndex ? arrayUnion(uid) : arrayRemove(uid);
-    }
-    await updateDoc(ref, updates);
-    return true;
-  } catch (e) { return false; }
-}
-
-async function csGetPolls(studyId) {
-  try {
-    return (await getDocs(collection(db, "community_studies", studyId, "polls"))).docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch { return []; }
-}
-
 // ── Check-ins ─────────────────────────────────────────────────────────────
 async function csCheckIn(studyId, uid, displayName) {
   const today = new Date().toISOString().slice(0, 10);
@@ -819,9 +788,6 @@ window.Community = {
   addContribution: csAddContribution,
   getContributions: csGetContributions,
   toggleReaction: csToggleReaction,
-  addPoll: csAddPoll,
-  pollVote: csPollVote,
-  getPolls: csGetPolls,
   checkIn: csCheckIn,
   getCheckIns: csGetCheckIns,
   addPrayer: csAddPrayer,
