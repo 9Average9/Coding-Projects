@@ -10937,43 +10937,35 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ══ Rhēma Word Study — all colors via CSS variables, theme-aware ════════════ */
 
-/* ID selector (1,0,0) beats .modal-overlay.open (0,2,0) — owns all layout */
+/* ── Rhema full-screen wrapper: fixed to viewport, never transformed ── */
 #rhemaModal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0; /* stretches to physical screen bottom — no JS height needed, no white bar */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  inset: 0;
   z-index: 1000;
+  display: none;
+  overflow: hidden;
+}
+#rhemaModal.open {
+  display: block;
 }
 
-.rhema-modal-overlay {
+/* ── Animated slide-up panel: transform lives here, flex column layout lives here ── */
+#rhemaSlide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--primary-light);
-  padding: 0 !important;
-  opacity: 0;
+  overflow: hidden;
   transform: translateY(100%);
-  pointer-events: none;
-  transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.28s ease;
   overscroll-behavior: none;
   touch-action: pan-y;
 }
-.rhema-modal-overlay.open {
-  opacity: 1;
+#rhemaModal.open #rhemaSlide {
   transform: translateY(0);
-  pointer-events: all;
-}
-
-.rhema-container {
-  position: relative;
-  flex: 1;           /* fills all space above the verse nav */
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  overscroll-behavior: none;
+  opacity: 1;
 }
 
 /* ── Header ── */
@@ -11043,10 +11035,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   gap: 6px;
   padding: 6px 12px 8px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
   background: var(--primary-light);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .rhema-highlight-bar::-webkit-scrollbar { display: none; }
 .rhema-highlight-bar.hidden { display: none; }
@@ -11309,7 +11306,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Picker overlay backdrop ── */
 .rhema-picker-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(3px);
@@ -11459,19 +11456,16 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-body {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.rhema-content-area {
-  flex: 1;
-  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
+}
+
+.rhema-content-area {
+  min-height: 100%;
 }
 
 .rhema-loading {
@@ -11694,7 +11688,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   width: 100%;
 }
 .rhema-verse-nav.hidden { display: none; }
-.rhema-modal-overlay.picker-open .rhema-verse-nav { visibility: hidden; pointer-events: none; }
+#rhemaModal.picker-open .rhema-verse-nav { visibility: hidden; pointer-events: none; }
 .rhema-nav-btn {
   background: color-mix(in srgb, var(--card-color) 55%, transparent);
   border: 1.5px solid var(--border-color);
@@ -11819,7 +11813,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Bottom sheet ── */
 .rhema-sheet-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.4);
   opacity: 0;
@@ -11833,7 +11827,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-sheet {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;

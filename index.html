@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.62" />
+  <link rel="stylesheet" href="style.css?v=2.3.63" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10679,8 +10679,9 @@ glacier: {
 
 
 <!-- ══ Rhēma Word Study ══════════════════════════════════════════════════════ -->
-<div id="rhemaModal" class="modal-overlay rhema-modal-overlay">
-  <div class="rhema-container">
+<div id="rhemaModal">
+  <!-- Animated slide-up panel: transform lives here, flex column layout lives here -->
+  <div id="rhemaSlide">
 
     <div class="rhema-header">
       <button class="icon-btn rhema-back-btn" onclick="rhemaGoBack()">
@@ -10731,7 +10732,6 @@ glacier: {
     </div>
 
     <!-- Scrollable body fills all space between picker and verse nav -->
-    <div id="rhemaChapterToast" class="rhema-chapter-toast hidden"></div>
     <div class="rhema-body">
       <div class="rhema-content-area">
         <div id="rhemaLoadingMsg" class="rhema-loading">Loading Rhēma data…</div>
@@ -10740,22 +10740,26 @@ glacier: {
       </div>
     </div>
 
-  </div><!-- end .rhema-container -->
-
-  <!-- Verse nav: direct flex child of overlay so it always sits at physical screen bottom -->
-  <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
-    <div class="rhema-verse-nav-row">
-      <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
-        <span class="material-symbols-outlined">chevron_left</span>
-      </button>
-      <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
-      <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
+    <!-- Verse nav: last flex child of #rhemaSlide — always at physical screen bottom -->
+    <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
+      <div class="rhema-verse-nav-row">
+        <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
+        <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+      <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
     </div>
-    <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
-  </div>
 
+    <!-- Chapter toast: position:absolute so it floats above content -->
+    <div id="rhemaChapterToast" class="rhema-chapter-toast hidden"></div>
+
+  </div><!-- end #rhemaSlide -->
+
+  <!-- Overlays: position:absolute within #rhemaModal (fixed full-screen, no transform) -->
   <!-- Word detail bottom sheet -->
   <div id="rhemaSheet" class="rhema-sheet">
     <div class="rhema-sheet-handle"></div>
@@ -10866,9 +10870,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.62"></script>
-  <script src="app.js?v=2.3.62"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.62"></script>
+  <script src="vocab.js?v=2.3.63"></script>
+  <script src="app.js?v=2.3.63"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.63"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
