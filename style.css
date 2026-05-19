@@ -12517,109 +12517,89 @@ body .app:has(#settingsScreen.screen.active) {
 
 /* ── Personal Studies ──────────────────────────────────────────────────────── */
 
-.studies-section {
-  padding: 16px 16px 4px;
+/* Home screen studies section */
+.home-studies-section {
+  margin: 12px 0 4px;
 }
-
-.studies-section-header {
+.home-studies-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  padding: 0 2px;
+  margin-bottom: 10px;
 }
-
-.studies-section-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-color);
-}
-
-.studies-add-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #4f8cff;
-  background: rgba(79,140,255,0.1);
+.hs-new-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
   border: none;
-  border-radius: 20px;
-  padding: 6px 12px;
+  background: rgba(79,140,255,0.12);
+  color: #4f8cff;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
-
-.studies-add-btn .material-symbols-outlined {
-  font-size: 16px;
+.hs-new-btn .material-symbols-outlined { font-size: 18px; }
+.hs-view-all-btn {
+  font-size: 0.78rem; font-weight: 600;
+  color: #4f8cff;
+  background: none; border: none;
+  cursor: pointer; padding: 0 4px;
 }
-
-.study-grid {
+.hs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
-  margin-bottom: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
 }
-
-.study-card {
+.hs-start-btn {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 16px;
+  background: var(--card-color);
+  border: 1.5px dashed var(--border-color);
+  border-radius: 16px;
+  color: var(--muted-color);
+  font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+}
+.hs-start-btn .material-symbols-outlined { font-size: 20px; color: #4f8cff; }
+.hs-study-card {
   background: var(--card-color);
   border: 1.5px solid var(--study-color, #4f8cff);
   border-radius: 16px;
-  padding: 14px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  cursor: pointer;
+  padding: 12px 10px 10px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  cursor: pointer; position: relative; overflow: hidden;
   transition: transform 0.15s;
-  position: relative;
-  overflow: hidden;
 }
-
-.study-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--study-color, #4f8cff);
-  opacity: 0.07;
-  pointer-events: none;
+.hs-study-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--study-color, #4f8cff); opacity: 0.06; pointer-events: none;
 }
-
-.study-card:active { transform: scale(0.97); }
-
-.study-card-icon {
-  font-size: 22px;
-  color: var(--study-color, #4f8cff);
+.hs-study-card:active { transform: scale(0.97); }
+.hs-study-icon { font-size: 20px; color: var(--study-color, #4f8cff); }
+.hs-study-name {
+  font-size: 0.82rem; font-weight: 700;
+  color: var(--text-color); line-height: 1.2; word-break: break-word;
 }
-
-.study-card-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-color);
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-.study-card-meta {
-  font-size: 0.72rem;
-  color: var(--muted-color);
-}
+.hs-study-meta { font-size: 0.7rem; color: var(--muted-color); }
 
 .study-card-done-dot {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 8px;
-  height: 8px;
-  background: #22c55e;
-  border-radius: 50%;
+  position: absolute; top: 8px; right: 8px;
+  width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
 }
 
-.studies-empty {
-  font-size: 0.85rem;
-  color: var(--muted-color);
-  text-align: center;
-  padding: 12px 0;
-  grid-column: 1 / -1;
+/* View All Studies modal list */
+.sva-list { display: flex; flex-direction: column; gap: 4px; }
+.sva-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 8px; border-radius: 12px; cursor: pointer;
+  transition: background 0.15s;
 }
+.sva-item:active { background: var(--primary-color); }
+.sva-icon { font-size: 22px; }
+.sva-info { flex: 1; }
+.sva-name { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-color); }
+.sva-meta { display: block; font-size: 0.75rem; color: var(--muted-color); }
+.sva-chev { font-size: 20px; color: var(--muted-color); }
 
 /* Study bottom sheets */
 .study-sheet-overlay {
@@ -12819,6 +12799,197 @@ body .app:has(#settingsScreen.screen.active) {
   color: #ef4444;
   cursor: pointer;
 }
+
+/* ── Study Sandbox ─────────────────────────────────────────────────────────── */
+.study-sandbox {
+  position: fixed; inset: 0; z-index: 800;
+  background: var(--primary-color);
+  display: flex; flex-direction: column;
+}
+.study-sandbox.hidden { display: none; }
+
+.ss-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 52px 16px 12px;
+  background: var(--card-color);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.ss-back-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--primary-color);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.ss-back-btn .material-symbols-outlined { font-size: 20px; color: var(--text-color); }
+.ss-title-wrap { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.ss-icon { font-size: 22px; }
+.ss-title { font-size: 1rem; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-members { font-size: 0.75rem; color: var(--muted-color); flex-shrink: 0; }
+
+.ss-tabs {
+  display: flex; gap: 0;
+  background: var(--card-color);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; overflow-x: auto;
+}
+.ss-tab {
+  flex: 1; padding: 12px 8px;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  font-size: 0.83rem; font-weight: 600; color: var(--muted-color);
+  cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+}
+.ss-tab.active { color: #4f8cff; border-bottom-color: #4f8cff; }
+
+.ss-body { flex: 1; overflow: hidden; position: relative; }
+.ss-pane {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column;
+  overflow: hidden;
+}
+.ss-pane.active { display: flex; }
+
+/* Notes pane */
+.ss-notes-list {
+  flex: 1; overflow-y: auto; padding: 12px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.ss-note-item {
+  background: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: 14px; padding: 12px 14px;
+}
+.ss-note-header {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+.ss-note-author { font-size: 0.78rem; font-weight: 700; color: var(--text-color); flex: 1; }
+.ss-note-date { font-size: 0.72rem; color: var(--muted-color); }
+.ss-note-del {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted-color); padding: 0; line-height: 1;
+}
+.ss-note-del .material-symbols-outlined { font-size: 16px; }
+.ss-note-body { font-size: 0.88rem; color: var(--text-color); line-height: 1.5; margin: 0; }
+
+.ss-compose {
+  display: flex; gap: 8px; align-items: flex-end;
+  padding: 10px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
+  border-top: 1px solid var(--border-color);
+  background: var(--card-color); flex-shrink: 0;
+}
+.ss-note-input {
+  flex: 1; min-height: 44px; max-height: 120px;
+  background: var(--primary-color);
+  border: 1px solid var(--border-color); border-radius: 12px;
+  padding: 10px 12px; font-size: 0.9rem; color: var(--text-color);
+  resize: none; outline: none; overflow-y: auto;
+  font-family: inherit;
+}
+.ss-send-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: #4f8cff; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.ss-send-btn .material-symbols-outlined { font-size: 20px; }
+
+/* Saved Verses pane */
+.ss-hint {
+  font-size: 0.82rem; color: var(--muted-color);
+  padding: 12px 16px 0; margin: 0;
+}
+.ss-verses-list { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ss-verse-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card-color); border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 10px 12px;
+}
+.ss-verse-ref {
+  flex: 1; text-align: left; background: none; border: none;
+  font-size: 0.9rem; font-weight: 600; color: #4f8cff; cursor: pointer;
+}
+.ss-verse-del {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted-color); padding: 0;
+}
+.ss-verse-del .material-symbols-outlined { font-size: 18px; }
+
+/* Rhema pane */
+.ss-rhema-pane { align-items: center; justify-content: center; gap: 16px; padding: 24px; }
+.ss-rhema-position {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card-color); border: 1px solid var(--border-color);
+  border-radius: 14px; padding: 12px 16px; width: 100%;
+}
+.ss-rhema-position .material-symbols-outlined { font-size: 20px; color: #4f8cff; }
+.ss-rhema-position span:last-child { font-size: 0.9rem; font-weight: 600; color: var(--text-color); }
+.ss-rhema-open-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 24px; border-radius: 16px; border: none;
+  background: #4f8cff; color: #fff;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer; width: 100%;
+  justify-content: center;
+}
+.ss-rhema-open-btn .material-symbols-outlined { font-size: 20px; }
+
+/* Word Log pane */
+.ss-wordlog-list { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.ss-word-item {
+  background: var(--card-color); border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 10px 12px; position: relative;
+}
+.ss-word-main { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+.ss-word-lemma { font-size: 1rem; font-weight: 700; color: var(--text-color); }
+.ss-word-translit { font-size: 0.8rem; color: var(--muted-color); font-style: italic; }
+.ss-word-strongs { font-size: 0.72rem; color: #4f8cff; font-weight: 600; }
+.ss-word-def { font-size: 0.82rem; color: var(--muted-color); margin: 0; line-height: 1.4; }
+.ss-word-del {
+  position: absolute; top: 8px; right: 8px;
+  background: none; border: none; cursor: pointer; color: var(--muted-color); padding: 0;
+}
+.ss-word-del .material-symbols-outlined { font-size: 16px; }
+
+/* Save Verse to Study button in Rhema sheet */
+.rhema-save-to-study-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: calc(100% - 32px); margin: 12px 16px 0;
+  padding: 12px; border-radius: 14px; border: 1.5px solid #4f8cff;
+  background: rgba(79,140,255,0.08); color: #4f8cff;
+  font-size: 0.88rem; font-weight: 700; cursor: pointer;
+}
+.rhema-save-to-study-btn.hidden { display: none; }
+.rhema-save-to-study-btn .material-symbols-outlined { font-size: 18px; }
+
+/* ── Community Study Board ─────────────────────────────────────────────────── */
+.study-board-list {
+  flex: 1; overflow-y: auto; padding: 12px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.study-board-empty {
+  font-size: 0.85rem; color: var(--muted-color); text-align: center; padding: 24px 0;
+}
+.study-board-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card-color); border: 1.5px solid var(--study-color, #4f8cff);
+  border-radius: 16px; padding: 12px 14px; cursor: pointer;
+  position: relative; overflow: hidden; transition: transform 0.15s;
+}
+.study-board-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--study-color, #4f8cff); opacity: 0.05; pointer-events: none;
+}
+.study-board-card:active { transform: scale(0.98); }
+.sbc-icon { font-size: 24px; color: var(--study-color, #4f8cff); flex-shrink: 0; }
+.sbc-info { flex: 1; min-width: 0; }
+.sbc-name { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-color); }
+.sbc-meta { display: block; font-size: 0.75rem; color: var(--muted-color); margin-top: 2px; }
+.sbc-collab-badge {
+  font-size: 0.68rem; font-weight: 700; color: #22c55e;
+  background: rgba(34,197,94,0.1); border-radius: 10px;
+  padding: 3px 8px; flex-shrink: 0;
+}
+.sbc-chev { font-size: 18px; color: var(--muted-color); flex-shrink: 0; }
 
 /* ── Theme-aware nav back buttons ───────────────────────────────────────── */
 .nav-bar .icon-btn {

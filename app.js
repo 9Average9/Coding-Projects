@@ -40,7 +40,16 @@ let _myStudies = [];
 let _studyCreateColor = '#4f8cff';
 let _studyCreateIcon = 'menu_book';
 let _studyCreateShareFriends = false;
-let _activeStudyId = null;
+let _activeSandboxStudy = null;     // full study doc of open sandbox
+let _sandboxUnsubNotes = null;
+let _sandboxUnsubVerses = null;
+let _sandboxUnsubWordLog = null;
+let _sandboxTab = 'notes';
+let _studySandboxId = null;         // set when Rhema is open in study mode
+let _studySandboxRhemaReturn = false;
+let _studyBoardSheetId = null;      // study shown in community board sheet
+let _studyBoardStudies = [];
+let _unsubEncouragements = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
@@ -7967,28 +7976,46 @@ const NAV_SCREENS = ['homeScreen', 'profilePage', 'communityPage'];
 async function _loadMyStudies() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  _myStudies = await window.Studies?.getAll(uid) || [];
-  _renderStudiesSection();
+  _myStudies = await window.Studies?.getMine(uid) || [];
+  _renderHomeStudies();
 }
 
-function _renderStudiesSection() {
-  const container = document.getElementById('myStudiesGrid');
-  if (!container) return;
+function _renderHomeStudies() {
+  const grid = document.getElementById('hsGrid');
+  const viewAllBtn = document.getElementById('hsViewAllBtn');
+  if (!grid) return;
   if (!_myStudies.length) {
-    container.innerHTML = '<p class="studies-empty">No studies yet. Create your first one!</p>';
+    grid.innerHTML = `<button class="hs-start-btn" onclick="openStudyCreateSheet()">
+      <span class="material-symbols-outlined">add</span><span>Start a Study</span></button>`;
+    viewAllBtn?.classList.add('hidden');
     return;
   }
   const today = new Date().toLocaleDateString("en-CA");
-  container.innerHTML = _myStudies.map(s => `
-    <div class="study-card" style="--study-color:${s.color}" onclick="openStudySession('${s.id}')">
-      ${s.lastSessionDate === today ? '<span class="study-card-done-dot"></span>' : ''}
-      <span class="study-card-icon material-symbols-outlined">${s.icon}</span>
-      <span class="study-card-name">${s.name}</span>
-      <span class="study-card-meta">${s.totalSessions || 0} session${s.totalSessions === 1 ? '' : 's'}</span>
-    </div>
-  `).join('');
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const visible = _myStudies.slice(0, 3);
+  grid.innerHTML = visible.map(s => {
+    const doneToday = uid && (s.lastSessionDates || {})[uid] === today;
+    return `<div class="hs-study-card" style="--study-color:${s.color}" onclick="openStudySandbox('${s.id}')">
+      ${doneToday ? '<span class="study-card-done-dot"></span>' : ''}
+      <span class="hs-study-icon material-symbols-outlined">${s.icon}</span>
+      <span class="hs-study-name">${s.name}</span>
+      <span class="hs-study-meta">${_studyMemberLabel(s)}</span>
+    </div>`;
+  }).join('');
+  if (_myStudies.length > 3) {
+    viewAllBtn?.classList.remove('hidden');
+    viewAllBtn && (viewAllBtn.textContent = `View All (${_myStudies.length})`);
+  } else {
+    viewAllBtn?.classList.add('hidden');
+  }
 }
 
+function _studyMemberLabel(s) {
+  const count = (s.collaboratorUids || []).length;
+  return count > 1 ? `${count} members` : 'Solo';
+}
+
+// Create sheet
 function openStudyCreateSheet() {
   _studyCreateColor = '#4f8cff';
   _studyCreateIcon = 'menu_book';
@@ -8003,111 +8030,408 @@ function openStudyCreateSheet() {
     el.classList.toggle('selected', el.dataset.icon === 'menu_book'));
   document.getElementById('studyCreateSheet')?.classList.add('open');
 }
-
-function closeStudyCreateSheet() {
-  document.getElementById('studyCreateSheet')?.classList.remove('open');
-}
-
+function closeStudyCreateSheet() { document.getElementById('studyCreateSheet')?.classList.remove('open'); }
 function selectStudyColor(el) {
   _studyCreateColor = el.dataset.color;
   document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
   el.classList.add('selected');
 }
-
 function selectStudyIcon(el) {
   _studyCreateIcon = el.dataset.icon;
   document.querySelectorAll('.study-icon-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
 }
-
-function toggleStudyShareFriends(checkbox) {
-  _studyCreateShareFriends = checkbox.checked;
-}
+function toggleStudyShareFriends(checkbox) { _studyCreateShareFriends = checkbox.checked; }
 
 async function submitStudyCreate() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   const name = document.getElementById('studyCreateName')?.value?.trim();
-  if (!name) {
-    document.getElementById('studyCreateName')?.focus();
-    return;
-  }
-  const id = await window.Studies?.create(uid, {
-    name, color: _studyCreateColor, icon: _studyCreateIcon, shareWithFriends: _studyCreateShareFriends
+  if (!name) { document.getElementById('studyCreateName')?.focus(); return; }
+  const btn = document.querySelector('#studyCreateSheet .main-btn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const id = await window.Studies?.create(uid, displayName, {
+    name, color: _studyCreateColor, icon: _studyCreateIcon, shareSession: _studyCreateShareFriends
   });
+  if (btn) { btn.textContent = 'Create Study'; btn.disabled = false; }
   if (id) {
     closeStudyCreateSheet();
     await _loadMyStudies();
   }
 }
 
-function openStudySession(studyId) {
+// View All modal
+function openStudiesViewAll() {
+  const list = document.getElementById('studiesViewAllList');
+  if (list) {
+    list.innerHTML = _myStudies.map(s => `
+      <div class="sva-item" onclick="closeStudiesViewAll();openStudySandbox('${s.id}')">
+        <span class="sva-icon material-symbols-outlined" style="color:${s.color}">${s.icon}</span>
+        <div class="sva-info">
+          <span class="sva-name">${s.name}</span>
+          <span class="sva-meta">${_studyMemberLabel(s)}</span>
+        </div>
+        <span class="material-symbols-outlined sva-chev">chevron_right</span>
+      </div>
+    `).join('');
+  }
+  document.getElementById('studiesViewAllModal')?.classList.add('open');
+}
+function closeStudiesViewAll() { document.getElementById('studiesViewAllModal')?.classList.remove('open'); }
+
+// ── Study Sandbox ─────────────────────────────────────────────────────────────
+
+async function openStudySandbox(studyId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
   const study = _myStudies.find(s => s.id === studyId);
   if (!study) return;
-  _activeStudyId = studyId;
-  const today = new Date().toLocaleDateString("en-CA");
-  const alreadyDone = study.lastSessionDate === today;
 
-  const iconEl = document.getElementById('studySessionIcon');
-  const titleEl = document.getElementById('studySessionTitle');
-  const metaEl = document.getElementById('studySessionMeta');
-  const logBtn = document.getElementById('studySessionLogBtn');
+  _activeSandboxStudy = study;
+  _sandboxTab = 'notes';
 
+  // Populate header
+  const iconEl = document.getElementById('ssIcon');
+  const titleEl = document.getElementById('ssTitle');
+  const membersEl = document.getElementById('ssMembers');
   if (iconEl) { iconEl.textContent = study.icon; iconEl.style.color = study.color; }
   if (titleEl) titleEl.textContent = study.name;
-  if (metaEl) metaEl.textContent = `${study.totalSessions || 0} session${study.totalSessions === 1 ? '' : 's'} total`;
-  if (logBtn) {
-    const sheet = document.getElementById('studySessionSheet');
-    sheet?.style.setProperty('--study-session-color', study.color);
-    if (alreadyDone) {
-      logBtn.textContent = 'Already done today!';
-      logBtn.classList.add('done');
-    } else {
-      logBtn.textContent = "Log Today's Session";
-      logBtn.classList.remove('done');
-    }
+  if (membersEl) membersEl.textContent = _studyMemberLabel(study);
+
+  // Switch to notes tab
+  switchSandboxTab('notes');
+
+  // Show sandbox
+  document.getElementById('studySandbox')?.classList.remove('hidden');
+  document.getElementById('bottomNav')?.classList.add('hidden');
+
+  // Fire session open (first of day → notify friends)
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  window.Studies?.openSession(uid, studyId, { displayName, friendsList });
+
+  // Start real-time listeners
+  _sandboxUnsubNotes?.();
+  _sandboxUnsubVerses?.();
+  _sandboxUnsubWordLog?.();
+  _sandboxUnsubNotes  = window.Studies.listenNotes(studyId, _renderSandboxNotes);
+  _sandboxUnsubVerses = window.Studies.listenVerses(studyId, _renderSandboxVerses);
+  _sandboxUnsubWordLog= window.Studies.listenWordLog(studyId, _renderSandboxWordLog);
+
+  // Update Rhema position display
+  _updateSandboxRhemaPreview();
+
+  // Refresh home studies (dot update)
+  _loadMyStudies();
+}
+
+function closeStudySandbox() {
+  // If Rhema is open in study mode, close it first
+  if (_studySandboxId) {
+    _studySandboxRhemaReturn = false;
+    _studySandboxId = null;
+    document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');
   }
-
-  document.getElementById('studySessionSheet')?.classList.add('open');
+  _sandboxUnsubNotes?.();
+  _sandboxUnsubVerses?.();
+  _sandboxUnsubWordLog?.();
+  _sandboxUnsubNotes = _sandboxUnsubVerses = _sandboxUnsubWordLog = null;
+  _activeSandboxStudy = null;
+  document.getElementById('studySandbox')?.classList.add('hidden');
+  document.getElementById('bottomNav')?.classList.remove('hidden');
+  _loadMyStudies();
 }
 
-function closeStudySessionSheet() {
-  document.getElementById('studySessionSheet')?.classList.remove('open');
-  _activeStudyId = null;
+function switchSandboxTab(tab) {
+  _sandboxTab = tab;
+  document.querySelectorAll('.ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
 }
 
-async function logStudySession() {
+// Notes
+function _renderSandboxNotes(notes) {
+  const list = document.getElementById('ssNotesList');
+  if (!list) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
-  if (!uid || !_activeStudyId) return;
-  const logBtn = document.getElementById('studySessionLogBtn');
-  if (logBtn?.classList.contains('done')) return;
-  const study = _myStudies.find(s => s.id === _activeStudyId);
-  if (!study) return;
-  if (logBtn) { logBtn.textContent = 'Logging…'; logBtn.disabled = true; }
+  if (!notes.length) {
+    list.innerHTML = '<p class="ss-hint">No notes yet. Add the first one below.</p>';
+    return;
+  }
+  list.innerHTML = notes.map(n => {
+    const isCreator = _activeSandboxStudy?.creatorUid === uid;
+    const canDel = n.authorUid === uid || isCreator;
+    const ts = n.createdAt?.toDate ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(n.createdAt.toDate()) : '';
+    return `<div class="ss-note-item">
+      <div class="ss-note-header">
+        <span class="ss-note-author">${n.authorName || 'Member'}</span>
+        <span class="ss-note-date">${ts}</span>
+        ${canDel ? `<button class="ss-note-del" onclick="deleteSandboxNote('${n.id}')"><span class="material-symbols-outlined">delete</span></button>` : ''}
+      </div>
+      <p class="ss-note-body">${n.content.replace(/\n/g, '<br>')}</p>
+    </div>`;
+  }).join('');
+}
 
-  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
-  const result = await window.Studies?.openSession(uid, _activeStudyId, {
-    name: displayName, studyName: study.name, friends: study.shareWithFriends ? friendsList : []
+async function submitSandboxNote() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_activeSandboxStudy) return;
+  const input = document.getElementById('ssNoteInput');
+  const text = input?.value?.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  await window.Studies.addNote(_activeSandboxStudy.id, uid, displayName, text);
+}
+
+async function deleteSandboxNote(noteId) {
+  if (!_activeSandboxStudy) return;
+  await window.Studies.deleteNote(_activeSandboxStudy.id, noteId);
+}
+
+// Saved Verses
+function _renderSandboxVerses(verses) {
+  const list = document.getElementById('ssVersesList');
+  if (!list) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!verses.length) { list.innerHTML = ''; return; }
+  list.innerHTML = verses.map(v => {
+    const label = `${v.bookName || v.book} ${v.chapter}:${v.verse}`;
+    const canDel = v.savedByUid === uid || _activeSandboxStudy?.creatorUid === uid;
+    return `<div class="ss-verse-item">
+      <button class="ss-verse-ref" onclick="jumpToRhemaFromStudy('${v.book}','${v.chapter}','${v.verse}')">${label}</button>
+      ${canDel ? `<button class="ss-verse-del" onclick="deleteSandboxVerse('${v.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function deleteSandboxVerse(verseId) {
+  if (!_activeSandboxStudy) return;
+  await window.Studies.deleteVerse(_activeSandboxStudy.id, verseId);
+}
+
+// Opens Rhema to a saved verse (in study mode)
+function jumpToRhemaFromStudy(book, chapter, verse) {
+  if (!_activeSandboxStudy) return;
+  _studySandboxId = _activeSandboxStudy.id;
+  _studySandboxRhemaReturn = true;
+  _rhemaBook = book; _rhemaChapter = chapter; _rhemaVerse = verse;
+  document.getElementById('rhemaSaveToStudyBtn')?.classList.remove('hidden');
+  showRhema();
+}
+
+// Word Log
+function _renderSandboxWordLog(words) {
+  const list = document.getElementById('ssWordlogList');
+  if (!list) return;
+  if (!words.length) { list.innerHTML = '<p class="ss-hint">No words logged yet.</p>'; return; }
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  list.innerHTML = words.map(w => {
+    const canDel = w.loggedByUid === uid || _activeSandboxStudy?.creatorUid === uid;
+    return `<div class="ss-word-item">
+      <div class="ss-word-main">
+        <span class="ss-word-lemma">${w.lemma || w.surface}</span>
+        <span class="ss-word-translit">${w.translit}</span>
+        <span class="ss-word-strongs">G${w.strongs}</span>
+      </div>
+      <p class="ss-word-def">${w.definition}</p>
+      ${canDel ? `<button class="ss-word-del" onclick="deleteSandboxWord('${w.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function deleteSandboxWord(wordId) {
+  if (!_activeSandboxStudy) return;
+  await window.Studies.deleteWordLog(_activeSandboxStudy.id, wordId);
+}
+
+// Rhema tab in sandbox
+function _updateSandboxRhemaPreview() {
+  const study = _activeSandboxStudy;
+  if (!study) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const pos = uid && (study.rhemaPositions || {})[uid];
+  const posText = document.getElementById('ssRhemaPositionText');
+  if (posText) {
+    posText.textContent = pos
+      ? `${window.RhemaNT?.names?.[pos.book] || pos.book} ${pos.chapter}:${pos.verse}`
+      : 'Not started yet';
+  }
+}
+
+function openSandboxRhema() {
+  if (!_activeSandboxStudy) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  _studySandboxId = _activeSandboxStudy.id;
+  _studySandboxRhemaReturn = true;
+  // Restore study-specific position
+  const pos = (_activeSandboxStudy.rhemaPositions || {})[uid];
+  if (pos) { _rhemaBook = pos.book; _rhemaChapter = pos.chapter; _rhemaVerse = pos.verse; }
+  document.getElementById('rhemaSaveToStudyBtn')?.classList.remove('hidden');
+  showRhema();
+}
+
+async function saveCurrentVerseToStudy() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_studySandboxId) return;
+  const study = _myStudies.find(s => s.id === _studySandboxId);
+  if (!study) return;
+  const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook;
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const btn = document.getElementById('rhemaSaveToStudyBtn');
+  if (btn) { btn.textContent = 'Saved!'; btn.disabled = true; }
+  await window.Studies.saveVerse(_studySandboxId, uid, displayName, {
+    book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, bookName
   });
-
-  if (logBtn) { logBtn.disabled = false; }
-  if (!result?.alreadyDone) {
-    if (logBtn) { logBtn.textContent = 'Session Logged!'; logBtn.classList.add('done'); }
-    const metaEl = document.getElementById('studySessionMeta');
-    if (metaEl) metaEl.textContent = `${result?.totalSessions || 1} session${result?.totalSessions === 1 ? '' : 's'} total`;
-    await _loadMyStudies();
-  }
+  setTimeout(() => {
+    if (btn) {
+      btn.innerHTML = '<span class="material-symbols-outlined">bookmark_add</span> Save Verse to Study';
+      btn.disabled = false;
+    }
+  }, 1500);
 }
 
-async function deleteCurrentStudy() {
+// ── Community Study Board ─────────────────────────────────────────────────────
+
+async function _loadStudyBoard() {
+  if (!friendsList.length) {
+    _renderStudyBoard([]);
+    return;
+  }
+  _studyBoardStudies = await window.Studies?.getFriends(friendsList) || [];
+  _renderStudyBoard(_studyBoardStudies);
+}
+
+function _renderStudyBoard(studies) {
+  const list = document.getElementById('studyBoardList');
+  if (!list) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
-  if (!uid || !_activeStudyId) return;
-  const study = _myStudies.find(s => s.id === _activeStudyId);
-  if (!study) return;
-  if (!confirm(`Delete "${study.name}"? This cannot be undone.`)) return;
-  await window.Studies?.delete(uid, _activeStudyId);
-  closeStudySessionSheet();
+  if (!studies.length) {
+    list.innerHTML = '<p class="study-board-empty">Your friends haven\'t created any studies yet.</p>';
+    return;
+  }
+  list.innerHTML = studies.map(s => {
+    const members = (s.collaboratorUids || []).length;
+    const isCollab = uid && s.collaboratorUids?.includes(uid);
+    return `<div class="study-board-card" style="--study-color:${s.color}" onclick="openStudyBoardSheet('${s.id}')">
+      <span class="sbc-icon material-symbols-outlined">${s.icon}</span>
+      <div class="sbc-info">
+        <span class="sbc-name">${s.name}</span>
+        <span class="sbc-meta">${s.creatorName}${members > 1 ? ` · ${members} members` : ''}</span>
+      </div>
+      ${isCollab ? '<span class="sbc-collab-badge">Collaborator</span>' : ''}
+      <span class="material-symbols-outlined sbc-chev">chevron_right</span>
+    </div>`;
+  }).join('');
+}
+
+function openStudyBoardSheet(studyId) {
+  const s = _studyBoardStudies.find(x => x.id === studyId);
+  if (!s) return;
+  _studyBoardSheetId = studyId;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const isPending = uid && s.pendingCollaboratorUids?.includes(uid);
+  const isCollab  = uid && s.collaboratorUids?.includes(uid);
+
+  const iconEl  = document.getElementById('sbsIcon');
+  const titleEl = document.getElementById('sbsTitle');
+  const creatorEl = document.getElementById('sbsCreator');
+  const membersEl = document.getElementById('sbsMembers');
+  const collabBtn = document.getElementById('sbsCollabBtn');
+
+  if (iconEl)  { iconEl.textContent = s.icon; iconEl.style.color = s.color; }
+  if (titleEl) titleEl.textContent = s.name;
+  if (creatorEl) creatorEl.textContent = `by ${s.creatorName}`;
+  if (membersEl) {
+    const names = (s.collaboratorUids || []).length > 1 ? `${(s.collaboratorUids.length)} members` : '';
+    membersEl.textContent = names;
+  }
+  if (collabBtn) {
+    if (isCollab)  { collabBtn.textContent = 'Open Study'; collabBtn.onclick = () => { closeStudyBoardSheet(); _openCollabStudy(studyId); }; }
+    else if (isPending) { collabBtn.textContent = 'Request Pending'; collabBtn.disabled = true; }
+    else { collabBtn.textContent = 'Request to Collaborate'; collabBtn.disabled = false; collabBtn.onclick = requestStudyCollab; }
+  }
+  document.getElementById('studyBoardSheet')?.classList.add('open');
+}
+
+function closeStudyBoardSheet() {
+  document.getElementById('studyBoardSheet')?.classList.remove('open');
+  _studyBoardSheetId = null;
+}
+
+async function requestStudyCollab() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_studyBoardSheetId) return;
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
+  const btn = document.getElementById('sbsCollabBtn');
+  if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
+  const ok = await window.Studies?.requestCollab(_studyBoardSheetId, uid, displayName);
+  if (btn) { btn.textContent = ok ? 'Request Sent!' : 'Error — Try Again'; btn.disabled = ok; }
+}
+
+async function copyFriendStudy() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_studyBoardSheetId) return;
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const btn = document.querySelector('#studyBoardSheet .study-session-btn[style*="22c55e"]');
+  if (btn) { btn.textContent = 'Copying…'; btn.disabled = true; }
+  const id = await window.Studies?.copy(_studyBoardSheetId, uid, displayName);
+  if (btn) { btn.textContent = id ? 'Copied! Check Home Screen' : 'Error'; btn.disabled = true; }
+  if (id) { await _loadMyStudies(); }
+}
+
+async function _openCollabStudy(studyId) {
+  // Load the collab study into _myStudies if not already there
+  if (!_myStudies.find(s => s.id === studyId)) await _loadMyStudies();
+  const study = _myStudies.find(s => s.id === studyId);
+  if (study) openStudySandbox(study.id);
+}
+
+// ── Collab notifications ──────────────────────────────────────────────────────
+
+function _startEncouragementListener(uid) {
+  _unsubEncouragements?.();
+  _unsubEncouragements = window.Studies?.listenEncouragements?.(uid, msgs => {
+    const collab = msgs.filter(m => m.type === 'studyCollabRequest' && !m._read);
+    collab.forEach(m => {
+      const existing = _notifItems.find(n => n.id === 'collab_' + m.id);
+      if (!existing) {
+        _notifItems.push({
+          id: 'collab_' + m.id, type: 'collab_request',
+          requesterUid: m.fromUid, requesterName: m.fromName,
+          studyId: m.studyId, msgId: m.id, read: false
+        });
+      }
+    });
+    const approved = msgs.filter(m => m.type === 'studyCollabApproved' && !m._read);
+    approved.forEach(m => {
+      const existing = _notifItems.find(n => n.id === 'collab_approved_' + m.id);
+      if (!existing) {
+        _notifItems.push({
+          id: 'collab_approved_' + m.id, type: 'collab_approved',
+          fromName: m.fromName, studyId: m.studyId, studyName: m.studyName, msgId: m.id, read: false
+        });
+      }
+    });
+    _updateNotifBadge();
+  });
+}
+
+async function notifApproveCollab(studyId, requesterUid, requesterName, itemId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  await window.Studies?.approveCollab(studyId, requesterUid, requesterName);
+  _notifItems = _notifItems.map(n => n.id === itemId ? { ...n, read: true, _approved: true } : n);
   await _loadMyStudies();
+  _loadNotifications();
+}
+
+async function notifDenyCollab(studyId, requesterUid, itemId) {
+  await window.Studies?.denyCollab(studyId, requesterUid);
+  _notifItems = _notifItems.filter(n => n.id !== itemId);
+  _updateNotifBadge();
+  _loadNotifications();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -8136,8 +8460,8 @@ function showNavPage(page) {
     showScreen('communityPage');
     localStorage.setItem('communityLastVisit', Date.now().toString());
     document.getElementById('commNavDot')?.classList.add('hidden');
-    showLbTab('xp');
-    _loadMyStudies();
+    showLbTab('studies');
+    _loadStudyBoard();
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -8211,10 +8535,13 @@ function populateHomeScreen() {
 function _saveRhemaPosition() {
   const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now() };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
-  // Sync to Firestore if logged in
   const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
   if (uid && window.LB) {
     window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
+  }
+  // Also save per-study position when in sandbox mode
+  if (_studySandboxId && uid) {
+    window.Studies?.saveRhemaPos(_studySandboxId, uid, _rhemaBook, _rhemaChapter, _rhemaVerse);
   }
 }
 
@@ -8310,7 +8637,8 @@ async function _loadNotifications() {
     read: (_notifItems.find(n => n.id === 'fr_' + reqUid)?.read) || false
   }));
   const acceptedItems = _notifItems.filter(n => n.type === 'friend_accepted');
-  _notifItems = [...updatedIncoming, ...acceptedItems];
+  const collabItems   = _notifItems.filter(n => n.type === 'collab_request' || n.type === 'collab_approved');
+  _notifItems = [...updatedIncoming, ...acceptedItems, ...collabItems];
   _updateNotifBadge();
 
   if (!_notifItems.length) {
@@ -8340,6 +8668,32 @@ async function _loadNotifications() {
           <div class="notif-body">
             <div class="notif-title">${n.requesterName}</div>
             <div class="notif-sub">Accepted your friend request</div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`;
+    }
+    if (n.type === 'collab_request') {
+      return `
+        <div class="notif-item${n.read ? '' : ' unread'}">
+          <div class="notif-icon"><span class="material-symbols-outlined">group_add</span></div>
+          <div class="notif-body">
+            <div class="notif-title">${n.requesterName}</div>
+            <div class="notif-sub">Wants to collaborate on your study</div>
+            <div class="notif-fr-actions">
+              <button class="notif-accept-btn" onclick="notifApproveCollab('${n.studyId}','${n.requesterUid}','${n.requesterName}','${n.id}')">Approve</button>
+              <button class="notif-deny-btn" onclick="notifDenyCollab('${n.studyId}','${n.requesterUid}','${n.id}')">Deny</button>
+            </div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`;
+    }
+    if (n.type === 'collab_approved') {
+      return `
+        <div class="notif-item${n.read ? '' : ' unread'}" onclick="this.classList.add('read');_notifItems=_notifItems.map(x=>x.id==='${n.id}'?{...x,read:true}:x);_updateNotifBadge()">
+          <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">handshake</span></div>
+          <div class="notif-body">
+            <div class="notif-title">${n.fromName}</div>
+            <div class="notif-sub">Approved your collaboration on "${n.studyName || 'a study'}"</div>
           </div>
           ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
         </div>`;
@@ -13611,15 +13965,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.38";
+const APP_VERSION = "2.3.39";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.38 — Personal Studies</div>
+<div class="un-version-label">v2.3.39 — Studies Full Launch</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>My Studies</strong> — Create personal studies from the Community page with a custom name, color, and icon</li>
-    <li><strong>Daily Sessions</strong> — Log each day's session with one tap; your total session count is tracked</li>
-    <li><strong>Share with Friends</strong> — Optionally share your study with friends — they get a push notification the first time you open a session each day</li>
+    <li><strong>Your Studies</strong> — Create personal studies right from the home screen with a custom name, color, and icon</li>
+    <li><strong>Study Sandbox</strong> — Each study has its own workspace: Notes (shared with collaborators), Saved Verses, Rhema with per-study position memory, and an auto-building Word Log</li>
+    <li><strong>Study Board</strong> — See your friends' studies on the Community page; request to collaborate or copy any study as your own in one tap</li>
+    <li><strong>Collaboration</strong> — Approve or deny collaboration requests right from the What's Going On panel</li>
+    <li><strong>Friend Notifications</strong> — Friends get a push the first time you open each study per day (optional toggle)</li>
   </ul>
 </div>
 <div class="un-version-label">v2.3.37 — Friend Accepted Notifications &amp; Polish</div>
@@ -14103,6 +14459,7 @@ window.__onAuthStateReady = async (user) => {
     updateLessonCompletionUI();
     populateHomeScreen();
     _loadMyStudies();
+    _startEncouragementListener(user.uid);
     // If friends modal was opened while auth was still loading, populate it now
     if (document.getElementById("friendsModal")?.classList.contains("open")) {
       switchFriendsTab(_friendsTab);
@@ -14542,8 +14899,9 @@ function showLbTab(tab) {
   document.querySelectorAll(".lb-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   document.querySelectorAll(".lb-tab-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
   if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
-  if (tab === "xp")           _renderXPBoard();
-  else if (tab === "scholar") _renderScholarBoard();
+  if (tab === "xp")              _renderXPBoard();
+  else if (tab === "scholar")    _renderScholarBoard();
+  else if (tab === "studies")    _loadStudyBoard();
 }
 
 function _lbEscape(str) {
@@ -15610,6 +15968,23 @@ async function showRhema() {
 
 function closeRhema() {
   _saveRhemaPosition();
+  // If opened from a study sandbox, hide Save Verse button and update preview
+  if (_studySandboxId) {
+    document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');
+    if (_studySandboxRhemaReturn) {
+      _studySandboxRhemaReturn = false;
+      // Update the sandbox Rhema position preview
+      if (_activeSandboxStudy) {
+        const uid = window.Auth?.getCurrentUser()?.uid;
+        if (uid) {
+          if (!_activeSandboxStudy.rhemaPositions) _activeSandboxStudy.rhemaPositions = {};
+          _activeSandboxStudy.rhemaPositions[uid] = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+        }
+        _updateSandboxRhemaPreview();
+      }
+    }
+    _studySandboxId = null;
+  }
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
   closeRhemaPickerSheet();
@@ -16089,6 +16464,19 @@ function openRhemaSheet(wordIdx, verse) {
     lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
 
   showRhemaTab(_rhemaActiveTab, word);
+
+  // Study sandbox: show Save Verse button and auto-log word
+  const saveBtn = document.getElementById('rhemaSaveToStudyBtn');
+  if (saveBtn) saveBtn.classList.toggle('hidden', !_studySandboxId);
+  if (_studySandboxId) {
+    const uid = window.Auth?.getCurrentUser()?.uid;
+    const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+    const lex = (window.RhemaLexicon || {})[strongs] || {};
+    window.Studies?.logWord(_studySandboxId, uid, displayName, {
+      lemma: lex.lemma || surface, strongs, definition: lex.def || lex.short_def || '',
+      surface, translit: lex.translit || ''
+    });
+  }
 
   const sheet = document.getElementById('rhemaSheet');
   sheet?.classList.add('open');

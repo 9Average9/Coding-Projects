@@ -113,6 +113,14 @@ exports.onEncouragementCreated = functions.firestore
       const studyName = snap.data().studyName || "Greek";
       title = "Studying Now 📖";
       body = `${fromName} is working on their ${studyName} study!`;
+    } else if (type === "studyCollabRequest") {
+      const studyName = snap.data().studyName || "a study";
+      title = "Collaboration Request";
+      body = `${fromName} wants to collaborate on your "${studyName}" study.`;
+    } else if (type === "studyCollabApproved") {
+      const studyName = snap.data().studyName || "a study";
+      title = "Collaboration Approved!";
+      body = `${fromName} approved your request to collaborate on "${studyName}".`;
     } else {
       title = "Basic Greek study reminder:";
       body = `${fromName} is reminding you to study your Greek!`;

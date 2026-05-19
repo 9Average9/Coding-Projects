@@ -367,6 +367,25 @@ glacier: {
             <span>Start a study →</span>
           </div>
         </div>
+        <!-- Your Studies section -->
+        <div class="home-studies-section" id="homeStudiesSection">
+          <div class="home-studies-header">
+            <span class="home-section-label" style="margin:0">Your Studies</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="hs-view-all-btn hidden" id="hsViewAllBtn" onclick="openStudiesViewAll()">View All</button>
+              <button class="hs-new-btn" onclick="openStudyCreateSheet()">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
+          </div>
+          <div class="hs-grid" id="hsGrid">
+            <button class="hs-start-btn" onclick="openStudyCreateSheet()">
+              <span class="material-symbols-outlined">add</span>
+              <span>Start a Study</span>
+            </button>
+          </div>
+        </div>
+
         <div class="home-section-label">Quick Actions</div>
         <div class="home-actions-grid">
           <button id="notifBtn" class="home-action-tile" onclick="openNotifications()">
@@ -9723,29 +9742,23 @@ glacier: {
         <span class="comm-friends-badge hidden" id="commFriendsBadge"></span>
       </button>
     </div>
-    <!-- My Studies -->
-    <div class="studies-section">
-      <div class="studies-section-header">
-        <span class="studies-section-title">My Studies</span>
-        <button class="studies-add-btn" onclick="openStudyCreateSheet()">
-          <span class="material-symbols-outlined">add</span>
-          New Study
-        </button>
-      </div>
-      <div class="study-grid" id="myStudiesGrid">
-        <p class="studies-empty">No studies yet. Create your first one!</p>
-      </div>
-    </div>
-
     <div class="lb-tabs comm-tabs">
-      <button class="lb-tab-btn active" data-tab="xp" onclick="showLbTab('xp')">
+      <button class="lb-tab-btn active" data-tab="studies" onclick="showLbTab('studies')">
+        <span class="material-symbols-outlined">menu_book</span> Studies
+      </button>
+      <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
         <span class="material-symbols-outlined">bolt</span> XP
       </button>
       <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
         <span class="material-symbols-outlined">school</span> Scholar
       </button>
     </div>
-    <div id="lbPaneXP" class="lb-tab-pane active" data-tab="xp">
+    <div id="lbPaneStudies" class="lb-tab-pane active" data-tab="studies">
+      <div id="studyBoardList" class="study-board-list">
+        <p class="study-board-empty">Add friends to see their studies here.</p>
+      </div>
+    </div>
+    <div id="lbPaneXP" class="lb-tab-pane" data-tab="xp">
       <div class="lb-podium-wrap" id="lbPodiumXP"></div>
       <div class="lb-list-below" id="lbListXP"></div>
       <div class="lb-join-area" id="lbJoinXP"></div>
@@ -10762,6 +10775,10 @@ glacier: {
       <button class="rhema-tab"        id="rhemaTabOcc"        onclick="showRhemaTab('occurrences')">Occurrences</button>
     </div>
     <div id="rhemaTabContent" class="rhema-tab-content"></div>
+    <button id="rhemaSaveToStudyBtn" class="rhema-save-to-study-btn hidden" onclick="saveCurrentVerseToStudy()">
+      <span class="material-symbols-outlined">bookmark_add</span>
+      Save Verse to Study
+    </button>
   </div>
   <!-- Grammar example modal (inside rhema overlay so z-index stacks correctly) -->
   <div id="rhemaGrammarModal" class="rhema-grammar-modal hidden" onclick="closeRhemaGrammarModal(event)">
@@ -10999,6 +11016,81 @@ glacier: {
 
 
 
+<!-- Study Sandbox (full-screen) -->
+<div id="studySandbox" class="study-sandbox hidden">
+  <div class="ss-header">
+    <button class="ss-back-btn" onclick="closeStudySandbox()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="ss-title-wrap">
+      <span class="ss-icon material-symbols-outlined" id="ssIcon">menu_book</span>
+      <span class="ss-title" id="ssTitle">Study</span>
+    </div>
+    <div class="ss-members" id="ssMembers"></div>
+  </div>
+  <div class="ss-tabs">
+    <button class="ss-tab active" data-tab="notes" onclick="switchSandboxTab('notes')">Notes</button>
+    <button class="ss-tab" data-tab="verses" onclick="switchSandboxTab('verses')">Verses</button>
+    <button class="ss-tab" data-tab="rhema" onclick="switchSandboxTab('rhema')">Rhema</button>
+    <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">Word Log</button>
+  </div>
+  <div class="ss-body">
+    <!-- Notes -->
+    <div id="ssPaneNotes" class="ss-pane active">
+      <div id="ssNotesList" class="ss-notes-list"></div>
+      <div class="ss-compose">
+        <textarea id="ssNoteInput" class="ss-note-input" placeholder="Add a note…" rows="3" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="ss-send-btn" onclick="submitSandboxNote()"><span class="material-symbols-outlined">send</span></button>
+      </div>
+    </div>
+    <!-- Saved Verses -->
+    <div id="ssPaneVerses" class="ss-pane">
+      <p class="ss-hint">Open Rhema, then tap a verse reference to save it here.</p>
+      <div id="ssVersesList" class="ss-verses-list"></div>
+    </div>
+    <!-- Rhema -->
+    <div id="ssPaneRhema" class="ss-pane ss-rhema-pane">
+      <div class="ss-rhema-position" id="ssRhemaPosition">
+        <span class="material-symbols-outlined">auto_stories</span>
+        <span id="ssRhemaPositionText">Not started yet</span>
+      </div>
+      <button class="ss-rhema-open-btn" onclick="openSandboxRhema()">
+        <span class="material-symbols-outlined">open_in_new</span>
+        Open Rhema
+      </button>
+      <p class="ss-hint">Your position in this study is saved separately from the main Rhema.</p>
+    </div>
+    <!-- Word Log -->
+    <div id="ssPaneWordlog" class="ss-pane">
+      <p class="ss-hint">Every Greek word you tap in Rhema while this study is open is auto-logged here.</p>
+      <div id="ssWordlogList" class="ss-wordlog-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- View All Studies Modal -->
+<div id="studiesViewAllModal" class="modal-overlay" onclick="if(event.target===this)closeStudiesViewAll()">
+  <div class="modal-card" style="max-height:80vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeStudiesViewAll()">×</button>
+    <h2 style="margin-bottom:16px">All My Studies</h2>
+    <div id="studiesViewAllList" class="sva-list"></div>
+  </div>
+</div>
+
+<!-- Study Board Info Sheet (friend's study) -->
+<div id="studyBoardSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyBoardSheet()">
+  <div class="study-sheet" onclick="event.stopPropagation()">
+    <div class="study-sheet-handle"></div>
+    <span class="study-sheet-icon-big material-symbols-outlined" id="sbsIcon">menu_book</span>
+    <h2 class="study-sheet-title" id="sbsTitle">Study</h2>
+    <p class="study-sheet-sub" id="sbsCreator">by —</p>
+    <p class="study-sheet-sub" id="sbsMembers" style="margin-top:-10px"></p>
+    <button class="study-session-btn" id="sbsCollabBtn" onclick="requestStudyCollab()">Request to Collaborate</button>
+    <button class="study-session-btn" style="background:#22c55e;margin-bottom:10px" onclick="copyFriendStudy()">Copy as My Own Study</button>
+    <button class="text-btn" style="width:100%" onclick="closeStudyBoardSheet()">Close</button>
+  </div>
+</div>
+
 <!-- Study Create Sheet -->
 <div id="studyCreateSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyCreateSheet()">
   <div class="study-sheet" onclick="event.stopPropagation()">
@@ -11039,8 +11131,8 @@ glacier: {
 
     <div class="study-share-toggle">
       <div class="study-share-label">
-        Share with Friends
-        <small>Friends get a push when you open a session (once per day)</small>
+        Notify Friends on Session
+        <small>Friends get a push the first time you open this study each day</small>
       </div>
       <label class="switch">
         <input type="checkbox" id="studyCreateShareToggle" onchange="toggleStudyShareFriends(this)">
