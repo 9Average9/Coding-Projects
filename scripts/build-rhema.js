@@ -193,6 +193,33 @@ function parseKjvBook(bookJson) {
   return result;
 }
 
+// ── Parse TBESG (Abbott-Smith via STEPBible, CC BY 4.0) ──────────────────────
+// Format: tab-separated, lines starting with G[0-9] are entries
+// Columns: EStrong# dStrong uStrong Greek Gloss Morph OneWordMeaning FullDefinition
+
+function parseTbesg(text) {
+  const result = {};
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!/^G\d/.test(trimmed)) continue;
+    const fields = trimmed.split('\t');
+    if (fields.length < 8) continue;
+    const estrong = fields[0].trim();
+    const defRaw  = fields[7] || '';
+    const num = parseInt(estrong.replace('G', ''), 10);
+    if (isNaN(num) || num <= 0 || num > 5624) continue;
+    let def = defRaw
+      .replace(/<ref='[^']*'>/g, '')
+      .replace(/<\/ref>/g, '')
+      .replace(/<BR \/>/gi, '<br>')
+      .replace(/†\s*\([A-Z]+\)\s*$/g, '')
+      .trim();
+    if (def) result[num] = def;
+  }
+  return result;
+}
+
 // ── Compute occurrences ───────────────────────────────────────────────────────
 
 function computeOccurrences(ntText) {
@@ -278,6 +305,12 @@ async function main() {
   const dodson = parseDodson(dodsonRaw);
   console.log(`  ${Object.keys(dodson).length} entries`);
 
+  // 4b. TBESG (Abbott-Smith, STEPBible CC BY 4.0)
+  console.log('\nDownloading TBESG (Abbott-Smith) lexicon...');
+  const tbesgRaw = await fetchText('https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESG%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Greek%20-%20STEPBible.org%20CC%20BY.txt');
+  const tbesg = parseTbesg(tbesgRaw);
+  console.log(`  ${Object.keys(tbesg).length} entries`);
+
   // 5. KJV NT
   console.log('\nDownloading KJV New Testament...');
   const kjvText = {};
@@ -308,14 +341,15 @@ async function main() {
     if (isNaN(num)) continue;
     const dod = dodson[num] || {};
     lexicon[num] = {
-      lemma:       entry.lemma       || '',
-      translit:    entry.translit    || '',
-      pronounce:   entry.pronunciation || '',
-      strongs_def: entry.strongs_def || '',
-      kjv_def:     entry.kjv_def     || '',
-      deriv:       entry.derivation  || '',
-      brief:       dod.brief         || '',
-      extended:    dod.extended      || '',
+      lemma:        entry.lemma         || '',
+      translit:     entry.translit      || '',
+      pronounce:    entry.pronunciation || '',
+      strongs_def:  entry.strongs_def   || '',
+      kjv_def:      entry.kjv_def       || '',
+      deriv:        entry.derivation    || '',
+      brief:        dod.brief           || '',
+      extended:     dod.extended        || '',
+      abbott_smith: tbesg[num]          || '',
     };
   }
 
