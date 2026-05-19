@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.42" />
+  <link rel="stylesheet" href="style.css?v=2.3.43" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10866,9 +10866,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.42"></script>
-  <script src="app.js?v=2.3.42"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.42"></script>
+  <script src="vocab.js?v=2.3.43"></script>
+  <script src="app.js?v=2.3.43"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.43"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11023,24 +11023,14 @@ glacier: {
     </div>
     <div class="ss-members" id="ssMembers"></div>
   </div>
-  <div class="ss-tabs">
-    <button class="ss-tab active" data-tab="rhema" onclick="switchSandboxTab('rhema')">Rhema</button>
-    <button class="ss-tab" data-tab="verses" onclick="switchSandboxTab('verses')">Verses</button>
-    <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">Word Log</button>
-    <button class="ss-tab" data-tab="notes" onclick="switchSandboxTab('notes')">Notes</button>
-  </div>
   <div class="ss-body">
     <!-- Rhema -->
     <div id="ssPaneRhema" class="ss-pane active ss-rhema-pane">
       <div class="ss-rhema-position" id="ssRhemaPosition">
         <span class="material-symbols-outlined">auto_stories</span>
-        <span id="ssRhemaPositionText">Not started yet</span>
+        <span id="ssRhemaPositionText">Tap Rhema below to begin</span>
       </div>
-      <button class="ss-rhema-open-btn" onclick="openSandboxRhema()">
-        <span class="material-symbols-outlined">open_in_new</span>
-        Open Rhema
-      </button>
-      <p class="ss-hint">Tap any word in Rhema to study it. Your position in this study is saved separately from the main Rhema.</p>
+      <p class="ss-hint">Your reading position is saved separately for each study. Tap the Rhema tab to open it.</p>
     </div>
     <!-- Saved Verses -->
     <div id="ssPaneVerses" class="ss-pane">
@@ -11060,6 +11050,24 @@ glacier: {
         <button class="ss-send-btn" onclick="submitSandboxNote()"><span class="material-symbols-outlined">send</span></button>
       </div>
     </div>
+  </div>
+  <div class="ss-tabs">
+    <button class="ss-tab active" data-tab="rhema" onclick="switchSandboxTab('rhema')">
+      <span class="material-symbols-outlined ss-tab-icon">auto_stories</span>
+      <span>Rhema</span>
+    </button>
+    <button class="ss-tab" data-tab="verses" onclick="switchSandboxTab('verses')">
+      <span class="material-symbols-outlined ss-tab-icon">bookmark</span>
+      <span>Verses</span>
+    </button>
+    <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">
+      <span class="material-symbols-outlined ss-tab-icon">dictionary</span>
+      <span>Word Log</span>
+    </button>
+    <button class="ss-tab" data-tab="notes" onclick="switchSandboxTab('notes')">
+      <span class="material-symbols-outlined ss-tab-icon">edit_note</span>
+      <span>Notes</span>
+    </button>
   </div>
 </div>
 

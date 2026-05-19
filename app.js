@@ -8126,7 +8126,6 @@ function openStudyCreateSheet() {
     el.classList.toggle('selected', el.dataset.icon === 'menu_book'));
   document.getElementById('studyCreateSheet')?.classList.add('open');
   _renderStudyInviteFriendsList();
-  _addSheetSwipeClose('studyCreateSheet', closeStudyCreateSheet);
 }
 function closeStudyCreateSheet() { document.getElementById('studyCreateSheet')?.classList.remove('open'); }
 function selectStudyColor(el) {
@@ -8292,8 +8291,6 @@ async function openStudySandbox(studyId, studyObj) {
     _updateSandboxRhemaPreview();
   });
 
-  // Auto-open Rhema immediately
-  openSandboxRhema();
 
   // Refresh home studies (dot update)
   _loadMyStudies();
@@ -8321,6 +8318,7 @@ function switchSandboxTab(tab) {
   _sandboxTab = tab;
   document.querySelectorAll('.ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
+  if (tab === 'rhema') openSandboxRhema();
 }
 
 // Notes
@@ -8867,7 +8865,8 @@ async function _loadNotifications() {
   }));
   const acceptedItems = _notifItems.filter(n => n.type === 'friend_accepted');
   const collabItems   = _notifItems.filter(n => n.type === 'collab_request' || n.type === 'collab_approved');
-  _notifItems = [...updatedIncoming, ...acceptedItems, ...collabItems];
+  const inviteItems   = _notifItems.filter(n => n.type === 'study_invite');
+  _notifItems = [...updatedIncoming, ...acceptedItems, ...collabItems, ...inviteItems];
   _updateNotifBadge();
 
   if (!_notifItems.length) {
@@ -14209,10 +14208,18 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.42";
+const APP_VERSION = "2.3.43";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.42 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-version-label">v2.3.43 — Sandbox Nav &amp; Notification Fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
+    <li><strong>Study Invites Fixed</strong> — Study invite notifications now appear correctly in What's Going On with Join and Decline buttons</li>
+    <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
+  </ul>
+</div>
+<div class="un-version-label">v2.3.43 — Study Invites &amp; Collaboration Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>

@@ -12919,16 +12919,19 @@ body .app:has(#settingsScreen.screen.active) {
 .ss-tabs {
   display: flex; gap: 0;
   background: var(--card-color);
-  border-bottom: 1px solid var(--border-color);
-  flex-shrink: 0; overflow-x: auto;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .ss-tab {
-  flex: 1; padding: 12px 8px;
-  background: none; border: none; border-bottom: 2px solid transparent;
-  font-size: 0.83rem; font-weight: 600; color: var(--muted-color);
-  cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+  flex: 1; padding: 10px 4px 8px;
+  background: none; border: none; border-top: 2px solid transparent;
+  font-size: 0.68rem; font-weight: 600; color: var(--muted-color);
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: color 0.15s, border-color 0.15s;
 }
-.ss-tab.active { color: #4f8cff; border-bottom-color: #4f8cff; }
+.ss-tab-icon { font-size: 22px; }
+.ss-tab.active { color: #4f8cff; border-top-color: #4f8cff; }
 
 .ss-body { flex: 1; overflow: hidden; position: relative; }
 .ss-pane {
