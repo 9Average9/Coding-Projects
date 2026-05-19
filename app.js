@@ -8125,9 +8125,13 @@ function openStudyCreateSheet() {
   document.querySelectorAll('.study-icon-btn').forEach(el =>
     el.classList.toggle('selected', el.dataset.icon === 'menu_book'));
   document.getElementById('studyCreateSheet')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
   _renderStudyInviteFriendsList();
 }
-function closeStudyCreateSheet() { document.getElementById('studyCreateSheet')?.classList.remove('open'); }
+function closeStudyCreateSheet() {
+  document.getElementById('studyCreateSheet')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
 function selectStudyColor(el) {
   _studyCreateColor = el.dataset.color;
   document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
@@ -8261,6 +8265,7 @@ async function openStudySandbox(studyId, studyObj) {
   // Show sandbox
   document.getElementById('studySandbox')?.classList.remove('hidden');
   document.getElementById('bottomNav')?.classList.add('hidden');
+  document.body.classList.add('sandbox-open');
 
   // Fire session open (first of day → notify friends)
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
@@ -8310,11 +8315,16 @@ function closeStudySandbox() {
   _sandboxUnsubNotes = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubStudy = null;
   _activeSandboxStudy = null;
   document.getElementById('studySandbox')?.classList.add('hidden');
+  document.getElementById('rhemaModal')?.classList.remove('open');
   document.getElementById('bottomNav')?.classList.remove('hidden');
+  document.body.classList.remove('sandbox-open');
   _loadMyStudies();
 }
 
 function switchSandboxTab(tab) {
+  if (tab !== 'rhema' && document.getElementById('rhemaModal')?.classList.contains('open')) {
+    closeRhema(true); // close Rhema modal but stay inside the sandbox
+  }
   _sandboxTab = tab;
   document.querySelectorAll('.ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
@@ -14208,10 +14218,19 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.43";
+const APP_VERSION = "2.3.44";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.43 — Sandbox Nav &amp; Notification Fixes</div>
+<div class="un-version-label">v2.3.44 — Study UI Polish</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Tab Bar Stays in Rhema</strong> — The study tab bar (Rhema / Verses / Word Log / Notes) now floats above the Rhema screen so you can switch tabs without leaving Rhema</li>
+    <li><strong>Community Page Fix</strong> — Community section was leaking into the bottom of the home screen; fixed</li>
+    <li><strong>Create Study Sheet</strong> — Drag handle removed so it's clear the sheet doesn't slide; home screen no longer scrolls behind it</li>
+    <li><strong>Back Button</strong> — Pressing back from any study tab or from Rhema closes the sandbox and returns to the home screen</li>
+  </ul>
+</div>
+<div class="un-version-label">v2.3.44 — Sandbox Nav &amp; Notification Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
@@ -14219,7 +14238,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.43 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-version-label">v2.3.44 — Study Invites &amp; Collaboration Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>
@@ -16239,7 +16258,7 @@ async function showRhema() {
   }
 }
 
-function closeRhema() {
+function closeRhema(keepSandbox = false) {
   _saveRhemaPosition();
   // If opened from a study sandbox, hide Save Verse button and update preview
   if (_studySandboxId) {
@@ -16263,7 +16282,7 @@ function closeRhema() {
         _studySandboxMainRhemaPos = null;
       }
     }
-    _studySandboxId = null;
+    if (!keepSandbox) _studySandboxId = null;
   }
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
@@ -16281,13 +16300,15 @@ function closeRhema() {
   document.getElementById('rhemaHighlightToggleBtn')?.classList.remove('active');
   updateRhemaBreadcrumb();
   // Restore nav — determine active page from which screen is visible
-  const activePage =
-    document.getElementById('profilePage')?.classList.contains('active') ? 'profile' :
-    document.getElementById('communityPage')?.classList.contains('active') ? 'community' : 'home';
-  setNavActive(activePage);
-  showBottomNav();
-  // Refresh continue card immediately so it shows updated passage
-  _updateHomeContinueCard();
+  // Only restore bottom nav if not staying inside a sandbox session
+  if (!_studySandboxId) {
+    const activePage =
+      document.getElementById('profilePage')?.classList.contains('active') ? 'profile' :
+      document.getElementById('communityPage')?.classList.contains('active') ? 'community' : 'home';
+    setNavActive(activePage);
+    showBottomNav();
+    _updateHomeContinueCard();
+  }
 }
 
 function rhemaGoBack() {
