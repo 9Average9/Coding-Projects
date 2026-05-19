@@ -446,74 +446,211 @@ async function fcmSendPushNotification(toUid, type, fromName, fromUid, extra = {
   }
 }
 
-// ── Personal Studies ──────────────────────────────────────────────────────────
+// ── Personal Studies (top-level collection, supports collaboration) ───────────
 
-async function studyCreate(uid, { name, color, icon, shareWithFriends }) {
+async function studyCreate(uid, displayName, { name, color, icon, shareSession }) {
   try {
-    const ref = await addDoc(collection(db, "users", uid, "studies"), {
-      name, color, icon, shareWithFriends: !!shareWithFriends,
-      createdAt: serverTimestamp(),
-      lastSessionDate: null, totalSessions: 0, isActive: true
+    const ref = await addDoc(collection(db, "studies"), {
+      name, color, icon,
+      creatorUid: uid, creatorName: displayName,
+      collaboratorUids: [uid], pendingCollaboratorUids: [],
+      shareSession: !!shareSession,
+      createdAt: serverTimestamp(), isActive: true,
+      rhemaPositions: {}, lastSessionDates: {}
     });
+    await updateDoc(doc(db, "users", uid), { studyIds: arrayUnion(ref.id) });
     return ref.id;
-  } catch (e) {
-    console.warn("studyCreate:", e);
-    return null;
-  }
+  } catch (e) { console.warn("studyCreate:", e); return null; }
 }
 
-async function studyGetAll(uid) {
+async function studyGetMine(uid) {
   try {
-    const q = query(collection(db, "users", uid, "studies"), where("isActive", "==", true), orderBy("createdAt", "asc"));
+    const q = query(collection(db, "studies"),
+      where("collaboratorUids", "array-contains", uid), where("isActive", "==", true));
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch (e) {
-    console.warn("studyGetAll:", e);
-    return [];
-  }
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+  } catch (e) { console.warn("studyGetMine:", e); return []; }
 }
 
-async function studyOpenSession(uid, studyId, { name, studyName, friends }) {
-  const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+async function studyGetFriends(friendUids) {
+  if (!friendUids?.length) return [];
   try {
-    const ref = doc(db, "users", uid, "studies", studyId);
+    const results = [];
+    const seen = new Set();
+    for (let i = 0; i < friendUids.length; i += 10) {
+      const batch = friendUids.slice(i, i + 10);
+      const q = query(collection(db, "studies"),
+        where("collaboratorUids", "array-contains-any", batch), where("isActive", "==", true));
+      const snap = await getDocs(q);
+      snap.docs.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); results.push({ id: d.id, ...d.data() }); } });
+    }
+    return results.sort((a, b) => a.name.localeCompare(b.name));
+  } catch (e) { console.warn("studyGetFriends:", e); return []; }
+}
+
+async function studyOpenSession(uid, studyId, { displayName, friendsList }) {
+  const today = new Date().toLocaleDateString("en-CA");
+  try {
+    const ref = doc(db, "studies", studyId);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return { alreadyDone: false };
+    if (!snap.exists()) return;
     const data = snap.data();
-    const alreadyDone = data.lastSessionDate === today;
+    const alreadyDone = (data.lastSessionDates || {})[uid] === today;
     if (!alreadyDone) {
-      await updateDoc(ref, {
-        lastSessionDate: today,
-        totalSessions: increment(1)
-      });
-      if (data.shareWithFriends && friends?.length) {
-        for (const friendUid of friends) {
-          fcmSendPushNotification(friendUid, "studySession", name, uid, { studyName });
+      await updateDoc(ref, { [`lastSessionDates.${uid}`]: today });
+      if (data.shareSession && friendsList?.length) {
+        const notifyUids = friendsList.filter(fuid => !data.collaboratorUids.includes(fuid));
+        for (const fuid of notifyUids) {
+          fcmSendPushNotification(fuid, "studySession", displayName, uid, { studyName: data.name });
         }
       }
     }
-    return { alreadyDone, totalSessions: data.totalSessions + (alreadyDone ? 0 : 1) };
-  } catch (e) {
-    console.warn("studyOpenSession:", e);
-    return { alreadyDone: false };
-  }
+    return { alreadyDone };
+  } catch (e) { console.warn("studyOpenSession:", e); }
 }
 
-async function studyDelete(uid, studyId) {
+async function studySaveRhemaPos(studyId, uid, book, chapter, verse) {
   try {
-    await updateDoc(doc(db, "users", uid, "studies", studyId), { isActive: false });
+    await updateDoc(doc(db, "studies", studyId), {
+      [`rhemaPositions.${uid}`]: { book, chapter, verse }
+    });
+  } catch (e) { console.warn("studySaveRhemaPos:", e); }
+}
+
+// Notes
+function studyListenNotes(studyId, callback) {
+  const q = query(collection(db, "studies", studyId, "notes"), orderBy("createdAt", "asc"));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("studyListenNotes:", err); callback([]); });
+}
+async function studyAddNote(studyId, uid, displayName, content) {
+  try {
+    await addDoc(collection(db, "studies", studyId, "notes"), {
+      content, authorUid: uid, authorName: displayName, createdAt: serverTimestamp()
+    });
     return true;
-  } catch (e) {
-    console.warn("studyDelete:", e);
-    return false;
-  }
+  } catch (e) { console.warn("studyAddNote:", e); return false; }
+}
+async function studyDeleteNote(studyId, noteId) {
+  try { await deleteDoc(doc(db, "studies", studyId, "notes", noteId)); return true; }
+  catch (e) { console.warn("studyDeleteNote:", e); return false; }
+}
+
+// Saved Verses
+function studyListenVerses(studyId, callback) {
+  const q = query(collection(db, "studies", studyId, "savedVerses"), orderBy("savedAt", "asc"));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("studyListenVerses:", err); callback([]); });
+}
+async function studySaveVerse(studyId, uid, displayName, { book, chapter, verse, bookName }) {
+  try {
+    await addDoc(collection(db, "studies", studyId, "savedVerses"), {
+      book, chapter, verse, bookName, savedByUid: uid, savedByName: displayName, savedAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) { console.warn("studySaveVerse:", e); return false; }
+}
+async function studyDeleteVerse(studyId, verseId) {
+  try { await deleteDoc(doc(db, "studies", studyId, "savedVerses", verseId)); return true; }
+  catch (e) { console.warn("studyDeleteVerse:", e); return false; }
+}
+
+// Word Log (deduped by Strong's number per study)
+function studyListenWordLog(studyId, callback) {
+  const q = query(collection(db, "studies", studyId, "wordLog"), orderBy("loggedAt", "asc"));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("studyListenWordLog:", err); callback([]); });
+}
+async function studyLogWord(studyId, uid, displayName, { lemma, strongs, definition, surface, translit }) {
+  try {
+    await setDoc(doc(db, "studies", studyId, "wordLog", String(strongs)), {
+      lemma, strongs: String(strongs), definition: definition || '', surface, translit: translit || '',
+      loggedByUid: uid, loggedByName: displayName, loggedAt: serverTimestamp()
+    }, { merge: true });
+    return true;
+  } catch (e) { console.warn("studyLogWord:", e); return false; }
+}
+async function studyDeleteWordLog(studyId, wordId) {
+  try { await deleteDoc(doc(db, "studies", studyId, "wordLog", wordId)); return true; }
+  catch (e) { console.warn("studyDeleteWordLog:", e); return false; }
+}
+
+// Collaboration
+async function studyRequestCollab(studyId, uid, displayName) {
+  try {
+    const ref = doc(db, "studies", studyId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return false;
+    await updateDoc(ref, { pendingCollaboratorUids: arrayUnion(uid) });
+    fcmSendPushNotification(snap.data().creatorUid, "studyCollabRequest", displayName, uid, { studyId, studyName: snap.data().name });
+    return true;
+  } catch (e) { console.warn("studyRequestCollab:", e); return false; }
+}
+async function studyApproveCollab(studyId, requesterUid, requesterName) {
+  try {
+    const ref = doc(db, "studies", studyId);
+    await updateDoc(ref, {
+      collaboratorUids: arrayUnion(requesterUid),
+      pendingCollaboratorUids: arrayRemove(requesterUid)
+    });
+    await updateDoc(doc(db, "users", requesterUid), { studyIds: arrayUnion(studyId) });
+    const snap = await getDoc(ref);
+    const myName = localStorage.getItem("authDisplayName") || "Someone";
+    fcmSendPushNotification(requesterUid, "studyCollabApproved", myName, window.Auth?.getCurrentUser()?.uid, { studyId, studyName: snap.data()?.name });
+    return true;
+  } catch (e) { console.warn("studyApproveCollab:", e); return false; }
+}
+async function studyDenyCollab(studyId, requesterUid) {
+  try {
+    await updateDoc(doc(db, "studies", studyId), { pendingCollaboratorUids: arrayRemove(requesterUid) });
+    return true;
+  } catch (e) { console.warn("studyDenyCollab:", e); return false; }
+}
+
+// Copy a study as your own personal copy (no approval needed)
+async function studyCopy(sourceStudyId, uid, displayName) {
+  try {
+    const snap = await getDoc(doc(db, "studies", sourceStudyId));
+    if (!snap.exists()) return null;
+    const s = snap.data();
+    const ref = await addDoc(collection(db, "studies"), {
+      name: s.name, color: s.color, icon: s.icon,
+      creatorUid: uid, creatorName: displayName,
+      collaboratorUids: [uid], pendingCollaboratorUids: [],
+      shareSession: s.shareSession ?? false,
+      createdAt: serverTimestamp(), isActive: true,
+      rhemaPositions: {}, lastSessionDates: {}, copiedFromId: sourceStudyId
+    });
+    await updateDoc(doc(db, "users", uid), { studyIds: arrayUnion(ref.id) });
+    return ref.id;
+  } catch (e) { console.warn("studyCopy:", e); return null; }
+}
+
+async function studyDeletePermanent(studyId, uid) {
+  try {
+    await updateDoc(doc(db, "studies", studyId), { isActive: false });
+    await updateDoc(doc(db, "users", uid), { studyIds: arrayRemove(studyId) });
+    return true;
+  } catch (e) { console.warn("studyDeletePermanent:", e); return false; }
+}
+
+// Listen for incoming encouragement messages (for in-app notifications)
+function listenEncouragements(uid, callback) {
+  const q = query(collection(db, "encouragements", uid, "messages"),
+    orderBy("createdAt", "desc"), limit(30));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => console.warn("listenEncouragements:", err));
 }
 
 window.Studies = {
-  create:      studyCreate,
-  getAll:      studyGetAll,
-  openSession: studyOpenSession,
-  delete:      studyDelete
+  create: studyCreate, getMine: studyGetMine, getFriends: studyGetFriends,
+  openSession: studyOpenSession, saveRhemaPos: studySaveRhemaPos,
+  listenNotes: studyListenNotes, addNote: studyAddNote, deleteNote: studyDeleteNote,
+  listenVerses: studyListenVerses, saveVerse: studySaveVerse, deleteVerse: studyDeleteVerse,
+  listenWordLog: studyListenWordLog, logWord: studyLogWord, deleteWordLog: studyDeleteWordLog,
+  requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
+  copy: studyCopy, delete: studyDeletePermanent, listenEncouragements
 };
 
 async function fcmRegisterToken(uid) {
