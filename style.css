@@ -11842,7 +11842,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   will-change: transform;
   transition: transform 0.28s cubic-bezier(0.32, 0, 0.67, 0),
               visibility 0s linear 0.28s;
-  min-height: 68vh;
+  min-height: 44vh;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -12940,8 +12940,15 @@ body.sandbox-open .ss-pane {
 body.sandbox-open .rhema-content-area {
   padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
-body.sandbox-open .rhema-verse-nav {
-  margin-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+/* Push verse nav above the tab bar — no gap, no coverage */
+body.sandbox-open .rhema-body {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+}
+/* Lift the word sheet above the tab bar in sandbox mode */
+body.sandbox-open .rhema-sheet {
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0;
+  max-height: calc(80vh - 56px - env(safe-area-inset-bottom, 0px));
 }
 
 .ss-tab {
