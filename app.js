@@ -13519,11 +13519,26 @@ function setProfileColor(color) {
   syncUserData();
   updateProfileUI();
 }
- 
+
+function _updateColorDots() {
+  const color = (profileData.color || "#4f8cff").toLowerCase();
+  const presets = ["#4f8cff","#22c55e","#8b5cf6","#d6a700","#ef4444","#f97316","#ec4899"];
+  const isPreset = presets.includes(color);
+
+  document.querySelectorAll(".color-dot[data-color]").forEach(dot => {
+    dot.classList.toggle("active", dot.dataset.color.toLowerCase() === color);
+  });
+
+  const customDot = document.getElementById("customColorDot");
+  if (customDot) {
+    customDot.classList.toggle("active", !isPreset);
+    customDot.style.outlineColor = !isPreset ? color : "transparent";
+  }
+}
+
 function openCustomProfileColor() {
   const picker = document.getElementById("customProfileColorInput");
   if (!picker) return;
-
   picker.value = profileData.color || "#4f8cff";
   picker.click();
 }
@@ -13604,6 +13619,7 @@ function updateProfileUI() {
   }
 
   document.documentElement.style.setProperty("--profile-color", profileData.color);
+  _updateColorDots();
 
   const fill = document.getElementById("xpFill");
   if (fill) {

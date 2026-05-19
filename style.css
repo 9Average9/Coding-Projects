@@ -5171,6 +5171,11 @@ body.dark .lesson-unlock-progress-text {
   border-radius: 50%;
   border: 3px solid white;
   cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.color-dot.active {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 2.5px rgba(0,0,0,0.28);
 }
 
 .color-dot.blue { background: #4f8cff; }
@@ -5841,10 +5846,14 @@ body.dark #profileModal .profile-action-card {
 }
 .custom-color-dot {
   background: conic-gradient(red, orange, yellow, lime, cyan, blue, violet, red);
-  color: white;
-  font-weight: 900;
-  font-size: 1.1rem;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+  border-color: transparent;
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+  transition: transform 0.12s, outline-color 0.12s;
+}
+.custom-color-dot.active {
+  transform: scale(1.18);
+  box-shadow: none;
 }
 
 .hidden-color-input {
