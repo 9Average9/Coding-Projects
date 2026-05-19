@@ -12936,19 +12936,20 @@ body.sandbox-open .ss-pane {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Push Rhema content up so verses aren't hidden behind the tab bar */
-body.sandbox-open .rhema-content-area {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+/* Clip the Rhema overlay above the study tab bar so the overlay fills only usable space */
+body.sandbox-open .rhema-modal-overlay {
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
-/* Push verse nav above the tab bar — no gap, no coverage */
-body.sandbox-open .rhema-body {
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-}
+/* No extra padding needed on rhema-body — the overlay itself is already clipped */
 /* Lift the word sheet above the tab bar in sandbox mode */
 body.sandbox-open .rhema-sheet {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   padding-bottom: 0;
   max-height: calc(80vh - 56px - env(safe-area-inset-bottom, 0px));
+}
+/* Verse nav: remove the safe-area bottom padding that was for standalone Rhema */
+body.sandbox-open .rhema-verse-nav {
+  padding-bottom: 14px;
 }
 
 .ss-tab {

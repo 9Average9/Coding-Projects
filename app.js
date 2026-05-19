@@ -14236,9 +14236,16 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.48";
+const APP_VERSION = "2.3.49";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.49 — Rhema Fullscreen Fix</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>No More White Space</strong> — Rhema now fills the full screen in study mode; the overlay is clipped cleanly above the tab bar instead of leaving a floating gap</li>
+    <li><strong>Save Verse Button</strong> — No longer overlapping with the study tab bar</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.48 — Study Nav Fixed</div>
 <div class="un-section">
   <ul class="un-list">
@@ -16263,10 +16270,13 @@ async function showRhema() {
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
-  _rhemaSavedScrollY = window.scrollY;
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${_rhemaSavedScrollY}px`;
-  document.body.style.width = '100%';
+  // Skip scroll lock when inside a study sandbox — the sandbox itself blocks background scroll
+  if (!_studySandboxId) {
+    _rhemaSavedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${_rhemaSavedScrollY}px`;
+    document.body.style.width = '100%';
+  }
 
   const loading = document.getElementById('rhemaLoadingMsg');
   const hint    = document.getElementById('rhemaTapHint');
