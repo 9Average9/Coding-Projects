@@ -17207,20 +17207,20 @@ function renderRhemaDefinition(strongs) {
     </div>`;
   }
 
-  if (lex.strongs_def) {
+  if (lex.extended || lex.brief) {
     if (lex.abbott_smith) html += `<div class="rhema-def-sep"></div>`;
+    html += `<div class="rhema-def-section">
+      <div class="rhema-def-label">Dodson Lexicon</div>
+      <div class="rhema-def-text">${lex.extended || lex.brief}</div>
+    </div>`;
+  }
+
+  if (lex.strongs_def) {
+    if (lex.abbott_smith || lex.extended || lex.brief) html += `<div class="rhema-def-sep"></div>`;
     html += `<div class="rhema-def-section">
       <div class="rhema-def-label">Strong's Definition</div>
       <div class="rhema-def-text">${lex.strongs_def}</div>
       ${lex.kjv_def ? `<div class="rhema-def-kjv">KJV: ${lex.kjv_def}</div>` : ''}
-    </div>`;
-  }
-
-  if (lex.extended || lex.brief) {
-    html += `<div class="rhema-def-sep"></div>`;
-    html += `<div class="rhema-def-section">
-      <div class="rhema-def-label">Dodson Lexicon</div>
-      <div class="rhema-def-text">${lex.extended || lex.brief}</div>
     </div>`;
   }
 
