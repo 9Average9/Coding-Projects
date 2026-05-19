@@ -14236,13 +14236,21 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.49";
+const APP_VERSION = "2.3.50";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.50 — Rhema Bottom Fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>No White Space at Bottom</strong> — Rhema now pins the verse-nav bar to the very bottom of the screen in both standalone and study mode</li>
+    <li><strong>Word Sheet Fills Behind Tab Bar</strong> — In study mode the word info sheet now extends to the physical bottom of the screen; the Save Verse button and content stay above the study tab bar</li>
+    <li><strong>iOS Viewport Fix</strong> — Switched scroll lock away from body position:fixed which was causing iOS to miscalculate the overlay height</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.49 — Rhema Fullscreen Fix</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>No More White Space</strong> — Rhema now fills the full screen in study mode; the overlay is clipped cleanly above the tab bar instead of leaving a floating gap</li>
+    <li><strong>Overlay Clipped Above Tab Bar</strong> — Rhema fills only usable space in study mode, no floating gap between content and tab bar</li>
     <li><strong>Save Verse Button</strong> — No longer overlapping with the study tab bar</li>
   </ul>
 </div>
@@ -16270,12 +16278,12 @@ async function showRhema() {
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
-  // Skip scroll lock when inside a study sandbox — the sandbox itself blocks background scroll
+  // Prevent background scroll — overflow:hidden avoids the body position:fixed trick that
+  // causes iOS WebKit to miscalculate the viewport height and leave a gap at the bottom.
+  // Skip entirely in sandbox mode since the sandbox already locks background scroll.
   if (!_studySandboxId) {
     _rhemaSavedScrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${_rhemaSavedScrollY}px`;
-    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
   }
 
   const loading = document.getElementById('rhemaLoadingMsg');
@@ -16323,9 +16331,7 @@ function closeRhema(keepSandbox = false) {
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
   closeRhemaPickerSheet();
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
+  document.body.style.overflow = '';
   window.scrollTo(0, _rhemaSavedScrollY);
   _rhemaTrail = [];
   _rhemaTrailPos = -1;
