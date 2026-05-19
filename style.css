@@ -8520,7 +8520,7 @@ body.dark-mode .advanced-btn {
   border: 1px solid rgba(79, 140, 255, 0.2);
   border-radius: 10px;
   font-size: 0.88rem;
-  color: var(--accent, #4f8cff);
+  color: #4f8cff;
   font-weight: 600;
   cursor: pointer;
   text-align: left;
@@ -8545,6 +8545,7 @@ body.dark-mode .advanced-btn {
 body.dark-mode .lesson-progress-badge {
   background: rgba(79, 140, 255, 0.12);
   border-color: rgba(79, 140, 255, 0.25);
+  color: #7aabff;
 }
 
 body.dark-mode .lesson-progress-badge.advanced {
@@ -12345,8 +12346,16 @@ body .app:has(#settingsScreen.screen.active) {
 /* Badge on notification tile icon */
 .hat-notif-icon { position: relative; }
 .notif-badge {
-  position: absolute; top: -3px; right: -3px; width: 9px; height: 9px;
-  background: #ef4444; border-radius: 50%; border: 2px solid var(--primary-color);
+  position: absolute; top: -5px; right: -5px;
+  width: 13px; height: 13px;
+  background: #ef4444; border-radius: 50%;
+  border: 2.5px solid var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.3);
+  animation: notif-pulse 2s ease-in-out infinite;
+}
+@keyframes notif-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(239,68,68,0.3); }
+  50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
 }
 /* Scroll container — full height, topbar scrolls with content */
 .home-scroll {
@@ -12481,6 +12490,8 @@ body .app:has(#settingsScreen.screen.active) {
 .notif-empty { text-align: center; padding: 32px 20px; color: var(--muted-color); font-size: 0.88rem; }
 .notif-fr-item { cursor: default; }
 .notif-fr-item:active { background: inherit; }
+.notif-fa-item { cursor: pointer; }
+.notif-icon-accepted .material-symbols-outlined { color: #22c55e !important; }
 .notif-fr-actions { display: flex; gap: 8px; margin-top: 8px; }
 .notif-accept-btn, .notif-deny-btn {
   padding: 5px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;
@@ -12499,6 +12510,8 @@ body .app:has(#settingsScreen.screen.active) {
   font-size: 0.68rem; font-weight: 900;
   display: flex; align-items: center; justify-content: center;
   border: 2px solid var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.3);
+  animation: notif-pulse 2s ease-in-out infinite;
 }
 .comm-friends-badge.hidden { display: none; }
 
