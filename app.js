@@ -55,6 +55,9 @@ let _studyBoardLastLoad = 0;         // timestamp of last board query
 let _studyBoardSheetId = null;      // study shown in community board sheet
 let _studyBoardStudies = [];
 let _unsubEncouragements = null;
+let _studyDeleteMode = false;
+let _studyLongPressTimer = null;
+let _studyPendingDeleteId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
@@ -8003,34 +8006,97 @@ function _renderHomeStudies() {
   const grid = document.getElementById('hsGrid');
   const viewAllBtn = document.getElementById('hsViewAllBtn');
   if (!grid) return;
+
   if (!_myStudies.length) {
+    _studyDeleteMode = false;
     grid.innerHTML = `<button class="hs-start-btn" onclick="openStudyCreateSheet()">
       <span class="material-symbols-outlined">add</span><span>Start a Study</span></button>`;
     viewAllBtn?.classList.add('hidden');
     return;
   }
+
   const today = new Date().toLocaleDateString("en-CA");
   const uid = window.Auth?.getCurrentUser()?.uid;
   const visible = _myStudies.slice(0, 3);
+
   const cards = visible.map(s => {
     const doneToday = uid && (s.lastSessionDates || {})[uid] === today;
-    return `<div class="hs-study-card" style="--study-color:${s.color}" onclick="openStudySandbox('${s.id}')">
+    const isCreator = s.creatorUid === uid;
+    return `<div class="hs-study-card${_studyDeleteMode ? ' jiggle' : ''}" style="--study-color:${s.color}"
+      onclick="${_studyDeleteMode ? 'void(0)' : `openStudySandbox('${s.id}')`}"
+      ontouchstart="_startStudyLongPress('${s.id}')" ontouchend="_cancelStudyLongPress()" ontouchcancel="_cancelStudyLongPress()"
+      onmousedown="_startStudyLongPress('${s.id}')" onmouseup="_cancelStudyLongPress()" onmouseleave="_cancelStudyLongPress()">
+      ${_studyDeleteMode && isCreator ? `<button class="hs-delete-btn" onclick="event.stopPropagation();confirmDeleteStudy('${s.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
       ${doneToday ? '<span class="study-card-done-dot"></span>' : ''}
       <span class="hs-study-icon material-symbols-outlined">${s.icon}</span>
       <span class="hs-study-name">${s.name}</span>
       <span class="hs-study-meta">${_studyMemberLabel(s)}</span>
     </div>`;
   }).join('');
-  const addCard = `<button class="hs-add-card" onclick="openStudyCreateSheet()">
-    <span class="material-symbols-outlined">add</span>
-    <span>New</span>
+
+  const addCard = _studyDeleteMode ? '' : `<button class="hs-add-card" onclick="openStudyCreateSheet()">
+    <span class="material-symbols-outlined">add</span><span>New</span>
   </button>`;
   grid.innerHTML = cards + addCard;
-  if (_myStudies.length > 3) {
+
+  // Header: "Done" in delete mode, "View All" otherwise
+  if (_studyDeleteMode) {
     viewAllBtn?.classList.remove('hidden');
-    viewAllBtn && (viewAllBtn.textContent = `View All (${_myStudies.length})`);
+    if (viewAllBtn) { viewAllBtn.textContent = 'Done'; viewAllBtn.onclick = _exitStudyDeleteMode; }
+  } else if (_myStudies.length > 3) {
+    viewAllBtn?.classList.remove('hidden');
+    if (viewAllBtn) { viewAllBtn.textContent = `View All (${_myStudies.length})`; viewAllBtn.onclick = openStudiesViewAll; }
   } else {
     viewAllBtn?.classList.add('hidden');
+    if (viewAllBtn) viewAllBtn.onclick = openStudiesViewAll;
+  }
+}
+
+function _startStudyLongPress(studyId) {
+  _cancelStudyLongPress();
+  _studyLongPressTimer = setTimeout(() => {
+    navigator.vibrate?.(40);
+    _studyDeleteMode = true;
+    _renderHomeStudies();
+  }, 500);
+}
+
+function _cancelStudyLongPress() {
+  clearTimeout(_studyLongPressTimer);
+}
+
+function _exitStudyDeleteMode() {
+  _studyDeleteMode = false;
+  _renderHomeStudies();
+}
+
+function confirmDeleteStudy(studyId) {
+  _studyPendingDeleteId = studyId;
+  const study = _myStudies.find(s => s.id === studyId);
+  const nameEl = document.getElementById('studyDeleteConfirmName');
+  if (nameEl) nameEl.textContent = `"${study?.name || 'this study'}"`;
+  document.getElementById('studyDeleteConfirm')?.classList.add('open');
+}
+
+function closeStudyDeleteConfirm() {
+  document.getElementById('studyDeleteConfirm')?.classList.remove('open');
+  _studyPendingDeleteId = null;
+}
+
+async function executeDeleteStudy() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_studyPendingDeleteId) return;
+  const btn = document.querySelector('#studyDeleteConfirm .main-btn');
+  if (btn) { btn.textContent = 'Deleting…'; btn.disabled = true; }
+  const ok = await window.Studies?.delete(_studyPendingDeleteId, uid);
+  if (btn) { btn.textContent = 'Yes, Delete'; btn.disabled = false; }
+  closeStudyDeleteConfirm();
+  if (ok) {
+    _myStudies = _myStudies.filter(s => s.id !== _studyPendingDeleteId);
+    if (!_myStudies.length) _studyDeleteMode = false;
+    _renderHomeStudies();
+  } else {
+    _showStudyToast('Could not delete. Only the creator can delete a study.');
   }
 }
 
@@ -8419,9 +8485,14 @@ async function copyFriendStudy() {
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
   const btn = document.querySelector('#studyBoardSheet .study-session-btn[style*="22c55e"]');
   if (btn) { btn.textContent = 'Copying…'; btn.disabled = true; }
-  const id = await window.Studies?.copy(_studyBoardSheetId, uid, displayName);
-  if (btn) { btn.textContent = id ? 'Copied! Check Home Screen' : 'Error'; btn.disabled = true; }
-  if (id) { await _loadMyStudies(); }
+  const study = await window.Studies?.copy(_studyBoardSheetId, uid, displayName);
+  if (btn) { btn.textContent = study ? 'Copied!' : 'Error'; btn.disabled = true; }
+  if (study) {
+    _myStudies = [study, ..._myStudies.filter(s => s.id !== study.id)];
+    _renderHomeStudies();
+    closeStudyBoardSheet();
+    openStudySandbox(study.id, study);
+  }
 }
 
 async function _openCollabStudy(studyId) {
@@ -14016,9 +14087,19 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.40";
+const APP_VERSION = "2.3.41";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.41 — Studies Polish &amp; Delete</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Delete a Study</strong> — Long-press any study card to enter edit mode (cards shake like iPhone home screen), then tap the ✕ to permanently delete it and all its notes, verses, and word log</li>
+    <li><strong>Collaborate Request Fixed</strong> — Requesting to collaborate on a friend's study now works correctly</li>
+    <li><strong>Copy Study Fixed</strong> — Copying a friend's study opens it immediately in your sandbox</li>
+    <li><strong>Community Page</strong> — Friends button restyled as a pill, layout and spacing improved for all screen sizes</li>
+    <li><strong>Sandbox Header</strong> — Safe-area insets applied so content never hides behind the iPhone notch</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.39 — Studies Full Launch</div>
 <div class="un-section">
   <ul class="un-list">
