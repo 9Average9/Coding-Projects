@@ -12035,7 +12035,9 @@ body .app:has(#homeScreen.screen.active),
 body .app:has(#profilePage.screen.active),
 body .app:has(#communityPage.screen.active) {
   padding: 0 !important;
-  overflow-x: hidden;
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Hide the app-header on nav screens (each screen has its own header) */
@@ -12056,7 +12058,7 @@ body .app:has(#communityPage.screen.active) #communityPage {
 #communityPage.screen.active,
 #profilePage.screen.active {
   display: flex; flex-direction: column;
-  height: 100vh; overflow: hidden;
+  height: 100vh; height: 100dvh; overflow: hidden;
   background: var(--primary-color) !important;
   border-radius: 0 !important; box-shadow: none !important;
   border: none !important; padding: 0 !important;
@@ -12460,8 +12462,9 @@ body .app:has(#settingsScreen.screen.active) {
 .profile-page-scroll {
   overflow-y: auto; overflow-x: hidden;
   flex: 1 1 0; min-height: 0;
-  padding: 0 16px;
-  -webkit-overflow-scrolling: touch;
+  padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 80px);
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
 }
 .profile-page-scroll .profile-card { box-shadow: none; border-radius: 0; background: transparent; padding: 0; max-height: none; overflow: visible; }
 
