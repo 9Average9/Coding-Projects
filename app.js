@@ -14247,9 +14247,16 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.52";
+const APP_VERSION = "2.3.53";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.53 — Verse Nav Pinned to Bottom</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Reference & Arrows Locked</strong> — Verse nav is now absolutely pinned to the bottom of the screen and can no longer be dragged or bounced by scroll gestures</li>
+    <li><strong>White Bar Gone</strong> — Content area fills correctly with padding so no empty scroll space appears below verse text</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.52 — Rhema + Study + Leaderboard Fixes</div>
 <div class="un-section">
   <ul class="un-list">
