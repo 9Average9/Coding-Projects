@@ -10988,6 +10988,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1.5px solid var(--border-color);
   flex-shrink: 0;
+  touch-action: none; /* swipes here must not scroll ancestors */
+  overscroll-behavior: none;
 }
 
 .rhema-title-block {
@@ -11201,6 +11203,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   background: var(--card-color);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
+  touch-action: none; /* swipes here must not scroll ancestors */
 }
 
 .rhema-pill {
@@ -11459,7 +11462,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative; /* anchor for absolutely-positioned verse nav */
 }
 
 .rhema-content-area {
@@ -11470,8 +11472,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   touch-action: pan-y;
   overscroll-behavior: none;
   width: 100%;
-  /* clear space for the absolutely-pinned verse nav bar */
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
 
 .rhema-loading {
@@ -11487,7 +11487,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 .rhema-verse-display {
   width: 100%;
-  min-height: 100%; /* fills scroll container — prevents bouncy empty space on short verses */
   padding: 16px 0 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -11678,12 +11677,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Verse nav bar — always in-flow so it never causes layout shifts ── */
 .rhema-verse-nav {
-  /* Hardcoded to bottom of rhema-body — out of flex flow so nothing can scroll it */
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  box-sizing: border-box;
+  /* flex-shrink: 0 keeps it in flow — no gap, sits right below the last word row */
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11853,8 +11848,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   will-change: transform;
   transition: transform 0.28s cubic-bezier(0.32, 0, 0.67, 0),
               visibility 0s linear 0.28s;
-  min-height: 44vh;
-  max-height: 80vh;
+  min-height: 60vh;
+  max-height: 82vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -12947,9 +12942,9 @@ body.sandbox-open .ss-pane {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* In sandbox the verse nav is taller (clears tab bar), so content needs more clearance */
+/* Verse content needs to scroll past the tab bar */
 body.sandbox-open .rhema-content-area {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 /* Verse nav arrows need to clear the tab bar height */
 body.sandbox-open .rhema-verse-nav {
