@@ -8115,11 +8115,12 @@ function _updateNotifBadge() {
   document.getElementById('notifBadge')?.classList.toggle('hidden', unread === 0);
 }
 
-// Remove resolved friend requests from the notif list and update badges.
-// Call this after accept/decline in the friends modal so both dots clear together.
+// Remove resolved incoming friend requests from the notif list and update badges.
+// Preserves friend_accepted notifications — they stay until tapped.
 function _syncFriendRequestNotifs() {
   _notifItems = _notifItems.filter(n =>
-    n.type !== 'friend_request' || (friendRequestsIn || []).includes(n.requesterUid)
+    n.type === 'friend_accepted' ||
+    (n.type === 'friend_request' && (friendRequestsIn || []).includes(n.requesterUid))
   );
   _updateNotifBadge();
 }
@@ -8142,45 +8143,73 @@ async function _loadNotifications() {
     })
   );
 
-  const notifications = requesters.map(({ uid: reqUid, name }) => ({
+  // Merge live requester lookups into the _notifItems already seeded by listenUserDoc
+  const updatedIncoming = requesters.map(({ uid: reqUid, name }) => ({
     id: 'fr_' + reqUid,
     type: 'friend_request',
     requesterUid: reqUid,
     requesterName: name,
-    read: false
+    read: (_notifItems.find(n => n.id === 'fr_' + reqUid)?.read) || false
   }));
-
-  _notifItems = notifications;
+  const acceptedItems = _notifItems.filter(n => n.type === 'friend_accepted');
+  _notifItems = [...updatedIncoming, ...acceptedItems];
   _updateNotifBadge();
 
-  if (!notifications.length) {
+  if (!_notifItems.length) {
     listEl.innerHTML = '<p class="notif-empty">No notifications yet.</p>';
     return;
   }
-  listEl.innerHTML = notifications.map(n => `
-    <div class="notif-item${n.read ? '' : ' unread'} notif-fr-item" id="notif-fr-${n.requesterUid}">
-      <div class="notif-icon"><span class="material-symbols-outlined">person_add</span></div>
-      <div class="notif-body">
-        <div class="notif-title">${n.requesterName}</div>
-        <div class="notif-sub">Wants to be your friend</div>
-        <div class="notif-fr-actions">
-          <button class="notif-accept-btn" onclick="notifAcceptFriend('${n.requesterUid}')">Accept</button>
-          <button class="notif-deny-btn" onclick="notifDeclineFriend('${n.requesterUid}')">Decline</button>
-        </div>
-      </div>
-      ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
-    </div>`).join('');
+  listEl.innerHTML = _notifItems.map(n => {
+    if (n.type === 'friend_request') {
+      return `
+        <div class="notif-item${n.read ? '' : ' unread'} notif-fr-item">
+          <div class="notif-icon"><span class="material-symbols-outlined">person_add</span></div>
+          <div class="notif-body">
+            <div class="notif-title">${n.requesterName}</div>
+            <div class="notif-sub">Wants to be your friend</div>
+            <div class="notif-fr-actions">
+              <button class="notif-accept-btn" onclick="notifAcceptFriend('${n.requesterUid}')">Accept</button>
+              <button class="notif-deny-btn" onclick="notifDeclineFriend('${n.requesterUid}')">Decline</button>
+            </div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`;
+    }
+    if (n.type === 'friend_accepted') {
+      return `
+        <div class="notif-item${n.read ? '' : ' unread'} notif-fa-item" onclick="notifDismissAccepted('${n.requesterUid}')">
+          <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">check_circle</span></div>
+          <div class="notif-body">
+            <div class="notif-title">${n.requesterName}</div>
+            <div class="notif-sub">Accepted your friend request</div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`;
+    }
+    return '';
+  }).join('');
 }
 
 async function notifAcceptFriend(uid) {
   await acceptRequestAction(uid);
-  // Rebuild notif list so the card disappears and badges clear
   await _loadNotifications();
 }
 
 async function notifDeclineFriend(uid) {
   await declineRequestAction(uid);
   await _loadNotifications();
+}
+
+function notifDismissAccepted(uid) {
+  _notifItems = _notifItems.map(n =>
+    n.id === 'fa_' + uid ? { ...n, read: true } : n
+  );
+  _updateNotifBadge();
+  // Re-render in place so the unread dot disappears
+  const el = document.querySelector(`.notif-fa-item`);
+  if (el) el.classList.remove('unread');
+  const dot = el?.querySelector('.notif-unread-dot');
+  if (dot) dot.remove();
 }
 
 function _notifTap(i) {
@@ -13424,9 +13453,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.36";
+const APP_VERSION = "2.3.37";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.37 — Friend Accepted Notification &amp; Polish</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Friend Accepted</strong> — When someone accepts your friend request, it now shows up in What's Going On with a green checkmark (push notification still fires too)</li>
+    <li><strong>Notification Dot</strong> — The red dot is larger, has a glow, and pulses so it's impossible to miss</li>
+    <li><strong>Lesson Track Colors</strong> — Basic track progress badge is always blue, Advanced is always gold — no more color bleed from app themes</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.36 — Notification Prompt &amp; Friend Notifications</div>
 <div class="un-section">
   <ul class="un-list">
@@ -13929,15 +13966,38 @@ window.__onAuthStateReady = async (user) => {
 
     _unsubUserDoc?.();
     _unsubUserDoc = window.Auth.listenUserDoc(user.uid, (data) => {
-      friendsList = data.friends || [];
-      friendRequestsIn = data.friendRequestsIn || [];
-      friendRequestsOut = data.friendRequestsOut || [];
+      const prevOut  = [...friendRequestsOut];
+      const prevList = [...friendsList];
+      friendsList        = data.friends           || [];
+      friendRequestsIn   = data.friendRequestsIn  || [];
+      friendRequestsOut  = data.friendRequestsOut || [];
+
+      // Detect accepted requests: uid left requestsOut AND is now in friends
+      const newlyAccepted = prevOut.filter(uid =>
+        !friendRequestsOut.includes(uid) && friendsList.includes(uid)
+      );
+
       updateFriendsBadge();
-      // Seed notif items from friend requests so the dot shows without opening the panel
-      _notifItems = (friendRequestsIn || []).map(uid => ({
+
+      // Rebuild incoming-request notif items, preserving accepted notifications
+      const incomingItems = (friendRequestsIn || []).map(uid => ({
         id: 'fr_' + uid, type: 'friend_request', requesterUid: uid,
         requesterName: 'Someone', read: false
       }));
+      // Keep existing accepted notifications that haven't been read/dismissed
+      const existingAccepted = _notifItems.filter(n => n.type === 'friend_accepted');
+      // Add newly detected accepted requests
+      newlyAccepted.forEach(uid => {
+        if (!existingAccepted.find(n => n.requesterUid === uid)) {
+          const item = { id: 'fa_' + uid, type: 'friend_accepted', requesterUid: uid, requesterName: 'Someone', read: false };
+          existingAccepted.push(item);
+          // Look up their name async and update the item in place
+          window.Friends?.getUser(uid).then(u => {
+            item.requesterName = u?.displayName || u?.username || 'Someone';
+          }).catch(() => {});
+        }
+      });
+      _notifItems = [...incomingItems, ...existingAccepted];
       _updateNotifBadge();
       const modal = document.getElementById("friendsModal");
       if (modal?.classList.contains("open")) {
