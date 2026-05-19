@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.63";
+const APP_VERSION = "2.3.64";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.63 — Rhema rebuilt: clean layout, verse nav pinned, no overflow</div>
+<div class="un-version-label">v2.3.64 — Block verse swipe when touching breadcrumb or highlight bar</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
@@ -16560,12 +16560,15 @@ function initRhemaVerseSwipe() {
   const area = document.getElementById('rhemaModal');
   if (!area || area._hSwipeInit) return;
   area._hSwipeInit = true;
-  let sx = 0, sy = 0;
+  let sx = 0, sy = 0, swipeBlocked = false;
   area.addEventListener('touchstart', e => {
     sx = e.touches[0].clientX;
     sy = e.touches[0].clientY;
+    // Block verse swipe if touch starts on a horizontally-scrollable element
+    swipeBlocked = !!e.target.closest('#rhemaBreadcrumb, #rhemaHighlightBar');
   }, { passive: true });
   area.addEventListener('touchend', e => {
+    if (swipeBlocked) return;
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
     // Require clearly horizontal swipe (≥45px, more horizontal than vertical)
