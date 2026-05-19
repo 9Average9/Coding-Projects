@@ -14566,8 +14566,13 @@ async function restoreUserFromFirestore(user) {
   if (data.lbScholarJoined) localStorage.setItem("lbScholarJoined", "true");
   if (data.lbScholarBest) localStorage.setItem("lbScholarBest", String(data.lbScholarBest));
   if (data.avatar) {
-    localStorage.setItem("profilePicType", "icon");
-    localStorage.setItem("profilePicValue", data.avatar);
+    if (data.avatar.startsWith("https://")) {
+      localStorage.setItem("profilePicType", "photo");
+      localStorage.setItem("profilePicRemoteURL", data.avatar);
+    } else {
+      localStorage.setItem("profilePicType", "icon");
+      localStorage.setItem("profilePicValue", data.avatar);
+    }
   }
   if (data.vocabChapterXP) {
     Object.entries(data.vocabChapterXP).forEach(([k, v]) => {
@@ -14611,8 +14616,9 @@ async function syncUserData() {
     xp: profileData.xp || 0,
     color: profileData.color || "#d4a93a",
     greekExperience: profileData.greekExperience || "new",
-    avatar: localStorage.getItem("profilePicType") === "icon"
-      ? (localStorage.getItem("profilePicValue") || "school") : "school",
+    avatar: localStorage.getItem("profilePicType") === "photo"
+      ? (localStorage.getItem("profilePicRemoteURL") || "school")
+      : (localStorage.getItem("profilePicValue") || "school"),
     streak: getStreakDays(),
     lastStudyDate: localStorage.getItem("lastStudyDate") || null,
     totalStudySeconds: totalStudySeconds || 0,
@@ -14655,8 +14661,9 @@ function gatherMigrationData() {
     xp: profileRaw.xp || 0,
     color: profileRaw.color || "#d4a93a",
     greekExperience: profileRaw.greekExperience || "new",
-    avatar: localStorage.getItem("profilePicType") === "icon"
-      ? (localStorage.getItem("profilePicValue") || "school") : "school",
+    avatar: localStorage.getItem("profilePicType") === "photo"
+      ? (localStorage.getItem("profilePicRemoteURL") || "school")
+      : (localStorage.getItem("profilePicValue") || "school"),
     streak: parseInt(localStorage.getItem("studyStreakDays") || "0"),
     lastStudyDate: localStorage.getItem("lastStudyDate") || null,
     totalStudySeconds: Number(localStorage.getItem("totalStudySeconds")) || 0,
@@ -15290,9 +15297,16 @@ function _lbEscape(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
+function _renderAvatar(avatarValue) {
+  if (avatarValue && avatarValue.startsWith("https://")) {
+    return `<img src="${avatarValue}" alt="avatar" class="avatar-photo-img">`;
+  }
+  const icon = (avatarValue && /^[a-z_]+$/.test(avatarValue)) ? avatarValue : "person";
+  return `<span class="material-symbols-outlined">${icon}</span>`;
+}
+
 function _lbAvatarHtml(entry) {
-  const icon = (entry.avatar && /^[a-z_]+$/.test(entry.avatar)) ? entry.avatar : "person";
-  return `<span class="lb-avatar"><span class="material-symbols-outlined">${icon}</span></span>`;
+  return `<span class="lb-avatar">${_renderAvatar(entry.avatar)}</span>`;
 }
 
 function _rankBadgeHtml(rank) {
@@ -15398,11 +15412,10 @@ function _renderPodiumBoard(podiumEl, listEl, entries, field, myUid) {
   podiumEl.innerHTML = `<div class="lb-podium">${order.map((e, i) => {
     const rank = ranks[i];
     const isMe = e.id === myUid;
-    const icon = (e.avatar && /^[a-z_]+$/.test(e.avatar)) ? e.avatar : "person";
     return `<div class="lb-pod-card lb-pod-${rank === 1 ? "first" : rank === 2 ? "second" : "third"}${isMe ? " lb-pod-me" : ""}" onclick="showLbUserInfo('${_lbEscape(e.id)}')">
       ${rank === 1 ? `<span class="lb-pod-crown material-symbols-outlined">emoji_events</span>` : ""}
       <div class="lb-pod-rank">${rank}</div>
-      <div class="lb-pod-avatar"><span class="material-symbols-outlined">${icon}</span></div>
+      <div class="lb-pod-avatar">${_renderAvatar(e.avatar)}</div>
       <div class="lb-pod-name">${_lbEscape(e.name || "User")}</div>
       <div class="lb-pod-score">${valStr(e)}</div>
     </div>`;
@@ -15411,10 +15424,9 @@ function _renderPodiumBoard(podiumEl, listEl, entries, field, myUid) {
   const rest = entries.slice(3);
   listEl.innerHTML = rest.map((e, i) => {
     const isMe = e.id === myUid;
-    const icon = (e.avatar && /^[a-z_]+$/.test(e.avatar)) ? e.avatar : "person";
     return `<div class="lb-row${isMe ? " lb-row-me" : ""}" onclick="showLbUserInfo('${_lbEscape(e.id)}')">
       <span class="lb-row-rank">#${i + 4}</span>
-      <span class="lb-row-avatar"><span class="material-symbols-outlined">${icon}</span></span>
+      <span class="lb-row-avatar">${_renderAvatar(e.avatar)}</span>
       <span class="lb-row-name">${_lbEscape(e.name || "User")}</span>
       <span class="lb-row-score">${valStr(e)}</span>
     </div>`;
@@ -15677,9 +15689,8 @@ function handleAvatarPhoto(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    // Compress to small square via canvas
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       const canvas = document.createElement("canvas");
       canvas.width = 120; canvas.height = 120;
       const ctx = canvas.getContext("2d");
@@ -15692,8 +15703,21 @@ function handleAvatarPhoto(input) {
       localStorage.setItem("profilePicValue", dataUrl);
       _applyProfileAvatar();
       closeAvatarPicker();
-      // Leaderboard shows generic icon for photos (can't share photos cross-device)
-      window.LB?.syncAvatar();
+
+      const user = window.Auth?.getCurrentUser();
+      if (user && window.Auth?.uploadAvatarPhoto) {
+        try {
+          const remoteUrl = await window.Auth.uploadAvatarPhoto(user.uid, dataUrl);
+          localStorage.setItem("profilePicRemoteURL", remoteUrl);
+          _applyProfileAvatar();
+          window.LB?.syncAvatar();
+          syncUserData();
+        } catch (err) {
+          console.warn("Avatar upload failed:", err);
+          window.LB?.syncAvatar();
+          syncUserData();
+        }
+      }
     };
     img.src = e.target.result;
   };
@@ -15704,10 +15728,11 @@ function _applyProfileAvatar() {
   const el = document.getElementById("profileAvatar");
   if (!el) return;
   const type = localStorage.getItem("profilePicType") || "icon";
-  const value = localStorage.getItem("profilePicValue") || "school";
   if (type === "photo") {
-    el.innerHTML = `<img src="${value}" alt="avatar" class="avatar-photo-img">`;
+    const src = localStorage.getItem("profilePicRemoteURL") || localStorage.getItem("profilePicValue") || "";
+    el.innerHTML = `<img src="${src}" alt="avatar" class="avatar-photo-img">`;
   } else {
+    const value = localStorage.getItem("profilePicValue") || "school";
     el.innerHTML = `<span class="material-symbols-outlined">${value}</span>`;
   }
 }
@@ -15719,8 +15744,7 @@ function showLbUserInfo(id) {
   if (!e) return;
 
   const avatarEl = document.getElementById("lbUserAvatar");
-  const icon = (e.avatar && /^[a-z_]+$/.test(e.avatar)) ? e.avatar : "school";
-  avatarEl.innerHTML = `<span class="material-symbols-outlined">${icon}</span>`;
+  avatarEl.innerHTML = _renderAvatar(e.avatar);
 
   document.getElementById("lbUserName").textContent = e.name || "—";
 
@@ -15770,9 +15794,8 @@ function _frEsc(str) {
   return String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-function _frIcon(u) {
-  const v = u?.avatar;
-  return (v && /^[a-z_]+$/.test(v)) ? v : "school";
+function _frAvatarValue(u) {
+  return u?.avatar || "school";
 }
 
 function _frStatus(uid) {
@@ -15838,7 +15861,6 @@ function switchFriendsTab(tab) {
 }
 
 function _frCardHTML(u, status) {
-  const icon = _frIcon(u);
   const name = _frEsc(u.displayName || u.username || "User");
   const rank = _frRank(u.xp);
   let actions = "";
@@ -15853,7 +15875,7 @@ function _frCardHTML(u, status) {
     actions = `<button class="fr-action-btn fr-add" onclick="event.stopPropagation();sendRequestAction('${u.uid}')"><span class="material-symbols-outlined">person_add</span></button>`;
   }
   return `<div class="fr-card" onclick="showFriendSheet('${u.uid}')">
-    <div class="fr-card-avatar"><span class="material-symbols-outlined">${icon}</span></div>
+    <div class="fr-card-avatar">${_renderAvatar(_frAvatarValue(u))}</div>
     <div class="fr-card-info"><span class="fr-card-name">${name}</span><span class="fr-card-rank">${rank}</span></div>
     <div class="fr-card-actions">${actions}</div>
   </div>`;
@@ -15940,7 +15962,7 @@ async function showFriendSheet(uid) {
     return;
   }
 
-  document.getElementById("friendSheetAvatar").innerHTML = `<span class="material-symbols-outlined">${_frIcon(u)}</span>`;
+  document.getElementById("friendSheetAvatar").innerHTML = _renderAvatar(_frAvatarValue(u));
   document.getElementById("friendSheetName").textContent  = u.displayName || u.username || "User";
   document.getElementById("friendSheetRank").textContent  = _frRank(u.xp);
 
