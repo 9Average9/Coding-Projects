@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.64";
+const APP_VERSION = "2.3.65";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.64 — Block verse swipe when touching breadcrumb or highlight bar</div>
+<div class="un-version-label">v2.3.65 — Fix pronoun parsing, restrict verse swipe to body</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
@@ -16180,7 +16180,10 @@ const MORPH_POS = {
   PREP:'Preposition', CONJ:'Conjunction', ADV:'Adverb', PART:'Particle',
   INJ:'Interjection', PRT:'Particle', COND:'Conditional Particle',
   HEB:'Hebrew/Aramaic', ARAM:'Aramaic', INF:'Infinitive',
-  P:'Pronoun', PRON:'Pronoun', R:'Pronoun', RI:'Proper Noun',
+  P:'Personal Pronoun', PRON:'Pronoun', R:'Relative Pronoun', RI:'Proper Noun',
+  C:'Relative Pronoun', D:'Demonstrative Pronoun', F:'Reflexive Pronoun',
+  I:'Interrogative Pronoun', K:'Correlative Pronoun', Q:'Correlative Pronoun',
+  S:'Possessive Pronoun', X:'Indefinite Pronoun',
 };
 const MORPH_CASE = {
   N:{l:'Nominative', d:'subject of the verb'},
@@ -16224,28 +16227,25 @@ function decodeMorph(code) {
   if (!code) return [];
   const rows = [];
 
+  const segs = code.split('-');
+  const posRaw = segs[0];
+  const vSegs  = segs.slice(1);
+
+  // Indeclinable words — just show part of speech
   const INDECLINABLE = { PREP:1, CONJ:1, ADV:1, PART:1, INJ:1, PRT:1, COND:1, HEB:1, ARAM:1 };
-  if (INDECLINABLE[code]) {
-    return [{ label:'Part of Speech', value: MORPH_POS[code] || code, desc:'' }];
+  if (INDECLINABLE[posRaw]) {
+    return [{ label:'Part of Speech', value: MORPH_POS[posRaw] || posRaw, desc:'' }];
   }
 
-  const segs = code.split('-');
-  let posRaw = segs[0];
-
-  // strip numeric prefix like "P-" that sometimes appears
+  // Detect 2nd aorist/perfect prefix on verb segments
   let tensePrefix = '';
-  let vSegs = segs.slice(1);
-
-  // Detect 2nd aorist/perfect: V-2AAI-3S or segment[1] === '2...'
   if (vSegs[0] && /^2[ARILP]/.test(vSegs[0])) {
     tensePrefix = '2';
     vSegs[0] = vSegs[0].substring(1);
   }
 
   const posLabel = MORPH_POS[posRaw];
-  if (posLabel) {
-    rows.push({ label:'Part of Speech', value: posLabel, desc:'' });
-  }
+  if (posLabel) rows.push({ label:'Part of Speech', value: posLabel, desc:'' });
 
   if (posRaw === 'V') {
     // Verb: [TVM]-[PN or CNG]
@@ -16276,8 +16276,57 @@ function decodeMorph(code) {
       if (person) rows.push({ label:'Person', value: person, desc:'' });
       if (num)    rows.push({ label:'Number', value: num,    desc:'' });
     }
-  } else if (['N','T','ADJ','A','P','PRON','R'].includes(posRaw)) {
-    // Noun-like: CNG
+
+  } else if (posRaw === 'P' || posRaw === 'PRON') {
+    // Personal pronoun: P-1AS (1st/2nd person: person+case+num) or P-APM (3rd: CNG)
+    const seg = vSegs[0] || '';
+    if (seg[0] === '1' || seg[0] === '2') {
+      const person = MORPH_PERSON[seg[0]];
+      const c = MORPH_CASE[seg[1]];
+      const n = MORPH_NUM[seg[2]];
+      if (person) rows.push({ label:'Person', value: person, desc:'' });
+      if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+      if (n) rows.push({ label:'Number', value: n,   desc: '' });
+    } else {
+      const c = MORPH_CASE[seg[0]];
+      const n = MORPH_NUM[seg[1]];
+      const g = MORPH_GEN[seg[2]];
+      if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+      if (n) rows.push({ label:'Number', value: n,   desc: '' });
+      if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+    }
+
+  } else if (posRaw === 'F') {
+    // Reflexive pronoun: F-[person]CNG  e.g. F-1APM = 1st person Acc Pl Masc
+    const seg = vSegs[0] || '';
+    const person = MORPH_PERSON[seg[0]];
+    const c = MORPH_CASE[seg[1]];
+    const n = MORPH_NUM[seg[2]];
+    const g = MORPH_GEN[seg[3]];
+    if (person) rows.push({ label:'Person', value: person, desc:'' });
+    if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+    if (n) rows.push({ label:'Number', value: n,   desc: '' });
+    if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+
+  } else if (posRaw === 'S') {
+    // Possessive pronoun/adjective: S-[person][possessor_num]CNG
+    // e.g. S-1SNSM = 1st person Singular-possessor, Nom Sg Masc ("my")
+    //      S-1PNSF = 1st person Plural-possessor, Nom Sg Fem ("our")
+    const seg = vSegs[0] || '';
+    const person  = MORPH_PERSON[seg[0]];
+    const posNum  = MORPH_NUM[seg[1]];   // possessor's number
+    const c = MORPH_CASE[seg[2]];
+    const n = MORPH_NUM[seg[3]];
+    const g = MORPH_GEN[seg[4]];
+    if (person) rows.push({ label:'Person',   value: person,  desc:'' });
+    if (posNum) rows.push({ label:'Possessor', value: posNum, desc:'' });
+    if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+    if (n) rows.push({ label:'Number', value: n,   desc: '' });
+    if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+
+  } else if (['N','T','ADJ','A','R','C','D','I','K','Q','X'].includes(posRaw)) {
+    // Standard CNG: Noun, Article, Adjective, Relative/Demonstrative/Interrogative/
+    // Correlative/Indefinite pronouns — vSegs[0] is CNG (ignore any trailing -K variant marker)
     const cng = vSegs[0] || '';
     const c = MORPH_CASE[cng[0]];
     const n = MORPH_NUM[cng[1]];
@@ -16556,19 +16605,17 @@ function updateRhemaVerseNav() {
 }
 
 function initRhemaVerseSwipe() {
-  // Attach to the whole rhema body so swiping anywhere on screen navigates verses
-  const area = document.getElementById('rhemaModal');
+  // Only attach to the verse scroll area — not the header, picker, breadcrumb,
+  // highlight bar, or word-detail sheet which each have their own scroll behaviour
+  const area = document.querySelector('#rhemaModal .rhema-body');
   if (!area || area._hSwipeInit) return;
   area._hSwipeInit = true;
-  let sx = 0, sy = 0, swipeBlocked = false;
+  let sx = 0, sy = 0;
   area.addEventListener('touchstart', e => {
     sx = e.touches[0].clientX;
     sy = e.touches[0].clientY;
-    // Block verse swipe if touch starts on a horizontally-scrollable element
-    swipeBlocked = !!e.target.closest('#rhemaBreadcrumb, #rhemaHighlightBar');
   }, { passive: true });
   area.addEventListener('touchend', e => {
-    if (swipeBlocked) return;
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
     // Require clearly horizontal swipe (≥45px, more horizontal than vertical)
