@@ -8243,6 +8243,15 @@ function closeStudiesViewAll() { document.getElementById('studiesViewAllModal')?
 async function openStudySandbox(studyId, studyObj) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
+
+  // Dismiss any pending collab_approved notification for this study when the user opens it
+  const approvedNotif = _notifItems.find(n => n.type === 'collab_approved' && n.studyId === studyId);
+  if (approvedNotif) {
+    if (approvedNotif.msgId) window.Studies?.deleteMsg(uid, approvedNotif.msgId);
+    _notifItems = _notifItems.filter(n => n.id !== approvedNotif.id);
+    _updateNotifBadge();
+  }
+
   // Use pre-loaded object, then local list, then fetch from Firestore
   let study = studyObj || _myStudies.find(s => s.id === studyId);
   if (!study) study = await window.Studies?.get(studyId);
@@ -8616,6 +8625,8 @@ function _startEncouragementListener(uid) {
           id: 'collab_approved_' + m.id, type: 'collab_approved',
           fromName: m.fromName, studyId: m.studyId, studyName: m.studyName, msgId: m.id, read: false
         });
+        // Instantly surface the newly approved study without waiting for a refresh
+        if (!_myStudies.find(s => s.id === m.studyId)) _loadMyStudies();
       }
     });
     _updateNotifBadge();
@@ -14236,15 +14247,24 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.51";
+const APP_VERSION = "2.3.52";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.52 — Rhema + Study + Leaderboard Fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>No White Bar in Rhema</strong> — Overlay now uses CSS 100dvh (dynamic viewport) so it fills the exact screen height on iOS; no white gap and no scroll interference</li>
+    <li><strong>Study Appears Instantly on Approval</strong> — When a study owner accepts your collab request, the study appears on your home screen immediately without needing a refresh</li>
+    <li><strong>Notification Dismisses on Opening</strong> — The "you were accepted" What's Going On entry goes away automatically the first time you open that study</li>
+    <li><strong>Leaderboard Name Fixed</strong> — New users who joined the XP leaderboard as "Anonymous" will have their real name restored on next login</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.51 — Fix Rhema Scroll Interference</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No More Tap Block</strong> — iOS rubber-band bounce no longer captures touch events; tapping words works immediately after any scroll attempt</li>
-    <li><strong>Scroll Lock Restored</strong> — body position:fixed is back (the only reliable iOS scroll lock); overlay height is now set from window.innerHeight so there is no white space at the bottom</li>
-    <li><strong>Removed Legacy Scroll Property</strong> — Dropped -webkit-overflow-scrolling:touch from verse and picker scroll areas; it was causing momentum-scroll tap delays</li>
+    <li><strong>Scroll Lock Restored</strong> — body position:fixed is back (the only reliable iOS scroll lock)</li>
+    <li><strong>Removed Legacy Scroll Property</strong> — Dropped -webkit-overflow-scrolling:touch from verse and picker scroll areas</li>
   </ul>
 </div>
 <div class="un-version-label">v2.3.50 — Rhema Bottom Fixes</div>
@@ -14740,6 +14760,9 @@ async function submitCreateAccount() {
     if (migration.lbXpJoined) await window.LB.joinXPBoard(migration.xp || 0).catch(() => {});
     if (migration.lbConsJoined) await window.LB.joinConsistencyBoard(parseInt(localStorage.getItem("studyStreakDays") || "0")).catch(() => {});
     if (migration.lbScholarJoined) window.LB.joinScholarBoard();
+    // Fix race condition: onAuthStateChanged fires before this point so the initial
+    // joinXPBoard call may have stored "Anonymous". Re-stamp with the real display name.
+    window.LB.refreshLeaderboardName(displayName).catch(() => {});
 
     hideAuthModal();
     updateProfileUI();
@@ -14807,15 +14830,18 @@ window.__onAuthStateReady = async (user) => {
     }
 
     // Auto opt-in to XP board for all logged-in users
+    const _lbName = profileData?.displayName || localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername');
     if (window.LB && !window.LB.isXpJoined()) {
       window.LB.joinXPBoard(profileData?.xp || 0).catch(() => {});
       localStorage.setItem("lbXpJoined", "true");
       syncUserData();
     } else if (window.LB) {
-      // Repair stale "Anonymous" leaderboard entries — sync name on every login
       if (window.LB.isXpJoined()) window.LB.syncXP(profileData?.xp || 0).catch(() => {});
       if (window.LB.isConsJoined()) window.LB.syncStreak(parseInt(localStorage.getItem("studyStreakDays") || "0")).catch(() => {});
     }
+    // Repair stale "Anonymous" entries — race condition: onAuthStateChanged fires before
+    // createAccount finishes writing to Firestore/localStorage, so the join can store "Anonymous"
+    if (_lbName && window.LB) window.LB.refreshLeaderboardName(_lbName).catch(() => {});
 
     // Silently refresh FCM token on login if permission already granted (handles expired tokens)
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
@@ -16286,16 +16312,14 @@ async function showRhema() {
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
-  // Lock background scroll. Only position:fixed on body fully prevents iOS rubber-band bounce
-  // (overflow:hidden alone does not). Set modal height explicitly from window.innerHeight so
-  // iOS uses the real screen height instead of a browser-chrome-adjusted value (which was
-  // leaving white space at the bottom). Skip in sandbox mode — sandbox overlay already covers.
+  // Only position:fixed on body fully prevents iOS rubber-band bounce (overflow:hidden does not).
+  // The overlay uses height:100dvh in CSS to match the dynamic viewport height exactly,
+  // so no white space gap. Skip scroll lock in sandbox — sandbox overlay already covers.
   if (!_studySandboxId) {
     _rhemaSavedScrollY = window.scrollY;
     document.body.style.position = 'fixed';
     document.body.style.top = `-${_rhemaSavedScrollY}px`;
     document.body.style.width = '100%';
-    modal.style.height = window.innerHeight + 'px';
   }
 
   const loading = document.getElementById('rhemaLoadingMsg');
@@ -16346,7 +16370,6 @@ function closeRhema(keepSandbox = false) {
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.width = '';
-  document.getElementById('rhemaModal').style.height = '';
   window.scrollTo(0, _rhemaSavedScrollY);
   _rhemaTrail = [];
   _rhemaTrailPos = -1;
