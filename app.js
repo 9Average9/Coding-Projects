@@ -14218,19 +14218,27 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.44";
+const APP_VERSION = "2.3.45";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.44 — Study UI Polish</div>
+<div class="un-version-label">v2.3.45 — Study Nav Fixed</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>App Nav Hides in Study</strong> — The main nav bar (Home, Profile, etc.) now properly disappears when a study is open</li>
+    <li><strong>Study Tab Bar Visible</strong> — Rhema / Verses / Word Log / Notes tab bar shows correctly; tapping a tab while in Rhema switches panes without breaking the session</li>
+    <li><strong>Rhema Back Button</strong> — Pressing back inside Rhema returns to the study sandbox (not home); the sandbox back arrow takes you home</li>
+    <li><strong>More Verse Space</strong> — Rhema verse display no longer gets clipped by the study tab bar</li>
+  </ul>
+</div>
+<div class="un-version-label">v2.3.45 — Study UI Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Tab Bar Stays in Rhema</strong> — The study tab bar (Rhema / Verses / Word Log / Notes) now floats above the Rhema screen so you can switch tabs without leaving Rhema</li>
     <li><strong>Community Page Fix</strong> — Community section was leaking into the bottom of the home screen; fixed</li>
     <li><strong>Create Study Sheet</strong> — Drag handle removed so it's clear the sheet doesn't slide; home screen no longer scrolls behind it</li>
-    <li><strong>Back Button</strong> — Pressing back from any study tab or from Rhema closes the sandbox and returns to the home screen</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.44 — Sandbox Nav &amp; Notification Fixes</div>
+<div class="un-version-label">v2.3.45 — Sandbox Nav &amp; Notification Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
@@ -14238,7 +14246,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.44 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-version-label">v2.3.45 — Study Invites &amp; Collaboration Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>
@@ -16312,14 +16320,15 @@ function closeRhema(keepSandbox = false) {
 }
 
 function rhemaGoBack() {
-  if (_rhemaTrail.length === 0) { closeRhema(); return; }
+  const inSandbox = !!_studySandboxId;
+  if (_rhemaTrail.length === 0) { closeRhema(inSandbox); return; }
   // Move cursor back without removing any items
   if (_rhemaTrailPos === -1) {
     _rhemaTrailPos = _rhemaTrail.length - 1;
   } else if (_rhemaTrailPos > 0) {
     _rhemaTrailPos--;
   } else {
-    closeRhema(); return;
+    closeRhema(inSandbox); return;
   }
   const target = _rhemaTrail[_rhemaTrailPos];
   _rhemaBook = target.book;
