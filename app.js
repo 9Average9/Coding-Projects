@@ -7978,6 +7978,20 @@ const NAV_SCREENS = ['homeScreen', 'profilePage', 'communityPage'];
 
 // ── Personal Studies ──────────────────────────────────────────────────────────
 
+function _showStudyToast(msg) {
+  let el = document.getElementById('studyToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'studyToast';
+    el.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 18px;border-radius:24px;font-size:0.85rem;font-weight:600;z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.25s';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
 async function _loadMyStudies() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
@@ -8055,19 +8069,25 @@ function toggleStudyShareFriends(checkbox) { _studyCreateShareFriends = checkbox
 
 async function submitStudyCreate() {
   const uid = window.Auth?.getCurrentUser()?.uid;
-  if (!uid) return;
+  if (!uid) { _showStudyToast('Sign in to create a study.'); return; }
   const name = document.getElementById('studyCreateName')?.value?.trim();
   if (!name) { document.getElementById('studyCreateName')?.focus(); return; }
   const btn = document.querySelector('#studyCreateSheet .main-btn');
   if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
-  const id = await window.Studies?.create(uid, displayName, {
+  const study = await window.Studies?.create(uid, displayName, {
     name, color: _studyCreateColor, icon: _studyCreateIcon, shareSession: _studyCreateShareFriends
   });
   if (btn) { btn.textContent = 'Create Study'; btn.disabled = false; }
-  if (id) {
+  if (study) {
+    // Optimistically add to local list so home screen updates immediately
+    _myStudies = [study, ..._myStudies.filter(s => s.id !== study.id)];
+    _renderHomeStudies();
     closeStudyCreateSheet();
-    await _loadMyStudies();
+    // Open the new study right away
+    openStudySandbox(study.id, study);
+  } else {
+    _showStudyToast('Could not create study. Check your connection and try again.');
   }
 }
 
@@ -8092,11 +8112,13 @@ function closeStudiesViewAll() { document.getElementById('studiesViewAllModal')?
 
 // ── Study Sandbox ─────────────────────────────────────────────────────────────
 
-async function openStudySandbox(studyId) {
+async function openStudySandbox(studyId, studyObj) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const study = _myStudies.find(s => s.id === studyId);
-  if (!study) return;
+  // Use pre-loaded object, then local list, then fetch from Firestore
+  let study = studyObj || _myStudies.find(s => s.id === studyId);
+  if (!study) study = await window.Studies?.get(studyId);
+  if (!study) { _showStudyToast('Study not found.'); return; }
 
   _activeSandboxStudy = study;
   _sandboxTab = 'notes';
