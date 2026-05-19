@@ -35,6 +35,13 @@ let _browseSearch = "";
 let _currentFriendSheetUid = null;
 let _authReady = false;
 
+// Personal Studies state
+let _myStudies = [];
+let _studyCreateColor = '#4f8cff';
+let _studyCreateIcon = 'menu_book';
+let _studyCreateShareFriends = false;
+let _activeStudyId = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
 
@@ -7955,6 +7962,156 @@ const screens = [
 
 const NAV_SCREENS = ['homeScreen', 'profilePage', 'communityPage'];
 
+// ── Personal Studies ──────────────────────────────────────────────────────────
+
+async function _loadMyStudies() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  _myStudies = await window.Studies?.getAll(uid) || [];
+  _renderStudiesSection();
+}
+
+function _renderStudiesSection() {
+  const container = document.getElementById('myStudiesGrid');
+  if (!container) return;
+  if (!_myStudies.length) {
+    container.innerHTML = '<p class="studies-empty">No studies yet. Create your first one!</p>';
+    return;
+  }
+  const today = new Date().toLocaleDateString("en-CA");
+  container.innerHTML = _myStudies.map(s => `
+    <div class="study-card" style="--study-color:${s.color}" onclick="openStudySession('${s.id}')">
+      ${s.lastSessionDate === today ? '<span class="study-card-done-dot"></span>' : ''}
+      <span class="study-card-icon material-symbols-outlined">${s.icon}</span>
+      <span class="study-card-name">${s.name}</span>
+      <span class="study-card-meta">${s.totalSessions || 0} session${s.totalSessions === 1 ? '' : 's'}</span>
+    </div>
+  `).join('');
+}
+
+function openStudyCreateSheet() {
+  _studyCreateColor = '#4f8cff';
+  _studyCreateIcon = 'menu_book';
+  _studyCreateShareFriends = false;
+  const nameEl = document.getElementById('studyCreateName');
+  if (nameEl) nameEl.value = '';
+  const toggle = document.getElementById('studyCreateShareToggle');
+  if (toggle) toggle.checked = false;
+  document.querySelectorAll('.study-color-swatch').forEach(el =>
+    el.classList.toggle('selected', el.dataset.color === '#4f8cff'));
+  document.querySelectorAll('.study-icon-btn').forEach(el =>
+    el.classList.toggle('selected', el.dataset.icon === 'menu_book'));
+  document.getElementById('studyCreateSheet')?.classList.add('open');
+}
+
+function closeStudyCreateSheet() {
+  document.getElementById('studyCreateSheet')?.classList.remove('open');
+}
+
+function selectStudyColor(el) {
+  _studyCreateColor = el.dataset.color;
+  document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectStudyIcon(el) {
+  _studyCreateIcon = el.dataset.icon;
+  document.querySelectorAll('.study-icon-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleStudyShareFriends(checkbox) {
+  _studyCreateShareFriends = checkbox.checked;
+}
+
+async function submitStudyCreate() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const name = document.getElementById('studyCreateName')?.value?.trim();
+  if (!name) {
+    document.getElementById('studyCreateName')?.focus();
+    return;
+  }
+  const id = await window.Studies?.create(uid, {
+    name, color: _studyCreateColor, icon: _studyCreateIcon, shareWithFriends: _studyCreateShareFriends
+  });
+  if (id) {
+    closeStudyCreateSheet();
+    await _loadMyStudies();
+  }
+}
+
+function openStudySession(studyId) {
+  const study = _myStudies.find(s => s.id === studyId);
+  if (!study) return;
+  _activeStudyId = studyId;
+  const today = new Date().toLocaleDateString("en-CA");
+  const alreadyDone = study.lastSessionDate === today;
+
+  const iconEl = document.getElementById('studySessionIcon');
+  const titleEl = document.getElementById('studySessionTitle');
+  const metaEl = document.getElementById('studySessionMeta');
+  const logBtn = document.getElementById('studySessionLogBtn');
+
+  if (iconEl) { iconEl.textContent = study.icon; iconEl.style.color = study.color; }
+  if (titleEl) titleEl.textContent = study.name;
+  if (metaEl) metaEl.textContent = `${study.totalSessions || 0} session${study.totalSessions === 1 ? '' : 's'} total`;
+  if (logBtn) {
+    const sheet = document.getElementById('studySessionSheet');
+    sheet?.style.setProperty('--study-session-color', study.color);
+    if (alreadyDone) {
+      logBtn.textContent = 'Already done today!';
+      logBtn.classList.add('done');
+    } else {
+      logBtn.textContent = "Log Today's Session";
+      logBtn.classList.remove('done');
+    }
+  }
+
+  document.getElementById('studySessionSheet')?.classList.add('open');
+}
+
+function closeStudySessionSheet() {
+  document.getElementById('studySessionSheet')?.classList.remove('open');
+  _activeStudyId = null;
+}
+
+async function logStudySession() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_activeStudyId) return;
+  const logBtn = document.getElementById('studySessionLogBtn');
+  if (logBtn?.classList.contains('done')) return;
+  const study = _myStudies.find(s => s.id === _activeStudyId);
+  if (!study) return;
+  if (logBtn) { logBtn.textContent = 'Logging…'; logBtn.disabled = true; }
+
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
+  const result = await window.Studies?.openSession(uid, _activeStudyId, {
+    name: displayName, studyName: study.name, friends: study.shareWithFriends ? friendsList : []
+  });
+
+  if (logBtn) { logBtn.disabled = false; }
+  if (!result?.alreadyDone) {
+    if (logBtn) { logBtn.textContent = 'Session Logged!'; logBtn.classList.add('done'); }
+    const metaEl = document.getElementById('studySessionMeta');
+    if (metaEl) metaEl.textContent = `${result?.totalSessions || 1} session${result?.totalSessions === 1 ? '' : 's'} total`;
+    await _loadMyStudies();
+  }
+}
+
+async function deleteCurrentStudy() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_activeStudyId) return;
+  const study = _myStudies.find(s => s.id === _activeStudyId);
+  if (!study) return;
+  if (!confirm(`Delete "${study.name}"? This cannot be undone.`)) return;
+  await window.Studies?.delete(uid, _activeStudyId);
+  closeStudySessionSheet();
+  await _loadMyStudies();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function showBottomNav() {
   document.getElementById('bottomNav')?.classList.remove('hidden');
 }
@@ -7980,6 +8137,7 @@ function showNavPage(page) {
     localStorage.setItem('communityLastVisit', Date.now().toString());
     document.getElementById('commNavDot')?.classList.add('hidden');
     showLbTab('xp');
+    _loadMyStudies();
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -13453,15 +13611,23 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.37";
+const APP_VERSION = "2.3.38";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.37 — Friend Accepted Notification &amp; Polish</div>
+<div class="un-version-label">v2.3.38 — Personal Studies</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>Friend Accepted</strong> — When someone accepts your friend request, it now shows up in What's Going On with a green checkmark (push notification still fires too)</li>
-    <li><strong>Notification Dot</strong> — The red dot is larger, has a glow, and pulses so it's impossible to miss</li>
-    <li><strong>Lesson Track Colors</strong> — Basic track progress badge is always blue, Advanced is always gold — no more color bleed from app themes</li>
+    <li><strong>My Studies</strong> — Create personal studies from the Community page with a custom name, color, and icon</li>
+    <li><strong>Daily Sessions</strong> — Log each day's session with one tap; your total session count is tracked</li>
+    <li><strong>Share with Friends</strong> — Optionally share your study with friends — they get a push notification the first time you open a session each day</li>
+  </ul>
+</div>
+<div class="un-version-label">v2.3.37 — Friend Accepted Notifications &amp; Polish</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Friend Accepted</strong> — In-app notification when someone accepts your friend request (plus a push notification)</li>
+    <li><strong>Lesson Badge Colors</strong> — Basic track progress badge is always blue; Advanced is always gold</li>
+    <li><strong>Notification Dot</strong> — Red dot is larger and pulses so it's easier to spot</li>
   </ul>
 </div>
 <div class="un-version-label">v2.3.36 — Notification Prompt &amp; Friend Notifications</div>
@@ -13471,13 +13637,6 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Friend Request Dots</strong> — Red notification dot now appears on both the What's Going On button and the Friends button when you have a pending request</li>
     <li><strong>Inline Accept / Decline</strong> — Friend requests in the What's Going On panel now show the person's name with Accept and Decline buttons right there — no need to open the Friends modal</li>
     <li><strong>Cross-clearing</strong> — Resolving a request from either the notification panel or the Friends modal clears all red dots at once</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.35 — Community Reset &amp; Basic Badge Fix</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Community Rebuilt</strong> — Gutted and restarting the community board from scratch so each feature can be tested as it's added</li>
-    <li><strong>Basic Track Badge</strong> — The Track 1 badge now shows in blue instead of the gold color it accidentally picked up</li>
   </ul>
 </div>
 `;
@@ -13943,6 +14102,7 @@ window.__onAuthStateReady = async (user) => {
     updatePracticeToolLocks();
     updateLessonCompletionUI();
     populateHomeScreen();
+    _loadMyStudies();
     // If friends modal was opened while auth was still loading, populate it now
     if (document.getElementById("friendsModal")?.classList.contains("open")) {
       switchFriendsTab(_friendsTab);

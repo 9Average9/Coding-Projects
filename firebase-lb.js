@@ -434,10 +434,10 @@ window.Friends = {
 const FCM_VAPID_KEY = "BDOeDKo0NmW6-kMwJB9noey7YK1u3raQ5NUvfFhv9kguPXDZfJirp5-ilbwwMCm9_0_hQ_EkiQktFe4f2pLl5VU";
 
 // Generic push notification writer — triggers the Cloud Function onEncouragementCreated.
-async function fcmSendPushNotification(toUid, type, fromName, fromUid) {
+async function fcmSendPushNotification(toUid, type, fromName, fromUid, extra = {}) {
   try {
     await addDoc(collection(db, "encouragements", toUid, "messages"), {
-      type, fromName, fromUid, processed: false, createdAt: serverTimestamp()
+      type, fromName, fromUid, processed: false, createdAt: serverTimestamp(), ...extra
     });
     return true;
   } catch (e) {
@@ -445,6 +445,76 @@ async function fcmSendPushNotification(toUid, type, fromName, fromUid) {
     return false;
   }
 }
+
+// ── Personal Studies ──────────────────────────────────────────────────────────
+
+async function studyCreate(uid, { name, color, icon, shareWithFriends }) {
+  try {
+    const ref = await addDoc(collection(db, "users", uid, "studies"), {
+      name, color, icon, shareWithFriends: !!shareWithFriends,
+      createdAt: serverTimestamp(),
+      lastSessionDate: null, totalSessions: 0, isActive: true
+    });
+    return ref.id;
+  } catch (e) {
+    console.warn("studyCreate:", e);
+    return null;
+  }
+}
+
+async function studyGetAll(uid) {
+  try {
+    const q = query(collection(db, "users", uid, "studies"), where("isActive", "==", true), orderBy("createdAt", "asc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.warn("studyGetAll:", e);
+    return [];
+  }
+}
+
+async function studyOpenSession(uid, studyId, { name, studyName, friends }) {
+  const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+  try {
+    const ref = doc(db, "users", uid, "studies", studyId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return { alreadyDone: false };
+    const data = snap.data();
+    const alreadyDone = data.lastSessionDate === today;
+    if (!alreadyDone) {
+      await updateDoc(ref, {
+        lastSessionDate: today,
+        totalSessions: increment(1)
+      });
+      if (data.shareWithFriends && friends?.length) {
+        for (const friendUid of friends) {
+          fcmSendPushNotification(friendUid, "studySession", name, uid, { studyName });
+        }
+      }
+    }
+    return { alreadyDone, totalSessions: data.totalSessions + (alreadyDone ? 0 : 1) };
+  } catch (e) {
+    console.warn("studyOpenSession:", e);
+    return { alreadyDone: false };
+  }
+}
+
+async function studyDelete(uid, studyId) {
+  try {
+    await updateDoc(doc(db, "users", uid, "studies", studyId), { isActive: false });
+    return true;
+  } catch (e) {
+    console.warn("studyDelete:", e);
+    return false;
+  }
+}
+
+window.Studies = {
+  create:      studyCreate,
+  getAll:      studyGetAll,
+  openSession: studyOpenSession,
+  delete:      studyDelete
+};
 
 async function fcmRegisterToken(uid) {
   if (!messaging) throw new Error("Firebase messaging not available on this browser.");
