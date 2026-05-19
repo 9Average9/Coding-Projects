@@ -54,7 +54,10 @@ service cloud.firestore {
         && request.auth.uid in request.resource.data.collaboratorUids;
       allow update: if request.auth != null && (
         request.auth.uid in resource.data.collaboratorUids ||
-        request.auth.uid == resource.data.creatorUid
+        request.auth.uid == resource.data.creatorUid ||
+        // Any auth user can add themselves to pendingCollaboratorUids (collab request)
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pendingCollaboratorUids']) &&
+         request.auth.uid in request.resource.data.pendingCollaboratorUids)
       );
       allow delete: if request.auth != null && request.auth.uid == resource.data.creatorUid;
     }

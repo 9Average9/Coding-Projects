@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.40" />
+  <link rel="stylesheet" href="style.css?v=2.3.41" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10866,9 +10866,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.40"></script>
-  <script src="app.js?v=2.3.40"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.40"></script>
+  <script src="vocab.js?v=2.3.41"></script>
+  <script src="app.js?v=2.3.41"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.41"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11083,6 +11083,18 @@ glacier: {
     <button class="study-session-btn" id="sbsCollabBtn" onclick="requestStudyCollab()">Request to Collaborate</button>
     <button class="study-session-btn" style="background:#22c55e;margin-bottom:10px" onclick="copyFriendStudy()">Copy as My Own Study</button>
     <button class="text-btn" style="width:100%" onclick="closeStudyBoardSheet()">Close</button>
+  </div>
+</div>
+
+<!-- Delete Study Confirm Sheet -->
+<div id="studyDeleteConfirm" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyDeleteConfirm()">
+  <div class="study-sheet" onclick="event.stopPropagation()">
+    <div class="study-sheet-handle"></div>
+    <h2 class="study-sheet-title" style="color:#ef4444">Delete Study?</h2>
+    <p class="study-sheet-sub" id="studyDeleteConfirmName" style="font-weight:700;color:var(--text-color)"></p>
+    <p class="study-sheet-sub">This permanently erases all notes, saved verses, and word log. Cannot be undone.</p>
+    <button class="main-btn" style="background:#ef4444;width:100%;margin-bottom:10px" onclick="executeDeleteStudy()">Yes, Delete Everything</button>
+    <button class="text-btn" style="width:100%" onclick="closeStudyDeleteConfirm()">Cancel</button>
   </div>
 </div>
 

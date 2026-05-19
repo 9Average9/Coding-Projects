@@ -12501,10 +12501,35 @@ body .app:has(#settingsScreen.screen.active) {
 .notif-deny-btn { background: transparent; border: 1.5px solid var(--border-color); color: var(--muted-color); }
 .notif-accept-btn:active, .notif-deny-btn:active { opacity: 0.7; }
 
-/* ── Community page Friends button badge ─────────────────────────────────── */
-.comm-friends-btn { position: relative; }
+/* ── Community page ───────────────────────────────────────────────────────── */
+#communityPage { display: flex; flex-direction: column; overflow: hidden; }
+.comm-scroll {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.comm-hero {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px 14px;
+  gap: 12px;
+}
+.comm-hero-text { flex: 1; min-width: 0; }
+.comm-hero-title { font-size: 1.55rem; font-weight: 800; color: var(--text-color); margin: 0 0 2px; }
+.comm-hero-sub { font-size: 0.8rem; color: var(--muted-color); margin: 0; }
+.comm-friends-btn {
+  position: relative;
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px 8px 12px;
+  background: var(--card-color);
+  border: 1.5px solid var(--border-color);
+  border-radius: 999px;
+  font-size: 0.82rem; font-weight: 700; color: var(--text-color);
+  cursor: pointer; flex-shrink: 0;
+  transition: transform 0.15s, background 0.15s;
+}
+.comm-friends-btn:active { transform: scale(0.95); background: var(--border-color); }
+.comm-friends-btn .material-symbols-outlined { font-size: 18px; color: var(--secondary-color); }
+.comm-tabs { padding: 0 16px; }
 .comm-friends-badge {
-  position: absolute; top: -4px; right: -4px;
+  position: absolute; top: -5px; right: -5px;
   min-width: 18px; height: 18px; padding: 0 4px;
   border-radius: 999px; background: #ef4444; color: #fff;
   font-size: 0.68rem; font-weight: 900;
@@ -12565,6 +12590,21 @@ body .app:has(#settingsScreen.screen.active) {
   background: var(--study-color, #4f8cff); opacity: 0.06; pointer-events: none;
 }
 .hs-study-card:active { transform: scale(0.97); }
+.hs-study-card.jiggle { animation: hs-jiggle 0.2s ease-in-out infinite; cursor: default; }
+.hs-delete-btn {
+  position: absolute; top: -7px; right: -7px; z-index: 10;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #1c1c1e; border: 2px solid #fff;
+  color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.hs-delete-btn .material-symbols-outlined { font-size: 13px; }
+@keyframes hs-jiggle {
+  0%,100% { transform: rotate(0deg); }
+  25% { transform: rotate(-1.8deg) translateY(-1px); }
+  75% { transform: rotate(1.8deg) translateY(-1px); }
+}
 .hs-add-card {
   background: var(--card-color);
   border: 1.5px dashed var(--border-color);
@@ -12812,7 +12852,7 @@ body .app:has(#settingsScreen.screen.active) {
 
 .ss-header {
   display: flex; align-items: center; gap: 10px;
-  padding: 52px 16px 12px;
+  padding: calc(env(safe-area-inset-top, 44px) + 12px) 16px 12px;
   background: var(--card-color);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;

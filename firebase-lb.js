@@ -612,7 +612,6 @@ async function studyApproveCollab(studyId, requesterUid, requesterName) {
       collaboratorUids: arrayUnion(requesterUid),
       pendingCollaboratorUids: arrayRemove(requesterUid)
     });
-    await updateDoc(doc(db, "users", requesterUid), { studyIds: arrayUnion(studyId) });
     const snap = await getDoc(ref);
     const myName = localStorage.getItem("authDisplayName") || "Someone";
     fcmSendPushNotification(requesterUid, "studyCollabApproved", myName, window.Auth?.getCurrentUser()?.uid, { studyId, studyName: snap.data()?.name });
@@ -640,15 +639,28 @@ async function studyCopy(sourceStudyId, uid, displayName) {
       createdAt: serverTimestamp(), isActive: true,
       rhemaPositions: {}, lastSessionDates: {}, copiedFromId: sourceStudyId
     });
-    await updateDoc(doc(db, "users", uid), { studyIds: arrayUnion(ref.id) });
-    return ref.id;
+    return {
+      id: ref.id, name: s.name, color: s.color, icon: s.icon,
+      shareSession: s.shareSession ?? false,
+      creatorUid: uid, creatorName: displayName,
+      collaboratorUids: [uid], pendingCollaboratorUids: [],
+      isActive: true, rhemaPositions: {}, lastSessionDates: {},
+      createdAt: { seconds: Math.floor(Date.now() / 1000) }
+    };
   } catch (e) { console.warn("studyCopy:", e); return null; }
 }
 
 async function studyDeletePermanent(studyId, uid) {
   try {
-    await updateDoc(doc(db, "studies", studyId), { isActive: false });
-    await updateDoc(doc(db, "users", uid), { studyIds: arrayRemove(studyId) });
+    const studyRef = doc(db, "studies", studyId);
+    const snap = await getDoc(studyRef);
+    if (!snap.exists() || snap.data().creatorUid !== uid) return false;
+    // Delete all subcollection documents first
+    for (const sub of ['notes', 'savedVerses', 'wordLog']) {
+      const subSnap = await getDocs(collection(db, "studies", studyId, sub));
+      for (const d of subSnap.docs) await deleteDoc(d.ref);
+    }
+    await deleteDoc(studyRef);
     return true;
   } catch (e) { console.warn("studyDeletePermanent:", e); return false; }
 }
