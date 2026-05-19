@@ -448,19 +448,18 @@ async function fcmSendPushNotification(toUid, type, fromName, fromUid, extra = {
 
 // ── Personal Studies (top-level collection, supports collaboration) ───────────
 
-async function studyCreate(uid, displayName, { name, color, icon, shareSession }) {
+async function studyCreate(uid, displayName, { name, description, color, icon, shareSession }) {
   try {
     const ref = await addDoc(collection(db, "studies"), {
-      name, color, icon,
+      name, description: description || '', color, icon,
       creatorUid: uid, creatorName: displayName,
       collaboratorUids: [uid], pendingCollaboratorUids: [],
       shareSession: !!shareSession,
       createdAt: serverTimestamp(), isActive: true,
       rhemaPositions: {}, lastSessionDates: {}
     });
-    // Return a locally-usable study object immediately (no second write needed)
     return {
-      id: ref.id, name, color, icon,
+      id: ref.id, name, description: description || '', color, icon,
       shareSession: !!shareSession,
       creatorUid: uid, creatorName: displayName,
       collaboratorUids: [uid], pendingCollaboratorUids: [],
@@ -471,6 +470,31 @@ async function studyCreate(uid, displayName, { name, color, icon, shareSession }
     console.warn("studyCreate error:", e?.code, e?.message);
     return null;
   }
+}
+
+function studyListen(studyId, callback) {
+  return onSnapshot(doc(db, "studies", studyId),
+    snap => callback(snap.exists() ? { id: snap.id, ...snap.data() } : null),
+    err => console.warn("studyListen:", err)
+  );
+}
+
+async function studyInviteCollab(studyId, studyName, inviteeUid, myDisplayName) {
+  try {
+    await updateDoc(doc(db, "studies", studyId), { pendingCollaboratorUids: arrayUnion(inviteeUid) });
+    await fcmSendPushNotification(inviteeUid, "studyInvite", myDisplayName, auth.currentUser?.uid, { studyId, studyName });
+    return true;
+  } catch (e) { console.warn("studyInviteCollab:", e); return false; }
+}
+
+async function studySelfApproveInvite(studyId, uid) {
+  try {
+    await updateDoc(doc(db, "studies", studyId), {
+      collaboratorUids: arrayUnion(uid),
+      pendingCollaboratorUids: arrayRemove(uid)
+    });
+    return true;
+  } catch (e) { console.warn("studySelfApproveInvite:", e); return false; }
 }
 
 async function studyGet(studyId) {
@@ -679,10 +703,12 @@ function listenEncouragements(uid, callback) {
 window.Studies = {
   create: studyCreate, get: studyGet, getMine: studyGetMine, getFriends: studyGetFriends,
   openSession: studyOpenSession, saveRhemaPos: studySaveRhemaPos,
+  listenStudy: studyListen,
   listenNotes: studyListenNotes, addNote: studyAddNote, deleteNote: studyDeleteNote,
   listenVerses: studyListenVerses, saveVerse: studySaveVerse, deleteVerse: studyDeleteVerse,
   listenWordLog: studyListenWordLog, logWord: studyLogWord, deleteWordLog: studyDeleteWordLog,
   requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
+  inviteCollab: studyInviteCollab, selfApproveInvite: studySelfApproveInvite,
   copy: studyCopy, delete: studyDeletePermanent, listenEncouragements
 };
 

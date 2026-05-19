@@ -40,10 +40,13 @@ let _myStudies = [];
 let _studyCreateColor = '#4f8cff';
 let _studyCreateIcon = 'menu_book';
 let _studyCreateShareFriends = false;
+let _studyCreateDescription = '';
+let _studyCreateInviteUids = new Set();
 let _activeSandboxStudy = null;     // full study doc of open sandbox
 let _sandboxUnsubNotes = null;
 let _sandboxUnsubVerses = null;
 let _sandboxUnsubWordLog = null;
+let _sandboxUnsubStudy = null;
 let _sandboxTab = 'notes';
 let _sandboxWordLogCache = [];       // local cache for dedup before writing
 let _studySandboxId = null;         // set when Rhema is open in study mode
@@ -8086,17 +8089,16 @@ function closeStudyDeleteConfirm() {
 async function executeDeleteStudy() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid || !_studyPendingDeleteId) return;
-  const btn = document.querySelector('#studyDeleteConfirm .main-btn');
-  if (btn) { btn.textContent = 'Deleting…'; btn.disabled = true; }
-  const ok = await window.Studies?.delete(_studyPendingDeleteId, uid);
-  if (btn) { btn.textContent = 'Yes, Delete'; btn.disabled = false; }
+  const studyId = _studyPendingDeleteId; // capture before clearing
+  // Optimistically remove immediately (like iOS)
+  _myStudies = _myStudies.filter(s => s.id !== studyId);
+  if (!_myStudies.length) _studyDeleteMode = false;
+  _renderHomeStudies();
   closeStudyDeleteConfirm();
-  if (ok) {
-    _myStudies = _myStudies.filter(s => s.id !== _studyPendingDeleteId);
-    if (!_myStudies.length) _studyDeleteMode = false;
-    _renderHomeStudies();
-  } else {
+  const ok = await window.Studies?.delete(studyId, uid);
+  if (!ok) {
     _showStudyToast('Could not delete. Only the creator can delete a study.');
+    await _loadMyStudies(); // restore if Firestore rejected it
   }
 }
 
@@ -8110,8 +8112,12 @@ function openStudyCreateSheet() {
   _studyCreateColor = '#4f8cff';
   _studyCreateIcon = 'menu_book';
   _studyCreateShareFriends = false;
+  _studyCreateDescription = '';
+  _studyCreateInviteUids = new Set();
   const nameEl = document.getElementById('studyCreateName');
   if (nameEl) nameEl.value = '';
+  const descEl = document.getElementById('studyCreateDesc');
+  if (descEl) descEl.value = '';
   const toggle = document.getElementById('studyCreateShareToggle');
   if (toggle) toggle.checked = false;
   document.querySelectorAll('.study-color-swatch').forEach(el =>
@@ -8119,6 +8125,8 @@ function openStudyCreateSheet() {
   document.querySelectorAll('.study-icon-btn').forEach(el =>
     el.classList.toggle('selected', el.dataset.icon === 'menu_book'));
   document.getElementById('studyCreateSheet')?.classList.add('open');
+  _renderStudyInviteFriendsList();
+  _addSheetSwipeClose('studyCreateSheet', closeStudyCreateSheet);
 }
 function closeStudyCreateSheet() { document.getElementById('studyCreateSheet')?.classList.remove('open'); }
 function selectStudyColor(el) {
@@ -8132,20 +8140,71 @@ function selectStudyIcon(el) {
   el.classList.add('selected');
 }
 function toggleStudyShareFriends(checkbox) { _studyCreateShareFriends = checkbox.checked; }
+function toggleStudyInviteFriend(uid) {
+  if (_studyCreateInviteUids.has(uid)) _studyCreateInviteUids.delete(uid);
+  else _studyCreateInviteUids.add(uid);
+  // Update button state
+  const btn = document.querySelector(`.study-invite-friend-btn[data-uid="${uid}"]`);
+  if (btn) btn.classList.toggle('invited', _studyCreateInviteUids.has(uid));
+}
+
+async function _renderStudyInviteFriendsList() {
+  const list = document.getElementById('studyCreateFriendsList');
+  if (!list) return;
+  if (!friendsList.length) { list.innerHTML = '<p class="ss-hint" style="margin:0;padding:4px 0">No friends yet. Add friends in the Community tab.</p>'; return; }
+  list.innerHTML = '<p class="ss-hint" style="margin:0;padding:4px 0">Loading…</p>';
+  try {
+    const users = await Promise.all(friendsList.map(uid => window.Friends?.getUser(uid).catch(() => null)));
+    list.innerHTML = users.filter(Boolean).map(u => {
+      const name = u.displayName || u.username || 'Friend';
+      const isSelected = _studyCreateInviteUids.has(u.uid || u.id);
+      const uid = u.uid || u.id;
+      return `<button class="study-invite-friend-btn${isSelected ? ' invited' : ''}" data-uid="${uid}" onclick="toggleStudyInviteFriend('${uid}')">
+        <span class="study-invite-friend-name">${name}</span>
+        <span class="material-symbols-outlined study-invite-friend-check">${isSelected ? 'check_circle' : 'add_circle'}</span>
+      </button>`;
+    }).join('') || '<p class="ss-hint" style="margin:0">No friends found.</p>';
+  } catch { list.innerHTML = '<p class="ss-hint" style="margin:0">Could not load friends.</p>'; }
+}
+
+function _addSheetSwipeClose(sheetId, closeFn) {
+  const sheet = document.querySelector(`#${sheetId} .study-sheet`);
+  if (!sheet || sheet._swipeInit) return;
+  sheet._swipeInit = true;
+  let startY = 0, dragging = false;
+  sheet.addEventListener('touchstart', e => { startY = e.touches[0].clientY; dragging = true; }, { passive: true });
+  sheet.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 0) sheet.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+  sheet.addEventListener('touchend', e => {
+    dragging = false;
+    const dy = e.changedTouches[0].clientY - startY;
+    sheet.style.transform = '';
+    if (dy > 80) closeFn();
+  });
+}
 
 async function submitStudyCreate() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) { _showStudyToast('Sign in to create a study.'); return; }
   const name = document.getElementById('studyCreateName')?.value?.trim();
   if (!name) { document.getElementById('studyCreateName')?.focus(); return; }
+  const description = document.getElementById('studyCreateDesc')?.value?.trim() || '';
   const btn = document.querySelector('#studyCreateSheet .main-btn');
   if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
   const study = await window.Studies?.create(uid, displayName, {
-    name, color: _studyCreateColor, icon: _studyCreateIcon, shareSession: _studyCreateShareFriends
+    name, description, color: _studyCreateColor, icon: _studyCreateIcon, shareSession: _studyCreateShareFriends
   });
   if (btn) { btn.textContent = 'Create Study'; btn.disabled = false; }
   if (study) {
+    // Send invites to selected friends
+    const inviteUids = [..._studyCreateInviteUids];
+    inviteUids.forEach(inviteeUid => {
+      window.Studies?.inviteCollab(study.id, study.name, inviteeUid, displayName);
+    });
     // Optimistically add to local list so home screen updates immediately
     _myStudies = [study, ..._myStudies.filter(s => s.id !== study.id)];
     _renderHomeStudies();
@@ -8187,7 +8246,7 @@ async function openStudySandbox(studyId, studyObj) {
   if (!study) { _showStudyToast('Study not found.'); return; }
 
   _activeSandboxStudy = study;
-  _sandboxTab = 'notes';
+  _sandboxTab = 'rhema';
 
   // Populate header
   const iconEl = document.getElementById('ssIcon');
@@ -8197,8 +8256,8 @@ async function openStudySandbox(studyId, studyObj) {
   if (titleEl) titleEl.textContent = study.name;
   if (membersEl) membersEl.textContent = _studyMemberLabel(study);
 
-  // Switch to notes tab
-  switchSandboxTab('notes');
+  // Switch to Rhema tab first
+  switchSandboxTab('rhema');
 
   // Show sandbox
   document.getElementById('studySandbox')?.classList.remove('hidden');
@@ -8217,15 +8276,24 @@ async function openStudySandbox(studyId, studyObj) {
   _sandboxUnsubNotes?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
+  _sandboxUnsubStudy?.();
   _sandboxUnsubNotes  = window.Studies.listenNotes(studyId, _renderSandboxNotes);
   _sandboxUnsubVerses = window.Studies.listenVerses(studyId, _renderSandboxVerses);
   _sandboxUnsubWordLog = window.Studies.listenWordLog(studyId, words => {
     _sandboxWordLogCache = words;
     _renderSandboxWordLog(words);
   });
+  // Live study-doc listener — updates collaborator count and Rhema positions in real time
+  _sandboxUnsubStudy = window.Studies.listenStudy?.(studyId, updated => {
+    if (!updated) return;
+    _activeSandboxStudy = updated;
+    const membersEl = document.getElementById('ssMembers');
+    if (membersEl) membersEl.textContent = _studyMemberLabel(updated);
+    _updateSandboxRhemaPreview();
+  });
 
-  // Update Rhema position display
-  _updateSandboxRhemaPreview();
+  // Auto-open Rhema immediately
+  openSandboxRhema();
 
   // Refresh home studies (dot update)
   _loadMyStudies();
@@ -8241,7 +8309,8 @@ function closeStudySandbox() {
   _sandboxUnsubNotes?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
-  _sandboxUnsubNotes = _sandboxUnsubVerses = _sandboxUnsubWordLog = null;
+  _sandboxUnsubStudy?.();
+  _sandboxUnsubNotes = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubStudy = null;
   _activeSandboxStudy = null;
   document.getElementById('studySandbox')?.classList.add('hidden');
   document.getElementById('bottomNav')?.classList.remove('hidden');
@@ -8518,6 +8587,17 @@ function _startEncouragementListener(uid) {
         });
       }
     });
+    const invites = msgs.filter(m => m.type === 'studyInvite' && !m._read);
+    invites.forEach(m => {
+      const existing = _notifItems.find(n => n.id === 'invite_' + m.id);
+      if (!existing) {
+        _notifItems.push({
+          id: 'invite_' + m.id, type: 'study_invite',
+          fromName: m.fromName, fromUid: m.fromUid,
+          studyId: m.studyId, studyName: m.studyName, msgId: m.id, read: false
+        });
+      }
+    });
     const approved = msgs.filter(m => m.type === 'studyCollabApproved' && !m._read);
     approved.forEach(m => {
       const existing = _notifItems.find(n => n.id === 'collab_approved_' + m.id);
@@ -8543,6 +8623,33 @@ async function notifApproveCollab(studyId, requesterUid, requesterName, itemId) 
 
 async function notifDenyCollab(studyId, requesterUid, itemId) {
   await window.Studies?.denyCollab(studyId, requesterUid);
+  _notifItems = _notifItems.filter(n => n.id !== itemId);
+  _updateNotifBadge();
+  _loadNotifications();
+}
+
+async function notifJoinStudy(studyId, itemId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const ok = await window.Studies?.selfApproveInvite(studyId, uid, displayName);
+  if (ok) {
+    _notifItems = _notifItems.filter(n => n.id !== itemId);
+    _updateNotifBadge();
+    _loadNotifications();
+    // Add to my studies and open sandbox
+    await _loadMyStudies();
+    const study = _myStudies.find(s => s.id === studyId);
+    if (study) openStudySandbox(studyId, study);
+  } else {
+    _showStudyToast('Could not join study. It may have been deleted.');
+  }
+}
+
+async function notifDenyStudyInvite(studyId, itemId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  await window.Studies?.denyCollab(studyId, uid);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   _loadNotifications();
@@ -8804,6 +8911,21 @@ async function _loadNotifications() {
             <div class="notif-fr-actions">
               <button class="notif-accept-btn" onclick="notifApproveCollab('${n.studyId}','${n.requesterUid}','${n.requesterName}','${n.id}')">Approve</button>
               <button class="notif-deny-btn" onclick="notifDenyCollab('${n.studyId}','${n.requesterUid}','${n.id}')">Deny</button>
+            </div>
+          </div>
+          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>`;
+    }
+    if (n.type === 'study_invite') {
+      return `
+        <div class="notif-item${n.read ? '' : ' unread'}">
+          <div class="notif-icon"><span class="material-symbols-outlined">group_add</span></div>
+          <div class="notif-body">
+            <div class="notif-title">${n.fromName}</div>
+            <div class="notif-sub">Invited you to collaborate on "${n.studyName || 'a study'}"</div>
+            <div class="notif-fr-actions">
+              <button class="notif-accept-btn" onclick="notifJoinStudy('${n.studyId}','${n.id}')">Join</button>
+              <button class="notif-deny-btn" onclick="notifDenyStudyInvite('${n.studyId}','${n.id}')">Decline</button>
             </div>
           </div>
           ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
@@ -14087,9 +14209,21 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.41";
+const APP_VERSION = "2.3.42";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.42 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>
+    <li><strong>Rhema First</strong> — Rhema is now the default tab in every study sandbox and opens automatically so you can dive in immediately</li>
+    <li><strong>Tab Order</strong> — Tabs are now Rhema → Verses → Word Log → Notes</li>
+    <li><strong>Live Collaborator Count</strong> — The member badge in the sandbox header updates in real time as friends join</li>
+    <li><strong>Study Description</strong> — Optionally add a short description when creating a study</li>
+    <li><strong>Swipe to Dismiss</strong> — Swipe down on the Create Study sheet to close it</li>
+    <li><strong>PC Collaboration</strong> — Invite notifications and collab requests appear in What's Going On for users without push support</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.41 — Studies Polish &amp; Delete</div>
 <div class="un-section">
   <ul class="un-list">

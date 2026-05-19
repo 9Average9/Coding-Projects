@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.41" />
+  <link rel="stylesheet" href="style.css?v=2.3.42" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10866,9 +10866,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.41"></script>
-  <script src="app.js?v=2.3.41"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.41"></script>
+  <script src="vocab.js?v=2.3.42"></script>
+  <script src="app.js?v=2.3.42"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.42"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11024,27 +11024,14 @@ glacier: {
     <div class="ss-members" id="ssMembers"></div>
   </div>
   <div class="ss-tabs">
-    <button class="ss-tab active" data-tab="notes" onclick="switchSandboxTab('notes')">Notes</button>
+    <button class="ss-tab active" data-tab="rhema" onclick="switchSandboxTab('rhema')">Rhema</button>
     <button class="ss-tab" data-tab="verses" onclick="switchSandboxTab('verses')">Verses</button>
-    <button class="ss-tab" data-tab="rhema" onclick="switchSandboxTab('rhema')">Rhema</button>
     <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">Word Log</button>
+    <button class="ss-tab" data-tab="notes" onclick="switchSandboxTab('notes')">Notes</button>
   </div>
   <div class="ss-body">
-    <!-- Notes -->
-    <div id="ssPaneNotes" class="ss-pane active">
-      <div id="ssNotesList" class="ss-notes-list"></div>
-      <div class="ss-compose">
-        <textarea id="ssNoteInput" class="ss-note-input" placeholder="Add a note…" rows="3" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-        <button class="ss-send-btn" onclick="submitSandboxNote()"><span class="material-symbols-outlined">send</span></button>
-      </div>
-    </div>
-    <!-- Saved Verses -->
-    <div id="ssPaneVerses" class="ss-pane">
-      <p class="ss-hint">Open Rhema, then tap a verse reference to save it here.</p>
-      <div id="ssVersesList" class="ss-verses-list"></div>
-    </div>
     <!-- Rhema -->
-    <div id="ssPaneRhema" class="ss-pane ss-rhema-pane">
+    <div id="ssPaneRhema" class="ss-pane active ss-rhema-pane">
       <div class="ss-rhema-position" id="ssRhemaPosition">
         <span class="material-symbols-outlined">auto_stories</span>
         <span id="ssRhemaPositionText">Not started yet</span>
@@ -11053,12 +11040,25 @@ glacier: {
         <span class="material-symbols-outlined">open_in_new</span>
         Open Rhema
       </button>
-      <p class="ss-hint">Your position in this study is saved separately from the main Rhema.</p>
+      <p class="ss-hint">Tap any word in Rhema to study it. Your position in this study is saved separately from the main Rhema.</p>
+    </div>
+    <!-- Saved Verses -->
+    <div id="ssPaneVerses" class="ss-pane">
+      <p class="ss-hint">Tap a verse reference in Rhema while this study is open to save it here.</p>
+      <div id="ssVersesList" class="ss-verses-list"></div>
     </div>
     <!-- Word Log -->
     <div id="ssPaneWordlog" class="ss-pane">
-      <p class="ss-hint">Every Greek word you tap in Rhema while this study is open is auto-logged here.</p>
+      <p class="ss-hint">Every Greek word you tap and save in Rhema while this study is open is logged here.</p>
       <div id="ssWordlogList" class="ss-wordlog-list"></div>
+    </div>
+    <!-- Notes -->
+    <div id="ssPaneNotes" class="ss-pane">
+      <div id="ssNotesList" class="ss-notes-list"></div>
+      <div class="ss-compose">
+        <textarea id="ssNoteInput" class="ss-note-input" placeholder="Add a note…" rows="3" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="ss-send-btn" onclick="submitSandboxNote()"><span class="material-symbols-outlined">send</span></button>
+      </div>
     </div>
   </div>
 </div>
@@ -11136,15 +11136,26 @@ glacier: {
       </div>
     </div>
 
+    <div class="study-create-field">
+      <label>Description <span style="font-weight:400;opacity:.6">(optional)</span></label>
+      <textarea id="studyCreateDesc" placeholder="What is this study about?" maxlength="200" rows="2" style="resize:none"></textarea>
+    </div>
+
     <div class="study-share-toggle">
       <div class="study-share-label">
-        Notify Friends on Session
-        <small>Friends get a push the first time you open this study each day</small>
+        Notify Friends When You Study
+        <small>Friends get a daily push showing you're in the Word — a quiet way to encourage them</small>
       </div>
       <label class="switch">
         <input type="checkbox" id="studyCreateShareToggle" onchange="toggleStudyShareFriends(this)">
         <span class="slider round"></span>
       </label>
+    </div>
+
+    <div class="study-create-field" id="studyInviteFriendsSection">
+      <label>Invite Friends to Collaborate</label>
+      <p style="font-size:12px;opacity:.6;margin:2px 0 8px">They'll get a notification and can join or decline. The study starts right away regardless.</p>
+      <div id="studyCreateFriendsList" class="study-invite-friends-list"></div>
     </div>
 
     <button class="main-btn" style="width:100%;margin-bottom:10px" onclick="submitStudyCreate()">Create Study</button>
