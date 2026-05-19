@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.66";
+const APP_VERSION = "2.3.67";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.66 — Fix indeclinable noun/numeral subtypes (PRI, NUI)</div>
+<div class="un-version-label">v2.3.67 — Add Abbott-Smith (TBESG) lexicon</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
@@ -16363,7 +16363,7 @@ function loadRhemaScripts() {
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
-      s.src = file + '?v=1';
+      s.src = file + '?v=2.3.67';
       s.onload = () => {
         loaded++;
         if (loaded === files.length) { _rhemaLoaded = true; resolve(); }
@@ -17200,7 +17200,15 @@ function renderRhemaDefinition(strongs) {
     html += `<div class="rhema-def-sep"></div>`;
   }
 
+  if (lex.abbott_smith) {
+    html += `<div class="rhema-def-section">
+      <div class="rhema-def-label">Abbott-Smith Lexicon</div>
+      <div class="rhema-def-text rhema-def-abbott">${lex.abbott_smith}</div>
+    </div>`;
+  }
+
   if (lex.strongs_def) {
+    if (lex.abbott_smith) html += `<div class="rhema-def-sep"></div>`;
     html += `<div class="rhema-def-section">
       <div class="rhema-def-label">Strong's Definition</div>
       <div class="rhema-def-text">${lex.strongs_def}</div>
@@ -17211,7 +17219,7 @@ function renderRhemaDefinition(strongs) {
   if (lex.extended || lex.brief) {
     html += `<div class="rhema-def-sep"></div>`;
     html += `<div class="rhema-def-section">
-      <div class="rhema-def-label">Lexical Definition</div>
+      <div class="rhema-def-label">Dodson Lexicon</div>
       <div class="rhema-def-text">${lex.extended || lex.brief}</div>
     </div>`;
   }

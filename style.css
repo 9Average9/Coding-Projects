@@ -11985,6 +11985,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   background: color-mix(in srgb, var(--border-color) 60%, transparent);
   margin: 14px 0;
 }
+.rhema-def-abbott {
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+.rhema-def-abbott b { font-weight: 700; }
 
 /* ── Occurrences tab ── */
 .rhema-occ-total {
