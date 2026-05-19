@@ -11386,7 +11386,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-book-list {
   flex: 1;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   overscroll-behavior: none;
 }
@@ -11423,7 +11422,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   gap: 8px;
   padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   overscroll-behavior: none;
 }
@@ -11464,7 +11462,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   overscroll-behavior: none;
   width: 100%;

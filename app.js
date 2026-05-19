@@ -14236,9 +14236,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.50";
+const APP_VERSION = "2.3.51";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.51 — Fix Rhema Scroll Interference</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>No More Tap Block</strong> — iOS rubber-band bounce no longer captures touch events; tapping words works immediately after any scroll attempt</li>
+    <li><strong>Scroll Lock Restored</strong> — body position:fixed is back (the only reliable iOS scroll lock); overlay height is now set from window.innerHeight so there is no white space at the bottom</li>
+    <li><strong>Removed Legacy Scroll Property</strong> — Dropped -webkit-overflow-scrolling:touch from verse and picker scroll areas; it was causing momentum-scroll tap delays</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.50 — Rhema Bottom Fixes</div>
 <div class="un-section">
   <ul class="un-list">
@@ -16278,12 +16286,16 @@ async function showRhema() {
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
-  // Prevent background scroll — overflow:hidden avoids the body position:fixed trick that
-  // causes iOS WebKit to miscalculate the viewport height and leave a gap at the bottom.
-  // Skip entirely in sandbox mode since the sandbox already locks background scroll.
+  // Lock background scroll. Only position:fixed on body fully prevents iOS rubber-band bounce
+  // (overflow:hidden alone does not). Set modal height explicitly from window.innerHeight so
+  // iOS uses the real screen height instead of a browser-chrome-adjusted value (which was
+  // leaving white space at the bottom). Skip in sandbox mode — sandbox overlay already covers.
   if (!_studySandboxId) {
     _rhemaSavedScrollY = window.scrollY;
-    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${_rhemaSavedScrollY}px`;
+    document.body.style.width = '100%';
+    modal.style.height = window.innerHeight + 'px';
   }
 
   const loading = document.getElementById('rhemaLoadingMsg');
@@ -16331,7 +16343,10 @@ function closeRhema(keepSandbox = false) {
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
   closeRhemaPickerSheet();
-  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  document.getElementById('rhemaModal').style.height = '';
   window.scrollTo(0, _rhemaSavedScrollY);
   _rhemaTrail = [];
   _rhemaTrailPos = -1;
