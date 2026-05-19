@@ -8264,6 +8264,7 @@ async function openStudySandbox(studyId, studyObj) {
 
   // Show sandbox
   document.getElementById('studySandbox')?.classList.remove('hidden');
+  document.getElementById('studyTabBar')?.classList.remove('hidden');
   document.getElementById('bottomNav')?.classList.add('hidden');
   document.body.classList.add('sandbox-open');
 
@@ -8315,6 +8316,7 @@ function closeStudySandbox() {
   _sandboxUnsubNotes = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubStudy = null;
   _activeSandboxStudy = null;
   document.getElementById('studySandbox')?.classList.add('hidden');
+  document.getElementById('studyTabBar')?.classList.add('hidden');
   document.getElementById('rhemaModal')?.classList.remove('open');
   document.getElementById('bottomNav')?.classList.remove('hidden');
   document.body.classList.remove('sandbox-open');
@@ -8326,7 +8328,7 @@ function switchSandboxTab(tab) {
     closeRhema(true); // close Rhema modal but stay inside the sandbox
   }
   _sandboxTab = tab;
-  document.querySelectorAll('.ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('#studyTabBar .ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
   if (tab === 'rhema') openSandboxRhema();
 }
@@ -14234,10 +14236,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.46";
+const APP_VERSION = "2.3.47";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.46 — Study Nav Fixed</div>
+<div class="un-version-label">v2.3.47 — Study Nav Fixed</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>App Nav Hides in Study</strong> — The main nav bar (Home, Profile, etc.) now properly disappears when a study is open</li>
@@ -14246,7 +14248,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>More Verse Space</strong> — Rhema verse display no longer gets clipped by the study tab bar</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.46 — Study UI Polish</div>
+<div class="un-version-label">v2.3.47 — Study UI Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Tab Bar Stays in Rhema</strong> — The study tab bar (Rhema / Verses / Word Log / Notes) now floats above the Rhema screen so you can switch tabs without leaving Rhema</li>
@@ -14254,7 +14256,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Study Sheet</strong> — Drag handle removed so it's clear the sheet doesn't slide; home screen no longer scrolls behind it</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.46 — Sandbox Nav &amp; Notification Fixes</div>
+<div class="un-version-label">v2.3.47 — Sandbox Nav &amp; Notification Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
@@ -14262,7 +14264,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.46 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-version-label">v2.3.47 — Study Invites &amp; Collaboration Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>
@@ -16336,15 +16338,16 @@ function closeRhema(keepSandbox = false) {
 }
 
 function rhemaGoBack() {
-  const inSandbox = !!_studySandboxId;
-  if (_rhemaTrail.length === 0) { closeRhema(inSandbox); return; }
+  // In study sandbox: back button closes the study entirely (user navigates via tab bar)
+  if (_studySandboxId) { closeStudySandbox(); return; }
+  if (_rhemaTrail.length === 0) { closeRhema(); return; }
   // Move cursor back without removing any items
   if (_rhemaTrailPos === -1) {
     _rhemaTrailPos = _rhemaTrail.length - 1;
   } else if (_rhemaTrailPos > 0) {
     _rhemaTrailPos--;
   } else {
-    closeRhema(inSandbox); return;
+    closeRhema(); return;
   }
   const target = _rhemaTrail[_rhemaTrailPos];
   _rhemaBook = target.book;
