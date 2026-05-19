@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.58" />
+  <link rel="stylesheet" href="style.css?v=2.3.59" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10730,7 +10730,7 @@ glacier: {
       <button class="rhema-hl-pill" data-cat="ADV"  onclick="toggleRhemaHighlight('ADV')" ><span class="rhema-hl-dot" style="background:rgba(253,186,116,1)"></span>Adverb</button>
     </div>
 
-    <!-- Scrollable body; verse nav is a direct sibling so it pins to screen bottom -->
+    <!-- Scrollable body fills all space between picker and verse nav -->
     <div id="rhemaChapterToast" class="rhema-chapter-toast hidden"></div>
     <div class="rhema-body">
       <div class="rhema-content-area">
@@ -10740,19 +10740,20 @@ glacier: {
       </div>
     </div>
 
-    <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
-      <div class="rhema-verse-nav-row">
-        <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
-          <span class="material-symbols-outlined">chevron_left</span>
-        </button>
-        <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
-        <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
-      </div>
-      <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
-    </div>
+  </div><!-- end .rhema-container -->
 
+  <!-- Verse nav: direct flex child of overlay so it always sits at physical screen bottom -->
+  <div id="rhemaVerseNav" class="rhema-verse-nav hidden">
+    <div class="rhema-verse-nav-row">
+      <button class="rhema-nav-btn" onclick="rhemaPrevVerse()">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span id="rhemaVerseRef" class="rhema-verse-ref"></span>
+      <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+    <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
   </div>
 
   <!-- Word detail bottom sheet -->
@@ -10865,9 +10866,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.58"></script>
-  <script src="app.js?v=2.3.58"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.58"></script>
+  <script src="vocab.js?v=2.3.59"></script>
+  <script src="app.js?v=2.3.59"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.59"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
