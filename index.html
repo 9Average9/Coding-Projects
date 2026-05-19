@@ -10987,6 +10987,18 @@ glacier: {
 
 <div id="profileFocusOverlay" class="profile-focus-overlay hidden"></div>
 
+<div id="notifPromptModal" class="modal-overlay" onclick="if(event.target===this)closeNotifPrompt()">
+  <div class="modal-card notif-prompt-card" onclick="event.stopPropagation()">
+    <div class="notif-prompt-icon">
+      <span class="material-symbols-outlined">notifications</span>
+    </div>
+    <h2 class="notif-prompt-title">Stay in the Loop</h2>
+    <p class="notif-prompt-body">Enable notifications to get study reminders and know when friends encourage you or send a friend request.</p>
+    <button class="main-btn notif-prompt-enable-btn" onclick="enableNotificationsFromPrompt()">Enable Notifications</button>
+    <button class="text-btn" onclick="closeNotifPrompt()">Not Now</button>
+  </div>
+</div>
+
 <div id="reminderModal" class="modal-overlay" onclick="closeReminderModal(event)">
   <div class="modal-card reminder-modal-card" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeReminderModalDirect()">×</button>

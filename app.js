@@ -13424,15 +13424,23 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.35";
+const APP_VERSION = "2.3.36";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.36 — Notification Prompt &amp; Friend Notifications</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Notification Prompt</strong> — New accounts now see a clean in-app prompt to enable notifications right after signing up</li>
+    <li><strong>Friend Request Dots</strong> — Red notification dot now appears on both the What's Going On button and the Friends button when you have a pending request</li>
+    <li><strong>Inline Accept / Decline</strong> — Friend requests in the What's Going On panel now show the person's name with Accept and Decline buttons right there — no need to open the Friends modal</li>
+    <li><strong>Cross-clearing</strong> — Resolving a request from either the notification panel or the Friends modal clears all red dots at once</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.35 — Community Reset &amp; Basic Badge Fix</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Community Rebuilt</strong> — Gutted and restarting the community board from scratch so each feature can be tested as it's added</li>
-    <li><strong>Friends</strong> — Friend requests, acceptance, and the friends list all continue to work as before</li>
-    <li><strong>Basic Track Badge</strong> — The Track 1 badge now shows in blue (matching the rest of the app) instead of the gold color it accidentally picked up</li>
+    <li><strong>Basic Track Badge</strong> — The Track 1 badge now shows in blue instead of the gold color it accidentally picked up</li>
   </ul>
 </div>
 `;
@@ -13845,12 +13853,10 @@ async function submitCreateAccount() {
     updatePracticeToolLocks();
     updateLessonCompletionUI();
 
-    // Prompt for notifications — creator recommends enabling to stay connected with friends
+    // Show in-app notification prompt for new accounts
     setTimeout(() => {
       if (Notification?.permission === "default") {
-        if (confirm("🔔 The creator highly recommends enabling notifications!\n\nThey help you stay connected and motivated with friends — you can encourage each other and get reminded to study.\n\nEnable push notifications?")) {
-          openReminderModal();
-        }
+        document.getElementById("notifPromptModal")?.classList.add("open");
       }
     }, 1200);
   } catch (e) {
@@ -14102,6 +14108,27 @@ function completeProfileFocusIfProfileMade() {
 
 
 
+
+// ── Notification permission prompt (shown after sign-up) ─────────────────────
+
+function closeNotifPrompt() {
+  document.getElementById("notifPromptModal")?.classList.remove("open");
+}
+
+async function enableNotificationsFromPrompt() {
+  const btn = document.getElementById("notifPromptModal")?.querySelector(".notif-prompt-enable-btn");
+  if (btn) { btn.disabled = true; btn.textContent = "Enabling…"; }
+  try {
+    const permission = await Notification.requestPermission();
+    closeNotifPrompt();
+    if (permission === "granted") {
+      const user = window.Auth?.getCurrentUser();
+      if (user) await window.FCM?.registerToken(user.uid).catch(() => {});
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Enable Notifications"; }
+  }
+}
 
 // ── FCM Reminders ────────────────────────────────────────────────────────────
 
