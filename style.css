@@ -10700,7 +10700,7 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
 .cs-action-secondary .cs-action-btn { flex: 1; }
 
 /* ── Create Study wide sheet ─────────────────────────────────────────────── */
-.cs-create-sheet-wide { max-height: 94vh; }
+.cs-create-sheet-wide { max-height: calc(72vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
 
 /* ── Visibility buttons ──────────────────────────────────────────────────── */
 .cs-vis-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }

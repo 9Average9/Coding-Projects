@@ -642,13 +642,9 @@ async function csAddContribution(studyId, uid, displayName, avatar, type, text, 
 
 async function csGetContributions(studyId, limitN = 60) {
   try {
-    const q = query(
-      collection(db, "community_studies", studyId, "contributions"),
-      orderBy("createdAt", "desc"),
-      limit(limitN)
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return (await getDocs(
+      query(collection(db, "community_studies", studyId, "contributions"), limit(limitN))
+    )).docs.map(d => ({ id: d.id, ...d.data() }));
   } catch { return []; }
 }
 
