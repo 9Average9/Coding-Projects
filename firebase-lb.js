@@ -26,7 +26,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   deleteUser,
-  onAuthStateChanged
+  onAuthStateChanged,
+  EmailAuthProvider,
+  reauthenticateWithCredential
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
   getMessaging,
@@ -121,17 +123,21 @@ async function logout() {
   await signOut(auth);
 }
 
-async function deleteAccount() {
+async function deleteAccount(password) {
   const user = auth.currentUser;
   if (!user) return;
   const uid = user.uid;
 
+  const username = localStorage.getItem("authUsername") || "";
+  const credential = EmailAuthProvider.credential(toEmail(username), password);
+  await reauthenticateWithCredential(user, credential);
+
   try {
     const snap = await getDoc(doc(db, "users", uid));
     if (snap.exists()) {
-      const { username, displayName } = snap.data();
+      const { username: u, displayName } = snap.data();
       await Promise.all([
-        deleteDoc(doc(db, "usernames", (username || "").toLowerCase().trim())).catch(() => {}),
+        deleteDoc(doc(db, "usernames", (u || "").toLowerCase().trim())).catch(() => {}),
         deleteDoc(doc(db, "displayNames", (displayName || "").toLowerCase().trim())).catch(() => {})
       ]);
     }

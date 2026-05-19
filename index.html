@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.30" />
+  <link rel="stylesheet" href="style.css?v=2.3.31" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10451,6 +10451,21 @@ glacier: {
   </div>
 </div>
 
+<!-- Delete Account Confirmation -->
+<div id="deleteAccountModal" class="modal-overlay" onclick="closeDeleteAccountModal(event)">
+  <div class="auth-card" onclick="event.stopPropagation()" style="max-width:360px">
+    <h3 style="margin:0 0 8px;color:#e53935">Delete Account</h3>
+    <p style="margin:0 0 16px;color:var(--muted-color);font-size:14px">This permanently removes all your data and cannot be undone. Enter your password to confirm.</p>
+    <div class="auth-field">
+      <label class="auth-label">Password</label>
+      <input type="password" id="deleteAccountPassword" class="auth-input" placeholder="Your password" autocomplete="current-password" />
+    </div>
+    <p class="auth-error" id="deleteAccountError"></p>
+    <button class="danger-btn" onclick="confirmDeleteAccount()" style="width:100%;margin-top:8px">Delete My Account</button>
+    <button class="sett-row" onclick="closeDeleteAccountModal()" style="width:100%;margin-top:8px;justify-content:center;border:none;color:var(--muted-color)">Cancel</button>
+  </div>
+</div>
+
 <!-- Display Name Info -->
 <div id="displayNameInfoModal" class="modal-overlay" onclick="closeDisplayNameInfo()">
   <div class="auth-info-card" onclick="event.stopPropagation()">
@@ -10842,9 +10857,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.30"></script>
-  <script src="app.js?v=2.3.30"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.30"></script>
+  <script src="vocab.js?v=2.3.31"></script>
+  <script src="app.js?v=2.3.31"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.31"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
