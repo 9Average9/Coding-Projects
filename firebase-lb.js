@@ -458,9 +458,26 @@ async function studyCreate(uid, displayName, { name, color, icon, shareSession }
       createdAt: serverTimestamp(), isActive: true,
       rhemaPositions: {}, lastSessionDates: {}
     });
-    await updateDoc(doc(db, "users", uid), { studyIds: arrayUnion(ref.id) });
-    return ref.id;
-  } catch (e) { console.warn("studyCreate:", e); return null; }
+    // Return a locally-usable study object immediately (no second write needed)
+    return {
+      id: ref.id, name, color, icon,
+      shareSession: !!shareSession,
+      creatorUid: uid, creatorName: displayName,
+      collaboratorUids: [uid], pendingCollaboratorUids: [],
+      isActive: true, rhemaPositions: {}, lastSessionDates: {},
+      createdAt: { seconds: Math.floor(Date.now() / 1000) }
+    };
+  } catch (e) {
+    console.warn("studyCreate error:", e?.code, e?.message);
+    return null;
+  }
+}
+
+async function studyGet(studyId) {
+  try {
+    const snap = await getDoc(doc(db, "studies", studyId));
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  } catch (e) { console.warn("studyGet:", e); return null; }
 }
 
 async function studyGetMine(uid) {
@@ -648,7 +665,7 @@ function listenEncouragements(uid, callback) {
 }
 
 window.Studies = {
-  create: studyCreate, getMine: studyGetMine, getFriends: studyGetFriends,
+  create: studyCreate, get: studyGet, getMine: studyGetMine, getFriends: studyGetFriends,
   openSession: studyOpenSession, saveRhemaPos: studySaveRhemaPos,
   listenNotes: studyListenNotes, addNote: studyAddNote, deleteNote: studyDeleteNote,
   listenVerses: studyListenVerses, saveVerse: studySaveVerse, deleteVerse: studyDeleteVerse,
