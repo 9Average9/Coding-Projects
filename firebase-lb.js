@@ -35,6 +35,12 @@ import {
   getToken,
   onMessage
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVWKRCtjg7ppR-D8ZNs-TfSwPlWdXXQ5Q",
@@ -48,6 +54,7 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const db = initializeFirestore(fbApp, { localCache: persistentLocalCache() });
 const auth = getAuth(fbApp);
+const storage = getStorage(fbApp);
 let messaging = null;
 try { messaging = getMessaging(fbApp); } catch (e) { console.warn("FCM unavailable:", e); }
 
@@ -191,9 +198,18 @@ function getUserId() {
 }
 
 function getAvatar() {
-  return localStorage.getItem("profilePicType") === "icon"
-    ? (localStorage.getItem("profilePicValue") || "school")
-    : "school";
+  if (localStorage.getItem("profilePicType") === "photo") {
+    return localStorage.getItem("profilePicRemoteURL") || "school";
+  }
+  return localStorage.getItem("profilePicValue") || "school";
+}
+
+async function uploadAvatarPhoto(uid, dataUrl) {
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
+  const avatarStorageRef = storageRef(storage, `avatars/${uid}.jpg`);
+  await uploadBytes(avatarStorageRef, blob, { contentType: "image/jpeg" });
+  return await getDownloadURL(avatarStorageRef);
 }
 
 function getMeta() {
@@ -844,7 +860,8 @@ window.Auth = {
   syncUserData,
   checkUsernameTaken,
   checkDisplayNameTaken,
-  listenUserDoc
+  listenUserDoc,
+  uploadAvatarPhoto
 };
 
 // Notify app.js when Firebase auth state is resolved
