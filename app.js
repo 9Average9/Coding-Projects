@@ -8914,22 +8914,22 @@ async function _loadNotifications() {
             <div class="notif-title">${n.requesterName}</div>
             <div class="notif-sub">Wants to be your friend</div>
             <div class="notif-fr-actions">
-              <button class="notif-accept-btn" onclick="notifAcceptFriend('${n.requesterUid}')">Accept</button>
+              <button class="notif-accept-btn" data-accept-uid="${n.requesterUid}" onclick="notifAcceptFriend('${n.requesterUid}')">Accept</button>
               <button class="notif-deny-btn" onclick="notifDeclineFriend('${n.requesterUid}')">Decline</button>
             </div>
           </div>
-          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+          <button class="notif-x-btn" onclick="event.stopPropagation();notifDeclineFriend('${n.requesterUid}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
     }
     if (n.type === 'friend_accepted') {
       return `
-        <div class="notif-item${n.read ? '' : ' unread'} notif-fa-item" onclick="notifDismissAccepted('${n.requesterUid}')">
+        <div class="notif-item${n.read ? '' : ' unread'} notif-fa-item">
           <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">check_circle</span></div>
           <div class="notif-body">
             <div class="notif-title">${n.requesterName}</div>
             <div class="notif-sub">Accepted your friend request</div>
           </div>
-          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+          <button class="notif-x-btn" onclick="event.stopPropagation();notifDismissAccepted('${n.requesterUid}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
     }
     if (n.type === 'collab_request') {
@@ -8944,7 +8944,7 @@ async function _loadNotifications() {
               <button class="notif-deny-btn" onclick="notifDenyCollab('${n.studyId}','${n.requesterUid}','${n.id}')">Deny</button>
             </div>
           </div>
-          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+          <button class="notif-x-btn" onclick="event.stopPropagation();notifDenyCollab('${n.studyId}','${n.requesterUid}','${n.id}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
     }
     if (n.type === 'study_invite') {
@@ -8959,18 +8959,18 @@ async function _loadNotifications() {
               <button class="notif-deny-btn" onclick="notifDenyStudyInvite('${n.studyId}','${n.id}')">Decline</button>
             </div>
           </div>
-          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+          <button class="notif-x-btn" onclick="event.stopPropagation();notifDenyStudyInvite('${n.studyId}','${n.id}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
     }
     if (n.type === 'collab_approved') {
       return `
-        <div class="notif-item${n.read ? '' : ' unread'}" onclick="notifDismissCollab('${n.id}','${n.msgId||''}')">
+        <div class="notif-item${n.read ? '' : ' unread'}">
           <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">handshake</span></div>
           <div class="notif-body">
             <div class="notif-title">${n.fromName}</div>
             <div class="notif-sub">Approved your collaboration on "${n.studyName || 'a study'}"</div>
           </div>
-          ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+          <button class="notif-x-btn" onclick="event.stopPropagation();notifDismissCollab('${n.id}','${n.msgId||''}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
     }
     return '';
@@ -8988,14 +8988,9 @@ async function notifDeclineFriend(uid) {
 }
 
 function notifDismissAccepted(uid) {
-  _notifItems = _notifItems.map(n =>
-    n.id === 'fa_' + uid ? { ...n, read: true } : n
-  );
+  _notifItems = _notifItems.filter(n => n.id !== 'fa_' + uid);
   _updateNotifBadge();
-  const el = document.querySelector(`.notif-fa-item`);
-  if (el) el.classList.remove('unread');
-  const dot = el?.querySelector('.notif-unread-dot');
-  if (dot) dot.remove();
+  _loadNotifications();
 }
 
 function notifDismissCollab(itemId, msgId) {
@@ -15869,7 +15864,7 @@ function _frCardHTML(u, status) {
   } else if (status === "outgoing") {
     actions = `<button class="fr-action-btn fr-pending" onclick="event.stopPropagation();cancelRequestAction('${u.uid}')">Pending ×</button>`;
   } else if (status === "incoming") {
-    actions = `<button class="fr-action-btn fr-accept" onclick="event.stopPropagation();acceptRequestAction('${u.uid}')">Accept</button>
+    actions = `<button class="fr-action-btn fr-accept" data-accept-uid="${u.uid}" onclick="event.stopPropagation();acceptRequestAction('${u.uid}')">Accept</button>
                <button class="fr-action-btn fr-decline" onclick="event.stopPropagation();declineRequestAction('${u.uid}')">Decline</button>`;
   } else {
     actions = `<button class="fr-action-btn fr-add" onclick="event.stopPropagation();sendRequestAction('${u.uid}')"><span class="material-symbols-outlined">person_add</span></button>`;
@@ -15907,11 +15902,12 @@ async function renderFindFriends(q = "") {
     const users = q.trim()
       ? await (window.Friends?.searchUsers(q.trim(), me.uid) || Promise.resolve([]))
       : await (window.Friends?.getAllUsers(me.uid) || Promise.resolve([]));
-    if (!users.length) {
+    const visible = users.filter(u => !friendsList.includes(u.uid));
+    if (!visible.length) {
       el.innerHTML = `<div class="fr-empty"><span class="material-symbols-outlined">search_off</span><p>No users found</p></div>`;
       return;
     }
-    el.innerHTML = users.map(u => _frCardHTML(u, _frStatus(u.uid))).join("");
+    el.innerHTML = visible.map(u => _frCardHTML(u, _frStatus(u.uid))).join("");
   } catch {
     el.innerHTML = `<div class="fr-empty"><p>Couldn't load — <button class="lb-retry-btn" onclick="renderFindFriends('${q}')">Retry</button></p></div>`;
   }
@@ -16039,12 +16035,21 @@ async function cancelRequestAction(uid) {
 async function acceptRequestAction(uid) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
+  // Show "Accepted ✓" on any visible accept buttons for this uid
+  document.querySelectorAll(`[data-accept-uid="${uid}"]`).forEach(btn => {
+    btn.textContent = "Accepted ✓";
+    btn.disabled = true;
+    btn.style.opacity = "0.75";
+  });
+  // Brief delay so user sees the "Accepted" state before card disappears
+  await new Promise(r => setTimeout(r, 750));
   // Optimistic update — add to friends instantly
   friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
   friendsList = [...new Set([...friendsList, uid])];
   updateFriendsBadge();
   if (_friendsTab === "friends")  renderFriendsList();
   if (_friendsTab === "requests") renderFriendRequests();
+  if (_friendsTab === "find")     renderFindFriends(_browseSearch);
   const myName = localStorage.getItem("authDisplayName") || "Someone";
   _syncFriendRequestNotifs();
   const ok = await window.Friends.acceptRequest(me.uid, uid, myName);
@@ -16056,6 +16061,7 @@ async function acceptRequestAction(uid) {
     _syncFriendRequestNotifs();
     if (_friendsTab === "friends")  renderFriendsList();
     if (_friendsTab === "requests") renderFriendRequests();
+    if (_friendsTab === "find")     renderFindFriends(_browseSearch);
   }
 }
 
