@@ -8623,14 +8623,20 @@ function _startEncouragementListener(uid) {
 async function notifApproveCollab(studyId, requesterUid, requesterName, itemId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
+  const item = _notifItems.find(n => n.id === itemId);
   await window.Studies?.approveCollab(studyId, requesterUid, requesterName);
-  _notifItems = _notifItems.map(n => n.id === itemId ? { ...n, read: true, _approved: true } : n);
+  if (item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
+  _notifItems = _notifItems.filter(n => n.id !== itemId);
+  _updateNotifBadge();
   await _loadMyStudies();
   _loadNotifications();
 }
 
 async function notifDenyCollab(studyId, requesterUid, itemId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const item = _notifItems.find(n => n.id === itemId);
   await window.Studies?.denyCollab(studyId, requesterUid);
+  if (uid && item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   _loadNotifications();
@@ -8639,13 +8645,14 @@ async function notifDenyCollab(studyId, requesterUid, itemId) {
 async function notifJoinStudy(studyId, itemId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
+  const item = _notifItems.find(n => n.id === itemId);
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
   const ok = await window.Studies?.selfApproveInvite(studyId, uid, displayName);
   if (ok) {
+    if (item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
     _notifItems = _notifItems.filter(n => n.id !== itemId);
     _updateNotifBadge();
     _loadNotifications();
-    // Add to my studies and open sandbox
     await _loadMyStudies();
     const study = _myStudies.find(s => s.id === studyId);
     if (study) openStudySandbox(studyId, study);
@@ -8657,7 +8664,9 @@ async function notifJoinStudy(studyId, itemId) {
 async function notifDenyStudyInvite(studyId, itemId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
+  const item = _notifItems.find(n => n.id === itemId);
   await window.Studies?.denyCollab(studyId, uid);
+  if (item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   _loadNotifications();
@@ -8942,7 +8951,7 @@ async function _loadNotifications() {
     }
     if (n.type === 'collab_approved') {
       return `
-        <div class="notif-item${n.read ? '' : ' unread'}" onclick="this.classList.add('read');_notifItems=_notifItems.map(x=>x.id==='${n.id}'?{...x,read:true}:x);_updateNotifBadge()">
+        <div class="notif-item${n.read ? '' : ' unread'}" onclick="notifDismissCollab('${n.id}','${n.msgId||''}')">
           <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">handshake</span></div>
           <div class="notif-body">
             <div class="notif-title">${n.fromName}</div>
@@ -8970,11 +8979,18 @@ function notifDismissAccepted(uid) {
     n.id === 'fa_' + uid ? { ...n, read: true } : n
   );
   _updateNotifBadge();
-  // Re-render in place so the unread dot disappears
   const el = document.querySelector(`.notif-fa-item`);
   if (el) el.classList.remove('unread');
   const dot = el?.querySelector('.notif-unread-dot');
   if (dot) dot.remove();
+}
+
+function notifDismissCollab(itemId, msgId) {
+  const currentUid = window.Auth?.getCurrentUser()?.uid;
+  if (currentUid && msgId) window.Studies?.deleteMsg(currentUid, msgId);
+  _notifItems = _notifItems.filter(n => n.id !== itemId);
+  _updateNotifBadge();
+  _loadNotifications();
 }
 
 function _notifTap(i) {
@@ -14218,10 +14234,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.45";
+const APP_VERSION = "2.3.46";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.45 — Study Nav Fixed</div>
+<div class="un-version-label">v2.3.46 — Study Nav Fixed</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>App Nav Hides in Study</strong> — The main nav bar (Home, Profile, etc.) now properly disappears when a study is open</li>
@@ -14230,7 +14246,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>More Verse Space</strong> — Rhema verse display no longer gets clipped by the study tab bar</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.45 — Study UI Polish</div>
+<div class="un-version-label">v2.3.46 — Study UI Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Tab Bar Stays in Rhema</strong> — The study tab bar (Rhema / Verses / Word Log / Notes) now floats above the Rhema screen so you can switch tabs without leaving Rhema</li>
@@ -14238,7 +14254,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Study Sheet</strong> — Drag handle removed so it's clear the sheet doesn't slide; home screen no longer scrolls behind it</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.45 — Sandbox Nav &amp; Notification Fixes</div>
+<div class="un-version-label">v2.3.46 — Sandbox Nav &amp; Notification Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
@@ -14246,7 +14262,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.45 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-version-label">v2.3.46 — Study Invites &amp; Collaboration Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>

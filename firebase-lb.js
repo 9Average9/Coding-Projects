@@ -433,6 +433,14 @@ window.Friends = {
 
 const FCM_VAPID_KEY = "BDOeDKo0NmW6-kMwJB9noey7YK1u3raQ5NUvfFhv9kguPXDZfJirp5-ilbwwMCm9_0_hQ_EkiQktFe4f2pLl5VU";
 
+// Delete a notification message after the user acts on it so it never re-surfaces
+async function deleteEncouragementMsg(uid, msgId) {
+  if (!uid || !msgId) return;
+  try {
+    await deleteDoc(doc(db, "encouragements", uid, "messages", msgId));
+  } catch (e) { console.warn("deleteEncouragementMsg:", e); }
+}
+
 // Generic push notification writer — triggers the Cloud Function onEncouragementCreated.
 async function fcmSendPushNotification(toUid, type, fromName, fromUid, extra = {}) {
   try {
@@ -709,7 +717,8 @@ window.Studies = {
   listenWordLog: studyListenWordLog, logWord: studyLogWord, deleteWordLog: studyDeleteWordLog,
   requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
   inviteCollab: studyInviteCollab, selfApproveInvite: studySelfApproveInvite,
-  copy: studyCopy, delete: studyDeletePermanent, listenEncouragements
+  copy: studyCopy, delete: studyDeletePermanent, listenEncouragements,
+  deleteMsg: deleteEncouragementMsg
 };
 
 async function fcmRegisterToken(uid) {
