@@ -11676,7 +11676,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 22px);
+  padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 6px);
   background: var(--primary-light);
   border-top: 1px solid var(--border-color);
   touch-action: none;
@@ -12936,20 +12936,25 @@ body.sandbox-open .ss-pane {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Clip the Rhema overlay above the study tab bar so the overlay fills only usable space */
+/* In sandbox mode the overlay fills the full screen.
+   The tab bar sits at z-index 1100 (above overlay z-1000) so it naturally floats on top. */
 body.sandbox-open .rhema-modal-overlay {
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  bottom: 0;
 }
-/* No extra padding needed on rhema-body — the overlay itself is already clipped */
-/* Lift the word sheet above the tab bar in sandbox mode */
-body.sandbox-open .rhema-sheet {
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: 0;
-  max-height: calc(80vh - 56px - env(safe-area-inset-bottom, 0px));
+/* Verse content needs to scroll past the tab bar */
+body.sandbox-open .rhema-content-area {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
-/* Verse nav: remove the safe-area bottom padding that was for standalone Rhema */
+/* Verse nav arrows need to clear the tab bar height */
 body.sandbox-open .rhema-verse-nav {
-  padding-bottom: 14px;
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 6px);
+}
+/* Word sheet extends to physical bottom; tab bar (z-index 1100) floats on top.
+   padding-bottom pushes the save-verse button and tab content above the tab bar. */
+body.sandbox-open .rhema-sheet {
+  bottom: 0;
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  max-height: 80vh;
 }
 
 .ss-tab {
