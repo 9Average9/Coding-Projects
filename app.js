@@ -13435,7 +13435,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.28";
+const APP_VERSION = "2.3.29";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
@@ -14829,16 +14829,27 @@ async function openStudyDetail(studyId) {
   el.innerHTML = '<p class="lb-loading">Loading…</p>';
   hideBottomNav();
   showScreen("csDetailPage");
+
+  const timeout = ms => new Promise(r => setTimeout(() => r(null), ms));
+  const safe = p => Promise.race([Promise.resolve(p).catch(() => null), timeout(8000)]);
+
   const [study, contribs, polls, prayers, plan, checkIns] = await Promise.all([
-    window.Community?.getStudy(studyId),
-    window.Community?.getContributions(studyId) || [],
-    window.Community?.getPolls(studyId) || [],
-    window.Community?.getPrayers(studyId) || [],
-    window.Community?.getReadingPlan(studyId),
-    window.Community?.getCheckIns(studyId) || []
+    safe(window.Community?.getStudy(studyId)),
+    safe(window.Community?.getContributions(studyId)),
+    safe(window.Community?.getPolls(studyId)),
+    safe(window.Community?.getPrayers(studyId)),
+    safe(window.Community?.getReadingPlan(studyId)),
+    safe(window.Community?.getCheckIns(studyId))
   ]);
+
   if (_csActiveStudyId !== studyId) return;
-  if (!study) { el.innerHTML = '<p class="lb-empty">Study not found.</p>'; return; }
+  if (!study) {
+    el.innerHTML = `<div style="padding:24px;text-align:center">
+      <p style="color:var(--muted-color);margin-bottom:16px">Could not load study. Check your connection and try again.</p>
+      <button class="cs-action-btn cs-delete-btn" style="max-width:200px;margin:0 auto" onclick="csForceDelete('${studyId}')">Delete This Study</button>
+    </div>`;
+    return;
+  }
   _renderStudyDetail(el, study, contribs || [], polls || [], prayers || [], plan, checkIns || []);
 }
 
@@ -15285,7 +15296,25 @@ async function csLeave(studyId) {
 }
 
 async function csDeleteMyStudy(studyId) {
-  if (!confirm("Delete this study? This can't be undone.")) return;
+  const btn = event?.currentTarget;
+  if (btn && btn.dataset.confirm !== "1") {
+    btn.dataset.confirm = "1";
+    btn.textContent = "Tap again to confirm";
+    setTimeout(() => { btn.dataset.confirm = ""; btn.textContent = "Delete Study"; }, 3000);
+    return;
+  }
+  await window.Community?.deleteStudy(studyId);
+  closeStudyDetail();
+}
+
+async function csForceDelete(studyId) {
+  const btn = event?.currentTarget;
+  if (btn && btn.dataset.confirm !== "1") {
+    btn.dataset.confirm = "1";
+    btn.textContent = "Tap again to confirm delete";
+    setTimeout(() => { btn.dataset.confirm = ""; btn.textContent = "Delete This Study"; }, 3000);
+    return;
+  }
   await window.Community?.deleteStudy(studyId);
   closeStudyDetail();
 }
