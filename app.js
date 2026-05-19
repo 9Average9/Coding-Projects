@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.60";
+const APP_VERSION = "2.3.61";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.60 — Verse Nav Pinned to Screen Bottom</div>
+<div class="un-version-label">v2.3.61 — Verse Nav Pinned to Screen Bottom</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
@@ -15034,6 +15034,12 @@ window.addEventListener("pagehide", () => {
   const startedAt = Number(sessionStorage.getItem("sessionStartedAt") || Date.now());
   localStorage.setItem("lastSessionLength", String(Date.now() - startedAt));
   syncUserData();
+});
+
+// Keep rhema modal height correct on orientation change
+window.addEventListener("resize", () => {
+  const modal = document.getElementById('rhemaModal');
+  if (modal?.classList.contains('open')) modal.style.height = window.innerHeight + 'px';
 });
 
 function openInstallModalFromProfile() {
@@ -16325,10 +16331,10 @@ async function showRhema() {
   hideBottomNav();
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
+  // Set height from JS — the only reliable way to match the true visible viewport on iOS Safari.
+  // CSS units (dvh/svh) and inset:0 can all be defeated by .modal-overlay class conflicts.
+  modal.style.height = window.innerHeight + 'px';
   modal.classList.add('open');
-  // Only position:fixed on body fully prevents iOS rubber-band bounce (overflow:hidden does not).
-  // The overlay uses height:100dvh in CSS to match the dynamic viewport height exactly,
-  // so no white space gap. Skip scroll lock in sandbox — sandbox overlay already covers.
   if (!_studySandboxId) {
     _rhemaSavedScrollY = window.scrollY;
     document.body.style.position = 'fixed';
@@ -16378,7 +16384,8 @@ function closeRhema(keepSandbox = false) {
     }
     if (!keepSandbox) _studySandboxId = null;
   }
-  document.getElementById('rhemaModal')?.classList.remove('open');
+  const _rm = document.getElementById('rhemaModal');
+  if (_rm) { _rm.classList.remove('open'); _rm.style.height = ''; }
   closeRhemaSheet();
   closeRhemaPickerSheet();
   document.body.style.position = '';
@@ -16558,7 +16565,8 @@ function updateRhemaVerseNav() {
 }
 
 function initRhemaVerseSwipe() {
-  const area = document.getElementById('rhemaVerseDisplay');
+  // Attach to the whole rhema body so swiping anywhere on screen navigates verses
+  const area = document.getElementById('rhemaModal');
   if (!area || area._hSwipeInit) return;
   area._hSwipeInit = true;
   let sx = 0, sy = 0;
@@ -16569,6 +16577,7 @@ function initRhemaVerseSwipe() {
   area.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
+    // Require clearly horizontal swipe (≥45px, more horizontal than vertical)
     if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
     if (dx < 0) rhemaNextVerse();
     else rhemaPrevVerse();

@@ -10937,13 +10937,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ══ Rhēma Word Study — all colors via CSS variables, theme-aware ════════════ */
 
-/* ID selector (specificity 1,0,0) beats any class conflict from .modal-overlay.open */
+/* ID selector (1,0,0) beats .modal-overlay.open (0,2,0) — owns all layout */
 #rhemaModal {
   position: fixed;
-  inset: 0;                       /* fills viewport exactly — no height unit quirks */
-  display: grid;
-  grid-template-rows: 1fr auto;   /* row 1: container fills space; row 2: nav at bottom */
-  grid-template-columns: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* height injected by JS in showRhema() = window.innerHeight — reliable on iOS */
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   z-index: 1000;
 }
@@ -10965,11 +10967,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 .rhema-container {
-  /* grid item in row 1 (1fr) — fills all space above the verse nav */
   position: relative;
+  flex: 1;           /* fills all space above the verse nav */
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
   overflow: hidden;
   overscroll-behavior: none;
 }
