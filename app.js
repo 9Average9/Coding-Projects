@@ -13435,7 +13435,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.26";
+const APP_VERSION = "2.3.27";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
