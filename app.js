@@ -13845,12 +13845,10 @@ async function submitCreateAccount() {
     updatePracticeToolLocks();
     updateLessonCompletionUI();
 
-    // Prompt for notifications — creator recommends enabling to stay connected with friends
+    // Show in-app notification prompt for new accounts
     setTimeout(() => {
       if (Notification?.permission === "default") {
-        if (confirm("🔔 The creator highly recommends enabling notifications!\n\nThey help you stay connected and motivated with friends — you can encourage each other and get reminded to study.\n\nEnable push notifications?")) {
-          openReminderModal();
-        }
+        document.getElementById("notifPromptModal")?.classList.add("open");
       }
     }, 1200);
   } catch (e) {
@@ -14102,6 +14100,27 @@ function completeProfileFocusIfProfileMade() {
 
 
 
+
+// ── Notification permission prompt (shown after sign-up) ─────────────────────
+
+function closeNotifPrompt() {
+  document.getElementById("notifPromptModal")?.classList.remove("open");
+}
+
+async function enableNotificationsFromPrompt() {
+  const btn = document.getElementById("notifPromptModal")?.querySelector(".notif-prompt-enable-btn");
+  if (btn) { btn.disabled = true; btn.textContent = "Enabling…"; }
+  try {
+    const permission = await Notification.requestPermission();
+    closeNotifPrompt();
+    if (permission === "granted") {
+      const user = window.Auth?.getCurrentUser();
+      if (user) await window.FCM?.registerToken(user.uid).catch(() => {});
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Enable Notifications"; }
+  }
+}
 
 // ── FCM Reminders ────────────────────────────────────────────────────────────
 

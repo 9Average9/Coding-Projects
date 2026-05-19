@@ -10822,6 +10822,21 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   align-items: center;
   padding: 16px;
 }
+.notif-prompt-card {
+  max-width: 320px;
+  padding: 28px 24px 22px;
+  text-align: center;
+}
+.notif-prompt-icon {
+  width: 60px; height: 60px; border-radius: 18px; margin: 0 auto 16px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-prompt-icon .material-symbols-outlined { font-size: 2rem; color: var(--secondary-color); }
+.notif-prompt-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 10px; color: var(--font-color); }
+.notif-prompt-body { font-size: 0.88rem; color: var(--muted-color); line-height: 1.55; margin: 0 0 20px; }
+.notif-prompt-enable-btn { width: 100%; margin-bottom: 8px; }
+
 .reminder-modal-card {
   max-width: 340px;
   padding: 22px 20px 18px;
