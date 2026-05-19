@@ -47,6 +47,7 @@ let _sandboxUnsubWordLog = null;
 let _sandboxTab = 'notes';
 let _studySandboxId = null;         // set when Rhema is open in study mode
 let _studySandboxRhemaReturn = false;
+let _studySandboxMainRhemaPos = null; // stashed main position while sandbox Rhema is open
 let _studyBoardSheetId = null;      // study shown in community board sheet
 let _studyBoardStudies = [];
 let _unsubEncouragements = null;
@@ -8265,7 +8266,9 @@ function openSandboxRhema() {
   if (!uid) return;
   _studySandboxId = _activeSandboxStudy.id;
   _studySandboxRhemaReturn = true;
-  // Restore study-specific position
+  // Stash the main Rhema position so we can restore it when sandbox Rhema closes
+  _studySandboxMainRhemaPos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+  // Load this study's saved position (or stay wherever main Rhema was as a fallback)
   const pos = (_activeSandboxStudy.rhemaPositions || {})[uid];
   if (pos) { _rhemaBook = pos.book; _rhemaChapter = pos.chapter; _rhemaVerse = pos.verse; }
   document.getElementById('rhemaSaveToStudyBtn')?.classList.remove('hidden');
@@ -8533,15 +8536,16 @@ function populateHomeScreen() {
 }
 
 function _saveRhemaPosition() {
+  const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
+  // Study sandbox Rhema: save to study only — never touch the main homescreen position
+  if (_studySandboxId) {
+    if (uid) window.Studies?.saveRhemaPos(_studySandboxId, uid, _rhemaBook, _rhemaChapter, _rhemaVerse);
+    return;
+  }
   const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now() };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
-  const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
   if (uid && window.LB) {
     window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
-  }
-  // Also save per-study position when in sandbox mode
-  if (_studySandboxId && uid) {
-    window.Studies?.saveRhemaPos(_studySandboxId, uid, _rhemaBook, _rhemaChapter, _rhemaVerse);
   }
 }
 
@@ -15981,6 +15985,13 @@ function closeRhema() {
           _activeSandboxStudy.rhemaPositions[uid] = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
         }
         _updateSandboxRhemaPreview();
+      }
+      // Restore the main Rhema position so homescreen "Continue Studying" is unchanged
+      if (_studySandboxMainRhemaPos) {
+        _rhemaBook    = _studySandboxMainRhemaPos.book;
+        _rhemaChapter = _studySandboxMainRhemaPos.chapter;
+        _rhemaVerse   = _studySandboxMainRhemaPos.verse;
+        _studySandboxMainRhemaPos = null;
       }
     }
     _studySandboxId = null;
