@@ -13435,7 +13435,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.29";
+const APP_VERSION = "2.3.30";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
@@ -13945,6 +13945,10 @@ window.__onAuthStateReady = async (user) => {
       window.LB.joinXPBoard(profileData?.xp || 0).catch(() => {});
       localStorage.setItem("lbXpJoined", "true");
       syncUserData();
+    } else if (window.LB) {
+      // Repair stale "Anonymous" leaderboard entries — sync name on every login
+      if (window.LB.isXpJoined()) window.LB.syncXP(profileData?.xp || 0).catch(() => {});
+      if (window.LB.isConsJoined()) window.LB.syncStreak(parseInt(localStorage.getItem("studyStreakDays") || "0")).catch(() => {});
     }
 
     // Silently refresh FCM token on login if permission already granted (handles expired tokens)
