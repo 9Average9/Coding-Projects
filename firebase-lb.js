@@ -263,6 +263,24 @@ async function joinConsistencyBoard(streak) {
   });
 }
 
+async function refreshLeaderboardName(name) {
+  if (!name || name === 'Anonymous') return;
+  const uid = getUserId();
+  if (!uid) return;
+  try {
+    const boards = [
+      { key: 'xp_board', joined: 'lbXpJoined' },
+      { key: 'consistency_board', joined: 'lbConsJoined' },
+      { key: 'scholar_board', joined: 'lbScholarJoined' }
+    ];
+    for (const { key, joined } of boards) {
+      if (localStorage.getItem(joined) === 'true') {
+        await setDoc(doc(db, key, uid), { name }, { merge: true });
+      }
+    }
+  } catch (e) { console.warn('refreshLeaderboardName:', e); }
+}
+
 async function syncAvatar() {
   const avatar = getAvatar();
   const boards = [
@@ -811,7 +829,8 @@ window.LB = {
   saveRhemaPosition,
   isXpJoined: () => localStorage.getItem("lbXpJoined") === "true",
   isScholarJoined: () => localStorage.getItem("lbScholarJoined") === "true",
-  isConsJoined: () => localStorage.getItem("lbConsJoined") === "true"
+  isConsJoined: () => localStorage.getItem("lbConsJoined") === "true",
+  refreshLeaderboardName
 };
 
 window.Auth = {
