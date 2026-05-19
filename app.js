@@ -12870,12 +12870,31 @@ function updateProfileUI() {
   updateReminderButtonUI();
 }
 
-async function resetAllAppData() {
-  if (!confirm("Delete your account? This removes all your data, leaderboard entries, and cannot be undone.")) return;
+function resetAllAppData() {
+  const modal = document.getElementById("deleteAccountModal");
+  const input = document.getElementById("deleteAccountPassword");
+  const err = document.getElementById("deleteAccountError");
+  if (input) input.value = "";
+  if (err) err.textContent = "";
+  if (modal) modal.classList.add("open");
+}
+
+function closeDeleteAccountModal(e) {
+  if (e && e.target !== document.getElementById("deleteAccountModal")) return;
+  document.getElementById("deleteAccountModal")?.classList.remove("open");
+}
+
+async function confirmDeleteAccount() {
+  const password = document.getElementById("deleteAccountPassword")?.value || "";
+  const err = document.getElementById("deleteAccountError");
+  if (!password) { if (err) err.textContent = "Please enter your password."; return; }
+  if (err) err.textContent = "";
   try {
-    await window.Auth.deleteAccount();
+    await window.Auth.deleteAccount(password);
   } catch (e) {
-    alert("Error deleting account: " + e.message);
+    if (err) err.textContent = e.code === "auth/wrong-password" || e.code === "auth/invalid-credential"
+      ? "Incorrect password."
+      : "Error: " + e.message;
     return;
   }
   localStorage.clear();
@@ -13435,7 +13454,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.30";
+const APP_VERSION = "2.3.31";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.17 — Study Groups</div>
