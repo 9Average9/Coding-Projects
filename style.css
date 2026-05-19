@@ -10943,7 +10943,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   top: 0;
   left: 0;
   right: 0;
-  /* height injected by JS in showRhema() = window.innerHeight — reliable on iOS */
+  bottom: 0; /* stretches to physical screen bottom — no JS height needed, no white bar */
   display: flex;
   flex-direction: column;
   overflow: hidden;
