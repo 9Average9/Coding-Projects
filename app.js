@@ -14258,9 +14258,18 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.67";
+const APP_VERSION = "2.3.68";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.68 — Profile scroll and layout fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Full-screen profile</strong> — Profile page fills the entire viewport correctly on all devices using dynamic viewport height (dvh)</li>
+    <li><strong>No scroll chaining</strong> — Scrolling the profile no longer bleeds into the page body; overscroll is fully contained</li>
+    <li><strong>No stuck active states</strong> — Removed deprecated momentum scroll flag that caused buttons to appear pressed during fast scrolling on iOS</li>
+    <li><strong>Content clears navbar</strong> — Bottom padding is now handled in CSS and correctly accounts for safe-area insets so the last item is always scrollable into view above the navbar</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.67 — Add Abbott-Smith (TBESG) lexicon</div>
 <div class="un-section">
   <ul class="un-list">
