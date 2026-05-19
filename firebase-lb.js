@@ -465,10 +465,11 @@ async function studyCreate(uid, displayName, { name, color, icon, shareSession }
 
 async function studyGetMine(uid) {
   try {
-    const q = query(collection(db, "studies"),
-      where("collaboratorUids", "array-contains", uid), where("isActive", "==", true));
+    // Single where clause — composite index not needed; filter isActive client-side
+    const q = query(collection(db, "studies"), where("collaboratorUids", "array-contains", uid));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(s => s.isActive !== false)
       .sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
   } catch (e) { console.warn("studyGetMine:", e); return []; }
 }
@@ -480,12 +481,12 @@ async function studyGetFriends(friendUids) {
     const seen = new Set();
     for (let i = 0; i < friendUids.length; i += 10) {
       const batch = friendUids.slice(i, i + 10);
-      const q = query(collection(db, "studies"),
-        where("collaboratorUids", "array-contains-any", batch), where("isActive", "==", true));
+      // Single where clause — filter isActive client-side to avoid composite index requirement
+      const q = query(collection(db, "studies"), where("collaboratorUids", "array-contains-any", batch));
       const snap = await getDocs(q);
       snap.docs.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); results.push({ id: d.id, ...d.data() }); } });
     }
-    return results.sort((a, b) => a.name.localeCompare(b.name));
+    return results.filter(s => s.isActive !== false).sort((a, b) => a.name.localeCompare(b.name));
   } catch (e) { console.warn("studyGetFriends:", e); return []; }
 }
 
@@ -637,10 +638,13 @@ async function studyDeletePermanent(studyId, uid) {
 
 // Listen for incoming encouragement messages (for in-app notifications)
 function listenEncouragements(uid, callback) {
-  const q = query(collection(db, "encouragements", uid, "messages"),
-    orderBy("createdAt", "desc"), limit(30));
-  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
-    err => console.warn("listenEncouragements:", err));
+  // No orderBy — avoids needing a composite index; sort client-side
+  const q = query(collection(db, "encouragements", uid, "messages"), limit(40));
+  return onSnapshot(q, snap => {
+    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    msgs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    callback(msgs);
+  }, err => console.warn("listenEncouragements:", err));
 }
 
 window.Studies = {

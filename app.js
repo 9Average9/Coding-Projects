@@ -45,9 +45,13 @@ let _sandboxUnsubNotes = null;
 let _sandboxUnsubVerses = null;
 let _sandboxUnsubWordLog = null;
 let _sandboxTab = 'notes';
+let _sandboxWordLogCache = [];       // local cache for dedup before writing
 let _studySandboxId = null;         // set when Rhema is open in study mode
 let _studySandboxRhemaReturn = false;
 let _studySandboxMainRhemaPos = null; // stashed main position while sandbox Rhema is open
+let _rhemaPosSaveTimer = null;        // debounce timer for Firestore position saves
+let _lastSavedSandboxPos = null;      // track last-written study position to skip no-ops
+let _studyBoardLastLoad = 0;         // timestamp of last board query
 let _studyBoardSheetId = null;      // study shown in community board sheet
 let _studyBoardStudies = [];
 let _unsubEncouragements = null;
@@ -7994,7 +7998,7 @@ function _renderHomeStudies() {
   const today = new Date().toLocaleDateString("en-CA");
   const uid = window.Auth?.getCurrentUser()?.uid;
   const visible = _myStudies.slice(0, 3);
-  grid.innerHTML = visible.map(s => {
+  const cards = visible.map(s => {
     const doneToday = uid && (s.lastSessionDates || {})[uid] === today;
     return `<div class="hs-study-card" style="--study-color:${s.color}" onclick="openStudySandbox('${s.id}')">
       ${doneToday ? '<span class="study-card-done-dot"></span>' : ''}
@@ -8003,6 +8007,11 @@ function _renderHomeStudies() {
       <span class="hs-study-meta">${_studyMemberLabel(s)}</span>
     </div>`;
   }).join('');
+  const addCard = `<button class="hs-add-card" onclick="openStudyCreateSheet()">
+    <span class="material-symbols-outlined">add</span>
+    <span>New</span>
+  </button>`;
+  grid.innerHTML = cards + addCard;
   if (_myStudies.length > 3) {
     viewAllBtn?.classList.remove('hidden');
     viewAllBtn && (viewAllBtn.textContent = `View All (${_myStudies.length})`);
@@ -8111,13 +8120,21 @@ async function openStudySandbox(studyId) {
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
   window.Studies?.openSession(uid, studyId, { displayName, friendsList });
 
+  // Reset efficiency caches for this session
+  _sandboxWordLogCache = [];
+  _lastSavedSandboxPos = null;
+  clearTimeout(_rhemaPosSaveTimer);
+
   // Start real-time listeners
   _sandboxUnsubNotes?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
   _sandboxUnsubNotes  = window.Studies.listenNotes(studyId, _renderSandboxNotes);
   _sandboxUnsubVerses = window.Studies.listenVerses(studyId, _renderSandboxVerses);
-  _sandboxUnsubWordLog= window.Studies.listenWordLog(studyId, _renderSandboxWordLog);
+  _sandboxUnsubWordLog = window.Studies.listenWordLog(studyId, words => {
+    _sandboxWordLogCache = words;
+    _renderSandboxWordLog(words);
+  });
 
   // Update Rhema position display
   _updateSandboxRhemaPreview();
@@ -8297,12 +8314,13 @@ async function saveCurrentVerseToStudy() {
 
 // ── Community Study Board ─────────────────────────────────────────────────────
 
-async function _loadStudyBoard() {
-  if (!friendsList.length) {
-    _renderStudyBoard([]);
-    return;
+async function _loadStudyBoard(force = false) {
+  if (!friendsList.length) { _renderStudyBoard([]); return; }
+  if (!force && _studyBoardStudies.length && Date.now() - _studyBoardLastLoad < 60_000) {
+    _renderStudyBoard(_studyBoardStudies); return;
   }
   _studyBoardStudies = await window.Studies?.getFriends(friendsList) || [];
+  _studyBoardLastLoad = Date.now();
   _renderStudyBoard(_studyBoardStudies);
 }
 
@@ -8537,9 +8555,16 @@ function populateHomeScreen() {
 
 function _saveRhemaPosition() {
   const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
-  // Study sandbox Rhema: save to study only — never touch the main homescreen position
+  // Study sandbox Rhema: debounced save to study only — never touch main homescreen position
   if (_studySandboxId) {
-    if (uid) window.Studies?.saveRhemaPos(_studySandboxId, uid, _rhemaBook, _rhemaChapter, _rhemaVerse);
+    if (!uid) return;
+    clearTimeout(_rhemaPosSaveTimer);
+    _rhemaPosSaveTimer = setTimeout(() => {
+      const posKey = `${_rhemaBook}|${_rhemaChapter}|${_rhemaVerse}`;
+      if (posKey === _lastSavedSandboxPos) return;
+      _lastSavedSandboxPos = posKey;
+      window.Studies?.saveRhemaPos(_studySandboxId, uid, _rhemaBook, _rhemaChapter, _rhemaVerse);
+    }, 2000);
     return;
   }
   const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now() };
@@ -13969,7 +13994,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.39";
+const APP_VERSION = "2.3.40";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.39 — Studies Full Launch</div>
@@ -16483,10 +16508,13 @@ function openRhemaSheet(wordIdx, verse) {
     const uid = window.Auth?.getCurrentUser()?.uid;
     const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
     const lex = (window.RhemaLexicon || {})[strongs] || {};
-    window.Studies?.logWord(_studySandboxId, uid, displayName, {
-      lemma: lex.lemma || surface, strongs, definition: lex.def || lex.short_def || '',
-      surface, translit: lex.translit || ''
-    });
+    const alreadyLogged = _sandboxWordLogCache.some(w => w.strongs === String(strongs));
+    if (!alreadyLogged) {
+      window.Studies?.logWord(_studySandboxId, uid, displayName, {
+        lemma: lex.lemma || surface, strongs, definition: lex.def || lex.short_def || '',
+        surface, translit: lex.translit || ''
+      });
+    }
   }
 
   const sheet = document.getElementById('rhemaSheet');
