@@ -10704,7 +10704,7 @@ body.dark .fr-card:hover { background: rgba(255,255,255,0.08); }
 }
 .fr-action-btn .material-symbols-outlined { font-size: 14px !important; }
 .fr-action-btn:hover { transform: scale(1.05); }
-.fr-add     { background: linear-gradient(135deg, #c9a227, #a07c10); color: #fff; }
+.fr-add     { background: var(--secondary-color); color: #fff; }
 .fr-accept  { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; }
 .fr-decline { background: transparent; border: 1.5px solid #ef4444; color: #ef4444; }
 .fr-pending { background: transparent; border: 1.5px solid var(--border-color); color: var(--font-color); opacity: 0.6; }
@@ -10797,7 +10797,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 .fr-sheet-btn .material-symbols-outlined { font-size: 18px !important; }
 .fr-sheet-btn:hover { transform: translateY(-1px); }
-.fr-sheet-add     { background: linear-gradient(135deg, #c9a227, #a07c10); color: #fff; }
+.fr-sheet-add     { background: var(--secondary-color); color: #fff; }
 .fr-sheet-accept  { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; }
 .fr-sheet-pending { background: color-mix(in srgb, var(--font-color) 8%, transparent); color: var(--font-color); opacity: 0.6; cursor: default; }
 .fr-sheet-remove  { background: color-mix(in srgb, #ef4444 10%, transparent); color: #ef4444; border: 1.5px solid #ef4444; }
@@ -12504,6 +12504,23 @@ body .app:has(#settingsScreen.screen.active) {
 .notif-accept-btn { background: var(--secondary-color); color: #fff; }
 .notif-deny-btn { background: transparent; border: 1.5px solid var(--border-color); color: var(--muted-color); }
 .notif-accept-btn:active, .notif-deny-btn:active { opacity: 0.7; }
+.notif-x-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--muted-color);
+  opacity: 0.45;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, background 0.15s;
+  align-self: center;
+}
+.notif-x-btn:hover { opacity: 1; background: color-mix(in srgb, var(--font-color) 10%, transparent); }
+.notif-x-btn .material-symbols-outlined { font-size: 16px !important; }
 
 /* ── Community page ───────────────────────────────────────────────────────── */
 .comm-scroll {
