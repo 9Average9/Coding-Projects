@@ -11459,6 +11459,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative; /* anchor for absolutely-positioned verse nav */
 }
 
 .rhema-content-area {
@@ -11469,6 +11470,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   touch-action: pan-y;
   overscroll-behavior: none;
   width: 100%;
+  /* clear space for the absolutely-pinned verse nav bar */
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
 
 .rhema-loading {
@@ -11675,6 +11678,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Verse nav bar — always in-flow so it never causes layout shifts ── */
 .rhema-verse-nav {
+  /* Hardcoded to bottom of rhema-body — out of flex flow so nothing can scroll it */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12938,9 +12947,9 @@ body.sandbox-open .ss-pane {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Verse content needs to scroll past the tab bar */
+/* In sandbox the verse nav is taller (clears tab bar), so content needs more clearance */
 body.sandbox-open .rhema-content-area {
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
 }
 /* Verse nav arrows need to clear the tab bar height */
 body.sandbox-open .rhema-verse-nav {
