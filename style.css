@@ -12502,7 +12502,6 @@ body .app:has(#settingsScreen.screen.active) {
 .notif-accept-btn:active, .notif-deny-btn:active { opacity: 0.7; }
 
 /* ── Community page ───────────────────────────────────────────────────────── */
-#communityPage { display: flex; flex-direction: column; overflow: hidden; }
 .comm-scroll {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
@@ -12922,6 +12921,23 @@ body .app:has(#settingsScreen.screen.active) {
   border-top: 1px solid var(--border-color);
   flex-shrink: 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Keep sandbox tab bar visible on top of the Rhema modal */
+body.sandbox-open .ss-tabs {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 1100;
+}
+
+/* Push pane content up so nothing hides behind the fixed tab bar */
+body.sandbox-open .ss-pane {
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Push Rhema body content up so it isn't hidden behind the fixed tab bar */
+body.sandbox-open .rhema-body {
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
 }
 .ss-tab {
   flex: 1; padding: 10px 4px 8px;
