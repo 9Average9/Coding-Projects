@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.55";
+const APP_VERSION = "2.3.56";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.55 — Version bump</div>
+<div class="un-version-label">v2.3.56 — Verse Nav Pinned to Screen Bottom</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
