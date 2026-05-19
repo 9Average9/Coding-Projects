@@ -14236,10 +14236,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.47";
+const APP_VERSION = "2.3.48";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.47 — Study Nav Fixed</div>
+<div class="un-version-label">v2.3.48 — Study Nav Fixed</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>App Nav Hides in Study</strong> — The main nav bar (Home, Profile, etc.) now properly disappears when a study is open</li>
@@ -14248,7 +14248,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>More Verse Space</strong> — Rhema verse display no longer gets clipped by the study tab bar</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.47 — Study UI Polish</div>
+<div class="un-version-label">v2.3.48 — Study UI Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Tab Bar Stays in Rhema</strong> — The study tab bar (Rhema / Verses / Word Log / Notes) now floats above the Rhema screen so you can switch tabs without leaving Rhema</li>
@@ -14256,7 +14256,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Study Sheet</strong> — Drag handle removed so it's clear the sheet doesn't slide; home screen no longer scrolls behind it</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.47 — Sandbox Nav &amp; Notification Fixes</div>
+<div class="un-version-label">v2.3.48 — Sandbox Nav &amp; Notification Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
@@ -14264,7 +14264,7 @@ const UPDATE_NOTES_HTML = `
     <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
   </ul>
 </div>
-<div class="un-version-label">v2.3.47 — Study Invites &amp; Collaboration Polish</div>
+<div class="un-version-label">v2.3.48 — Study Invites &amp; Collaboration Polish</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>
