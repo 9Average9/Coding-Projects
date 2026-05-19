@@ -13454,7 +13454,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.33";
+const APP_VERSION = "2.3.34";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.33 — Social &amp; Study Fixes</div>
@@ -15003,7 +15003,7 @@ function _renderStudyDetail(el, study, contribs, prayers, plan, checkIns) {
     const done = myUid && (task.completedBy || []).includes(myUid);
     const doneCount = (task.completedBy || []).length;
     return `<div class="cs-task-row${done ? " done" : ""}">
-      <button class="cs-task-check" onclick="csToggleTaskUI('${study.id}',${i})" ${!myUid || !isMember ? "disabled" : ""}>
+      <button class="cs-task-check" onclick="csToggleTaskUI('${study.id}',${i},${!!done})" ${!myUid || !isMember ? "disabled" : ""}>
         <span class="material-symbols-outlined">${done ? "check_circle" : "radio_button_unchecked"}</span>
       </button>
       <span class="cs-task-label">${_lbEscape(task.label)}</span>
@@ -15175,14 +15175,11 @@ async function csAnswerPrayer(studyId, prayerId) {
   openStudyDetail(studyId);
 }
 
-async function csToggleTaskUI(studyId, taskIndex) {
+async function csToggleTaskUI(studyId, taskIndex, isDone) {
   const me = window.Auth?.getCurrentUser();
   if (!me) return;
-  const plan = await window.Community?.getReadingPlan(studyId);
-  const task = plan?.tasks?.[taskIndex];
-  const isDone = task ? (task.completedBy || []).includes(me.uid) : false;
   await window.Community?.toggleTask(studyId, taskIndex, me.uid, !isDone);
-  openStudyDetail(studyId);
+  openStudyDetail(studyId, true);
 }
 
 // ── Prayer Sheet ──────────────────────────────────────────────────────────────
