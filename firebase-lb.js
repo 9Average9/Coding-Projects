@@ -198,7 +198,7 @@ function getMeta() {
 }
 
 function getLbDisplayName() {
-  return localStorage.getItem("authDisplayName") || "Anonymous";
+  return localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Anonymous";
 }
 
 async function checkNameTaken(boardName, name) {
