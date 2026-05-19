@@ -8581,9 +8581,15 @@ body.dark-mode .lesson-progress-badge.advanced {
 }
 
 .track-info-badge.basic-badge {
-  background: rgba(214, 196, 154, 0.35);
-  border: 1px solid rgba(36, 52, 71, 0.15);
-  color: var(--font-color);
+  background: rgba(79, 140, 255, 0.12);
+  border: 1px solid rgba(79, 140, 255, 0.25);
+  color: #4f8cff;
+}
+
+body.dark .track-info-badge.basic-badge {
+  background: rgba(79, 140, 255, 0.15);
+  border-color: rgba(79, 140, 255, 0.3);
+  color: #7aabff;
 }
 
 .track-info-badge.advanced-badge {
