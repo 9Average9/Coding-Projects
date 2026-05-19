@@ -11474,6 +11474,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   touch-action: pan-y;
   overscroll-behavior: none;
   width: 100%;
+  /* pad so content scrolls above the fixed verse nav (80px) + safe area */
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .rhema-loading {
@@ -11677,9 +11679,13 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   cursor: pointer;
 }
 
-/* ── Verse nav bar — direct child of .rhema-container so it always sits at screen bottom ── */
+/* ── Verse nav bar — fixed to physical screen bottom, independent of scroll layout ── */
 .rhema-verse-nav {
-  flex-shrink: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1002;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12943,13 +12949,14 @@ body.sandbox-open .ss-pane {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Verse content needs to scroll past the tab bar */
-body.sandbox-open .rhema-content-area {
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-}
-/* Verse nav arrows need to clear the tab bar height */
+/* Verse nav lifts above the sandbox tab bar */
 body.sandbox-open .rhema-verse-nav {
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 6px);
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 6px;
+}
+/* Content scrolls above the nav (80px) which itself sits above the tab bar (56px + safe area) */
+body.sandbox-open .rhema-content-area {
+  padding-bottom: calc(136px + env(safe-area-inset-bottom, 0px));
 }
 /* Word sheet extends to physical bottom; tab bar (z-index 1100) floats on top.
    padding-bottom pushes the save-verse button and tab content above the tab bar. */
