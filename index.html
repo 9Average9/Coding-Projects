@@ -9676,13 +9676,15 @@ glacier: {
   <button class="color-dot red" data-color="#ef4444" onclick="setProfileColor('#ef4444')" title="Red"></button>
   <button class="color-dot orange" data-color="#f97316" onclick="setProfileColor('#f97316')" title="Orange"></button>
   <button class="color-dot pink" data-color="#ec4899" onclick="setProfileColor('#ec4899')" title="Pink"></button>
-  <button class="color-dot custom-color-dot" id="customColorDot" onclick="openCustomProfileColor()" title="Custom color"></button>
+  <label class="color-dot custom-color-dot" id="customColorDot"
+    for="customProfileColorInput"
+    onclick="var p=document.getElementById('customProfileColorInput');if(p)p.value=(profileData&&profileData.color)||'#4f8cff'"
+    title="Custom color"></label>
 
   <input
     type="color"
     id="customProfileColorInput"
     class="hidden-color-input"
-    inputmode="none"
     onchange="setProfileColor(this.value)"
   />
 </div>
