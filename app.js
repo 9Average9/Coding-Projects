@@ -8112,36 +8112,43 @@ function closeNotifications() {
 
 function _updateNotifBadge() {
   const unread = _notifItems.filter(n => !n.read).length;
-  const badge = document.getElementById('notifBadge');
-  if (badge) {
-    badge.classList.toggle('hidden', unread === 0);
-  }
+  document.getElementById('notifBadge')?.classList.toggle('hidden', unread === 0);
 }
 
-function _loadNotifications() {
+// Remove resolved friend requests from the notif list and update badges.
+// Call this after accept/decline in the friends modal so both dots clear together.
+function _syncFriendRequestNotifs() {
+  _notifItems = _notifItems.filter(n =>
+    n.type !== 'friend_request' || (friendRequestsIn || []).includes(n.requesterUid)
+  );
+  _updateNotifBadge();
+}
+
+async function _loadNotifications() {
   const listEl = document.getElementById('notifList');
   if (!listEl) return;
-  const uid = window.Auth?.getCurrentUser()?.uid || window.LB?.getUserId();
+  const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) {
     listEl.innerHTML = '<p class="notif-empty">Sign in to see notifications.</p>';
     return;
   }
   listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
 
-  const notifications = [];
+  // Look up display names for each incoming friend request
+  const requesters = await Promise.all(
+    (friendRequestsIn || []).map(async reqUid => {
+      const u = await window.Friends?.getUser(reqUid).catch(() => null);
+      return { uid: reqUid, name: u?.displayName || u?.username || 'Someone' };
+    })
+  );
 
-  // Friend requests
-  (friendRequestsIn || []).forEach(reqUid => {
-    notifications.push({
-      id: 'fr_' + reqUid,
-      type: 'friend_request',
-      icon: 'person_add',
-      title: 'New friend request',
-      sub: 'Someone wants to connect with you',
-      read: false,
-      action: () => { closeNotifications(); showFriendsModal(); }
-    });
-  });
+  const notifications = requesters.map(({ uid: reqUid, name }) => ({
+    id: 'fr_' + reqUid,
+    type: 'friend_request',
+    requesterUid: reqUid,
+    requesterName: name,
+    read: false
+  }));
 
   _notifItems = notifications;
   _updateNotifBadge();
@@ -8150,15 +8157,30 @@ function _loadNotifications() {
     listEl.innerHTML = '<p class="notif-empty">No notifications yet.</p>';
     return;
   }
-  listEl.innerHTML = notifications.map((n, i) => `
-    <div class="notif-item${n.read ? '' : ' unread'}" onclick="_notifTap(${i})">
-      <div class="notif-icon"><span class="material-symbols-outlined">${n.icon}</span></div>
+  listEl.innerHTML = notifications.map(n => `
+    <div class="notif-item${n.read ? '' : ' unread'} notif-fr-item" id="notif-fr-${n.requesterUid}">
+      <div class="notif-icon"><span class="material-symbols-outlined">person_add</span></div>
       <div class="notif-body">
-        <div class="notif-title">${n.title}</div>
-        <div class="notif-sub">${n.sub}</div>
+        <div class="notif-title">${n.requesterName}</div>
+        <div class="notif-sub">Wants to be your friend</div>
+        <div class="notif-fr-actions">
+          <button class="notif-accept-btn" onclick="notifAcceptFriend('${n.requesterUid}')">Accept</button>
+          <button class="notif-deny-btn" onclick="notifDeclineFriend('${n.requesterUid}')">Decline</button>
+        </div>
       </div>
       ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
     </div>`).join('');
+}
+
+async function notifAcceptFriend(uid) {
+  await acceptRequestAction(uid);
+  // Rebuild notif list so the card disappears and badges clear
+  await _loadNotifications();
+}
+
+async function notifDeclineFriend(uid) {
+  await declineRequestAction(uid);
+  await _loadNotifications();
 }
 
 function _notifTap(i) {
@@ -13905,6 +13927,11 @@ window.__onAuthStateReady = async (user) => {
       friendRequestsIn = data.friendRequestsIn || [];
       friendRequestsOut = data.friendRequestsOut || [];
       updateFriendsBadge();
+      // Seed notif items from friend requests so the dot shows without opening the panel
+      _notifItems = (friendRequestsIn || []).map(uid => ({
+        id: 'fr_' + uid, type: 'friend_request', requesterUid: uid,
+        requesterName: 'Someone', read: false
+      }));
       _updateNotifBadge();
       const modal = document.getElementById("friendsModal");
       if (modal?.classList.contains("open")) {
@@ -14769,8 +14796,9 @@ function _frStatus(uid) {
 }
 
 function updateFriendsBadge() {
-  const count = friendRequestsIn.length;
-  [document.getElementById("friendsHomeBadge"), document.getElementById("friendsReqTabBadge")].forEach(el => {
+  const count = (friendRequestsIn || []).length;
+  ["commFriendsBadge", "friendsReqTabBadge"].forEach(id => {
+    const el = document.getElementById(id);
     if (!el) return;
     el.textContent = count > 0 ? String(count) : "";
     el.classList.toggle("hidden", count === 0);
@@ -14814,7 +14842,12 @@ function switchFriendsTab(tab) {
   if (sw) sw.style.display = tab === "find" ? "" : "none";
   if (tab === "friends")  renderFriendsList();
   if (tab === "find")     renderFindFriends(_browseSearch);
-  if (tab === "requests") renderFriendRequests();
+  if (tab === "requests") {
+    // Mark friend request notifs as read so the What's Going On dot clears
+    _notifItems = _notifItems.map(n => n.type === 'friend_request' ? { ...n, read: true } : n);
+    _updateNotifBadge();
+    renderFriendRequests();
+  }
 }
 
 function _frCardHTML(u, status) {
@@ -15004,12 +15037,14 @@ async function acceptRequestAction(uid) {
   if (_friendsTab === "friends")  renderFriendsList();
   if (_friendsTab === "requests") renderFriendRequests();
   const myName = localStorage.getItem("authDisplayName") || "Someone";
+  _syncFriendRequestNotifs();
   const ok = await window.Friends.acceptRequest(me.uid, uid, myName);
   if (!ok) {
     // Rollback on failure
     friendRequestsIn = [...new Set([...friendRequestsIn, uid])];
     friendsList = friendsList.filter(id => id !== uid);
     updateFriendsBadge();
+    _syncFriendRequestNotifs();
     if (_friendsTab === "friends")  renderFriendsList();
     if (_friendsTab === "requests") renderFriendRequests();
   }
@@ -15021,6 +15056,7 @@ async function declineRequestAction(uid) {
   if (await window.Friends.declineRequest(me.uid, uid)) {
     friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
     updateFriendsBadge();
+    _syncFriendRequestNotifs();
     renderFriendRequests();
   }
 }

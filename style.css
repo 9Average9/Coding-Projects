@@ -12464,6 +12464,28 @@ body .app:has(#settingsScreen.screen.active) {
 .notif-time { font-size: 0.7rem; color: var(--muted-color); margin-top: 2px; }
 .notif-unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary-color); flex-shrink: 0; margin-top: 6px; }
 .notif-empty { text-align: center; padding: 32px 20px; color: var(--muted-color); font-size: 0.88rem; }
+.notif-fr-item { cursor: default; }
+.notif-fr-item:active { background: inherit; }
+.notif-fr-actions { display: flex; gap: 8px; margin-top: 8px; }
+.notif-accept-btn, .notif-deny-btn {
+  padding: 5px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;
+  border: none; cursor: pointer; transition: opacity 0.15s;
+}
+.notif-accept-btn { background: var(--secondary-color); color: #fff; }
+.notif-deny-btn { background: transparent; border: 1.5px solid var(--border-color); color: var(--muted-color); }
+.notif-accept-btn:active, .notif-deny-btn:active { opacity: 0.7; }
+
+/* ── Community page Friends button badge ─────────────────────────────────── */
+.comm-friends-btn { position: relative; }
+.comm-friends-badge {
+  position: absolute; top: -4px; right: -4px;
+  min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 999px; background: #ef4444; color: #fff;
+  font-size: 0.68rem; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--primary-color);
+}
+.comm-friends-badge.hidden { display: none; }
 
 /* ── Theme-aware nav back buttons ───────────────────────────────────────── */
 .nav-bar .icon-btn {
