@@ -14247,10 +14247,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.65";
+const APP_VERSION = "2.3.66";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.65 — Fix pronoun parsing, restrict verse swipe to body</div>
+<div class="un-version-label">v2.3.66 — Fix indeclinable noun/numeral subtypes (PRI, NUI)</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
@@ -16328,12 +16328,19 @@ function decodeMorph(code) {
     // Standard CNG: Noun, Article, Adjective, Relative/Demonstrative/Interrogative/
     // Correlative/Indefinite pronouns — vSegs[0] is CNG (ignore any trailing -K variant marker)
     const cng = vSegs[0] || '';
-    const c = MORPH_CASE[cng[0]];
-    const n = MORPH_NUM[cng[1]];
-    const g = MORPH_GEN[cng[2]];
-    if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
-    if (n) rows.push({ label:'Number', value: n,   desc: '' });
-    if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+    // Indeclinable subtypes: PRI = proper noun, NUI = numeral, LI/OI = other indeclinables
+    if (cng === 'PRI' || cng === 'NUI' || cng === 'LI' || cng === 'OI') {
+      const label = cng === 'PRI' ? 'Proper Noun (Indeclinable)' :
+                    cng === 'NUI' ? 'Numeral (Indeclinable)' : 'Indeclinable';
+      rows.push({ label:'Form', value: label, desc:'' });
+    } else {
+      const c = MORPH_CASE[cng[0]];
+      const n = MORPH_NUM[cng[1]];
+      const g = MORPH_GEN[cng[2]];
+      if (c) rows.push({ label:'Case',   value: c.l, desc: c.d });
+      if (n) rows.push({ label:'Number', value: n,   desc: '' });
+      if (g) rows.push({ label:'Gender', value: g,   desc: '' });
+    }
   }
 
   return rows;
