@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.78";
+const APP_VERSION = "2.3.79";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17048,6 +17048,24 @@ const _SX_CLAUSE_LABELS = {
   coordinating:'Continued', alternative:'Alternative', conjunction:'Clause',
 };
 
+const _SX_PLAIN_LABELS = {
+  subject:        'who does it',
+  predicate:      'the action',
+  object:         'who / what receives',
+  genitive:       'of / whose',
+  dative:         'to / for / by',
+  accusative:     'direction or extent',
+  vocative:       'spoken to',
+  modifier:       'how / where / by what',
+  attributive:    'describes who',
+  circumstantial: 'when / why / how',
+  infinitive:     'in order to',
+  prednom:        'what it is',
+  conjunction:    'connects',
+  particle:       'tone / emphasis',
+  unknown:        'phrase',
+};
+
 const _SX_ROLE_INFO = {
   subject: {
     title: 'Subject — Who or what is doing it',
@@ -17432,7 +17450,7 @@ function _renderDiagramBranch(clause, words, verse) {
     html += `<div class="rsx-dg-chip rsx-c-${p.color || 'other'}"
       data-role="${p.role}" data-label="${p.label}" data-greek="${greekStr}"
       onclick="openRhemaSyntaxSheet(this)">`;
-    html += `<span class="rsx-dg-chip-role">${p.label}</span>`;
+    html += `<span class="rsx-dg-chip-role">${_SX_PLAIN_LABELS[p.role] || p.label}</span>`;
     html += `<span class="rsx-dg-chip-gr">`;
     for (const wi of p.words) {
       const w = words[wi];
