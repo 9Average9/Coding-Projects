@@ -17207,6 +17207,25 @@ function _sxVerbPerson(morph) {
   return m ? parseInt(m[1]) : null;
 }
 
+// Simple English morphology helpers for verb gloss display
+function _engIng(v) {
+  if (!v) return v;
+  if (/[^aeiou]e$/.test(v)) return v.slice(0, -1) + 'ing'; // come→coming, love→loving
+  return v + 'ing';
+}
+function _engPast(v) {
+  if (!v) return v;
+  if (/e$/.test(v)) return v + 'd';          // loved, placed
+  if (/[^aeiou]y$/.test(v)) return v.slice(0, -1) + 'ied'; // tried
+  return v + 'ed';                           // killed, walked
+}
+function _eng3sg(v) {
+  if (!v) return v;
+  if (/(?:s|sh|ch|x|z)$/.test(v)) return v + 'es';
+  if (/[^aeiou]y$/.test(v)) return v.slice(0, -1) + 'ies';
+  return v + 's';
+}
+
 function _sxVerbGloss(morph, brief) {
   const base = (brief || '').split(',')[0].split(';')[0].trim().replace(/^I /, '').trim();
   if (!base) return '';
@@ -17216,7 +17235,9 @@ function _sxVerbGloss(morph, brief) {
   const persNum = parts[2] || '';
   const tense = form[0], voice = form[1], mood = form[form.length - 1];
   if (mood === 'N') return `to ${base}`;
-  if (mood === 'P') return (tense === 'A' || tense === 'X' || tense === 'Y') ? `having ${base}` : `${base}ing`;
+  if (mood === 'P') return (tense === 'A' || tense === 'X' || tense === 'Y')
+    ? `having ${_engPast(base)}`
+    : _engIng(base);
   const pn = persNum.match(/^([123])([SP])/);
   if (!pn) return base;
   const [, pers, num] = pn;
@@ -17229,8 +17250,12 @@ function _sxVerbGloss(morph, brief) {
     const beF = BE[`${pers}${num}`] || 'are';
     return modal ? `${subj} might ${beF}` : `${subj} ${beF}`;
   }
-  const vb = voice === 'P' ? `be ${base}` : base;
-  return subj ? `${subj}${modal} ${vb}` : `${modal.trim()} ${vb}`.trim();
+  const conjugated = voice === 'P'
+    ? `be ${base}`
+    : (pers === '3' && num === 'S' && !modal)
+      ? _eng3sg(base.split(' ')[0]) + (base.includes(' ') ? base.slice(base.indexOf(' ')) : '')
+      : base;
+  return subj ? `${subj}${modal} ${conjugated}` : `${modal.trim()} ${conjugated}`.trim();
 }
 
 const _SX_CLAUSE_TYPES = {
@@ -17242,7 +17267,7 @@ const _SX_CLAUSE_TYPES = {
   5613:'comparative', 2531:'comparative', 5618:'comparative',  // ὡς, καθώς, ὥσπερ
   2509:'comparative',                                          // καθάπερ
   1893:'causal',   1894:'causal',   1063:'explanatory',        // ἐπεί, ἐπειδή, γάρ
-  3767:'inferential', 1352:'inferential', 3606:'inferential',  // οὖν, διό, ὅθεν
+  3767:'inferential', 1352:'inferential', 3606:'inferential', 686:'inferential',  // οὖν, διό, ὅθεν, ἄρα
   235:'adversative', 4133:'adversative',                       // ἀλλά, πλήν
   2532:'coordinating', 1161:'coordinating', 5037:'coordinating', 3303:'coordinating', // καί,δέ,τε,μέν
   2228:'alternative', 1535:'alternative',                      // ἤ, εἴτε
@@ -17315,7 +17340,7 @@ const _SX_CLAUSE_SUBTITLES = {
 };
 
 // Adverb Strongs sets for semantic classification
-const _SX_NEG_STRONGS  = new Set([3756, 3361, 3762, 3367]);
+const _SX_NEG_STRONGS  = new Set([3756, 3361, 3762, 3367, 3765]);
 const _SX_DIST_STRONGS = new Set([3112, 1451, 4139]);
 const _SX_LOC_STRONGS  = new Set([1563, 847, 1759, 3606, 1566]);
 const _SX_TIME_STRONGS = new Set([3568, 5119, 4218, 3753, 1534, 1899]);
@@ -17608,6 +17633,9 @@ function _sxAssignRoles(phrases, cats, roleMap) {
       const firstStrongs = cats[p.words[0]]?.strongs;
       if (_SX_NEG_STRONGS.has(firstStrongs)) {
         p.role = 'negation'; p.label = 'Negation'; p.color = 'other'; p.plainLabel = 'negates';
+      } else if (_SX_CLAUSE_TYPES[firstStrongs]) {
+        // Discourse particles that connect clauses (ἄρα, γάρ tagged as PART not CONJ)
+        p.role = 'conjunction'; p.label = _SX_CLAUSE_LABELS[_SX_CLAUSE_TYPES[firstStrongs]] || 'Connects'; p.color = 'conj'; p.plainLabel = 'connects';
       } else {
         p.role = 'particle'; p.label = 'Particle'; p.color = 'other';
       }
