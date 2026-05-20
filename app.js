@@ -16436,16 +16436,16 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-kjv.js'];
+    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-kjv.js', 'rhema-syntax.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
-      s.src = file + '?v=2.3.67';
+      s.src = file + '?v=' + APP_VERSION;
       s.onload = () => {
         loaded++;
         if (loaded === files.length) { _rhemaLoaded = true; resolve(); }
       };
-      s.onerror = (e) => {
+      s.onerror = () => {
         if (!failed) { failed = true; reject(new Error('Failed to load ' + file)); }
       };
       document.head.appendChild(s);
@@ -17230,7 +17230,24 @@ function _sxGroupPhrases(words) {
   return { phrases, cats };
 }
 
-function _sxAssignRoles(phrases, cats) {
+function _sxGetRoleMap(words, book, chapter, verse) {
+  const verseData = window.RhemaSyntax?.[book]?.[chapter]?.[verse];
+  if (!verseData || !verseData.length) return null;
+  const roleMap = {};
+  for (const [dsPos, dsStrongs, role] of verseData) {
+    const exact = dsPos - 1;
+    if (exact >= 0 && exact < words.length && words[exact][1] === dsStrongs) {
+      roleMap[exact] = role; continue;
+    }
+    const lo = Math.max(0, dsPos - 4), hi = Math.min(words.length - 1, dsPos + 2);
+    for (let i = lo; i <= hi; i++) {
+      if (words[i][1] === dsStrongs && roleMap[i] === undefined) { roleMap[i] = role; break; }
+    }
+  }
+  return Object.keys(roleMap).length ? roleMap : null;
+}
+
+function _sxAssignRoles(phrases, cats, roleMap) {
   const hasFiniteVerb = phrases.some(p => p.type === 'finite-verb');
   // Detect copulative verbs (εἰμί=1510, γίνομαι=1096, ὑπάρχω=5225) for predicate nominative detection
   const hasCopula = phrases.some(p =>
@@ -17266,6 +17283,23 @@ function _sxAssignRoles(phrases, cats) {
       }
     }
   }
+  // Dataset overrides: apply scholar-annotated roles where available
+  if (roleMap) {
+    for (const p of phrases) {
+      for (const wi of p.words) {
+        const dr = roleMap[wi];
+        if (!dr) continue;
+        if (dr === 'p') {
+          p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb'; p.fromDataset = true;
+        } else if (dr === 'io') {
+          if (p.role === 'dative') { p.label = 'Indirect Obj.'; p.fromDataset = true; }
+        } else if (dr === 'o2') {
+          p.role = 'object'; p.label = 'Object (2)'; p.color = 'obj'; p.fromDataset = true;
+        }
+        break;
+      }
+    }
+  }
   return phrases;
 }
 
@@ -17279,9 +17313,12 @@ function _sxConfidence(words, phrases) {
 
 // ── Syntax tree builder ───────────────────────────────────────────────────────
 
-function _sxBuildTree(words) {
+function _sxBuildTree(words, verseRef) {
   const { phrases, cats } = _sxGroupPhrases(words);
-  _sxAssignRoles(phrases, cats);
+  const roleMap = (window.RhemaSyntax && verseRef)
+    ? _sxGetRoleMap(words, verseRef.book, verseRef.chapter, verseRef.verse)
+    : null;
+  _sxAssignRoles(phrases, cats, roleMap);
   const confidence = _sxConfidence(words, phrases);
 
   // Split phrase list into clause segments at conjunction boundaries
@@ -17331,7 +17368,9 @@ const _SX_CLAUSE_COLORS = {
 
 function _renderSyntaxView(words, verse) {
   if (!words.length) return '<div class="rsx-tree"><p style="padding:16px;color:var(--muted-color)">No verse data.</p></div>';
-  const { tree, cats, confidence } = _sxBuildTree(words);
+  const verseNum = verse || _rhemaVerse;
+  const verseRef = { book: _rhemaBook, chapter: _rhemaChapter, verse: verseNum };
+  const { tree, cats, confidence } = _sxBuildTree(words, verseRef);
   let html = '<div class="rsx-tree">';
   html += `<div class="rsx-attr-bar">
     <span class="rsx-attr-label">Greek Grammar Analysis</span>
