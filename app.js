@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.72";
+const APP_VERSION = "2.3.73";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17047,20 +17047,111 @@ const _SX_CLAUSE_LABELS = {
 };
 
 const _SX_ROLE_INFO = {
-  subject:     { title:'Subject (Nominative)', body:'The nominative case marks the subject — the one performing or undergoing the verb\'s action. Greek word order is flexible; the case ending identifies the subject, not the position.' },
-  predicate:   { title:'Verb / Predicate', body:'The main verb carries tense (time aspect), voice (active/middle/passive), and mood (indicative/subjunctive/imperative/optative). Each layer adds precise meaning beyond the basic action.' },
-  object:      { title:'Direct Object (Accusative)', body:'The accusative case marks the direct object — what receives the action of a transitive verb. Accusatives also express extent, direction, or serve as the object of certain prepositions.' },
-  genitive:    { title:'Genitive', body:'The genitive expresses a relationship to another noun — possession ("of God"), source ("from heaven"), description, partition, or separation. The specific nuance is determined by context.' },
-  dative:      { title:'Dative', body:'The dative can be the indirect object ("to / for someone"), express means ("by means of"), location ("in / among"), or manner. Greek uses one case for what English splits across several prepositions.' },
-  accusative:  { title:'Accusative', body:'Here the accusative is not a direct object but expresses extent, direction, or is the object of a preposition (e.g. εἰς, κατά, διά take the accusative).' },
-  vocative:    { title:'Direct Address (Vocative)', body:'The vocative case addresses someone directly: κύριε ("Lord!"), θεέ ("O God!"). It marks speech directed at a person or entity.' },
-  modifier:    { title:'Prepositional Phrase', body:'A preposition plus its object. The case of the object changes the meaning — ἐν + dative = "in/among"; εἰς + accusative = "into/toward"; ἐκ + genitive = "out of/from".' },
-  attributive: { title:'Attributive Participle', body:'An articular participle (article + participle) modifies a noun like an adjective: "the believing one," "the written word." It describes the noun\'s characteristic action or state.' },
-  circumstantial:{ title:'Circumstantial Participle', body:'An adverbial participle framing the main verb — describing the time, cause, means, manner, or condition of the main action. Its precise role depends on context and the tense of the participle.' },
-  infinitive:  { title:'Infinitive', body:'The infinitive is a verbal noun. It can express purpose ("in order to"), result, content (indirect statement), or complement a finite verb. It does not encode a specific person or number by itself.' },
-  conjunction: { title:'Conjunction / Clause Marker', body:'Conjunctions mark how clauses relate. ἵνα = purpose or result; ὅτι = content or reason; ὥστε = result; εἰ / ἐάν = condition. These small connective words are structurally critical.' },
-  particle:    { title:'Particle / Adverb', body:'Particles and adverbs modify the verb or clause. Key examples: οὐ/μή = negation; γέ = emphasis; ἤδη = "already"; οὕτως = "thus/in this way." Small words with significant logical weight.' },
-  unknown:     { title:'Phrase', body:'Tap individual words within this phrase to see their morphological parsing and lexical definition.' },
+  subject: {
+    title: 'Subject — Who or what is doing it',
+    body: 'The nominative case marks the subject — the main actor in the clause. Greek doesn\'t rely on word order to show this; the case ending on the word does that work. This means the subject can appear anywhere in the sentence, often at the end for emphasis.',
+    range: null,
+    example: 'In John 3:16 — ὁ θεὸς is nominative, so God is the one who loved. The subject could have come last in the sentence and still meant exactly the same thing.',
+    question: 'Who is performing this action? Is there anything significant or surprising about who the subject is in this context?',
+  },
+  predicate: {
+    title: 'Verb — The action or state',
+    body: 'The finite verb is the engine of the clause. A single Greek verb encodes five things at once: what is happening (its basic meaning), when and how complete the action is (tense-aspect), who acts or is acted on (voice), the speaker\'s certainty or intent (mood), and who is doing it (person and number).',
+    range: 'Voice matters: active = the subject acts; passive = the subject is acted upon; middle = the subject acts for its own benefit. Mood matters: indicative = stated as real; subjunctive = potential or purpose; imperative = a command; optative = a wish.',
+    example: 'ἠγάπησεν (John 3:16) is aorist indicative active — a completed, definite act of love in the past. If the author had written in the present tense, it would read as ongoing love. That distinction is deliberate.',
+    question: 'What is the tense — completed act (aorist), ongoing action (present), or enduring state (perfect)? Is it active, passive, or middle? What does each of those layers tell you?',
+  },
+  object: {
+    title: 'Direct Object — What receives the action',
+    body: 'The accusative case marks the direct object — what the verb acts on. Greek uses the accusative ending to show this regardless of where the word appears in the sentence.',
+    range: 'The accusative also expresses extent of time or space ("for three days," "a long way"), direction of movement, or it is the required object of certain prepositions: εἰς ("into"), κατά ("according to / against"), διά ("because of").',
+    example: 'In John 3:16 — τὸν κόσμον (the world) is accusative. God\'s love has a scope: the entire world. The definite article ("the world," not "a world") is also significant — a specific, known creation.',
+    question: 'What is being affected by this action? Is the scope of the object larger or smaller than you expected? Does the specific word choice carry meaning beyond the simple action?',
+  },
+  genitive: {
+    title: 'Genitive — A relationship to another word',
+    body: 'The genitive shows how one word relates to another noun. English typically translates it with "of" — but that single English word covers many distinct Greek relationships. Context determines which one applies.',
+    range: 'Possible relationships: possession ("the love of God" = God\'s love), source ("from God"), description ("of glory" = glorious), partition ("some of them"), separation ("apart from the law"), or a verbal relationship (subjective genitive = "God\'s act of loving"; objective genitive = "love directed toward God").',
+    example: 'ἀγάπη τοῦ θεοῦ — "the love of God." Is this God\'s love for us, or our love for God? The genitive alone does not decide — context does. Both are grammatically valid readings of the same phrase.',
+    question: 'What is the nature of this relationship — possession, source, description, or something else? Does the meaning shift if you try a different reading? Which fits the surrounding context?',
+  },
+  dative: {
+    title: 'Dative — To, for, by, in, or with',
+    body: 'The dative is Greek\'s most versatile case. English splits its meaning across several different prepositions, but Greek uses one case ending for all of them. The surrounding words and context tell you which sense applies.',
+    range: 'Indirect object ("he gave it to them"), means or instrument ("by faith," "with his own hand"), location or sphere ("in Christ," "among the churches"), manner ("with boldness," "with joy"), or the interested party ("for you," "for their benefit").',
+    example: 'ἐν Χριστῷ — "in Christ" — one of Paul\'s most frequent phrases. The dative here signals participation or sphere, not just physical location. Being "in Christ" is a status and a position.',
+    question: 'Which English preposition fits best — to, for, by, in, or with? Does trying a different preposition change your understanding of the verse? Which reading fits the author\'s argument?',
+  },
+  accusative: {
+    title: 'Accusative — Extent, direction, or object of a preposition',
+    body: 'Here the accusative is not a direct object but is serving another function: expressing the extent of time or space, the direction of movement, or it is the required object of a preposition.',
+    range: 'Common with εἰς ("into / toward / for the purpose of"), κατά ("according to / against"), διά ("because of"), and others. The preposition and context determine the exact meaning.',
+    example: 'εἰς τὸν αἰῶνα — "into the age" = forever. The preposition εἰς plus accusative expresses direction or purpose — here, movement into unending time.',
+    question: 'What is this accusative expressing — direction, extent, purpose, or the object of a preposition? How does the preposition (if there is one) shape the meaning?',
+  },
+  vocative: {
+    title: 'Direct Address — Speaking to someone',
+    body: 'The vocative case addresses someone or something directly. It steps outside the grammar of the sentence and turns to speak to a person or entity. It marks prayer, petition, command, and direct appeal.',
+    range: null,
+    example: 'κύριε — "Lord!" (Matthew 8:2). The leper is not describing Jesus as Lord in a general sense; he is speaking directly to him in a moment of desperate appeal. The vocative transforms description into relationship.',
+    question: 'Who is being addressed? What does the specific title or name used in the address tell you about the speaker\'s understanding of that person and the nature of this moment?',
+  },
+  modifier: {
+    title: 'Prepositional Phrase — Location, direction, or relationship',
+    body: 'A preposition followed by its object phrase. In Greek, the case of the object changes the meaning of the preposition — sometimes dramatically. The same preposition used with different cases can mean very different things.',
+    range: 'Key examples: ἐν + dative = "in / among / by means of"; εἰς + accusative = "into / toward / for"; ἐκ + genitive = "out of / from"; διά + genitive = "through"; διά + accusative = "because of"; πρός + accusative = "toward / with / in the presence of."',
+    example: 'ἐν Χριστῷ (dative) = "in Christ" — sphere or union. εἰς Χριστόν (accusative) = "into Christ" — movement or direction. Same root word, same preposition, different cases, different meaning.',
+    question: 'What does this phrase tell you about location, direction, means, or sphere? Does the case of the object shift the meaning? What specific relationship is the author describing?',
+  },
+  attributive: {
+    title: 'Attributive Participle — Describing a person or thing',
+    body: 'A participle with an article (ὁ, ἡ, τό) in front of it acts like an adjective — it describes a noun by its characteristic action or ongoing state. It names a category of person by what they do or are.',
+    range: 'Best translated as a relative clause: ὁ πιστεύων = "the one who believes" / "the believing one." The present tense participle suggests ongoing, habitual action. The aorist would describe a completed act. The tense choice is deliberate.',
+    example: 'ὁ πιστεύων εἰς αὐτόν (John 3:16) — "the one who believes in him." The article + participle defines a person by their ongoing relationship of trust toward Jesus. It is a portrait of a life, not a single moment.',
+    question: 'What characteristic does this participle attach to the person or thing being described? Is the action ongoing (present participle) or completed (aorist)? Why does that tense choice matter here?',
+  },
+  circumstantial: {
+    title: 'Circumstantial Participle — When, why, or how the main action happens',
+    body: 'A participle without an article frames or qualifies the main verb. It doesn\'t stand on its own — it adds circumstance around the main action. The exact relationship depends on context and the tense of the participle.',
+    range: 'Temporal: "while he was speaking / after he spoke." Causal: "because he knew." Means: "by doing this." Conditional: "if you are willing." Concessive: "even though he knew." The same participle can sometimes fit more than one reading — context decides.',
+    example: 'ἀπελθὼν πέπρακεν — "having gone, he sold" (Matthew 13:46). The aorist participle describes action completed before the main verb — he went first, then sold. Sequence matters.',
+    question: 'What is this participle telling you about the main action — when it happened, why, how, or under what condition? Does the tense of the participle (aorist vs. present) affect the timing relationship to the main verb?',
+  },
+  infinitive: {
+    title: 'Infinitive — A verb acting as a noun',
+    body: 'The Greek infinitive is a verbal noun. It carries the verb\'s action but plays a noun role in the sentence — it can be a subject, an object, or the complement of another verb. It does not have its own person or number.',
+    range: 'Purpose: "in order to save" (often with τοῦ or εἰς τό before it). Result: "so that they believed." Content: "he said that he was going." Complement: "he began to teach" / "he is able to do." Each use answers a different question about the main action.',
+    example: 'σῶσαι τὸν κόσμον (John 3:17) — "to save the world." This infinitive expresses the purpose of God sending the Son. It answers "why?" before the question is even asked.',
+    question: 'What role is this infinitive playing — expressing a purpose, a result, the content of what was said or known, or complementing the main verb? How does identifying that role change your reading of the sentence?',
+  },
+  prednom: {
+    title: 'Predicate Nominative — What the subject is',
+    body: 'When a linking verb like εἰμί ("is / was / will be") connects two nominatives, the second one does not name a new actor — it completes or defines the first. Think of the verb as an equals sign between two nominatives.',
+    range: 'The presence of the article often (but not always) distinguishes subject from predicate: the nominative with the article tends to be the subject; the one without tends to be the predicate (this principle is called Colwell\'s Rule — a useful guide, not an absolute law).',
+    example: 'θεὸς ἦν ὁ λόγος (John 1:1c) — "the Word was God." ὁ λόγος (the Word, has the article) is the subject. θεός (God, no article here) is the predicate nominative — it describes the nature of the Word, not a second actor. The word order is inverted for emphasis.',
+    question: 'What does this predicate tell you about the nature or identity of the subject? Is it defining what something is, or describing its characteristic quality?',
+  },
+  conjunction: {
+    title: 'Conjunction — How this clause connects to what came before',
+    body: 'Conjunctions are small words with major structural weight. They don\'t just link clauses — they tell you the logical relationship between them. Reading past them too quickly is one of the most common ways to miss the author\'s argument.',
+    range: 'ἵνα = purpose ("in order that") or result ("so that"); ὅτι = content ("that") or reason ("because"); ὥστε = result ("so that / therefore"); εἰ = condition (assumed real); ἐάν = condition (uncertain, future possibility); ὅς / ὅτε / ὅταν = relative / temporal clauses.',
+    example: 'ἵνα in John 3:16 — "that/so that whoever believes in him should not perish." This ἵνα introduces the purpose of God\'s love: the goal was eternal life. The entire second half of the verse depends on this one word.',
+    question: 'What does this conjunction tell you about the relationship between these clauses — goal, consequence, reason, or condition? What would be lost if you skipped over it?',
+  },
+  particle: {
+    title: 'Particle or Adverb — Tone, contrast, or emphasis',
+    body: 'Particles and adverbs are small words that shade the meaning of the clause or verb in ways that are easy to miss in translation. Preachers and commentators often focus on the nouns and verbs while these words do quiet but essential work.',
+    range: 'γάρ = "for / because" (grounds or explains what was just said — always backward-looking); δέ = mild contrast or continuation; ἀλλά = strong contrast ("but"); γέ = emphasis; οὐ / μή = negation; ἤδη = "already"; οὕτως = "in this way / thus"; μόνον = "only."',
+    example: 'γὰρ in Romans 8:18 — "For I consider that the sufferings of this present time are not worth comparing..." The γάρ roots this verse in the promise of glory that came before it. Without γάρ, it floats; with it, it is an argument.',
+    question: 'What is this word contributing — explanation, contrast, emphasis, negation? What would be lost if this word were simply removed? What does it tell you about how the author sees the connection to what came before?',
+  },
+  unknown: {
+    title: 'Phrase',
+    body: 'The grammatical structure of this phrase is uncertain from morphology alone. This sometimes happens with ambiguous forms or unusual constructions.',
+    range: null,
+    example: null,
+    question: 'Try tapping the individual words within this phrase to see their morphological parsing and lexical definition — you may be able to work out the structure from there.',
+  },
 };
 
 function _sxGroupPhrases(words) {
@@ -17141,26 +17232,38 @@ function _sxGroupPhrases(words) {
 
 function _sxAssignRoles(phrases, cats) {
   const hasFiniteVerb = phrases.some(p => p.type === 'finite-verb');
+  // Detect copulative verbs (εἰμί=1510, γίνομαι=1096, ὑπάρχω=5225) for predicate nominative detection
+  const hasCopula = phrases.some(p =>
+    p.type === 'finite-verb' && [1510, 1096, 5225].includes(cats[p.words[0]]?.strongs)
+  );
+  let nomCount = 0;
   for (const p of phrases) {
-    if (p.type === 'finite-verb')       { p.role = 'predicate';     p.label = 'Verb';            p.color = 'verb'; }
-    else if (p.type === 'conjunction')  { p.role = 'conjunction';   p.label = _SX_CLAUSE_LABELS[p.clauseType] || 'Conjunction'; p.color = 'conj'; }
-    else if (p.type === 'prep-phrase')  { p.role = 'modifier';      p.label = 'Prep. Phrase';    p.color = 'prep'; }
-    else if (p.type === 'articular-participle') { p.role = 'attributive';    p.label = 'Attr. Participle'; p.color = 'part'; }
-    else if (p.type === 'participle-phrase')    { p.role = 'circumstantial'; p.label = 'Participle';       p.color = 'part'; }
-    else if (p.type === 'infinitive')   { p.role = 'infinitive';    p.label = 'Infinitive';      p.color = 'part'; }
-    else if (p.type === 'particle')     { p.role = 'particle';      p.label = 'Particle';        p.color = 'other'; }
+    if (p.type === 'finite-verb')              { p.role = 'predicate';      p.label = 'Verb';            p.color = 'verb'; }
+    else if (p.type === 'conjunction')         { p.role = 'conjunction';    p.label = _SX_CLAUSE_LABELS[p.clauseType] || 'Conjunction'; p.color = 'conj'; }
+    else if (p.type === 'prep-phrase')         { p.role = 'modifier';       p.label = 'Prep. Phrase';    p.color = 'prep'; }
+    else if (p.type === 'articular-participle'){ p.role = 'attributive';    p.label = 'Attr. Participle';p.color = 'part'; }
+    else if (p.type === 'participle-phrase')   { p.role = 'circumstantial'; p.label = 'Participle';      p.color = 'part'; }
+    else if (p.type === 'infinitive')          { p.role = 'infinitive';     p.label = 'Infinitive';      p.color = 'part'; }
+    else if (p.type === 'particle')            { p.role = 'particle';       p.label = 'Particle';        p.color = 'other'; }
     else {
       const cng = cats[p.words[0]]?.cng;
       if (!cng) { p.role = 'unknown'; p.label = '?'; p.color = 'other'; continue; }
-      const cm = {
-        N: { role:'subject',    label:'Subject',    color:'subj' },
-        G: { role:'genitive',   label:'Genitive',   color:'gen'  },
-        D: { role:'dative',     label:'Dative',     color:'dat'  },
-        A: { role: hasFiniteVerb ? 'object' : 'accusative',
-             label: hasFiniteVerb ? 'Object'  : 'Accusative', color:'obj' },
-        V: { role:'vocative',   label:'Address',    color:'subj' },
-      }[cng.case] || { role:'unknown', label:'?', color:'other' };
-      p.role = cm.role; p.label = cm.label; p.color = cm.color;
+      if (cng.case === 'N') {
+        nomCount++;
+        if (hasCopula && nomCount > 1) {
+          p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb';
+        } else {
+          p.role = 'subject'; p.label = 'Subject'; p.color = 'subj';
+        }
+      } else {
+        const cm = {
+          G: { role:'genitive',  label:'Genitive',   color:'gen'  },
+          D: { role:'dative',    label:'Dative',      color:'dat'  },
+          A: { role: hasFiniteVerb ? 'object' : 'accusative', label: hasFiniteVerb ? 'Object' : 'Accusative', color:'obj' },
+          V: { role:'vocative',  label:'Address',     color:'subj' },
+        }[cng.case] || { role:'unknown', label:'?', color:'other' };
+        p.role = cm.role; p.label = cm.label; p.color = cm.color;
+      }
     }
   }
   return phrases;
@@ -17174,75 +17277,145 @@ function _sxConfidence(words, phrases) {
   return 'clear';
 }
 
-function _sxAnalyze(words) {
+// ── Syntax tree builder ───────────────────────────────────────────────────────
+
+function _sxBuildTree(words) {
   const { phrases, cats } = _sxGroupPhrases(words);
   _sxAssignRoles(phrases, cats);
   const confidence = _sxConfidence(words, phrases);
-  const clauses = [];
-  let cur = { label: 'Main Clause', phrases: [], isMain: true };
+
+  // Split phrase list into clause segments at conjunction boundaries
+  const segments = [];
+  let cur = { clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases: [], isSubordinate: false, children: [] };
   for (const p of phrases) {
-    const isSub = p.type === 'conjunction' &&
-      !['coordinating','adversative','alternative'].includes(p.clauseType);
-    if (isSub) {
-      if (cur.phrases.length) clauses.push(cur);
-      cur = { label: _SX_CLAUSE_LABELS[p.clauseType] || 'Clause', conjPhrase: p, phrases: [], isMain: false };
+    if (p.type === 'conjunction') {
+      const isSubord = !['coordinating', 'adversative', 'alternative'].includes(p.clauseType);
+      if (cur.phrases.length || cur.conjPhrase) segments.push(cur);
+      cur = { clauseType: p.clauseType, label: _SX_CLAUSE_LABELS[p.clauseType] || 'Clause', conjPhrase: p, phrases: [], isSubordinate: isSubord, children: [] };
     } else {
       cur.phrases.push(p);
     }
   }
-  if (cur.phrases.length) clauses.push(cur);
-  if (!clauses.length && phrases.length) clauses.push({ label: 'Clause', phrases, isMain: true });
-  return { clauses, confidence, cats };
+  if (cur.phrases.length || cur.conjPhrase) segments.push(cur);
+  if (!segments.length) segments.push({ clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases, isSubordinate: false, children: [] });
+
+  // Nest subordinate clauses under the last non-subordinate root
+  const roots = [];
+  let lastRoot = null;
+  for (const seg of segments) {
+    if (!seg.isSubordinate) {
+      roots.push(seg);
+      lastRoot = seg;
+    } else {
+      if (lastRoot) lastRoot.children.push(seg);
+      else { roots.push(seg); lastRoot = seg; }
+    }
+  }
+
+  const tree = roots.length === 1 ? roots[0] : {
+    clauseType: 'main', label: 'Main Clause', conjPhrase: null,
+    phrases: [], isSubordinate: false, children: roots,
+  };
+  return { tree, cats, confidence };
 }
 
-// ── Syntax renderer ───────────────────────────────────────────────────────────
+// ── Syntax tree renderer ──────────────────────────────────────────────────────
+
+const _SX_CLAUSE_COLORS = {
+  main:'var(--secondary-color)', coordinating:'var(--muted-color)', conjunction:'var(--muted-color)',
+  purpose:'#8b5cf6', content:'#3b82f6', result:'#10b981', conditional:'#f59e0b',
+  relative:'#06b6d4', temporal:'#f97316', comparative:'#84cc16',
+  causal:'#ec4899', explanatory:'#6366f1', inferential:'#14b8a6',
+  adversative:'#ef4444', alternative:'#a78bfa',
+};
 
 function _renderSyntaxView(words, verse) {
-  if (!words.length) return '<p class="rsx-empty">No verse loaded.</p>';
-  const vArg = verse ? `, '${verse}'` : '';
-  const { clauses, confidence } = _sxAnalyze(words);
-  let html = '<div class="rsx-view">';
+  if (!words.length) return '<div class="rsx-tree"><p style="padding:16px;color:var(--muted-color)">No verse data.</p></div>';
+  const { tree, cats, confidence } = _sxBuildTree(words);
+  let html = '<div class="rsx-tree">';
+  html += `<div class="rsx-attr-bar">
+    <span class="rsx-attr-label">Greek Grammar Analysis</span>
+    <button class="rsx-info-btn" onclick="openSyntaxInfoSheet(event)" title="About this tool">
+      <span class="material-symbols-outlined">info</span>
+    </button>
+  </div>`;
   if (confidence === 'complex') {
-    html += `<div class="rsx-warning"><span class="material-symbols-outlined">info</span>Complex syntax — take extra time to study. Rules faithfully applied; some phrase relationships may be uncertain.</div>`;
+    html += `<div class="rsx-warning"><span class="material-symbols-outlined">school</span><span>Complex structure — grammar rules faithfully applied. Take extra time here and verify with other study tools.</span></div>`;
   }
-  for (const clause of clauses) {
-    html += `<div class="rsx-clause${clause.isMain ? ' rsx-main' : ''}">`;
-    if (!clause.isMain && clause.conjPhrase) {
-      const conjWord = words[clause.conjPhrase.words[0]][0];
-      html += `<div class="rsx-clause-hdr"><span class="rsx-conj-word">${conjWord}</span>${clause.label}</div>`;
-    } else {
-      html += `<div class="rsx-clause-hdr">${clause.label}</div>`;
-    }
-    html += `<div class="rsx-phrases">`;
+  html += _renderTreeClause(tree, words, verse, 0);
+  html += '</div>';
+  return html;
+}
+
+function _renderTreeClause(clause, words, verse, depth) {
+  const vArg  = verse ? `, '${verse}'` : '';
+  const color = _SX_CLAUSE_COLORS[clause.clauseType] || 'var(--secondary-color)';
+  let html = `<div class="rsx-clause-card rsx-depth-${Math.min(depth, 2)}" style="--clr:${color}">`;
+
+  // Header
+  html += `<div class="rsx-clause-hdr-row">`;
+  if (clause.conjPhrase) {
+    const cw = words[clause.conjPhrase.words[0]];
+    if (cw) html += `<span class="rsx-clause-conj-word">${cw[0]}</span>`;
+  }
+  html += `<span class="rsx-clause-type-lbl">${clause.label}</span></div>`;
+
+  // Phrase rows
+  if (clause.phrases.length) {
+    html += `<div class="rsx-phrase-list">`;
     for (const p of clause.phrases) {
-      html += `<div class="rsx-phrase rsx-c-${p.color || 'other'}" data-role="${p.role}" data-label="${p.label}" onclick="openRhemaSyntaxSheet(this)">`;
-      html += `<div class="rsx-ptag">${p.label}</div><div class="rsx-pwords">`;
+      const greekStr = p.words.map(wi => words[wi]?.[0] || '').join(' ').replace(/"/g, '&quot;');
+      html += `<div class="rsx-phrase-row rsx-c-${p.color || 'other'}"
+        data-role="${p.role}" data-label="${p.label}" data-greek="${greekStr}"
+        onclick="openRhemaSyntaxSheet(this)">
+        <span class="rsx-role-chip">${p.label}</span>
+        <span class="rsx-phrase-greek">`;
       for (const wi of p.words) {
         const w = words[wi];
+        if (!w) continue;
         const lex = (window.RhemaLexicon || {})[w[1]] || {};
         const gloss = (lex.brief || '').split(',')[0].split(';')[0].trim();
-        html += `<span class="rhema-word rsx-word" data-idx="${wi}" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
-        html += `<span class="rhema-greek-text">${w[0]}</span>`;
-        if (gloss && !_rhemaGreekOnly) html += `<span class="rhema-gloss">${gloss}</span>`;
+        html += `<span class="rsx-tree-word" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
+        html += `<span class="rsx-tw-greek">${w[0]}</span>`;
+        if (gloss) html += `<span class="rsx-tw-gloss">${gloss}</span>`;
         html += `</span>`;
       }
-      html += `</div></div>`;
+      html += `</span><span class="material-symbols-outlined rsx-row-chevron">chevron_right</span></div>`;
     }
-    html += `</div></div>`;
+    html += `</div>`;
   }
-  html += '</div>';
+
+  // Nested subordinate clauses
+  if (clause.children && clause.children.length) {
+    html += `<div class="rsx-clause-children">`;
+    for (const child of clause.children) html += _renderTreeClause(child, words, verse, depth + 1);
+    html += `</div>`;
+  }
+  html += `</div>`;
   return html;
 }
 
 function openRhemaSyntaxSheet(el) {
   const role  = el?.dataset?.role  || 'unknown';
+  const greek = el?.dataset?.greek || '';
   const info  = _SX_ROLE_INFO[role] || _SX_ROLE_INFO.unknown;
-  const greekText = Array.from(el?.querySelectorAll('.rhema-greek-text') || []).map(e => e.textContent).join(' ');
-  document.querySelectorAll('.rsx-phrase.selected').forEach(e => e.classList.remove('selected'));
-  el?.classList.add('selected');
-  document.getElementById('rsxSheetGreek').textContent = greekText;
+
+  document.querySelectorAll('.rsx-phrase-row.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
+  el?.classList.add('rsx-selected');
+
+  document.getElementById('rsxSheetGreek').textContent = greek;
   document.getElementById('rsxSheetRole').textContent  = info.title;
-  document.getElementById('rsxSheetBody').textContent  = info.body;
+
+  let body = `<p class="rsx-body-main">${info.body}</p>`;
+  if (info.range) {
+    body += `<div class="rsx-body-section"><span class="rsx-section-label">Range of meanings</span><p>${info.range}</p></div>`;
+  }
+  if (info.example) {
+    body += `<div class="rsx-body-section"><span class="rsx-section-label">Example</span><p>${info.example}</p></div>`;
+  }
+  body += `<div class="rsx-body-section rsx-study-q"><span class="rsx-section-label">For your study</span><p>${info.question}</p></div>`;
+  document.getElementById('rsxSheetBody').innerHTML = body;
+
   const sheet = document.getElementById('rhemaSyntaxSheet');
   if (!sheet) return;
   if (!sheet._swipeInit) {
@@ -17257,16 +17430,39 @@ function openRhemaSyntaxSheet(el) {
   document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
 }
 
+function openSyntaxInfoSheet(e) {
+  if (e) e.stopPropagation();
+  const sheet = document.getElementById('rhemaSyntaxInfoSheet');
+  if (!sheet) return;
+  if (!sheet._swipeInit) {
+    sheet._swipeInit = true;
+    const handle = sheet.querySelector('.rhema-sheet-handle');
+    let sy = 0, cy = 0, dr = false;
+    handle?.addEventListener('touchstart', ev => { sy = ev.touches[0].clientY; cy = sy; dr = true; sheet.style.transition = 'none'; }, { passive: true });
+    handle?.addEventListener('touchmove', ev => { if (!dr) return; cy = ev.touches[0].clientY; const dy = cy - sy; if (dy > 0) { ev.preventDefault(); sheet.style.transform = `translateY(${dy}px)`; } }, { passive: false });
+    handle?.addEventListener('touchend', () => { if (!dr) return; dr = false; if (cy - sy > 80) closeSyntaxInfoSheet(); else { sheet.style.transition = 'transform 0.25s ease'; sheet.style.transform = 'translateY(0)'; } });
+  }
+  sheet.classList.add('open');
+  document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
+}
+
+function closeSyntaxInfoSheet() {
+  const sheet = document.getElementById('rhemaSyntaxInfoSheet');
+  if (sheet) { sheet.classList.remove('open'); sheet.style.transform = ''; sheet.style.transition = ''; }
+  document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
+}
+
 function closeRhemaSyntaxSheet() {
   const sheet = document.getElementById('rhemaSyntaxSheet');
   if (sheet) { sheet.classList.remove('open'); sheet.style.transform = ''; sheet.style.transition = ''; }
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
-  document.querySelectorAll('.rsx-phrase.selected').forEach(e => e.classList.remove('selected'));
+  document.querySelectorAll('.rsx-phrase-row.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
 }
 
 function closeAnyRhemaSheet() {
   closeRhemaSheet();
   closeRhemaSyntaxSheet();
+  closeSyntaxInfoSheet();
 }
 
 function toggleRhemaChapterMode() {
