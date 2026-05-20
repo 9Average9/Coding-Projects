@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.78";
+const APP_VERSION = "2.3.80";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -16689,12 +16689,15 @@ function initRhemaVerseSwipe() {
   const area = document.querySelector('#rhemaModal .rhema-body');
   if (!area || area._hSwipeInit) return;
   area._hSwipeInit = true;
-  let sx = 0, sy = 0;
+  let sx = 0, sy = 0, _swipeInDiagram = false;
   area.addEventListener('touchstart', e => {
     sx = e.touches[0].clientX;
     sy = e.touches[0].clientY;
+    _swipeInDiagram = !!e.target.closest('.rsx-diagram');
   }, { passive: true });
   area.addEventListener('touchend', e => {
+    // Don't navigate verses when the user is scrolling the syntax diagram
+    if (_swipeInDiagram) return;
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
     // Require clearly horizontal swipe (≥45px, more horizontal than vertical)
@@ -17046,6 +17049,24 @@ const _SX_CLAUSE_LABELS = {
   comparative:'Comparative', causal:'Causal', explanatory:'Reason',
   inferential:'Inference', adversative:'Contrast',
   coordinating:'Continued', alternative:'Alternative', conjunction:'Clause',
+};
+
+const _SX_PLAIN_LABELS = {
+  subject:        'who does it',
+  predicate:      'the action',
+  object:         'who / what receives',
+  genitive:       'of / whose',
+  dative:         'to / for / by',
+  accusative:     'direction or extent',
+  vocative:       'spoken to',
+  modifier:       'how / where / by what',
+  attributive:    'describes who',
+  circumstantial: 'when / why / how',
+  infinitive:     'in order to',
+  prednom:        'what it is',
+  conjunction:    'connects',
+  particle:       'tone / emphasis',
+  unknown:        'phrase',
 };
 
 const _SX_ROLE_INFO = {
@@ -17432,7 +17453,7 @@ function _renderDiagramBranch(clause, words, verse) {
     html += `<div class="rsx-dg-chip rsx-c-${p.color || 'other'}"
       data-role="${p.role}" data-label="${p.label}" data-greek="${greekStr}"
       onclick="openRhemaSyntaxSheet(this)">`;
-    html += `<span class="rsx-dg-chip-role">${p.label}</span>`;
+    html += `<span class="rsx-dg-chip-role">${_SX_PLAIN_LABELS[p.role] || p.label}</span>`;
     html += `<span class="rsx-dg-chip-gr">`;
     for (const wi of p.words) {
       const w = words[wi];
