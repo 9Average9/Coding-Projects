@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.75";
+const APP_VERSION = "2.3.77";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17029,12 +17029,14 @@ function _sxVerbType(morph) {
 }
 
 const _SX_CLAUSE_TYPES = {
-  2443:'purpose', 3754:'content', 5620:'result',
+  2443:'purpose', 3704:'purpose',                              // ἵνα, ὅπως
+  3754:'content', 5620:'result',
   1487:'conditional', 1437:'conditional',
   3739:'relative', 3748:'relative',
   3752:'temporal', 3753:'temporal', 2193:'temporal', 5613:'comparative',
   1893:'causal', 1063:'explanatory',
-  3767:'inferential', 235:'adversative',
+  3767:'inferential', 1352:'inferential',                      // οὖν, διό
+  235:'adversative', 4133:'adversative',                       // ἀλλά, πλήν
   2532:'coordinating', 1161:'coordinating', 2228:'alternative',
 };
 
@@ -17051,98 +17053,98 @@ const _SX_ROLE_INFO = {
     title: 'Subject — Who or what is doing it',
     body: 'The nominative case marks the subject — the main actor in the clause. Greek doesn\'t rely on word order to show this; the case ending on the word does that work. This means the subject can appear anywhere in the sentence, often at the end for emphasis.',
     range: null,
-    example: 'In John 3:16 — ὁ θεὸς is nominative, so God is the one who loved. The subject could have come last in the sentence and still meant exactly the same thing.',
+    example: 'In English, "The dog chased the cat" and "The cat chased the dog" mean opposite things — word order tells you who did what. In Greek, the nominative case ending on the word does that job instead, so the subject can appear anywhere in the sentence without changing the meaning.',
     question: 'Who is performing this action? Is there anything significant or surprising about who the subject is in this context?',
   },
   predicate: {
     title: 'Verb — The action or state',
     body: 'The finite verb is the engine of the clause. A single Greek verb encodes five things at once: what is happening (its basic meaning), when and how complete the action is (tense-aspect), who acts or is acted on (voice), the speaker\'s certainty or intent (mood), and who is doing it (person and number).',
     range: 'Voice matters: active = the subject acts; passive = the subject is acted upon; middle = the subject acts for its own benefit. Mood matters: indicative = stated as real; subjunctive = potential or purpose; imperative = a command; optative = a wish.',
-    example: 'ἠγάπησεν (John 3:16) is aorist indicative active — a completed, definite act of love in the past. If the author had written in the present tense, it would read as ongoing love. That distinction is deliberate.',
+    example: 'In English, "she ran," "she was running," and "she has run" all describe running — but they mark different aspects of time and completion. Greek tense-aspect works the same way but is encoded directly into the verb: aorist = a single completed event, present = ongoing or repeated action, perfect = a past act whose result still stands now.',
     question: 'What is the tense — completed act (aorist), ongoing action (present), or enduring state (perfect)? Is it active, passive, or middle? What does each of those layers tell you?',
   },
   object: {
     title: 'Direct Object — What receives the action',
     body: 'The accusative case marks the direct object — what the verb acts on. Greek uses the accusative ending to show this regardless of where the word appears in the sentence.',
     range: 'The accusative also expresses extent of time or space ("for three days," "a long way"), direction of movement, or it is the required object of certain prepositions: εἰς ("into"), κατά ("according to / against"), διά ("because of").',
-    example: 'In John 3:16 — τὸν κόσμον (the world) is accusative. God\'s love has a scope: the entire world. The definite article ("the world," not "a world") is also significant — a specific, known creation.',
+    example: 'In English, "the dog bit the man" and "the man bit the dog" mean opposite things — word order tells you who received the action. In Greek, the accusative case ending does that job regardless of word order, so the direct object can appear anywhere in the sentence.',
     question: 'What is being affected by this action? Is the scope of the object larger or smaller than you expected? Does the specific word choice carry meaning beyond the simple action?',
   },
   genitive: {
     title: 'Genitive — A relationship to another word',
     body: 'The genitive shows how one word relates to another noun. English typically translates it with "of" — but that single English word covers many distinct Greek relationships. Context determines which one applies.',
     range: 'Possible relationships: possession ("the love of God" = God\'s love), source ("from God"), description ("of glory" = glorious), partition ("some of them"), separation ("apart from the law"), or a verbal relationship (subjective genitive = "God\'s act of loving"; objective genitive = "love directed toward God").',
-    example: 'ἀγάπη τοῦ θεοῦ — "the love of God." Is this God\'s love for us, or our love for God? The genitive alone does not decide — context does. Both are grammatically valid readings of the same phrase.',
+    example: 'English "of" covers many relationships: "a cup of coffee" (contents), "a man of courage" (description), "the king\'s decision" (possession). Greek\'s genitive works the same way — the same ending is used for all of these, and context is what determines which relationship is meant.',
     question: 'What is the nature of this relationship — possession, source, description, or something else? Does the meaning shift if you try a different reading? Which fits the surrounding context?',
   },
   dative: {
     title: 'Dative — To, for, by, in, or with',
     body: 'The dative is Greek\'s most versatile case. English splits its meaning across several different prepositions, but Greek uses one case ending for all of them. The surrounding words and context tell you which sense applies.',
     range: 'Indirect object ("he gave it to them"), means or instrument ("by faith," "with his own hand"), location or sphere ("in Christ," "among the churches"), manner ("with boldness," "with joy"), or the interested party ("for you," "for their benefit").',
-    example: 'ἐν Χριστῷ — "in Christ" — one of Paul\'s most frequent phrases. The dative here signals participation or sphere, not just physical location. Being "in Christ" is a status and a position.',
+    example: 'English splits the dative\'s work across several prepositions: "I gave the book to her" (recipient), "I cut it with a knife" (instrument), "she sat in the room" (location), "he did it for you" (benefit). Greek uses a single dative case ending for all of these — the surrounding words tell you which sense applies.',
     question: 'Which English preposition fits best — to, for, by, in, or with? Does trying a different preposition change your understanding of the verse? Which reading fits the author\'s argument?',
   },
   accusative: {
     title: 'Accusative — Extent, direction, or object of a preposition',
     body: 'Here the accusative is not a direct object but is serving another function: expressing the extent of time or space, the direction of movement, or it is the required object of a preposition.',
     range: 'Common with εἰς ("into / toward / for the purpose of"), κατά ("according to / against"), διά ("because of"), and others. The preposition and context determine the exact meaning.',
-    example: 'εἰς τὸν αἰῶνα — "into the age" = forever. The preposition εἰς plus accusative expresses direction or purpose — here, movement into unending time.',
+    example: 'In "she walked three miles to the store," "three miles" is the extent of the walk and "the store" is the direction. Neither one is what she walked — they modify the action itself. Greek uses the accusative for both of these functions, with the preposition and context marking which one applies.',
     question: 'What is this accusative expressing — direction, extent, purpose, or the object of a preposition? How does the preposition (if there is one) shape the meaning?',
   },
   vocative: {
     title: 'Direct Address — Speaking to someone',
     body: 'The vocative case addresses someone or something directly. It steps outside the grammar of the sentence and turns to speak to a person or entity. It marks prayer, petition, command, and direct appeal.',
     range: null,
-    example: 'κύριε — "Lord!" (Matthew 8:2). The leper is not describing Jesus as Lord in a general sense; he is speaking directly to him in a moment of desperate appeal. The vocative transforms description into relationship.',
+    example: 'In "David, come here!" the name David steps outside the grammar of the sentence — it\'s not doing anything or having anything done to it; it\'s being addressed directly. Every language has this function. Greek marks it with its own case ending, making the shift from talking about someone to talking to them visible in the word itself.',
     question: 'Who is being addressed? What does the specific title or name used in the address tell you about the speaker\'s understanding of that person and the nature of this moment?',
   },
   modifier: {
     title: 'Prepositional Phrase — Location, direction, or relationship',
     body: 'A preposition followed by its object phrase. In Greek, the case of the object changes the meaning of the preposition — sometimes dramatically. The same preposition used with different cases can mean very different things.',
     range: 'Key examples: ἐν + dative = "in / among / by means of"; εἰς + accusative = "into / toward / for"; ἐκ + genitive = "out of / from"; διά + genitive = "through"; διά + accusative = "because of"; πρός + accusative = "toward / with / in the presence of."',
-    example: 'ἐν Χριστῷ (dative) = "in Christ" — sphere or union. εἰς Χριστόν (accusative) = "into Christ" — movement or direction. Same root word, same preposition, different cases, different meaning.',
+    example: 'In English, "in the room," "into the room," and "out of the room" use completely different words to signal different spatial ideas. Greek often uses the same preposition but changes the case of its object to produce different meanings — ἐν + dative = "in/among"; εἰς + accusative = "into/toward." The case does the work the different English words do.',
     question: 'What does this phrase tell you about location, direction, means, or sphere? Does the case of the object shift the meaning? What specific relationship is the author describing?',
   },
   attributive: {
     title: 'Attributive Participle — Describing a person or thing',
     body: 'A participle with an article (ὁ, ἡ, τό) in front of it acts like an adjective — it describes a noun by its characteristic action or ongoing state. It names a category of person by what they do or are.',
     range: 'Best translated as a relative clause: ὁ πιστεύων = "the one who believes" / "the believing one." The present tense participle suggests ongoing, habitual action. The aorist would describe a completed act. The tense choice is deliberate.',
-    example: 'ὁ πιστεύων εἰς αὐτόν (John 3:16) — "the one who believes in him." The article + participle defines a person by their ongoing relationship of trust toward Jesus. It is a portrait of a life, not a single moment.',
+    example: 'In English, "the running man" and "the man who runs" say the same thing — an article plus a description defines a person by what they characteristically do. Greek\'s articular participle (article + participle) works identically. The present tense participle points to ongoing or habitual action; the aorist points to a completed one.',
     question: 'What characteristic does this participle attach to the person or thing being described? Is the action ongoing (present participle) or completed (aorist)? Why does that tense choice matter here?',
   },
   circumstantial: {
     title: 'Circumstantial Participle — When, why, or how the main action happens',
     body: 'A participle without an article frames or qualifies the main verb. It doesn\'t stand on its own — it adds circumstance around the main action. The exact relationship depends on context and the tense of the participle.',
     range: 'Temporal: "while he was speaking / after he spoke." Causal: "because he knew." Means: "by doing this." Conditional: "if you are willing." Concessive: "even though he knew." The same participle can sometimes fit more than one reading — context decides.',
-    example: 'ἀπελθὼν πέπρακεν — "having gone, he sold" (Matthew 13:46). The aorist participle describes action completed before the main verb — he went first, then sold. Sequence matters.',
+    example: 'In English, "having finished his work, he left" tells you what came first; "while eating, she read" tells you two things happening at once. Greek marks this difference with tense: an aorist participle describes action completed before the main verb; a present participle describes action simultaneous with it. The same "-ing" form in English often leaves this ambiguous — Greek does not.',
     question: 'What is this participle telling you about the main action — when it happened, why, how, or under what condition? Does the tense of the participle (aorist vs. present) affect the timing relationship to the main verb?',
   },
   infinitive: {
     title: 'Infinitive — A verb acting as a noun',
     body: 'The Greek infinitive is a verbal noun. It carries the verb\'s action but plays a noun role in the sentence — it can be a subject, an object, or the complement of another verb. It does not have its own person or number.',
     range: 'Purpose: "in order to save" (often with τοῦ or εἰς τό before it). Result: "so that they believed." Content: "he said that he was going." Complement: "he began to teach" / "he is able to do." Each use answers a different question about the main action.',
-    example: 'σῶσαι τὸν κόσμον (John 3:17) — "to save the world." This infinitive expresses the purpose of God sending the Son. It answers "why?" before the question is even asked.',
+    example: 'In English, "to run" can be a subject ("To run is tiring"), a direct object ("she wants to run"), or a purpose ("he trained to run"). Greek infinitives work the same way — one verb form, multiple grammatical roles, determined entirely by where it sits in the sentence and what surrounds it.',
     question: 'What role is this infinitive playing — expressing a purpose, a result, the content of what was said or known, or complementing the main verb? How does identifying that role change your reading of the sentence?',
   },
   prednom: {
     title: 'Predicate Nominative — What the subject is',
     body: 'When a linking verb like εἰμί ("is / was / will be") connects two nominatives, the second one does not name a new actor — it completes or defines the first. Think of the verb as an equals sign between two nominatives.',
     range: 'The presence of the article often (but not always) distinguishes subject from predicate: the nominative with the article tends to be the subject; the one without tends to be the predicate (this principle is called Colwell\'s Rule — a useful guide, not an absolute law).',
-    example: 'θεὸς ἦν ὁ λόγος (John 1:1c) — "the Word was God." ὁ λόγος (the Word, has the article) is the subject. θεός (God, no article here) is the predicate nominative — it describes the nature of the Word, not a second actor. The word order is inverted for emphasis.',
+    example: 'In "Lincoln was president," "president" doesn\'t introduce a second person — it describes what Lincoln was. In "My sister is the doctor," "the doctor" completes the subject. The linking verb acts like an equals sign. Greek\'s predicate nominative works identically: two nominatives connected by a linking verb, where one names the subject and the other defines or describes it.',
     question: 'What does this predicate tell you about the nature or identity of the subject? Is it defining what something is, or describing its characteristic quality?',
   },
   conjunction: {
     title: 'Conjunction — How this clause connects to what came before',
     body: 'Conjunctions are small words with major structural weight. They don\'t just link clauses — they tell you the logical relationship between them. Reading past them too quickly is one of the most common ways to miss the author\'s argument.',
     range: 'ἵνα = purpose ("in order that") or result ("so that"); ὅτι = content ("that") or reason ("because"); ὥστε = result ("so that / therefore"); εἰ = condition (assumed real); ἐάν = condition (uncertain, future possibility); ὅς / ὅτε / ὅταν = relative / temporal clauses.',
-    example: 'ἵνα in John 3:16 — "that/so that whoever believes in him should not perish." This ἵνα introduces the purpose of God\'s love: the goal was eternal life. The entire second half of the verse depends on this one word.',
+    example: 'In English, "so that," "because," "if," and "when" each signal a different relationship between two clauses — purpose, reason, condition, time. Greek conjunctions do the same precise work. Skipping past them is like reading a legal contract and ignoring "unless" and "provided that" — the small words carry the logical weight of the whole sentence.',
     question: 'What does this conjunction tell you about the relationship between these clauses — goal, consequence, reason, or condition? What would be lost if you skipped over it?',
   },
   particle: {
     title: 'Particle or Adverb — Tone, contrast, or emphasis',
     body: 'Particles and adverbs are small words that shade the meaning of the clause or verb in ways that are easy to miss in translation. Preachers and commentators often focus on the nouns and verbs while these words do quiet but essential work.',
     range: 'γάρ = "for / because" (grounds or explains what was just said — always backward-looking); δέ = mild contrast or continuation; ἀλλά = strong contrast ("but"); γέ = emphasis; οὐ / μή = negation; ἤδη = "already"; οὕτως = "in this way / thus"; μόνον = "only."',
-    example: 'οὕτως in John 3:16 — "For God so loved the world..." The word so (οὕτως) is not a filler — it points back to something previously demonstrated. Translators often render it "in this way," reminding the reader that the love described is not vague sentiment but a specific, costly act.',
+    example: 'In English, "well," "after all," "so," and "indeed" are small words that set tone and signal how what you\'re about to say relates to what came before. "Well, I suppose you\'re right" is different from "So, you\'re right then" — same conclusion, different logical weight. Greek particles do this work at the sentence level.',
     question: 'What is this word contributing — explanation, contrast, emphasis, negation? What would be lost if this word were simply removed? What does it tell you about how the author sees the connection to what came before?',
   },
   unknown: {
@@ -17325,7 +17327,7 @@ function _sxBuildTree(words, verseRef) {
   // γάρ (explanatory) and οὖν (inferential) are discourse-level particles —
   // they don't create subordinate clauses, so keep them as tappable phrases
   // inside the current segment rather than splitting.
-  const _SX_NONSPLIT = new Set(['explanatory', 'inferential']);
+  const _SX_NONSPLIT = new Set(['explanatory', 'inferential', 'conjunction']);
   const segments = [];
   let cur = { clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases: [], isSubordinate: false, children: [] };
   for (const p of phrases) {
@@ -17404,6 +17406,12 @@ function _renderSyntaxView(words, verse) {
 }
 
 function _renderTreeClause(clause, words, verse, depth) {
+  // Synthetic wrapper (no phrases, no conjunction) — render children directly
+  // so the user never sees a "Main Clause" card wrapping another "Main Clause" card
+  if (!clause.conjPhrase && !clause.phrases.length && clause.children && clause.children.length) {
+    return clause.children.map(c => _renderTreeClause(c, words, verse, depth)).join('');
+  }
+
   const vArg  = verse ? `, '${verse}'` : '';
   const color = _SX_CLAUSE_COLORS[clause.clauseType] || 'var(--secondary-color)';
   let html = `<div class="rsx-clause-card rsx-depth-${Math.min(depth, 2)}" style="--clr:${color}">`;
