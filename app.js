@@ -49,6 +49,7 @@ let _sandboxUnsubWordLog = null;
 let _sandboxUnsubStudy = null;
 let _sandboxTab = 'notes';
 let _sandboxWordLogCache = [];       // local cache for dedup before writing
+let _ssActiveWordStrongs = null;     // strongs of word currently shown in sandbox word detail
 let _studySandboxId = null;         // set when Rhema is open in study mode
 let _studySandboxRhemaReturn = false;
 let _studySandboxMainRhemaPos = null; // stashed main position while sandbox Rhema is open
@@ -8418,18 +8419,24 @@ function jumpToRhemaFromStudy(book, chapter, verse) {
 function _renderSandboxWordLog(words) {
   const list = document.getElementById('ssWordlogList');
   if (!list) return;
-  if (!words.length) { list.innerHTML = '<p class="ss-hint">No words logged yet.</p>'; return; }
+  if (!words.length) {
+    list.innerHTML = '<p class="ss-hint">No words logged yet. Tap any word in Rhema then press "Add to Word Log."</p>';
+    return;
+  }
   const uid = window.Auth?.getCurrentUser()?.uid;
   list.innerHTML = words.map(w => {
     const canDel = w.loggedByUid === uid || _activeSandboxStudy?.creatorUid === uid;
-    return `<div class="ss-word-item">
+    const surface = w.surface || w.lemma;
+    const lemma   = w.lemma && w.lemma !== surface ? w.lemma : '';
+    return `<div class="ss-word-item ss-word-tappable" onclick="openSandboxWordDetail('${w.strongs}')">
       <div class="ss-word-main">
-        <span class="ss-word-lemma">${w.lemma || w.surface}</span>
+        <span class="ss-word-surface">${surface}</span>
+        ${lemma ? `<span class="ss-word-lemma">${lemma}</span>` : ''}
         <span class="ss-word-translit">${w.translit}</span>
         <span class="ss-word-strongs">G${w.strongs}</span>
       </div>
       <p class="ss-word-def">${w.definition}</p>
-      ${canDel ? `<button class="ss-word-del" onclick="deleteSandboxWord('${w.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
+      ${canDel ? `<button class="ss-word-del" onclick="event.stopPropagation();deleteSandboxWord('${w.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
     </div>`;
   }).join('');
 }
@@ -8437,6 +8444,41 @@ function _renderSandboxWordLog(words) {
 async function deleteSandboxWord(wordId) {
   if (!_activeSandboxStudy) return;
   await window.Studies.deleteWordLog(_activeSandboxStudy.id, wordId);
+}
+
+function openSandboxWordDetail(strongs) {
+  const w = _sandboxWordLogCache.find(x => String(x.strongs) === String(strongs));
+  if (!w && !window.RhemaLexicon?.[strongs]) return;
+  _ssActiveWordStrongs = String(strongs);
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const surface = w?.surface || lex.lemma || '';
+  const lemma   = lex.lemma || w?.lemma || '';
+  const translit = lex.translit || w?.translit || '';
+  document.getElementById('ssWdSurface').textContent = surface;
+  document.getElementById('ssWdStrongs').textContent = 'G' + strongs;
+  document.getElementById('ssWdLemma').textContent = lemma ? `${lemma}  (${translit})` : '';
+  document.querySelectorAll('#ssWordDetailSheet .rhema-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('ssWdTabDef')?.classList.add('active');
+  const content = document.getElementById('ssWdContent');
+  if (content) content.innerHTML = renderRhemaDefinition(strongs);
+  document.getElementById('ssWordDetailSheet')?.classList.add('open');
+  document.getElementById('ssWordDetailBackdrop')?.classList.add('visible');
+}
+
+function showSandboxWordTab(tab) {
+  const s = _ssActiveWordStrongs;
+  if (!s) return;
+  document.querySelectorAll('#ssWordDetailSheet .rhema-tab').forEach(b =>
+    b.classList.toggle('active', b.id === (tab === 'definition' ? 'ssWdTabDef' : 'ssWdTabOcc')));
+  const content = document.getElementById('ssWdContent');
+  if (!content) return;
+  content.innerHTML = tab === 'definition' ? renderRhemaDefinition(s) : renderRhemaOccurrences(s);
+}
+
+function closeSandboxWordDetail() {
+  document.getElementById('ssWordDetailSheet')?.classList.remove('open');
+  document.getElementById('ssWordDetailBackdrop')?.classList.remove('visible');
+  _ssActiveWordStrongs = null;
 }
 
 // Rhema tab in sandbox
@@ -8486,6 +8528,24 @@ async function saveCurrentVerseToStudy() {
       btn.disabled = false;
     }
   }, 1500);
+}
+
+async function addCurrentWordToLog() {
+  if (!_studySandboxId || !_rhemaActiveWord) return;
+  const [surface, strongs] = _rhemaActiveWord;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  await window.Studies?.logWord(_studySandboxId, uid, displayName, {
+    lemma: lex.lemma || surface, strongs,
+    definition: lex.def || lex.short_def || '',
+    surface, translit: lex.translit || ''
+  });
+  if (!_sandboxWordLogCache.some(w => String(w.strongs) === String(strongs))) {
+    _sandboxWordLogCache.push({ strongs: String(strongs), surface, lemma: lex.lemma || surface });
+  }
+  const btn = document.getElementById('rhemaAddToWordLogBtn');
+  if (btn) { btn.disabled = true; btn.classList.add('logged'); btn.textContent = '✓ In Word Log'; }
 }
 
 // ── Community Study Board ─────────────────────────────────────────────────────
@@ -16925,19 +16985,17 @@ function openRhemaSheet(wordIdx, verse) {
 
   showRhemaTab(_rhemaActiveTab, word);
 
-  // Study sandbox: show Save Verse button and auto-log word
+  // Study sandbox: show Save Verse and Add to Word Log buttons
   const saveBtn = document.getElementById('rhemaSaveToStudyBtn');
   if (saveBtn) saveBtn.classList.toggle('hidden', !_studySandboxId);
-  if (_studySandboxId) {
-    const uid = window.Auth?.getCurrentUser()?.uid;
-    const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
-    const lex = (window.RhemaLexicon || {})[strongs] || {};
-    const alreadyLogged = _sandboxWordLogCache.some(w => w.strongs === String(strongs));
-    if (!alreadyLogged) {
-      window.Studies?.logWord(_studySandboxId, uid, displayName, {
-        lemma: lex.lemma || surface, strongs, definition: lex.def || lex.short_def || '',
-        surface, translit: lex.translit || ''
-      });
+  const logBtn = document.getElementById('rhemaAddToWordLogBtn');
+  if (logBtn) {
+    logBtn.classList.toggle('hidden', !_studySandboxId);
+    if (_studySandboxId) {
+      const alreadyLogged = _sandboxWordLogCache.some(w => String(w.strongs) === String(strongs));
+      logBtn.disabled = alreadyLogged;
+      logBtn.classList.toggle('logged', alreadyLogged);
+      logBtn.textContent = alreadyLogged ? '✓ In Word Log' : '+ Add to Word Log';
     }
   }
 
