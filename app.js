@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.80";
+const APP_VERSION = "2.3.81";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -16472,6 +16472,7 @@ async function showRhema() {
     if (hint)    hint.classList.remove('hidden');
     initRhemaPicker();
     renderRhemaVerse();
+    startRhemaCoach();
   } catch (e) {
     if (loading) loading.textContent = 'Failed to load data. Check your connection.';
   }
@@ -16967,6 +16968,7 @@ function toggleWheelTool(tool) {
     _syncWheelBtn('syntax', _rhemaSyntaxMode);
     _syncToolWandIndicator();
     renderRhemaVerse();
+    if (_rhemaSyntaxMode) startRhemaSyntaxCoach();
   } else if (tool === 'highlight') {
     toggleRhemaHighlightBar();
     _syncToolWandIndicator();
@@ -16993,6 +16995,174 @@ function _syncWheelState() {
 function _syncToolWandIndicator() {
   const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn;
   document.getElementById('rhemaToolBtn')?.classList.toggle('has-active', hasActive);
+}
+
+// ── Coach mark onboarding ─────────────────────────────────────────────────────
+
+const _RHEMA_COACH_STEPS = [
+  {
+    targetFn: () => document.querySelector('.rhema-content-area'),
+    position: 'below',
+    title: 'Read the Greek text',
+    body: 'Tap any highlighted Greek word to open its definition, parsing, and usage — no Greek knowledge needed.',
+  },
+  {
+    targetFn: () => document.getElementById('rhemaToolBtn'),
+    position: 'below',
+    title: 'Study tools',
+    body: 'Open the tool wheel to turn on the Syntax tree, Greek-only mode, word highlighting, and more.',
+  },
+  {
+    targetFn: () => document.getElementById('rhemaSwapBtn'),
+    position: 'below',
+    title: 'English side-by-side',
+    body: 'Swap between Greek and English to compare, or stack them to read both at once.',
+  },
+  {
+    targetFn: () => document.querySelector('.rhema-picker'),
+    position: 'above',
+    title: 'Jump to any verse',
+    body: 'Tap the book, chapter, or verse to jump anywhere in the New Testament instantly.',
+  },
+];
+
+const _RHEMA_SYNTAX_COACH_STEPS = [
+  {
+    targetFn: () => document.querySelector('.rsx-dg-node'),
+    position: 'right',
+    title: 'Each box is a clause',
+    body: 'The verse is broken into clauses. The main clause is on the left; subordinate clauses branch off to the right.',
+  },
+  {
+    targetFn: () => document.querySelector('.rsx-dg-chip'),
+    position: 'right',
+    title: 'Tap a phrase to learn more',
+    body: 'Tap any phrase chip to see its grammatical role and what that role means in plain English.',
+  },
+  {
+    targetFn: () => document.querySelector('.rsx-dg-arr'),
+    position: 'above',
+    title: 'Follow the arrows',
+    body: 'Arrows show how clauses connect. Scroll left-to-right to see the full structure.',
+  },
+];
+
+let _coachSteps = [];
+let _coachIdx = 0;
+let _coachSyntaxDone = false;
+
+function startRhemaCoach() {
+  // For testing: always show. For production, uncomment the line below:
+  // if (localStorage.getItem('rhemaCoachDone')) return;
+  _coachSteps = _RHEMA_COACH_STEPS;
+  _coachIdx = 0;
+  _coachSyntaxDone = false;
+  // Small delay so the modal finishes animating in
+  setTimeout(() => _showCoachStep(), 350);
+}
+
+function startRhemaSyntaxCoach() {
+  if (_coachSyntaxDone) return;
+  // Small delay so the syntax tree renders first
+  setTimeout(() => {
+    const firstNode = document.querySelector('.rsx-dg-node');
+    if (!firstNode) return;
+    _coachSyntaxDone = true;
+    _coachSteps = _RHEMA_SYNTAX_COACH_STEPS;
+    _coachIdx = 0;
+    _showCoachStep();
+  }, 400);
+}
+
+function _showCoachStep() {
+  const overlay = document.getElementById('rhemaCoachOverlay');
+  const spotlight = document.getElementById('rhemaCoachSpotlight');
+  const card = document.getElementById('rhemaCoachCard');
+  if (!overlay || !spotlight || !card) return;
+
+  const step = _coachSteps[_coachIdx];
+  if (!step) { _endRhemaCoach(); return; }
+
+  const target = step.targetFn();
+  const modal = document.getElementById('rhemaModal');
+
+  overlay.classList.remove('hidden');
+
+  if (target && modal) {
+    const mRect = modal.getBoundingClientRect();
+    const tRect = target.getBoundingClientRect();
+    const PAD = 8;
+    const sl = tRect.left - mRect.left - PAD;
+    const st = tRect.top  - mRect.top  - PAD;
+    const sw = tRect.width  + PAD * 2;
+    const sh = tRect.height + PAD * 2;
+
+    spotlight.style.left   = sl + 'px';
+    spotlight.style.top    = st + 'px';
+    spotlight.style.width  = sw + 'px';
+    spotlight.style.height = sh + 'px';
+    spotlight.style.display = '';
+
+    // Position the card relative to the spotlight
+    const CARD_W = Math.min(320, window.innerWidth - 40);
+    const MARGIN  = 16;
+    let cardTop, cardLeft;
+
+    if (step.position === 'above') {
+      cardTop  = st - sh - MARGIN - 4;
+      cardLeft = Math.max(MARGIN, Math.min(sl + sw / 2 - CARD_W / 2, mRect.width - CARD_W - MARGIN));
+      if (cardTop < MARGIN) { cardTop = st + sh + MARGIN; }
+    } else if (step.position === 'right') {
+      cardTop  = Math.max(MARGIN, st + sh / 2 - 80);
+      cardLeft = sl + sw + MARGIN;
+      if (cardLeft + CARD_W > mRect.width - MARGIN) {
+        cardLeft = sl - CARD_W - MARGIN;
+      }
+    } else { // below (default)
+      cardTop  = st + sh + MARGIN;
+      cardLeft = Math.max(MARGIN, Math.min(sl + sw / 2 - CARD_W / 2, mRect.width - CARD_W - MARGIN));
+      if (cardTop + 180 > mRect.height - MARGIN) { cardTop = st - 180 - MARGIN; }
+    }
+
+    card.style.top  = Math.max(MARGIN, cardTop) + 'px';
+    card.style.left = Math.max(MARGIN, cardLeft) + 'px';
+    card.style.width = CARD_W + 'px';
+  } else {
+    // No target — center card, hide spotlight
+    spotlight.style.display = 'none';
+    const CARD_W = Math.min(320, window.innerWidth - 40);
+    card.style.top  = '50%';
+    card.style.left = '50%';
+    card.style.transform = 'translate(-50%, -50%)';
+    card.style.width = CARD_W + 'px';
+  }
+
+  document.getElementById('rhemaCoachStep').textContent =
+    `${_coachIdx + 1} of ${_coachSteps.length}`;
+  document.getElementById('rhemaCoachTitle').textContent = step.title;
+  document.getElementById('rhemaCoachBody').textContent  = step.body;
+  document.getElementById('rhemaCoachNextLabel').textContent =
+    _coachIdx === _coachSteps.length - 1 ? 'Done' : 'Next';
+}
+
+function rhemaCoachNext() {
+  _coachIdx++;
+  if (_coachIdx >= _coachSteps.length) {
+    _endRhemaCoach();
+  } else {
+    _showCoachStep();
+  }
+}
+
+function rhemaCoachSkip() {
+  _endRhemaCoach();
+}
+
+function _endRhemaCoach() {
+  const overlay = document.getElementById('rhemaCoachOverlay');
+  if (overlay) overlay.classList.add('hidden');
+  // For production, uncomment:
+  // localStorage.setItem('rhemaCoachDone', '1');
 }
 
 // ── Syntax Analyzer ───────────────────────────────────────────────────────────
