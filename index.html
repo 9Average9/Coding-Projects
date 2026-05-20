@@ -10853,6 +10853,23 @@ glacier: {
     </div>
   </div>
 
+  <!-- ── Coach mark onboarding overlay ── -->
+  <div id="rhemaCoachOverlay" class="rhema-coach-overlay hidden" onclick="rhemaCoachNext()">
+    <div id="rhemaCoachSpotlight" class="rhema-coach-spotlight"></div>
+    <div id="rhemaCoachCard" class="rhema-coach-card" onclick="event.stopPropagation()">
+      <div id="rhemaCoachStep" class="rhema-coach-step-label"></div>
+      <div id="rhemaCoachTitle" class="rhema-coach-title"></div>
+      <div id="rhemaCoachBody" class="rhema-coach-body"></div>
+      <div class="rhema-coach-actions">
+        <button class="rhema-coach-skip" onclick="rhemaCoachSkip()">Skip</button>
+        <button class="rhema-coach-next" onclick="rhemaCoachNext()">
+          <span id="rhemaCoachNextLabel">Next</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Book picker ── -->
   <div id="rhemaBookPickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
     <div class="rhema-picker-sheet" onclick="event.stopPropagation()">
