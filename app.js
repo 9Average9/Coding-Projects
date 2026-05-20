@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.77";
+const APP_VERSION = "2.3.78";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17400,62 +17400,67 @@ function _renderSyntaxView(words, verse) {
   if (confidence === 'complex') {
     html += `<div class="rsx-warning"><span class="material-symbols-outlined">school</span><span>Complex structure — grammar rules faithfully applied. Take extra time here and verify with other study tools.</span></div>`;
   }
-  html += _renderTreeClause(tree, words, verse, 0);
+  html += '<div class="rsx-diagram">' + _renderDiagramBranch(tree, words, verse) + '</div>';
   html += '</div>';
   return html;
 }
 
-function _renderTreeClause(clause, words, verse, depth) {
-  // Synthetic wrapper (no phrases, no conjunction) — render children directly
-  // so the user never sees a "Main Clause" card wrapping another "Main Clause" card
-  if (!clause.conjPhrase && !clause.phrases.length && clause.children && clause.children.length) {
-    return clause.children.map(c => _renderTreeClause(c, words, verse, depth)).join('');
+function _renderDiagramBranch(clause, words, verse) {
+  // Transparent synthetic root — just render children at root level
+  if (!clause.conjPhrase && !clause.phrases.length && clause.children?.length) {
+    return `<div class="rsx-dg-roots">${clause.children.map(c => _renderDiagramBranch(c, words, verse)).join('')}</div>`;
   }
 
   const vArg  = verse ? `, '${verse}'` : '';
   const color = _SX_CLAUSE_COLORS[clause.clauseType] || 'var(--secondary-color)';
-  let html = `<div class="rsx-clause-card rsx-depth-${Math.min(depth, 2)}" style="--clr:${color}">`;
+  const children = clause.children || [];
+  const multi = children.length > 1;
 
-  // Header
-  html += `<div class="rsx-clause-hdr-row">`;
+  let html = `<div class="rsx-dg-branch">`;
+
+  // ── Node card ─────────────────────────────────────────────────────────
+  html += `<div class="rsx-dg-node" style="--clr:${color}">`;
+  html += `<div class="rsx-dg-hdr">`;
   if (clause.conjPhrase) {
     const cw = words[clause.conjPhrase.words[0]];
-    if (cw) html += `<span class="rsx-clause-conj-word">${cw[0]}</span>`;
+    if (cw) html += `<span class="rsx-dg-conj">${cw[0]}</span>`;
   }
-  html += `<span class="rsx-clause-type-lbl">${clause.label}</span></div>`;
+  html += `<span class="rsx-dg-lbl">${clause.label}</span></div>`;
 
-  // Phrase rows
-  if (clause.phrases.length) {
-    html += `<div class="rsx-phrase-list">`;
-    for (const p of clause.phrases) {
-      const greekStr = p.words.map(wi => words[wi]?.[0] || '').join(' ').replace(/"/g, '&quot;');
-      html += `<div class="rsx-phrase-row rsx-c-${p.color || 'other'}"
-        data-role="${p.role}" data-label="${p.label}" data-greek="${greekStr}"
-        onclick="openRhemaSyntaxSheet(this)">
-        <span class="rsx-role-chip">${p.label}</span>
-        <span class="rsx-phrase-greek">`;
-      for (const wi of p.words) {
-        const w = words[wi];
-        if (!w) continue;
-        const lex = (window.RhemaLexicon || {})[w[1]] || {};
-        const gloss = (lex.brief || '').split(',')[0].split(';')[0].trim();
-        html += `<span class="rsx-tree-word" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
-        html += `<span class="rsx-tw-greek">${w[0]}</span>`;
-        if (gloss) html += `<span class="rsx-tw-gloss">${gloss}</span>`;
-        html += `</span>`;
-      }
-      html += `</span><span class="material-symbols-outlined rsx-row-chevron">chevron_right</span></div>`;
+  for (const p of clause.phrases) {
+    const greekStr = p.words.map(wi => words[wi]?.[0] || '').join(' ').replace(/"/g, '&quot;');
+    html += `<div class="rsx-dg-chip rsx-c-${p.color || 'other'}"
+      data-role="${p.role}" data-label="${p.label}" data-greek="${greekStr}"
+      onclick="openRhemaSyntaxSheet(this)">`;
+    html += `<span class="rsx-dg-chip-role">${p.label}</span>`;
+    html += `<span class="rsx-dg-chip-gr">`;
+    for (const wi of p.words) {
+      const w = words[wi];
+      if (!w) continue;
+      const lex = (window.RhemaLexicon || {})[w[1]] || {};
+      const gloss = (lex.brief || '').split(',')[0].split(';')[0].trim();
+      html += `<span class="rsx-dg-wd" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
+      html += `<span class="rsx-dg-wd-gr">${w[0]}</span>`;
+      if (gloss) html += `<span class="rsx-dg-wd-gl">${gloss}</span>`;
+      html += `</span>`;
+    }
+    html += `</span></div>`;
+  }
+  html += `</div>`; // end .rsx-dg-node
+
+  // ── Children connected by arrows ──────────────────────────────────────
+  if (children.length) {
+    html += `<div class="rsx-dg-subtree${multi ? ' rsx-dg-multi' : ''}">`;
+    for (const child of children) {
+      const cc = _SX_CLAUSE_COLORS[child.clauseType] || 'var(--secondary-color)';
+      html += `<div class="rsx-dg-child"><div class="rsx-dg-arm" style="--clr:${cc}"><div class="rsx-dg-arr"></div></div>`;
+      html += _renderDiagramBranch(child, words, verse);
+      html += `</div>`;
     }
     html += `</div>`;
   }
 
-  // Nested subordinate clauses
-  if (clause.children && clause.children.length) {
-    html += `<div class="rsx-clause-children">`;
-    for (const child of clause.children) html += _renderTreeClause(child, words, verse, depth + 1);
-    html += `</div>`;
-  }
-  html += `</div>`;
+  html += `</div>`; // end .rsx-dg-branch
   return html;
 }
 
@@ -17464,7 +17469,7 @@ function openRhemaSyntaxSheet(el) {
   const greek = el?.dataset?.greek || '';
   const info  = _SX_ROLE_INFO[role] || _SX_ROLE_INFO.unknown;
 
-  document.querySelectorAll('.rsx-phrase-row.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
+  document.querySelectorAll('.rsx-dg-chip.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
   el?.classList.add('rsx-selected');
 
   document.getElementById('rsxSheetGreek').textContent = greek;
@@ -17520,7 +17525,7 @@ function closeRhemaSyntaxSheet() {
   const sheet = document.getElementById('rhemaSyntaxSheet');
   if (sheet) { sheet.classList.remove('open'); sheet.style.transform = ''; sheet.style.transition = ''; }
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
-  document.querySelectorAll('.rsx-phrase-row.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
+  document.querySelectorAll('.rsx-dg-chip.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
 }
 
 function closeAnyRhemaSheet() {
