@@ -11277,6 +11277,30 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rsx-c-conj  .rsx-dg-chip { background: rgba(250,204,21,0.08); }
 .rsx-c-part  .rsx-dg-chip { background: rgba(253,186,116,0.10); }
 
+/* Main verb chip — visually dominant */
+.rsx-dg-chip--main { padding: 7px 9px; }
+.rsx-dg-chip--main .rsx-dg-chip-role { opacity: 0.9; font-size: 0.63rem; }
+.rsx-dg-chip--main .rsx-dg-wd-gr { font-size: 1.05rem; }
+
+/* Dependent genitive — indented under its anchor noun */
+.rsx-dg-chip--dep {
+  padding-left: 18px;
+  border-left: 3px solid rgba(167,139,250,0.4);
+  opacity: 0.88;
+}
+
+/* Clause subtitle — muted helper text inside header bar */
+.rsx-dg-subtitle {
+  flex-basis: 100%;
+  font-size: 0.52rem;
+  color: rgba(255,255,255,0.58);
+  font-style: italic;
+  line-height: 1.3;
+  margin-top: -2px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* ── Children subtree ── */
 .rsx-dg-subtree {
   display: flex;

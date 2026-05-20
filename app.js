@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.82";
+const APP_VERSION = "2.3.83";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17201,6 +17201,38 @@ function _sxVerbType(morph) {
   return 'finite';
 }
 
+function _sxVerbPerson(morph) {
+  if (!morph || !morph.startsWith('V-')) return null;
+  const m = (morph.split('-')[2] || '').match(/^([123])/);
+  return m ? parseInt(m[1]) : null;
+}
+
+function _sxVerbGloss(morph, brief) {
+  const base = (brief || '').split(',')[0].split(';')[0].trim().replace(/^I /, '').trim();
+  if (!base) return '';
+  if (!morph || !morph.startsWith('V-')) return base;
+  const parts = morph.split('-');
+  const form = (parts[1] || '').replace(/^2/, '');
+  const persNum = parts[2] || '';
+  const tense = form[0], voice = form[1], mood = form[form.length - 1];
+  if (mood === 'N') return `to ${base}`;
+  if (mood === 'P') return (tense === 'A' || tense === 'X' || tense === 'Y') ? `having ${base}` : `${base}ing`;
+  const pn = persNum.match(/^([123])([SP])/);
+  if (!pn) return base;
+  const [, pers, num] = pn;
+  const SUBJ = { '1S':'I', '2S':'you', '3S':'he / she', '1P':'we', '2P':'you all', '3P':'they' };
+  const subj = SUBJ[`${pers}${num}`] || '';
+  const modal = (mood === 'S' || mood === 'O') ? ' might' : '';
+  if (mood === 'D') return `${base}!`;
+  if (base === 'am' || base === 'be') {
+    const BE = { '1S':'am', '2S':'are', '3S':'is', '1P':'are', '2P':'are', '3P':'are' };
+    const beF = BE[`${pers}${num}`] || 'are';
+    return modal ? `${subj} might ${beF}` : `${subj} ${beF}`;
+  }
+  const vb = voice === 'P' ? `be ${base}` : base;
+  return subj ? `${subj}${modal} ${vb}` : `${modal.trim()} ${vb}`.trim();
+}
+
 const _SX_CLAUSE_TYPES = {
   2443:'purpose',  3704:'purpose',                             // ἵνα, ὅπως
   3754:'content',  5620:'result',
@@ -17218,10 +17250,10 @@ const _SX_CLAUSE_TYPES = {
 };
 
 const _SX_CLAUSE_LABELS = {
-  purpose:'Purpose (ἵνα)', content:'Content Clause', result:'Result (ὥστε)',
+  purpose:'Purpose', content:'Content Clause', result:'Result',
   conditional:'Conditional', relative:'Relative Clause', temporal:'Temporal',
-  comparative:'Comparative', causal:'Causal', explanatory:'Reason',
-  inferential:'Inference', adversative:'Contrast',
+  comparative:'Comparison', causal:'Reason Clause', explanatory:'Reason',
+  inferential:'Conclusion', adversative:'Contrast',
   coordinating:'Continued', alternative:'Alternative', conjunction:'Clause',
 };
 
@@ -17229,7 +17261,7 @@ const _SX_PLAIN_LABELS = {
   subject:        'who does it',
   predicate:      'the action',
   object:         'who / what receives',
-  genitive:       'of / whose',
+  genitive:       'of / belonging to',
   dative:         'to / for / by',
   accusative:     'direction or extent',
   vocative:       'spoken to',
@@ -17240,8 +17272,53 @@ const _SX_PLAIN_LABELS = {
   prednom:        'what it is',
   conjunction:    'connects',
   particle:       'tone / emphasis',
+  negation:       'negates',
+  adverb:         'describes',
+  'adv-group':    'which group',
   unknown:        'phrase',
 };
+
+// Preposition Strongs → label function(objCase) → plain label string
+const _SX_PREP_LABELS = {
+  1223: c => c === 'G' ? 'through / by means of' : 'because of',
+  1722: () => 'in / within',
+  1519: () => 'into / toward',
+  4314: () => 'toward / to',
+  1537: () => 'from / out of',
+  575:  () => 'from / away from',
+  5259: c => c === 'G' ? 'by (agent)' : 'under',
+  5228: c => c === 'G' ? 'on behalf of' : 'above / beyond',
+  2596: c => c === 'G' ? 'against / down from' : 'according to',
+  3326: c => c === 'G' ? 'with / among' : 'after',
+  4862: () => 'with / together with',
+  1909: c => c === 'G' ? 'on / over' : c === 'D' ? 'on / at' : 'upon / onto',
+  3844: c => c === 'G' ? 'from beside' : c === 'D' ? 'beside / near' : 'alongside',
+  4253: () => 'before / in front of',
+  4012: c => c === 'G' ? 'concerning / about' : 'around / near',
+};
+
+// Clause type → muted subtitle shown below header label
+const _SX_CLAUSE_SUBTITLES = {
+  coordinating:  'continues the thought',
+  adversative:   'sets up a contrast',
+  purpose:       'in order that…',
+  content:       'explains what was said / thought',
+  result:        'so that…',
+  conditional:   'if…',
+  relative:      'which / who…',
+  temporal:      'when / while…',
+  comparative:   'just as…',
+  causal:        'because…',
+  explanatory:   'explains the reason',
+  inferential:   'therefore…',
+  alternative:   'or…',
+};
+
+// Adverb Strongs sets for semantic classification
+const _SX_NEG_STRONGS  = new Set([3756, 3361, 3762, 3367]);
+const _SX_DIST_STRONGS = new Set([3112, 1451, 4139]);
+const _SX_LOC_STRONGS  = new Set([1563, 847, 1759, 3606, 1566]);
+const _SX_TIME_STRONGS = new Set([3568, 5119, 4218, 3753, 1534, 1899]);
 
 const _SX_ROLE_INFO = {
   subject: {
@@ -17342,6 +17419,20 @@ const _SX_ROLE_INFO = {
     example: 'In English, "well," "after all," "so," and "indeed" are small words that set tone and signal how what you\'re about to say relates to what came before. "Well, I suppose you\'re right" is different from "So, you\'re right then" — same conclusion, different logical weight. Greek particles do this work at the sentence level.',
     question: 'What is this word contributing — explanation, contrast, emphasis, negation? What would be lost if this word were simply removed? What does it tell you about how the author sees the connection to what came before?',
   },
+  negation: {
+    title: 'Negation — "Not" / "No"',
+    body: 'This negative word negates the verb or the element it immediately precedes. Greek uses two different negatives: οὐ for factual denials of what is objectively true; μή for volitional negation in commands, conditions, and purpose clauses.',
+    range: 'Compound forms extend the idea: οὐκέτι = "no longer"; οὐδέποτε = "never"; μηδέ = "nor / and not"; οὐδείς/μηδείς = "no one / nothing." A doubled negative in Greek intensifies rather than cancels: οὐ μή = emphatic denial.',
+    example: 'In English, "not" works the same way in any context. Greek makes a distinction: οὐ/οὐκ is used for factual negations ("it is not so"), while μή is used for conditions, commands, and purposes ("do not do this," "lest he come"). The choice tells you something about how the speaker is framing the statement.',
+    question: 'Is this a factual negation (οὐ) or a volitional/conditional negation (μή)? What is being negated — the main verb, an adjective, or a particular element? Does the scope of the denial affect your reading?',
+  },
+  adverb: {
+    title: 'Adverb — How, where, or when',
+    body: 'An adverb modifies a verb, adjective, or another adverb. It adds circumstantial detail — manner, place, or time — without changing who performs the action or what the action is.',
+    range: 'Greek adverbs commonly end in -ως (like English "-ly"). Manner adverbs describe how; place adverbs describe where; time adverbs describe when. Some adverbs function as sentence-level frames, setting the scene rather than modifying a single word.',
+    example: 'In English, "she spoke boldly" and "they arrived suddenly" use adverbs to describe how the actions happened. Greek adverbs do the same, but Greek word order often fronts them for special emphasis — an adverb at the start of a clause draws attention to that circumstance as the framing idea.',
+    question: 'What kind of adverb is this — manner, place, or time? How does this detail fill in the scene? Is its position suggesting that the author wants to emphasize this circumstance?',
+  },
   unknown: {
     title: 'Phrase',
     body: 'The grammatical structure of this phrase is uncertain from morphology alone. This sometimes happens with ambiguous forms or unusual constructions.',
@@ -17384,20 +17475,31 @@ function _sxGroupPhrases(words) {
         }
         break;
       }
-      // Bare article with no following noun: treat as particle (e.g. ὁ μέν… ὁ δέ)
-      if (!g.type) g.type = g.words.length > 1 ? 'noun-phrase' : 'particle';
+      // Bare article: check if followed by adverb (e.g. τοῖς μακράν = "those who are far")
+      if (!g.type) {
+        if (i < cats.length && cats[i].pos === 'ADV') {
+          g.type = 'adv-group'; g.artCase = artCase; g.words.push(i); i++;
+        } else {
+          g.type = g.words.length > 1 ? 'noun-phrase' : 'particle';
+        }
+      }
       phrases.push(g); continue;
     }
     if (c.pos === 'PREP') {
-      const g = { type: 'prep-phrase', words: [i] };
+      const g = { type: 'prep-phrase', words: [i], prepStrongs: c.strongs };
       i++;
+      let prepObjCase = null;
       while (i < cats.length) {
         const n = cats[i];
         if (['CONJ','COND'].includes(n.pos)) break;
         if (n.pos === 'VERB' && n.vtype === 'finite') break;
-        if (['ART','NOUN','ADJ','PRON'].includes(n.pos)) { g.words.push(i); i++; continue; }
+        if (['ART','NOUN','ADJ','PRON'].includes(n.pos)) {
+          if (!prepObjCase && n.cng?.case) prepObjCase = n.cng.case;
+          g.words.push(i); i++; continue;
+        }
         break;
       }
+      g.prepObjCase = prepObjCase;
       phrases.push(g); continue;
     }
     if (c.pos === 'VERB') {
@@ -17423,6 +17525,7 @@ function _sxGroupPhrases(words) {
       phrases.push(g); continue;
     }
     if (c.pos === 'ADJ') { phrases.push({ type: 'adj-phrase', words: [i] }); i++; continue; }
+    if (c.pos === 'ADV') { phrases.push({ type: 'adverb', words: [i] }); i++; continue; }
     phrases.push({ type: 'particle', words: [i] }); i++;
   }
   return { phrases, cats };
@@ -17448,32 +17551,84 @@ function _sxGetRoleMap(words, book, chapter, verse) {
 function _sxAssignRoles(phrases, cats, roleMap) {
   const hasFiniteVerb = phrases.some(p => p.type === 'finite-verb');
   const _copulaStrongs = new Set([1510, 1096, 5225]); // εἰμί, γίνομαι, ὑπάρχω
-  const hasCopula = phrases.some(p =>
-    p.type === 'finite-verb' && _copulaStrongs.has(cats[p.words[0]]?.strongs)
-  );
-  // Cap prednom assignments to the number of copulas so a second copulative
-  // clause's subject is not falsely tagged as prednom (nomCount crosses clauses)
+
+  // Find first copula; detect its person for prednom logic
+  let copulaPhrase = null;
+  for (const p of phrases) {
+    if (p.type === 'finite-verb' && _copulaStrongs.has(cats[p.words[0]]?.strongs)) {
+      copulaPhrase = p; break;
+    }
+  }
+  const hasCopula = !!copulaPhrase;
+  const copulaPerson = copulaPhrase ? _sxVerbPerson(cats[copulaPhrase.words[0]]?.morph) : null;
+  // 1st/2nd person copula → subject implicit in verb ending → all nominatives are predicate nominatives
+  // Explicit subject pronouns (ἐγώ, σύ, ἡμεῖς, ὑμεῖς) still treated as subjects
+  const _EXPLICIT_SUBJ_STRONGS = new Set([1473, 4771, 2249, 5210]);
+  const implicitSubject = hasCopula && (copulaPerson === 1 || copulaPerson === 2);
   const copulaCount = phrases.filter(p =>
     p.type === 'finite-verb' && _copulaStrongs.has(cats[p.words[0]]?.strongs)
   ).length;
   let nomCount = 0;
   let predNomAssigned = 0;
+
   for (const p of phrases) {
-    if (p.type === 'finite-verb')              { p.role = 'predicate';      p.label = 'Verb';            p.color = 'verb'; }
-    else if (p.type === 'conjunction')         { p.role = 'conjunction';    p.label = _SX_CLAUSE_LABELS[p.clauseType] || 'Conjunction'; p.color = 'conj'; }
-    else if (p.type === 'prep-phrase')         { p.role = 'modifier';       p.label = 'Prep. Phrase';    p.color = 'prep'; }
-    else if (p.type === 'articular-participle'){ p.role = 'attributive';    p.label = 'Attr. Participle';p.color = 'part'; }
-    else if (p.type === 'participle-phrase')   { p.role = 'circumstantial'; p.label = 'Participle';      p.color = 'part'; }
-    else if (p.type === 'infinitive')          { p.role = 'infinitive';     p.label = 'Infinitive';      p.color = 'part'; }
-    else if (p.type === 'particle')            { p.role = 'particle';       p.label = 'Particle';        p.color = 'other'; }
-    else {
+    if (p.type === 'finite-verb') {
+      p.role = 'predicate'; p.label = 'Verb'; p.color = 'verb'; p.isMainVerb = true;
+    } else if (p.type === 'conjunction') {
+      p.role = 'conjunction'; p.label = _SX_CLAUSE_LABELS[p.clauseType] || 'Conjunction'; p.color = 'conj';
+    } else if (p.type === 'prep-phrase') {
+      p.role = 'modifier'; p.color = 'prep';
+      const fn = _SX_PREP_LABELS[p.prepStrongs];
+      const prepLabel = fn ? fn(p.prepObjCase) : null;
+      p.label = prepLabel ? (prepLabel.charAt(0).toUpperCase() + prepLabel.slice(1)) : 'Prep. Phrase';
+      p.plainLabel = prepLabel || 'how / where / by what';
+    } else if (p.type === 'adv-group') {
+      p.role = 'adv-group'; p.label = 'Group'; p.color = 'other'; p.plainLabel = 'which group';
+    } else if (p.type === 'adverb') {
+      const firstStrongs = cats[p.words[0]]?.strongs;
+      p.label = 'Adverb'; p.color = 'other';
+      if (_SX_NEG_STRONGS.has(firstStrongs)) {
+        p.role = 'negation'; p.label = 'Negation'; p.plainLabel = 'negates';
+      } else if (_SX_DIST_STRONGS.has(firstStrongs)) {
+        p.role = 'adverb'; p.plainLabel = 'how far / where';
+      } else if (_SX_LOC_STRONGS.has(firstStrongs)) {
+        p.role = 'adverb'; p.plainLabel = 'state / location';
+      } else if (_SX_TIME_STRONGS.has(firstStrongs)) {
+        p.role = 'adverb'; p.plainLabel = 'when';
+      } else {
+        p.role = 'adverb'; p.plainLabel = 'describes';
+      }
+    } else if (p.type === 'articular-participle') {
+      p.role = 'attributive'; p.label = 'Attr. Participle'; p.color = 'part';
+    } else if (p.type === 'participle-phrase') {
+      p.role = 'circumstantial'; p.label = 'Participle'; p.color = 'part';
+    } else if (p.type === 'infinitive') {
+      p.role = 'infinitive'; p.label = 'Infinitive'; p.color = 'part';
+    } else if (p.type === 'particle') {
+      const firstStrongs = cats[p.words[0]]?.strongs;
+      if (_SX_NEG_STRONGS.has(firstStrongs)) {
+        p.role = 'negation'; p.label = 'Negation'; p.color = 'other'; p.plainLabel = 'negates';
+      } else {
+        p.role = 'particle'; p.label = 'Particle'; p.color = 'other';
+      }
+    } else {
       const cng = cats[p.words[0]]?.cng;
       if (!cng) { p.role = 'unknown'; p.label = '?'; p.color = 'other'; continue; }
       if (cng.case === 'N') {
-        nomCount++;
-        if (hasCopula && nomCount > 1 && predNomAssigned < copulaCount) {
-          predNomAssigned++;
+        const firstStrongs = cats[p.words[0]]?.strongs;
+        const isExplicitSubjPron = _EXPLICIT_SUBJ_STRONGS.has(firstStrongs);
+        if (hasCopula && implicitSubject && !isExplicitSubjPron) {
           p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb';
+          p.plainLabel = copulaPerson === 2 ? 'what you are' : 'what I am';
+          predNomAssigned++;
+        } else if (hasCopula) {
+          nomCount++;
+          if (nomCount > 1 && predNomAssigned < copulaCount) {
+            predNomAssigned++;
+            p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb';
+          } else {
+            p.role = 'subject'; p.label = 'Subject'; p.color = 'subj';
+          }
         } else {
           p.role = 'subject'; p.label = 'Subject'; p.color = 'subj';
         }
@@ -17488,6 +17643,15 @@ function _sxAssignRoles(phrases, cats, roleMap) {
       }
     }
   }
+
+  // Mark dependent genitives: a genitive immediately following a subject/object/prednom
+  const _DEP_ANCHORS = new Set(['subject', 'object', 'prednom']);
+  for (let i = 1; i < phrases.length; i++) {
+    if (phrases[i].role === 'genitive' && _DEP_ANCHORS.has(phrases[i - 1].role)) {
+      phrases[i].isDep = true;
+    }
+  }
+
   // Dataset overrides: apply scholar-annotated roles where available
   if (roleMap) {
     for (const p of phrases) {
@@ -17496,10 +17660,13 @@ function _sxAssignRoles(phrases, cats, roleMap) {
         if (!dr) continue;
         if (dr === 'p') {
           p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb'; p.fromDataset = true;
+          if (!p.plainLabel) p.plainLabel = copulaPerson === 2 ? 'what you are' : 'what it is';
         } else if (dr === 's') {
           p.role = 'subject'; p.label = 'Subject'; p.color = 'subj'; p.fromDataset = true;
+          delete p.plainLabel;
         } else if (dr === 'o') {
           p.role = 'object'; p.label = 'Object'; p.color = 'obj'; p.fromDataset = true;
+          delete p.plainLabel;
         } else if (dr === 'io') {
           if (p.role === 'dative') { p.label = 'Indirect Obj.'; p.fromDataset = true; }
         } else if (dr === 'o2') {
@@ -17634,20 +17801,26 @@ function _renderDiagramBranch(clause, words, verse) {
     const cw = words[clause.conjPhrase.words[0]];
     if (cw) html += `<span class="rsx-dg-conj">${cw[0]}</span>`;
   }
-  html += `<span class="rsx-dg-lbl">${clause.label}</span></div>`;
+  const subtitle = _SX_CLAUSE_SUBTITLES[clause.clauseType] || '';
+  html += `<span class="rsx-dg-lbl">${clause.label}</span>`;
+  if (subtitle) html += `<span class="rsx-dg-subtitle">${subtitle}</span>`;
+  html += `</div>`;
 
   for (const p of clause.phrases) {
     const greekStr = p.words.map(wi => words[wi]?.[0] || '').join(' ').replace(/"/g, '&quot;');
-    html += `<div class="rsx-dg-chip rsx-c-${p.color || 'other'}"
+    const chipMod = p.isMainVerb ? ' rsx-dg-chip--main' : p.isDep ? ' rsx-dg-chip--dep' : '';
+    html += `<div class="rsx-dg-chip rsx-c-${p.color || 'other'}${chipMod}"
       data-role="${p.role}" data-label="${p.label}" data-greek="${greekStr}"
       onclick="openRhemaSyntaxSheet(this)">`;
-    html += `<span class="rsx-dg-chip-role">${_SX_PLAIN_LABELS[p.role] || p.label}</span>`;
+    html += `<span class="rsx-dg-chip-role">${p.plainLabel || _SX_PLAIN_LABELS[p.role] || p.label}</span>`;
     html += `<span class="rsx-dg-chip-gr">`;
     for (const wi of p.words) {
       const w = words[wi];
       if (!w) continue;
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
-      const gloss = (lex.brief || '').split(',')[0].split(';')[0].trim();
+      const gloss = w[2]?.startsWith('V-')
+        ? _sxVerbGloss(w[2], lex.brief)
+        : (lex.brief || '').split(',')[0].split(';')[0].trim();
       html += `<span class="rsx-dg-wd" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
       html += `<span class="rsx-dg-wd-gr">${w[0]}</span>`;
       if (gloss) html += `<span class="rsx-dg-wd-gl">${gloss}</span>`;
