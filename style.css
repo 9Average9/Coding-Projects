@@ -11334,13 +11334,13 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-radius: 22px 22px 0 0;
   border-top: 1.5px solid var(--border-color);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  max-height: 80vh;
+  max-height: 80svh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 .rhema-picker-sheet--grid {
-  max-height: 62vh;
+  max-height: 62svh;
 }
 
 .rhema-picker-handle {
@@ -11470,7 +11470,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
   width: 100%;
 }
 
@@ -11851,8 +11850,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   will-change: transform;
   transition: transform 0.28s cubic-bezier(0.32, 0, 0.67, 0),
               visibility 0s linear 0.28s;
-  min-height: 60vh;
-  max-height: 82vh;
+  min-height: 60svh;
+  max-height: 82svh;
   display: flex;
   flex-direction: column;
   overflow: hidden;

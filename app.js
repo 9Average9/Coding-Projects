@@ -14304,9 +14304,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.69";
+const APP_VERSION = "2.3.70";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.70 — Rhema picker and word sheet fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Pickers no longer glitch</strong> — Removed a deprecated iOS scroll flag on the verse area that caused picker overlays to render incorrectly or appear behind content</li>
+    <li><strong>Word sheet no longer sticks</strong> — Fixed a race condition where partially dragging the word detail sheet and closing it elsewhere left an inline transform that stuck the sheet mid-screen on next open</li>
+    <li><strong>Stable picker heights</strong> — Switched sheet max-heights from dynamic to small viewport units so pickers don't resize when browser chrome shifts</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.69 — Profile color picker and scroll fixes</div>
 <div class="un-section">
   <ul class="un-list">
@@ -14336,15 +14344,6 @@ const UPDATE_NOTES_HTML = `
   <ul class="un-list">
     <li><strong>Reference & Arrows Locked</strong> — Verse nav is now absolutely pinned to the bottom of the screen</li>
     <li><strong>White Bar Gone</strong> — Content area fills correctly with padding so no empty scroll space appears below verse text</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.52 — Rhema + Study + Leaderboard Fixes</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>No White Bar in Rhema</strong> — Overlay now uses CSS 100dvh so it fills the exact screen height on iOS</li>
-    <li><strong>Study Appears Instantly on Approval</strong> — Approved collab studies appear immediately without a refresh</li>
-    <li><strong>Notification Dismisses on Opening</strong> — Accepted collab entry clears automatically when you open the study</li>
-    <li><strong>Leaderboard Name Fixed</strong> — Anonymous users have their real name restored on next login</li>
   </ul>
 </div>
 `;
@@ -16567,7 +16566,11 @@ function openRhemaVersePicker() {
 function closeRhemaPickerSheet() {
   document.getElementById('rhemaModal')?.classList.remove('picker-open');
   ['rhemaBookPickerOverlay','rhemaChapPickerOverlay','rhemaVersePickerOverlay'].forEach(id => {
-    document.getElementById(id)?.classList.add('hidden');
+    const overlay = document.getElementById(id);
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    const sheet = overlay.querySelector('.rhema-picker-sheet');
+    if (sheet) { sheet.style.transform = ''; sheet.style.transition = ''; }
   });
 }
 
@@ -16952,7 +16955,12 @@ function openRhemaSheet(wordIdx, verse) {
 }
 
 function closeRhemaSheet() {
-  document.getElementById('rhemaSheet')?.classList.remove('open');
+  const sheet = document.getElementById('rhemaSheet');
+  if (sheet) {
+    sheet.classList.remove('open');
+    sheet.style.transform = '';
+    sheet.style.transition = '';
+  }
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
   document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
   _rhemaActiveWord = null;
