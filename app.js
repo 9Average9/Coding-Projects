@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.79";
+const APP_VERSION = "2.3.80";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -16689,12 +16689,15 @@ function initRhemaVerseSwipe() {
   const area = document.querySelector('#rhemaModal .rhema-body');
   if (!area || area._hSwipeInit) return;
   area._hSwipeInit = true;
-  let sx = 0, sy = 0;
+  let sx = 0, sy = 0, _swipeInDiagram = false;
   area.addEventListener('touchstart', e => {
     sx = e.touches[0].clientX;
     sy = e.touches[0].clientY;
+    _swipeInDiagram = !!e.target.closest('.rsx-diagram');
   }, { passive: true });
   area.addEventListener('touchend', e => {
+    // Don't navigate verses when the user is scrolling the syntax diagram
+    if (_swipeInDiagram) return;
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
     // Require clearly horizontal swipe (≥45px, more horizontal than vertical)

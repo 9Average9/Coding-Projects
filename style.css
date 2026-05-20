@@ -11168,6 +11168,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   padding: 12px 16px 28px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  touch-action: pan-x;     /* override parent pan-y so horizontal scroll works */
+  cursor: grab;
 }
 
 /* Multiple top-level roots (genuine parallel main clauses) */
