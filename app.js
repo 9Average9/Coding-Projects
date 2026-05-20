@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.81";
+const APP_VERSION = "2.3.82";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17202,15 +17202,19 @@ function _sxVerbType(morph) {
 }
 
 const _SX_CLAUSE_TYPES = {
-  2443:'purpose', 3704:'purpose',                              // ἵνα, ὅπως
-  3754:'content', 5620:'result',
+  2443:'purpose',  3704:'purpose',                             // ἵνα, ὅπως
+  3754:'content',  5620:'result',
   1487:'conditional', 1437:'conditional',
-  3739:'relative', 3748:'relative',
-  3752:'temporal', 3753:'temporal', 2193:'temporal', 5613:'comparative',
-  1893:'causal', 1063:'explanatory',
-  3767:'inferential', 1352:'inferential',                      // οὖν, διό
+  3739:'relative', 3748:'relative', 3699:'relative',           // ὅς, ὅστις, ὅπου
+  3752:'temporal', 3753:'temporal', 2193:'temporal', 4250:'temporal', // ὅταν,ὅτε,ἕως,πρίν
+  5613:'comparative', 2531:'comparative', 5618:'comparative',  // ὡς, καθώς, ὥσπερ
+  2509:'comparative',                                          // καθάπερ
+  1893:'causal',   1894:'causal',   1063:'explanatory',        // ἐπεί, ἐπειδή, γάρ
+  3767:'inferential', 1352:'inferential', 3606:'inferential',  // οὖν, διό, ὅθεν
   235:'adversative', 4133:'adversative',                       // ἀλλά, πλήν
-  2532:'coordinating', 1161:'coordinating', 2228:'alternative',
+  2532:'coordinating', 1161:'coordinating', 5037:'coordinating', 3303:'coordinating', // καί,δέ,τε,μέν
+  2228:'alternative', 1535:'alternative',                      // ἤ, εἴτε
+  3777:'coordinating',                                         // οὔτε (negative coord)
 };
 
 const _SX_CLAUSE_LABELS = {
@@ -17380,7 +17384,8 @@ function _sxGroupPhrases(words) {
         }
         break;
       }
-      if (!g.type) g.type = 'noun-phrase';
+      // Bare article with no following noun: treat as particle (e.g. ὁ μέν… ὁ δέ)
+      if (!g.type) g.type = g.words.length > 1 ? 'noun-phrase' : 'particle';
       phrases.push(g); continue;
     }
     if (c.pos === 'PREP') {
@@ -17432,7 +17437,7 @@ function _sxGetRoleMap(words, book, chapter, verse) {
     if (exact >= 0 && exact < words.length && words[exact][1] === dsStrongs) {
       roleMap[exact] = role; continue;
     }
-    const lo = Math.max(0, dsPos - 4), hi = Math.min(words.length - 1, dsPos + 2);
+    const lo = Math.max(0, dsPos - 5), hi = Math.min(words.length - 1, dsPos + 1); // dsPos is 1-based
     for (let i = lo; i <= hi; i++) {
       if (words[i][1] === dsStrongs && roleMap[i] === undefined) { roleMap[i] = role; break; }
     }
@@ -17442,11 +17447,17 @@ function _sxGetRoleMap(words, book, chapter, verse) {
 
 function _sxAssignRoles(phrases, cats, roleMap) {
   const hasFiniteVerb = phrases.some(p => p.type === 'finite-verb');
-  // Detect copulative verbs (εἰμί=1510, γίνομαι=1096, ὑπάρχω=5225) for predicate nominative detection
+  const _copulaStrongs = new Set([1510, 1096, 5225]); // εἰμί, γίνομαι, ὑπάρχω
   const hasCopula = phrases.some(p =>
-    p.type === 'finite-verb' && [1510, 1096, 5225].includes(cats[p.words[0]]?.strongs)
+    p.type === 'finite-verb' && _copulaStrongs.has(cats[p.words[0]]?.strongs)
   );
+  // Cap prednom assignments to the number of copulas so a second copulative
+  // clause's subject is not falsely tagged as prednom (nomCount crosses clauses)
+  const copulaCount = phrases.filter(p =>
+    p.type === 'finite-verb' && _copulaStrongs.has(cats[p.words[0]]?.strongs)
+  ).length;
   let nomCount = 0;
+  let predNomAssigned = 0;
   for (const p of phrases) {
     if (p.type === 'finite-verb')              { p.role = 'predicate';      p.label = 'Verb';            p.color = 'verb'; }
     else if (p.type === 'conjunction')         { p.role = 'conjunction';    p.label = _SX_CLAUSE_LABELS[p.clauseType] || 'Conjunction'; p.color = 'conj'; }
@@ -17460,7 +17471,8 @@ function _sxAssignRoles(phrases, cats, roleMap) {
       if (!cng) { p.role = 'unknown'; p.label = '?'; p.color = 'other'; continue; }
       if (cng.case === 'N') {
         nomCount++;
-        if (hasCopula && nomCount > 1) {
+        if (hasCopula && nomCount > 1 && predNomAssigned < copulaCount) {
+          predNomAssigned++;
           p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb';
         } else {
           p.role = 'subject'; p.label = 'Subject'; p.color = 'subj';
@@ -17484,6 +17496,10 @@ function _sxAssignRoles(phrases, cats, roleMap) {
         if (!dr) continue;
         if (dr === 'p') {
           p.role = 'prednom'; p.label = 'Predicate'; p.color = 'verb'; p.fromDataset = true;
+        } else if (dr === 's') {
+          p.role = 'subject'; p.label = 'Subject'; p.color = 'subj'; p.fromDataset = true;
+        } else if (dr === 'o') {
+          p.role = 'object'; p.label = 'Object'; p.color = 'obj'; p.fromDataset = true;
         } else if (dr === 'io') {
           if (p.role === 'dative') { p.label = 'Indirect Obj.'; p.fromDataset = true; }
         } else if (dr === 'o2') {
@@ -17534,22 +17550,24 @@ function _sxBuildTree(words, verseRef) {
   if (cur.phrases.length || cur.conjPhrase) segments.push(cur);
   if (!segments.length) segments.push({ clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases, isSubordinate: false, children: [] });
 
-  // Nest clauses using a stack so subordinate clauses nest properly under
-  // their immediate parent, and non-subordinating conjunctions (ἀλλά, δέ)
-  // that appear deep in a subord chain pop back one level rather than
-  // jumping all the way to a new top-level root.
+  // Nest clauses using a stack.  Every verse has exactly one root (the first
+  // segment). Subordinate conjunctions (ἵνα, ὅτι, ὥστε…) nest under the
+  // current clause.  Coordinating/adversative conjunctions (καί, δέ, ἀλλά…)
+  // pop back one depth level then attach there — this keeps the tree a single
+  // left-to-right horizontal flow instead of stacking independent roots
+  // vertically, which confused users.
   const roots = [];
   const stk = [];
   for (const seg of segments) {
     if (!seg.isSubordinate) {
-      if (stk.length > 1) {
-        // Pop the deepest subord; become a sibling at the level above
-        stk.pop();
-        stk[stk.length - 1].children.push(seg);
+      if (stk.length === 0) {
+        // Very first segment — becomes the one and only root
+        roots.push(seg);
         stk.push(seg);
       } else {
-        stk.length = 0;
-        roots.push(seg);
+        // Coordinating: pop one level then attach as child of that parent
+        if (stk.length > 1) stk.pop();
+        stk[stk.length - 1].children.push(seg);
         stk.push(seg);
       }
     } else {
