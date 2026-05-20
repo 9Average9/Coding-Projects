@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.73";
+const APP_VERSION = "2.3.75";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17142,7 +17142,7 @@ const _SX_ROLE_INFO = {
     title: 'Particle or Adverb — Tone, contrast, or emphasis',
     body: 'Particles and adverbs are small words that shade the meaning of the clause or verb in ways that are easy to miss in translation. Preachers and commentators often focus on the nouns and verbs while these words do quiet but essential work.',
     range: 'γάρ = "for / because" (grounds or explains what was just said — always backward-looking); δέ = mild contrast or continuation; ἀλλά = strong contrast ("but"); γέ = emphasis; οὐ / μή = negation; ἤδη = "already"; οὕτως = "in this way / thus"; μόνον = "only."',
-    example: 'γὰρ in Romans 8:18 — "For I consider that the sufferings of this present time are not worth comparing..." The γάρ roots this verse in the promise of glory that came before it. Without γάρ, it floats; with it, it is an argument.',
+    example: 'οὕτως in John 3:16 — "For God so loved the world..." The word so (οὕτως) is not a filler — it points back to something previously demonstrated. Translators often render it "in this way," reminding the reader that the love described is not vague sentiment but a specific, costly act.',
     question: 'What is this word contributing — explanation, contrast, emphasis, negation? What would be lost if this word were simply removed? What does it tell you about how the author sees the connection to what came before?',
   },
   unknown: {
@@ -17321,11 +17321,16 @@ function _sxBuildTree(words, verseRef) {
   _sxAssignRoles(phrases, cats, roleMap);
   const confidence = _sxConfidence(words, phrases);
 
-  // Split phrase list into clause segments at conjunction boundaries
+  // Split phrase list into clause segments at conjunction boundaries.
+  // γάρ (explanatory) and οὖν (inferential) are discourse-level particles —
+  // they don't create subordinate clauses, so keep them as tappable phrases
+  // inside the current segment rather than splitting.
+  const _SX_NONSPLIT = new Set(['explanatory', 'inferential']);
   const segments = [];
   let cur = { clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases: [], isSubordinate: false, children: [] };
   for (const p of phrases) {
     if (p.type === 'conjunction') {
+      if (_SX_NONSPLIT.has(p.clauseType)) { cur.phrases.push(p); continue; }
       const isSubord = !['coordinating', 'adversative', 'alternative'].includes(p.clauseType);
       if (cur.phrases.length || cur.conjPhrase) segments.push(cur);
       cur = { clauseType: p.clauseType, label: _SX_CLAUSE_LABELS[p.clauseType] || 'Clause', conjPhrase: p, phrases: [], isSubordinate: isSubord, children: [] };
@@ -17336,16 +17341,28 @@ function _sxBuildTree(words, verseRef) {
   if (cur.phrases.length || cur.conjPhrase) segments.push(cur);
   if (!segments.length) segments.push({ clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases, isSubordinate: false, children: [] });
 
-  // Nest subordinate clauses under the last non-subordinate root
+  // Nest clauses using a stack so subordinate clauses nest properly under
+  // their immediate parent, and non-subordinating conjunctions (ἀλλά, δέ)
+  // that appear deep in a subord chain pop back one level rather than
+  // jumping all the way to a new top-level root.
   const roots = [];
-  let lastRoot = null;
+  const stk = [];
   for (const seg of segments) {
     if (!seg.isSubordinate) {
-      roots.push(seg);
-      lastRoot = seg;
+      if (stk.length > 1) {
+        // Pop the deepest subord; become a sibling at the level above
+        stk.pop();
+        stk[stk.length - 1].children.push(seg);
+        stk.push(seg);
+      } else {
+        stk.length = 0;
+        roots.push(seg);
+        stk.push(seg);
+      }
     } else {
-      if (lastRoot) lastRoot.children.push(seg);
-      else { roots.push(seg); lastRoot = seg; }
+      if (stk.length) stk[stk.length - 1].children.push(seg);
+      else roots.push(seg);
+      stk.push(seg);
     }
   }
 
