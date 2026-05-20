@@ -5856,11 +5856,13 @@ body.dark #profileModal .profile-action-card {
 }
 
 .hidden-color-input {
-  position: absolute;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
   opacity: 0;
   pointer-events: none;
-  width: 0;
-  height: 0;
 }
 .profile-title-row {
   display: flex;
@@ -12037,7 +12039,7 @@ body .app:has(#communityPage.screen.active) {
   padding: 0 !important;
   overflow: hidden;
   height: 100vh;
-  height: 100dvh;
+  height: 100svh;
 }
 
 /* Hide the app-header on nav screens (each screen has its own header) */
@@ -12058,7 +12060,7 @@ body .app:has(#communityPage.screen.active) #communityPage {
 #communityPage.screen.active,
 #profilePage.screen.active {
   display: flex; flex-direction: column;
-  height: 100vh; height: 100dvh; overflow: hidden;
+  height: 100vh; height: 100svh; overflow: hidden;
   background: var(--primary-color) !important;
   border-radius: 0 !important; box-shadow: none !important;
   border: none !important; padding: 0 !important;

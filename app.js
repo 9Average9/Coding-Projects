@@ -14201,10 +14201,6 @@ function getDisplayChapterNumber(mounceChapter) {
   return chapterMap[mounceChapter] || mounceChapter;
 }
 
-function openCustomProfileColor() {
-  document.getElementById("customProfileColorInput")?.click();
-}
-
 function showRanksModal() {
   renderRanksList();
   document.getElementById("ranksModal")?.classList.add("open");
@@ -14258,136 +14254,47 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.68";
+const APP_VERSION = "2.3.69";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.69 — Profile color picker and scroll fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Color picker no longer breaks scroll</strong> — Fixed a bug where opening the custom color wheel caused iOS to scroll-jump the profile and leave it unscrollable</li>
+    <li><strong>Stable profile height</strong> — Switched from dynamic to small viewport height (svh) so the profile layout doesn't reflow when the color picker or any system UI opens</li>
+    <li><strong>Duplicate function removed</strong> — Cleaned up a duplicate openCustomProfileColor definition that was silently overriding the correct one</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.68 — Profile scroll and layout fixes</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>Full-screen profile</strong> — Profile page fills the entire viewport correctly on all devices using dynamic viewport height (dvh)</li>
-    <li><strong>No scroll chaining</strong> — Scrolling the profile no longer bleeds into the page body; overscroll is fully contained</li>
+    <li><strong>Full-screen profile</strong> — Profile page fills the entire viewport correctly on all devices</li>
+    <li><strong>No scroll chaining</strong> — Scrolling the profile no longer bleeds into the page body</li>
     <li><strong>No stuck active states</strong> — Removed deprecated momentum scroll flag that caused buttons to appear pressed during fast scrolling on iOS</li>
-    <li><strong>Content clears navbar</strong> — Bottom padding is now handled in CSS and correctly accounts for safe-area insets so the last item is always scrollable into view above the navbar</li>
+    <li><strong>Content clears navbar</strong> — Bottom padding correctly accounts for safe-area insets</li>
   </ul>
 </div>
 <div class="un-version-label">v2.3.67 — Add Abbott-Smith (TBESG) lexicon</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow; swipe-blocking on the header/picker bars prevents it from being dragged</li>
-    <li><strong>Word Sheet Opens Bigger</strong> — Sheet now opens at 60vh minimum (was 44vh) so word definitions and parsing have more room</li>
+    <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow</li>
+    <li><strong>Word Sheet Opens Bigger</strong> — Sheet now opens at 60vh minimum (was 44vh)</li>
   </ul>
 </div>
 <div class="un-version-label">v2.3.53 — Verse Nav Pinned to Bottom</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>Reference & Arrows Locked</strong> — Verse nav is now absolutely pinned to the bottom of the screen and can no longer be dragged or bounced by scroll gestures</li>
+    <li><strong>Reference & Arrows Locked</strong> — Verse nav is now absolutely pinned to the bottom of the screen</li>
     <li><strong>White Bar Gone</strong> — Content area fills correctly with padding so no empty scroll space appears below verse text</li>
   </ul>
 </div>
 <div class="un-version-label">v2.3.52 — Rhema + Study + Leaderboard Fixes</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>No White Bar in Rhema</strong> — Overlay now uses CSS 100dvh (dynamic viewport) so it fills the exact screen height on iOS; no white gap and no scroll interference</li>
-    <li><strong>Study Appears Instantly on Approval</strong> — When a study owner accepts your collab request, the study appears on your home screen immediately without needing a refresh</li>
-    <li><strong>Notification Dismisses on Opening</strong> — The "you were accepted" What's Going On entry goes away automatically the first time you open that study</li>
-    <li><strong>Leaderboard Name Fixed</strong> — New users who joined the XP leaderboard as "Anonymous" will have their real name restored on next login</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.51 — Fix Rhema Scroll Interference</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>No More Tap Block</strong> — iOS rubber-band bounce no longer captures touch events; tapping words works immediately after any scroll attempt</li>
-    <li><strong>Scroll Lock Restored</strong> — body position:fixed is back (the only reliable iOS scroll lock)</li>
-    <li><strong>Removed Legacy Scroll Property</strong> — Dropped -webkit-overflow-scrolling:touch from verse and picker scroll areas</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.50 — Rhema Bottom Fixes</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>No White Space at Bottom</strong> — Rhema now pins the verse-nav bar to the very bottom of the screen in both standalone and study mode</li>
-    <li><strong>Word Sheet Fills Behind Tab Bar</strong> — In study mode the word info sheet now extends to the physical bottom of the screen; the Save Verse button and content stay above the study tab bar</li>
-    <li><strong>iOS Viewport Fix</strong> — Switched scroll lock away from body position:fixed which was causing iOS to miscalculate the overlay height</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.49 — Rhema Fullscreen Fix</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Overlay Clipped Above Tab Bar</strong> — Rhema fills only usable space in study mode, no floating gap between content and tab bar</li>
-    <li><strong>Save Verse Button</strong> — No longer overlapping with the study tab bar</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.48 — Study Nav Fixed</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>App Nav Hides in Study</strong> — The main nav bar (Home, Profile, etc.) now properly disappears when a study is open</li>
-    <li><strong>Study Tab Bar Visible</strong> — Rhema / Verses / Word Log / Notes tab bar shows correctly; tapping a tab while in Rhema switches panes without breaking the session</li>
-    <li><strong>Rhema Back Button</strong> — Pressing back inside Rhema returns to the study sandbox (not home); the sandbox back arrow takes you home</li>
-    <li><strong>More Verse Space</strong> — Rhema verse display no longer gets clipped by the study tab bar</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.48 — Study UI Polish</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Tab Bar Stays in Rhema</strong> — The study tab bar (Rhema / Verses / Word Log / Notes) now floats above the Rhema screen so you can switch tabs without leaving Rhema</li>
-    <li><strong>Community Page Fix</strong> — Community section was leaking into the bottom of the home screen; fixed</li>
-    <li><strong>Create Study Sheet</strong> — Drag handle removed so it's clear the sheet doesn't slide; home screen no longer scrolls behind it</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.48 — Sandbox Nav &amp; Notification Fixes</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Bottom Tab Bar</strong> — Rhema, Verses, Word Log, and Notes now live at the bottom of the sandbox like a proper nav bar; tapping Rhema opens it instantly</li>
-    <li><strong>Study Invites Fixed</strong> — Study invite notifications now appear correctly in What's Going On with Join and Decline buttons</li>
-    <li><strong>Create Sheet</strong> — Sheet now closes cleanly by tapping outside or pressing Cancel, no more accidental swipe issues</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.48 — Study Invites &amp; Collaboration Polish</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Invite Friends from the Start</strong> — When creating a study, scroll through your friends list and invite collaborators right away; they get a push notification and a What's Going On entry to join or decline</li>
-    <li><strong>Rhema First</strong> — Rhema is now the default tab in every study sandbox and opens automatically so you can dive in immediately</li>
-    <li><strong>Tab Order</strong> — Tabs are now Rhema → Verses → Word Log → Notes</li>
-    <li><strong>Live Collaborator Count</strong> — The member badge in the sandbox header updates in real time as friends join</li>
-    <li><strong>Study Description</strong> — Optionally add a short description when creating a study</li>
-    <li><strong>Swipe to Dismiss</strong> — Swipe down on the Create Study sheet to close it</li>
-    <li><strong>PC Collaboration</strong> — Invite notifications and collab requests appear in What's Going On for users without push support</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.41 — Studies Polish &amp; Delete</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Delete a Study</strong> — Long-press any study card to enter edit mode (cards shake like iPhone home screen), then tap the ✕ to permanently delete it and all its notes, verses, and word log</li>
-    <li><strong>Collaborate Request Fixed</strong> — Requesting to collaborate on a friend's study now works correctly</li>
-    <li><strong>Copy Study Fixed</strong> — Copying a friend's study opens it immediately in your sandbox</li>
-    <li><strong>Community Page</strong> — Friends button restyled as a pill, layout and spacing improved for all screen sizes</li>
-    <li><strong>Sandbox Header</strong> — Safe-area insets applied so content never hides behind the iPhone notch</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.39 — Studies Full Launch</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Your Studies</strong> — Create personal studies right from the home screen with a custom name, color, and icon</li>
-    <li><strong>Study Sandbox</strong> — Each study has its own workspace: Notes (shared with collaborators), Saved Verses, Rhema with per-study position memory, and an auto-building Word Log</li>
-    <li><strong>Study Board</strong> — See your friends' studies on the Community page; request to collaborate or copy any study as your own in one tap</li>
-    <li><strong>Collaboration</strong> — Approve or deny collaboration requests right from the What's Going On panel</li>
-    <li><strong>Friend Notifications</strong> — Friends get a push the first time you open each study per day (optional toggle)</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.37 — Friend Accepted Notifications &amp; Polish</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Friend Accepted</strong> — In-app notification when someone accepts your friend request (plus a push notification)</li>
-    <li><strong>Lesson Badge Colors</strong> — Basic track progress badge is always blue; Advanced is always gold</li>
-    <li><strong>Notification Dot</strong> — Red dot is larger and pulses so it's easier to spot</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.36 — Notification Prompt &amp; Friend Notifications</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Notification Prompt</strong> — New accounts now see a clean in-app prompt to enable notifications right after signing up</li>
-    <li><strong>Friend Request Dots</strong> — Red notification dot now appears on both the What's Going On button and the Friends button when you have a pending request</li>
-    <li><strong>Inline Accept / Decline</strong> — Friend requests in the What's Going On panel now show the person's name with Accept and Decline buttons right there — no need to open the Friends modal</li>
-    <li><strong>Cross-clearing</strong> — Resolving a request from either the notification panel or the Friends modal clears all red dots at once</li>
+    <li><strong>No White Bar in Rhema</strong> — Overlay now uses CSS 100dvh so it fills the exact screen height on iOS</li>
+    <li><strong>Study Appears Instantly on Approval</strong> — Approved collab studies appear immediately without a refresh</li>
+    <li><strong>Notification Dismisses on Opening</strong> — Accepted collab entry clears automatically when you open the study</li>
+    <li><strong>Leaderboard Name Fixed</strong> — Anonymous users have their real name restored on next login</li>
   </ul>
 </div>
 `;

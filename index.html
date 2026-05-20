@@ -9677,16 +9677,15 @@ glacier: {
   <button class="color-dot orange" data-color="#f97316" onclick="setProfileColor('#f97316')" title="Orange"></button>
   <button class="color-dot pink" data-color="#ec4899" onclick="setProfileColor('#ec4899')" title="Pink"></button>
   <label class="color-dot custom-color-dot" id="customColorDot"
-    for="customProfileColorInput"
-    onclick="var p=document.getElementById('customProfileColorInput');if(p)p.value=(profileData&&profileData.color)||'#4f8cff'"
-    title="Custom color"></label>
-
-  <input
-    type="color"
-    id="customProfileColorInput"
-    class="hidden-color-input"
-    onchange="setProfileColor(this.value)"
-  />
+    onclick="var i=this.querySelector('input');if(i)i.value=(profileData&&profileData.color)||'#4f8cff'"
+    title="Custom color">
+    <input
+      type="color"
+      id="customProfileColorInput"
+      class="hidden-color-input"
+      onchange="setProfileColor(this.value)"
+    />
+  </label>
 </div>
 
     <div class="prof-menu-card">
