@@ -16392,12 +16392,6 @@ async function showRhema() {
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
-  if (!_studySandboxId) {
-    _rhemaSavedScrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${_rhemaSavedScrollY}px`;
-    document.body.style.width = '100%';
-  }
 
   const loading = document.getElementById('rhemaLoadingMsg');
   const hint    = document.getElementById('rhemaTapHint');
@@ -16444,10 +16438,6 @@ function closeRhema(keepSandbox = false) {
   document.getElementById('rhemaModal')?.classList.remove('open');
   closeRhemaSheet();
   closeRhemaPickerSheet();
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  window.scrollTo(0, _rhemaSavedScrollY);
   _rhemaTrail = [];
   _rhemaTrailPos = -1;
   _rhemaHighlightStrongs = null;
@@ -16529,7 +16519,8 @@ function openRhemaBookPicker() {
   document.getElementById('rhemaModal')?.classList.add('picker-open');
   initRhemaPickerSwipeDown('rhemaBookPickerOverlay');
   requestAnimationFrame(() => {
-    list.querySelector('.selected')?.scrollIntoView({ block: 'center' });
+    const sel = list.querySelector('.selected');
+    if (sel) list.scrollTop = sel.offsetTop - (list.clientHeight - sel.offsetHeight) / 2;
   });
 }
 
@@ -16834,10 +16825,12 @@ function renderRhemaVerse() {
       }).join('');
     }
 
-    // Scroll to the target verse after render (cross-ref jump or chapter entry)
+    // Scroll to the target verse — use direct scrollTop to avoid iOS scrollIntoView
+    // scrolling the visual viewport instead of the container
     requestAnimationFrame(() => {
+      const body   = document.querySelector('#rhemaModal .rhema-body');
       const target = display.querySelector(`.rhema-chapter-block[data-verse="${_rhemaVerse}"]`);
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (body && target) body.scrollTop = target.offsetTop;
     });
   } else {
     const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
