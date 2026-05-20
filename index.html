@@ -10693,8 +10693,10 @@ glacier: {
         <span class="rhema-title-greek">Word Study</span>
       </div>
       <div class="rhema-header-actions">
-        <button id="rhemaHighlightToggleBtn" class="rhema-swap-btn rhema-hl-toggle-btn" onclick="toggleRhemaHighlightBar()" title="Highlight by part of speech"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">ink_highlighter</span></button>
-        <button id="rhemaGreekModeBtn" class="rhema-swap-btn" onclick="toggleRhemaMode()">Just Greek</button>
+        <button id="rhemaToolBtn" class="rhema-tool-btn" onclick="toggleRhemaWheel()" title="Tools">
+          <span class="material-symbols-outlined">auto_fix_high</span>
+          <span class="rhema-tool-dot"></span>
+        </button>
         <button id="rhemaSwapBtn" class="rhema-swap-btn" onclick="toggleRhemaKjv()">KJV</button>
       </div>
     </div>
@@ -10792,7 +10794,46 @@ glacier: {
     </div>
   </div>
 
-  <div id="rhemaSheetBackdrop" class="rhema-sheet-backdrop" onclick="closeRhemaSheet()"></div>
+  <div id="rhemaSheetBackdrop" class="rhema-sheet-backdrop" onclick="closeAnyRhemaSheet()"></div>
+
+  <!-- ── Syntax explanation sheet ── -->
+  <div id="rhemaSyntaxSheet" class="rhema-sheet rhema-syntax-sheet">
+    <div class="rhema-sheet-handle"></div>
+    <div class="rsx-sheet-inner">
+      <div id="rsxSheetGreek" class="rsx-sheet-greek"></div>
+      <div id="rsxSheetRole"  class="rsx-sheet-role"></div>
+      <p   id="rsxSheetBody"  class="rsx-sheet-body"></p>
+    </div>
+  </div>
+
+  <!-- ── Tool wheel overlay ── -->
+  <div id="rhemaWheelOverlay" class="rhema-wheel-overlay" style="display:none" onclick="closeRhemaWheel()">
+    <div class="rhema-wheel" onclick="event.stopPropagation()">
+      <button class="rhema-wheel-item" id="wheelItemSyntax" onclick="toggleWheelTool('syntax')">
+        <span class="material-symbols-outlined">account_tree</span>
+        <span class="rwi-label">Syntax</span>
+      </button>
+      <button class="rhema-wheel-item" id="wheelItemHighlight" onclick="toggleWheelTool('highlight')">
+        <span class="material-symbols-outlined">ink_highlighter</span>
+        <span class="rwi-label">Highlight</span>
+      </button>
+      <button class="rhema-wheel-item" id="wheelItemGreek" onclick="toggleWheelTool('greek-only')">
+        <span class="material-symbols-outlined">translate</span>
+        <span class="rwi-label">Greek Only</span>
+      </button>
+      <button class="rhema-wheel-item rw-placeholder" id="wheelItemXref" onclick="toggleWheelTool('xref')">
+        <span class="material-symbols-outlined">hub</span>
+        <span class="rwi-label">Cross-Ref</span>
+      </button>
+      <button class="rhema-wheel-item rw-placeholder" id="wheelItemNotes" onclick="toggleWheelTool('notes')">
+        <span class="material-symbols-outlined">stylus_note</span>
+        <span class="rwi-label">Notes</span>
+      </button>
+      <button class="rhema-wheel-center" onclick="closeRhemaWheel()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ── Book picker ── -->
   <div id="rhemaBookPickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">

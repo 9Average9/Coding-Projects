@@ -14364,9 +14364,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.70";
+const APP_VERSION = "2.3.72";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Syntax Tool</strong> — New mode that breaks any verse into labeled phrase blocks: Subject, Verb, Object, Genitive, Dative, Prep Phrase, Participle, and more. Tap any block for a plain-English explanation of that grammatical role. Complex verses display a study caution banner.</li>
+    <li><strong>Tool Wheel</strong> — Tap the magic wand (✦) in the header to open an animated radial menu. Toggle Syntax, Highlights, and Greek Only — multiple tools can be active at once. Cross-Reference and Notes slots are reserved for upcoming features.</li>
+    <li><strong>Study sandbox</strong> — Word log shows the inflected surface form first, entries are tappable for full detail, and an explicit "Add to Word Log" button replaces auto-logging.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.3.70 — Rhema picker and word sheet fixes</div>
 <div class="un-section">
   <ul class="un-list">
@@ -16144,6 +16152,7 @@ let _rhemaChapter = '3';
 let _rhemaVerse = '16';
 let _rhemaShowKjv    = false;
 let _rhemaGreekOnly  = false;
+let _rhemaSyntaxMode = false;
 let _rhemaActiveTab = 'parsing';
 let _rhemaActiveWord = null;
 let _rhemaTrail = [];       // full cross-ref trail — never auto-shrinks
@@ -16193,9 +16202,8 @@ const HIGHLIGHT_CATS = {
 function toggleRhemaHighlightBar() {
   _rhemaHighlightBarOn = !_rhemaHighlightBarOn;
   const bar = document.getElementById('rhemaHighlightBar');
-  const btn = document.getElementById('rhemaHighlightToggleBtn');
   if (bar) bar.classList.toggle('hidden', !_rhemaHighlightBarOn);
-  if (btn) btn.classList.toggle('active', _rhemaHighlightBarOn);
+  _syncWheelBtn('highlight', _rhemaHighlightBarOn);
   if (!_rhemaHighlightBarOn) {
     _rhemaPosHighlights.clear();
     renderRhemaVerse();
@@ -16852,6 +16860,7 @@ function _renderVerseWords(words, verse) {
 function renderRhemaVerse() {
   if (!window.RhemaNT) return;
   closeRhemaSheet();
+  closeRhemaSyntaxSheet();
 
   const display = document.getElementById('rhemaVerseDisplay');
   const kjvDiv  = document.getElementById('rhemaKjvDisplay');
@@ -16861,23 +16870,23 @@ function renderRhemaVerse() {
     const chapterData = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {};
     const verseNums = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
 
-    // chapter-mode overrides the grid on the outer div
     display.classList.remove('greek-only');
-    display.classList.add('chapter-mode');
+    display.classList.toggle('chapter-mode', !_rhemaSyntaxMode);
+    display.classList.toggle('rsx-chapter-mode', _rhemaSyntaxMode);
     display.innerHTML = verseNums.map(vn => {
       const v = String(vn);
       const words = chapterData[v] || [];
       const isTarget = v === _rhemaVerse && _rhemaHighlightStrongs !== null;
+      const inner = _rhemaSyntaxMode
+        ? _renderSyntaxView(words, v)
+        : `<div class="rhema-chapter-word-grid${_rhemaGreekOnly ? ' greek-only' : ''}">${_renderVerseWords(words, v)}</div>`;
       return `<div class="rhema-chapter-block${isTarget ? ' rhema-chapter-block-target' : ''}" data-verse="${v}">` +
-             `<div class="rhema-chapter-verse-label">${vn}</div>` +
-             `<div class="rhema-chapter-word-grid${_rhemaGreekOnly ? ' greek-only' : ''}">` +
-             _renderVerseWords(words, v) +
-             `</div></div>`;
+             `<div class="rhema-chapter-verse-label">${vn}</div>` + inner + `</div>`;
     }).join('');
 
     if (kjvDiv && window.RhemaKJV) {
       const kjvChap = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter] || {};
-      kjvDiv.innerHTML = verseNums.map(vn => {
+      kjvDiv.innerHTML = _rhemaSyntaxMode ? '' : verseNums.map(vn => {
         const v = String(vn);
         return `<div class="rhema-chapter-block" data-verse="${v}">` +
                `<div class="rhema-chapter-verse-label">${vn}</div>` +
@@ -16885,8 +16894,6 @@ function renderRhemaVerse() {
       }).join('');
     }
 
-    // Scroll to the target verse — use direct scrollTop to avoid iOS scrollIntoView
-    // scrolling the visual viewport instead of the container
     requestAnimationFrame(() => {
       const body   = document.querySelector('#rhemaModal .rhema-body');
       const target = display.querySelector(`.rhema-chapter-block[data-verse="${_rhemaVerse}"]`);
@@ -16894,13 +16901,17 @@ function renderRhemaVerse() {
     });
   } else {
     const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
-    display.classList.remove('chapter-mode');
-    display.classList.toggle('greek-only', _rhemaGreekOnly);
-    display.innerHTML = _renderVerseWords(words, null);
-
-    if (kjvDiv && window.RhemaKJV) {
-      const kjvText = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
-      kjvDiv.textContent = kjvText;
+    display.classList.remove('chapter-mode', 'rsx-chapter-mode');
+    if (_rhemaSyntaxMode) {
+      display.classList.remove('greek-only');
+      display.innerHTML = _renderSyntaxView(words, null);
+      if (kjvDiv) kjvDiv.innerHTML = '';
+    } else {
+      display.classList.toggle('greek-only', _rhemaGreekOnly);
+      display.innerHTML = _renderVerseWords(words, null);
+      if (kjvDiv && window.RhemaKJV) {
+        kjvDiv.textContent = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
+      }
     }
   }
 
@@ -16919,12 +16930,343 @@ function toggleRhemaKjv() {
 
 function toggleRhemaMode() {
   _rhemaGreekOnly = !_rhemaGreekOnly;
-  const btn = document.getElementById('rhemaGreekModeBtn');
-  if (btn) {
-    btn.textContent = _rhemaGreekOnly ? 'Interlinear' : 'Just Greek';
-    btn.classList.toggle('active', _rhemaGreekOnly);
-  }
+  _syncWheelBtn('greek-only', _rhemaGreekOnly);
+  _syncToolWandIndicator();
   renderRhemaVerse();
+}
+
+// ── Tool Wheel ────────────────────────────────────────────────────────────────
+
+function openRhemaWheel() {
+  const overlay = document.getElementById('rhemaWheelOverlay');
+  if (!overlay) return;
+  _syncWheelState();
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function closeRhemaWheel() {
+  const overlay = document.getElementById('rhemaWheelOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(() => { if (!overlay.classList.contains('open')) overlay.style.display = 'none'; }, 300);
+}
+
+function toggleRhemaWheel() {
+  const overlay = document.getElementById('rhemaWheelOverlay');
+  if (!overlay) return;
+  overlay.classList.contains('open') ? closeRhemaWheel() : openRhemaWheel();
+}
+
+function toggleWheelTool(tool) {
+  if (tool === 'syntax') {
+    _rhemaSyntaxMode = !_rhemaSyntaxMode;
+    _syncWheelBtn('syntax', _rhemaSyntaxMode);
+    _syncToolWandIndicator();
+    renderRhemaVerse();
+  } else if (tool === 'highlight') {
+    toggleRhemaHighlightBar();
+    _syncToolWandIndicator();
+  } else if (tool === 'greek-only') {
+    toggleRhemaMode();
+  } else {
+    const btnIds = { xref: 'wheelItemXref', notes: 'wheelItemNotes' };
+    const btn = document.getElementById(btnIds[tool]);
+    if (btn) { btn.classList.add('shake'); setTimeout(() => btn.classList.remove('shake'), 500); }
+  }
+}
+
+function _syncWheelBtn(tool, active) {
+  const ids = { syntax: 'wheelItemSyntax', 'greek-only': 'wheelItemGreek', highlight: 'wheelItemHighlight' };
+  document.getElementById(ids[tool])?.classList.toggle('active', active);
+}
+
+function _syncWheelState() {
+  _syncWheelBtn('syntax', _rhemaSyntaxMode);
+  _syncWheelBtn('greek-only', _rhemaGreekOnly);
+  _syncWheelBtn('highlight', _rhemaHighlightBarOn);
+}
+
+function _syncToolWandIndicator() {
+  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn;
+  document.getElementById('rhemaToolBtn')?.classList.toggle('has-active', hasActive);
+}
+
+// ── Syntax Analyzer ───────────────────────────────────────────────────────────
+
+function _sxPos(morph) {
+  if (!morph) return 'UNK';
+  const p = morph.split('-')[0];
+  if (p === 'T') return 'ART';
+  if (p === 'N' || p === 'RI') return 'NOUN';
+  if (p === 'V') return 'VERB';
+  if (p === 'A') return 'ADJ';
+  if (['P','R','C','D','F','I','K','Q','X'].includes(p)) return 'PRON';
+  if (p === 'PREP') return 'PREP';
+  if (p === 'CONJ') return 'CONJ';
+  if (p === 'ADV') return 'ADV';
+  if (p === 'COND') return 'COND';
+  return 'PART';
+}
+
+function _sxCNG(morph) {
+  if (!morph) return null;
+  for (const seg of morph.split('-').slice(1)) {
+    if (/^[NGDAV][SP][MFN]$/.test(seg)) return { case: seg[0], number: seg[1], gender: seg[2] };
+    if (/^[NGDAV][SP]$/.test(seg))       return { case: seg[0], number: seg[1], gender: null };
+    if (/^\d[NGDAV][SP]$/.test(seg))     return { case: seg[1], number: seg[2], gender: null };
+  }
+  return null;
+}
+
+function _sxVerbType(morph) {
+  if (!morph || !morph.startsWith('V-')) return null;
+  const form = (morph.split('-')[1] || '').replace(/^2/, '');
+  const m = form[form.length - 1];
+  if (m === 'P') return 'participle';
+  if (m === 'N') return 'infinitive';
+  return 'finite';
+}
+
+const _SX_CLAUSE_TYPES = {
+  2443:'purpose', 3754:'content', 5620:'result',
+  1487:'conditional', 1437:'conditional',
+  3739:'relative', 3748:'relative',
+  3752:'temporal', 3753:'temporal', 2193:'temporal', 5613:'comparative',
+  1893:'causal', 1063:'explanatory',
+  3767:'inferential', 235:'adversative',
+  2532:'coordinating', 1161:'coordinating', 2228:'alternative',
+};
+
+const _SX_CLAUSE_LABELS = {
+  purpose:'Purpose (ἵνα)', content:'Content Clause', result:'Result (ὥστε)',
+  conditional:'Conditional', relative:'Relative Clause', temporal:'Temporal',
+  comparative:'Comparative', causal:'Causal', explanatory:'Reason',
+  inferential:'Inference', adversative:'Contrast',
+  coordinating:'Continued', alternative:'Alternative', conjunction:'Clause',
+};
+
+const _SX_ROLE_INFO = {
+  subject:     { title:'Subject (Nominative)', body:'The nominative case marks the subject — the one performing or undergoing the verb\'s action. Greek word order is flexible; the case ending identifies the subject, not the position.' },
+  predicate:   { title:'Verb / Predicate', body:'The main verb carries tense (time aspect), voice (active/middle/passive), and mood (indicative/subjunctive/imperative/optative). Each layer adds precise meaning beyond the basic action.' },
+  object:      { title:'Direct Object (Accusative)', body:'The accusative case marks the direct object — what receives the action of a transitive verb. Accusatives also express extent, direction, or serve as the object of certain prepositions.' },
+  genitive:    { title:'Genitive', body:'The genitive expresses a relationship to another noun — possession ("of God"), source ("from heaven"), description, partition, or separation. The specific nuance is determined by context.' },
+  dative:      { title:'Dative', body:'The dative can be the indirect object ("to / for someone"), express means ("by means of"), location ("in / among"), or manner. Greek uses one case for what English splits across several prepositions.' },
+  accusative:  { title:'Accusative', body:'Here the accusative is not a direct object but expresses extent, direction, or is the object of a preposition (e.g. εἰς, κατά, διά take the accusative).' },
+  vocative:    { title:'Direct Address (Vocative)', body:'The vocative case addresses someone directly: κύριε ("Lord!"), θεέ ("O God!"). It marks speech directed at a person or entity.' },
+  modifier:    { title:'Prepositional Phrase', body:'A preposition plus its object. The case of the object changes the meaning — ἐν + dative = "in/among"; εἰς + accusative = "into/toward"; ἐκ + genitive = "out of/from".' },
+  attributive: { title:'Attributive Participle', body:'An articular participle (article + participle) modifies a noun like an adjective: "the believing one," "the written word." It describes the noun\'s characteristic action or state.' },
+  circumstantial:{ title:'Circumstantial Participle', body:'An adverbial participle framing the main verb — describing the time, cause, means, manner, or condition of the main action. Its precise role depends on context and the tense of the participle.' },
+  infinitive:  { title:'Infinitive', body:'The infinitive is a verbal noun. It can express purpose ("in order to"), result, content (indirect statement), or complement a finite verb. It does not encode a specific person or number by itself.' },
+  conjunction: { title:'Conjunction / Clause Marker', body:'Conjunctions mark how clauses relate. ἵνα = purpose or result; ὅτι = content or reason; ὥστε = result; εἰ / ἐάν = condition. These small connective words are structurally critical.' },
+  particle:    { title:'Particle / Adverb', body:'Particles and adverbs modify the verb or clause. Key examples: οὐ/μή = negation; γέ = emphasis; ἤδη = "already"; οὕτως = "thus/in this way." Small words with significant logical weight.' },
+  unknown:     { title:'Phrase', body:'Tap individual words within this phrase to see their morphological parsing and lexical definition.' },
+};
+
+function _sxGroupPhrases(words) {
+  const cats = words.map((w, i) => ({
+    i, surface: w[0], strongs: w[1], morph: w[2],
+    pos: _sxPos(w[2]), cng: _sxCNG(w[2]), vtype: _sxVerbType(w[2]),
+  }));
+  const phrases = [];
+  let i = 0;
+  while (i < cats.length) {
+    const c = cats[i];
+    if (c.pos === 'CONJ' || c.pos === 'COND') {
+      phrases.push({ type: 'conjunction', clauseType: _SX_CLAUSE_TYPES[c.strongs] || 'conjunction', words: [i] });
+      i++; continue;
+    }
+    if (c.pos === 'ART') {
+      const g = { type: null, words: [i] };
+      const artCase = c.cng?.case;
+      i++;
+      while (i < cats.length) {
+        const n = cats[i];
+        if (['CONJ','COND','PREP'].includes(n.pos)) break;
+        if (n.pos === 'VERB' && n.vtype === 'finite') break;
+        if (n.pos === 'ART' && n.cng?.case !== artCase) break;
+        if (n.pos === 'ART') { g.words.push(i); i++; continue; }
+        if (n.pos === 'VERB' && n.vtype === 'participle') {
+          g.type = 'articular-participle'; g.words.push(i); i++; continue;
+        }
+        if (['NOUN','ADJ','PRON'].includes(n.pos)) {
+          if (!g.type) g.type = n.pos === 'NOUN' ? 'noun-phrase' :
+                                  n.pos === 'ADJ'  ? 'adj-phrase'  : 'pron-phrase';
+          g.words.push(i); i++; continue;
+        }
+        break;
+      }
+      if (!g.type) g.type = 'noun-phrase';
+      phrases.push(g); continue;
+    }
+    if (c.pos === 'PREP') {
+      const g = { type: 'prep-phrase', words: [i] };
+      i++;
+      while (i < cats.length) {
+        const n = cats[i];
+        if (['CONJ','COND'].includes(n.pos)) break;
+        if (n.pos === 'VERB' && n.vtype === 'finite') break;
+        if (['ART','NOUN','ADJ','PRON'].includes(n.pos)) { g.words.push(i); i++; continue; }
+        break;
+      }
+      phrases.push(g); continue;
+    }
+    if (c.pos === 'VERB') {
+      if (c.vtype === 'finite') { phrases.push({ type: 'finite-verb', words: [i] }); i++; continue; }
+      if (c.vtype === 'participle') {
+        const g = { type: 'participle-phrase', words: [i] }; i++;
+        while (i < cats.length) {
+          const n = cats[i];
+          if (['CONJ','COND','PREP','ART','VERB'].includes(n.pos)) break;
+          if (['NOUN','PRON'].includes(n.pos) && n.cng?.case === 'A') { g.words.push(i); i++; continue; }
+          break;
+        }
+        phrases.push(g); continue;
+      }
+      phrases.push({ type: 'infinitive', words: [i] }); i++; continue;
+    }
+    if (c.pos === 'NOUN' || c.pos === 'PRON') {
+      const g = { type: c.pos === 'NOUN' ? 'noun-phrase' : 'pron-phrase', words: [i] }; i++;
+      while (i < cats.length) {
+        if (cats[i].pos === 'PRON' && cats[i].cng?.case === 'G') { g.words.push(i); i++; continue; }
+        break;
+      }
+      phrases.push(g); continue;
+    }
+    if (c.pos === 'ADJ') { phrases.push({ type: 'adj-phrase', words: [i] }); i++; continue; }
+    phrases.push({ type: 'particle', words: [i] }); i++;
+  }
+  return { phrases, cats };
+}
+
+function _sxAssignRoles(phrases, cats) {
+  const hasFiniteVerb = phrases.some(p => p.type === 'finite-verb');
+  for (const p of phrases) {
+    if (p.type === 'finite-verb')       { p.role = 'predicate';     p.label = 'Verb';            p.color = 'verb'; }
+    else if (p.type === 'conjunction')  { p.role = 'conjunction';   p.label = _SX_CLAUSE_LABELS[p.clauseType] || 'Conjunction'; p.color = 'conj'; }
+    else if (p.type === 'prep-phrase')  { p.role = 'modifier';      p.label = 'Prep. Phrase';    p.color = 'prep'; }
+    else if (p.type === 'articular-participle') { p.role = 'attributive';    p.label = 'Attr. Participle'; p.color = 'part'; }
+    else if (p.type === 'participle-phrase')    { p.role = 'circumstantial'; p.label = 'Participle';       p.color = 'part'; }
+    else if (p.type === 'infinitive')   { p.role = 'infinitive';    p.label = 'Infinitive';      p.color = 'part'; }
+    else if (p.type === 'particle')     { p.role = 'particle';      p.label = 'Particle';        p.color = 'other'; }
+    else {
+      const cng = cats[p.words[0]]?.cng;
+      if (!cng) { p.role = 'unknown'; p.label = '?'; p.color = 'other'; continue; }
+      const cm = {
+        N: { role:'subject',    label:'Subject',    color:'subj' },
+        G: { role:'genitive',   label:'Genitive',   color:'gen'  },
+        D: { role:'dative',     label:'Dative',     color:'dat'  },
+        A: { role: hasFiniteVerb ? 'object' : 'accusative',
+             label: hasFiniteVerb ? 'Object'  : 'Accusative', color:'obj' },
+        V: { role:'vocative',   label:'Address',    color:'subj' },
+      }[cng.case] || { role:'unknown', label:'?', color:'other' };
+      p.role = cm.role; p.label = cm.label; p.color = cm.color;
+    }
+  }
+  return phrases;
+}
+
+function _sxConfidence(words, phrases) {
+  const finite = phrases.filter(p => p.type === 'finite-verb').length;
+  const conj   = phrases.filter(p => p.type === 'conjunction').length;
+  if (words.length > 25 || finite > 3 || conj > 4) return 'complex';
+  if (words.length > 15 || finite > 2 || conj > 2) return 'medium';
+  return 'clear';
+}
+
+function _sxAnalyze(words) {
+  const { phrases, cats } = _sxGroupPhrases(words);
+  _sxAssignRoles(phrases, cats);
+  const confidence = _sxConfidence(words, phrases);
+  const clauses = [];
+  let cur = { label: 'Main Clause', phrases: [], isMain: true };
+  for (const p of phrases) {
+    const isSub = p.type === 'conjunction' &&
+      !['coordinating','adversative','alternative'].includes(p.clauseType);
+    if (isSub) {
+      if (cur.phrases.length) clauses.push(cur);
+      cur = { label: _SX_CLAUSE_LABELS[p.clauseType] || 'Clause', conjPhrase: p, phrases: [], isMain: false };
+    } else {
+      cur.phrases.push(p);
+    }
+  }
+  if (cur.phrases.length) clauses.push(cur);
+  if (!clauses.length && phrases.length) clauses.push({ label: 'Clause', phrases, isMain: true });
+  return { clauses, confidence, cats };
+}
+
+// ── Syntax renderer ───────────────────────────────────────────────────────────
+
+function _renderSyntaxView(words, verse) {
+  if (!words.length) return '<p class="rsx-empty">No verse loaded.</p>';
+  const vArg = verse ? `, '${verse}'` : '';
+  const { clauses, confidence } = _sxAnalyze(words);
+  let html = '<div class="rsx-view">';
+  if (confidence === 'complex') {
+    html += `<div class="rsx-warning"><span class="material-symbols-outlined">info</span>Complex syntax — take extra time to study. Rules faithfully applied; some phrase relationships may be uncertain.</div>`;
+  }
+  for (const clause of clauses) {
+    html += `<div class="rsx-clause${clause.isMain ? ' rsx-main' : ''}">`;
+    if (!clause.isMain && clause.conjPhrase) {
+      const conjWord = words[clause.conjPhrase.words[0]][0];
+      html += `<div class="rsx-clause-hdr"><span class="rsx-conj-word">${conjWord}</span>${clause.label}</div>`;
+    } else {
+      html += `<div class="rsx-clause-hdr">${clause.label}</div>`;
+    }
+    html += `<div class="rsx-phrases">`;
+    for (const p of clause.phrases) {
+      html += `<div class="rsx-phrase rsx-c-${p.color || 'other'}" data-role="${p.role}" data-label="${p.label}" onclick="openRhemaSyntaxSheet(this)">`;
+      html += `<div class="rsx-ptag">${p.label}</div><div class="rsx-pwords">`;
+      for (const wi of p.words) {
+        const w = words[wi];
+        const lex = (window.RhemaLexicon || {})[w[1]] || {};
+        const gloss = (lex.brief || '').split(',')[0].split(';')[0].trim();
+        html += `<span class="rhema-word rsx-word" data-idx="${wi}" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
+        html += `<span class="rhema-greek-text">${w[0]}</span>`;
+        if (gloss && !_rhemaGreekOnly) html += `<span class="rhema-gloss">${gloss}</span>`;
+        html += `</span>`;
+      }
+      html += `</div></div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function openRhemaSyntaxSheet(el) {
+  const role  = el?.dataset?.role  || 'unknown';
+  const info  = _SX_ROLE_INFO[role] || _SX_ROLE_INFO.unknown;
+  const greekText = Array.from(el?.querySelectorAll('.rhema-greek-text') || []).map(e => e.textContent).join(' ');
+  document.querySelectorAll('.rsx-phrase.selected').forEach(e => e.classList.remove('selected'));
+  el?.classList.add('selected');
+  document.getElementById('rsxSheetGreek').textContent = greekText;
+  document.getElementById('rsxSheetRole').textContent  = info.title;
+  document.getElementById('rsxSheetBody').textContent  = info.body;
+  const sheet = document.getElementById('rhemaSyntaxSheet');
+  if (!sheet) return;
+  if (!sheet._swipeInit) {
+    sheet._swipeInit = true;
+    const handle = sheet.querySelector('.rhema-sheet-handle');
+    let sy = 0, cy = 0, dr = false;
+    handle?.addEventListener('touchstart', e => { sy = e.touches[0].clientY; cy = sy; dr = true; sheet.style.transition = 'none'; }, { passive: true });
+    handle?.addEventListener('touchmove', e => { if (!dr) return; cy = e.touches[0].clientY; const dy = cy - sy; if (dy > 0) { e.preventDefault(); sheet.style.transform = `translateY(${dy}px)`; } }, { passive: false });
+    handle?.addEventListener('touchend', () => { if (!dr) return; dr = false; if (cy - sy > 80) closeRhemaSyntaxSheet(); else { sheet.style.transition = 'transform 0.25s ease'; sheet.style.transform = 'translateY(0)'; } });
+  }
+  sheet.classList.add('open');
+  document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
+}
+
+function closeRhemaSyntaxSheet() {
+  const sheet = document.getElementById('rhemaSyntaxSheet');
+  if (sheet) { sheet.classList.remove('open'); sheet.style.transform = ''; sheet.style.transition = ''; }
+  document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
+  document.querySelectorAll('.rsx-phrase.selected').forEach(e => e.classList.remove('selected'));
+}
+
+function closeAnyRhemaSheet() {
+  closeRhemaSheet();
+  closeRhemaSyntaxSheet();
 }
 
 function toggleRhemaChapterMode() {
