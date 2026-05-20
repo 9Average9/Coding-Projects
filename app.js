@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.76";
+const APP_VERSION = "2.3.77";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -17406,6 +17406,12 @@ function _renderSyntaxView(words, verse) {
 }
 
 function _renderTreeClause(clause, words, verse, depth) {
+  // Synthetic wrapper (no phrases, no conjunction) — render children directly
+  // so the user never sees a "Main Clause" card wrapping another "Main Clause" card
+  if (!clause.conjPhrase && !clause.phrases.length && clause.children && clause.children.length) {
+    return clause.children.map(c => _renderTreeClause(c, words, verse, depth)).join('');
+  }
+
   const vArg  = verse ? `, '${verse}'` : '';
   const color = _SX_CLAUSE_COLORS[clause.clauseType] || 'var(--secondary-color)';
   let html = `<div class="rsx-clause-card rsx-depth-${Math.min(depth, 2)}" style="--clr:${color}">`;
