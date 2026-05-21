@@ -14896,54 +14896,20 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.89";
+const APP_VERSION = "2.5.0";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
+<div class="un-version-label">v2.5.0 — Workspace + Accessibility Update</div>
 <div class="un-section">
   <ul class="un-list">
-    <li><strong>Syntax Tool</strong> — New mode that breaks any verse into labeled phrase blocks: Subject, Verb, Object, Genitive, Dative, Prep Phrase, Participle, and more. Tap any block for a plain-English explanation of that grammatical role. Complex verses display a study caution banner.</li>
-    <li><strong>Tool Wheel</strong> — Tap the magic wand (✦) in the header to open an animated radial menu. Toggle Syntax, Highlights, and Greek Only — multiple tools can be active at once. Cross-Reference and Notes slots are reserved for upcoming features.</li>
-    <li><strong>Study sandbox</strong> — Word log shows the inflected surface form first, entries are tappable for full detail, and an explicit "Add to Word Log" button replaces auto-logging.</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.70 — Rhema picker and word sheet fixes</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Pickers no longer glitch</strong> — Removed a deprecated iOS scroll flag on the verse area that caused picker overlays to render incorrectly or appear behind content</li>
-    <li><strong>Word sheet no longer sticks</strong> — Fixed a race condition where partially dragging the word detail sheet and closing it elsewhere left an inline transform that stuck the sheet mid-screen on next open</li>
-    <li><strong>Stable picker heights</strong> — Switched sheet max-heights from dynamic to small viewport units so pickers don't resize when browser chrome shifts</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.69 — Profile color picker and scroll fixes</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Color picker no longer breaks scroll</strong> — Fixed a bug where opening the custom color wheel caused iOS to scroll-jump the profile and leave it unscrollable</li>
-    <li><strong>Stable profile height</strong> — Switched from dynamic to small viewport height (svh) so the profile layout doesn't reflow when the color picker or any system UI opens</li>
-    <li><strong>Duplicate function removed</strong> — Cleaned up a duplicate openCustomProfileColor definition that was silently overriding the correct one</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.68 — Profile scroll and layout fixes</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Full-screen profile</strong> — Profile page fills the entire viewport correctly on all devices</li>
-    <li><strong>No scroll chaining</strong> — Scrolling the profile no longer bleeds into the page body</li>
-    <li><strong>No stuck active states</strong> — Removed deprecated momentum scroll flag that caused buttons to appear pressed during fast scrolling on iOS</li>
-    <li><strong>Content clears navbar</strong> — Bottom padding correctly accounts for safe-area insets</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.67 — Add Abbott-Smith (TBESG) lexicon</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>No White Gap</strong> — Verse nav sits directly below the last word in the flex flow</li>
-    <li><strong>Word Sheet Opens Bigger</strong> — Sheet now opens at 60vh minimum (was 44vh)</li>
-  </ul>
-</div>
-<div class="un-version-label">v2.3.53 — Verse Nav Pinned to Bottom</div>
-<div class="un-section">
-  <ul class="un-list">
-    <li><strong>Reference & Arrows Locked</strong> — Verse nav is now absolutely pinned to the bottom of the screen</li>
-    <li><strong>White Bar Gone</strong> — Content area fills correctly with padding so no empty scroll space appears below verse text</li>
+    <li><strong>Study Workspace</strong> — Your studies now have a full Workspace tab (Observe, Interpret, Apply, Question). Long-press any verse in Rhema while a study is open to capture a thought. Greek verse and English translation appear together for comparison as you navigate.</li>
+    <li><strong>Greek keyboard in Workspace</strong> — Tap the α button in the workspace note compose area to toggle a Greek character keyboard for typing directly in Greek.</li>
+    <li><strong>Writing modal improvement</strong> — English (KJV) verse now appears below the Greek verse in the writing modal. Use the left/right arrows to navigate verses and compare Greek and English side by side.</li>
+    <li><strong>Rhema coach — one time only</strong> — The Rhema and Syntax onboarding coach now shows only once per device. It won't keep reappearing after you've completed it.</li>
+    <li><strong>Coach back button</strong> — Added a Back button to the coach walkthrough so you can revisit previous steps.</li>
+    <li><strong>Sheet close buttons</strong> — Every bottom sheet now has an ✕ close button for accessibility, in addition to swipe-to-dismiss.</li>
+    <li><strong>Home screen scroll</strong> — The home screen now scrolls properly when studies push content below the navigation bar.</li>
+    <li><strong>Various polish</strong> — Removed accidental text-selection popups on the home screen; tapping a verse in the workspace now correctly switches to the Rhema tab.</li>
   </ul>
 </div>
 `;
