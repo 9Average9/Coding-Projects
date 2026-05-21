@@ -8377,6 +8377,7 @@ function switchSandboxTab(tab) {
   document.querySelectorAll('#studyTabBar .ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
   if (tab === 'rhema') openSandboxRhema();
+  if (tab === 'notes') _updateWsVerseDisplay();
 }
 
 // Notes
@@ -8433,9 +8434,35 @@ function switchWorkspaceTab(type) {
   _workspaceTab = type;
   document.querySelectorAll('.ws-tab').forEach(b => b.classList.toggle('active', b.dataset.type === type));
   _renderWorkspaceEntries(_sandboxEntriesCache);
-  // Update compose placeholder
   const input = document.getElementById('ssNoteInput');
   if (input) input.placeholder = _WS_META[type]?.placeholder || 'Add a note…';
+  _updateWsVerseDisplay();
+}
+
+function _updateWsVerseDisplay() {
+  const refEl = document.getElementById('wsVerseRef');
+  const kjvEl = document.getElementById('wsVerseKjv');
+  if (!refEl) return;
+  const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook || '';
+  refEl.textContent = (bookName && _rhemaChapter && _rhemaVerse)
+    ? `${bookName} ${_rhemaChapter}:${_rhemaVerse}` : '';
+  if (kjvEl) {
+    kjvEl.textContent = (window.RhemaKJV && _rhemaBook && _rhemaChapter && _rhemaVerse)
+      ? ((window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '') : '';
+  }
+}
+
+function wsNavVerse(delta) {
+  if (!window.RhemaNT || !_rhemaBook || !_rhemaChapter) return;
+  const chapterData = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {};
+  const verses = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
+  const idx = verses.indexOf(Number(_rhemaVerse));
+  if (idx === -1) return;
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= verses.length) return;
+  _rhemaVerse = String(verses[newIdx]);
+  syncRhemaPicker();
+  _updateWsVerseDisplay();
 }
 
 function _renderWorkspaceEntries(entries) {
@@ -8837,7 +8864,7 @@ function _findMorphForSurface(strongs, surface) {
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
         for (const word of (bdata[ch][v] || [])) {
-          if (word[1] === strongs && _stripGreekAccents(word[0]).toLowerCase() === norm) return word[2] || '';
+          if (String(word[1]) === String(strongs) && _stripGreekAccents(word[0]).toLowerCase() === norm) return word[2] || '';
         }
       }
     }
@@ -8928,6 +8955,7 @@ function openSandboxWordDetail(strongs) {
   document.getElementById('ssWdLemma').textContent = lemma ? `${lemma}  (${translit})` : '';
   document.querySelectorAll('#ssWordDetailSheet .rhema-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('ssWdTabDef')?.classList.add('active');
+  _wlSelectedForm = null;
   const content = document.getElementById('ssWdContent');
   if (content) content.innerHTML = renderRhemaDefinition(strongs);
   document.getElementById('ssWordDetailSheet')?.classList.add('open');
@@ -8937,11 +8965,21 @@ function openSandboxWordDetail(strongs) {
 function showSandboxWordTab(tab) {
   const s = _ssActiveWordStrongs;
   if (!s) return;
+  const tabIdMap = { definition: 'ssWdTabDef', parsing: 'ssWdTabParse', occurrences: 'ssWdTabOcc' };
   document.querySelectorAll('#ssWordDetailSheet .rhema-tab').forEach(b =>
-    b.classList.toggle('active', b.id === (tab === 'definition' ? 'ssWdTabDef' : 'ssWdTabOcc')));
+    b.classList.toggle('active', b.id === tabIdMap[tab]));
   const content = document.getElementById('ssWdContent');
   if (!content) return;
-  content.innerHTML = tab === 'definition' ? renderRhemaDefinition(s) : renderRhemaOccurrences(s);
+  if (tab === 'definition') {
+    content.innerHTML = renderRhemaDefinition(s);
+  } else if (tab === 'parsing') {
+    const w = _sandboxWordLogCache.find(x => String(x.strongs) === String(s));
+    const surface = w?.surface || (window.RhemaLexicon?.[s]?.lemma) || '';
+    const morph = _findMorphForSurface(s, surface);
+    content.innerHTML = renderRhemaParsing(surface, s, morph);
+  } else {
+    content.innerHTML = renderRhemaOccurrences(s);
+  }
 }
 
 function closeSandboxWordDetail() {
@@ -18954,8 +18992,8 @@ function openRhemaBookVerses(code, strongs) {
     for (const v of verseNums) {
       const words = bookText[ch][v];
       const wordIdx = formNorm
-        ? words.findIndex(w => w[1] === strongs && _stripGreekAccents(w[0]).toLowerCase() === formNorm)
-        : words.findIndex(w => w[1] === strongs);
+        ? words.findIndex(w => String(w[1]) === String(strongs) && _stripGreekAccents(w[0]).toLowerCase() === formNorm)
+        : words.findIndex(w => String(w[1]) === String(strongs));
       if (wordIdx >= 0) refs.push({ ch, v, wordIdx, words });
     }
   }

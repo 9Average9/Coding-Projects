@@ -13898,7 +13898,7 @@ body.sandbox-open #rhemaModal {
 }
 .wl-key-bs:active { background: color-mix(in srgb, var(--muted-color) 20%, transparent); }
 .wl-results {
-  flex: 1; overflow-y: auto; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 12px);
+  flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 12px);
 }
 .wl-hint {
   padding: 32px 20px; text-align: center; color: var(--muted-color); font-size: 0.85rem; line-height: 1.5;
@@ -13923,3 +13923,29 @@ body.sandbox-open #rhemaModal {
   color: var(--accent-color, #4f8cff); background: color-mix(in srgb, var(--accent-color, #4f8cff) 14%, transparent);
   border-radius: 6px; padding: 2px 6px; flex-shrink: 0;
 }
+
+/* ── Workspace compose verse bar ────────────────────────────────────────────── */
+.ws-compose-verse {
+  flex-shrink: 0; background: var(--card-color);
+  border-top: 1px solid var(--border-color); padding: 8px 16px 6px;
+}
+.ws-compose-verse-nav {
+  display: flex; align-items: center; gap: 4px;
+}
+.ws-verse-arrow {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted-color); padding: 2px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.15s;
+}
+.ws-verse-arrow:active { color: var(--accent-color, #4f8cff); }
+.ws-verse-arrow .material-symbols-outlined { font-size: 20px; }
+.ws-compose-ref {
+  flex: 1; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-color);
+}
+.ws-compose-kjv {
+  font-size: 0.78rem; color: var(--muted-color); line-height: 1.5; font-style: italic;
+  margin-top: 4px;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.ss-compose { border-top: none; }
