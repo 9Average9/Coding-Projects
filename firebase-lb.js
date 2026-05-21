@@ -621,6 +621,29 @@ async function studyDeleteNote(studyId, noteId) {
   catch (e) { console.warn("studyDeleteNote:", e); return false; }
 }
 
+// Study Workspace Entries (observations / interpretations / applications / questions)
+function studyListenEntries(studyId, callback) {
+  const q = query(collection(db, "studies", studyId, "entries"), orderBy("createdAt", "asc"));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("studyListenEntries:", err); callback([]); });
+}
+async function studyAddEntry(studyId, uid, displayName, { type, content, verseRef, verseSnippet }) {
+  try {
+    await addDoc(collection(db, "studies", studyId, "entries"), {
+      type, content,
+      verseRef: verseRef || null,
+      verseSnippet: verseSnippet || '',
+      authorUid: uid, authorName: displayName,
+      createdAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) { console.warn("studyAddEntry:", e); return false; }
+}
+async function studyDeleteEntry(studyId, entryId) {
+  try { await deleteDoc(doc(db, "studies", studyId, "entries", entryId)); return true; }
+  catch (e) { console.warn("studyDeleteEntry:", e); return false; }
+}
+
 // Saved Verses
 function studyListenVerses(studyId, callback) {
   const q = query(collection(db, "studies", studyId, "savedVerses"), orderBy("savedAt", "asc"));
@@ -747,6 +770,7 @@ window.Studies = {
   openSession: studyOpenSession, saveRhemaPos: studySaveRhemaPos,
   listenStudy: studyListen,
   listenNotes: studyListenNotes, addNote: studyAddNote, deleteNote: studyDeleteNote,
+  listenEntries: studyListenEntries, addEntry: studyAddEntry, deleteEntry: studyDeleteEntry,
   listenVerses: studyListenVerses, saveVerse: studySaveVerse, deleteVerse: studyDeleteVerse,
   listenWordLog: studyListenWordLog, logWord: studyLogWord, deleteWordLog: studyDeleteWordLog,
   requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
