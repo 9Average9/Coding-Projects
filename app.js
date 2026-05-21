@@ -7992,7 +7992,8 @@ const screens = [
   "homeScreen", "profilePage", "communityPage", "csDetailPage",
   "newLearnMenu", "advancedLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
-  "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
+  "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen",
+  "nllView", "nbdView"
 ];
 
 const NAV_SCREENS = ['homeScreen', 'profilePage', 'communityPage'];
@@ -11160,6 +11161,8 @@ function closeLearnSideMenu() {
 }
 
 function showLearnLesson(lesson) {
+  if (NEW_STYLE_LESSON_CONFIG[lesson]) { openNllView(lesson); return; }
+
   const dashboard = document.getElementById("learnDashboard");
 
   if (dashboard) dashboard.style.display = "none";
@@ -11351,6 +11354,8 @@ const advLessonNumbers = {
 };
 
 function showAdvancedLesson(lessonId) {
+  if (NEW_STYLE_LESSON_CONFIG[lessonId]) { openNllView(lessonId); return; }
+
   const section = document.getElementById(lessonId + "Lesson");
   if (!section) {
     alert("This lesson is coming soon! Check back for updates.");
@@ -15068,9 +15073,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.3";
+const APP_VERSION = "2.5.4";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.5.4 — New Lesson Experience</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Redesigned lesson view</strong> — Basic and Advanced Lesson 1 now use a numbered timeline with per-block time estimates, sequential unlocking, and a dedicated content page per block.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.5.3 — Lesson Block Progress Fix</div>
 <div class="un-section">
   <ul class="un-list">
@@ -19246,4 +19257,238 @@ function renderRhemaBookVerses() {
       <button class="${kjvCls}" onclick="toggleRhemaBookViewKjv()">KJV</button>
     </div>
     <div>${rows}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NEW-STYLE LESSON UI  — block list + block detail views
+   ═══════════════════════════════════════════════════════════════════ */
+
+const NEW_STYLE_LESSON_CONFIG = {
+  history: {
+    lessonId: "history",
+    lessonNum: "LESSON 1",
+    title: "NT Greek Overview",
+    estimatedTime: "9 min",
+    decoLeft: "α",
+    decoMid: "account_balance",
+    decoRight: "Ω",
+    isAdvanced: false,
+    blocks: [
+      { title: "What is Koine Greek?",   time: "~3 min",   hasActivity: true  },
+      { title: "What did it look like?", time: "~1 min",   hasActivity: false },
+      { title: "Why this matters",       time: "~1.5 min", hasActivity: false },
+      { title: "Your goal",              time: "~1 min",   hasActivity: false },
+      { title: "Quick facts",            time: "~30 sec",  hasActivity: false },
+      { title: "Big Takeaway",           time: "~2 min",   hasActivity: true  },
+    ]
+  },
+  adv_history: {
+    lessonId: "adv_history",
+    lessonNum: "ADVANCED · LESSON 1",
+    title: "NT Greek Overview",
+    estimatedTime: "~25 min",
+    decoLeft: "κ",
+    decoMid: "history_edu",
+    decoRight: "ν",
+    isAdvanced: true,
+    blocks: [
+      { title: "What Is Koine Greek?",                         time: "~2 min",   hasActivity: true  },
+      { title: "The Timeline: Greek Through the Ages",         time: "~2 min",   hasActivity: true  },
+      { title: "Alexander the Great and the Lingua Franca",    time: "~3 min",   hasActivity: true  },
+      { title: "Why Greek? Providence and Language",           time: "~2 min",   hasActivity: false },
+      { title: "The Septuagint (LXX) — The Greek Old Testament", time: "~2.5 min", hasActivity: true },
+      { title: "The New Testament Documents",                  time: "~3 min",   hasActivity: true  },
+      { title: "NT Manuscripts — The Evidence",                time: "~2.5 min", hasActivity: false },
+      { title: "Textual Criticism — What Is It?",              time: "~2 min",   hasActivity: false },
+      { title: "What Greek Reveals That Translation Hides",    time: "~3 min",   hasActivity: false },
+      { title: "Mounce's Approach — What You're Signing Up For", time: "~2.5 min", hasActivity: false },
+      { title: "Lexicons and the Lexical Form",                time: "~2 min",   hasActivity: false },
+    ]
+  }
+};
+
+let currentNllLesson = null;
+let currentNbdBlockIndex = null;
+
+function openNllView(lessonId) {
+  hideBottomNav();
+  currentNllLesson = lessonId;
+  const cfg = NEW_STYLE_LESSON_CONFIG[lessonId];
+
+  document.getElementById("nllBadge").textContent        = cfg.lessonNum;
+  document.getElementById("nllDecoLeft").textContent     = cfg.decoLeft;
+  document.getElementById("nllDecoMid").textContent      = cfg.decoMid;
+  document.getElementById("nllDecoRight").textContent    = cfg.decoRight;
+  document.getElementById("nllLessonTitle").textContent  = cfg.title;
+  document.getElementById("nllEstTime").textContent      = "Estimated time: " + cfg.estimatedTime;
+
+  showScreen("nllView");
+  renderNllView(lessonId);
+}
+
+function renderNllView(lessonId) {
+  const cfg     = NEW_STYLE_LESSON_CONFIG[lessonId];
+  const opened  = openedLessonBlocks[lessonId] || [];
+  const isDone  = cfg.isAdvanced
+    ? completedAdvancedLessons[lessonId] === true
+    : completedLessons[lessonId] === true;
+
+  const list = document.getElementById("nllBlocksList");
+  list.innerHTML = "";
+
+  cfg.blocks.forEach((blockCfg, i) => {
+    const isFirst    = i === 0;
+    const isLast     = i === cfg.blocks.length - 1;
+    const isUnlocked = isFirst || opened.includes(i - 1) || isDone;
+    const isVisited  = opened.includes(i) || isDone;
+    const nextUnlocked = !isLast && (opened.includes(i) || isDone);
+
+    const circleState   = isVisited ? "done" : isUnlocked ? "active" : "locked-circle";
+    const circleContent = isVisited
+      ? `<span class="material-symbols-outlined">check</span>`
+      : String(i + 1);
+
+    const rightIcon = !isUnlocked
+      ? `<span class="material-symbols-outlined" style="font-size:1.05rem">lock</span>`
+      : !isVisited
+        ? `<span class="material-symbols-outlined">chevron_right</span>`
+        : "";
+
+    const connectorClass = nextUnlocked ? "solid" : "dashed";
+
+    const item = document.createElement("div");
+    item.className = `nll-block-item${isUnlocked ? "" : " locked"}`;
+    item.innerHTML = `
+      <div class="nll-left-col">
+        <div class="nll-circle ${circleState}">${circleContent}</div>
+        ${!isLast ? `<div class="nll-connector ${connectorClass}"></div>` : ""}
+      </div>
+      <div class="nll-right-col">
+        <div class="nll-card${isUnlocked ? "" : " locked-card"}">
+          <div class="nll-card-text">
+            <div class="nll-card-title">${blockCfg.title}</div>
+            <div class="nll-card-time">
+              <span class="material-symbols-outlined">schedule</span>${blockCfg.time}
+            </div>
+          </div>
+          <div class="nll-card-icon">${rightIcon}</div>
+        </div>
+      </div>`;
+
+    if (isUnlocked) {
+      item.addEventListener("click", () => openNbdView(lessonId, i));
+    }
+    list.appendChild(item);
+  });
+
+  // Progress bar
+  const visitedCount = isDone ? cfg.blocks.length : opened.length;
+  const pct = Math.min(100, Math.round((visitedCount / cfg.blocks.length) * 100));
+  document.getElementById("nllProgressFill").style.width = pct + "%";
+  document.getElementById("nllProgressPct").textContent  = pct + "%";
+
+  // Footer
+  const allVisited = visitedCount >= cfg.blocks.length;
+  const btn = document.getElementById("nllCompleteBtn");
+  const msg = document.getElementById("nllFooterMsg");
+
+  if (isDone) {
+    btn.textContent = cfg.isAdvanced ? "Quiz Completed ✓" : "Lesson Completed ✓";
+    btn.disabled = true;
+    btn.classList.add("completed");
+    msg.style.display = "none";
+  } else if (allVisited) {
+    btn.textContent = cfg.isAdvanced ? "Start Quiz" : "Complete Lesson";
+    btn.disabled = false;
+    btn.classList.remove("completed");
+    msg.style.display = "none";
+  } else {
+    const rem = cfg.blocks.length - visitedCount;
+    btn.textContent = cfg.isAdvanced ? "Start Quiz" : "Complete Lesson";
+    btn.disabled = true;
+    btn.classList.remove("completed");
+    msg.style.display = "block";
+    msg.textContent = `${rem} block${rem !== 1 ? "s" : ""} remaining.`;
+  }
+}
+
+function openNbdView(lessonId, blockIndex) {
+  currentNbdBlockIndex = blockIndex;
+  const cfg = NEW_STYLE_LESSON_CONFIG[lessonId];
+
+  // Mark as opened via the existing tracking system
+  const lessonSection = document.getElementById(lessonId + "Lesson");
+  if (lessonSection) {
+    const domBlocks = Array.from(lessonSection.querySelectorAll(".lesson-block"));
+    if (domBlocks[blockIndex]) {
+      markLessonBlockOpened(lessonSection, domBlocks[blockIndex]);
+    }
+  }
+
+  showScreen("nbdView");
+  document.getElementById("nbdTitle").textContent = cfg.blocks[blockIndex].title;
+
+  // Clone block content into the detail view
+  const contentEl = document.getElementById("nbdContent");
+  contentEl.innerHTML = "";
+
+  if (lessonSection) {
+    const domBlocks  = Array.from(lessonSection.querySelectorAll(".lesson-block"));
+    const srcContent = domBlocks[blockIndex]?.querySelector(".lesson-block-content");
+    if (srcContent) {
+      contentEl.innerHTML = srcContent.innerHTML;
+
+      // Restore previously answered KC state (advanced lessons)
+      if (cfg.isAdvanced) {
+        const answered = answeredKCs[lessonId] || {};
+        contentEl.querySelectorAll(".knowledge-check").forEach(kc => {
+          if (answered[kc.id]) {
+            kc.classList.add("answered");
+            kc.querySelectorAll(".kc-opt").forEach(b => { b.disabled = true; });
+          }
+        });
+      }
+
+      // Restore previously revealed Show-Answer buttons (basic lessons)
+      contentEl.querySelectorAll(".answer-row").forEach(row => {
+        // answers stay unrevealed on re-open — intentional (re-test yourself)
+      });
+
+      // Hook all interactive buttons to auto-unlock next block after interaction
+      contentEl.querySelectorAll(".small-btn, .kc-opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          setTimeout(() => {
+            if (lessonSection) {
+              const blocks = Array.from(lessonSection.querySelectorAll(".lesson-block"));
+              if (blocks[blockIndex]) markLessonBlockOpened(lessonSection, blocks[blockIndex]);
+            }
+          }, 120);
+        });
+      });
+    }
+  }
+
+  const scroll = document.querySelector("#nbdView .nbd-scroll");
+  if (scroll) scroll.scrollTop = 0;
+}
+
+function backToLessonList() {
+  showScreen("nllView");
+  renderNllView(currentNllLesson);
+}
+
+function backFromNllView() {
+  currentNllLesson = null;
+  showNewLearnMenu();
+}
+
+function nllCompleteLesson() {
+  if (!currentNllLesson) return;
+  const cfg = NEW_STYLE_LESSON_CONFIG[currentNllLesson];
+  if (cfg.isAdvanced) {
+    openAdvQuiz(currentNllLesson);
+  } else {
+    completeLesson(currentNllLesson);
+    renderNllView(currentNllLesson);
+  }
 }
