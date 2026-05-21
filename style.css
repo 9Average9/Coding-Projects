@@ -8721,6 +8721,18 @@ body.dark .track-tool-pill {
   color: #fff;
 }
 
+/* 4-tab layout: tighten up font/padding */
+.lesson-breakdown-tabs:has(> :nth-child(4)) .breakdown-tab {
+  font-size: 0.75rem;
+  padding: 7px 4px;
+}
+
+.lessons-breakdown-card.adv-tab-active #breakdownVerbAdvTab {
+  border-color: #c9a227;
+  background: #c9a227;
+  color: #fff;
+}
+
 .lessons-breakdown-card.adv-tab-active #breakdownBasicTab {
   border-color: #c9a227;
   color: #c9a227;
@@ -14096,4 +14108,410 @@ body.sandbox-open #rhemaModal {
 
 .lesson-est-time .material-symbols-outlined {
   font-size: 13px;
+}
+
+/* ===== GREEK VERBS LESSON TRACKS ===== */
+
+.basic-verb-lesson {
+  display: none;
+  padding: 0 0 40px;
+}
+
+.basic-verb-lesson.active {
+  display: block;
+}
+
+.adv-verb-lesson {
+  display: none;
+  padding: 0 0 40px;
+}
+
+.adv-verb-lesson.active {
+  display: block;
+}
+
+/* Verb lesson screens inherit block styling from the shared lesson-block rules */
+#basicVerbsLearnMenu .lesson-module,
+#advVerbsLearnMenu .lesson-module {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+}
+
+#basicVerbsLearnMenu .lesson-lead,
+#advVerbsLearnMenu .lesson-lead {
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 18px;
+  color: var(--text-color);
+  opacity: 0.88;
+}
+
+/* Quiz unlock area */
+.verb-quiz-area {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin: 20px 0 14px;
+  text-align: center;
+}
+
+.verb-quiz-area .quiz-locked-msg {
+  color: var(--text-muted, var(--text-color));
+  opacity: 0.7;
+  font-size: 0.88rem;
+  margin: 0 0 8px;
+}
+
+.quiz-start-btn {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s;
+}
+
+.quiz-start-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lesson-score-badge {
+  display: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+
+.lesson-score-badge.score-passed {
+  background: rgba(76, 175, 80, 0.15);
+  color: #2e7d32;
+}
+
+.lesson-score-badge.score-failed {
+  background: rgba(244, 67, 54, 0.12);
+  color: #c62828;
+}
+
+body.dark .lesson-score-badge.score-passed { color: #a5d6a7; background: rgba(76,175,80,0.2); }
+body.dark .lesson-score-badge.score-failed { color: #ef9a9a; background: rgba(244,67,54,0.18); }
+
+/* Verb Quiz Modal */
+.verb-quiz-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+
+.verb-quiz-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.verb-quiz-modal-card {
+  background: var(--card-bg, #fff);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 620px;
+  min-height: 360px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  transform: translateY(30px);
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+.verb-quiz-modal-overlay.open .verb-quiz-modal-card {
+  transform: translateY(0);
+}
+
+.verb-quiz-modal-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.verb-quiz-modal-topbar .vqm-back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.verb-quiz-modal-progress {
+  flex: 1;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.verb-quiz-modal-fill {
+  height: 100%;
+  background: var(--accent-color);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.verb-quiz-modal-counter {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted, var(--text-color));
+  opacity: 0.7;
+  min-width: 38px;
+  text-align: right;
+}
+
+.verb-quiz-modal-body {
+  padding: 22px 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.verb-quiz-modal-body.quiz-modal-body-animate {
+  animation: qmbSlideIn 0.2s ease;
+}
+
+@keyframes qmbSlideIn {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.quiz-modal-q-text {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 20px;
+  color: var(--text-color);
+}
+
+.quiz-modal-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.quiz-modal-opt {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: var(--text-color);
+}
+
+.quiz-modal-opt:hover:not(:disabled) {
+  border-color: var(--accent-color);
+  background: rgba(var(--accent-rgb, 100,100,200), 0.06);
+}
+
+.quiz-modal-opt.qm-selected {
+  border-color: var(--accent-color);
+  background: rgba(var(--accent-rgb, 100,100,200), 0.1);
+  font-weight: 600;
+}
+
+.quiz-modal-opt:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.verb-quiz-modal-result {
+  padding: 28px 24px;
+  text-align: center;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.verb-quiz-modal-result.hidden { display: none; }
+.verb-quiz-modal-body.hidden   { display: none; }
+
+.quiz-result-icon {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+}
+
+.quiz-see-results-btn {
+  margin-top: 18px;
+  width: 100%;
+}
+
+.quiz-answer-review {
+  text-align: left;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.quiz-answer-row {
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 0;
+}
+
+.quiz-answer-q {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.quiz-answer-wrong { color: #d32f2f; font-size: 0.85rem; margin: 2px 0; }
+.quiz-answer-correct { color: #2e7d32; font-size: 0.85rem; margin: 2px 0; }
+
+body.dark .quiz-answer-wrong { color: #ef9a9a; }
+body.dark .quiz-answer-correct { color: #a5d6a7; }
+
+/* Verb Lesson Complete Modal */
+.verb-lesson-complete-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+
+.verb-lesson-complete-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.verb-lesson-complete-card {
+  background: var(--card-bg, #fff);
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+}
+
+.verb-lesson-complete-card .lesson-complete-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.verb-lesson-complete-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.verb-lesson-complete-card p {
+  font-size: 0.92rem;
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+/* Verb Info Modals */
+.verb-info-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+
+.verb-info-modal.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.verb-info-card {
+  background: var(--card-bg, #fff);
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+}
+
+.verb-info-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.verb-info-card p,
+.verb-info-card li {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  opacity: 0.88;
+}
+
+/* Mobile full-width verb lessons */
+@media (max-width: 760px) {
+  body .app:has(#basicVerbsLearnMenu.screen.active .basic-verb-lesson.active),
+  body .app:has(#advVerbsLearnMenu.screen.active .adv-verb-lesson.active) {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  body #basicVerbsLearnMenu.screen.active:has(.basic-verb-lesson.active),
+  body #advVerbsLearnMenu.screen.active:has(.adv-verb-lesson.active) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body #basicVerbsLearnMenu .basic-verb-lesson.active,
+  body #basicVerbsLearnMenu .basic-verb-lesson.active .lesson-module,
+  body #advVerbsLearnMenu .adv-verb-lesson.active,
+  body #advVerbsLearnMenu .adv-verb-lesson.active .lesson-module {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  body #basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block,
+  body #basicVerbsLearnMenu .basic-verb-lesson.active .lesson-lead,
+  body #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block,
+  body #advVerbsLearnMenu .adv-verb-lesson.active .lesson-lead,
+  body #advVerbsLearnMenu .adv-verb-lesson.active .knowledge-check {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box;
+  }
+
+  body #basicVerbsLearnMenu.screen.active:has(.basic-verb-lesson.active) .nav-bar,
+  body #advVerbsLearnMenu.screen.active:has(.adv-verb-lesson.active) .nav-bar {
+    padding: 0 10px;
+  }
 }

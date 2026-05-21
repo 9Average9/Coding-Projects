@@ -7991,6 +7991,7 @@ let currentSentence = null;
 const screens = [
   "homeScreen", "profilePage", "communityPage", "csDetailPage",
   "newLearnMenu", "advancedLearnMenu",
+  "basicVerbsLearnMenu", "advVerbsLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
   "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
 ];
@@ -11200,6 +11201,12 @@ function showNewLearnMenu() {
     const savedMode = localStorage.getItem("lessonMode") || "basic";
     if (savedMode === "advanced") {
       showAdvancedLearnMenu();
+    } else if (savedMode === "verbBasic") {
+      if (typeof showBasicVerbsTrack === "function") showBasicVerbsTrack();
+      else _openBasicLearnMenu();
+    } else if (savedMode === "verbAdvanced") {
+      if (typeof showAdvVerbsTrack === "function") showAdvVerbsTrack();
+      else showAdvancedLearnMenu();
     } else {
       _openBasicLearnMenu();
     }
@@ -11244,6 +11251,10 @@ function selectLessonMode(mode) {
   hideLessonModeModal();
   if (mode === "advanced") {
     showAdvancedLearnMenu();
+  } else if (mode === "verbBasic") {
+    if (typeof showBasicVerbsTrack === "function") showBasicVerbsTrack();
+  } else if (mode === "verbAdvanced") {
+    if (typeof showAdvVerbsTrack === "function") showAdvVerbsTrack();
   } else {
     _openBasicLearnMenu();
   }
@@ -11265,8 +11276,14 @@ function updateLessonModeSettingsUI() {
   const label = document.getElementById("currentLessonModeLabel");
   const resetRow = document.getElementById("lessonModeResetRow");
   if (label) {
-    label.textContent = mode === "advanced" ? "Advanced Lessons" : "Basic Lessons";
-    label.classList.toggle("lesson-mode-label-advanced", mode === "advanced");
+    const labelMap = {
+      advanced: "Advanced Lessons",
+      verbBasic: "Greek Verbs — Basic",
+      verbAdvanced: "Greek Verbs — Advanced"
+    };
+    label.textContent = labelMap[mode] || "Basic Lessons";
+    label.classList.toggle("lesson-mode-label-advanced",
+      mode === "advanced" || mode === "verbAdvanced");
   }
   if (resetRow) resetRow.style.display = dismissed ? "flex" : "none";
 }
@@ -11313,7 +11330,11 @@ function showLearnDashboard() {
   }
 }
 function handleLearnBack() {
-  if (currentLearnLesson) {
+  if (typeof currentVerbBasicLesson !== "undefined" && currentVerbBasicLesson) {
+    if (typeof showVerbBasicDashboard === "function") showVerbBasicDashboard();
+  } else if (typeof currentVerbAdvLesson !== "undefined" && currentVerbAdvLesson) {
+    if (typeof showVerbAdvDashboard === "function") showVerbAdvDashboard();
+  } else if (currentLearnLesson) {
     showLearnDashboard();
   } else if (currentAdvLearnLesson) {
     showAdvancedLearnDashboard();
@@ -14841,6 +14862,78 @@ const ACHIEVEMENT_DATA = {
     icon: "👑",
     title: "Greek Master",
     desc: "Completed both the Basic and Advanced lesson tracks."
+  },
+
+  firstVerbLesson: {
+    icon: "🔤",
+    title: "First Verb Lesson",
+    desc: "Completed your first Greek Verbs lesson."
+  },
+
+  verbExplorer: {
+    icon: "🔍",
+    title: "Verb Explorer",
+    desc: "Completed 5 Greek Verbs lessons."
+  },
+
+  verbBasicComplete: {
+    icon: "📗",
+    title: "Verb Foundations",
+    desc: "Completed all 22 Basic Verb lessons."
+  },
+
+  presentTenseMaster: {
+    icon: "⏱️",
+    title: "Present Tense Master",
+    desc: "Completed the Present Tense and Aspect lessons."
+  },
+
+  aoristExplorer: {
+    icon: "📜",
+    title: "Aorist Explorer",
+    desc: "Completed all Aorist lessons in the Advanced Track."
+  },
+
+  voiceDetective: {
+    icon: "🔎",
+    title: "Voice Detective",
+    desc: "Completed all Voice lessons in the Advanced Track."
+  },
+
+  participleApprentice: {
+    icon: "🎓",
+    title: "Participle Apprentice",
+    desc: "Completed the Participle series in the Advanced Track."
+  },
+
+  greekReader1: {
+    icon: "📖",
+    title: "Greek Reader I",
+    desc: "Completed 10 Advanced Verb lessons."
+  },
+
+  greekReader2: {
+    icon: "📚",
+    title: "Greek Reader II",
+    desc: "Completed 20 Advanced Verb lessons."
+  },
+
+  greekReader3: {
+    icon: "🏛️",
+    title: "Greek Reader III",
+    desc: "Completed all 28 Advanced Verb lessons."
+  },
+
+  verbScholar: {
+    icon: "⭐",
+    title: "Verb Scholar",
+    desc: "Mastered the complete Greek Verbs curriculum."
+  },
+
+  verbAdvComplete: {
+    icon: "🌟",
+    title: "Advanced Track Complete",
+    desc: "Completed the full Advanced Verb Track."
   }
 };
 function unlockAchievement(id) {
@@ -14911,15 +15004,25 @@ function switchLessonBreakdownTab(tab, navigate) {
   if (navigate === undefined) navigate = _lessonBreakdownNavigate;
   const basicTab = document.getElementById("breakdownBasicTab");
   const advTab = document.getElementById("breakdownAdvancedTab");
+  const vbTab = document.getElementById("breakdownVerbBasicTab");
+  const vaTab = document.getElementById("breakdownVerbAdvTab");
   const card = document.querySelector(".lessons-breakdown-card");
   if (basicTab) basicTab.classList.toggle("active", tab === "basic");
   if (advTab) advTab.classList.toggle("active", tab === "advanced");
-  if (card) card.classList.toggle("adv-tab-active", tab === "advanced");
+  if (vbTab) vbTab.classList.toggle("active", tab === "verbBasic");
+  if (vaTab) vaTab.classList.toggle("active", tab === "verbAdv");
+  if (card) card.classList.toggle("adv-tab-active", tab === "advanced" || tab === "verbAdv");
 
   localStorage.setItem("lessonMode", tab);
   if (navigate) {
     if (tab === "advanced") {
       showAdvancedLearnMenu();
+    } else if (tab === "verbBasic") {
+      if (typeof showBasicVerbsTrack === "function") showBasicVerbsTrack();
+      else _openBasicLearnMenu();
+    } else if (tab === "verbAdv") {
+      if (typeof showAdvVerbsTrack === "function") showAdvVerbsTrack();
+      else showAdvancedLearnMenu();
     } else {
       _openBasicLearnMenu();
     }
@@ -14931,6 +15034,36 @@ function switchLessonBreakdownTab(tab, navigate) {
 function renderLessonsBreakdown(tab) {
   const list = document.getElementById("lessonsBreakdownList");
   if (!list) return;
+
+  if (tab === "verbBasic" && typeof VERB_BASIC_LESSONS !== "undefined") {
+    const completionMap = typeof completedVerbBasicLessons !== "undefined" ? completedVerbBasicLessons : {};
+    const titles = typeof VERB_BASIC_LESSON_TITLES !== "undefined" ? VERB_BASIC_LESSON_TITLES : {};
+    list.innerHTML = VERB_BASIC_LESSONS.map((id, i) => {
+      const done = completionMap[id] === true;
+      return `
+        <div class="breakdown-lesson-item ${done ? "done" : ""}">
+          <span class="breakdown-num">${i + 1}</span>
+          <span class="breakdown-name">${titles[id] || id}</span>
+          <span class="breakdown-status">${done ? "✓" : "○"}</span>
+        </div>`;
+    }).join("");
+    return;
+  }
+
+  if (tab === "verbAdv" && typeof VERB_ADV_LESSONS !== "undefined") {
+    const completionMap = typeof completedVerbAdvancedLessons !== "undefined" ? completedVerbAdvancedLessons : {};
+    const titles = typeof VERB_ADV_LESSON_TITLES !== "undefined" ? VERB_ADV_LESSON_TITLES : {};
+    list.innerHTML = VERB_ADV_LESSONS.map((id, i) => {
+      const done = completionMap[id] === true;
+      return `
+        <div class="breakdown-lesson-item ${done ? "done" : ""}">
+          <span class="breakdown-num">${i + 1}</span>
+          <span class="breakdown-name">${titles[id] || id}</span>
+          <span class="breakdown-status">${done ? "✓" : "○"}</span>
+        </div>`;
+    }).join("");
+    return;
+  }
 
   const isAdv = tab === "advanced";
   const lessons = isAdv ? REQUIRED_ADVANCED_LESSONS : REQUIRED_LESSONS;
@@ -15332,6 +15465,7 @@ async function restoreUserFromFirestore(user) {
   if (data.hasSeenLearnWelcome) localStorage.setItem("hasSeenLearnWelcome", "true");
   if (data.hasSeenHomeIntro) localStorage.setItem("hasSeenHomeIntro", "true");
   if (data.greekVocabStats) localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
+  if (typeof loadVerbDataFromSync === "function") loadVerbDataFromSync(data);
   friendsList = data.friends || [];
   friendRequestsIn = data.friendRequestsIn || [];
   friendRequestsOut = data.friendRequestsOut || [];
@@ -15382,7 +15516,8 @@ async function syncUserData() {
     lessonModePromptDismissed: localStorage.getItem("lessonModePromptDismissed") === "true",
     hasSeenLearnWelcome: localStorage.getItem("hasSeenLearnWelcome") === "true",
     hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true",
-    greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })()
+    greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })(),
+    ...(typeof getVerbSyncData === "function" ? getVerbSyncData() : {})
   };
 
   await window.Auth.syncUserData(user.uid, data);
