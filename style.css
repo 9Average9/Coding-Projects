@@ -11163,6 +11163,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Syntax diagram (horizontal tree) ──────────────────────────────── */
 
+/* Syntax tree must span all 4 grid columns so the diagram has full width for 2D scrolling */
+.rhema-verse-display .rsx-tree {
+  grid-column: 1 / -1;
+}
+
 .rsx-diagram {
   overflow-x: auto;
   overflow-y: auto;
@@ -13076,6 +13081,8 @@ body .app:has(#settingsScreen.screen.active) {
   display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
   cursor: pointer; position: relative; overflow: hidden;
   transition: transform 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .hs-study-card::before {
   content: ''; position: absolute; inset: 0;
