@@ -12105,7 +12105,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rhema-sandbox-arrows {
   position: fixed;
   left: 0; right: 0;
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 4px);
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 12px);
   display: none;
   justify-content: space-between;
   align-items: center;
@@ -12294,7 +12294,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--card-color);
+  background: #ffffff;
   border-radius: 22px 22px 0 0;
   box-shadow: 0 -6px 40px rgba(0,0,0,0.18);
   border-top: 1.5px solid var(--border-color);
@@ -12317,6 +12317,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   transition: transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1),
               visibility 0s linear 0s;
 }
+body.dark .rhema-sheet { background: #1f2937; }
+body.sepia .rhema-sheet { background: #fffcf2; }
 
 .rhema-sheet-handle {
   width: 40px;
