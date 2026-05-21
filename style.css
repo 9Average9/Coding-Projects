@@ -13429,12 +13429,6 @@ body.sandbox-open .ss-pane {
 body.sandbox-open #rhemaModal {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
-/* Modal already sits above the tab bar; just add a small gap so the sheet
-   doesn't sit flush against the modal's bottom edge */
-body.sandbox-open .rhema-sheet,
-body.sandbox-open .rhema-picker-sheet {
-  bottom: 20px;
-}
 
 .ss-tab {
   flex: 1; padding: 10px 4px 8px;
