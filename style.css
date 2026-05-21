@@ -12102,17 +12102,17 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 /* ── Verse nav bar — direct flex child of overlay, always at physical screen bottom ── */
 /* ── Floating prev/next arrows for study-sandbox Rhema ── */
 .rhema-sandbox-arrows {
-  position: absolute;
+  position: fixed;
   left: 0; right: 0;
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 8px);
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 4px);
   display: none;
   justify-content: space-between;
   align-items: center;
   padding: 0 16px;
   pointer-events: none;
-  z-index: 20;
+  z-index: 1050; /* above rhema modal (1000), below study tab bar (1100) */
 }
-#rhemaSlide.sandbox-nav .rhema-sandbox-arrows { display: flex; }
+.rhema-sandbox-arrows.visible { display: flex; }
 .rhema-sandbox-nav-btn {
   pointer-events: all;
   background: color-mix(in srgb, var(--card-color) 88%, transparent);
@@ -13429,7 +13429,8 @@ body.sandbox-open #rhemaModal {
 /* Remove safe-area padding from sheets; the modal already clears the tab bar */
 body.sandbox-open .rhema-sheet,
 body.sandbox-open .rhema-picker-sheet {
-  padding-bottom: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 12px;
 }
 
 .ss-tab {
