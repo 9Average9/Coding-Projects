@@ -1,0 +1,1506 @@
+<!-- ============================================================ -->
+<!-- SECTION 1: verbAdvDashboard MENU -->
+<!-- ============================================================ -->
+
+<div id="verbAdvDashboard">
+  <div class="advanced-learn-header">
+    <div class="advanced-learn-badge"><span class="material-symbols-outlined">school</span>Advanced Verb Track</div>
+    <p>Deep study of Greek verbal aspect, syntax, voice, and real NT reading. Quizzes required.</p>
+  </div>
+  <button class="lesson-progress-badge advanced" onclick="showLessonsBreakdownModal('verbAdv')">
+    <span class="material-symbols-outlined">check_circle</span>
+    <span id="verbAdvProgressText">0 of 28 complete</span>
+    <span class="material-symbols-outlined lesson-progress-arrow">chevron_right</span>
+  </button>
+  <div class="learn-path-grid advanced-path-grid">
+
+    <button onclick="showAdvVerbLesson('va_01')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">1</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Verbs and Communication</strong>
+        <small>How Greek verbs convey perspective and emphasis</small>
+        <span class="lesson-status" data-verb-lesson-status="va_01">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_02')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">2</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Embedded Subjects</strong>
+        <small>How verb endings carry the subject in Greek</small>
+        <span class="lesson-status" data-verb-lesson-status="va_02">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_03')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">3</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Present Tense and Imperfective Aspect</strong>
+        <small>Understanding ongoing action and aspect</small>
+        <span class="lesson-status" data-verb-lesson-status="va_03">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_04')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">4</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Imperfect in Narrative</strong>
+        <small>Unfolding action in NT story sections</small>
+        <span class="lesson-status" data-verb-lesson-status="va_04">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_05')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">5</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Future Tense Nuance</strong>
+        <small>Promise, prediction, warning, and expectation</small>
+        <span class="lesson-status" data-verb-lesson-status="va_05">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_06')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">6</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Aorist Overview</strong>
+        <small>Action as a whole — avoiding oversimplification</small>
+        <span class="lesson-status" data-verb-lesson-status="va_06">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_07')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">7</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Constative and Ingressive Ideas</strong>
+        <small>Interpretive categories for aorist usage</small>
+        <span class="lesson-status" data-verb-lesson-status="va_07">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_08')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">8</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Culminative Ideas</strong>
+        <small>Emphasis on completion and end result</small>
+        <span class="lesson-status" data-verb-lesson-status="va_08">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_09')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">9</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Second Aorists</strong>
+        <small>Stem recognition and irregular forms</small>
+        <span class="lesson-status" data-verb-lesson-status="va_09">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_10')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">10</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Aspect and Time</strong>
+        <small>Balancing time reference and verbal aspect</small>
+        <span class="lesson-status" data-verb-lesson-status="va_10">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_11')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">11</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Active Voice in Depth</strong>
+        <small>Agency, subject involvement, and force</small>
+        <span class="lesson-status" data-verb-lesson-status="va_11">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_12')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">12</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Middle Voice Nuance</strong>
+        <small>Beyond reflexive — subject involvement and interest</small>
+        <span class="lesson-status" data-verb-lesson-status="va_12">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_13')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">13</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Passive Voice Nuance</strong>
+        <small>Received action, implied agency, divine passive</small>
+        <span class="lesson-status" data-verb-lesson-status="va_13">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_14')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">14</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Deponent Discussion</strong>
+        <small>Middle/passive forms with active meaning</small>
+        <span class="lesson-status" data-verb-lesson-status="va_14">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_15')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">15</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Imperatives and Force</strong>
+        <small>Urgency, intensity, and tone in commands</small>
+        <span class="lesson-status" data-verb-lesson-status="va_15">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_16')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">16</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Subjunctive Introduction</strong>
+        <small>Possibility, contingency, and expectation</small>
+        <span class="lesson-status" data-verb-lesson-status="va_16">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_17')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">17</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Infinitives in Syntax</strong>
+        <small>Verbal nouns in Greek sentence structures</small>
+        <span class="lesson-status" data-verb-lesson-status="va_17">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_18')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">18</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Participles as Verbal Adjectives</strong>
+        <small>Blending verbal force and adjectival function</small>
+        <span class="lesson-status" data-verb-lesson-status="va_18">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_19')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">19</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Attributive Participles</strong>
+        <small>Participles functioning within noun structures</small>
+        <span class="lesson-status" data-verb-lesson-status="va_19">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_20')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">20</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Circumstantial Participles</strong>
+        <small>Temporal, causal, concessive, conditional relationships</small>
+        <span class="lesson-status" data-verb-lesson-status="va_20">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_21')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">21</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Genitive Absolute</strong>
+        <small>Structure and function of the genitive absolute</small>
+        <span class="lesson-status" data-verb-lesson-status="va_21">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_22')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">22</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Conditional Statements</strong>
+        <small>Protasis, apodosis, and classification systems</small>
+        <span class="lesson-status" data-verb-lesson-status="va_22">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_23')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">23</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Principal Parts Strategy</strong>
+        <small>Long-term memorization and recognition strategies</small>
+        <span class="lesson-status" data-verb-lesson-status="va_23">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_24')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">24</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Complex Parsing</strong>
+        <small>Tense, voice, mood, syntax, and nuance integrated</small>
+        <span class="lesson-status" data-verb-lesson-status="va_24">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_25')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">25</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Translation Philosophy</strong>
+        <small>Literal, smooth, and interpretive approaches</small>
+        <span class="lesson-status" data-verb-lesson-status="va_25">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~7 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_26')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">26</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Exegetical Pitfalls</strong>
+        <small>Avoiding over-reading tense and forcing theology</small>
+        <span class="lesson-status" data-verb-lesson-status="va_26">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~8 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_27')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">27</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Extended NT Reading</strong>
+        <small>Following extended NT sections more naturally</small>
+        <span class="lesson-status" data-verb-lesson-status="va_27">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~9 min</small>
+      </div>
+    </button>
+
+    <button onclick="showAdvVerbLesson('va_28')">
+      <div class="lesson-number-wrap">
+        <div class="lesson-number">28</div>
+        <div class="lesson-label">Advanced</div>
+      </div>
+      <div class="lesson-text">
+        <strong>Final Integration</strong>
+        <small>Synthesizing all major systems and reading strategies</small>
+        <span class="lesson-status" data-verb-lesson-status="va_28">○ Not completed</span>
+        <small class="lesson-est-time"><span class="material-symbols-outlined">schedule</span> ~10 min</small>
+      </div>
+    </button>
+
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 2: 28 LESSON SECTIONS -->
+<!-- ============================================================ -->
+
+
+<!-- ============================================================ -->
+<!-- va_01: Verbs and Communication -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_01VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">This lesson revisits the fundamental purpose of Greek verbs, emphasizing that they communicate far more than simple actions.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">What Greek Verbs Communicate</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek verbs communicate:</p>
+        <ul>
+          <li>action</li>
+          <li>perspective</li>
+          <li>progression</li>
+          <li>emphasis</li>
+          <li>condition</li>
+          <li>expectation</li>
+        </ul>
+        <p>Parsing exists to help explain communication.</p>
+        <p class="highlight">A Greek verb is not merely a grammar label — it is the primary engine of meaning in any sentence.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Why Parsing Serves Communication</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Students sometimes treat parsing as an end in itself — a grammar exercise to complete. But parsing exists to explain communication.</p>
+        <p>When you parse a verb, you are answering the question: <em>What is this verb telling its reader?</em></p>
+        <ul>
+          <li>What is happening?</li>
+          <li>How is the action being viewed?</li>
+          <li>Who is involved?</li>
+          <li>What kind of statement is being made?</li>
+        </ul>
+        <p class="highlight">Parsing is a tool for understanding a verb's function — not an end in itself.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Five Elements of a Parse</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>A standard Greek verb parse identifies five elements:</p>
+        <ul>
+          <li><strong>Tense</strong> — time and aspect of the action</li>
+          <li><strong>Voice</strong> — subject's relationship to the action</li>
+          <li><strong>Mood</strong> — type of communication (statement, command, etc.)</li>
+          <li><strong>Person</strong> — first, second, or third</li>
+          <li><strong>Number</strong> — singular or plural</li>
+        </ul>
+        <p>Notice that gender agreement is <em>not</em> part of a finite verb parse — gender belongs to nouns, adjectives, and participles, not to the verb form itself.</p>
+        <p class="highlight">Each element of the parse serves the goal of understanding what the verb communicates in context.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_01_1">
+      <p class="kc-question">What does a Greek verb communicate that goes beyond simple action?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_01_1', this)">Action alone</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_01_1', this)">Action, perspective, progression, emphasis, condition, and expectation</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_01_1', this)">Tense and person only</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_01_1', this)">Grammatical relationships between nouns</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_01_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_01_2">
+      <p class="kc-question">What is the primary purpose of parsing a Greek verb?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_01_2', this)">To help with speed-reading</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_01_2', this)">To explain how the verb communicates its meaning</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_01_2', this)">To memorize vocabulary</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_01_2', this)">To translate without context</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_01_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_01">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_01">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_01" onclick="openVerbAdvQuiz('va_01')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_01" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_01" disabled onclick="completeVerbAdvancedLesson('va_01')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_02: Embedded Subjects -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_02VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Greek verb endings often communicate the subject without requiring explicit pronouns. When explicit pronouns do appear, they carry deliberate communicative weight.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Subject Embedded in the Ending</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>One of the most striking features of Greek is that the verb ending communicates person and number, embedding the subject within the verb itself.</p>
+        <p>Consider γράφω — the single word means "I write." The -ω ending communicates first person singular. No separate word for "I" is required.</p>
+        <ul>
+          <li><strong>γράφω</strong> — I write</li>
+          <li><strong>γράφεις</strong> — you write</li>
+          <li><strong>γράφει</strong> — he/she writes</li>
+          <li><strong>γράφομεν</strong> — we write</li>
+        </ul>
+        <p class="highlight">In Greek, the verb ending communicates person and number, embedding the subject within the verb itself.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">When Explicit Pronouns Appear</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Because the verb already communicates the subject, explicit pronouns in Greek are not required. When a writer <em>does</em> include an explicit pronoun alongside a verb, that choice is deliberate.</p>
+        <p>Explicit pronouns may add:</p>
+        <ul>
+          <li><strong>emphasis</strong> — "I myself write" (not someone else)</li>
+          <li><strong>contrast</strong> — "I write, but you do not"</li>
+          <li><strong>clarification</strong> — making the subject explicit in a complex context</li>
+        </ul>
+        <p>For example, ἐγὼ γράφω places ἐγώ ("I") before the verb. Since γράφω already says "I," adding ἐγώ emphasizes the subject — "I myself write."</p>
+        <p class="highlight">Explicit pronouns are rhetorical choices. They add emphasis, contrast, or clarification beyond what the verb ending already communicates.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_02_1">
+      <p class="kc-question">How does Greek communicate the subject of a verb without an explicit pronoun?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_02_1', this)">English always requires a subject before the verb</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_02_1', this)">The verb ending communicates person and number, embedding the subject within the verb</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_02_1', this)">Definite articles mark verb subjects</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_02_1', this)">Word position in the sentence identifies the subject</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_02_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_02_2">
+      <p class="kc-question">When a Greek writer adds an explicit pronoun alongside a verb, this typically indicates:</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_02_2', this)">The verb is future tense</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_02_2', this)">Emphasis, contrast, or clarification</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_02_2', this)">The verb is passive voice</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_02_2', this)">The sentence is a question</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_02_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_02">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_02">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_02" onclick="openVerbAdvQuiz('va_02')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_02" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_02" disabled onclick="completeVerbAdvancedLesson('va_02')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_03: Present Tense and Imperfective Aspect -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_03VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">The present tense often portrays action as ongoing, unfolding, or in progress. Students must resist reducing the present tense to simple "present time."</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Imperfective Aspect Defined</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The present tense typically portrays action as ongoing, unfolding, or in progress. Linguists call this <strong>imperfective aspect</strong> — the action is viewed as an open, developing event rather than a closed whole.</p>
+        <p>English equivalents often include:</p>
+        <ul>
+          <li>"He writes." — simple present, but often implying habit or ongoing state</li>
+          <li>"He is writing." — present continuous, making the process explicit</li>
+        </ul>
+        <p>Neither English form perfectly captures what the Greek present communicates in every context — the key is the <em>perspective</em>: action viewed as ongoing and unfolding.</p>
+        <p class="highlight">The present tense portrays action as ongoing, unfolding, or in progress — what linguists call imperfective aspect.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Critical Mistake to Avoid</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The most important warning about the present tense: <strong>Do not reduce present tense to simple "present time."</strong></p>
+        <p>Greek tense communicates both aspect and temporal reference. To collapse the present tense into merely "happening now" ignores the imperfective aspect — the way it portrays action as ongoing or unfolding.</p>
+        <p>The present tense can even describe future events when the context makes clear the speaker is portraying something with certainty or vividness.</p>
+        <p class="highlight">Do not reduce the present tense to only present time. Both time and aspect operate together.</p>
+        <hr/>
+        <p>This principle extends beyond the present tense — it applies to every tense in the Greek system. Tense communicates viewpoint as well as time.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_03_1">
+      <p class="kc-question">What aspect does the Greek present tense typically communicate?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_03_1', this)">Past completed action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_03_1', this)">Ongoing, unfolding, or in-progress action</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_03_1', this)">Future expectation</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_03_1', this)">Completed action with ongoing result</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_03_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_03_2">
+      <p class="kc-question">What is the primary mistake to avoid with the Greek present tense?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_03_2', this)">Using it too broadly in translation</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_03_2', this)">Reducing it to only present time reference, ignoring imperfective aspect</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_03_2', this)">Confusing it with the imperfect tense</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_03_2', this)">Treating it as identical to English present tense</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_03_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_03">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_03">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_03" onclick="openVerbAdvQuiz('va_03')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_03" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_03" disabled onclick="completeVerbAdvancedLesson('va_03')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_04: Imperfect in Narrative -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_04VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">The imperfect frequently appears in narrative sections to portray unfolding action. Students should notice how it contributes to scene development.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Imperfect in Narrative Context</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The imperfect tense frequently appears in narrative sections — especially in the Gospels and Acts — to portray past action as ongoing or unfolding at that moment in the story.</p>
+        <p>When a Greek narrative writer wants to show what was happening in the background, or to slow down the scene and show it developing, the imperfect is the natural choice.</p>
+        <ul>
+          <li>The crowd <strong>was gathering</strong> (imperfect — ongoing)</li>
+          <li>People <strong>were coming</strong> from every direction (imperfect — unfolding)</li>
+          <li>He <strong>was teaching</strong> them (imperfect — continuous activity)</li>
+        </ul>
+        <p class="highlight">The imperfect frequently appears in narrative sections to portray unfolding action and scene development.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Imperfect vs. Aorist in Narrative</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Understanding the imperfect requires contrasting it with the aorist. Both are past tenses, but their aspects differ significantly:</p>
+        <ul>
+          <li><strong>Imperfect</strong> — portrays action as ongoing or unfolding (imperfective aspect)</li>
+          <li><strong>Aorist</strong> — presents action as a complete whole (perfective/aoristic aspect)</li>
+        </ul>
+        <p>In a narrative passage, the aorist often drives the story forward with individual completed events, while the imperfect lingers and shows action in motion.</p>
+        <p>Students should notice how the interplay of imperfect and aorist contributes to how a scene develops — the imperfect paints the background, the aorist moves the plot.</p>
+        <p class="highlight">Imperfect portrays ongoing/unfolding action. Aorist presents action as a complete whole. The difference matters for reading narrative with precision.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_04_1">
+      <p class="kc-question">Where does the imperfect tense most commonly appear in NT Greek?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_04_1', this)">In letters and commands</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_04_1', this)">In narrative sections where scenes unfold</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_04_1', this)">In purpose clauses</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_04_1', this)">In direct speech only</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_04_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_04_2">
+      <p class="kc-question">How does the imperfect differ from the aorist in narrative use?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_04_2', this)">The imperfect is future; the aorist is past</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_04_2', this)">The imperfect portrays ongoing/unfolding action; the aorist presents action as a complete whole</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_04_2', this)">The imperfect is always active; the aorist is always passive</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_04_2', this)">The imperfect is emphatic; the aorist is de-emphasized</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_04_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_04">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_04">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_04" onclick="openVerbAdvQuiz('va_04')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_04" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_04" disabled onclick="completeVerbAdvancedLesson('va_04')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_05: Future Tense Nuance -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_05VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Future verbs may communicate expectation, prediction, promise, or warning. Context matters greatly in determining which communicative force is in play.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Range of Future Tense Communication</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The Greek future tense is not limited to simple factual statements about what will happen. Future verbs may communicate:</p>
+        <ul>
+          <li><strong>expectation</strong> — what is anticipated to occur</li>
+          <li><strong>prediction</strong> — what the speaker foresees</li>
+          <li><strong>promise</strong> — a commitment about future action</li>
+          <li><strong>warning</strong> — alerting someone to a future consequence</li>
+        </ul>
+        <p>The same grammatical form carries different communicative force depending on who is speaking, to whom, and in what situation. Context matters.</p>
+        <p class="highlight">Future verbs may communicate expectation, prediction, promise, or warning. Context determines which.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Context Shapes Future Force</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Consider how the same future tense form means different things in different contexts:</p>
+        <ul>
+          <li>"I will be with you always." — a divine <strong>promise</strong></li>
+          <li>"You will not escape judgment." — a solemn <strong>warning</strong></li>
+          <li>"The Son of Man will come." — a prophetic <strong>prediction</strong></li>
+          <li>"He will arrive tomorrow." — a simple <strong>expectation</strong></li>
+        </ul>
+        <p>The grammatical form is identical in each case. What changes is the communicative context — who speaks, the relationship between speaker and audience, and the discourse setting.</p>
+        <p class="highlight">Context — not grammar alone — determines whether a future verb communicates promise, warning, prediction, or expectation.</p>
+        <hr/>
+        <p>Students should resist mechanical reading of future verbs. Always ask: in this context, what kind of future statement is being made?</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_05_1">
+      <p class="kc-question">Greek future tense verbs can communicate which range of ideas?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_05_1', this)">Only factual future events</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_05_1', this)">Expectation, prediction, promise, or warning</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_05_1', this)">Only divine pronouncements</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_05_1', this)">Only questions about the future</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_05_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_05_2">
+      <p class="kc-question">What determines the specific communicative force of a future verb?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_05_2', this)">The person and number of the verb</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_05_2', this)">Context — who is speaking, to whom, and in what situation</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_05_2', this)">Whether the verb has a smooth or rough breathing</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_05_2', this)">Whether the verb appears before or after its subject</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_05_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_05">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_05">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_05" onclick="openVerbAdvQuiz('va_05')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_05" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_05" disabled onclick="completeVerbAdvancedLesson('va_05')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_06: Aorist Overview -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_06VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">The aorist is often misunderstood. Students must avoid simplistic formulas. The aorist frequently presents action as a complete or undefined whole.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">What the Aorist Communicates</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The aorist tense typically presents action as a complete or undefined whole — without focusing on its duration, its beginning, or its ongoing result.</p>
+        <p>Rather than showing action as ongoing (imperfect) or as completed with a present result (perfect), the aorist simply presents the event — often without further commentary on how it unfolded.</p>
+        <ul>
+          <li>"He spoke." — the event, presented simply</li>
+          <li>"She came." — the action, as a whole</li>
+          <li>"They believed." — the act, without further detail</li>
+        </ul>
+        <p class="highlight">The aorist frequently presents action as a complete or undefined whole.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Avoiding Simplistic Formulas</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>A common and serious mistake is reducing the aorist to a simplistic formula such as "once-for-all action." This oversimplification has led to significant interpretive errors in NT scholarship.</p>
+        <p>The aorist does not by itself communicate:</p>
+        <ul>
+          <li>That an action happened only once</li>
+          <li>That an action can never be repeated</li>
+          <li>Special theological permanence or finality</li>
+        </ul>
+        <p>The aorist communicates <em>aspect</em> — a perspective on the action as a whole — not special theological force on its own.</p>
+        <p class="highlight">Avoid simplistic formulas. Context — not the aorist tense alone — determines whether an action is one-time or repeated.</p>
+        <hr/>
+        <p>Over-reading the aorist has produced some inflated theological claims that the grammar cannot actually support. Students should resist that temptation and allow context to do its proper interpretive work.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_06_1">
+      <p class="kc-question">What does the aorist tense typically communicate?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_06_1', this)">Past ongoing action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_06_1', this)">Action as a complete or undefined whole</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_06_1', this)">Completed action with ongoing result</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_06_1', this)">Future expectation</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_06_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_06_2">
+      <p class="kc-question">Why is calling the aorist "once-for-all action" an oversimplification?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_06_2', this)">The aorist is actually quite rare in the NT</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_06_2', this)">The aorist does not by itself communicate that an action cannot be repeated</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_06_2', this)">The aorist is entirely meaningless</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_06_2', this)">The aorist is better called "the tense of completion"</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_06_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_06">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_06">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_06" onclick="openVerbAdvQuiz('va_06')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_06" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_06" disabled onclick="completeVerbAdvancedLesson('va_06')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_07: Constative and Ingressive Ideas -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_07VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Students explore common interpretive categories associated with aorist usage. These categories describe patterns, not rigid rules.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Constative Aorist</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>constative</strong> (or summary) use of the aorist views the entire event as a single whole unit, without focusing on any particular moment within it — not the beginning, not the end, not the middle.</p>
+        <p>It "sums up" the action as one event:</p>
+        <ul>
+          <li>"Paul preached for three years in Ephesus." — the whole activity viewed as one unit</li>
+          <li>"The disciples followed Jesus." — their entire discipleship in one expression</li>
+        </ul>
+        <p>The constative aorist is the most common category — it represents the default function of the aorist presenting a whole event without commentary.</p>
+        <p class="highlight">A constative aorist views the entire event as a whole unit, without focusing on any particular moment within it.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Ingressive Aorist</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>ingressive</strong> (or inceptive) use of the aorist focuses on the beginning or entry into an action or state.</p>
+        <p>Where the context makes clear that the point of focus is the start of something, an ingressive translation is appropriate:</p>
+        <ul>
+          <li>"He <strong>began to reign</strong>." — entry into the state of reigning</li>
+          <li>"She <strong>fell sick</strong>." — entering the state of sickness</li>
+          <li>"They <strong>burst into tears</strong>." — entry into weeping</li>
+        </ul>
+        <p>Important: these categories describe patterns, not rigid rules. Not every aorist of a verb that can be ingressive <em>is</em> ingressive — context determines which interpretation fits.</p>
+        <p class="highlight">The ingressive aorist focuses on the beginning or entry into an action. These categories describe patterns, not rigid rules.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_07_1">
+      <p class="kc-question">What does a constative use of the aorist communicate?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_07_1', this)">The beginning of an action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_07_1', this)">The entire event viewed as a whole</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_07_1', this)">The end result of an action</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_07_1', this)">An ongoing background action</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_07_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_07_2">
+      <p class="kc-question">What does an ingressive use of the aorist focus on?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_07_2', this)">The end result or climax</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_07_2', this)">The beginning or entry into an action</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_07_2', this)">Action ongoing throughout</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_07_2', this)">The completion of the action</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_07_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_07">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_07">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_07" onclick="openVerbAdvQuiz('va_07')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_07" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_07" disabled onclick="completeVerbAdvancedLesson('va_07')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_08: Culminative Ideas -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_08VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Some aorists emphasize the completion or culmination of action. Context determines interpretation.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Culminative Aorist</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The <strong>culminative</strong> (or effective) use of the aorist emphasizes the completion or end result of an action — that the action reached its culmination or final point.</p>
+        <p>Where the context draws attention to the successful conclusion or result of a process, a culminative translation is appropriate:</p>
+        <ul>
+          <li>"He <strong>won</strong> the race." — emphasis on the culminating result</li>
+          <li>"She <strong>persuaded</strong> them." — focus on the successful outcome</li>
+          <li>"He <strong>finished</strong> the work." — the action brought to its end</li>
+        </ul>
+        <p class="highlight">Some aorists emphasize the completion or culmination of action. Context determines interpretation.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Categories as Analytical Tools</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The three aorist categories — constative, ingressive, and culminative — are <em>analytical tools</em>, not mechanical rules to apply to every aorist.</p>
+        <p>These categories describe patterns that appear across the NT. They help students articulate what the context is already communicating. They do not replace contextual analysis — they serve it.</p>
+        <ul>
+          <li>Not every aorist fits neatly into a category.</li>
+          <li>Context always determines which label, if any, best fits.</li>
+          <li>The categories are descriptive, not prescriptive.</li>
+        </ul>
+        <p class="highlight">These categories are analytical tools that describe patterns. Context always determines which category, if any, best fits.</p>
+        <hr/>
+        <p>Students who use these categories as rigid checklists will over-read the grammar. Students who use them as flexible lenses will read more carefully and accurately.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_08_1">
+      <p class="kc-question">What does a culminative use of the aorist emphasize?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_08_1', this)">The start of an action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_08_1', this)">The entire event without focus</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_08_1', this)">The completion or end result</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_08_1', this)">Repeated action over time</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_08_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_08_2">
+      <p class="kc-question">How should students use the aorist categories (constative, ingressive, culminative)?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_08_2', this)">As mechanical rules applied to every aorist</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_08_2', this)">As analytical tools that describe patterns — context always determines which fits</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_08_2', this)">By rejecting them entirely as unhelpful</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_08_2', this)">As categories that override context</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_08_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_08">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_08">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_08" onclick="openVerbAdvQuiz('va_08')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_08" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_08" disabled onclick="completeVerbAdvancedLesson('va_08')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_09: Second Aorists -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_09VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Second aorists require stronger stem recognition. Students should practice identifying irregular forms.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">What Makes Second Aorists Different</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>First aorists use a recognizable suffix pattern (typically -σα-) to mark the aorist. Second aorists do not follow that pattern. Instead, they use a completely different stem from the present tense form.</p>
+        <p>Common second aorist forms in NT Greek:</p>
+        <ul>
+          <li>Present: <strong>λέγω</strong> (I say) → Aorist: <strong>εἶπον</strong> (I said)</li>
+          <li>Present: <strong>ἔρχομαι</strong> (I come) → Aorist: <strong>ἦλθον</strong> (I came)</li>
+          <li>Present: <strong>ὁράω</strong> (I see) → Aorist: <strong>εἶδον</strong> (I saw)</li>
+          <li>Present: <strong>φέρω</strong> (I carry) → Aorist: <strong>ἤνεγκον</strong> (I carried)</li>
+        </ul>
+        <p class="highlight">Second aorists require stronger stem recognition. The stem changes completely from the present form.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Same Function, Different Form</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Despite the different stem, second aorists function in the same way as first aorists. The meaning and communicative force are identical — action presented as a complete or undefined whole.</p>
+        <p>The difference is only in form, not in meaning or function.</p>
+        <p>Because common verbs like "say," "come," and "see" are second aorists, students will encounter these forms hundreds of times in NT reading. Investing in recognition of these stems pays off immediately.</p>
+        <p class="highlight">Same function as first aorist. Different stem. The key practical skill is stem recognition for common verbs.</p>
+        <hr/>
+        <p>Students should practice identifying these irregular forms until εἶπον, ἦλθον, and εἶδον are as recognizable as any regular verb form.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_09_1">
+      <p class="kc-question">How do second aorists differ from first aorists functionally?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_09_1', this)">They communicate a different kind of action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_09_1', this)">They look different but function the same</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_09_1', this)">They are restricted to passive voice</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_09_1', this)">They only appear in the subjunctive</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_09_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_09_2">
+      <p class="kc-question">What is the key practical skill for handling second aorists?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_09_2', this)">Knowing which verbs are deponent</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_09_2', this)">Recognizing the changed stems for common verbs</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_09_2', this)">Avoiding second aorists in translation</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_09_2', this)">Translating second aorists differently from first aorists</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_09_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_09">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_09">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_09" onclick="openVerbAdvQuiz('va_09')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_09" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_09" disabled onclick="completeVerbAdvancedLesson('va_09')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_10: Aspect and Time -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_10VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Greek tense systems involve both aspect and temporal reference. Students should avoid extreme dogmatism in either direction.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Two Elements: Aspect and Time</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Greek tense systems involve both:</p>
+        <ul>
+          <li><strong>Aspect</strong> — how the speaker portrays or views the action (ongoing, as a whole, completed with result)</li>
+          <li><strong>Temporal reference</strong> — when the action occurs (past, present, future)</li>
+        </ul>
+        <p>Both elements are real and operative. The Greek tense system is not purely aspectual (with no time reference), nor is it simply time-based (like a simple timeline).</p>
+        <p>In the indicative mood, temporal reference is especially clear — the present tense communicates present time, the imperfect communicates past, and so on. Outside the indicative, temporal reference weakens and aspect becomes more prominent.</p>
+        <p class="highlight">Greek tense systems involve both aspect and temporal reference. Both matter for careful reading.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Avoiding Extreme Dogmatism</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Recent NT scholarship has produced vigorous debate about verbal aspect. Some scholars have argued that Greek tense communicates <em>only</em> aspect, with no time reference. Others have pushed back, arguing that time is still present.</p>
+        <p>Students should avoid extreme dogmatism in either direction:</p>
+        <ul>
+          <li>Claiming Greek tense is <em>only</em> about time misses the well-established role of aspect.</li>
+          <li>Claiming Greek tense is <em>only</em> about aspect overcorrects and ignores real temporal reference in the indicative.</li>
+        </ul>
+        <p>The balanced position: both aspect and temporal reference are present in Greek tense, and students should read with both in view.</p>
+        <p class="highlight">Avoid extreme dogmatism. Both aspect and time operate in the Greek tense system.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_10_1">
+      <p class="kc-question">Greek tense systems involve:</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_10_1', this)">Only time reference, like English</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_10_1', this)">Both aspect and temporal reference</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_10_1', this)">Only aspect with no time reference</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_10_1', this)">Neither aspect nor time</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_10_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_10_2">
+      <p class="kc-question">What approach to Greek tense is most accurate?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_10_2', this)">Claiming time is completely irrelevant is the correct overcorrection</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_10_2', this)">Avoid extreme dogmatism — both time and aspect operate together</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_10_2', this)">Reducing Greek tense to only time reference is best</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_10_2', this)">Replacing time with pure aspect is the scholarly consensus</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_10_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_10">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_10">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_10" onclick="openVerbAdvQuiz('va_10')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_10" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_10" disabled onclick="completeVerbAdvancedLesson('va_10')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_11: Active Voice in Depth -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_11VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Students explore agency, subject involvement, and the communication force of active voice in Greek.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Active Voice: Subject as Agent</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>In active voice, the subject performs or initiates the action. The subject is the grammatical agent — the one acting, doing, or causing.</p>
+        <ul>
+          <li>"The teacher <strong>teaches</strong>." — the teacher acts</li>
+          <li>"Paul <strong>wrote</strong> the letter." — Paul is the agent</li>
+          <li>"God <strong>loved</strong> the world." — God initiates the action</li>
+        </ul>
+        <p>Active voice is the default voice in Greek, and the most common. It establishes the subject as the driving force of the verbal action.</p>
+        <p class="highlight">In active voice, the subject performs or initiates the action — the subject is the grammatical agent.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Agency and Communication Force</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Understanding active voice goes beyond recognizing that "the subject acts." In depth, active voice communicates:</p>
+        <ul>
+          <li><strong>Agency</strong> — clear identification of who is responsible for the action</li>
+          <li><strong>Subject involvement</strong> — the subject is the source of the verbal action</li>
+          <li><strong>Communication force</strong> — the directness and clarity of the statement about who acts</li>
+        </ul>
+        <p>Active voice works independently of tense — a present active, aorist active, and future active all communicate subject agency; what differs is the aspect and time reference.</p>
+        <p class="highlight">Active voice communicates subject agency — the subject acts or initiates. This is the core grammatical information the active voice carries.</p>
+        <hr/>
+        <p>Urgency is not what active voice communicates — urgency is contextual. Word order communicates emphasis, not voice. Whether an action is repeated belongs to aspect. Voice is specifically about agency.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_11_1">
+      <p class="kc-question">In active voice, the subject is:</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_11_1', this)">Receiving the action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_11_1', this)">Performing or initiating the action</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_11_1', this)">Indirectly affected by the action</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_11_1', this)">Both performing and receiving the action</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_11_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_11_2">
+      <p class="kc-question">What does active voice communicate about the subject?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_11_2', this)">That the action is urgent</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_11_2', this)">That the subject is the grammatical agent</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_11_2', this)">That the subject appears first in word order</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_11_2', this)">That the action is being repeated</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_11_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_11">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_11">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_11" onclick="openVerbAdvQuiz('va_11')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_11" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_11" disabled onclick="completeVerbAdvancedLesson('va_11')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_12: Middle Voice Nuance -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_12VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">The middle voice is one of the most nuanced areas of Greek grammar. Students must avoid simplistic "subject does action to self" explanations.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Beyond the Reflexive Oversimplification</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The most common oversimplification about the middle voice is the reflexive formula: "the subject does the action to itself."</p>
+        <p>While this captures some middle uses, it misses many others. The middle voice is more accurately described as communicating:</p>
+        <ul>
+          <li><strong>subject involvement</strong> — the subject is specially involved in or connected to the action</li>
+          <li><strong>subject interest</strong> — the subject has a personal stake in the outcome</li>
+          <li><strong>subject participation</strong> — the subject participates in the action in a distinctive way</li>
+        </ul>
+        <p>Many middle verbs do not carry reflexive meaning at all. The middle communicates something about the subject's relationship to the action — but that relationship varies significantly across different verbs and contexts.</p>
+        <p class="highlight">Avoid simplistic "subject acts on itself" explanations. The middle often communicates subject involvement, interest, or participation.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Why Middle Voice is Nuanced</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The middle voice is described as nuanced for a specific reason: its semantic contribution varies significantly across verbs and contexts.</p>
+        <p>For some verbs, the middle signals clear reflexive or reciprocal action. For others, the middle communicates the subject's special interest in the result. For still others, the middle form is used because of lexical convention (these are the "deponent" verbs discussed in the next lesson).</p>
+        <p>Responsible reading of middle voice forms requires:</p>
+        <ul>
+          <li>Resisting the reflexive default</li>
+          <li>Asking: how is the subject specially involved here?</li>
+          <li>Consulting context to determine the specific relationship being communicated</li>
+        </ul>
+        <p class="highlight">The middle voice is nuanced — its contribution varies significantly across verbs and contexts. Resist oversimplification.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_12_1">
+      <p class="kc-question">What is the most common oversimplification about the middle voice?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_12_1', this)">That it is always passive</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_12_1', this)">That "the subject acts on itself" (reflexive oversimplification)</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_12_1', this)">That it is only used in the aorist</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_12_1', this)">That it communicates future action</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_12_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_12_2">
+      <p class="kc-question">What does the middle voice more accurately communicate?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_12_2', this)">That the subject is purely passive</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_12_2', this)">Subject involvement, interest, or participation in the action</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_12_2', this)">That the action is conditional</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_12_2', this)">That the subject is plural</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_12_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_12">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_12">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_12" onclick="openVerbAdvQuiz('va_12')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_12" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_12" disabled onclick="completeVerbAdvancedLesson('va_12')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_13: Passive Voice Nuance -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_13VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Passive constructions may communicate received action, implied agency, and focus shift — including the important "divine passive" pattern in NT Greek.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">Passive Voice: Received Action and Focus Shift</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>In passive voice, the grammatical subject receives the action rather than performing it. This shifts the focus from the agent (who acts) to the recipient (who is acted upon).</p>
+        <ul>
+          <li>"The letter <strong>was written</strong>." — focus on the letter, not the writer</li>
+          <li>"The disciples <strong>were sent</strong>." — focus on the disciples as recipients</li>
+          <li>"He <strong>was healed</strong>." — emphasis on the recipient of healing</li>
+        </ul>
+        <p>Passive voice may also communicate <em>implied agency</em> — the agent may be unnamed but implied by the context.</p>
+        <p class="highlight">Passive constructions may communicate received action, implied agency, and a shift of focus from agent to recipient.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Divine Passive</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>A significant and recurring pattern in NT Greek — especially in the teachings of Jesus — is the <strong>divine passive</strong> (also called the theological passive).</p>
+        <p>The divine passive is a Jewish rhetorical convention where God is implied as the agent of the action without being named explicitly. This convention reflects reverence for the divine name.</p>
+        <ul>
+          <li>"You will be <strong>forgiven</strong>." → implies: God will forgive you</li>
+          <li>"Blessed are those who <strong>are comforted</strong>." → implies: God will comfort them</li>
+          <li>"Ask and it will be <strong>given</strong> to you." → implies: God will give it</li>
+        </ul>
+        <p>Recognizing the divine passive is an important exegetical skill — it helps students see God as the implied agent even when the text does not name him.</p>
+        <p class="highlight">The divine passive implies God as agent without naming him — a Jewish rhetorical convention prominent in Jesus' teaching.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_13_1">
+      <p class="kc-question">In passive voice, the grammatical subject:</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_13_1', this)">Performs the action</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_13_1', this)">Receives the action</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_13_1', this)">Is indeterminate</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_13_1', this)">Performs and receives simultaneously</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_13_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_13_2">
+      <p class="kc-question">What is the "divine passive"?</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_13_2', this)">A passive where God is explicitly named as subject</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_13_2', this)">A passive construction where God is implied as agent without being named</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_13_2', this)">A passive verb used only in divine commands</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_13_2', this)">A form found only in the Psalms</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_13_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_13">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_13">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_13" onclick="openVerbAdvQuiz('va_13')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_13" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_13" disabled onclick="completeVerbAdvancedLesson('va_13')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- va_14: Deponent Discussion -->
+<!-- ============================================================ -->
+<div class="adv-verb-lesson" id="va_14VaLesson">
+  <div class="lesson-module">
+    <p class="lesson-lead">Students are introduced carefully to deponent discussions. This is an area where oversimplification must be avoided.</p>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">What Deponent Verbs Are</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>Deponent verbs have no active forms in the lexicon but are translated actively. They appear in middle or passive forms, yet their meaning is active.</p>
+        <p>Well-known NT examples:</p>
+        <ul>
+          <li><strong>ἔρχομαι</strong> — I come / I go (appears in middle form, translated actively)</li>
+          <li><strong>ἀποκρίνομαι</strong> — I answer (middle form, active meaning)</li>
+          <li><strong>πορεύομαι</strong> — I go / I travel (middle form, active meaning)</li>
+          <li><strong>ἐρωτάω</strong> — some forms are deponent in certain tenses</li>
+        </ul>
+        <p>Students learn which common verbs are traditionally classified as deponent so they can translate them correctly — actively — when they appear in middle or passive form.</p>
+        <p class="highlight">Deponent verbs have no active forms in the lexicon but are translated actively.</p>
+      </div>
+    </div>
+
+    <div class="lesson-block" onclick="toggleVerbLessonBlock(this, 'adv')">
+      <div class="lesson-block-header">
+        <span class="lesson-block-title">The Scholarly Debate</span>
+        <span class="lesson-block-icon material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="lesson-block-body">
+        <p>The term "deponent" and the traditional explanation for these verbs have become a subject of ongoing scholarly discussion.</p>
+        <p>The central debate centers on whether middle/passive forms of so-called deponent verbs are <em>semantically empty</em> (carrying active meaning with no contribution from the middle/passive form) or whether these forms still communicate something real about subject involvement — just in ways that are harder to detect than a standard middle.</p>
+        <p>Students should:</p>
+        <ul>
+          <li>Learn which verbs are traditionally classified as deponent</li>
+          <li>Translate them actively</li>
+          <li>Avoid the extreme claim that the middle/passive form communicates absolutely nothing</li>
+          <li>Hold the question lightly, aware that it is an ongoing scholarly conversation</li>
+        </ul>
+        <p class="highlight">Avoid oversimplification. The deponent discussion is an ongoing scholarly conversation about whether middle/passive forms are semantically empty or communicate something real.</p>
+      </div>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_14_1">
+      <p class="kc-question">A deponent verb is best described as:</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_14_1', this)">A verb with no active forms, translated actively</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_14_1', this)">A verb that can only be used passively</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_14_1', this)">A verb communicating both active and passive simultaneously</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_14_1', this)">A verb with irregular accent patterns</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_14_1_fb"></p>
+    </div>
+
+    <div class="knowledge-check" id="kc_va_14_2">
+      <p class="kc-question">The scholarly debate around deponents centers on:</p>
+      <div class="kc-options">
+        <button class="kc-opt" data-opt="0" onclick="answerVerbKC('kc_va_14_2', this)">Whether to memorize them differently</button>
+        <button class="kc-opt" data-opt="1" onclick="answerVerbKC('kc_va_14_2', this)">Whether middle/passive forms are semantically empty or communicate something real</button>
+        <button class="kc-opt" data-opt="2" onclick="answerVerbKC('kc_va_14_2', this)">Whether they appear only in certain books</button>
+        <button class="kc-opt" data-opt="3" onclick="answerVerbKC('kc_va_14_2', this)">Whether the term "deponent" is too positive in meaning</button>
+      </div>
+      <p class="kc-feedback" id="kc_va_14_2_fb"></p>
+    </div>
+
+    <div class="complete-lesson-box">
+      <div class="verb-quiz-area" id="verbQuizArea_va_14">
+        <p class="quiz-locked-msg" id="verbQuizHint_va_14">Complete all sections and knowledge checks above to unlock the quiz.</p>
+        <button class="main-btn" id="startVerbQuiz_va_14" onclick="openVerbAdvQuiz('va_14')" disabled>Take Quiz</button>
+        <span class="lesson-score-badge" id="verbLessonScore_va_14" style="display:none;"></span>
+      </div>
+      <div class="complete-verb-lesson-wrap">
+        <button class="complete-lesson-btn" data-complete-verb-lesson="va_14" disabled onclick="completeVerbAdvancedLesson('va_14')">Complete Lesson</button>
+      </div>
+    </div>
+  </div>
+</div>
