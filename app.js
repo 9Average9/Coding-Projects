@@ -8808,19 +8808,41 @@ function openWlWordDetail(strongs, formSurface) {
   _wlSelectedForm = formSurface || null;
   const lex = (window.RhemaLexicon || {})[strongs] || {};
   if (!lex.lemma) return;
+  const surface = formSurface || lex.lemma;
+  const morph = formSurface ? _findMorphForSurface(strongs, formSurface) : '';
+  _rhemaActiveWord = [surface, strongs, morph];
   // Populate the standard rhema word sheet
-  document.getElementById('rhemaSheetSurface').textContent = formSurface || lex.lemma;
+  document.getElementById('rhemaSheetSurface').textContent = surface;
   document.getElementById('rhemaSheetStrongs').textContent = 'G' + strongs;
   document.getElementById('rhemaSheetLemma').textContent   = lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
   // Hide study buttons (not in verse context)
   document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');
   document.getElementById('rhemaAddToWordLogBtn')?.classList.add('hidden');
+  // Hide sandbox arrows while sheet is open
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   // Show definition tab
-  showRhemaTab('definition', [formSurface || lex.lemma, strongs, '']);
+  showRhemaTab('definition', _rhemaActiveWord);
   const sheet = document.getElementById('rhemaSheet');
   sheet?.classList.add('open');
   document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
   closeWordLibrary();
+}
+
+function _findMorphForSurface(strongs, surface) {
+  const norm = _stripGreekAccents(surface).toLowerCase();
+  const texts = window.RhemaNT?.text;
+  if (!texts) return '';
+  for (const book of RHEMA_BOOK_ORDER) {
+    const bdata = texts[book] || {};
+    for (const ch of Object.keys(bdata)) {
+      for (const v of Object.keys(bdata[ch])) {
+        for (const word of (bdata[ch][v] || [])) {
+          if (word[1] === strongs && _stripGreekAccents(word[0]).toLowerCase() === norm) return word[2] || '';
+        }
+      }
+    }
+  }
+  return '';
 }
 
 // Saved Verses
@@ -18924,13 +18946,16 @@ function openRhemaBookVerses(code, strongs) {
   const bookText = (window.RhemaNT?.text || {})[code];
   if (!bookText) return;
 
+  const formNorm = _wlSelectedForm ? _stripGreekAccents(_wlSelectedForm).toLowerCase() : null;
   const refs = [];
   const chapters = Object.keys(bookText).sort((a,b) => +a - +b);
   for (const ch of chapters) {
     const verseNums = Object.keys(bookText[ch]).sort((a,b) => +a - +b);
     for (const v of verseNums) {
       const words = bookText[ch][v];
-      const wordIdx = words.findIndex(w => w[1] === strongs);
+      const wordIdx = formNorm
+        ? words.findIndex(w => w[1] === strongs && _stripGreekAccents(w[0]).toLowerCase() === formNorm)
+        : words.findIndex(w => w[1] === strongs);
       if (wordIdx >= 0) refs.push({ ch, v, wordIdx, words });
     }
   }

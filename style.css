@@ -13844,6 +13844,7 @@ body.sandbox-open #rhemaModal {
   border-radius: 22px 22px 0 0; border-top: 1.5px solid var(--border-color);
   display: flex; flex-direction: column;
   max-height: 88svh; min-height: 50svh;
+  overflow: hidden;
   transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
 }
 .wl-overlay.open .wl-sheet { transform: translateY(0); }
