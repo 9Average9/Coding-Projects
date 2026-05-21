@@ -11141,19 +11141,6 @@ const learnLessonTitles = {
   howToRead: "How to Read Greek"
 };
 
-const LESSON_TIMES = {
-  history: "~ 8 min",
-  alphabet: "~ 10 min",
-  pronunciation: "~ 8 min",
-  nouns: "~ 12 min",
-  cases: "~ 10 min",
-  prepositions: "~ 10 min",
-  adjectives: "~ 8 min",
-  pronouns: "~ 10 min",
-  conjunctions: "~ 8 min",
-  howToRead: "~ 12 min"
-};
-
 function toggleLearnSideMenu(event) {
   if (event) event.stopPropagation();
 
@@ -11197,20 +11184,6 @@ function showLearnLesson(lesson) {
   updateCompleteLessonButton(lesson);
 
   closeLearnSideMenu();
-}
-
-function handleLessonClick(id) {
-  const idx = REQUIRED_LESSONS.indexOf(id);
-  if (idx > 0 && completedLessons[REQUIRED_LESSONS[idx - 1]] !== true) {
-    const card = document.getElementById('card-' + id);
-    if (card) {
-      card.style.animation = 'none';
-      void card.offsetHeight;
-      card.style.animation = 'lessonLockShake 0.35s ease';
-    }
-    return;
-  }
-  showLearnLesson(id);
 }
 
   setTimeout(() => {
@@ -13554,48 +13527,6 @@ function updateLessonCompletionUI() {
 
     status.classList.toggle("completed", isCompleted);
   });
-  updateBasicLessonTimelineUI();
-}
-
-function updateBasicLessonTimelineUI() {
-  REQUIRED_LESSONS.forEach((id, index) => {
-    const dot = document.getElementById("dot-" + id);
-    const card = document.getElementById("card-" + id);
-    const rightIcon = document.getElementById("right-" + id);
-    const line = document.getElementById("line-" + id);
-
-    if (!dot || !card) return;
-
-    const isCompleted = completedLessons[id] === true;
-    const isLocked = index > 0 && completedLessons[REQUIRED_LESSONS[index - 1]] !== true;
-
-    const dotIcon = dot.querySelector(".dot-icon");
-    dot.className = "lesson-tl-dot" + (isCompleted ? " completed" : isLocked ? " locked" : " available");
-    if (dotIcon) {
-      dotIcon.textContent = isCompleted ? "check" : isLocked ? "lock" : "";
-    }
-
-    if (line) {
-      line.className = "lesson-tl-line" + (isCompleted ? " completed" : "") + (id === "howToRead" ? " last-line" : "");
-    }
-
-    card.className = "lesson-tl-card" + (isCompleted ? " completed" : isLocked ? " locked" : "");
-
-    if (rightIcon) {
-      rightIcon.textContent = isLocked ? "lock" : "chevron_right";
-    }
-
-    const statusEl = card.querySelector("[data-lesson-status]");
-    if (statusEl) {
-      if (isCompleted) {
-        statusEl.innerHTML = '<span class="lesson-check">✓</span> Completed';
-        statusEl.className = "lesson-status completed";
-      } else {
-        statusEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;line-height:1;vertical-align:middle">schedule</span> ' + (LESSON_TIMES[id] || "");
-        statusEl.className = "lesson-status";
-      }
-    }
-  });
 }
 
 function resetLessonData() {
@@ -13621,6 +13552,8 @@ function resetLessonData() {
   });
 
   updateLessonCompletionUI();
+
+  syncUserData();
 
   alert("Lesson data has been reset.");
   showHome();
@@ -15017,22 +14950,11 @@ function renderLessonsBreakdown(tab) {
 function updateLessonMenuProgress() {
   const basicDone = REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
   const advDone = REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length;
-  const total = REQUIRED_LESSONS.length;
 
   const basicEl = document.getElementById("basicLessonsProgressText");
   const advEl = document.getElementById("advancedLessonsProgressText");
-  if (basicEl) basicEl.textContent = `${basicDone} of ${total} complete`;
+  if (basicEl) basicEl.textContent = `${basicDone} of ${REQUIRED_LESSONS.length} complete`;
   if (advEl) advEl.textContent = `${advDone} of ${REQUIRED_ADVANCED_LESSONS.length} complete`;
-
-  const ring = document.getElementById("basicProgressRing");
-  const fraction = document.getElementById("basicProgressFraction");
-  if (ring) {
-    const circumference = 201.06;
-    ring.style.strokeDashoffset = String(circumference * (1 - basicDone / total));
-  }
-  if (fraction) fraction.textContent = `${basicDone}/${total}`;
-
-  updateBasicLessonTimelineUI();
 }
 
 function updateStudyStreak() {
