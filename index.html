@@ -10757,6 +10757,16 @@ glacier: {
       <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
     </div>
 
+    <!-- Floating prev/next arrows shown only in study-sandbox Rhema (replaces verse-nav bar) -->
+    <div class="rhema-sandbox-arrows">
+      <button class="rhema-sandbox-nav-btn" onclick="rhemaPrevVerse()">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <button class="rhema-sandbox-nav-btn" onclick="rhemaNextVerse()">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+
     <!-- Chapter toast: position:absolute so it floats above content -->
     <div id="rhemaChapterToast" class="rhema-chapter-toast hidden"></div>
 

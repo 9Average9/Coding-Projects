@@ -11168,7 +11168,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   padding: 12px 16px 28px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;  /* allow parent to scroll vertically over the diagram */
   cursor: grab;
 }
 
@@ -11397,9 +11397,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-radius: 18px;
   padding: 20px 20px 16px;
   width: min(320px, calc(100vw - 40px));
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0,0,0,0.38);
-  transition: top 0.35s cubic-bezier(.4,0,.2,1),
-              left 0.35s cubic-bezier(.4,0,.2,1);
+  transition: top 0.28s cubic-bezier(.4,0,.2,1),
+              left 0.28s cubic-bezier(.4,0,.2,1);
   pointer-events: all;
 }
 .rhema-coach-step-label {
@@ -12098,6 +12100,38 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 /* ── Verse nav bar — direct flex child of overlay, always at physical screen bottom ── */
+/* ── Floating prev/next arrows for study-sandbox Rhema ── */
+.rhema-sandbox-arrows {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 8px);
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  pointer-events: none;
+  z-index: 20;
+}
+#rhemaSlide.sandbox-nav .rhema-sandbox-arrows { display: flex; }
+.rhema-sandbox-nav-btn {
+  pointer-events: all;
+  background: color-mix(in srgb, var(--card-color) 88%, transparent);
+  border: 1.5px solid var(--border-color);
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--font-color);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+.rhema-sandbox-nav-btn:active {
+  background: color-mix(in srgb, var(--secondary-color) 20%, transparent);
+}
+.rhema-sandbox-nav-btn .material-symbols-outlined { font-size: 1.35rem; }
+
 .rhema-verse-nav {
   flex-shrink: 0;
   display: flex;

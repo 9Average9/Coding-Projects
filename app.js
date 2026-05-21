@@ -16672,15 +16672,23 @@ function rhemaSelectVerse(v) {
 // ── Verse swipe navigation ────────────────────────────────────────────────────
 
 function updateRhemaVerseNav() {
-  const nav = document.getElementById('rhemaVerseNav');
-  const ref = document.getElementById('rhemaVerseRef');
+  const nav   = document.getElementById('rhemaVerseNav');
+  const ref   = document.getElementById('rhemaVerseRef');
+  const slide = document.getElementById('rhemaSlide');
   if (!nav) return;
-  nav.classList.remove('hidden');
-  if (ref && window.RhemaNT) {
-    const bookName = window.RhemaNT.names[_rhemaBook] || _rhemaBook;
-    ref.textContent = _rhemaFullChapter
-      ? `${bookName} ${_rhemaChapter}`
-      : `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
+  if (_studySandboxId) {
+    // In study sandbox: hide the full bar and show floating arrow buttons instead
+    nav.classList.add('hidden');
+    slide?.classList.add('sandbox-nav');
+  } else {
+    nav.classList.remove('hidden');
+    slide?.classList.remove('sandbox-nav');
+    if (ref && window.RhemaNT) {
+      const bookName = window.RhemaNT.names[_rhemaBook] || _rhemaBook;
+      ref.textContent = _rhemaFullChapter
+        ? `${bookName} ${_rhemaChapter}`
+        : `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
+    }
   }
 }
 
@@ -16968,7 +16976,10 @@ function toggleWheelTool(tool) {
     _syncWheelBtn('syntax', _rhemaSyntaxMode);
     _syncToolWandIndicator();
     renderRhemaVerse();
-    if (_rhemaSyntaxMode) startRhemaSyntaxCoach();
+    if (_rhemaSyntaxMode) {
+      closeRhemaWheel();
+      setTimeout(() => startRhemaSyntaxCoach(), 360); // wait for wheel close animation
+    }
   } else if (tool === 'highlight') {
     toggleRhemaHighlightBar();
     _syncToolWandIndicator();
@@ -17035,7 +17046,7 @@ const _RHEMA_SYNTAX_COACH_STEPS = [
   },
   {
     targetFn: () => document.querySelector('.rsx-dg-chip'),
-    position: 'right',
+    position: 'below',
     title: 'Tap a phrase to learn more',
     body: 'Tap any phrase chip to see its grammatical role and what that role means in plain English.',
   },
@@ -17052,6 +17063,7 @@ let _coachIdx = 0;
 let _coachSyntaxDone = false;
 
 function startRhemaCoach() {
+  if (_studySandboxId) return; // no coach in study sandbox
   // For testing: always show. For production, uncomment the line below:
   // if (localStorage.getItem('rhemaCoachDone')) return;
   _coachSteps = _RHEMA_COACH_STEPS;
@@ -17062,87 +17074,101 @@ function startRhemaCoach() {
 }
 
 function startRhemaSyntaxCoach() {
-  if (_coachSyntaxDone) return;
-  // Small delay so the syntax tree renders first
-  setTimeout(() => {
-    const firstNode = document.querySelector('.rsx-dg-node');
-    if (!firstNode) return;
-    _coachSyntaxDone = true;
-    _coachSteps = _RHEMA_SYNTAX_COACH_STEPS;
-    _coachIdx = 0;
-    _showCoachStep();
-  }, 400);
+  if (_coachSyntaxDone || _studySandboxId) return;
+  const firstNode = document.querySelector('.rsx-dg-node');
+  if (!firstNode) return;
+  _coachSyntaxDone = true;
+  _coachSteps = _RHEMA_SYNTAX_COACH_STEPS;
+  _coachIdx = 0;
+  _showCoachStep();
 }
 
 function _showCoachStep() {
-  const overlay = document.getElementById('rhemaCoachOverlay');
+  const overlay   = document.getElementById('rhemaCoachOverlay');
   const spotlight = document.getElementById('rhemaCoachSpotlight');
-  const card = document.getElementById('rhemaCoachCard');
+  const card      = document.getElementById('rhemaCoachCard');
   if (!overlay || !spotlight || !card) return;
 
   const step = _coachSteps[_coachIdx];
   if (!step) { _endRhemaCoach(); return; }
 
-  const target = step.targetFn();
-  const modal = document.getElementById('rhemaModal');
-
   overlay.classList.remove('hidden');
+  card.style.transform = '';
 
-  if (target && modal) {
-    const mRect = modal.getBoundingClientRect();
-    const tRect = target.getBoundingClientRect();
-    const PAD = 8;
-    const sl = tRect.left - mRect.left - PAD;
-    const st = tRect.top  - mRect.top  - PAD;
-    const sw = tRect.width  + PAD * 2;
-    const sh = tRect.height + PAD * 2;
-
-    spotlight.style.left   = sl + 'px';
-    spotlight.style.top    = st + 'px';
-    spotlight.style.width  = sw + 'px';
-    spotlight.style.height = sh + 'px';
-    spotlight.style.display = '';
-
-    // Position the card relative to the spotlight
-    const CARD_W = Math.min(320, window.innerWidth - 40);
-    const MARGIN  = 16;
-    let cardTop, cardLeft;
-
-    if (step.position === 'above') {
-      cardTop  = st - sh - MARGIN - 4;
-      cardLeft = Math.max(MARGIN, Math.min(sl + sw / 2 - CARD_W / 2, mRect.width - CARD_W - MARGIN));
-      if (cardTop < MARGIN) { cardTop = st + sh + MARGIN; }
-    } else if (step.position === 'right') {
-      cardTop  = Math.max(MARGIN, st + sh / 2 - 80);
-      cardLeft = sl + sw + MARGIN;
-      if (cardLeft + CARD_W > mRect.width - MARGIN) {
-        cardLeft = sl - CARD_W - MARGIN;
-      }
-    } else { // below (default)
-      cardTop  = st + sh + MARGIN;
-      cardLeft = Math.max(MARGIN, Math.min(sl + sw / 2 - CARD_W / 2, mRect.width - CARD_W - MARGIN));
-      if (cardTop + 180 > mRect.height - MARGIN) { cardTop = st - 180 - MARGIN; }
-    }
-
-    card.style.top  = Math.max(MARGIN, cardTop) + 'px';
-    card.style.left = Math.max(MARGIN, cardLeft) + 'px';
-    card.style.width = CARD_W + 'px';
-  } else {
-    // No target — center card, hide spotlight
-    spotlight.style.display = 'none';
-    const CARD_W = Math.min(320, window.innerWidth - 40);
-    card.style.top  = '50%';
-    card.style.left = '50%';
-    card.style.transform = 'translate(-50%, -50%)';
-    card.style.width = CARD_W + 'px';
-  }
-
+  // Set content first so card has its real height when we measure
   document.getElementById('rhemaCoachStep').textContent =
     `${_coachIdx + 1} of ${_coachSteps.length}`;
   document.getElementById('rhemaCoachTitle').textContent = step.title;
   document.getElementById('rhemaCoachBody').textContent  = step.body;
   document.getElementById('rhemaCoachNextLabel').textContent =
     _coachIdx === _coachSteps.length - 1 ? 'Done' : 'Next';
+
+  const target = step.targetFn();
+  const modal  = document.getElementById('rhemaModal');
+
+  if (!target || !modal) {
+    spotlight.style.display = 'none';
+    const CARD_W = Math.min(320, window.innerWidth - 40);
+    card.style.width = CARD_W + 'px';
+    card.style.top  = '50%';
+    card.style.left = '50%';
+    card.style.transform = 'translate(-50%, -50%)';
+    return;
+  }
+
+  const mRect = modal.getBoundingClientRect();
+  const tRect = target.getBoundingClientRect();
+  const PAD    = 8;
+  const MARGIN = 16;
+  const CARD_W = Math.min(320, mRect.width - MARGIN * 2);
+
+  const sl = tRect.left - mRect.left - PAD;
+  const st = tRect.top  - mRect.top  - PAD;
+  const sw = tRect.width  + PAD * 2;
+  const sh = tRect.height + PAD * 2;
+
+  spotlight.style.left   = sl + 'px';
+  spotlight.style.top    = st + 'px';
+  spotlight.style.width  = sw + 'px';
+  spotlight.style.height = sh + 'px';
+  spotlight.style.display = '';
+
+  card.style.width = CARD_W + 'px';
+  // Hide temporarily so we can measure the card's rendered height
+  card.style.visibility = 'hidden';
+  card.style.top  = '-9999px';
+  card.style.left = '0';
+
+  requestAnimationFrame(() => {
+    const CARD_H     = card.offsetHeight;
+    const spotBottom = st + sh;
+    const spotRight  = sl + sw;
+    let cardTop, cardLeft;
+
+    if (step.position === 'above') {
+      cardTop  = st - CARD_H - MARGIN;
+      cardLeft = sl + sw / 2 - CARD_W / 2;
+      if (cardTop < MARGIN) { cardTop = spotBottom + MARGIN; } // flip below
+    } else if (step.position === 'right') {
+      cardTop  = st + sh / 2 - CARD_H / 2;
+      cardLeft = spotRight + MARGIN;
+      if (cardLeft + CARD_W > mRect.width - MARGIN) {
+        cardLeft = sl - CARD_W - MARGIN; // flip left
+      }
+    } else { // below (default)
+      cardTop  = spotBottom + MARGIN;
+      cardLeft = sl + sw / 2 - CARD_W / 2;
+      if (cardTop + CARD_H > mRect.height - MARGIN) { cardTop = st - CARD_H - MARGIN; } // flip above
+    }
+
+    // Final clamp — card must stay fully inside the modal
+    cardTop  = Math.max(MARGIN, Math.min(cardTop,  mRect.height - CARD_H  - MARGIN));
+    cardLeft = Math.max(MARGIN, Math.min(cardLeft, mRect.width  - CARD_W  - MARGIN));
+
+    card.style.top  = cardTop  + 'px';
+    card.style.left = cardLeft + 'px';
+    card.style.visibility = '';
+  });
 }
 
 function rhemaCoachNext() {
@@ -17801,9 +17827,6 @@ function _renderSyntaxView(words, verse) {
       <span class="material-symbols-outlined">info</span>
     </button>
   </div>`;
-  if (confidence === 'complex') {
-    html += `<div class="rsx-warning"><span class="material-symbols-outlined">school</span><span>Complex structure — grammar rules faithfully applied. Take extra time here and verify with other study tools.</span></div>`;
-  }
   html += '<div class="rsx-diagram">' + _renderDiagramBranch(tree, words, verse) + '</div>';
   html += '</div>';
   return html;
