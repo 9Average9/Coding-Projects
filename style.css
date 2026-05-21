@@ -11888,8 +11888,9 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
-  touch-action: pan-x pan-y;  /* allow child .rsx-diagram to scroll horizontally */
+  overflow-x: clip; /* clip not hidden — hidden creates an X scroll container that swallows
+                       horizontal touch gestures before they reach .rsx-diagram */
+  touch-action: pan-x pan-y;
   overscroll-behavior: none;
   width: 100%;
 }

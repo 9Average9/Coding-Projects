@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.85" />
+  <link rel="stylesheet" href="style.css?v=2.3.86" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10757,16 +10757,6 @@ glacier: {
       <p class="rhema-tap-hint" id="rhemaTapHint">Tap any word · swipe to navigate</p>
     </div>
 
-    <!-- Floating prev/next arrows shown only in study-sandbox Rhema (replaces verse-nav bar) -->
-    <div class="rhema-sandbox-arrows">
-      <button class="rhema-sandbox-nav-btn" onclick="rhemaPrevVerse()">
-        <span class="material-symbols-outlined">chevron_left</span>
-      </button>
-      <button class="rhema-sandbox-nav-btn" onclick="rhemaNextVerse()">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
-    </div>
-
     <!-- Chapter toast: position:absolute so it floats above content -->
     <div id="rhemaChapterToast" class="rhema-chapter-toast hidden"></div>
 
@@ -10960,9 +10950,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.85"></script>
-  <script src="app.js?v=2.3.85"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.85"></script>
+  <script src="vocab.js?v=2.3.86"></script>
+  <script src="app.js?v=2.3.86"></script>
+  <script type="module" src="firebase-lb.js?v=2.3.86"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11550,5 +11540,15 @@ glacier: {
   </div>
 </div>
 
+<!-- Sandbox Rhema floating nav arrows — must live at body level so position:fixed
+     is relative to the viewport, not to #rhemaSlide's transform context -->
+<div class="rhema-sandbox-arrows">
+  <button class="rhema-sandbox-nav-btn" onclick="rhemaPrevVerse()">
+    <span class="material-symbols-outlined">chevron_left</span>
+  </button>
+  <button class="rhema-sandbox-nav-btn" onclick="rhemaNextVerse()">
+    <span class="material-symbols-outlined">chevron_right</span>
+  </button>
+</div>
 </body>
 </html>
