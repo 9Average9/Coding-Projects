@@ -17459,11 +17459,6 @@ function toggleWheelTool(tool) {
     _syncToolWandIndicator();
   } else if (tool === 'greek-only') {
     toggleRhemaMode();
-  } else if (tool === 'xref') {
-    _rhemaCrossRefMode = !_rhemaCrossRefMode;
-    document.getElementById('wheelItemXref')?.classList.toggle('active', _rhemaCrossRefMode);
-    _syncToolWandIndicator();
-    closeRhemaWheel();
   } else if (tool === 'wordlibrary') {
     closeRhemaWheel();
     setTimeout(() => openWordLibrary(), 200);
@@ -17483,7 +17478,7 @@ function _syncWheelState() {
 }
 
 function _syncToolWandIndicator() {
-  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn || _rhemaCrossRefMode;
+  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn;
   document.getElementById('rhemaToolBtn')?.classList.toggle('has-active', hasActive);
 }
 
@@ -18557,9 +18552,8 @@ function openRhemaSheet(wordIdx, verse) {
   document.getElementById('rhemaSheetLemma').textContent   =
     lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
 
-  // Cross-ref mode: jump straight to occurrences
   _wlSelectedForm = null;
-  showRhemaTab(_rhemaCrossRefMode ? 'occurrences' : _rhemaActiveTab, word);
+  showRhemaTab(_rhemaActiveTab, word);
 
   // Study sandbox: show Save Verse and Add to Word Log buttons
   const saveBtn = document.getElementById('rhemaSaveToStudyBtn');
