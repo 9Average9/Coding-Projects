@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.88";
+const APP_VERSION = "2.3.89";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -18049,6 +18049,7 @@ function openRhemaSheet(wordIdx, verse) {
   const sheet = document.getElementById('rhemaSheet');
   sheet?.classList.add('open');
   document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   initRhemaSwipeDown(sheet);
 }
 
@@ -18061,6 +18062,7 @@ function closeRhemaSheet() {
   }
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
   document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
+  if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
   _rhemaActiveWord = null;
 }
 
