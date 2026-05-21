@@ -1,0 +1,181 @@
+# COMPLETE IMPLEMENTATION GUIDE FOR CLAUDE
+
+Read all attached files completely before writing any code.
+
+The curriculum files are the educational source of truth.
+
+Your role:
+- implement the curriculum
+- preserve all lesson wording
+- preserve lesson progression
+- preserve activities
+- preserve quizzes
+- preserve educational explanations
+
+Do NOT:
+- rewrite lessons
+- summarize sections
+- compress explanations
+- remove examples
+- oversimplify nuanced grammar discussions
+
+---
+
+# CORE REQUIREMENTS
+
+## Reuse Existing Systems
+
+Reuse the app’s current:
+- Firebase syncing
+- local saving
+- XP systems
+- achievement systems
+- lesson completion tracking
+- theme systems
+
+Do NOT create separate systems unnecessarily.
+
+---
+
+# LESSON EXPERIENCE
+
+The lesson experience should feel:
+- premium
+- calm
+- rewarding
+- immersive
+- educational
+- progressive
+
+Avoid:
+- giant walls of text
+- cluttered layouts
+- excessive animations
+- visually noisy interfaces
+
+---
+
+# LESSON STRUCTURE
+
+Each lesson should include:
+1. Lesson Header
+2. Big Idea
+3. Main Teaching Sections
+4. Examples
+5. Common Mistakes
+6. Activities
+7. Knowledge Checks
+8. Review Summary
+9. Completion State
+
+---
+
+# BASIC TRACK
+
+## Progression
+Mostly open progression.
+
+## Knowledge Checks
+Optional/lightweight.
+
+## XP
+Granted immediately on completion.
+
+---
+
+# ADVANCED TRACK
+
+## Progression
+Sequential unlocking recommended.
+
+## Quizzes
+Required for lesson completion.
+
+## XP
+Higher rewards.
+
+## Failure
+Quiz retry allowed without penalty.
+
+---
+
+# ACTIVITY TYPES
+
+Support:
+- multiple choice
+- matching
+- parsing drills
+- syntax recognition
+- choose best translation
+- identify the verb
+- spot the mistake
+
+---
+
+# SAVE REQUIREMENTS
+
+Track:
+- completed lessons
+- current lesson
+- quiz completion
+- XP earned
+- achievements
+- streaks
+
+Save:
+- locally
+- Firebase
+
+---
+
+# ACHIEVEMENTS
+
+Suggested:
+- First Verb Lesson
+- Verb Explorer
+- Present Tense Master
+- Aorist Explorer
+- Voice Detective
+- Participle Apprentice
+- Verb Scholar
+- Greek Reader I
+- Greek Reader II
+- Greek Reader III
+- Advanced Track Complete
+
+---
+
+# UI/UX DIRECTION
+
+Use:
+- collapsible lesson blocks
+- smooth transitions
+- layered cards
+- progress bars
+- lesson completion banners
+- subtle animations
+- theme-aware styling
+
+Do NOT hardcode colors.
+
+Use the existing theme system.
+
+---
+
+# IMPORTANT EDUCATIONAL DIRECTION
+
+The lessons should remain:
+- language-focused
+- grammatically focused
+- non-sectarian
+- objective in tone
+
+Avoid theological claims unless absolutely necessary.
+
+The curriculum teaches:
+- grammar
+- syntax
+- communication
+- reading ability
+
+not denominational doctrine.
