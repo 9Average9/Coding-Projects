@@ -1,0 +1,309 @@
+
+# ADVANCED GREEK VERBS TRACK
+
+## INTRODUCTION
+
+The Advanced Track revisits the same systems from the Basic Track with greater depth and nuance.
+
+This track focuses heavily on:
+- verbal aspect
+- syntax interaction
+- reading flow
+- parsing confidence
+- translation sensitivity
+- real NT usage
+
+The purpose is not merely to memorize grammar terminology.
+
+The purpose is to think through Greek meaning more naturally.
+
+---
+
+# LESSON 1 — VERBS AND COMMUNICATION
+
+Greek verbs communicate:
+- action
+- perspective
+- progression
+- emphasis
+- condition
+- expectation
+
+Parsing exists to help explain communication.
+
+---
+
+# LESSON 2 — EMBEDDED SUBJECTS
+
+Greek verb endings often communicate the subject without requiring explicit pronouns.
+
+Explicit pronouns may add:
+- emphasis
+- contrast
+- clarification
+
+---
+
+# LESSON 3 — PRESENT TENSE AND IMPERFECTIVE ASPECT
+
+The present tense often portrays action as ongoing, unfolding, or in progress.
+
+Important:
+Do not reduce present tense to simple “present time.”
+
+---
+
+# LESSON 4 — IMPERFECT IN NARRATIVE
+
+The imperfect frequently appears in narrative sections to portray unfolding action.
+
+Students should notice how it contributes to scene development.
+
+---
+
+# LESSON 5 — FUTURE TENSE NUANCE
+
+Future verbs may communicate:
+- expectation
+- prediction
+- promise
+- warning
+
+Context matters.
+
+---
+
+# LESSON 6 — AORIST OVERVIEW
+
+The aorist is often misunderstood.
+
+Avoid simplistic formulas.
+
+The aorist frequently presents action as a complete or undefined whole.
+
+---
+
+# LESSON 7 — CONSTATIVE AND INGRESIVE IDEAS
+
+Students explore common interpretive categories associated with aorist usage.
+
+Important:
+These categories describe patterns, not rigid rules.
+
+---
+
+# LESSON 8 — CULMINATIVE IDEAS
+
+Some aorists emphasize the completion or culmination of action.
+
+Context determines interpretation.
+
+---
+
+# LESSON 9 — SECOND AORISTS
+
+Second aorists require stronger stem recognition.
+
+Students should practice identifying irregular forms.
+
+---
+
+# LESSON 10 — ASPECT AND TIME
+
+Greek tense systems involve both:
+- aspect
+- temporal reference
+
+Avoid extreme dogmatism.
+
+---
+
+# LESSON 11 — ACTIVE VOICE IN DEPTH
+
+Students explore:
+- agency
+- subject involvement
+- communication force
+
+---
+
+# LESSON 12 — MIDDLE VOICE NUANCE
+
+The middle voice is one of the most nuanced areas of Greek grammar.
+
+Avoid simplistic “subject does action to self” explanations.
+
+---
+
+# LESSON 13 — PASSIVE VOICE NUANCE
+
+Passive constructions may communicate:
+- received action
+- implied agency
+- focus shift
+
+---
+
+# LESSON 14 — DEPONENT DISCUSSION
+
+Students are introduced carefully to deponent discussions.
+
+Avoid oversimplification.
+
+---
+
+# LESSON 15 — IMPERATIVES AND FORCE
+
+Commands vary in:
+- urgency
+- intensity
+- tone
+
+Context matters greatly.
+
+---
+
+# LESSON 16 — SUBJUNCTIVE INTRODUCTION
+
+The subjunctive often communicates:
+- possibility
+- contingency
+- expectation
+
+---
+
+# LESSON 17 — INFINITIVES IN SYNTAX
+
+Students explore infinitive usage in larger sentence structures.
+
+---
+
+# LESSON 18 — PARTICIPLES AS VERBAL ADJECTIVES
+
+Participles blend:
+- verbal force
+- adjectival function
+
+They are essential for advanced NT reading.
+
+---
+
+# LESSON 19 — ATTRIBUTIVE PARTICIPLES
+
+Students learn how participles function adjectivally within noun structures.
+
+---
+
+# LESSON 20 — CIRCUMSTANTIAL PARTICIPLES
+
+Students explore:
+- temporal
+- causal
+- concessive
+- conditional relationships
+
+---
+
+# LESSON 21 — GENITIVE ABSOLUTE
+
+Students learn the structure and common function of genitive absolute constructions.
+
+---
+
+# LESSON 22 — CONDITIONAL STATEMENTS
+
+Students explore:
+- conditional structures
+- protasis/apodosis basics
+- introductory classification systems
+
+---
+
+# LESSON 23 — PRINCIPAL PARTS STRATEGY
+
+Students develop long-term memorization and recognition strategies.
+
+---
+
+# LESSON 24 — COMPLEX PARSING
+
+Students combine:
+- tense
+- voice
+- mood
+- syntax
+- nuance
+
+into integrated analysis.
+
+---
+
+# LESSON 25 — TRANSLATION PHILOSOPHY
+
+Students compare:
+- literal translation
+- smooth translation
+- interpretive translation
+
+without dogmatic theological claims.
+
+---
+
+# LESSON 26 — EXEGETICAL PITFALLS
+
+Students learn to avoid:
+- over-reading tense
+- forcing theology into grammar
+- simplistic aspect claims
+
+---
+
+# LESSON 27 — EXTENDED NT READING
+
+Students begin following extended NT sections more naturally.
+
+---
+
+# LESSON 28 — FINAL INTEGRATION
+
+Students synthesize all major systems and reading strategies.
+
+---
+
+# ADVANCED QUIZ REQUIREMENTS
+
+Every lesson requires:
+- quiz completion
+- passing score
+- retry capability
+
+Quiz types:
+- parsing
+- translation
+- syntax recognition
+- nuance identification
+- multiple choice
+- matching
+
+---
+
+# ADVANCED TRACK IMPLEMENTATION NOTES
+
+## XP
+- Larger XP rewards
+- Perfect quiz bonuses
+- Streak bonuses
+
+## Achievements
+- Present Tense Master
+- Aorist Explorer
+- Voice Detective
+- Participle Apprentice
+- Greek Reader I
+- Greek Reader II
+- Greek Reader III
+- Verb Scholar
+
+## Progression
+Sequential unlocks recommended.
+
