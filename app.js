@@ -8836,7 +8836,7 @@ function openWlWordDetail(strongs, formSurface) {
   const lex = (window.RhemaLexicon || {})[strongs] || {};
   if (!lex.lemma) return;
   const surface = formSurface || lex.lemma;
-  const morph = formSurface ? _findMorphForSurface(strongs, formSurface) : '';
+  const morph = formSurface ? _findMorphForSurface(strongs, formSurface) : _findAnyMorphForStrongs(strongs);
   _rhemaActiveWord = [surface, strongs, morph];
   // Populate the standard rhema word sheet
   document.getElementById('rhemaSheetSurface').textContent = surface;
@@ -8865,6 +8865,22 @@ function _findMorphForSurface(strongs, surface) {
       for (const v of Object.keys(bdata[ch])) {
         for (const word of (bdata[ch][v] || [])) {
           if (String(word[1]) === String(strongs) && _stripGreekAccents(word[0]).toLowerCase() === norm) return word[2] || '';
+        }
+      }
+    }
+  }
+  return '';
+}
+
+function _findAnyMorphForStrongs(strongs) {
+  const texts = window.RhemaNT?.text;
+  if (!texts) return '';
+  for (const book of RHEMA_BOOK_ORDER) {
+    const bdata = texts[book] || {};
+    for (const ch of Object.keys(bdata)) {
+      for (const v of Object.keys(bdata[ch])) {
+        for (const word of (bdata[ch][v] || [])) {
+          if (String(word[1]) === String(strongs) && word[2]) return word[2];
         }
       }
     }
