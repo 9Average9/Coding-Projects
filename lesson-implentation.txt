@@ -1,4 +1,4 @@
-# COMPLETE IMPLEMENTATION GUIDE FOR CLAUDE
+ # COMPLETE IMPLEMENTATION GUIDE FOR CLAUDE
 
 Read all attached files completely before writing any code.
 
