@@ -8697,7 +8697,7 @@ function _startEncouragementListener(uid) {
         _notifItems.push({
           id: 'collab_' + m.id, type: 'collab_request',
           requesterUid: m.fromUid, requesterName: m.fromName,
-          studyId: m.studyId, msgId: m.id, read: false
+          studyId: m.studyId, studyName: m.studyName || '', msgId: m.id, read: false
         });
       }
     });
@@ -9083,7 +9083,7 @@ async function _loadNotifications() {
           <div class="notif-icon"><span class="material-symbols-outlined">group_add</span></div>
           <div class="notif-body">
             <div class="notif-title">${n.requesterName}</div>
-            <div class="notif-sub">Wants to collaborate on your study</div>
+            <div class="notif-sub">Wants to join your${n.studyName ? ` "${n.studyName}"` : ''} study</div>
             <div class="notif-fr-actions">
               <button class="notif-accept-btn" onclick="notifApproveCollab('${n.studyId}','${n.requesterUid}','${n.requesterName}','${n.id}')">Approve</button>
               <button class="notif-deny-btn" onclick="notifDenyCollab('${n.studyId}','${n.requesterUid}','${n.id}')">Deny</button>
@@ -9113,7 +9113,7 @@ async function _loadNotifications() {
           <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">handshake</span></div>
           <div class="notif-body">
             <div class="notif-title">${n.fromName}</div>
-            <div class="notif-sub">Approved your collaboration on "${n.studyName || 'a study'}"</div>
+            <div class="notif-sub">Approved your request to join "${n.studyName || 'a study'}"</div>
           </div>
           <button class="notif-x-btn" onclick="event.stopPropagation();notifDismissCollab('${n.id}','${n.msgId||''}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
@@ -16980,6 +16980,7 @@ function renderRhemaVerse() {
   updateRhemaVerseNav();
   initRhemaVerseSwipe();
   updateHighlightToolbar();
+  _syncToolWandIndicator();
   _saveRhemaPosition();
 }
 
@@ -17983,6 +17984,7 @@ function _renderDiagramBranch(clause, words, verse) {
 }
 
 function openRhemaSyntaxSheet(el) {
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const role  = el?.dataset?.role  || 'unknown';
   const greek = el?.dataset?.greek || '';
   const info  = _SX_ROLE_INFO[role] || _SX_ROLE_INFO.unknown;
@@ -18019,6 +18021,7 @@ function openRhemaSyntaxSheet(el) {
 
 function openSyntaxInfoSheet(e) {
   if (e) e.stopPropagation();
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const sheet = document.getElementById('rhemaSyntaxInfoSheet');
   if (!sheet) return;
   if (!sheet._swipeInit) {
@@ -18037,6 +18040,7 @@ function closeSyntaxInfoSheet() {
   const sheet = document.getElementById('rhemaSyntaxInfoSheet');
   if (sheet) { sheet.classList.remove('open'); sheet.style.transform = ''; sheet.style.transition = ''; }
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
+  if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
 }
 
 function closeRhemaSyntaxSheet() {
@@ -18044,6 +18048,7 @@ function closeRhemaSyntaxSheet() {
   if (sheet) { sheet.classList.remove('open'); sheet.style.transform = ''; sheet.style.transition = ''; }
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
   document.querySelectorAll('.rsx-dg-chip.rsx-selected').forEach(e => e.classList.remove('rsx-selected'));
+  if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
 }
 
 function closeAnyRhemaSheet() {

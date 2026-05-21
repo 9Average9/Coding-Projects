@@ -115,12 +115,12 @@ exports.onEncouragementCreated = functions.firestore
       body = `${fromName} is working on their ${studyName} study!`;
     } else if (type === "studyCollabRequest") {
       const studyName = snap.data().studyName || "a study";
-      title = "Collaboration Request";
-      body = `${fromName} wants to collaborate on your "${studyName}" study.`;
+      title = "Study Join Request";
+      body = `${fromName} wants to join your "${studyName}" study.`;
     } else if (type === "studyCollabApproved") {
       const studyName = snap.data().studyName || "a study";
-      title = "Collaboration Approved!";
-      body = `${fromName} approved your request to collaborate on "${studyName}".`;
+      title = "Study Request Approved!";
+      body = `${fromName} approved your request to join "${studyName}".`;
     } else if (type === "studyInvite") {
       const studyName = snap.data().studyName || "a study";
       title = "Study Invitation";
