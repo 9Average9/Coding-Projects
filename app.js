@@ -13545,9 +13545,14 @@ function resetLessonData() {
 
   localStorage.removeItem("completedLessons");
   localStorage.removeItem("openedLessonBlocks");
+  localStorage.removeItem("completedAdvancedLessons");
+  localStorage.removeItem("answeredKCs");
+  localStorage.removeItem("advQuizScores");
 
   completedLessons = {};
   openedLessonBlocks = {};
+  completedAdvancedLessons = {};
+  answeredKCs = {};
 
   document.querySelectorAll(".lesson-block").forEach(block => {
     block.classList.remove("visited", "open");
@@ -15073,7 +15078,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.5";
+const APP_VERSION = "2.5.6";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.5.4 — New Lesson Experience</div>
@@ -19359,28 +19364,27 @@ function renderNllView(lessonId) {
     const item = document.createElement("div");
     item.className = `nll-block-item${isUnlocked ? "" : " locked"}`;
     item.innerHTML = `
-      <div class="nll-left-col">
-        <div class="nll-circle-wrap">
-          <div class="nll-circle ${circleState}">${circleContent}</div>
-          ${!isLast ? `<div class="nll-connector ${connectorClass}"></div>` : ""}
-        </div>
-      </div>
-      <div class="nll-right-col">
-        <div class="nll-card${isUnlocked ? "" : " locked-card"}">
-          <div class="nll-card-text">
-            <div class="nll-card-title">${blockCfg.title}</div>
-            <div class="nll-card-time">
-              <span class="material-symbols-outlined">schedule</span>${blockCfg.time}
-            </div>
+      <div class="nll-card${isUnlocked ? "" : " locked-card"}">
+        <div class="nll-circle ${circleState}">${circleContent}</div>
+        <div class="nll-card-text">
+          <div class="nll-card-title">${blockCfg.title}</div>
+          <div class="nll-card-time">
+            <span class="material-symbols-outlined">schedule</span>${blockCfg.time}
           </div>
-          <div class="nll-card-icon">${rightIcon}</div>
         </div>
+        <div class="nll-card-icon">${rightIcon}</div>
       </div>`;
 
     if (isUnlocked) {
       item.addEventListener("click", () => openNbdView(lessonId, i));
     }
     list.appendChild(item);
+
+    if (!isLast) {
+      const connector = document.createElement("div");
+      connector.className = `nll-connector ${connectorClass}`;
+      list.appendChild(connector);
+    }
   });
 
   // Progress bar
@@ -19433,9 +19437,9 @@ function openNbdView(lessonId, blockIndex) {
   currentNbdBlockIndex = blockIndex;
   const cfg = NEW_STYLE_LESSON_CONFIG[lessonId];
 
-  // Mark as opened via the existing tracking system
+  // Mark as opened immediately only when no activity is required to unlock the next block
   const lessonSection = document.getElementById(lessonId + "Lesson");
-  if (lessonSection) {
+  if (lessonSection && !cfg.blocks[blockIndex].hasActivity) {
     const domBlocks = Array.from(lessonSection.querySelectorAll(".lesson-block"));
     if (domBlocks[blockIndex]) {
       markLessonBlockOpened(lessonSection, domBlocks[blockIndex]);
@@ -19498,8 +19502,13 @@ function backToLessonList() {
 }
 
 function backFromNllView() {
+  const cfg = NEW_STYLE_LESSON_CONFIG[currentNllLesson];
   currentNllLesson = null;
-  showNewLearnMenu();
+  if (cfg?.isAdvanced) {
+    showAdvancedLearnMenu();
+  } else {
+    _openBasicLearnMenu();
+  }
 }
 
 function nllCompleteLesson() {

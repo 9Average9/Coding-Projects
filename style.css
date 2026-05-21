@@ -12517,7 +12517,9 @@ body .app:has(#communityPage.screen.active) {
 /* Hide the app-header on nav screens (each screen has its own header) */
 body .app:has(#homeScreen.screen.active) .app-header,
 body .app:has(#profilePage.screen.active) .app-header,
-body .app:has(#communityPage.screen.active) .app-header {
+body .app:has(#communityPage.screen.active) .app-header,
+body .app:has(#nllView.screen.active) .app-header,
+body .app:has(#nbdView.screen.active) .app-header {
   display: none !important;
 }
 
@@ -14233,34 +14235,15 @@ body.sandbox-open #rhemaModal {
   flex-shrink: 0;
 }
 
-/* Each item = left timeline col + right card col */
+/* Each item is just the card — no side column */
 .nll-block-item {
-  display: flex;
-  align-items: stretch;
   cursor: pointer;
 }
 .nll-block-item.locked { cursor: default; }
 
-.nll-left-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 48px;
-  flex-shrink: 0;
-}
-
-/* Spacer above circle so circle aligns with card center */
-.nll-circle-wrap {
-  padding-top: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-
 .nll-circle {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -14286,10 +14269,9 @@ body.sandbox-open #rhemaModal {
 }
 
 .nll-connector {
-  flex: 1;
   width: 2px;
-  min-height: 12px;
-  margin: 3px 0;
+  height: 22px;
+  margin: 3px 0 3px 35px;
   border-radius: 1px;
 }
 .nll-connector.solid {
@@ -14305,14 +14287,7 @@ body.sandbox-open #rhemaModal {
   );
 }
 
-/* Right column holds the card + bottom gap */
-.nll-right-col {
-  flex: 1;
-  padding-bottom: 10px;
-}
-.nll-block-item:last-child .nll-right-col { padding-bottom: 0; }
-
-/* The card itself */
+/* The card — circle is the first flex child */
 .nll-card {
   background: var(--card-color);
   border-radius: 18px;
@@ -14320,10 +14295,9 @@ body.sandbox-open #rhemaModal {
   padding: 16px 18px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-  margin-left: 10px;
-  min-height: 68px;
+  min-height: 74px;
   transition: box-shadow 0.15s, transform 0.1s;
 }
 .nll-block-item:not(.locked) .nll-card:active {
