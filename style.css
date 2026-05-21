@@ -13427,11 +13427,11 @@ body.sandbox-open .ss-pane {
 body.sandbox-open #rhemaModal {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
-/* Remove safe-area padding from sheets; the modal already clears the tab bar */
+/* Modal already sits above the tab bar; just add a small gap so the sheet
+   doesn't sit flush against the modal's bottom edge */
 body.sandbox-open .rhema-sheet,
 body.sandbox-open .rhema-picker-sheet {
-  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  padding-bottom: 12px;
+  bottom: 20px;
 }
 
 .ss-tab {
