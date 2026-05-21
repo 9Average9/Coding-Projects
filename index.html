@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.3.89" />
+  <link rel="stylesheet" href="style.css?v=2.5.0" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10765,7 +10765,7 @@ glacier: {
   <!-- Overlays: position:absolute within #rhemaModal (fixed full-screen, no transform) -->
   <!-- Word detail bottom sheet -->
   <div id="rhemaSheet" class="rhema-sheet">
-    <div class="rhema-sheet-handle"></div>
+    <button class="sheet-x-close" onclick="closeRhemaSheet()"><span class="material-symbols-outlined">close</span></button>
     <div class="rhema-sheet-top">
       <span class="rhema-sheet-surface" id="rhemaSheetSurface"></span>
       <span class="rhema-sheet-strongs" id="rhemaSheetStrongs"></span>
@@ -10798,7 +10798,7 @@ glacier: {
 
   <!-- ── Syntax explanation sheet ── -->
   <div id="rhemaSyntaxSheet" class="rhema-sheet rhema-syntax-sheet">
-    <div class="rhema-sheet-handle"></div>
+    <button class="sheet-x-close" onclick="closeRhemaSyntaxSheet()"><span class="material-symbols-outlined">close</span></button>
     <div class="rsx-sheet-scroll">
       <div class="rsx-sheet-inner">
         <div id="rsxSheetGreek" class="rsx-sheet-greek"></div>
@@ -10810,7 +10810,7 @@ glacier: {
 
   <!-- ── Syntax tool info sheet ── -->
   <div id="rhemaSyntaxInfoSheet" class="rhema-sheet rhema-syntax-info-sheet">
-    <div class="rhema-sheet-handle"></div>
+    <button class="sheet-x-close" onclick="closeSyntaxInfoSheet()"><span class="material-symbols-outlined">close</span></button>
     <div class="rsx-info-scroll">
       <div class="rsx-info-inner">
         <h3 class="rsx-info-title">About the Syntax Tool</h3>
@@ -10862,6 +10862,7 @@ glacier: {
       <div id="rhemaCoachBody" class="rhema-coach-body"></div>
       <div class="rhema-coach-actions">
         <button class="rhema-coach-skip" onclick="rhemaCoachSkip()">Skip</button>
+        <button class="rhema-coach-back" id="rhemaCoachBackBtn" onclick="rhemaCoachBack()">Back</button>
         <button class="rhema-coach-next" onclick="rhemaCoachNext()">
           <span id="rhemaCoachNextLabel">Next</span>
           <span class="material-symbols-outlined">arrow_forward</span>
@@ -10873,9 +10874,9 @@ glacier: {
   <!-- ── Book picker ── -->
   <div id="rhemaBookPickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
     <div class="rhema-picker-sheet" onclick="event.stopPropagation()">
-      <div class="rhema-picker-handle"></div>
       <div class="rhema-picker-hdr">
         <span class="rhema-picker-title">Select Book</span>
+        <button class="rhema-picker-x" onclick="closeRhemaPickerSheet()">✕</button>
       </div>
       <div class="rhema-picker-search-row">
         <span class="material-symbols-outlined rhema-picker-search-icon">search</span>
@@ -10888,7 +10889,6 @@ glacier: {
   <!-- ── Chapter picker ── -->
   <div id="rhemaChapPickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
     <div class="rhema-picker-sheet rhema-picker-sheet--grid" onclick="event.stopPropagation()">
-      <div class="rhema-picker-handle"></div>
       <div class="rhema-picker-hdr">
         <span class="rhema-picker-title">Select Chapter</span>
         <button class="rhema-picker-x" onclick="closeRhemaPickerSheet()">✕</button>
@@ -10900,7 +10900,6 @@ glacier: {
   <!-- ── Verse picker ── -->
   <div id="rhemaVersePickerOverlay" class="rhema-picker-overlay hidden" onclick="closeRhemaPickerSheet()">
     <div class="rhema-picker-sheet rhema-picker-sheet--grid" onclick="event.stopPropagation()">
-      <div class="rhema-picker-handle"></div>
       <div class="rhema-picker-hdr">
         <span class="rhema-picker-title">Select Verse</span>
         <button class="rhema-picker-x" onclick="closeRhemaPickerSheet()">✕</button>
@@ -10950,9 +10949,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.3.89"></script>
-  <script src="app.js?v=2.3.89"></script>
-  <script type="module" src="firebase-lb.js?v=2.3.89"></script>
+  <script src="vocab.js?v=2.5.0"></script>
+  <script src="app.js?v=2.5.0"></script>
+  <script type="module" src="firebase-lb.js?v=2.5.0"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11147,15 +11146,13 @@ glacier: {
         </button>
       </div>
       <div id="wsEntriesList" class="ws-entries-list"></div>
-      <div class="ws-compose-verse" id="wsComposeVerse">
-        <div class="ws-compose-verse-nav">
-          <button class="ws-verse-arrow" onclick="wsNavVerse(-1)"><span class="material-symbols-outlined">chevron_left</span></button>
-          <span id="wsVerseRef" class="ws-compose-ref"></span>
-          <button class="ws-verse-arrow" onclick="wsNavVerse(1)"><span class="material-symbols-outlined">chevron_right</span></button>
-        </div>
-        <div id="wsVerseKjv" class="ws-compose-kjv"></div>
+      <div class="ws-kbd-row" id="wsKbdRow">
+        <div id="wsGreekKeyboard" class="ws-greek-keyboard hidden"></div>
       </div>
       <div class="ss-compose">
+        <button class="ws-kbd-toggle" id="wsKbdToggleBtn" onclick="toggleWsKeyboard()" title="Greek keyboard">
+          <span class="ws-kbd-icon">α</span>
+        </button>
         <textarea id="ssNoteInput" class="ss-note-input" placeholder="Add a note…" rows="2" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
         <button class="ss-send-btn" onclick="submitWorkspaceEntry()"><span class="material-symbols-outlined">send</span></button>
       </div>
@@ -11164,7 +11161,7 @@ glacier: {
   <!-- Word detail sheet — slides up from bottom of sandbox when a word log entry is tapped -->
   <div id="ssWordDetailBackdrop" class="ss-wd-backdrop" onclick="closeSandboxWordDetail()"></div>
   <div id="ssWordDetailSheet" class="ss-wd-sheet">
-    <div class="ss-wd-handle"></div>
+    <button class="sheet-x-close" onclick="closeSandboxWordDetail()"><span class="material-symbols-outlined">close</span></button>
     <div class="ss-wd-top">
       <span id="ssWdSurface" class="ss-wd-surface"></span>
       <span id="ssWdStrongs" class="ss-wd-strongs"></span>
@@ -11236,6 +11233,11 @@ glacier: {
     </button>
   </div>
   <div id="swmVerseCard" class="swm-verse-card"></div>
+  <div class="swm-verse-nav-row">
+    <button class="swm-verse-arrow" onclick="swmNavVerse(-1)"><span class="material-symbols-outlined">chevron_left</span></button>
+    <div id="swmKjvText" class="swm-kjv-text"></div>
+    <button class="swm-verse-arrow" onclick="swmNavVerse(1)"><span class="material-symbols-outlined">chevron_right</span></button>
+  </div>
   <div class="swm-body">
     <textarea id="swmTextarea" class="swm-textarea" placeholder="Write your thoughts…" rows="5" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
   </div>
@@ -11250,7 +11252,6 @@ glacier: {
 <!-- ── Word Library ── -->
 <div id="wordLibraryOverlay" class="wl-overlay hidden" onclick="if(event.target===this)closeWordLibrary()">
   <div class="wl-sheet" onclick="event.stopPropagation()">
-    <div class="wl-handle"></div>
     <div class="wl-header">
       <span class="material-symbols-outlined wl-header-icon">local_library</span>
       <span class="wl-title">Word Library</span>
@@ -11264,9 +11265,33 @@ glacier: {
       <button class="wl-kbd-toggle" id="wlKbdToggleBtn" onclick="toggleWlKeyboard()" title="Greek keyboard">
         <span class="wl-kbd-icon">α</span>
       </button>
+      <button class="wl-info-btn" onclick="openWlInfoModal()" title="How to use the Word Library">
+        <span class="material-symbols-outlined">info</span>
+      </button>
     </div>
     <div id="wlGreekKeyboard" class="wl-keyboard hidden"></div>
     <div id="wlResults" class="wl-results"><p class="wl-hint">Search by Greek (ἀγαπ…), transliteration (agap…), or English meaning.</p></div>
+  </div>
+</div>
+
+<!-- Word Library Info Modal -->
+<div id="wlInfoModal" class="modal-overlay" onclick="if(event.target===this)closeWlInfoModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeWlInfoModal()">×</button>
+    <h2 style="margin-bottom:12px">About the Word Library</h2>
+    <div class="wl-info-body">
+      <p><strong>This is not a normal dictionary.</strong> Standard Bible dictionaries show you the base (lexical) form of a word — the form listed in a lexicon. The Word Library goes further: you can search for the <em>exact inflected form</em> that appears in the Greek New Testament text.</p>
+      <h3>How to search</h3>
+      <p><strong>English</strong> — Type any English meaning (e.g. "love", "faith"). Results show every Greek word that carries that meaning.</p>
+      <p><strong>Transliteration</strong> — Type the Latin spelling of a Greek word (e.g. "agape", "pistis"). Useful if you don't have a Greek keyboard.</p>
+      <p><strong>Greek (lexical)</strong> — Type the dictionary form of the word (e.g. ἀγάπη). Results show the word's full definition and NT occurrences.</p>
+      <h3>Greek keyboard — exact form lookup</h3>
+      <p>Tap the <strong>α</strong> button to open the Greek character keyboard. Use it to type the <em>exact inflected form</em> as it appears in the text (e.g. ἀγαπῶμεν). This searches the actual NT word forms, not just lexical entries — so you can find which verse uses that specific form and what it parses as.</p>
+      <h3>Lexical lookup</h3>
+      <p>Each result shows the lemma (dictionary form), Strong's number, transliteration, and a full gloss. Tap any result to see its complete definition.</p>
+      <h3>Occurrences</h3>
+      <p>Inside a word's detail view, the <strong>Occurrences</strong> tab lists every verse in the NT where that word appears. Tap any verse to jump directly to it in Rhema for full context and parsing.</p>
+    </div>
   </div>
 </div>
 
@@ -11282,7 +11307,7 @@ glacier: {
 <!-- Study Board Info Sheet (friend's study) -->
 <div id="studyBoardSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyBoardSheet()">
   <div class="study-sheet" onclick="event.stopPropagation()">
-    <div class="study-sheet-handle"></div>
+    <button class="sheet-x-close" onclick="closeStudyBoardSheet()"><span class="material-symbols-outlined">close</span></button>
     <span class="study-sheet-icon-big material-symbols-outlined" id="sbsIcon">menu_book</span>
     <h2 class="study-sheet-title" id="sbsTitle">Study</h2>
     <p class="study-sheet-sub" id="sbsCreator">by —</p>
@@ -11296,7 +11321,7 @@ glacier: {
 <!-- Delete Study Confirm Sheet -->
 <div id="studyDeleteConfirm" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyDeleteConfirm()">
   <div class="study-sheet" onclick="event.stopPropagation()">
-    <div class="study-sheet-handle"></div>
+    <button class="sheet-x-close" onclick="closeStudyDeleteConfirm()"><span class="material-symbols-outlined">close</span></button>
     <h2 class="study-sheet-title" style="color:#ef4444">Delete Study?</h2>
     <p class="study-sheet-sub" id="studyDeleteConfirmName" style="font-weight:700;color:var(--text-color)"></p>
     <p class="study-sheet-sub">This permanently erases all notes, saved verses, and word log. Cannot be undone.</p>
@@ -11372,7 +11397,7 @@ glacier: {
 <!-- Study Session Sheet -->
 <div id="studySessionSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudySessionSheet()">
   <div class="study-sheet" onclick="event.stopPropagation()">
-    <div class="study-sheet-handle"></div>
+    <button class="sheet-x-close" onclick="closeStudySessionSheet()"><span class="material-symbols-outlined">close</span></button>
     <span class="study-sheet-icon-big material-symbols-outlined" id="studySessionIcon">menu_book</span>
     <h2 class="study-sheet-title" id="studySessionTitle">Study</h2>
     <p class="study-sheet-sub" id="studySessionMeta">0 sessions total</p>

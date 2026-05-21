@@ -11461,6 +11461,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   cursor: pointer;
 }
 .rhema-coach-next .material-symbols-outlined { font-size: 1rem; }
+.rhema-coach-back {
+  background: none; border: 1px solid var(--border-color);
+  border-radius: 10px; padding: 10px 16px; font-size: 0.9rem; font-weight: 600;
+  color: var(--font-color); cursor: pointer; transition: background 0.15s;
+}
+.rhema-coach-back:active { background: var(--border-color); }
 /* Shake animation for placeholder buttons */
 @keyframes rw-shake {
   0%, 100% { filter: brightness(1); }
@@ -12522,6 +12528,12 @@ body .app:has(#communityPage.screen.active) #communityPage {
   margin-top: 0 !important;
 }
 
+#homeScreen.screen.active {
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden !important;
+}
+
 /* Community and profile pages fill full height */
 #communityPage.screen.active,
 #profilePage.screen.active {
@@ -12846,7 +12858,11 @@ body .app:has(#settingsScreen.screen.active) {
   position: relative;
 }
 /* Fog overlays — pointer-events:none so they don't block taps */
-#homeScreen { position: relative; }
+#homeScreen {
+  position: relative;
+  -webkit-user-select: none;
+  user-select: none;
+}
 #homeScreen::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 56px;
   background: linear-gradient(to bottom, var(--primary-color) 30%, transparent);
@@ -13164,6 +13180,7 @@ body .app:has(#settingsScreen.screen.active) {
 }
 
 .study-sheet {
+  position: relative;
   background: var(--card-color);
   border-radius: 24px 24px 0 0;
   padding: 20px 20px calc(env(safe-area-inset-bottom,0px) + 24px);
@@ -13184,6 +13201,16 @@ body .app:has(#settingsScreen.screen.active) {
   border-radius: 2px;
   margin: 0 auto 20px;
 }
+
+.sheet-x-close {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  background: none; border: none; cursor: pointer;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; color: var(--muted-color); transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.sheet-x-close:active { background: var(--border-color); }
+.sheet-x-close .material-symbols-outlined { font-size: 1.25rem; }
 
 .study-sheet-title {
   font-size: 1.1rem;
@@ -13805,6 +13832,20 @@ body.sandbox-open #rhemaModal {
   font-style: italic;
   overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
 }
+.swm-verse-nav-row {
+  display: flex; align-items: flex-start; gap: 8px; padding: 8px 16px 4px;
+}
+.swm-verse-arrow {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--secondary-color); border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.swm-verse-arrow:active { background: var(--border-color); }
+.swm-kjv-text {
+  flex: 1; font-size: 0.82rem; line-height: 1.5; color: var(--muted-color);
+  font-style: italic; text-align: center; padding: 2px 0;
+}
 .swm-body { flex: 1; padding: 0 16px 8px; overflow-y: auto; }
 .swm-textarea {
   width: 100%; min-height: 140px; max-height: 340px;
@@ -13897,6 +13938,33 @@ body.sandbox-open #rhemaModal {
   transition: background 0.1s;
 }
 .wl-key-bs:active { background: color-mix(in srgb, var(--muted-color) 20%, transparent); }
+
+/* ── Workspace Greek keyboard ─────────────────────────────────────────────── */
+.ws-kbd-toggle {
+  background: none; border: none; cursor: pointer;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; flex-shrink: 0;
+  color: var(--muted-color); transition: background 0.15s, color 0.15s;
+}
+.ws-kbd-toggle.active { background: var(--secondary-color); color: #fff; }
+.ws-kbd-icon { font-size: 1.1rem; font-weight: 700; font-family: 'Noto Serif', serif; }
+.ws-greek-keyboard {
+  display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 6px 4px;
+  background: var(--card-color); border-top: 1px solid var(--border-color);
+}
+.ws-kbd-row { width: 100%; }
+
+.wl-info-btn {
+  background: none; border: none; cursor: pointer;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; flex-shrink: 0; color: var(--muted-color);
+  transition: background 0.15s, color 0.15s;
+}
+.wl-info-btn:active { background: var(--border-color); }
+.wl-info-btn .material-symbols-outlined { font-size: 1.25rem; }
+.wl-info-body p { font-size: 0.88rem; line-height: 1.55; margin: 0 0 10px; color: var(--font-color); }
+.wl-info-body h3 { font-size: 0.9rem; font-weight: 700; margin: 14px 0 4px; color: var(--secondary-color); }
+
 .wl-results {
   flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 12px);
 }
