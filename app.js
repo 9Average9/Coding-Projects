@@ -9098,7 +9098,7 @@ async function _loadNotifications() {
           <div class="notif-icon"><span class="material-symbols-outlined">group_add</span></div>
           <div class="notif-body">
             <div class="notif-title">${n.fromName}</div>
-            <div class="notif-sub">Invited you to collaborate on "${n.studyName || 'a study'}"</div>
+            <div class="notif-sub">Invited you to join "${n.studyName || 'a study'}"</div>
             <div class="notif-fr-actions">
               <button class="notif-accept-btn" onclick="notifJoinStudy('${n.studyId}','${n.id}')">Join</button>
               <button class="notif-deny-btn" onclick="notifDenyStudyInvite('${n.studyId}','${n.id}')">Decline</button>
