@@ -13368,9 +13368,11 @@ function markLessonBlockOpened(lessonSection, block) {
 
 function restoreOpenedLessonBlocks(lessonSection, lessonId) {
   const opened = openedLessonBlocks[lessonId] || [];
+  const isCompleted = completedLessons[lessonId] === true ||
+    completedAdvancedLessons[lessonId] === true;
 
   lessonSection.querySelectorAll(".lesson-block").forEach((block, index) => {
-    if (opened.includes(index)) {
+    if (isCompleted || opened.includes(index)) {
       block.classList.add("visited");
     }
   });
@@ -15066,9 +15068,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.2";
+const APP_VERSION = "2.5.3";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.5.3 — Lesson Block Progress Fix</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Lesson progress restored correctly</strong> — Completed lessons now show all blocks as visited when reopened, even if block data was incomplete.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.5.2 — Custom Study Colors &amp; Keyboard</div>
 <div class="un-section">
   <ul class="un-list">
