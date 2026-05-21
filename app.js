@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.84";
+const APP_VERSION = "2.3.85";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -16505,6 +16505,7 @@ function closeRhema(keepSandbox = false) {
     if (!keepSandbox) _studySandboxId = null;
   }
   document.getElementById('rhemaModal')?.classList.remove('open');
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaSheet();
   closeRhemaPickerSheet();
   _rhemaTrail = [];
@@ -16672,17 +16673,17 @@ function rhemaSelectVerse(v) {
 // ── Verse swipe navigation ────────────────────────────────────────────────────
 
 function updateRhemaVerseNav() {
-  const nav   = document.getElementById('rhemaVerseNav');
-  const ref   = document.getElementById('rhemaVerseRef');
-  const slide = document.getElementById('rhemaSlide');
+  const nav    = document.getElementById('rhemaVerseNav');
+  const ref    = document.getElementById('rhemaVerseRef');
+  const arrows = document.querySelector('.rhema-sandbox-arrows');
   if (!nav) return;
   if (_studySandboxId) {
-    // In study sandbox: hide the full bar and show floating arrow buttons instead
+    // In study sandbox: hide the full bar and show floating arrow pair instead
     nav.classList.add('hidden');
-    slide?.classList.add('sandbox-nav');
+    arrows?.classList.add('visible');
   } else {
     nav.classList.remove('hidden');
-    slide?.classList.remove('sandbox-nav');
+    arrows?.classList.remove('visible');
     if (ref && window.RhemaNT) {
       const bookName = window.RhemaNT.names[_rhemaBook] || _rhemaBook;
       ref.textContent = _rhemaFullChapter
@@ -16705,8 +16706,8 @@ function initRhemaVerseSwipe() {
     _swipeInDiagram = !!e.target.closest('.rsx-diagram');
   }, { passive: true });
   area.addEventListener('touchend', e => {
-    // Don't navigate verses when the user is scrolling the syntax diagram
-    if (_swipeInDiagram) return;
+    // Disable swipe navigation entirely when the syntax tree is visible
+    if (_rhemaSyntaxMode || _swipeInDiagram) return;
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
     // Require clearly horizontal swipe (≥45px, more horizontal than vertical)
