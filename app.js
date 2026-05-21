@@ -13553,6 +13553,8 @@ function resetLessonData() {
 
   updateLessonCompletionUI();
 
+  syncUserData();
+
   alert("Lesson data has been reset.");
   showHome();
 }
