@@ -776,8 +776,20 @@ window.Studies = {
   requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
   inviteCollab: studyInviteCollab, selfApproveInvite: studySelfApproveInvite,
   copy: studyCopy, delete: studyDeletePermanent, listenEncouragements,
-  deleteMsg: deleteEncouragementMsg
+  deleteMsg: deleteEncouragementMsg,
+  getMemberNames: studyGetMemberNames
 };
+
+async function studyGetMemberNames(uids) {
+  if (!uids?.length) return [];
+  try {
+    const snaps = await Promise.all(uids.map(uid => getDoc(doc(db, 'users', uid)).catch(() => null)));
+    return snaps.map((snap, i) => ({
+      uid: uids[i],
+      name: snap?.exists() ? (snap.data().displayName || snap.data().username || 'Member') : 'Member'
+    }));
+  } catch (e) { console.warn('getMemberNames:', e); return uids.map(uid => ({ uid, name: 'Member' })); }
+}
 
 async function fcmRegisterToken(uid) {
   if (!messaging) throw new Error("Firebase messaging not available on this browser.");

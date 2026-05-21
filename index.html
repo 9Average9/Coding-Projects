@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.5.0" />
+  <link rel="stylesheet" href="style.css?v=2.5.1" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -370,7 +370,10 @@ glacier: {
         <!-- Your Studies section -->
         <div class="home-studies-section" id="homeStudiesSection">
           <div class="home-studies-header">
-            <span class="home-section-label" style="margin:0">Your Studies</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="home-section-label" style="margin:0">Your Studies</span>
+              <button class="hs-info-btn" onclick="openStudiesInfoModal()" title="About Studies"><span class="material-symbols-outlined">info</span></button>
+            </div>
             <button class="hs-view-all-btn hidden" id="hsViewAllBtn" onclick="openStudiesViewAll()">View All</button>
           </div>
           <div class="hs-grid" id="hsGrid">
@@ -10949,9 +10952,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.5.0"></script>
-  <script src="app.js?v=2.5.0"></script>
-  <script type="module" src="firebase-lb.js?v=2.5.0"></script>
+  <script src="vocab.js?v=2.5.1"></script>
+  <script src="app.js?v=2.5.1"></script>
+  <script type="module" src="firebase-lb.js?v=2.5.1"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11146,9 +11149,6 @@ glacier: {
         </button>
       </div>
       <div id="wsEntriesList" class="ws-entries-list"></div>
-      <div class="ws-kbd-row" id="wsKbdRow">
-        <div id="wsGreekKeyboard" class="ws-greek-keyboard hidden"></div>
-      </div>
       <div class="ss-compose">
         <button class="ws-kbd-toggle" id="wsKbdToggleBtn" onclick="toggleWsKeyboard()" title="Greek keyboard">
           <span class="ws-kbd-icon">α</span>
@@ -11156,6 +11156,7 @@ glacier: {
         <textarea id="ssNoteInput" class="ss-note-input" placeholder="Add a note…" rows="2" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
         <button class="ss-send-btn" onclick="submitWorkspaceEntry()"><span class="material-symbols-outlined">send</span></button>
       </div>
+      <div id="wsGreekKeyboard" class="ws-greek-keyboard hidden"></div>
     </div>
   </div>
   <!-- Word detail sheet — slides up from bottom of sandbox when a word log entry is tapped -->
@@ -11286,11 +11287,37 @@ glacier: {
       <p><strong>Transliteration</strong> — Type the Latin spelling of a Greek word (e.g. "agape", "pistis"). Useful if you don't have a Greek keyboard.</p>
       <p><strong>Greek (lexical)</strong> — Type the dictionary form of the word (e.g. ἀγάπη). Results show the word's full definition and NT occurrences.</p>
       <h3>Greek keyboard — exact form lookup</h3>
-      <p>Tap the <strong>α</strong> button to open the Greek character keyboard. Use it to type the <em>exact inflected form</em> as it appears in the text (e.g. ἀγαπῶμεν). This searches the actual NT word forms, not just lexical entries — so you can find which verse uses that specific form and what it parses as.</p>
+      <p>Tap the <strong>α</strong> button to open the built-in Greek character keyboard. Use it to type the <em>exact inflected form</em> as it appears in the text (e.g. ἀγαπῶμεν). This searches the actual NT word forms, not just lexical entries — so you can find which verse uses that specific form and what it parses as.</p>
       <h3>Lexical lookup</h3>
       <p>Each result shows the lemma (dictionary form), Strong's number, transliteration, and a full gloss. Tap any result to see its complete definition.</p>
       <h3>Occurrences</h3>
       <p>Inside a word's detail view, the <strong>Occurrences</strong> tab lists every verse in the NT where that word appears. Tap any verse to jump directly to it in Rhema for full context and parsing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Study Members Modal -->
+<div id="studyMembersModal" class="modal-overlay" onclick="if(event.target===this)closeStudyMembersModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeStudyMembersModal()">×</button>
+    <h2 style="margin-bottom:14px">Members</h2>
+    <div id="studyMembersList" class="study-members-list"></div>
+  </div>
+</div>
+
+<!-- Studies Info Modal -->
+<div id="studiesInfoModal" class="modal-overlay" onclick="if(event.target===this)closeStudiesInfoModal()">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeStudiesInfoModal()">×</button>
+    <h2 style="margin-bottom:12px">About Studies</h2>
+    <div class="wl-info-body">
+      <p>A <strong>Study</strong> is your personal space to work through a passage of Scripture in a structured way. Everything you do inside a study — reading, notes, and word lookups — is kept separate from your regular Rhema reading.</p>
+      <h3>Observe · Interpret · Apply · Question</h3>
+      <p>The <strong>Workspace</strong> tab guides you through the classic Bible study method. Long-press any verse in the Rhema reader while a study is open to capture a thought under one of the four categories.</p>
+      <h3>Collaborate</h3>
+      <p>Studies can be shared with friends. A collaborator can see and add to all four workspace categories. Only the creator can delete the study.</p>
+      <h3>Deleting a study</h3>
+      <p><strong>Long-press</strong> any study card on the home screen to enter delete mode. A red ✕ will appear on studies you created. Tap it to permanently remove that study and all its notes.</p>
     </div>
   </div>
 </div>
@@ -11311,7 +11338,12 @@ glacier: {
     <span class="study-sheet-icon-big material-symbols-outlined" id="sbsIcon">menu_book</span>
     <h2 class="study-sheet-title" id="sbsTitle">Study</h2>
     <p class="study-sheet-sub" id="sbsCreator">by —</p>
-    <p class="study-sheet-sub" id="sbsMembers" style="margin-top:-10px"></p>
+    <p class="study-sheet-sub" id="sbsDate" style="margin-top:-8px;font-size:0.78rem;opacity:0.55"></p>
+    <p class="study-sheet-sub sbs-desc" id="sbsDesc"></p>
+    <button class="sbs-members-btn" id="sbsMembersBtn" onclick="openStudyMembersModal()" style="display:none">
+      <span class="material-symbols-outlined">group</span>
+      <span id="sbsMembersLabel">See Members</span>
+    </button>
     <button class="study-session-btn" id="sbsCollabBtn" onclick="requestStudyCollab()">Request to Collaborate</button>
     <button class="study-session-btn" style="background:#22c55e;margin-bottom:10px" onclick="copyFriendStudy()">Copy as My Own Study</button>
     <button class="text-btn" style="width:100%" onclick="closeStudyBoardSheet()">Close</button>
@@ -11333,6 +11365,7 @@ glacier: {
 <!-- Study Create Sheet -->
 <div id="studyCreateSheet" class="study-sheet-overlay" onclick="if(event.target===this)closeStudyCreateSheet()">
   <div class="study-sheet" onclick="event.stopPropagation()">
+    <button class="sheet-x-close" onclick="closeStudyCreateSheet()"><span class="material-symbols-outlined">close</span></button>
     <h2 class="study-sheet-title">New Study</h2>
     <p class="study-sheet-sub">Give your study a name and style.</p>
 
@@ -11364,6 +11397,18 @@ glacier: {
         <button class="study-icon-btn" data-icon="favorite" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">favorite</span></button>
         <button class="study-icon-btn" data-icon="bolt" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">bolt</span></button>
         <button class="study-icon-btn" data-icon="local_fire_department" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">local_fire_department</span></button>
+        <button class="study-icon-btn" data-icon="volunteer_activism" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">volunteer_activism</span></button>
+        <button class="study-icon-btn" data-icon="handshake" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">handshake</span></button>
+        <button class="study-icon-btn" data-icon="groups" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">groups</span></button>
+        <button class="study-icon-btn" data-icon="spa" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">spa</span></button>
+        <button class="study-icon-btn" data-icon="school" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">school</span></button>
+        <button class="study-icon-btn" data-icon="shield" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">shield</span></button>
+        <button class="study-icon-btn" data-icon="light_mode" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">light_mode</span></button>
+        <button class="study-icon-btn" data-icon="emoji_events" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">emoji_events</span></button>
+        <button class="study-icon-btn" data-icon="nature" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">nature</span></button>
+        <button class="study-icon-btn" data-icon="diversity_3" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">diversity_3</span></button>
+        <button class="study-icon-btn" data-icon="self_improvement" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">self_improvement</span></button>
+        <button class="study-icon-btn" data-icon="hiking" onclick="selectStudyIcon(this)"><span class="material-symbols-outlined">hiking</span></button>
       </div>
     </div>
 

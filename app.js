@@ -8042,8 +8042,8 @@ function _renderHomeStudies() {
     const isCreator = s.creatorUid === uid;
     return `<div class="hs-study-card${_studyDeleteMode ? ' jiggle' : ''}" style="--study-color:${s.color}"
       onclick="${_studyDeleteMode ? 'void(0)' : `openStudySandbox('${s.id}')`}"
-      ontouchstart="_startStudyLongPress('${s.id}')" ontouchend="_cancelStudyLongPress()" ontouchcancel="_cancelStudyLongPress()"
-      onmousedown="_startStudyLongPress('${s.id}')" onmouseup="_cancelStudyLongPress()" onmouseleave="_cancelStudyLongPress()">
+      ontouchstart="_startStudyLongPress('${s.id}',event)" ontouchmove="_onStudyLongPressMove(event)" ontouchend="_cancelStudyLongPress()" ontouchcancel="_cancelStudyLongPress()"
+      onmousedown="_startStudyLongPress('${s.id}',event)" onmousemove="_onStudyLongPressMove(event)" onmouseup="_cancelStudyLongPress()" onmouseleave="_cancelStudyLongPress()">
       ${_studyDeleteMode && isCreator ? `<button class="hs-delete-btn" onclick="event.stopPropagation();confirmDeleteStudy('${s.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
       ${doneToday ? '<span class="study-card-done-dot"></span>' : ''}
       <span class="hs-study-icon material-symbols-outlined">${s.icon}</span>
@@ -8070,13 +8070,27 @@ function _renderHomeStudies() {
   }
 }
 
-function _startStudyLongPress(studyId) {
+let _studyLongPressStartX = 0, _studyLongPressStartY = 0;
+
+function _startStudyLongPress(studyId, event) {
   _cancelStudyLongPress();
+  const touch = event?.touches?.[0];
+  _studyLongPressStartX = touch?.clientX ?? event?.clientX ?? 0;
+  _studyLongPressStartY = touch?.clientY ?? event?.clientY ?? 0;
   _studyLongPressTimer = setTimeout(() => {
     navigator.vibrate?.(40);
     _studyDeleteMode = true;
     _renderHomeStudies();
   }, 500);
+}
+
+function _onStudyLongPressMove(event) {
+  const touch = event?.touches?.[0];
+  const x = touch?.clientX ?? event?.clientX ?? 0;
+  const y = touch?.clientY ?? event?.clientY ?? 0;
+  if (Math.abs(x - _studyLongPressStartX) > 8 || Math.abs(y - _studyLongPressStartY) > 8) {
+    _cancelStudyLongPress();
+  }
 }
 
 function _cancelStudyLongPress() {
@@ -9202,19 +9216,39 @@ function openStudyBoardSheet(studyId) {
   const isPending = uid && s.pendingCollaboratorUids?.includes(uid);
   const isCollab  = uid && s.collaboratorUids?.includes(uid);
 
-  const iconEl  = document.getElementById('sbsIcon');
-  const titleEl = document.getElementById('sbsTitle');
-  const creatorEl = document.getElementById('sbsCreator');
-  const membersEl = document.getElementById('sbsMembers');
-  const collabBtn = document.getElementById('sbsCollabBtn');
+  const iconEl     = document.getElementById('sbsIcon');
+  const titleEl    = document.getElementById('sbsTitle');
+  const creatorEl  = document.getElementById('sbsCreator');
+  const dateEl     = document.getElementById('sbsDate');
+  const descEl     = document.getElementById('sbsDesc');
+  const membersBtn = document.getElementById('sbsMembersBtn');
+  const membersLbl = document.getElementById('sbsMembersLabel');
+  const collabBtn  = document.getElementById('sbsCollabBtn');
 
-  if (iconEl)  { iconEl.textContent = s.icon; iconEl.style.color = s.color; }
-  if (titleEl) titleEl.textContent = s.name;
+  if (iconEl)    { iconEl.textContent = s.icon; iconEl.style.color = s.color; }
+  if (titleEl)   titleEl.textContent = s.name;
   if (creatorEl) creatorEl.textContent = `by ${s.creatorName}`;
-  if (membersEl) {
-    const names = (s.collaboratorUids || []).length > 1 ? `${(s.collaboratorUids.length)} members` : '';
-    membersEl.textContent = names;
+
+  if (dateEl) {
+    const ts = s.createdAt?.toDate?.();
+    dateEl.textContent = ts ? `Created ${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(ts)}` : '';
   }
+
+  if (descEl) {
+    descEl.textContent = s.description || '';
+    descEl.style.display = s.description ? '' : 'none';
+  }
+
+  const memberCount = (s.collaboratorUids || []).length;
+  if (membersBtn && membersLbl) {
+    if (memberCount > 1) {
+      membersLbl.textContent = `See Members (${memberCount})`;
+      membersBtn.style.display = 'flex';
+    } else {
+      membersBtn.style.display = 'none';
+    }
+  }
+
   if (collabBtn) {
     if (isCollab)  { collabBtn.textContent = 'Open Study'; collabBtn.onclick = () => { closeStudyBoardSheet(); _openCollabStudy(studyId); }; }
     else if (isPending) { collabBtn.textContent = 'Request Pending'; collabBtn.disabled = true; }
@@ -9231,6 +9265,47 @@ function closeStudySessionSheet() {
 function closeStudyBoardSheet() {
   document.getElementById('studyBoardSheet')?.classList.remove('open');
   _studyBoardSheetId = null;
+}
+
+async function openStudyMembersModal() {
+  const s = _studyBoardStudies.find(x => x.id === _studyBoardSheetId);
+  if (!s) return;
+  const list = document.getElementById('studyMembersList');
+  if (!list) return;
+
+  const renderRows = (rows) => {
+    list.innerHTML = rows.map(r => `
+      <div class="study-member-row">
+        <span class="material-symbols-outlined">person</span>
+        <span>${r.name}</span>
+        ${r.isCreator ? '<span class="study-member-creator-tag">Creator</span>' : ''}
+      </div>`).join('');
+  };
+
+  // Show immediately with known creator
+  renderRows([{ name: s.creatorName || 'Creator', isCreator: true }]);
+  document.getElementById('studyMembersModal')?.classList.add('open');
+
+  // Fetch names for all collaborators except creator in parallel
+  const collabUids = (s.collaboratorUids || []).filter(uid => uid !== s.creatorUid);
+  if (!collabUids.length) return;
+
+  const fetched = await window.Studies?.getMemberNames?.(collabUids) || [];
+  const allRows = [{ name: s.creatorName || 'Creator', isCreator: true },
+    ...fetched.map(m => ({ name: m.name, isCreator: false }))];
+  renderRows(allRows);
+}
+
+function closeStudyMembersModal() {
+  document.getElementById('studyMembersModal')?.classList.remove('open');
+}
+
+function openStudiesInfoModal() {
+  document.getElementById('studiesInfoModal')?.classList.add('open');
+}
+
+function closeStudiesInfoModal() {
+  document.getElementById('studiesInfoModal')?.classList.remove('open');
 }
 
 async function requestStudyCollab() {
@@ -14985,9 +15060,21 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.5.1";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.5.1 — Polish &amp; Studies Update</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>More study icons</strong> — 12 new icons to choose from when creating a study.</li>
+    <li><strong>Community study details</strong> — Tapping a friend's study now shows its description, creation date, and a "See Members" button listing all collaborators.</li>
+    <li><strong>Studies info button</strong> — Tap ℹ️ next to "Your Studies" to learn how studies, the Observe/Interpret/Apply/Question method, and delete mode all work.</li>
+    <li><strong>Scroll-safe long press</strong> — Scrolling through study cards no longer accidentally triggers delete mode.</li>
+    <li><strong>Theme-colored send &amp; back buttons</strong> — The workspace send button and study back arrow now follow your chosen color theme.</li>
+    <li><strong>Greek keyboard below text box</strong> — The workspace Greek keyboard now slides out below the note input instead of above it.</li>
+    <li><strong>Home scroll fix</strong> — Swiping up from the bottom of the home screen no longer gets the page stuck.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.5.0 — Workspace + Accessibility Update</div>
 <div class="un-section">
   <ul class="un-list">
