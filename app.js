@@ -44,10 +44,22 @@ let _studyCreateDescription = '';
 let _studyCreateInviteUids = new Set();
 let _activeSandboxStudy = null;     // full study doc of open sandbox
 let _sandboxUnsubNotes = null;
+let _sandboxUnsubEntries = null;
+let _sandboxEntriesCache = [];
+let _workspaceTab = 'observations';
 let _sandboxUnsubVerses = null;
 let _sandboxUnsubWordLog = null;
 let _sandboxUnsubStudy = null;
 let _sandboxTab = 'notes';
+let _rhemaCrossRefMode = false;
+let _wlOpen = false;
+let _wlIndex = null;
+let _ntSurfaceIndex = null;
+let _wlSelectedForm = null;
+let _wlKbdVisible = false;
+let _writingModalType = null;
+let _miniWheelLongPressTimer = null;
+let _miniWheelLongPressActive = false;
 let _sandboxWordLogCache = [];       // local cache for dedup before writing
 let _ssActiveWordStrongs = null;     // strongs of word currently shown in sandbox word detail
 let _studySandboxId = null;         // set when Rhema is open in study mode
@@ -8289,10 +8301,14 @@ async function openStudySandbox(studyId, studyObj) {
 
   // Start real-time listeners
   _sandboxUnsubNotes?.();
+  _sandboxUnsubEntries?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
   _sandboxUnsubStudy?.();
-  _sandboxUnsubNotes  = window.Studies.listenNotes(studyId, _renderSandboxNotes);
+  _sandboxUnsubEntries = window.Studies.listenEntries(studyId, entries => {
+    _sandboxEntriesCache = entries;
+    _renderWorkspaceEntries(entries);
+  });
   _sandboxUnsubVerses = window.Studies.listenVerses(studyId, _renderSandboxVerses);
   _sandboxUnsubWordLog = window.Studies.listenWordLog(studyId, words => {
     _sandboxWordLogCache = words;
@@ -8338,10 +8354,12 @@ function closeStudySandbox() {
   // Hide floating nav arrows
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   _sandboxUnsubNotes?.();
+  _sandboxUnsubEntries?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
   _sandboxUnsubStudy?.();
-  _sandboxUnsubNotes = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubStudy = null;
+  _sandboxUnsubNotes = _sandboxUnsubEntries = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubStudy = null;
+  _sandboxEntriesCache = [];
   _activeSandboxStudy = null;
   document.getElementById('studySandbox')?.classList.add('hidden');
   document.getElementById('studyTabBar')?.classList.add('hidden');
@@ -8400,6 +8418,409 @@ async function submitSandboxNote() {
 async function deleteSandboxNote(noteId) {
   if (!_activeSandboxStudy) return;
   await window.Studies.deleteNote(_activeSandboxStudy.id, noteId);
+}
+
+// ── Study Workspace ───────────────────────────────────────────────────────────
+
+const _WS_META = {
+  observations:    { icon: 'visibility',    name: 'Observation',    color: '#3b82f6', placeholder: 'What do you notice in the text?' },
+  interpretations: { icon: 'psychology',    name: 'Interpretation', color: '#8b5cf6', placeholder: 'What does this mean?' },
+  applications:    { icon: 'rocket_launch', name: 'Application',    color: '#10b981', placeholder: 'How does this apply?' },
+  questions:       { icon: 'quiz',          name: 'Question',       color: '#f59e0b', placeholder: 'What are you wondering?' },
+};
+
+function switchWorkspaceTab(type) {
+  _workspaceTab = type;
+  document.querySelectorAll('.ws-tab').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+  _renderWorkspaceEntries(_sandboxEntriesCache);
+  // Update compose placeholder
+  const input = document.getElementById('ssNoteInput');
+  if (input) input.placeholder = _WS_META[type]?.placeholder || 'Add a note…';
+}
+
+function _renderWorkspaceEntries(entries) {
+  const list = document.getElementById('wsEntriesList');
+  if (!list) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const filtered = entries.filter(e => e.type === _workspaceTab);
+  if (!filtered.length) {
+    const meta = _WS_META[_workspaceTab];
+    list.innerHTML = `<div class="ws-entry-hint">
+      <span class="material-symbols-outlined">${meta?.icon || 'notes'}</span>
+      No ${meta?.name?.toLowerCase() || 'entries'} yet.<br>Long-press any verse or type below.
+    </div>`;
+    return;
+  }
+  const isCreator = _activeSandboxStudy?.creatorUid === uid;
+  list.innerHTML = filtered.map(e => {
+    const meta = _WS_META[e.type] || _WS_META.observations;
+    const canDel = e.authorUid === uid || isCreator;
+    const ts = e.createdAt?.toDate ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(e.createdAt.toDate()) : '';
+    const ref = e.verseRef ? `${window.RhemaNT?.names?.[e.verseRef.book] || e.verseRef.book} ${e.verseRef.chapter}:${e.verseRef.verse}` : '';
+    const clickAttr = ref ? `onclick="jumpToRhemaFromStudy('${e.verseRef.book}','${e.verseRef.chapter}','${e.verseRef.verse}')"` : '';
+    return `<div class="ws-entry" style="--ws-entry-color:${meta.color}" ${clickAttr}>
+      <div class="ws-entry-head">
+        <span class="material-symbols-outlined ws-entry-icon" style="color:${meta.color}">${meta.icon}</span>
+        <span class="ws-entry-ref">${ref || 'General'}</span>
+        <span class="ws-entry-author">${e.authorName || ''}</span>
+        <span class="ws-entry-date">${ts}</span>
+        ${canDel ? `<button class="ws-entry-del" onclick="event.stopPropagation();deleteWorkspaceEntry('${e.id}')"><span class="material-symbols-outlined">delete</span></button>` : ''}
+      </div>
+      ${e.verseSnippet ? `<div class="ws-entry-snippet">"${e.verseSnippet}"</div>` : ''}
+      <div class="ws-entry-content">${e.content.replace(/</g,'&lt;')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function submitWorkspaceEntry() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_activeSandboxStudy) return;
+  const input = document.getElementById('ssNoteInput');
+  const text = input?.value?.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const verseRef = _studySandboxId ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, bookName: window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook } : null;
+  const verseSnippet = _studySandboxId ? _getVerseSnippet() : '';
+  await window.Studies.addEntry(_activeSandboxStudy.id, uid, displayName, { type: _workspaceTab, content: text, verseRef, verseSnippet });
+}
+
+async function deleteWorkspaceEntry(entryId) {
+  if (!_activeSandboxStudy) return;
+  await window.Studies.deleteEntry(_activeSandboxStudy.id, entryId);
+}
+
+function _getVerseSnippet() {
+  const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  if (!words.length) return '';
+  const greek = words.slice(0, 10).map(w => w[0]).join(' ');
+  return greek.length > 60 ? greek.slice(0, 57) + '…' : greek;
+}
+
+// ── Study Mini Wheel ──────────────────────────────────────────────────────────
+
+function _initStudyLongPress() {
+  const display = document.getElementById('rhemaVerseDisplay');
+  if (!display || display._lpInit) return;
+  display._lpInit = true;
+  display.addEventListener('touchstart', e => {
+    if (!_studySandboxId || _sandboxTab !== 'rhema') return;
+    if (e.target.closest('.rsx-diagram') || e.target.closest('.rhema-sheet')) return;
+    _miniWheelLongPressActive = true;
+    _miniWheelLongPressTimer = setTimeout(() => {
+      if (_miniWheelLongPressActive) {
+        e.preventDefault?.();
+        openStudyMiniWheel();
+      }
+    }, 520);
+  }, { passive: true });
+  display.addEventListener('touchend',  () => { _miniWheelLongPressActive = false; clearTimeout(_miniWheelLongPressTimer); }, { passive: true });
+  display.addEventListener('touchmove', () => { _miniWheelLongPressActive = false; clearTimeout(_miniWheelLongPressTimer); }, { passive: true });
+}
+
+function openStudyMiniWheel() {
+  const overlay = document.getElementById('studyMiniWheelOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function closeStudyMiniWheel() {
+  const overlay = document.getElementById('studyMiniWheelOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(() => overlay.classList.add('hidden'), 220);
+}
+
+function selectMiniWheelItem(type) {
+  closeStudyMiniWheel();
+  setTimeout(() => openWritingModal(type), 240);
+}
+
+// ── Writing Modal ─────────────────────────────────────────────────────────────
+
+function openWritingModal(type) {
+  _writingModalType = type;
+  const meta = _WS_META[type] || _WS_META.observations;
+  const modal = document.getElementById('studyWritingModal');
+  if (!modal) return;
+  // Header chip
+  const icon = document.getElementById('swmTypeIcon');
+  const name = document.getElementById('swmTypeName');
+  const chip = document.getElementById('swmTypeChip');
+  if (icon) icon.textContent = meta.icon;
+  if (name) name.textContent = meta.name;
+  if (chip) chip.style.color = meta.color;
+  // Verse card
+  const card = document.getElementById('swmVerseCard');
+  if (card) {
+    const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook;
+    const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+    const snippet = words.slice(0, 14).map(w => w[0]).join(' ');
+    card.innerHTML = `<div class="swm-verse-ref">${bookName} ${_rhemaChapter}:${_rhemaVerse}</div>
+      <div class="swm-verse-text">${snippet}${words.length > 14 ? '…' : ''}</div>`;
+  }
+  // Clear textarea
+  const ta = document.getElementById('swmTextarea');
+  if (ta) { ta.value = ''; ta.style.height = 'auto'; ta.placeholder = meta.placeholder; }
+  // Show
+  modal.classList.remove('hidden');
+  requestAnimationFrame(() => modal.classList.add('open'));
+  setTimeout(() => ta?.focus(), 320);
+}
+
+function closeWritingModal() {
+  const modal = document.getElementById('studyWritingModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  setTimeout(() => modal.classList.add('hidden'), 300);
+  _writingModalType = null;
+}
+
+async function saveWritingModal() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_activeSandboxStudy || !_writingModalType) return;
+  const ta = document.getElementById('swmTextarea');
+  const text = ta?.value?.trim();
+  if (!text) { ta?.focus(); return; }
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const verseRef = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, bookName: window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook };
+  const verseSnippet = _getVerseSnippet();
+  // Switch workspace to the saved type so user sees their entry
+  if (_sandboxTab === 'notes' && _workspaceTab !== _writingModalType) switchWorkspaceTab(_writingModalType);
+  await window.Studies.addEntry(_activeSandboxStudy.id, uid, displayName, { type: _writingModalType, content: text, verseRef, verseSnippet });
+  closeWritingModal();
+}
+
+// ── Word Library ──────────────────────────────────────────────────────────────
+
+function _stripGreekAccents(s) {
+  const map = {
+    'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω',
+    'ἀ':'α','ἁ':'α','ἂ':'α','ἃ':'α','ἄ':'α','ἅ':'α','ἆ':'α','ἇ':'α',
+    'ἐ':'ε','ἑ':'ε','ἒ':'ε','ἓ':'ε','ἔ':'ε','ἕ':'ε',
+    'ἠ':'η','ἡ':'η','ἢ':'η','ἣ':'η','ἤ':'η','ἥ':'η','ἦ':'η','ἧ':'η',
+    'ἰ':'ι','ἱ':'ι','ἲ':'ι','ἳ':'ι','ἴ':'ι','ἵ':'ι','ἶ':'ι','ἷ':'ι',
+    'ὀ':'ο','ὁ':'ο','ὂ':'ο','ὃ':'ο','ὄ':'ο','ὅ':'ο',
+    'ὐ':'υ','ὑ':'υ','ὒ':'υ','ὓ':'υ','ὔ':'υ','ὕ':'υ','ὖ':'υ','ὗ':'υ',
+    'ὠ':'ω','ὡ':'ω','ὢ':'ω','ὣ':'ω','ὤ':'ω','ὥ':'ω','ὦ':'ω','ὧ':'ω',
+    'ᾳ':'α','ᾴ':'α','ᾶ':'α','ᾷ':'α',
+    'ῃ':'η','ῄ':'η','ῆ':'η','ῇ':'η',
+    'ῳ':'ω','ῴ':'ω','ῶ':'ω','ῷ':'ω',
+    'ϊ':'ι','ΐ':'ι','ῒ':'ι','ῖ':'ι','ῗ':'ι',
+    'ϋ':'υ','ΰ':'υ','ῢ':'υ','ῦ':'υ','ῧ':'υ',
+    'ῤ':'ρ','ῥ':'ρ','ὰ':'α','ὲ':'ε','ὴ':'η','ὶ':'ι','ὸ':'ο','ὺ':'υ','ὼ':'ω',
+    'ς':'σ',
+  };
+  return s.split('').map(c => map[c] || c).join('');
+}
+
+function _normalizeTranslit(s) {
+  return s.toLowerCase()
+    .replace(/[ūū]/g,'u').replace(/ō/g,'o').replace(/ē/g,'e')
+    .replace(/y/g,'i')   // upsilon → iota for fuzzy matching
+    .replace(/[^a-z]/g,'');
+}
+
+function _buildWlIndex() {
+  if (_wlIndex) return;
+  const lex = window.RhemaLexicon || {};
+  _wlIndex = Object.entries(lex).map(([s, e]) => ({
+    strongs: parseInt(s),
+    lemma: e.lemma || '',
+    translit: e.translit || '',
+    brief: (e.brief || '').split(',')[0].split(';')[0].trim(),
+    occ: e.occ || 0,
+    lemmaStripped: _stripGreekAccents(e.lemma || '').toLowerCase(),
+    translitNorm: _normalizeTranslit(e.translit || ''),
+  })).filter(e => e.lemma);
+}
+
+function _wlSearchLexicon(q, maxResults) {
+  _buildWlIndex();
+  const hasGreek = /[Ͱ-Ͽἀ-῿]/.test(q);
+  let prefix, contains;
+  if (hasGreek) {
+    const qn = _stripGreekAccents(q).toLowerCase();
+    prefix   = _wlIndex.filter(e => e.lemmaStripped.startsWith(qn));
+    contains = _wlIndex.filter(e => !e.lemmaStripped.startsWith(qn) && e.lemmaStripped.includes(qn));
+  } else {
+    const qn = _normalizeTranslit(q);
+    if (!qn) return [];
+    prefix   = _wlIndex.filter(e => e.translitNorm.startsWith(qn));
+    contains = _wlIndex.filter(e => !e.translitNorm.startsWith(qn) && e.translitNorm.includes(qn));
+    // Also search brief definition for short queries
+    if (q.length >= 3 && prefix.length + contains.length < 5) {
+      const ql = q.toLowerCase();
+      const defMatch = _wlIndex.filter(e => e.brief.toLowerCase().includes(ql) && !prefix.includes(e) && !contains.includes(e));
+      contains = [...contains, ...defMatch];
+    }
+  }
+  return [...prefix, ...contains].slice(0, maxResults);
+}
+
+function _wlScanNTForm(q) {
+  // Find exact surface form matches in NT text for Greek queries
+  if (!/[Ͱ-Ͽἀ-῿]/.test(q)) return [];
+  if (!window.RhemaNT) return [];
+  const qn = _stripGreekAccents(q).toLowerCase();
+  const found = {}; // surface → { strongs, count }
+  for (const book of RHEMA_BOOK_ORDER) {
+    const bdata = (window.RhemaNT.text[book] || {});
+    for (const ch of Object.keys(bdata)) {
+      for (const v of Object.keys(bdata[ch])) {
+        for (const word of (bdata[ch][v] || [])) {
+          const sn = _stripGreekAccents(word[0]).toLowerCase();
+          if (sn.startsWith(qn) && sn !== qn.replace(/^\s+|\s+$/g,'')) {
+            if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0] };
+            found[word[0]].count++;
+          } else if (sn === qn) {
+            if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0], exact: true };
+            found[word[0]].count++;
+          }
+        }
+      }
+    }
+  }
+  return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
+}
+
+function _rhemaExactFormOccurrences(surface) {
+  const books = {};
+  const norm = _stripGreekAccents(surface).toLowerCase();
+  const texts = window.RhemaNT?.text;
+  if (!texts) return books;
+  for (const book of RHEMA_BOOK_ORDER) {
+    const bdata = texts[book] || {};
+    let count = 0;
+    for (const ch of Object.keys(bdata)) {
+      for (const v of Object.keys(bdata[ch])) {
+        for (const word of (bdata[ch][v] || [])) {
+          if (_stripGreekAccents(word[0]).toLowerCase() === norm) count++;
+        }
+      }
+    }
+    if (count) books[book] = count;
+  }
+  return books;
+}
+
+function openWordLibrary() {
+  if (!window.RhemaLexicon) { _showStudyToast('Word data not loaded yet.'); return; }
+  _wlOpen = true;
+  _wlSelectedForm = null;
+  const overlay = document.getElementById('wordLibraryOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  const input = document.getElementById('wlSearchInput');
+  if (input) { input.value = ''; setTimeout(() => input.focus(), 350); }
+  document.getElementById('wlResults').innerHTML = '<p class="wl-hint">Search by Greek (ἀγαπ…), transliteration (agap…), or English meaning.</p>';
+  // Build keyboard if needed
+  _buildWlKeyboard();
+}
+
+function closeWordLibrary() {
+  _wlOpen = false;
+  const overlay = document.getElementById('wordLibraryOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(() => overlay.classList.add('hidden'), 260);
+}
+
+function _buildWlKeyboard() {
+  const kbd = document.getElementById('wlGreekKeyboard');
+  if (!kbd || kbd._built) return;
+  kbd._built = true;
+  const letters = ['α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω'];
+  kbd.innerHTML = letters.map(l => `<button class="wl-key" onclick="wlKbdInput('${l}')">${l}</button>`).join('') +
+    `<button class="wl-key-bs" onclick="wlKbdBackspace()">⌫ del</button>`;
+}
+
+function toggleWlKeyboard() {
+  _wlKbdVisible = !_wlKbdVisible;
+  document.getElementById('wlGreekKeyboard')?.classList.toggle('hidden', !_wlKbdVisible);
+  document.getElementById('wlKbdToggleBtn')?.classList.toggle('active', _wlKbdVisible);
+}
+
+function wlKbdInput(char) {
+  const input = document.getElementById('wlSearchInput');
+  if (!input) return;
+  input.value += char;
+  wlOnSearch(input.value);
+  input.focus();
+}
+
+function wlKbdBackspace() {
+  const input = document.getElementById('wlSearchInput');
+  if (!input) return;
+  input.value = input.value.slice(0, -1);
+  wlOnSearch(input.value);
+}
+
+let _wlSearchTimer = null;
+function wlOnSearch(q) {
+  clearTimeout(_wlSearchTimer);
+  _wlSearchTimer = setTimeout(() => _wlDoSearch(q), 120);
+}
+
+function _wlDoSearch(q) {
+  const results = document.getElementById('wlResults');
+  if (!results) return;
+  const query = q.trim();
+  if (!query) {
+    results.innerHTML = '<p class="wl-hint">Search by Greek (ἀγαπ…), transliteration (agap…), or English meaning.</p>';
+    return;
+  }
+  const lexEntries = _wlSearchLexicon(query, 40);
+  const formEntries = _wlScanNTForm(query);
+
+  let html = '';
+  if (formEntries.length) {
+    html += `<div class="wl-section-label">Exact Forms in NT</div>`;
+    html += formEntries.map(f => {
+      const lex = (window.RhemaLexicon || {})[f.strongs] || {};
+      return `<div class="wl-result-item wl-result-form" onclick="openWlWordDetail(${f.strongs},'${f.surface.replace(/'/g,"\\'")}')">
+        <span class="wl-result-lemma">${f.surface}</span>
+        <span class="wl-result-translit">${lex.translit || ''}</span>
+        <span class="wl-result-brief">${(lex.brief||'').split(',')[0].trim()}</span>
+        <span class="wl-result-form-tag">form</span>
+        <span class="wl-result-count">${f.count}×</span>
+      </div>`;
+    }).join('');
+  }
+  if (lexEntries.length) {
+    html += `<div class="wl-section-label">Lexical Forms</div>`;
+    html += lexEntries.map(e =>
+      `<div class="wl-result-item" onclick="openWlWordDetail(${e.strongs},null)">
+        <span class="wl-result-lemma">${e.lemma}</span>
+        <span class="wl-result-translit">${e.translit}</span>
+        <span class="wl-result-brief">${e.brief}</span>
+        <span class="wl-result-count">${e.occ || ''}${e.occ ? '×' : ''}</span>
+      </div>`
+    ).join('');
+  }
+  if (!html) html = `<p class="wl-hint">No results for "${query.replace(/</g,'&lt;')}".<br>Try a different spelling or search in Greek.</p>`;
+  results.innerHTML = html;
+}
+
+function openWlWordDetail(strongs, formSurface) {
+  _wlSelectedForm = formSurface || null;
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  if (!lex.lemma) return;
+  // Populate the standard rhema word sheet
+  document.getElementById('rhemaSheetSurface').textContent = formSurface || lex.lemma;
+  document.getElementById('rhemaSheetStrongs').textContent = 'G' + strongs;
+  document.getElementById('rhemaSheetLemma').textContent   = lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
+  // Hide study buttons (not in verse context)
+  document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');
+  document.getElementById('rhemaAddToWordLogBtn')?.classList.add('hidden');
+  // Show definition tab
+  showRhemaTab('definition', [formSurface || lex.lemma, strongs, '']);
+  const sheet = document.getElementById('rhemaSheet');
+  sheet?.classList.add('open');
+  document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
+  closeWordLibrary();
 }
 
 // Saved Verses
@@ -16982,6 +17403,7 @@ function renderRhemaVerse() {
   updateHighlightToolbar();
   _syncToolWandIndicator();
   _saveRhemaPosition();
+  if (_studySandboxId) _initStudyLongPress();
 }
 
 function toggleRhemaKjv() {
@@ -17037,10 +17459,14 @@ function toggleWheelTool(tool) {
     _syncToolWandIndicator();
   } else if (tool === 'greek-only') {
     toggleRhemaMode();
-  } else {
-    const btnIds = { xref: 'wheelItemXref', notes: 'wheelItemNotes' };
-    const btn = document.getElementById(btnIds[tool]);
-    if (btn) { btn.classList.add('shake'); setTimeout(() => btn.classList.remove('shake'), 500); }
+  } else if (tool === 'xref') {
+    _rhemaCrossRefMode = !_rhemaCrossRefMode;
+    document.getElementById('wheelItemXref')?.classList.toggle('active', _rhemaCrossRefMode);
+    _syncToolWandIndicator();
+    closeRhemaWheel();
+  } else if (tool === 'wordlibrary') {
+    closeRhemaWheel();
+    setTimeout(() => openWordLibrary(), 200);
   }
 }
 
@@ -17053,10 +17479,11 @@ function _syncWheelState() {
   _syncWheelBtn('syntax', _rhemaSyntaxMode);
   _syncWheelBtn('greek-only', _rhemaGreekOnly);
   _syncWheelBtn('highlight', _rhemaHighlightBarOn);
+  document.getElementById('wheelItemXref')?.classList.toggle('active', _rhemaCrossRefMode);
 }
 
 function _syncToolWandIndicator() {
-  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn;
+  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn || _rhemaCrossRefMode;
   document.getElementById('rhemaToolBtn')?.classList.toggle('has-active', hasActive);
 }
 
@@ -18130,7 +18557,9 @@ function openRhemaSheet(wordIdx, verse) {
   document.getElementById('rhemaSheetLemma').textContent   =
     lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
 
-  showRhemaTab(_rhemaActiveTab, word);
+  // Cross-ref mode: jump straight to occurrences
+  _wlSelectedForm = null;
+  showRhemaTab(_rhemaCrossRefMode ? 'occurrences' : _rhemaActiveTab, word);
 
   // Study sandbox: show Save Verse and Add to Word Log buttons
   const saveBtn = document.getElementById('rhemaSaveToStudyBtn');
@@ -18454,6 +18883,25 @@ function renderRhemaDefinition(strongs) {
 }
 
 function renderRhemaOccurrences(strongs) {
+  if (_wlSelectedForm) {
+    const exactBooks = _rhemaExactFormOccurrences(_wlSelectedForm);
+    const exactTotal = Object.values(exactBooks).reduce((a, b) => a + b, 0);
+    if (exactTotal === 0) return `<p style="opacity:.5;font-size:.85rem">No occurrences of "${_wlSelectedForm}" found.</p>`;
+    const bookRows = RHEMA_BOOK_ORDER
+      .filter(code => exactBooks[code])
+      .map(code => `
+        <div class="rhema-occ-row tappable" onclick="openRhemaBookVerses('${code}',${strongs})">
+          <span class="rhema-occ-book">${window.RhemaNT?.names[code] || code}</span>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span class="rhema-occ-count">${exactBooks[code]}×</span>
+            <span class="material-symbols-outlined" style="font-size:1rem;opacity:0.4;color:var(--secondary-color)">chevron_right</span>
+          </div>
+        </div>`).join('');
+    return `
+      <div class="rhema-occ-total">Form <em>${_wlSelectedForm}</em> appears <span>${exactTotal}</span>× in the New Testament</div>
+      <div class="rhema-occ-list">${bookRows}</div>`;
+  }
+
   const occ = (window.RhemaOcc || {})[strongs];
   if (!occ) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
 
