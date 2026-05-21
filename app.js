@@ -58,6 +58,8 @@ let _ntSurfaceIndex = null;
 let _wlSelectedForm = null;
 let _wlKbdVisible = false;
 let _writingModalType = null;
+let _swmDisplayBook = '', _swmDisplayChapter = '', _swmDisplayVerse = '';
+let _swmSavedBook = '', _swmSavedChapter = '', _swmSavedVerse = '';
 let _miniWheelLongPressTimer = null;
 let _miniWheelLongPressActive = false;
 let _sandboxWordLogCache = [];       // local cache for dedup before writing
@@ -8377,7 +8379,7 @@ function switchSandboxTab(tab) {
   document.querySelectorAll('#studyTabBar .ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
   if (tab === 'rhema') openSandboxRhema();
-  if (tab === 'notes') _updateWsVerseDisplay();
+  if (tab === 'notes') { _buildWsKeyboard(); }
 }
 
 // Notes
@@ -8568,6 +8570,10 @@ function selectMiniWheelItem(type) {
 
 function openWritingModal(type) {
   _writingModalType = type;
+  // Save the original verse ref (this is what gets stored with the note)
+  _swmSavedBook = _rhemaBook; _swmSavedChapter = _rhemaChapter; _swmSavedVerse = _rhemaVerse;
+  // Display starts at the saved verse
+  _swmDisplayBook = _rhemaBook; _swmDisplayChapter = _rhemaChapter; _swmDisplayVerse = _rhemaVerse;
   const meta = _WS_META[type] || _WS_META.observations;
   const modal = document.getElementById('studyWritingModal');
   if (!modal) return;
@@ -8578,15 +8584,8 @@ function openWritingModal(type) {
   if (icon) icon.textContent = meta.icon;
   if (name) name.textContent = meta.name;
   if (chip) chip.style.color = meta.color;
-  // Verse card
-  const card = document.getElementById('swmVerseCard');
-  if (card) {
-    const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook;
-    const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
-    const snippet = words.slice(0, 14).map(w => w[0]).join(' ');
-    card.innerHTML = `<div class="swm-verse-ref">${bookName} ${_rhemaChapter}:${_rhemaVerse}</div>
-      <div class="swm-verse-text">${snippet}${words.length > 14 ? '…' : ''}</div>`;
-  }
+  // Verse card + KJV
+  _updateSwmVerseDisplay();
   // Clear textarea
   const ta = document.getElementById('swmTextarea');
   if (ta) { ta.value = ''; ta.style.height = 'auto'; ta.placeholder = meta.placeholder; }
@@ -8594,6 +8593,34 @@ function openWritingModal(type) {
   modal.classList.remove('hidden');
   requestAnimationFrame(() => modal.classList.add('open'));
   setTimeout(() => ta?.focus(), 320);
+}
+
+function _updateSwmVerseDisplay() {
+  const card = document.getElementById('swmVerseCard');
+  const kjv = document.getElementById('swmKjvText');
+  if (card) {
+    const bookName = window.RhemaNT?.names?.[_swmDisplayBook] || _swmDisplayBook;
+    const words = (window.RhemaNT?.text[_swmDisplayBook] || {})[_swmDisplayChapter]?.[_swmDisplayVerse] || [];
+    const snippet = words.slice(0, 14).map(w => w[0]).join(' ');
+    card.innerHTML = `<div class="swm-verse-ref">${bookName} ${_swmDisplayChapter}:${_swmDisplayVerse}</div>
+      <div class="swm-verse-text">${snippet}${words.length > 14 ? '…' : ''}</div>`;
+  }
+  if (kjv) {
+    kjv.textContent = (window.RhemaKJV && _swmDisplayBook && _swmDisplayChapter && _swmDisplayVerse)
+      ? ((window.RhemaKJV[_swmDisplayBook] || {})[_swmDisplayChapter]?.[_swmDisplayVerse] || '') : '';
+  }
+}
+
+function swmNavVerse(delta) {
+  if (!window.RhemaNT || !_swmDisplayBook || !_swmDisplayChapter) return;
+  const chapterData = (window.RhemaNT.text[_swmDisplayBook] || {})[_swmDisplayChapter] || {};
+  const verses = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
+  const idx = verses.indexOf(Number(_swmDisplayVerse));
+  if (idx === -1) return;
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= verses.length) return;
+  _swmDisplayVerse = String(verses[newIdx]);
+  _updateSwmVerseDisplay();
 }
 
 function closeWritingModal() {
@@ -8611,8 +8638,13 @@ async function saveWritingModal() {
   const text = ta?.value?.trim();
   if (!text) { ta?.focus(); return; }
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
-  const verseRef = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, bookName: window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook };
-  const verseSnippet = _getVerseSnippet();
+  const verseRef = { book: _swmSavedBook, chapter: _swmSavedChapter, verse: _swmSavedVerse, bookName: window.RhemaNT?.names?.[_swmSavedBook] || _swmSavedBook };
+  const verseSnippet = (() => {
+    const words = (window.RhemaNT?.text[_swmSavedBook] || {})[_swmSavedChapter]?.[_swmSavedVerse] || [];
+    if (!words.length) return '';
+    const greek = words.slice(0, 10).map(w => w[0]).join(' ');
+    return greek.length > 60 ? greek.slice(0, 57) + '…' : greek;
+  })();
   // Switch workspace to the saved type so user sees their entry
   if (_sandboxTab === 'notes' && _workspaceTab !== _writingModalType) switchWorkspaceTab(_writingModalType);
   await window.Studies.addEntry(_activeSandboxStudy.id, uid, displayName, { type: _writingModalType, content: text, verseRef, verseSnippet });
@@ -8785,6 +8817,50 @@ function wlKbdBackspace() {
   wlOnSearch(input.value);
 }
 
+// ── Workspace Greek keyboard ──────────────────────────────────────────────────
+
+let _wsKbdVisible = false;
+
+function _buildWsKeyboard() {
+  const kbd = document.getElementById('wsGreekKeyboard');
+  if (!kbd || kbd._built) return;
+  kbd._built = true;
+  const letters = ['α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω'];
+  kbd.innerHTML = letters.map(l => `<button class="wl-key" onclick="wsKbdInput('${l}')">${l}</button>`).join('') +
+    `<button class="wl-key-bs" onclick="wsKbdBackspace()">⌫ del</button>`;
+}
+
+function toggleWsKeyboard() {
+  _wsKbdVisible = !_wsKbdVisible;
+  document.getElementById('wsGreekKeyboard')?.classList.toggle('hidden', !_wsKbdVisible);
+  document.getElementById('wsKbdToggleBtn')?.classList.toggle('active', _wsKbdVisible);
+}
+
+function wsKbdInput(char) {
+  const input = document.getElementById('ssNoteInput');
+  if (!input) return;
+  input.value += char;
+  input.style.height = 'auto';
+  input.style.height = input.scrollHeight + 'px';
+  input.focus();
+}
+
+function wsKbdBackspace() {
+  const input = document.getElementById('ssNoteInput');
+  if (!input) return;
+  input.value = input.value.slice(0, -1);
+  input.style.height = 'auto';
+  input.style.height = input.scrollHeight + 'px';
+}
+
+function openWlInfoModal() {
+  document.getElementById('wlInfoModal')?.classList.add('open');
+}
+
+function closeWlInfoModal() {
+  document.getElementById('wlInfoModal')?.classList.remove('open');
+}
+
 let _wlSearchTimer = null;
 function wlOnSearch(q) {
   clearTimeout(_wlSearchTimer);
@@ -8924,6 +9000,9 @@ function jumpToRhemaFromStudy(book, chapter, verse) {
   _rhemaBook = book; _rhemaChapter = chapter; _rhemaVerse = verse;
   _rhemaSyntaxMode = false; _rhemaShowKjv = false; _rhemaGreekOnly = false;
   document.getElementById('rhemaSaveToStudyBtn')?.classList.remove('hidden');
+  // Switch sandbox tab indicator to Rhema without resetting position
+  _sandboxTab = 'rhema';
+  document.querySelectorAll('#studyTabBar .ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'rhema'));
   showRhema();
 }
 
@@ -9144,6 +9223,11 @@ function openStudyBoardSheet(studyId) {
   document.getElementById('studyBoardSheet')?.classList.add('open');
 }
 
+function closeStudySessionSheet() {
+  const sheet = document.getElementById('studySessionSheet');
+  if (sheet) sheet.classList.remove('open');
+}
+
 function closeStudyBoardSheet() {
   document.getElementById('studyBoardSheet')?.classList.remove('open');
   _studyBoardSheetId = null;
@@ -9338,6 +9422,11 @@ function showHome() {
     scr.addEventListener('scroll', () => {
       document.getElementById('homeScreen')?.classList.toggle('scrolled-top', scr.scrollTop > 10);
     }, { passive: true });
+  }
+  const homeScreen = document.getElementById('homeScreen');
+  if (homeScreen) {
+    homeScreen.addEventListener('contextmenu', e => e.preventDefault());
+    homeScreen.addEventListener('selectstart', e => e.preventDefault());
   }
 }
 
@@ -17579,18 +17668,17 @@ let _coachIdx = 0;
 let _coachSyntaxDone = false;
 
 function startRhemaCoach() {
-  if (_studySandboxId) return; // no coach in study sandbox
-  // For testing: always show. For production, uncomment the line below:
-  // if (localStorage.getItem('rhemaCoachDone')) return;
+  if (_studySandboxId) return;
+  if (localStorage.getItem('coachSeenV250')) return;
   _coachSteps = _RHEMA_COACH_STEPS;
   _coachIdx = 0;
   _coachSyntaxDone = false;
-  // Small delay so the modal finishes animating in
   setTimeout(() => _showCoachStep(), 350);
 }
 
 function startRhemaSyntaxCoach() {
   if (_coachSyntaxDone || _studySandboxId) return;
+  if (localStorage.getItem('coachSeenV250')) return;
   const firstNode = document.querySelector('.rsx-dg-node');
   if (!firstNode) return;
   _coachSyntaxDone = true;
@@ -17618,6 +17706,8 @@ function _showCoachStep() {
   document.getElementById('rhemaCoachBody').textContent  = step.body;
   document.getElementById('rhemaCoachNextLabel').textContent =
     _coachIdx === _coachSteps.length - 1 ? 'Done' : 'Next';
+  const backBtn = document.getElementById('rhemaCoachBackBtn');
+  if (backBtn) backBtn.style.display = _coachIdx === 0 ? 'none' : '';
 
   const target = step.targetFn();
   const modal  = document.getElementById('rhemaModal');
@@ -17711,11 +17801,16 @@ function rhemaCoachSkip() {
   _endRhemaCoach();
 }
 
+function rhemaCoachBack() {
+  if (_coachIdx <= 0) return;
+  _coachIdx--;
+  _showCoachStep();
+}
+
 function _endRhemaCoach() {
   const overlay = document.getElementById('rhemaCoachOverlay');
   if (overlay) overlay.classList.add('hidden');
-  // For production, uncomment:
-  // localStorage.setItem('rhemaCoachDone', '1');
+  localStorage.setItem('coachSeenV250', '1');
 }
 
 // ── Syntax Analyzer ───────────────────────────────────────────────────────────
