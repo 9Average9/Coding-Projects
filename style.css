@@ -14069,3 +14069,246 @@ body.sandbox-open #rhemaModal {
   overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
 .ss-compose { border-top: none; }
+
+
+/* ===== PREMIUM LESSON UI REDESIGN ===== */
+
+/* ---- Lesson Menu: override dark button styles ---- */
+
+/* Remove glossy overlay */
+#newLearnMenu .learn-path-grid button::before {
+  display: none !important;
+}
+
+/* Light card-style lesson buttons */
+#newLearnMenu .learn-path-grid button {
+  background: var(--card-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05) !important;
+  padding: 16px 16px !important;
+  grid-template-columns: 60px 1fr !important;
+  column-gap: 14px !important;
+  align-items: center !important;
+  transition: box-shadow 0.18s ease, transform 0.12s ease !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#newLearnMenu .learn-path-grid button:active {
+  transform: scale(0.985) !important;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.06) !important;
+}
+
+/* Override white text → theme font color */
+#newLearnMenu .learn-path-grid button strong {
+  color: var(--font-color) !important;
+  text-shadow: none !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.1px !important;
+}
+
+#newLearnMenu .learn-path-grid button small {
+  color: var(--muted-color) !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+body #newLearnMenu .learn-path-grid button .lesson-text small {
+  color: var(--muted-color) !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+}
+
+/* Lesson number circle */
+#newLearnMenu .lesson-number-wrap {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 50% !important;
+  background: var(--secondary-color) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+  margin: 0 auto !important;
+}
+
+#newLearnMenu .lesson-number {
+  color: var(--btn-text-color) !important;
+  text-shadow: none !important;
+  font-size: 1.3rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+#newLearnMenu .lesson-label {
+  color: var(--btn-text-color) !important;
+  text-shadow: none !important;
+  opacity: 0.7 !important;
+  font-size: 0.58rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1.2 !important;
+}
+
+/* Lesson text column: stack items */
+#newLearnMenu .lesson-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+}
+
+/* Hide "○ Not completed" text, show nothing */
+#newLearnMenu .lesson-status:not(.completed) {
+  display: none !important;
+}
+
+/* Completed checkmark: green */
+#newLearnMenu .lesson-status.completed {
+  color: #22c55e !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  display: block !important;
+}
+
+/* Completed lesson card: subtle accent tint */
+#newLearnMenu .learn-path-grid button:has(.lesson-status.completed) {
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)) !important;
+  border-color: color-mix(in srgb, var(--secondary-color) 28%, var(--border-color)) !important;
+}
+
+/* Completed lesson circle: warmer tint */
+#newLearnMenu .learn-path-grid button:has(.lesson-status.completed) .lesson-number-wrap {
+  background: color-mix(in srgb, var(--accent-color) 60%, var(--secondary-color)) !important;
+}
+
+/* Estimated time: visible when lesson not completed */
+.lesson-est-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-color);
+  margin-top: 2px;
+}
+
+.lesson-est-time .material-symbols-outlined {
+  font-size: 14px;
+  color: var(--muted-color);
+}
+
+/* Hide estimated time once lesson is completed */
+#newLearnMenu .lesson-status.completed ~ .lesson-est-time {
+  display: none !important;
+}
+
+/* Timeline connecting line between lesson cards */
+#learnDashboard .learn-path-grid {
+  position: relative !important;
+}
+
+#learnDashboard .learn-path-grid::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 45px !important;
+  top: 58px !important;
+  bottom: 58px !important;
+  width: 2px !important;
+  background: color-mix(in srgb, var(--secondary-color) 30%, transparent) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Progress badge: clean card style */
+#learnDashboard .lesson-progress-badge {
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, var(--border-color)) !important;
+  border-radius: 14px !important;
+  padding: 11px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin-bottom: 14px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--font-color) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+  cursor: pointer !important;
+}
+
+#learnDashboard .lesson-progress-badge .material-symbols-outlined {
+  color: var(--secondary-color) !important;
+  font-size: 20px !important;
+}
+
+#learnDashboard .lesson-progress-badge .lesson-progress-arrow {
+  margin-left: auto !important;
+  color: var(--muted-color) !important;
+  font-size: 20px !important;
+}
+
+/* ---- Lesson Screen: premium card styling ---- */
+
+/* Lesson module: transparent container so blocks float */
+#newLearnMenu .lesson-module {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 4px !important;
+}
+
+/* Lesson lead: styled intro card */
+#newLearnMenu .lesson-lead {
+  font-size: 0.95rem !important;
+  line-height: 1.7 !important;
+  color: var(--font-color) !important;
+  background: color-mix(in srgb, var(--secondary-color) 7%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+  border-radius: 16px !important;
+  padding: 18px 20px !important;
+  margin-bottom: 10px !important;
+}
+
+/* Lesson block: theme-aware card */
+#newLearnMenu .lesson-block {
+  background: var(--card-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+  margin: 8px 0 !important;
+}
+
+/* Block header: text left, time inline, expand icon pushed right */
+#newLearnMenu .lesson-block-header {
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  color: var(--font-color) !important;
+}
+
+#newLearnMenu .lesson-block-header::after {
+  margin-left: auto !important;
+  color: var(--muted-color) !important;
+}
+
+/* Block time estimate */
+.block-time {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted-color);
+  opacity: 0.75;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.1px;
+}
+
+/* ===== END PREMIUM LESSON UI REDESIGN ===== */
