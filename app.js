@@ -15073,7 +15073,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.4";
+const APP_VERSION = "2.5.5";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.5.4 — New Lesson Experience</div>
@@ -19360,8 +19360,10 @@ function renderNllView(lessonId) {
     item.className = `nll-block-item${isUnlocked ? "" : " locked"}`;
     item.innerHTML = `
       <div class="nll-left-col">
-        <div class="nll-circle ${circleState}">${circleContent}</div>
-        ${!isLast ? `<div class="nll-connector ${connectorClass}"></div>` : ""}
+        <div class="nll-circle-wrap">
+          <div class="nll-circle ${circleState}">${circleContent}</div>
+          ${!isLast ? `<div class="nll-connector ${connectorClass}"></div>` : ""}
+        </div>
       </div>
       <div class="nll-right-col">
         <div class="nll-card${isUnlocked ? "" : " locked-card"}">
@@ -19412,6 +19414,21 @@ function renderNllView(lessonId) {
   }
 }
 
+function _nllUpdateProgressBar(lessonId) {
+  const cfg     = NEW_STYLE_LESSON_CONFIG[lessonId];
+  if (!cfg) return;
+  const opened  = openedLessonBlocks[lessonId] || [];
+  const isDone  = cfg.isAdvanced
+    ? completedAdvancedLessons[lessonId] === true
+    : completedLessons[lessonId] === true;
+  const visited = isDone ? cfg.blocks.length : opened.length;
+  const pct     = Math.min(100, Math.round((visited / cfg.blocks.length) * 100));
+  const fill    = document.getElementById("nllProgressFill");
+  const pctEl   = document.getElementById("nllProgressPct");
+  if (fill)  fill.style.width  = pct + "%";
+  if (pctEl) pctEl.textContent = pct + "%";
+}
+
 function openNbdView(lessonId, blockIndex) {
   currentNbdBlockIndex = blockIndex;
   const cfg = NEW_STYLE_LESSON_CONFIG[lessonId];
@@ -19424,6 +19441,9 @@ function openNbdView(lessonId, blockIndex) {
       markLessonBlockOpened(lessonSection, domBlocks[blockIndex]);
     }
   }
+
+  // Live-update the progress bar on the list view (visible when user returns)
+  _nllUpdateProgressBar(lessonId);
 
   showScreen("nbdView");
   document.getElementById("nbdTitle").textContent = cfg.blocks[blockIndex].title;
