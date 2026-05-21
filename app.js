@@ -16548,9 +16548,9 @@ function closeRhema(keepSandbox = false) {
     if (!keepSandbox) _studySandboxId = null;
   }
   document.getElementById('rhemaModal')?.classList.remove('open');
-  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaSheet();
   closeRhemaPickerSheet();
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   _rhemaTrail = [];
   _rhemaTrailPos = -1;
   _rhemaHighlightStrongs = null;
@@ -16612,9 +16612,9 @@ function syncRhemaPicker() {
 }
 
 function openRhemaBookPicker() {
-  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaPickerSheet();
   closeRhemaSheet();
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const overlay = document.getElementById('rhemaBookPickerOverlay');
   if (!overlay || !window.RhemaNT) return;
   const list = document.getElementById('rhemaBookList');
@@ -16639,9 +16639,9 @@ function openRhemaBookPicker() {
 }
 
 function openRhemaChapPicker() {
-  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaPickerSheet();
   closeRhemaSheet();
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const overlay = document.getElementById('rhemaChapPickerOverlay');
   if (!overlay || !window.RhemaNT) return;
   const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a-+b);
@@ -16655,9 +16655,9 @@ function openRhemaChapPicker() {
 }
 
 function openRhemaVersePicker() {
-  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaPickerSheet();
   closeRhemaSheet();
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const overlay = document.getElementById('rhemaVersePickerOverlay');
   if (!overlay || !window.RhemaNT) return;
   const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a-+b);
@@ -17833,6 +17833,23 @@ function _sxBuildTree(words, verseRef) {
   }
   if (cur.phrases.length || cur.conjPhrase) segments.push(cur);
   if (!segments.length) segments.push({ clauseType: 'main', label: 'Main Clause', conjPhrase: null, phrases, isSubordinate: false, children: [] });
+
+  // Post-pass: fix subject plain-labels in passive-voice segments.
+  // In Greek, passive subjects receive the action rather than perform it —
+  // "who does it" is wrong for passive; use "who / what is acted on" instead.
+  for (const seg of segments) {
+    const verbP = seg.phrases.find(p => p.type === 'finite-verb');
+    if (!verbP) continue;
+    const morph = cats[verbP.words[0]]?.morph;
+    if (!morph?.startsWith('V-')) continue;
+    const verbForm = (morph.split('-')[1] || '').replace(/^2/, '');
+    const voice = verbForm[1]; // A=active, M=middle, P=passive, O/N=middle-passive
+    if (voice === 'P' || voice === 'O' || voice === 'N') {
+      for (const p of seg.phrases) {
+        if (p.role === 'subject' && !p.fromDataset) p.plainLabel = 'who / what is acted on';
+      }
+    }
+  }
 
   // Nest clauses using a stack.  Every verse has exactly one root (the first
   // segment). Subordinate conjunctions (ἵνα, ὅτι, ὥστε…) nest under the
