@@ -437,136 +437,216 @@ glacier: {
 
   <div id="learnDashboard" class="learn-content">
 
-  <button class="lesson-progress-badge" onclick="showLessonsBreakdownModal('basic')">
-    <span class="material-symbols-outlined">check_circle</span>
-    <span id="basicLessonsProgressText">0 of 6 complete</span>
-    <span class="material-symbols-outlined lesson-progress-arrow">chevron_right</span>
+  <!-- Circular progress card -->
+  <button class="lesson-progress-card" onclick="showLessonsBreakdownModal('basic')">
+    <div class="lesson-progress-ring-wrap">
+      <svg class="lesson-progress-ring" viewBox="0 0 80 80" fill="none">
+        <circle class="lpr-bg" cx="40" cy="40" r="32" stroke-width="7"/>
+        <circle class="lpr-fill" id="basicProgressRing" cx="40" cy="40" r="32" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <div class="lesson-progress-fraction" id="basicProgressFraction">0/10</div>
+    </div>
+    <div class="lesson-progress-info">
+      <strong class="lesson-progress-count" id="basicLessonsProgressText">0 of 10 complete</strong>
+      <div class="lesson-progress-sub">Keep going! You're making great progress.</div>
+    </div>
+    <span class="material-symbols-outlined lesson-progress-chevron">chevron_right</span>
   </button>
 
-  <!--  ADD THIS BLOCK -->
-  <div class="learn-path-grid">
+  <!-- Lesson timeline -->
+  <div class="lesson-timeline">
 
-  <button onclick="showLearnLesson('history')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">1</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-history">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-history"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-history"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-history" onclick="handleLessonClick('history')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">1</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>NT Greek Overview</strong>
+          <small>Context and purpose of Koine Greek</small>
+          <span class="lesson-status" data-lesson-status="history">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-history">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>NT Greek Overview</strong>
-      <small>Context and purpose of Koine Greek</small>
-      <span class="lesson-status" data-lesson-status="history">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('alphabet')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">2</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-alphabet">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-alphabet"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-alphabet"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-alphabet" onclick="handleLessonClick('alphabet')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">2</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Greek Alphabet</strong>
+          <small>Letters, names, sounds, and recognition</small>
+          <span class="lesson-status" data-lesson-status="alphabet">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-alphabet">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Greek Alphabet</strong>
-      <small>Letters, names, sounds, and recognition</small>
-      <span class="lesson-status" data-lesson-status="alphabet">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('pronunciation')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">3</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-pronunciation">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-pronunciation"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-pronunciation"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-pronunciation" onclick="handleLessonClick('pronunciation')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">3</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Pronunciation</strong>
+          <small>Learn consistent Greek sounds</small>
+          <span class="lesson-status" data-lesson-status="pronunciation">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-pronunciation">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Pronunciation</strong>
-      <small>Learn consistent Greek sounds</small>
-      <span class="lesson-status" data-lesson-status="pronunciation">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('nouns')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">4</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-nouns">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-nouns"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-nouns"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-nouns" onclick="handleLessonClick('nouns')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">4</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Noun System</strong>
+          <small>Understand noun types and endings</small>
+          <span class="lesson-status" data-lesson-status="nouns">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-nouns">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Noun System</strong>
-      <small>How Greek words carry meaning</small>
-      <span class="lesson-status" data-lesson-status="nouns">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('cases')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">5</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-cases">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-cases"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-cases"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-cases" onclick="handleLessonClick('cases')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">5</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Case Endings</strong>
+          <small>Recognize patterns and forms</small>
+          <span class="lesson-status" data-lesson-status="cases">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-cases">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Case Endings</strong>
-      <small>Recognize patterns and forms</small>
-      <span class="lesson-status" data-lesson-status="cases">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('prepositions')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">6</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-prepositions">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-prepositions"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-prepositions"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-prepositions" onclick="handleLessonClick('prepositions')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">6</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Prepositions</strong>
+          <small>In, into, out of — how case sharpens meaning</small>
+          <span class="lesson-status" data-lesson-status="prepositions">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-prepositions">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Prepositions</strong>
-      <small>In, into, out of — how case sharpens meaning</small>
-      <span class="lesson-status" data-lesson-status="prepositions">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('adjectives')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">7</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-adjectives">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-adjectives"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-adjectives"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-adjectives" onclick="handleLessonClick('adjectives')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">7</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Adjectives</strong>
+          <small>Describing words that agree with nouns</small>
+          <span class="lesson-status" data-lesson-status="adjectives">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-adjectives">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Adjectives</strong>
-      <small>Describing words that agree with nouns</small>
-      <span class="lesson-status" data-lesson-status="adjectives">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('pronouns')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">8</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-pronouns">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-pronouns"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-pronouns"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-pronouns" onclick="handleLessonClick('pronouns')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">8</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Pronouns</strong>
+          <small>He, she, this, who — pointing back to nouns</small>
+          <span class="lesson-status" data-lesson-status="pronouns">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-pronouns">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Pronouns</strong>
-      <small>He, she, this, who — pointing back to nouns</small>
-      <span class="lesson-status" data-lesson-status="pronouns">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('conjunctions')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">9</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-conjunctions">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-conjunctions"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line" id="line-conjunctions"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-conjunctions" onclick="handleLessonClick('conjunctions')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">9</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>Conjunctions</strong>
+          <small>And, but, because — how ideas connect</small>
+          <span class="lesson-status" data-lesson-status="conjunctions">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-conjunctions">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>Conjunctions</strong>
-      <small>And, but, because — how ideas connect</small>
-      <span class="lesson-status" data-lesson-status="conjunctions">○ Not completed</span>
-    </div>
-  </button>
 
-  <button onclick="showLearnLesson('howToRead')">
-    <div class="lesson-number-wrap">
-      <div class="lesson-number">10</div>
-      <div class="lesson-label">Lesson</div>
+    <div class="lesson-tl-item" id="tl-howToRead">
+      <div class="lesson-tl-left">
+        <div class="lesson-tl-dot" id="dot-howToRead"><span class="dot-icon material-symbols-outlined"></span></div>
+        <div class="lesson-tl-line last-line" id="line-howToRead"></div>
+      </div>
+      <button class="lesson-tl-card" id="card-howToRead" onclick="handleLessonClick('howToRead')">
+        <div class="lesson-num-col">
+          <span class="lesson-number">10</span>
+          <span class="lesson-label">LESSON</span>
+        </div>
+        <div class="lesson-text">
+          <strong>How to Read Greek</strong>
+          <small>Putting all the tools together</small>
+          <span class="lesson-status" data-lesson-status="howToRead">○ Not completed</span>
+        </div>
+        <span class="lesson-tl-right material-symbols-outlined" id="right-howToRead">chevron_right</span>
+      </button>
     </div>
-    <div class="lesson-text">
-      <strong>How to Read Greek</strong>
-      <small>Putting all the tools together</small>
-      <span class="lesson-status" data-lesson-status="howToRead">○ Not completed</span>
-    </div>
-  </button>
 
-</div>
+  </div>
   </div>
 </div>
     <div id="historyLesson" class="learn-lesson">

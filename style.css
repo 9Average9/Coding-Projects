@@ -14069,3 +14069,245 @@ body.sandbox-open #rhemaModal {
   overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
 }
 .ss-compose { border-top: none; }
+
+/* ===== LESSON PROGRESS CARD (circular ring) ===== */
+.lesson-progress-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 32px);
+  margin: 0 16px 20px;
+  padding: 16px 18px;
+  background: var(--card-color, rgba(255,252,242,0.92));
+  border: 1px solid var(--border-color, #d6c49a);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.lesson-progress-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+.lesson-progress-ring-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lesson-progress-ring {
+  width: 72px;
+  height: 72px;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.lpr-bg {
+  fill: none;
+  stroke: rgba(201,162,39,0.18);
+}
+.lpr-fill {
+  fill: none;
+  stroke: #c9a227;
+  stroke-linecap: round;
+  stroke-dasharray: 201.06;
+  stroke-dashoffset: 201.06;
+  transition: stroke-dashoffset 0.5s ease;
+}
+.lesson-progress-fraction {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--font-color, #1f2933);
+  pointer-events: none;
+}
+.lesson-progress-info { flex: 1; min-width: 0; }
+.lesson-progress-count {
+  display: block;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--font-color, #1f2933);
+  margin-bottom: 5px;
+}
+.lesson-progress-sub {
+  font-size: 0.82rem;
+  color: var(--muted-color, #5f6c7b);
+  line-height: 1.35;
+}
+.lesson-progress-chevron {
+  font-size: 22px !important;
+  color: var(--muted-color, #5f6c7b) !important;
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+
+/* ===== LESSON TIMELINE ===== */
+.lesson-timeline {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+.lesson-tl-item {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.lesson-tl-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 34px;
+  flex-shrink: 0;
+  padding-top: 14px;
+}
+.lesson-tl-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2.5px solid #c9a227;
+  background: var(--card-color, rgba(255,252,242,0.92));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+  z-index: 1;
+}
+.lesson-tl-dot .dot-icon {
+  font-size: 16px !important;
+  color: transparent;
+  line-height: 1;
+}
+.lesson-tl-dot.completed {
+  background: #c9a227;
+  border-color: #c9a227;
+}
+.lesson-tl-dot.completed .dot-icon { color: #fff; }
+.lesson-tl-dot.locked {
+  border-color: rgba(0,0,0,0.18);
+}
+.lesson-tl-dot.locked .dot-icon { color: rgba(0,0,0,0.32); }
+.lesson-tl-line {
+  flex: 1;
+  width: 2px;
+  background: var(--border-color, #d6c49a);
+  min-height: 8px;
+  border-radius: 2px;
+  margin: 2px 0;
+}
+.lesson-tl-line.completed { background: #c9a227; }
+.lesson-tl-line.last-line { visibility: hidden; }
+
+/* Lesson card */
+.lesson-tl-card {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px;
+  margin-bottom: 10px;
+  background: var(--card-color, rgba(255,252,242,0.92));
+  border: 1px solid var(--border-color, #d6c49a);
+  border-radius: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  color: var(--font-color, #1f2933);
+}
+.lesson-tl-card.completed {
+  background: rgba(201,162,39,0.1);
+  border-color: rgba(201,162,39,0.28);
+}
+.lesson-tl-card.locked {
+  opacity: 0.58;
+  cursor: default;
+}
+.lesson-tl-card:hover:not(.locked) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+}
+.lesson-num-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+}
+.lesson-num-col .lesson-number {
+  font-size: 2.1rem !important;
+  font-weight: 950;
+  color: var(--font-color, #1f2933) !important;
+  text-shadow: none !important;
+  line-height: 1;
+  opacity: 1 !important;
+}
+.lesson-num-col .lesson-label {
+  font-size: 0.6rem !important;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--muted-color, #5f6c7b) !important;
+  text-shadow: none !important;
+  margin-top: 3px;
+  opacity: 1 !important;
+}
+.lesson-tl-card .lesson-text { min-width: 0; }
+.lesson-tl-card .lesson-text strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--font-color, #1f2933) !important;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  text-shadow: none !important;
+}
+.lesson-tl-card .lesson-text small {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted-color, #5f6c7b) !important;
+  line-height: 1.35;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+.lesson-tl-card .lesson-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted-color, #5f6c7b);
+  text-shadow: none !important;
+}
+.lesson-tl-card .lesson-status.completed { color: #16a34a !important; }
+.lesson-tl-right {
+  font-size: 20px !important;
+  color: var(--muted-color, #5f6c7b) !important;
+  opacity: 0.6;
+  flex-shrink: 0;
+  text-shadow: none !important;
+}
+
+/* Shake animation for locked lesson tap */
+@keyframes lessonLockShake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* Dark mode adjustments */
+body.dark .lesson-tl-dot.locked { border-color: rgba(255,255,255,0.22); }
+body.dark .lesson-tl-dot.locked .dot-icon { color: rgba(255,255,255,0.38); }
+body.dark .lesson-progress-fraction,
+body.dark .lesson-progress-count { color: var(--font-color, #f8fafc); }
