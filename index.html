@@ -11147,6 +11147,14 @@ glacier: {
         </button>
       </div>
       <div id="wsEntriesList" class="ws-entries-list"></div>
+      <div class="ws-compose-verse" id="wsComposeVerse">
+        <div class="ws-compose-verse-nav">
+          <button class="ws-verse-arrow" onclick="wsNavVerse(-1)"><span class="material-symbols-outlined">chevron_left</span></button>
+          <span id="wsVerseRef" class="ws-compose-ref"></span>
+          <button class="ws-verse-arrow" onclick="wsNavVerse(1)"><span class="material-symbols-outlined">chevron_right</span></button>
+        </div>
+        <div id="wsVerseKjv" class="ws-compose-kjv"></div>
+      </div>
       <div class="ss-compose">
         <textarea id="ssNoteInput" class="ss-note-input" placeholder="Add a note…" rows="2" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
         <button class="ss-send-btn" onclick="submitWorkspaceEntry()"><span class="material-symbols-outlined">send</span></button>
@@ -11164,6 +11172,7 @@ glacier: {
     <div id="ssWdLemma" class="ss-wd-lemma"></div>
     <div class="rhema-sheet-tabs">
       <button class="rhema-tab active" id="ssWdTabDef" onclick="showSandboxWordTab('definition')">Definition</button>
+      <button class="rhema-tab" id="ssWdTabParse" onclick="showSandboxWordTab('parsing')">Parsing</button>
       <button class="rhema-tab" id="ssWdTabOcc" onclick="showSandboxWordTab('occurrences')">Occurrences</button>
     </div>
     <div id="ssWdContent" class="rhema-tab-content"></div>
