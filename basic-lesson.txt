@@ -1,0 +1,440 @@
+
+# BASIC GREEK VERBS TRACK
+
+## INTRODUCTION
+
+Welcome to the Greek Verbs Track.
+
+This course is designed to help complete beginners understand Greek verbs progressively and confidently. The flow is inspired by the educational structure of Bill Mounce while adapting the lessons for a modern interactive learning environment.
+
+The purpose of this course is not merely to memorize labels.
+
+The goal is to understand how Greek communicates meaning.
+
+---
+
+# LESSON 1 — WHAT VERBS ARE IN ENGLISH
+
+## Big Idea
+
+Before learning Greek verbs, we first need to understand what verbs are in normal language.
+
+A verb communicates:
+- action
+- condition
+- existence
+- process
+- experience
+
+Examples:
+- run
+- speak
+- believe
+- know
+- is
+
+Without verbs, sentences lose movement and meaning.
+
+## Why This Matters
+
+Greek verbs can feel intimidating at first because they carry a lot of information.
+
+But underneath the Greek endings and labels is the same basic idea:
+verbs communicate what is happening.
+
+## Mini Activity
+
+Identify the verb:
+1. The teacher speaks.
+2. God is faithful.
+3. The disciples walked.
+
+Answers:
+1. speaks
+2. is
+3. walked
+
+## Takeaway
+
+Verbs are the engine of sentences.
+
+---
+
+# LESSON 2 — SUBJECTS AND ACTIONS
+
+## Big Idea
+
+Verbs connect to subjects.
+
+The subject performs or experiences the action.
+
+Examples:
+- The student learns.
+- The crowd listened.
+- Jesus spoke.
+
+## Key Concept
+
+Greek often communicates the subject through the verb ending itself.
+
+This becomes important later.
+
+## Activity
+
+Identify the subject and verb:
+“The disciple writes.”
+
+Subject:
+disciple
+
+Verb:
+writes
+
+---
+
+# LESSON 3 — TIME AND ACTION
+
+## Big Idea
+
+English verbs often communicate time:
+- present
+- past
+- future
+
+Examples:
+- writes
+- wrote
+- will write
+
+Greek also communicates how actions are viewed.
+
+This idea becomes important when discussing aspect.
+
+## Common Mistake
+
+Do not reduce Greek tense to ONLY time.
+
+Greek often communicates viewpoint as well.
+
+---
+
+# LESSON 4 — COMMANDS AND STATEMENTS
+
+## Big Idea
+
+Not every sentence communicates the same kind of idea.
+
+Examples:
+- “He speaks.” (statement)
+- “Speak!” (command)
+- “If he speaks…” (possibility/condition)
+
+Greek has formal systems describing these kinds of communication.
+
+---
+
+# LESSON 5 — INTRO TO GREEK VERBS
+
+## Big Idea
+
+Greek verbs often contain:
+- person
+- number
+- tense
+- voice
+- mood
+
+inside the verb itself.
+
+## Example
+
+γράφω
+
+Translation:
+“I write”
+
+This single word already communicates:
+- first person
+- singular
+- present
+- active
+- indicative
+
+Later lessons will explain each category carefully.
+
+---
+
+# LESSON 6 — PERSON AND NUMBER
+
+## Person
+
+Greek verbs communicate:
+- first person
+- second person
+- third person
+
+## Number
+
+Greek distinguishes:
+- singular
+- plural
+
+## Examples
+
+γράφω — I write  
+γράφεις — you write  
+γράφει — he/she/it writes
+
+---
+
+# LESSON 7 — PRESENT ACTIVE INDICATIVE
+
+## Big Idea
+
+Most Greek textbooks begin with the present active indicative because it forms the foundation of many verb discussions.
+
+## Present
+
+The action is viewed as ongoing or in progress.
+
+## Active
+
+The subject performs the action.
+
+## Indicative
+
+The sentence communicates assertion or statement.
+
+## Example
+
+λύω
+
+“I loose” or “I destroy”
+
+---
+
+# LESSON 8 — UNDERSTANDING ENDINGS
+
+## Big Idea
+
+Greek endings communicate meaning.
+
+The stem usually carries the core meaning.
+The ending carries grammatical information.
+
+Example:
+
+γράφ-ω
+
+Stem:
+γράφ-
+
+Ending:
+-ω
+
+---
+
+# LESSON 9 — ACTIVE VOICE
+
+## Big Idea
+
+In active voice, the subject performs the action.
+
+Examples:
+- The teacher teaches.
+- The student learns.
+
+Greek Example:
+γράφει
+
+“He/she writes.”
+
+---
+
+# LESSON 10 — MIDDLE AND PASSIVE BASICS
+
+## Passive Voice
+
+The subject receives the action.
+
+Example:
+“The letter was written.”
+
+## Middle Voice
+
+The subject is connected to or involved in the action in some way.
+
+Important:
+Do not oversimplify the middle voice.
+
+---
+
+# LESSON 11 — INDICATIVE MOOD
+
+## Big Idea
+
+The indicative mood typically communicates assertion or presentation of reality.
+
+Examples:
+- He speaks.
+- They traveled.
+- We believe.
+
+---
+
+# LESSON 12 — IMPERFECT TENSE
+
+## Big Idea
+
+The imperfect often communicates past ongoing action.
+
+Example:
+“He was teaching.”
+
+Greek writers often use the imperfect in narrative sections.
+
+---
+
+# LESSON 13 — FUTURE TENSE
+
+## Big Idea
+
+The future tense commonly communicates future action or expectation.
+
+Example:
+“He will speak.”
+
+---
+
+# LESSON 14 — AORIST BASICS
+
+## Big Idea
+
+The aorist is one of the most important Greek verb systems.
+
+It often presents action as a whole or undefined event.
+
+Important:
+Avoid simplistic explanations like:
+“once-for-all action.”
+
+The aorist is more nuanced than that.
+
+---
+
+# LESSON 15 — SECOND AORISTS
+
+## Big Idea
+
+Second aorists use different stems but generally function similarly to first aorists.
+
+Students should focus on recognition.
+
+---
+
+# LESSON 16 — PERFECT TENSE
+
+## Big Idea
+
+The perfect tense often communicates a completed action with continuing result.
+
+Example idea:
+“It has been written.”
+
+---
+
+# LESSON 17 — IMPERATIVES
+
+## Big Idea
+
+Imperatives communicate commands.
+
+Examples:
+- Go!
+- Listen!
+- Write!
+
+---
+
+# LESSON 18 — INFINITIVES
+
+## Big Idea
+
+Infinitives are verbal forms often functioning similarly to verbal nouns.
+
+English examples:
+- to speak
+- to learn
+- to write
+
+---
+
+# LESSON 19 — PARTICIPLES
+
+## Big Idea
+
+Participles combine verbal and adjectival ideas.
+
+They are extremely common in NT Greek.
+
+---
+
+# LESSON 20 — PRINCIPAL PARTS
+
+## Big Idea
+
+Principal parts help students recognize different verb systems.
+
+Memorizing principal parts greatly improves reading ability.
+
+---
+
+# LESSON 21 — READING FULL PARSES
+
+Students now begin combining:
+- tense
+- voice
+- mood
+- person
+- number
+
+into full parsing recognition.
+
+---
+
+# LESSON 22 — READING REAL NT VERBS
+
+Students begin:
+- identifying verbs in context
+- recognizing systems naturally
+- following Greek sentence flow
+
+---
+
+# BASIC TRACK IMPLEMENTATION NOTES
+
+## XP
+- Moderate XP per lesson
+- Bonus XP for optional activities
+
+## Activities
+- matching
+- parsing drills
+- identify the verb
+- choose best translation
+
+## Progress Tracking
+Reuse existing:
+- Firebase systems
+- local saving
+- XP systems
+- lesson completion systems
+
+## UI
+Use:
+- collapsible lesson sections
+- smooth transitions
+- progress bars
+- calm spacing
+- theme-aware styling
+
