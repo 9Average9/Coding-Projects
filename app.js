@@ -14364,7 +14364,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.3.87";
+const APP_VERSION = "2.3.88";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.3.72 — Syntax Tool + Tool Wheel</div>
@@ -16569,6 +16569,7 @@ function syncRhemaPicker() {
 }
 
 function openRhemaBookPicker() {
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaPickerSheet();
   closeRhemaSheet();
   const overlay = document.getElementById('rhemaBookPickerOverlay');
@@ -16595,6 +16596,7 @@ function openRhemaBookPicker() {
 }
 
 function openRhemaChapPicker() {
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaPickerSheet();
   closeRhemaSheet();
   const overlay = document.getElementById('rhemaChapPickerOverlay');
@@ -16610,6 +16612,7 @@ function openRhemaChapPicker() {
 }
 
 function openRhemaVersePicker() {
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   closeRhemaPickerSheet();
   closeRhemaSheet();
   const overlay = document.getElementById('rhemaVersePickerOverlay');
@@ -16633,6 +16636,7 @@ function closeRhemaPickerSheet() {
     const sheet = overlay.querySelector('.rhema-picker-sheet');
     if (sheet) { sheet.style.transform = ''; sheet.style.transition = ''; }
   });
+  if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
 }
 
 function rhemaFilterBooks(query) {
@@ -16953,6 +16957,7 @@ function toggleRhemaMode() {
 function openRhemaWheel() {
   const overlay = document.getElementById('rhemaWheelOverlay');
   if (!overlay) return;
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   _syncWheelState();
   overlay.style.display = 'flex';
   requestAnimationFrame(() => overlay.classList.add('open'));
@@ -16963,6 +16968,7 @@ function closeRhemaWheel() {
   if (!overlay) return;
   overlay.classList.remove('open');
   setTimeout(() => { if (!overlay.classList.contains('open')) overlay.style.display = 'none'; }, 300);
+  if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
 }
 
 function toggleRhemaWheel() {
