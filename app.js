@@ -8319,6 +8319,24 @@ function closeStudySandbox() {
     _studySandboxId = null;
     document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');
   }
+  // Restore main Rhema position and modes so nothing from the study carries over
+  if (_studySandboxMainRhemaPos) {
+    _rhemaBook       = _studySandboxMainRhemaPos.book;
+    _rhemaChapter    = _studySandboxMainRhemaPos.chapter;
+    _rhemaVerse      = _studySandboxMainRhemaPos.verse;
+    _rhemaSyntaxMode = _studySandboxMainRhemaPos.syntaxMode || false;
+    _rhemaShowKjv    = _studySandboxMainRhemaPos.showKjv    || false;
+    _rhemaGreekOnly  = _studySandboxMainRhemaPos.greekOnly  || false;
+    _studySandboxMainRhemaPos = null;
+  } else {
+    _rhemaSyntaxMode = false;
+    _rhemaShowKjv = false;
+    _rhemaGreekOnly = false;
+  }
+  _rhemaPosHighlights.clear();
+  _rhemaHighlightBarOn = false;
+  // Hide floating nav arrows
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   _sandboxUnsubNotes?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
@@ -8410,7 +8428,15 @@ function jumpToRhemaFromStudy(book, chapter, verse) {
   if (!_activeSandboxStudy) return;
   _studySandboxId = _activeSandboxStudy.id;
   _studySandboxRhemaReturn = true;
+  // Stash current modes before overriding for study context
+  if (!_studySandboxMainRhemaPos) {
+    _studySandboxMainRhemaPos = {
+      book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse,
+      syntaxMode: _rhemaSyntaxMode, showKjv: _rhemaShowKjv, greekOnly: _rhemaGreekOnly
+    };
+  }
   _rhemaBook = book; _rhemaChapter = chapter; _rhemaVerse = verse;
+  _rhemaSyntaxMode = false; _rhemaShowKjv = false; _rhemaGreekOnly = false;
   document.getElementById('rhemaSaveToStudyBtn')?.classList.remove('hidden');
   showRhema();
 }
@@ -8501,8 +8527,17 @@ function openSandboxRhema() {
   if (!uid) return;
   _studySandboxId = _activeSandboxStudy.id;
   _studySandboxRhemaReturn = true;
-  // Stash the main Rhema position so we can restore it when sandbox Rhema closes
-  _studySandboxMainRhemaPos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+  // Stash the main Rhema position AND modes so we can restore them when sandbox closes
+  _studySandboxMainRhemaPos = {
+    book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse,
+    syntaxMode: _rhemaSyntaxMode, showKjv: _rhemaShowKjv, greekOnly: _rhemaGreekOnly
+  };
+  // Start study Rhema clean — no modes carry in from main
+  _rhemaSyntaxMode = false;
+  _rhemaShowKjv = false;
+  _rhemaGreekOnly = false;
+  _rhemaPosHighlights.clear();
+  _rhemaHighlightBarOn = false;
   // Load this study's saved position (or stay wherever main Rhema was as a fallback)
   const pos = (_activeSandboxStudy.rhemaPositions || {})[uid];
   if (pos) { _rhemaBook = pos.book; _rhemaChapter = pos.chapter; _rhemaVerse = pos.verse; }
@@ -16494,13 +16529,21 @@ function closeRhema(keepSandbox = false) {
         }
         _updateSandboxRhemaPreview();
       }
-      // Restore the main Rhema position so homescreen "Continue Studying" is unchanged
+      // Restore the main Rhema position AND modes so homescreen is unchanged
       if (_studySandboxMainRhemaPos) {
         _rhemaBook    = _studySandboxMainRhemaPos.book;
         _rhemaChapter = _studySandboxMainRhemaPos.chapter;
         _rhemaVerse   = _studySandboxMainRhemaPos.verse;
+        _rhemaSyntaxMode = _studySandboxMainRhemaPos.syntaxMode || false;
+        _rhemaShowKjv    = _studySandboxMainRhemaPos.showKjv    || false;
+        _rhemaGreekOnly  = _studySandboxMainRhemaPos.greekOnly  || false;
         _studySandboxMainRhemaPos = null;
       }
+    } else {
+      // Tab-switch within study (keepSandbox=true) — reset modes for isolation
+      _rhemaSyntaxMode = false;
+      _rhemaShowKjv = false;
+      _rhemaGreekOnly = false;
     }
     if (!keepSandbox) _studySandboxId = null;
   }
@@ -16923,6 +16966,7 @@ function renderRhemaVerse() {
       display.classList.remove('greek-only');
       display.innerHTML = _renderSyntaxView(words, null);
       if (kjvDiv) kjvDiv.innerHTML = '';
+      requestAnimationFrame(() => _initDiagramScroll(display.querySelector('.rsx-diagram')));
     } else {
       display.classList.toggle('greek-only', _rhemaGreekOnly);
       display.innerHTML = _renderVerseWords(words, null);
@@ -17019,8 +17063,8 @@ function _syncToolWandIndicator() {
 
 const _RHEMA_COACH_STEPS = [
   {
-    targetFn: () => document.querySelector('.rhema-content-area'),
-    position: 'below',
+    targetFn: () => document.getElementById('rhemaVerseDisplay'),
+    position: 'center',
     title: 'Read the Greek text',
     body: 'Tap any highlighted Greek word to open its definition, parsing, and usage — no Greek knowledge needed.',
   },
@@ -17047,7 +17091,7 @@ const _RHEMA_COACH_STEPS = [
 const _RHEMA_SYNTAX_COACH_STEPS = [
   {
     targetFn: () => document.querySelector('.rsx-dg-node'),
-    position: 'right',
+    position: 'below',
     title: 'Each box is a clause',
     body: 'The verse is broken into clauses. The main clause is on the left; subordinate clauses branch off to the right.',
   },
@@ -17058,8 +17102,8 @@ const _RHEMA_SYNTAX_COACH_STEPS = [
     body: 'Tap any phrase chip to see its grammatical role and what that role means in plain English.',
   },
   {
-    targetFn: () => document.querySelector('.rsx-dg-arr'),
-    position: 'above',
+    targetFn: () => document.querySelector('.rsx-dg-arm'),
+    position: 'below',
     title: 'Follow the arrows',
     body: 'Arrows show how clauses connect. Scroll left-to-right to see the full structure.',
   },
@@ -17140,6 +17184,17 @@ function _showCoachStep() {
   spotlight.style.height = sh + 'px';
   spotlight.style.display = '';
 
+  // 'center' position: spotlight the element but place the card centered in the modal
+  if (step.position === 'center') {
+    card.style.width = CARD_W + 'px';
+    card.style.top  = '50%';
+    card.style.left = '50%';
+    card.style.transform = 'translate(-50%, -50%)';
+    card.style.visibility = '';
+    return;
+  }
+
+  card.style.transform = '';
   card.style.width = CARD_W + 'px';
   // Hide temporarily so we can measure the card's rendered height
   card.style.visibility = 'hidden';
@@ -17821,6 +17876,29 @@ const _SX_CLAUSE_COLORS = {
   causal:'#ec4899', explanatory:'#6366f1', inferential:'#14b8a6',
   adversative:'#ef4444', alternative:'#a78bfa',
 };
+
+function _initDiagramScroll(el) {
+  if (!el || el._dragInit) return;
+  el._dragInit = true;
+  let active = false, startX, startY, scrollLeft, scrollTop;
+  el.addEventListener('mousedown', e => {
+    active = true;
+    el.classList.add('grabbing');
+    startX = e.pageX - el.offsetLeft;
+    startY = e.pageY - el.offsetTop;
+    scrollLeft = el.scrollLeft;
+    scrollTop  = el.scrollTop;
+    e.preventDefault();
+  });
+  document.addEventListener('mouseup', () => { active = false; el.classList.remove('grabbing'); });
+  el.addEventListener('mouseleave', () => { active = false; el.classList.remove('grabbing'); });
+  el.addEventListener('mousemove', e => {
+    if (!active) return;
+    e.preventDefault();
+    el.scrollLeft = scrollLeft - (e.pageX - el.offsetLeft - startX);
+    el.scrollTop  = scrollTop  - (e.pageY - el.offsetTop  - startY);
+  });
+}
 
 function _renderSyntaxView(words, verse) {
   if (!words.length) return '<div class="rsx-tree"><p style="padding:16px;color:var(--muted-color)">No verse data.</p></div>';
