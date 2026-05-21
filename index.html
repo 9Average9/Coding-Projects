@@ -313,7 +313,7 @@ glacier: {
 
 
 
-  <link rel="stylesheet" href="style.css?v=2.5.1" />
+  <link rel="stylesheet" href="style.css?v=2.5.2" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
 
 
@@ -10952,9 +10952,9 @@ glacier: {
 
   </main>
 
-  <script src="vocab.js?v=2.5.1"></script>
-  <script src="app.js?v=2.5.1"></script>
-  <script type="module" src="firebase-lb.js?v=2.5.1"></script>
+  <script src="vocab.js?v=2.5.2"></script>
+  <script src="app.js?v=2.5.2"></script>
+  <script type="module" src="firebase-lb.js?v=2.5.2"></script>
 
 <!-- Leaderboard Intro Modal -->
 <div id="lbIntroModal" class="modal-overlay lb-intro-overlay">
@@ -11383,6 +11383,9 @@ glacier: {
         <div class="study-color-swatch" style="background:#ef4444" data-color="#ef4444" onclick="selectStudyColor(this)"></div>
         <div class="study-color-swatch" style="background:#a855f7" data-color="#a855f7" onclick="selectStudyColor(this)"></div>
         <div class="study-color-swatch" style="background:#f97316" data-color="#f97316" onclick="selectStudyColor(this)"></div>
+        <label class="study-color-swatch custom-color-dot" id="studyCustomColorDot">
+          <input type="color" id="studyCustomColorInput" class="hidden-color-input" onchange="setStudyCustomColor(this.value)">
+        </label>
       </div>
     </div>
 

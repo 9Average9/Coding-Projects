@@ -8166,6 +8166,12 @@ function selectStudyColor(el) {
   document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
   el.classList.add('selected');
 }
+function setStudyCustomColor(value) {
+  _studyCreateColor = value;
+  document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
+  const dot = document.getElementById('studyCustomColorDot');
+  if (dot) dot.classList.add('selected');
+}
 function selectStudyIcon(el) {
   _studyCreateIcon = el.dataset.icon;
   document.querySelectorAll('.study-icon-btn').forEach(b => b.classList.remove('selected'));
@@ -15060,9 +15066,16 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.5.2";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.5.2 — Custom Study Colors &amp; Keyboard</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Custom study color</strong> — Pick any color for your study with the rainbow color wheel, not just the preset swatches.</li>
+    <li><strong>Bigger workspace keyboard keys</strong> — Greek keyboard keys in the workspace are now larger and easier to tap.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.5.1 — Polish &amp; Studies Update</div>
 <div class="un-section">
   <ul class="un-list">

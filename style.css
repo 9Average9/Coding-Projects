@@ -13284,6 +13284,12 @@ body .app:has(#settingsScreen.screen.active) {
   transform: scale(1.15);
 }
 
+label.study-color-swatch.custom-color-dot {
+  display: block;
+  background: conic-gradient(red, orange, yellow, lime, cyan, blue, violet, red);
+  outline: none;
+}
+
 .study-icon-grid {
   display: flex;
   gap: 10px;
@@ -13952,6 +13958,16 @@ body.sandbox-open #rhemaModal {
 .ws-greek-keyboard {
   display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 12px 8px;
   background: var(--card-color); border-top: 1px solid var(--border-color);
+}
+.ws-greek-keyboard .wl-key {
+  padding: 13px 0;
+  font-size: 1.15rem;
+  min-height: 50px;
+}
+.ws-greek-keyboard .wl-key-bs {
+  padding: 13px 0;
+  font-size: 0.85rem;
+  min-height: 50px;
 }
 
 .wl-info-btn {
