@@ -107,14 +107,14 @@ function _closeRhemaXrefShell() {
 
 function _xrefTopCardHtml() {
   const ref = _xrefKey();
-  return `<button class="rx-top-card" onclick="openRhemaCrossRefSelect()">
-    <div>
+  return `<div class="rx-top-card" role="button" tabindex="0" onclick="openRhemaCrossRefSelect()" onkeydown="if(event.key==='Enter'||event.key===' ')openRhemaCrossRefSelect()">
+    <div class="rx-top-card-copy">
       <h3>${_xrefEscape(_xrefDisplay(ref))}</h3>
       <p>${_xrefEscape(_xrefKjvText(_rhemaXrefActive))}</p>
       <span class="rx-change"><span class="material-symbols-outlined">touch_app</span>Tap to change verse</span>
     </div>
     <span class="material-symbols-outlined rx-top-watermark">auto_stories</span>
-  </button>`;
+  </div>`;
 }
 
 function _renderXrefBreadcrumb() {
@@ -153,7 +153,7 @@ function renderRhemaCrossReferences() {
     const preview = !isEmpty ? refs.slice(0, 2).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('') : '';
     const chips = cat.key === 'themes' && !isEmpty ? refs.slice(0, 5).map(item => `<span>${_xrefEscape(item.label)}</span>`).join('') : '';
     return `<button class="rx-category-card${isEmpty ? ' rx-no-data' : ''}" data-xref-cat="${cat.key}" onclick="openRhemaXrefCategory('${cat.key}')">
-      <span class="rx-category-icon material-symbols-outlined">${cat.icon}</span>
+      <span class="rx-category-icon"><span class="material-symbols-outlined">${cat.icon}</span></span>
       <span class="rx-category-copy">
         <span class="rx-category-title">${cat.title} <em>${isEmpty ? '—' : refs.length}</em></span>
         <span class="rx-category-desc">${cat.desc}</span>
@@ -198,7 +198,7 @@ function renderRhemaXrefTrail() {
   </button>`).join('');
   const save = _studySandboxId ? `<button class="rx-save-trail-btn" onclick="saveCurrentRhemaTrail()"><span class="material-symbols-outlined">bookmark</span>Save Trail</button>` : '';
   document.getElementById('rxMainView').innerHTML = _xrefTopCardHtml() +
-    `<div class="rx-active-category" data-xref-cat="${cat.key}"><span class="material-symbols-outlined">${cat.icon}</span><div><strong>${cat.title} <em>${refs.length}</em></strong><p>${cat.desc}</p></div></div>` +
+    `<div class="rx-active-category" data-xref-cat="${cat.key}"><span class="rx-category-icon"><span class="material-symbols-outlined">${cat.icon}</span></span><div><strong>${cat.title} <em>${refs.length}</em></strong><p>${cat.desc}</p></div></div>` +
     `<div class="rx-verse-stack">${cards || '<p class="rx-empty">No starter links are loaded for this verse yet.</p>'}</div>${save}`;
 }
 
