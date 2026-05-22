@@ -13174,6 +13174,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex-shrink: 0;
 }
 .rhema-book-row.selected .rhema-book-check { visibility: visible; }
+.rhema-testament-sep {
+  padding: 10px 20px 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+}
 
 /* ── Chapter / Verse number grid ── */
 .rhema-num-grid {
