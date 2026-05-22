@@ -3772,6 +3772,134 @@ body.dark .ending-piece {
   border-color: rgba(214, 196, 154, 0.45);
 }
 
+/* ── Paradigm colour system ───────────────────────────────────────── */
+
+/* Connecting vowel — green */
+.cv-piece {
+  background: rgba(34, 197, 94, 0.18);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #15803d;
+}
+body.dark .cv-piece {
+  background: rgba(34, 197, 94, 0.22);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+}
+
+/* Tense formative — orange */
+.tf-piece {
+  background: rgba(249, 115, 22, 0.16);
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  color: #c2410c;
+}
+body.dark .tf-piece {
+  background: rgba(249, 115, 22, 0.22);
+  border-color: rgba(249, 115, 22, 0.38);
+  color: #fb923c;
+}
+
+/* Augment — purple */
+.aug-piece {
+  background: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  color: #7c3aed;
+}
+body.dark .aug-piece {
+  background: rgba(139, 92, 246, 0.22);
+  border-color: rgba(139, 92, 246, 0.38);
+  color: #a78bfa;
+}
+
+/* Reduplication — teal */
+.redup-piece {
+  background: rgba(20, 184, 166, 0.16);
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  color: #0f766e;
+}
+body.dark .redup-piece {
+  background: rgba(20, 184, 166, 0.22);
+  border-color: rgba(20, 184, 166, 0.38);
+  color: #2dd4bf;
+}
+
+/* Shared pill shape for all morpheme pieces */
+.cv-piece, .tf-piece, .aug-piece, .redup-piece {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  display: inline-block;
+}
+
+/* Verb paradigm table */
+.verb-paradigm-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 0.88rem;
+}
+.verb-paradigm-table th {
+  background: rgba(0,0,0,0.05);
+  padding: 5px 10px;
+  text-align: left;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.verb-paradigm-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  vertical-align: middle;
+}
+.verb-paradigm-table tr:last-child td { border-bottom: none; }
+.verb-paradigm-table .vpt-form { font-size: 1.05rem; font-weight: 700; }
+.verb-paradigm-table .vpt-parse { opacity: 0.6; font-size: 0.8rem; }
+.verb-paradigm-table .vpt-trans { font-style: italic; color: #555; }
+body.dark .verb-paradigm-table th { background: rgba(255,255,255,0.07); }
+body.dark .verb-paradigm-table td { border-bottom-color: rgba(255,255,255,0.07); }
+body.dark .verb-paradigm-table .vpt-trans { color: #aaa; }
+
+/* Verb builder: λύ + ο + μεν display */
+.verb-builder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 14px;
+  margin: 12px 0;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.verb-builder .vb-plus {
+  font-size: 1.1rem;
+  font-weight: 900;
+  opacity: 0.4;
+}
+.verb-builder .vb-equals {
+  font-size: 1.2rem;
+  font-weight: 700;
+  opacity: 0.35;
+  margin: 0 2px;
+}
+.verb-builder .vb-result {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.verb-builder .vb-label {
+  width: 100%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  opacity: 0.45;
+  margin-bottom: 2px;
+}
+body.dark .verb-builder {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+}
+
 body.dark .word-job,
 body.dark .check-label {
   color: #cbd5e1;

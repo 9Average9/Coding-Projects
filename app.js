@@ -14879,7 +14879,7 @@ const ACHIEVEMENT_DATA = {
   verbBasicComplete: {
     icon: "📗",
     title: "Verb Foundations",
-    desc: "Completed all 22 Basic Verb lessons."
+    desc: "Completed all 28 Basic Verb lessons."
   },
 
   presentTenseMaster: {
@@ -14921,7 +14921,7 @@ const ACHIEVEMENT_DATA = {
   greekReader3: {
     icon: "🏛️",
     title: "Greek Reader III",
-    desc: "Completed all 28 Advanced Verb lessons."
+    desc: "Completed all 32 Advanced Verb lessons."
   },
 
   verbScholar: {
