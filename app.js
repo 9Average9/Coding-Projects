@@ -8485,7 +8485,7 @@ function _updateWsVerseDisplay() {
   const refEl = document.getElementById('wsVerseRef');
   const kjvEl = document.getElementById('wsVerseKjv');
   if (!refEl) return;
-  const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook || '';
+  const bookName = _rhemaBookName(_rhemaBook) || '';
   refEl.textContent = (bookName && _rhemaChapter && _rhemaVerse)
     ? `${bookName} ${_rhemaChapter}:${_rhemaVerse}` : '';
   if (kjvEl) {
@@ -8495,8 +8495,8 @@ function _updateWsVerseDisplay() {
 }
 
 function wsNavVerse(delta) {
-  if (!window.RhemaNT || !_rhemaBook || !_rhemaChapter) return;
-  const chapterData = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {};
+  if (!_rhemaData() || !_rhemaBook || !_rhemaChapter) return;
+  const chapterData = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {};
   const verses = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
   const idx = verses.indexOf(Number(_rhemaVerse));
   if (idx === -1) return;
@@ -8525,7 +8525,7 @@ function _renderWorkspaceEntries(entries) {
     const meta = _WS_META[e.type] || _WS_META.observations;
     const canDel = e.authorUid === uid || isCreator;
     const ts = e.createdAt?.toDate ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(e.createdAt.toDate()) : '';
-    const ref = e.verseRef ? `${window.RhemaNT?.names?.[e.verseRef.book] || e.verseRef.book} ${e.verseRef.chapter}:${e.verseRef.verse}` : '';
+    const ref = e.verseRef ? `${_rhemaBookName(e.verseRef.book)} ${e.verseRef.chapter}:${e.verseRef.verse}` : '';
     const clickAttr = ref ? `onclick="jumpToRhemaFromStudy('${e.verseRef.book}','${e.verseRef.chapter}','${e.verseRef.verse}')"` : '';
     return `<div class="ws-entry" style="--ws-entry-color:${meta.color}" ${clickAttr}>
       <div class="ws-entry-head">
@@ -8549,7 +8549,7 @@ async function submitWorkspaceEntry() {
   if (!text) return;
   input.value = ''; input.style.height = 'auto';
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
-  const verseRef = _studySandboxId ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, bookName: window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook } : null;
+  const verseRef = _studySandboxId ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, bookName: _rhemaBookName(_rhemaBook) } : null;
   const verseSnippet = _studySandboxId ? _getVerseSnippet() : '';
   await window.Studies.addEntry(_activeSandboxStudy.id, uid, displayName, { type: _workspaceTab, content: text, verseRef, verseSnippet });
 }
@@ -8560,7 +8560,7 @@ async function deleteWorkspaceEntry(entryId) {
 }
 
 function _getVerseSnippet() {
-  const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  const words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
   if (!words.length) return '';
   const greek = words.slice(0, 10).map(w => w[0]).join(' ');
   return greek.length > 60 ? greek.slice(0, 57) + '…' : greek;
@@ -8639,8 +8639,8 @@ function _updateSwmVerseDisplay() {
   const card = document.getElementById('swmVerseCard');
   const kjv = document.getElementById('swmKjvText');
   if (card) {
-    const bookName = window.RhemaNT?.names?.[_swmDisplayBook] || _swmDisplayBook;
-    const words = (window.RhemaNT?.text[_swmDisplayBook] || {})[_swmDisplayChapter]?.[_swmDisplayVerse] || [];
+    const bookName = _rhemaBookName(_swmDisplayBook);
+    const words = (_rhemaText()[_swmDisplayBook] || {})[_swmDisplayChapter]?.[_swmDisplayVerse] || [];
     const snippet = words.slice(0, 14).map(w => w[0]).join(' ');
     card.innerHTML = `<div class="swm-verse-ref">${bookName} ${_swmDisplayChapter}:${_swmDisplayVerse}</div>
       <div class="swm-verse-text">${snippet}${words.length > 14 ? '…' : ''}</div>`;
@@ -8652,8 +8652,8 @@ function _updateSwmVerseDisplay() {
 }
 
 function swmNavVerse(delta) {
-  if (!window.RhemaNT || !_swmDisplayBook || !_swmDisplayChapter) return;
-  const chapterData = (window.RhemaNT.text[_swmDisplayBook] || {})[_swmDisplayChapter] || {};
+  if (!_rhemaData() || !_swmDisplayBook || !_swmDisplayChapter) return;
+  const chapterData = (_rhemaText()[_swmDisplayBook] || {})[_swmDisplayChapter] || {};
   const verses = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
   const idx = verses.indexOf(Number(_swmDisplayVerse));
   if (idx === -1) return;
@@ -8678,9 +8678,9 @@ async function saveWritingModal() {
   const text = ta?.value?.trim();
   if (!text) { ta?.focus(); return; }
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
-  const verseRef = { book: _swmSavedBook, chapter: _swmSavedChapter, verse: _swmSavedVerse, bookName: window.RhemaNT?.names?.[_swmSavedBook] || _swmSavedBook };
+  const verseRef = { book: _swmSavedBook, chapter: _swmSavedChapter, verse: _swmSavedVerse, bookName: _rhemaBookName(_swmSavedBook) };
   const verseSnippet = (() => {
-    const words = (window.RhemaNT?.text[_swmSavedBook] || {})[_swmSavedChapter]?.[_swmSavedVerse] || [];
+    const words = (_rhemaText()[_swmSavedBook] || {})[_swmSavedChapter]?.[_swmSavedVerse] || [];
     if (!words.length) return '';
     const greek = words.slice(0, 10).map(w => w[0]).join(' ');
     return greek.length > 60 ? greek.slice(0, 57) + '…' : greek;
@@ -8761,11 +8761,11 @@ function _wlSearchLexicon(q, maxResults) {
 function _wlScanNTForm(q) {
   // Find exact surface form matches in NT text for Greek queries
   if (!/[Ͱ-Ͽἀ-῿]/.test(q)) return [];
-  if (!window.RhemaNT) return [];
+  if (!_rhemaData()) return [];
   const qn = _stripGreekAccents(q).toLowerCase();
   const found = {}; // surface → { strongs, count }
-  for (const book of RHEMA_BOOK_ORDER) {
-    const bdata = (window.RhemaNT.text[book] || {});
+  for (const book of _rhemaBookOrder()) {
+    const bdata = (_rhemaText()[book] || {});
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
         for (const word of (bdata[ch][v] || [])) {
@@ -8787,9 +8787,9 @@ function _wlScanNTForm(q) {
 function _rhemaExactFormOccurrences(surface) {
   const books = {};
   const norm = _stripGreekAccents(surface).toLowerCase();
-  const texts = window.RhemaNT?.text;
+  const texts = _rhemaText();
   if (!texts) return books;
-  for (const book of RHEMA_BOOK_ORDER) {
+  for (const book of _rhemaBookOrder()) {
     const bdata = texts[book] || {};
     let count = 0;
     for (const ch of Object.keys(bdata)) {
@@ -8973,9 +8973,9 @@ function openWlWordDetail(strongs, formSurface) {
 
 function _findMorphForSurface(strongs, surface) {
   const norm = _stripGreekAccents(surface).toLowerCase();
-  const texts = window.RhemaNT?.text;
+  const texts = _rhemaText();
   if (!texts) return '';
-  for (const book of RHEMA_BOOK_ORDER) {
+  for (const book of _rhemaBookOrder()) {
     const bdata = texts[book] || {};
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
@@ -8989,9 +8989,9 @@ function _findMorphForSurface(strongs, surface) {
 }
 
 function _findAnyMorphForStrongs(strongs) {
-  const texts = window.RhemaNT?.text;
+  const texts = _rhemaText();
   if (!texts) return '';
-  for (const book of RHEMA_BOOK_ORDER) {
+  for (const book of _rhemaBookOrder()) {
     const bdata = texts[book] || {};
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
@@ -9132,7 +9132,7 @@ function _updateSandboxRhemaPreview() {
   const posText = document.getElementById('ssRhemaPositionText');
   if (posText) {
     posText.textContent = pos
-      ? `${window.RhemaNT?.names?.[pos.book] || pos.book} ${pos.chapter}:${pos.verse}`
+      ? `${_rhemaBookName(pos.book)} ${pos.chapter}:${pos.verse}`
       : 'Not started yet';
   }
 }
@@ -9166,7 +9166,7 @@ async function saveCurrentVerseToStudy() {
   if (!uid || !_studySandboxId) return;
   const study = _myStudies.find(s => s.id === _studySandboxId);
   if (!study) return;
-  const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook;
+  const bookName = _rhemaBookName(_rhemaBook);
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
   const btn = document.getElementById('rhemaSaveToStudyBtn');
   if (btn) { btn.textContent = 'Saved!'; btn.disabled = true; }
@@ -15359,7 +15359,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.6.6";
+const APP_VERSION = "2.7.0";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.6.5 — Lesson Polish &amp; Navigation Fix</div>
@@ -17217,7 +17217,9 @@ let _rhemaHighlightStrongs = null;
 let _rhemaSavedScrollY = 0;
 let _rhemaFullChapter = false;
 
-const RHEMA_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
+const RHEMA_OT_BOOK_ORDER = ['GEN','EXO','LEV','NUM','DEU','JOS','JDG','RUT','1SA','2SA','1KI','2KI','1CH','2CH','EZR','NEH','EST','JOB','PSA','PRO','ECC','SNG','ISA','JER','LAM','EZK','DAN','HOS','JOL','AMO','OBA','JON','MIC','NAM','HAB','ZEP','HAG','ZEC','MAL'];
+const RHEMA_NT_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
+const RHEMA_BOOK_ORDER = [...RHEMA_OT_BOOK_ORDER, ...RHEMA_NT_BOOK_ORDER];
 
 const RHEMA_BOOK_ABBR = {
   GEN:'Ge', EXO:'Ex', LEV:'Le', NUM:'Nu', DEU:'Dt', JOS:'Jos', JDG:'Jdg',
@@ -17253,7 +17255,49 @@ const RHEMA_BOOK_NAMES = {
 
 window.RhemaBookNames = RHEMA_BOOK_NAMES;
 window.RhemaBookAbbr = RHEMA_BOOK_ABBR;
-window.RhemaNTBookOrder = RHEMA_BOOK_ORDER;
+window.RhemaNTBookOrder = RHEMA_NT_BOOK_ORDER;
+window.RhemaBookOrder = RHEMA_BOOK_ORDER;
+
+function _ensureRhemaBibleData() {
+  if (window.RhemaBible || !window.RhemaNT) return window.RhemaBible || window.RhemaNT;
+  const lxx = window.RhemaLXX || { books: [], names: {}, text: {} };
+  window.RhemaBible = {
+    books: [...(lxx.books || []), ...(window.RhemaNT.books || RHEMA_NT_BOOK_ORDER)],
+    names: { ...(lxx.names || {}), ...(window.RhemaNT.names || {}) },
+    text: { ...(lxx.text || {}), ...(window.RhemaNT.text || {}) },
+  };
+  return window.RhemaBible;
+}
+
+function _rhemaData() {
+  return _ensureRhemaBibleData();
+}
+
+function _rhemaText() {
+  return _rhemaData()?.text || {};
+}
+
+function _rhemaBookName(code) {
+  return _rhemaData()?.names?.[code] || RHEMA_BOOK_NAMES[code] || code;
+}
+
+function _rhemaBookOrder() {
+  const text = _rhemaText();
+  return (window.RhemaBible?.books || RHEMA_BOOK_ORDER).filter(code => text[code]);
+}
+
+function _rhemaOccurrenceData(strongs) {
+  const merged = { total: 0, books: {} };
+  for (const source of [window.RhemaLXXOcc, window.RhemaOcc]) {
+    const occ = source?.[strongs];
+    if (!occ) continue;
+    merged.total += occ.total || 0;
+    for (const [book, count] of Object.entries(occ.books || {})) {
+      merged.books[book] = (merged.books[book] || 0) + count;
+    }
+  }
+  return merged.total ? merged : null;
+}
 
 // ── POS Highlight system ──────────────────────────────────────────────────────
 
@@ -17297,7 +17341,7 @@ function toggleRhemaHighlightBar() {
 }
 
 function toggleRhemaHighlight(cat) {
-  const words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  const words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
   const hasMatch = words.some(w => normalizePosKey(w[2]) === cat);
 
   if (_rhemaPosHighlights.has(cat)) {
@@ -17318,10 +17362,10 @@ function updateHighlightToolbar() {
   if (!_rhemaHighlightBarOn) return;
   let words;
   if (_rhemaFullChapter) {
-    const chData = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter] || {};
+    const chData = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {};
     words = Object.values(chData).flat();
   } else {
-    words = (window.RhemaNT?.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+    words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
   }
   for (const cat of Object.keys(HIGHLIGHT_CATS)) {
     const btn = document.querySelector(`.rhema-hl-pill[data-cat="${cat}"]`);
@@ -17520,14 +17564,14 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
+    const files = ['rhema-nt.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
       s.src = file + '?v=' + APP_VERSION;
       s.onload = () => {
         loaded++;
-        if (loaded === files.length) { _rhemaLoaded = true; resolve(); }
+        if (loaded === files.length) { _ensureRhemaBibleData(); _rhemaLoaded = true; resolve(); }
       };
       s.onerror = () => {
         if (!failed) { failed = true; reject(new Error('Failed to load ' + file)); }
@@ -17647,12 +17691,12 @@ function rhemaGoBack() {
 // ── Verse picker ──────────────────────────────────────────────────────────────
 
 function initRhemaPicker() {
-  if (!window.RhemaNT) return;
+  if (!_rhemaData()) return;
   syncRhemaPicker();
 }
 
 function syncRhemaPicker() {
-  const bookName = window.RhemaNT?.names?.[_rhemaBook] || _rhemaBook;
+  const bookName = _rhemaBookName(_rhemaBook);
   const b = document.getElementById('rhemaPillBook');
   const c = document.getElementById('rhemaPillChap');
   const v = document.getElementById('rhemaPillVerse');
@@ -17666,10 +17710,10 @@ function openRhemaBookPicker() {
   closeRhemaSheet();
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const overlay = document.getElementById('rhemaBookPickerOverlay');
-  if (!overlay || !window.RhemaNT) return;
+  if (!overlay || !_rhemaData()) return;
   const list = document.getElementById('rhemaBookList');
-  list.innerHTML = RHEMA_BOOK_ORDER.map(code => {
-    const name = window.RhemaNT.names[code] || code;
+  list.innerHTML = _rhemaBookOrder().map(code => {
+    const name = _rhemaBookName(code);
     const sel  = code === _rhemaBook ? ' selected' : '';
     return `<div class="rhema-book-row${sel}" onclick="rhemaSelectBook('${code}')">
       <span class="material-symbols-outlined rhema-book-icon">menu_book</span>
@@ -17693,8 +17737,8 @@ function openRhemaChapPicker() {
   closeRhemaSheet();
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const overlay = document.getElementById('rhemaChapPickerOverlay');
-  if (!overlay || !window.RhemaNT) return;
-  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a-+b);
+  if (!overlay || !_rhemaData()) return;
+  const chapters = Object.keys(_rhemaText()[_rhemaBook] || {}).sort((a,b) => +a-+b);
   document.getElementById('rhemaChapGrid').innerHTML = chapters.map(ch => {
     const sel = ch === _rhemaChapter ? ' selected' : '';
     return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectChap('${ch}')">${ch}</div>`;
@@ -17709,8 +17753,8 @@ function openRhemaVersePicker() {
   closeRhemaSheet();
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   const overlay = document.getElementById('rhemaVersePickerOverlay');
-  if (!overlay || !window.RhemaNT) return;
-  const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a-+b);
+  if (!overlay || !_rhemaData()) return;
+  const verses = Object.keys((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a-+b);
   document.getElementById('rhemaVerseGrid').innerHTML = verses.map(v => {
     const sel = v === _rhemaVerse ? ' selected' : '';
     return `<div class="rhema-num-cell${sel}" onclick="rhemaSelectVerse('${v}')">${v}</div>`;
@@ -17781,8 +17825,8 @@ function updateRhemaVerseNav() {
   } else {
     nav.classList.remove('hidden');
     arrows?.classList.remove('visible');
-    if (ref && window.RhemaNT) {
-      const bookName = window.RhemaNT.names[_rhemaBook] || _rhemaBook;
+    if (ref && _rhemaData()) {
+      const bookName = _rhemaBookName(_rhemaBook);
       ref.textContent = _rhemaFullChapter
         ? `${bookName} ${_rhemaChapter}`
         : `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
@@ -17815,8 +17859,8 @@ function initRhemaVerseSwipe() {
 }
 
 function rhemaPrevVerse() {
-  if (!window.RhemaNT) return;
-  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a - +b);
+  if (!_rhemaData()) return;
+  const chapters = Object.keys(_rhemaText()[_rhemaBook] || {}).sort((a,b) => +a - +b);
   const chIdx = chapters.indexOf(_rhemaChapter);
   if (_rhemaFullChapter) {
     if (chIdx > 0) {
@@ -17824,14 +17868,14 @@ function rhemaPrevVerse() {
       _rhemaVerse = '1';
     } else return;
   } else {
-    const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
+    const verses = Object.keys((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
     const idx = verses.indexOf(_rhemaVerse);
     if (idx > 0) {
       _rhemaVerse = verses[idx - 1];
     } else {
       if (chIdx > 0) {
         _rhemaChapter = chapters[chIdx - 1];
-        const prevVerses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
+        const prevVerses = Object.keys((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
         _rhemaVerse = prevVerses[prevVerses.length - 1];
       } else return;
     }
@@ -17841,8 +17885,8 @@ function rhemaPrevVerse() {
 }
 
 function rhemaNextVerse() {
-  if (!window.RhemaNT) return;
-  const chapters = Object.keys(window.RhemaNT.text[_rhemaBook] || {}).sort((a,b) => +a - +b);
+  if (!_rhemaData()) return;
+  const chapters = Object.keys(_rhemaText()[_rhemaBook] || {}).sort((a,b) => +a - +b);
   const chIdx = chapters.indexOf(_rhemaChapter);
   if (_rhemaFullChapter) {
     if (chIdx < chapters.length - 1) {
@@ -17850,7 +17894,7 @@ function rhemaNextVerse() {
       _rhemaVerse = '1';
     } else return;
   } else {
-    const verses = Object.keys((window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
+    const verses = Object.keys((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {}).sort((a,b) => +a - +b);
     const idx = verses.indexOf(_rhemaVerse);
     if (idx < verses.length - 1) {
       _rhemaVerse = verses[idx + 1];
@@ -17968,7 +18012,7 @@ function _renderVerseWords(words, verse) {
 }
 
 function renderRhemaVerse() {
-  if (!window.RhemaNT) return;
+  if (!_rhemaData()) return;
   closeRhemaSheet();
   closeRhemaSyntaxSheet();
 
@@ -17977,7 +18021,7 @@ function renderRhemaVerse() {
   if (!display) return;
 
   if (_rhemaFullChapter) {
-    const chapterData = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter] || {};
+    const chapterData = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {};
     const verseNums = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
 
     display.classList.remove('greek-only');
@@ -18010,7 +18054,7 @@ function renderRhemaVerse() {
       if (body && target) body.scrollTop = target.offsetTop;
     });
   } else {
-    const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+    const words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
     display.classList.remove('chapter-mode', 'rsx-chapter-mode');
     if (_rhemaSyntaxMode) {
       display.classList.remove('greek-only');
@@ -18136,7 +18180,7 @@ const _RHEMA_COACH_STEPS = [
     targetFn: () => document.querySelector('.rhema-picker'),
     position: 'above',
     title: 'Jump to any verse',
-    body: 'Tap the book, chapter, or verse to jump anywhere in the New Testament instantly.',
+    body: 'Tap the book, chapter, or verse to jump anywhere in Rhema instantly.',
   },
 ];
 
@@ -19165,9 +19209,9 @@ function updateRhemaSwapVisibility() {
 // ── Word detail sheet ─────────────────────────────────────────────────────────
 
 function openRhemaSheet(wordIdx, verse) {
-  if (!window.RhemaNT) return;
+  if (!_rhemaData()) return;
   if (verse) { _rhemaVerse = verse; syncRhemaPicker(); }
-  const words = (window.RhemaNT.text[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+  const words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
   const word  = words[wordIdx];
   if (!word) return;
 
@@ -19183,7 +19227,7 @@ function openRhemaSheet(wordIdx, verse) {
   const lex = (window.RhemaLexicon || {})[strongs] || {};
 
   document.getElementById('rhemaSheetSurface').textContent = surface;
-  document.getElementById('rhemaSheetStrongs').textContent = 'G' + strongs;
+  document.getElementById('rhemaSheetStrongs').textContent = strongs ? 'G' + strongs : 'LXX';
   document.getElementById('rhemaSheetLemma').textContent   =
     lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
 
@@ -19545,33 +19589,34 @@ function renderRhemaDefinition(strongs) {
 }
 
 function renderRhemaOccurrences(strongs) {
+  if (!strongs) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
   if (_wlSelectedForm) {
     const exactBooks = _rhemaExactFormOccurrences(_wlSelectedForm);
     const exactTotal = Object.values(exactBooks).reduce((a, b) => a + b, 0);
     if (exactTotal === 0) return `<p style="opacity:.5;font-size:.85rem">No occurrences of "${_wlSelectedForm}" found.</p>`;
-    const bookRows = RHEMA_BOOK_ORDER
+    const bookRows = _rhemaBookOrder()
       .filter(code => exactBooks[code])
       .map(code => `
         <div class="rhema-occ-row tappable" onclick="openRhemaBookVerses('${code}',${strongs})">
-          <span class="rhema-occ-book">${window.RhemaNT?.names[code] || code}</span>
+          <span class="rhema-occ-book">${_rhemaBookName(code)}</span>
           <div style="display:flex;align-items:center;gap:4px">
             <span class="rhema-occ-count">${exactBooks[code]}×</span>
             <span class="material-symbols-outlined" style="font-size:1rem;opacity:0.4;color:var(--secondary-color)">chevron_right</span>
           </div>
         </div>`).join('');
     return `
-      <div class="rhema-occ-total">Form <em>${_wlSelectedForm}</em> appears <span>${exactTotal}</span>× in the New Testament</div>
+      <div class="rhema-occ-total">Form <em>${_wlSelectedForm}</em> appears <span>${exactTotal}</span>× in Rhema</div>
       <div class="rhema-occ-list">${bookRows}</div>`;
   }
 
-  const occ = (window.RhemaOcc || {})[strongs];
+  const occ = _rhemaOccurrenceData(strongs);
   if (!occ) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
 
-  const bookRows = RHEMA_BOOK_ORDER
+  const bookRows = _rhemaBookOrder()
     .filter(code => occ.books[code])
     .map(code => `
       <div class="rhema-occ-row tappable" onclick="openRhemaBookVerses('${code}',${strongs})">
-        <span class="rhema-occ-book">${window.RhemaNT?.names[code] || code}</span>
+        <span class="rhema-occ-book">${_rhemaBookName(code)}</span>
         <div style="display:flex;align-items:center;gap:4px">
           <span class="rhema-occ-count">${occ.books[code]}×</span>
           <span class="material-symbols-outlined" style="font-size:1rem;opacity:0.4;color:var(--secondary-color)">chevron_right</span>
@@ -19579,7 +19624,7 @@ function renderRhemaOccurrences(strongs) {
       </div>`).join('');
 
   return `
-    <div class="rhema-occ-total">Appears <span>${occ.total}</span>× in the New Testament</div>
+    <div class="rhema-occ-total">Appears <span>${occ.total}</span>× in Rhema</div>
     <div class="rhema-occ-list">${bookRows}</div>`;
 }
 
@@ -19589,7 +19634,7 @@ let _rhemaBVRefs    = [];
 let _rhemaBVKjv     = false;
 
 function openRhemaBookVerses(code, strongs) {
-  const bookText = (window.RhemaNT?.text || {})[code];
+  const bookText = (_rhemaText() || {})[code];
   if (!bookText) return;
 
   const formNorm = _wlSelectedForm ? _stripGreekAccents(_wlSelectedForm).toLowerCase() : null;
@@ -19637,7 +19682,7 @@ function renderRhemaBookVerses() {
   const code    = _rhemaBVCode;
   const strongs = _rhemaBVStrongs;
   const refs    = _rhemaBVRefs;
-  const bookName = window.RhemaNT?.names[code] || code;
+  const bookName = _rhemaBookName(code);
 
   const rows = refs.map(({ ch, v, wordIdx, words }) => {
     let previewHtml;
