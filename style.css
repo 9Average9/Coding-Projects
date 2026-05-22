@@ -7604,6 +7604,31 @@ body #newLearnMenu .lesson-block-content {
   color: var(--font-color) !important;
 }
 
+/* Visually distinct open state — lifts the card off the page */
+body #newLearnMenu .lesson-block.open {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13) !important;
+  border: 1.5px solid
+    color-mix(in srgb, var(--secondary-color) 42%, var(--border-color))
+    !important;
+}
+
+/* Give the content panel a visible (non-transparent) background when open */
+body #newLearnMenu .lesson-block.open .lesson-block-content {
+  background: color-mix(
+    in srgb,
+    var(--secondary-color) 4%,
+    var(--card-color)
+  ) !important;
+}
+
+/* Mobile: visual separator between header and content when open */
+@media (max-width: 760px) {
+  body #newLearnMenu .lesson-block.open .lesson-block-header {
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--secondary-color) 28%, var(--border-color));
+  }
+}
+
 /* Highlight boxes */
 body #newLearnMenu .highlight,
 body #newLearnMenu .mini-example,
