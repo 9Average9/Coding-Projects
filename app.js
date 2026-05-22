@@ -15209,9 +15209,18 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.5.3";
+const APP_VERSION = "2.6.0";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.6.0 — Greek Verb Paradigm System</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>10 new verb lessons</strong> — A complete paradigm progression system across both verb tracks, teaching how Greek verbs are actually built: stem + connecting vowel + ending.</li>
+    <li><strong>Basic Track: 6 new lessons</strong> — Lessons 8–11 introduce paradigms, the three-part verb template, the ο/ε connecting vowel rule, and pattern recognition. Lesson 17 covers the augment. Lesson 26 covers contract verbs.</li>
+    <li><strong>Advanced Track: 4 new lessons</strong> — Lessons 3–4 cover morphological construction and contract behavior. Lessons 12–13 cover tense formatives (σ, κ, θη) and augment/reduplication.</li>
+    <li><strong>Color-coded morpheme system</strong> — Stems, connecting vowels, tense formatives, augments, and reduplication each display in distinct colors throughout all new lessons.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.5.3 — Custom Study Colors &amp; Keyboard</div>
 <div class="un-section">
   <ul class="un-list">
