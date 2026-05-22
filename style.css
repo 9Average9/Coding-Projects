@@ -12274,9 +12274,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rx-active-category > .material-symbols-outlined {
   background: color-mix(in srgb, var(--rx-cat-color) 12%, var(--card-color));
   color: var(--rx-cat-color);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  padding: 0;
+  text-align: center;
   line-height: 1;
   font-size: 28px;
   font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 28;
@@ -12285,6 +12287,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rx-category-icon {
   width: 56px;
   height: 56px;
+  min-width: 56px;
+  min-height: 56px;
   align-self: start;
   margin-top: 2px;
 }
@@ -12359,6 +12363,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rx-active-category > .material-symbols-outlined {
   width: 52px;
   height: 52px;
+  min-width: 52px;
+  min-height: 52px;
 }
 
 .rx-active-category strong {
@@ -12388,6 +12394,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   .rx-category-icon {
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
   }
 }
 
