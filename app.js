@@ -16183,6 +16183,12 @@ function openReminderModal() {
   const disableBtn = document.getElementById("disableReminderBtn");
   if (disableBtn) disableBtn.style.display = localStorage.getItem("reminderEnabled") === "true" ? "block" : "none";
 
+  const notifWarning = document.getElementById("reminderNotifWarning");
+  if (notifWarning) {
+    const granted = typeof Notification !== "undefined" && Notification.permission === "granted";
+    notifWarning.classList.toggle("hidden", granted);
+  }
+
   modal.classList.add("open");
 }
 

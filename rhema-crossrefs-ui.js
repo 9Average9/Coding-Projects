@@ -271,10 +271,14 @@ function renderRhemaXrefSelect() {
     testamentGrid.innerHTML = ['OT', 'NT'].map(t => `<button class="${_rhemaXrefSelect.testament === t ? 'active' : ''}" onclick="rhemaXrefSelectTestament('${t}')"><span class="material-symbols-outlined">auto_stories</span>${t === 'OT' ? 'Old Testament' : 'New Testament'}</button>`).join('');
   }
   const books = _xrefBookList().filter(b => b.testament === _rhemaXrefSelect.testament);
-  const bookSelect = document.getElementById('rxBookSelect');
-  if (bookSelect) {
-    bookSelect.innerHTML = books.map(b => `<option value="${b.code}"${b.code === _rhemaXrefSelect.book ? ' selected' : ''}>${_xrefEscape(b.name)}</option>`).join('');
+  const bookList = document.getElementById('rxBookList');
+  if (bookList) {
+    bookList.innerHTML = books.map(b => `<div class="rhema-book-row${b.code === _rhemaXrefSelect.book ? ' selected' : ''}" onclick="rhemaXrefSelectBook('${b.code}')"><span class="material-symbols-outlined rhema-book-icon">menu_book</span><span class="rhema-book-name">${_xrefEscape(b.name)}</span><span class="material-symbols-outlined rhema-book-check">check</span></div>`).join('');
+    const sel = bookList.querySelector('.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
   }
+  const bookBtn = document.getElementById('rxBookBtnLabel');
+  if (bookBtn) bookBtn.textContent = books.find(b => b.code === _rhemaXrefSelect.book)?.name || 'Select Book';
   const chapters = Object.keys(window.RhemaKJV?.[_rhemaXrefSelect.book] || {}).sort((a,b) => +a - +b);
   if (!chapters.includes(_rhemaXrefSelect.chapter)) _rhemaXrefSelect.chapter = chapters[0] || '1';
   document.getElementById('rxChapterGrid').innerHTML = chapters.map(ch => `<button class="${ch === _rhemaXrefSelect.chapter ? 'active' : ''}" onclick="rhemaXrefSelectChapter('${ch}')">${ch}</button>`).join('');
@@ -296,7 +300,29 @@ function rhemaXrefSelectBook(code) {
   _rhemaXrefSelect.book = code;
   _rhemaXrefSelect.chapter = '1';
   _rhemaXrefSelect.verse = '1';
+  closeRxBookPicker();
   renderRhemaXrefSelect();
+}
+
+function openRxBookPicker() {
+  const el = document.getElementById('rxBookPickerOverlay');
+  if (!el) return;
+  const input = document.getElementById('rxBookSearchInput');
+  if (input) { input.value = ''; rxFilterBooks(''); }
+  el.classList.remove('hidden');
+  const sel = document.getElementById('rxBookList')?.querySelector('.selected');
+  if (sel) setTimeout(() => sel.scrollIntoView({ block: 'center' }), 50);
+}
+
+function closeRxBookPicker() {
+  document.getElementById('rxBookPickerOverlay')?.classList.add('hidden');
+}
+
+function rxFilterBooks(query) {
+  const q = query.toLowerCase().trim();
+  document.getElementById('rxBookList')?.querySelectorAll('.rhema-book-row').forEach(row => {
+    row.style.display = !q || row.querySelector('.rhema-book-name')?.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
 }
 
 function rhemaXrefSelectChapter(ch) {
@@ -331,6 +357,31 @@ function closeRhemaCrossRefInfo(event) {
   document.getElementById('rhemaXrefInfoModal')?.classList.add('hidden');
 }
 
+let _trailSaveResolve = null;
+
+function _promptTrailTitle(defaultTitle) {
+  return new Promise(resolve => {
+    _trailSaveResolve = resolve;
+    const input = document.getElementById('rxTrailSaveInput');
+    if (input) input.value = defaultTitle;
+    document.getElementById('rxTrailSaveModal')?.classList.remove('hidden');
+    setTimeout(() => { input?.focus(); input?.select(); }, 80);
+  });
+}
+
+function rxTrailSaveConfirm() {
+  const val = (document.getElementById('rxTrailSaveInput')?.value || '').trim();
+  document.getElementById('rxTrailSaveModal')?.classList.add('hidden');
+  _trailSaveResolve?.(val || null);
+  _trailSaveResolve = null;
+}
+
+function rxTrailSaveDismiss() {
+  document.getElementById('rxTrailSaveModal')?.classList.add('hidden');
+  _trailSaveResolve?.(null);
+  _trailSaveResolve = null;
+}
+
 async function saveCurrentRhemaTrail() {
   if (!_studySandboxId || !_rhemaXrefCategory) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
@@ -343,7 +394,8 @@ async function saveCurrentRhemaTrail() {
     text: _xrefKjvText(item.ref)
   }));
   const defaultTitle = `${_xrefDisplay(_rhemaXrefBreadcrumb[0])} Trail`;
-  const title = (prompt('Trail title', defaultTitle) || defaultTitle).trim();
+  const title = await _promptTrailTitle(defaultTitle);
+  if (!title) return;
   const trail = {
     title,
     startVerse: _xrefDisplay(_rhemaXrefBreadcrumb[0]),
@@ -428,5 +480,10 @@ Object.assign(window, {
   closeRhemaCrossRefInfo,
   saveCurrentRhemaTrail,
   openSavedRhemaTrail,
-  deleteSandboxTrail
+  deleteSandboxTrail,
+  openRxBookPicker,
+  closeRxBookPicker,
+  rxFilterBooks,
+  rxTrailSaveConfirm,
+  rxTrailSaveDismiss
 });

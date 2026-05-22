@@ -6024,13 +6024,17 @@ body.dark #profileModal .profile-action-card {
 }
 
 .hidden-color-input {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 1px;
-  height: 1px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
   opacity: 0;
   pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  padding: 0;
 }
 .profile-title-row {
   display: flex;
@@ -11406,6 +11410,33 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--accent-color, #c9a227);
   font-weight: 700;
 }
+.reminder-notif-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--secondary-color) 10%, var(--card-color));
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 28%, transparent);
+  color: var(--secondary-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.reminder-notif-warning.hidden { display: none; }
+.reminder-notif-warning .material-symbols-outlined { font-size: 1.15rem; flex-shrink: 0; }
+.reminder-notif-warning > span:nth-child(2) { flex: 1; }
+.reminder-notif-enable-btn {
+  background: var(--secondary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
 .reminder-modal-card .main-btn {
   margin-top: 6px;
   padding: 12px;
@@ -11998,7 +12029,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   background: color-mix(in srgb, var(--secondary-color) 7%, var(--card-color));
 }
 .rx-testament-grid .material-symbols-outlined { font-size: 34px; }
-.rx-book-select {
+.rx-book-btn {
   width: 100%;
   min-height: 58px;
   border-radius: 16px;
@@ -12006,8 +12037,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   background: var(--card-color);
   color: var(--text-color);
   font-size: 1rem;
+  font-weight: 600;
   padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-align: left;
 }
+.rx-book-btn-chevron { margin-left: auto; color: var(--muted-color); font-size: 1.2rem; }
 .rx-number-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -12060,6 +12098,87 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   margin: 0;
   color: var(--text-color);
   line-height: 1.55;
+}
+.rx-trail-save-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.rx-trail-save-overlay.hidden { display: none; }
+.rx-trail-save-card {
+  background: var(--card-color);
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  padding: 32px 24px 24px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.rx-trail-save-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--secondary-color) 14%, var(--card-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.rx-trail-save-icon .material-symbols-outlined {
+  font-size: 34px;
+  color: var(--secondary-color);
+}
+.rx-trail-save-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+.rx-trail-save-card > p {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  color: var(--muted-color);
+}
+.rx-trail-save-input {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 14px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 16px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.rx-trail-save-input:focus {
+  border-color: var(--secondary-color);
+}
+.rx-trail-save-card .rx-primary-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+.rx-trail-save-cancel {
+  background: none;
+  border: none;
+  color: var(--muted-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px;
+  opacity: 0.7;
 }
 .rx-empty {
   margin: 0;
@@ -14241,6 +14360,8 @@ body .app:has(#settingsScreen.screen.active) {
 
 label.study-color-swatch.custom-color-dot {
   display: block;
+  position: relative;
+  overflow: hidden;
   background: conic-gradient(red, orange, yellow, lime, cyan, blue, violet, red);
   outline: none;
 }
