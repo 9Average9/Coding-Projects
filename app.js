@@ -15477,9 +15477,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.0";
+const APP_VERSION = "2.7.8";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.8 — Rhema Testament Navigation</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Old &amp; New Testament labels in the book picker</strong> — The Rhema book list now shows clear "Old Testament" and "New Testament" section headers so you can navigate between the two at a glance. The headers hide automatically when you search.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.6.5 — Lesson Polish &amp; Navigation Fix</div>
 <div class="un-section">
   <ul class="un-list">
