@@ -367,7 +367,8 @@ function openSavedRhemaTrail(trailId) {
   if (!active) return;
   _rhemaXrefActive = active;
   _rhemaXrefBreadcrumb = (trail.rawBreadcrumbTrail || [trail.activeRef]).filter(Boolean);
-  _rhemaXrefCursor = _rhemaXrefBreadcrumb.length - 1;
+  const _restoredCursorIdx = trail.activeRef ? _rhemaXrefBreadcrumb.lastIndexOf(trail.activeRef) : -1;
+  _rhemaXrefCursor = _restoredCursorIdx >= 0 ? _restoredCursorIdx : _rhemaXrefBreadcrumb.length - 1;
   _rhemaXrefCategory = trail.categoryKey || 'direct';
   _rhemaBook = active.book;
   _rhemaChapter = active.chapter;
