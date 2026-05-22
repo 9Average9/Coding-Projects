@@ -9499,6 +9499,7 @@ function showNavPage(page) {
 }
 
 function showScreen(id) {
+  if (id !== 'homeScreen') _stopHomeFlip();
   closeLearnSideMenu();
 
   screens.forEach(screen => {
@@ -9508,7 +9509,7 @@ function showScreen(id) {
 
   const target = document.getElementById(id);
   if (target) target.classList.add("active");
-  
+
 }
 
 function showHome() {
@@ -9516,6 +9517,7 @@ function showHome() {
   setNavActive('home');
   showBottomNav();
   populateHomeScreen();
+  _startHomeFlip();
   // Wire fog scroll listener once
   const scr = document.getElementById('homeScroll');
   if (scr && !scr._fogBound) {
@@ -9630,7 +9632,8 @@ function _saveRhemaPosition() {
     return;
   }
   const verseSnippet = window.RhemaKJV ? ((window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '') : '';
-  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now(), snippet: verseSnippet };
+  const greekSnippet = window.RhemaNT ? ((((window.RhemaNT.text || {})[_rhemaBook] || {})[_rhemaChapter] || {})[_rhemaVerse] || []).map(w => w[0]).join(' ') : '';
+  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now(), snippet: verseSnippet, greek: greekSnippet };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
   if (uid && window.LB) {
     window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
@@ -9676,6 +9679,136 @@ function resumeRhema() {
   showRhema();
 }
 
+// ── Home verse / snippet language-flip ────────────────────────────────────────
+
+let _homeFlipTimer = null;
+let _homeFlipIsGreek = false;
+let _homeFlipEnVerse = '';
+let _homeFlipEnSnippet = '';
+
+function _startHomeFlip() {
+  if (_homeFlipTimer) return;
+  _homeFlipIsGreek = false;
+  _homeFlipEnVerse = document.getElementById('homeVerseText')?.textContent || '';
+  _homeFlipEnSnippet = document.getElementById('hccSnippet')?.textContent || '';
+  _homeFlipTimer = setInterval(_doHomeFlip, 30000);
+}
+
+function _stopHomeFlip() {
+  clearInterval(_homeFlipTimer);
+  _homeFlipTimer = null;
+  if (_homeFlipIsGreek) {
+    const vt = document.getElementById('homeVerseText');
+    if (vt && _homeFlipEnVerse) vt.textContent = _homeFlipEnVerse;
+    const sn = document.getElementById('hccSnippet');
+    if (sn && _homeFlipEnSnippet) sn.textContent = _homeFlipEnSnippet;
+    _homeFlipIsGreek = false;
+  }
+}
+
+function _homeFlipGetGreek(ref) {
+  if (!window.RhemaNT) return '';
+  const m = String(ref).match(/^(.+?)\s+(\d+):(\d+)/);
+  if (!m) return '';
+  const name = m[1].trim().toLowerCase(), ch = m[2], v = m[3];
+  const code = Object.keys(window.RhemaNT.names || {})
+    .find(k => (window.RhemaNT.names[k] || '').toLowerCase() === name);
+  if (!code) return '';
+  const words = (((window.RhemaNT.text || {})[code] || {})[ch] || {})[v] || [];
+  return words.map(w => w[0]).join(' ');
+}
+
+function _doHomeFlip() {
+  if (!document.getElementById('homeScreen')?.classList.contains('active')) {
+    _stopHomeFlip();
+    return;
+  }
+  const wantGreek = !_homeFlipIsGreek;
+
+  const vt = document.getElementById('homeVerseText');
+  if (vt) {
+    let text = '';
+    if (wantGreek) {
+      const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+      text = _homeFlipGetGreek(HOME_VERSES[doy % HOME_VERSES.length].ref);
+    } else {
+      text = _homeFlipEnVerse;
+    }
+    if (text) _morphTextEl(vt, text, 18);
+    else if (wantGreek) return; // no greek available — skip this cycle
+  }
+
+  const sn = document.getElementById('hccSnippet');
+  if (sn) {
+    let text = '';
+    if (wantGreek) {
+      try { text = JSON.parse(localStorage.getItem('rhemaLastPos') || '{}').greek || ''; } catch {}
+    } else {
+      text = _homeFlipEnSnippet;
+    }
+    if (text) _morphTextEl(sn, text, 38);
+  }
+
+  _homeFlipIsGreek = wantGreek;
+}
+
+function _morphTextEl(el, toText, staggerMs) {
+  const existingSpans = [...el.querySelectorAll('.hv-ch')];
+  const fromChars = existingSpans.length
+    ? existingSpans.map(s => s.dataset.c || s.textContent.replace(' ', ' '))
+    : [...(el.textContent || '')];
+
+  if (!existingSpans.length) {
+    el.innerHTML = fromChars.map(c => {
+      const safe = c === '"' ? '&quot;' : c === "'" ? '&#39;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c;
+      return `<span class="hv-ch" data-c="${safe}">${c === ' ' ? ' ' : safe}</span>`;
+    }).join('');
+  }
+
+  const spans = [...el.querySelectorAll('.hv-ch')];
+  const toChars = [...toText];
+  const maxLen = Math.max(spans.length, toChars.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    const delay = i * staggerMs;
+    if (i < spans.length && i < toChars.length) {
+      const span = spans[i], nc = toChars[i];
+      span.dataset.c = nc;
+      if (span.textContent.replace(' ', ' ') !== nc) _animChar(span, nc, delay);
+    } else if (i >= spans.length) {
+      const nc = toChars[i];
+      const span = document.createElement('span');
+      span.className = 'hv-ch';
+      span.dataset.c = nc;
+      span.style.cssText = 'transform:scale(0);opacity:0';
+      span.textContent = nc === ' ' ? ' ' : nc;
+      el.appendChild(span);
+      setTimeout(() => {
+        span.style.cssText = '';
+        span.classList.add('hv-ch--enter');
+        span.addEventListener('animationend', () => span.classList.remove('hv-ch--enter'), { once: true });
+      }, delay);
+    } else {
+      const span = spans[i];
+      setTimeout(() => {
+        span.classList.add('hv-ch--exit');
+        span.addEventListener('animationend', () => { if (span.parentNode) span.remove(); }, { once: true });
+      }, delay);
+    }
+  }
+}
+
+function _animChar(span, newCh, delay) {
+  setTimeout(() => {
+    span.classList.add('hv-ch--out');
+    span.addEventListener('animationend', () => {
+      span.textContent = newCh === ' ' ? ' ' : newCh;
+      span.classList.remove('hv-ch--out');
+      span.classList.add('hv-ch--in');
+      span.addEventListener('animationend', () => span.classList.remove('hv-ch--in'), { once: true });
+    }, { once: true });
+  }, delay);
+}
 
 // ── Notifications ─────────────────────────────────────────────────────────────
 let _notifItems = [];
