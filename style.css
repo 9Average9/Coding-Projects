@@ -2,6 +2,9 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overscroll-behavior: none;
+}
 html {
   touch-action: manipulation;
 }
@@ -706,6 +709,7 @@ body.dark .small-btn {
   z-index: 1000;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 
 .modal-overlay.open {
@@ -719,6 +723,7 @@ body.dark .small-btn {
   max-height: calc(100vh - 48px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   background: rgba(255, 252, 242, 0.98);
   border: 1px solid #d6c49a;
   border-radius: 24px;
@@ -1191,6 +1196,7 @@ body.dark .color-row input[type="color"] {
 #knownWordsContent {
   overflow-y: auto;
   padding-right: 6px;
+  overscroll-behavior: contain;
 }
 
 .known-word-row {
@@ -1739,6 +1745,7 @@ body.dark .lesson-intro-block {
 .lesson-block-content table {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   display: block;
   max-width: 100%;
 }
@@ -2577,6 +2584,7 @@ body.dark .complete-check {
   max-height: 80vh;
   overflow-y: auto;
   padding: 20px;
+  overscroll-behavior: contain;
 }
 
 .welcome-card h2,
@@ -3582,6 +3590,7 @@ body.dark #newLearnMenu .icon-btn:hover {
   margin-top: 40px;      /* pushes it down a bit like your welcome modal */
   margin-bottom: 40px;
   overflow-y: auto;      /* scroll inside modal, not page */
+  overscroll-behavior: contain;
 }
 
 /* Mobile adjustment */
@@ -4795,6 +4804,7 @@ body.dark .paradigm-dots {
 .modal-card {
   max-height: min(82vh, 760px);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* alphabet + sound modal specific sizing */
@@ -6112,6 +6122,7 @@ body.dark .rank-item {
   text-align: left;
   max-height: 80vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .update-modal-card h2 { text-align: center; }
 .update-modal-card .main-btn { width: 100%; }
@@ -6625,6 +6636,7 @@ body.home-active {
 
 body:not(.home-active) {
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 /* HOME SCREEN CLEANUP */
 /* ══ Home screen ═══════════════════════════════════════════════════════════ */
@@ -6640,6 +6652,7 @@ body:not(.home-active) {
   gap: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* Top nav row: icons flush left/right, no center title */
@@ -7349,6 +7362,7 @@ body:not(.home-active) {
 
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 
@@ -9983,6 +9997,7 @@ body.dark .quiz-modal-topbar {
   max-height: 55vh;
   overflow-y: auto;
   padding: 0 2px;
+  overscroll-behavior: contain;
 }
 
 .quiz-answer-row {
@@ -10071,6 +10086,7 @@ body.dark .adv-quiz-start-area {
   max-height: 80vh;
   overflow-y: auto;
   padding: 20px 22px 28px;
+  overscroll-behavior: contain;
 }
 
 .adv-cs-title {
@@ -10086,6 +10102,7 @@ body.dark .adv-quiz-start-area {
   margin-bottom: 12px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .adv-cs-gk {
@@ -10233,6 +10250,7 @@ table.paradigm-table {
 .paradigm-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   margin: 12px 0;
@@ -10477,6 +10495,7 @@ body.dark #advancedLearnMenu .icon-btn:hover {
   flex-direction: column;
   gap: 6px;
   padding-bottom: 8px;
+  overscroll-behavior: contain;
 }
 .lb-entry {
   display: flex;
@@ -11107,7 +11126,7 @@ body.dark .friends-search-input { background: #111827; border-color: #374151; }
 .friends-tab-pane { display: none; flex-direction: column; flex: 1; overflow: hidden; padding: 10px 16px 0; }
 .friends-tab-pane.active { display: flex; }
 
-.fr-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 24px; }
+.fr-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 24px; overscroll-behavior: contain; }
 
 .fr-section-label {
   font-size: 0.72rem;
@@ -11193,6 +11212,7 @@ body.dark .fr-card:hover { background: rgba(255,255,255,0.08); }
   gap: 4px;
   max-height: 90vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 body.dark .fr-sheet { background: #1f2937; }
 .fr-sheet-close {
@@ -11637,6 +11657,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex-direction: column;
   gap: 14px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .rx-breadcrumb {
   display: flex;
@@ -11654,6 +11675,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   overflow-x: auto;
   padding: 0 16px;
   scrollbar-width: none;
+  overscroll-behavior: contain;
 }
 .rx-breadcrumb-scroll::-webkit-scrollbar { display: none; }
 .rx-breadcrumb-scroll button {
@@ -12077,6 +12099,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   max-height: calc(100svh - 200px);
   padding: 12px 16px 28px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   touch-action: pan-x pan-y;
   cursor: grab;
@@ -12263,7 +12286,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Syntax explanation sheet ── */
 .rhema-syntax-sheet { min-height: unset; max-height: 72svh; }
-.rsx-sheet-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.rsx-sheet-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .rsx-sheet-inner { padding: 4px 22px 32px; }
 .rsx-sheet-greek { font-size: 1.4rem; font-weight: 500; letter-spacing: 0.03em; color: var(--font-color); line-height: 1.45; margin-bottom: 4px; word-break: break-word; }
 .rsx-sheet-role  { font-size: 0.95rem; font-weight: 700; color: var(--secondary-color); margin-bottom: 14px; }
@@ -12277,7 +12300,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Syntax info sheet ── */
 .rhema-syntax-info-sheet { min-height: unset; max-height: 78svh; }
-.rsx-info-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.rsx-info-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .rsx-info-inner { padding: 8px 22px 36px; }
 .rsx-info-title { font-size: 1.05rem; font-weight: 700; color: var(--font-color); margin: 0 0 14px; }
 .rsx-info-text { font-size: 0.86rem; line-height: 1.72; color: var(--font-color); margin: 0 0 10px; }
@@ -12315,6 +12338,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
               left 0.28s cubic-bezier(.4,0,.2,1),
               transform 0.28s cubic-bezier(.4,0,.2,1);
   pointer-events: all;
+  overscroll-behavior: contain;
 }
 .rhema-coach-step-label {
   font-size: 0.62rem;
@@ -12393,6 +12417,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  overscroll-behavior: contain;
 }
 .rhema-highlight-bar::-webkit-scrollbar { display: none; }
 .rhema-highlight-bar.hidden { display: none; }
@@ -12479,6 +12504,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   position: relative;
   max-height: 70vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .rhema-grammar-close {
   position: absolute;
@@ -12965,6 +12991,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   overflow-y: hidden;
   padding: 6px 0 4px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   touch-action: pan-x;
   scrollbar-width: thin;
   scrollbar-color: var(--secondary-color) transparent;
@@ -13309,6 +13336,7 @@ body.sepia .rhema-sheet { background: #fffcf2; }
   flex: 1;
   overflow-y: auto;
   padding: 16px 22px 24px;
+  overscroll-behavior: contain;
 }
 
 /* ── Parsing tab ── */
@@ -13490,6 +13518,7 @@ body .app:has(#settingsScreen.screen.active) {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
   display: flex;
   flex-direction: column;
@@ -13875,6 +13904,7 @@ body .app:has(#settingsScreen.screen.active) {
   background: var(--card-color); border-radius: 20px; width: calc(100% - 40px);
   max-width: 460px; max-height: 70vh; overflow-y: auto;
   padding: 0 0 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  overscroll-behavior: contain;
 }
 .notif-panel-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -13936,6 +13966,7 @@ body .app:has(#settingsScreen.screen.active) {
 /* ── Community page ───────────────────────────────────────────────────────── */
 .comm-scroll {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .comm-hero {
   display: flex; align-items: center; justify-content: space-between;
@@ -14104,6 +14135,7 @@ body .app:has(#settingsScreen.screen.active) {
   transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
   max-height: 85vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .study-sheet-overlay.open .study-sheet {
@@ -14267,6 +14299,7 @@ label.study-color-swatch.custom-color-dot {
   gap: 8px;
   max-height: 200px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .study-invite-friend-btn {
@@ -14414,6 +14447,7 @@ body.sandbox-open #rhemaModal {
 .ss-notes-list {
   flex: 1; overflow-y: auto; padding: 12px 16px;
   display: flex; flex-direction: column; gap: 10px;
+  overscroll-behavior: contain;
 }
 .ss-note-item {
   background: var(--card-color);
@@ -14445,6 +14479,7 @@ body.sandbox-open #rhemaModal {
   padding: 10px 12px; font-size: 0.9rem; color: var(--text-color);
   resize: none; outline: none; overflow-y: auto;
   font-family: inherit;
+  overscroll-behavior: contain;
 }
 .ss-send-btn {
   width: 44px; height: 44px; border-radius: 50%; border: none;
@@ -14459,7 +14494,7 @@ body.sandbox-open #rhemaModal {
   font-size: 0.82rem; color: var(--muted-color);
   padding: 12px 16px 0; margin: 0;
 }
-.ss-verses-list { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+.ss-verses-list { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 6px; overscroll-behavior: contain; }
 .ss-verse-item {
   display: flex; align-items: center; gap: 8px;
   background: var(--card-color); border: 1px solid var(--border-color);
@@ -14482,6 +14517,7 @@ body.sandbox-open #rhemaModal {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overscroll-behavior: contain;
 }
 .ss-trail-item {
   display: grid;
@@ -14542,7 +14578,7 @@ body.sandbox-open #rhemaModal {
 .ss-rhema-position span:last-child { font-size: 0.95rem; font-weight: 600; color: var(--text-color); }
 
 /* Word Log pane */
-.ss-wordlog-list { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.ss-wordlog-list { flex: 1; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; }
 .ss-word-item {
   background: var(--card-color); border: 1px solid var(--border-color);
   border-radius: 12px; padding: 10px 12px; position: relative;
@@ -14637,6 +14673,7 @@ body.sandbox-open #rhemaModal {
 .study-board-list {
   flex: 1; overflow-y: auto; padding: 12px 16px;
   display: flex; flex-direction: column; gap: 8px;
+  overscroll-behavior: contain;
 }
 .study-board-empty {
   font-size: 0.85rem; color: var(--muted-color); text-align: center; padding: 24px 0;
@@ -14695,6 +14732,7 @@ body.sandbox-open #rhemaModal {
 .ws-entries-list {
   flex: 1; overflow-y: auto; padding: 10px 14px;
   display: flex; flex-direction: column; gap: 10px;
+  overscroll-behavior: contain;
 }
 .ws-entry {
   background: var(--card-color); border: 1px solid var(--border-color);
@@ -14824,7 +14862,7 @@ body.sandbox-open #rhemaModal {
   flex: 1; font-size: 0.82rem; line-height: 1.5; color: var(--muted-color);
   font-style: italic; text-align: center; padding: 2px 0;
 }
-.swm-body { flex: 1; padding: 0 16px 8px; overflow-y: auto; }
+.swm-body { flex: 1; padding: 0 16px 8px; overflow-y: auto; overscroll-behavior: contain; }
 .swm-textarea {
   width: 100%; min-height: 140px; max-height: 340px;
   background: var(--card-color); border: 1.5px solid var(--border-color);
@@ -14832,6 +14870,7 @@ body.sandbox-open #rhemaModal {
   font-size: 0.95rem; color: var(--text-color);
   resize: none; outline: none; overflow-y: auto;
   font-family: inherit; line-height: 1.6; box-sizing: border-box;
+  overscroll-behavior: contain;
 }
 .swm-textarea:focus { border-color: var(--accent-color, #4f8cff); }
 .swm-footer {
@@ -14990,6 +15029,7 @@ body.sandbox-open #rhemaModal {
 
 .wl-results {
   flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 12px);
+  overscroll-behavior: contain;
 }
 .wl-hint {
   padding: 32px 20px; text-align: center; color: var(--muted-color); font-size: 0.85rem; line-height: 1.5;
@@ -15248,6 +15288,7 @@ body.dark .lesson-score-badge.score-failed { color: #ef9a9a; background: rgba(24
   padding: 22px 20px 24px;
   overflow-y: auto;
   flex: 1;
+  overscroll-behavior: contain;
 }
 
 .verb-quiz-modal-body.quiz-modal-body-animate {
@@ -15307,6 +15348,7 @@ body.dark .lesson-score-badge.score-failed { color: #ef9a9a; background: rgba(24
   text-align: center;
   overflow-y: auto;
   flex: 1;
+  overscroll-behavior: contain;
 }
 
 .verb-quiz-modal-result.hidden { display: none; }
@@ -15326,6 +15368,7 @@ body.dark .lesson-score-badge.score-failed { color: #ef9a9a; background: rgba(24
   text-align: left;
   max-height: 55vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .quiz-answer-row {
