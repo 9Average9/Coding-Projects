@@ -12819,6 +12819,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   justify-content: flex-end;
 }
 .rhema-picker-overlay.hidden { display: none; }
+/* Cross-ref book picker must be viewport-fixed (nested inside xref page, not body) */
+#rxBookPickerOverlay { position: fixed; z-index: 9050; }
 
 /* ── Picker sheet (slides from bottom) ── */
 .rhema-picker-sheet {
@@ -15095,18 +15097,20 @@ body.sandbox-open #rhemaModal {
 .ws-kbd-toggle.active { background: var(--secondary-color); color: #fff; border-color: var(--secondary-color); }
 .ws-kbd-icon { font-size: 1.2rem; font-weight: 700; font-family: 'Noto Serif', serif; }
 .ws-greek-keyboard {
-  display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 12px 8px;
+  display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px;
+  padding: 10px 14px 12px;
   background: var(--card-color); border-top: 1px solid var(--border-color);
 }
 .ws-greek-keyboard .wl-key {
   padding: 13px 0;
   font-size: 1.15rem;
-  min-height: 50px;
+  min-height: 52px;
 }
 .ws-greek-keyboard .wl-key-bs {
+  grid-column: span 6;
   padding: 13px 0;
-  font-size: 0.85rem;
-  min-height: 50px;
+  font-size: 0.9rem;
+  min-height: 52px;
 }
 
 .wl-info-btn {
