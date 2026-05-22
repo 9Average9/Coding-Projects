@@ -17831,14 +17831,22 @@ function openRhemaBookPicker() {
   const overlay = document.getElementById('rhemaBookPickerOverlay');
   if (!overlay || !_rhemaData()) return;
   const list = document.getElementById('rhemaBookList');
-  list.innerHTML = _rhemaBookOrder().map(code => {
+  const books = _rhemaBookOrder();
+  const firstOT = books.find(c => RHEMA_OT_BOOK_ORDER.includes(c));
+  const firstNT = books.find(c => RHEMA_NT_BOOK_ORDER.includes(c));
+  list.innerHTML = books.map(code => {
     const name = _rhemaBookName(code);
     const sel  = code === _rhemaBook ? ' selected' : '';
-    return `<div class="rhema-book-row${sel}" onclick="rhemaSelectBook('${code}')">
+    const isNT = RHEMA_NT_BOOK_ORDER.includes(code);
+    let out = '';
+    if (code === firstOT) out += '<div class="rhema-testament-sep" data-sep="OT">Old Testament</div>';
+    if (code === firstNT) out += '<div class="rhema-testament-sep" data-sep="NT">New Testament</div>';
+    out += `<div class="rhema-book-row${sel}" data-testament="${isNT ? 'NT' : 'OT'}" onclick="rhemaSelectBook('${code}')">
       <span class="material-symbols-outlined rhema-book-icon">menu_book</span>
       <span class="rhema-book-name">${name}</span>
       <span class="material-symbols-outlined rhema-book-check">check</span>
     </div>`;
+    return out;
   }).join('');
   const search = document.getElementById('rhemaBookSearch');
   if (search) search.value = '';
@@ -17897,9 +17905,18 @@ function closeRhemaPickerSheet() {
 
 function rhemaFilterBooks(query) {
   const q = query.toLowerCase().trim();
-  document.getElementById('rhemaBookList')?.querySelectorAll('.rhema-book-row').forEach(row => {
+  const list = document.getElementById('rhemaBookList');
+  if (!list) return;
+  list.querySelectorAll('.rhema-book-row').forEach(row => {
     const name = row.querySelector('.rhema-book-name')?.textContent?.toLowerCase() || '';
     row.style.display = (!q || name.includes(q)) ? '' : 'none';
+  });
+  ['OT', 'NT'].forEach(t => {
+    const sep = list.querySelector(`.rhema-testament-sep[data-sep="${t}"]`);
+    if (!sep) return;
+    const anyVisible = [...list.querySelectorAll(`.rhema-book-row[data-testament="${t}"]`)]
+      .some(r => r.style.display !== 'none');
+    sep.style.display = anyVisible ? '' : 'none';
   });
 }
 
