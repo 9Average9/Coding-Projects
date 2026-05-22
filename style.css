@@ -2,6 +2,9 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overscroll-behavior: none;
+}
 html {
   touch-action: manipulation;
 }
@@ -719,6 +722,7 @@ body.dark .small-btn {
   max-height: calc(100vh - 48px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   background: rgba(255, 252, 242, 0.98);
   border: 1px solid #d6c49a;
   border-radius: 24px;
@@ -1739,6 +1743,7 @@ body.dark .lesson-intro-block {
 .lesson-block-content table {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   display: block;
   max-width: 100%;
 }
@@ -7349,6 +7354,7 @@ body:not(.home-active) {
 
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 
@@ -10086,6 +10092,7 @@ body.dark .adv-quiz-start-area {
   margin-bottom: 12px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .adv-cs-gk {
@@ -10233,6 +10240,7 @@ table.paradigm-table {
 .paradigm-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   margin: 12px 0;
@@ -11637,6 +11645,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   flex-direction: column;
   gap: 14px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .rx-breadcrumb {
   display: flex;
@@ -12077,6 +12086,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   max-height: calc(100svh - 200px);
   padding: 12px 16px 28px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   touch-action: pan-x pan-y;
   cursor: grab;
@@ -12263,7 +12273,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Syntax explanation sheet ── */
 .rhema-syntax-sheet { min-height: unset; max-height: 72svh; }
-.rsx-sheet-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.rsx-sheet-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .rsx-sheet-inner { padding: 4px 22px 32px; }
 .rsx-sheet-greek { font-size: 1.4rem; font-weight: 500; letter-spacing: 0.03em; color: var(--font-color); line-height: 1.45; margin-bottom: 4px; word-break: break-word; }
 .rsx-sheet-role  { font-size: 0.95rem; font-weight: 700; color: var(--secondary-color); margin-bottom: 14px; }
@@ -12277,7 +12287,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 
 /* ── Syntax info sheet ── */
 .rhema-syntax-info-sheet { min-height: unset; max-height: 78svh; }
-.rsx-info-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.rsx-info-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .rsx-info-inner { padding: 8px 22px 36px; }
 .rsx-info-title { font-size: 1.05rem; font-weight: 700; color: var(--font-color); margin: 0 0 14px; }
 .rsx-info-text { font-size: 0.86rem; line-height: 1.72; color: var(--font-color); margin: 0 0 10px; }
@@ -12965,6 +12975,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   overflow-y: hidden;
   padding: 6px 0 4px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   touch-action: pan-x;
   scrollbar-width: thin;
   scrollbar-color: var(--secondary-color) transparent;
@@ -13490,6 +13501,7 @@ body .app:has(#settingsScreen.screen.active) {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
   display: flex;
   flex-direction: column;
@@ -13936,6 +13948,7 @@ body .app:has(#settingsScreen.screen.active) {
 /* ── Community page ───────────────────────────────────────────────────────── */
 .comm-scroll {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .comm-hero {
   display: flex; align-items: center; justify-content: space-between;
