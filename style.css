@@ -8749,6 +8749,31 @@ body.dark-mode .advanced-btn {
   border-color: #b8911e !important;
 }
 
+/* ── Basic Verb Track: use theme accent, not gold ── */
+#basicVerbsLearnMenu .advanced-learn-header {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb,79,140,255),0.12), rgba(var(--accent-rgb,79,140,255),0.04));
+  border-bottom-color: rgba(var(--accent-rgb,79,140,255),0.2);
+}
+#basicVerbsLearnMenu .advanced-learn-badge {
+  background: var(--accent-color, #4f8cff);
+}
+#basicVerbsLearnMenu .advanced-path-grid button {
+  border-left-color: var(--accent-color, #4f8cff) !important;
+}
+#basicVerbsLearnMenu .advanced-path-grid .lesson-number {
+  color: var(--accent-color, #4f8cff) !important;
+}
+#basicVerbsLearnMenu .advanced-path-grid .lesson-label {
+  color: var(--accent-color, #4f8cff) !important;
+}
+body.dark-mode #basicVerbsLearnMenu .advanced-path-grid .lesson-number,
+body.dark-mode #basicVerbsLearnMenu .advanced-path-grid .lesson-label {
+  color: var(--accent-color, #4f8cff) !important;
+}
+body.dark-mode #basicVerbsLearnMenu .advanced-path-grid button {
+  border-left-color: var(--accent-color, #4f8cff) !important;
+}
+
 /* ── Lesson progress badge on lesson menus ── */
 .lesson-progress-badge {
   display: flex;
@@ -8945,7 +8970,7 @@ body.dark .track-tool-pill {
   color: #fff;
 }
 
-/* Advanced tab goes gold */
+/* Advanced foundations tab = gold when active */
 .lessons-breakdown-card.adv-tab-active #breakdownAdvancedTab {
   border-color: #c9a227;
   background: #c9a227;
@@ -8958,23 +8983,25 @@ body.dark .track-tool-pill {
   padding: 7px 4px;
 }
 
-.lessons-breakdown-card.adv-tab-active #breakdownVerbAdvTab {
+/* Advanced verbs tab = gold ONLY when verbAdv is the active tab */
+.lessons-breakdown-card.verb-adv-tab-active #breakdownVerbAdvTab {
   border-color: #c9a227;
   background: #c9a227;
   color: #fff;
 }
 
-.lessons-breakdown-card.adv-tab-active #breakdownBasicTab {
-  border-color: #c9a227;
-  color: #c9a227;
-  background: transparent;
-}
-
+/* Lesson numbers: gold for advanced foundations */
 .lessons-breakdown-card.adv-tab-active .breakdown-num {
   background: #c9a227;
 }
+/* Lesson numbers: gold for advanced verbs */
+.lessons-breakdown-card.verb-adv-tab-active .breakdown-num {
+  background: #c9a227;
+}
 
-.lessons-breakdown-card.adv-tab-active .breakdown-lesson-item.done .breakdown-num {
+/* Completed lesson numbers stay green regardless */
+.lessons-breakdown-card.adv-tab-active .breakdown-lesson-item.done .breakdown-num,
+.lessons-breakdown-card.verb-adv-tab-active .breakdown-lesson-item.done .breakdown-num {
   background: #22c55e;
 }
 
@@ -8983,12 +9010,13 @@ body.dark-mode .lessons-breakdown-card.adv-tab-active #breakdownAdvancedTab {
   background: #e2b93b;
 }
 
-body.dark-mode .lessons-breakdown-card.adv-tab-active #breakdownBasicTab {
+body.dark-mode .lessons-breakdown-card.verb-adv-tab-active #breakdownVerbAdvTab {
   border-color: #e2b93b;
-  color: #e2b93b;
+  background: #e2b93b;
 }
 
-body.dark-mode .lessons-breakdown-card.adv-tab-active .breakdown-num {
+body.dark-mode .lessons-breakdown-card.adv-tab-active .breakdown-num,
+body.dark-mode .lessons-breakdown-card.verb-adv-tab-active .breakdown-num {
   background: #e2b93b;
   color: #1a1a1a;
 }
