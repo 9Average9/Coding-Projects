@@ -10207,6 +10207,7 @@ function getStats() {
 
 function saveStats(stats) {
   localStorage.setItem("greekVocabStats", JSON.stringify(stats));
+  localStorage.setItem("testsCompleted", String((stats.tests || []).length));
 }
 
 function updateWordStats(wordId, wasCorrect) {
@@ -10238,6 +10239,7 @@ function saveTestScore(correct, total) {
   });
 
   saveStats(stats);
+  syncUserData();
 }
 
 function getWeakWords(pool) {
@@ -15639,7 +15641,13 @@ async function restoreUserFromFirestore(user) {
   if (data.lessonModePromptDismissed) localStorage.setItem("lessonModePromptDismissed", "true");
   if (data.hasSeenLearnWelcome) localStorage.setItem("hasSeenLearnWelcome", "true");
   if (data.hasSeenHomeIntro) localStorage.setItem("hasSeenHomeIntro", "true");
-  if (data.greekVocabStats) localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
+  if (data.greekVocabStats) {
+    localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
+    const restoredCount = (data.testsCompleted != null)
+      ? data.testsCompleted
+      : (data.greekVocabStats.tests || []).length;
+    localStorage.setItem("testsCompleted", String(restoredCount));
+  }
   if (typeof loadVerbDataFromSync === "function") loadVerbDataFromSync(data);
   friendsList = data.friends || [];
   friendRequestsIn = data.friendRequestsIn || [];
@@ -15692,6 +15700,7 @@ async function syncUserData() {
     hasSeenLearnWelcome: localStorage.getItem("hasSeenLearnWelcome") === "true",
     hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true",
     greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })(),
+    testsCompleted: parseInt(localStorage.getItem("testsCompleted") || "0"),
     ...(typeof getVerbSyncData === "function" ? getVerbSyncData() : {})
   };
 
@@ -16833,6 +16842,11 @@ function showLbUserInfo(id) {
   const mins = Math.floor((rawSeconds % 3600) / 60);
   document.getElementById("lbUserTime").textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
+  const tests = isMe
+    ? parseInt(localStorage.getItem("testsCompleted") || "0")
+    : (e.testsCompleted || 0);
+  document.getElementById("lbUserTests").textContent = tests;
+
   document.getElementById("lbUserModal").classList.add("open");
 }
 
@@ -17043,11 +17057,15 @@ async function showFriendSheet(uid) {
                  + Object.values(u.completedAdvancedLessons || {}).filter(Boolean).length;
   const known    = (u.knownWords || []).length;
 
+  const testsCount = u.testsCompleted != null
+    ? u.testsCompleted
+    : (u.greekVocabStats?.tests?.length || 0);
   document.getElementById("friendSheetStats").innerHTML = `
     <div class="fr-sheet-stat"><span class="material-symbols-outlined">bolt</span><div><strong>XP</strong><span>${(u.xp||0).toLocaleString()}</span></div></div>
     <div class="fr-sheet-stat"><span class="material-symbols-outlined">local_fire_department</span><div><strong>Streak</strong><span>${u.streak||0} day${u.streak!==1?"s":""}</span></div></div>
     <div class="fr-sheet-stat"><span class="material-symbols-outlined">menu_book</span><div><strong>Lessons Done</strong><span>${lessons}</span></div></div>
     <div class="fr-sheet-stat"><span class="material-symbols-outlined">translate</span><div><strong>Known Words</strong><span>${known}</span></div></div>
+    <div class="fr-sheet-stat"><span class="material-symbols-outlined">quiz</span><div><strong>Tests Completed</strong><span>${testsCount}</span></div></div>
     <div class="fr-sheet-stat"><span class="material-symbols-outlined">schedule</span><div><strong>Time in App</strong><span>${timeStr}</span></div></div>
     <div class="fr-sheet-stat"><span class="material-symbols-outlined">calendar_today</span><div><strong>Member Since</strong><span>${joinDate}</span></div></div>
   `;

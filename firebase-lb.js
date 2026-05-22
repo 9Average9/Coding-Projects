@@ -215,7 +215,8 @@ async function uploadAvatarPhoto(uid, dataUrl) {
 function getMeta() {
   return {
     joinDate: localStorage.getItem("appJoinDate") || null,
-    studySeconds: Number(localStorage.getItem("totalStudySeconds")) || 0
+    studySeconds: Number(localStorage.getItem("totalStudySeconds")) || 0,
+    testsCompleted: parseInt(localStorage.getItem("testsCompleted") || "0")
   };
 }
 
