@@ -15209,9 +15209,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.6.0";
+const APP_VERSION = "2.6.1";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.6.1 — Bug Fixes</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Fixed knowledge checks and quiz buttons</strong> in new advanced verb lessons (va_29–va_32) — they now respond correctly and unlock the quiz as expected.</li>
+    <li><strong>Fixed lesson padding</strong> — introductory text in verb lessons no longer appears flush against the container edge on mobile.</li>
+    <li><strong>Fixed broken lesson blocks</strong> in Basic Lesson 3 (Pronunciation) and Basic Lesson 10 (How to Read Greek) — blocks now toggle and display correctly.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.6.0 — Greek Verb Paradigm System</div>
 <div class="un-section">
   <ul class="un-list">
