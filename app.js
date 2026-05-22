@@ -6,6 +6,10 @@ let testCorrect = 0;
 let missedWords = [];
 let answered = false;
 let currentTestSaved = false;
+let currentTestMode = "vocab";
+let currentParadigmAnswer = null;
+let currentParadigmTargetTotal = 20;
+let selectedVerbParadigmLesson = "vb_06";
 let knownWords = JSON.parse(localStorage.getItem("knownWords")) || [];
 let currentTranslateSentence = null;
 let translationProgress =
@@ -10015,6 +10019,345 @@ function setAllChapters(name, checked) {
   });
 }
 
+function setTestMode(mode) {
+  currentTestMode = mode;
+  ["vocab", "cases", "verbs"].forEach(key => {
+    const tabId = `testTab${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    document.getElementById(tabId)?.classList.toggle("active", key === mode);
+    document.getElementById(`${key}TestPanel`)?.classList.toggle("active", key === mode);
+  });
+  document.querySelector("#testMenu .nav-bar .icon-btn[onclick='showKnownWordsModal()']")?.classList.toggle("hidden", mode !== "vocab");
+  if (mode === "verbs") buildVerbParadigmLessonList();
+}
+
+function _lessonCompleteForWarning(kind, lessonId) {
+  if (kind === "case") return completedLessons.cases === true || completedAdvancedLessons.adv_cases === true;
+  if (kind === "verbBasic") return typeof completedVerbBasicLessons !== "undefined" && completedVerbBasicLessons[lessonId] === true;
+  if (kind === "verbAdv") return typeof completedVerbAdvancedLessons !== "undefined" && completedVerbAdvancedLessons[lessonId] === true;
+  return true;
+}
+
+function _confirmUnfinishedLesson(lessonName) {
+  return confirm(`You haven't completed the "${lessonName}" lesson, so you may not know how to complete this quiz. Would you like to continue anyway?`);
+}
+
+function _shuffleOptions(options, answer) {
+  const unique = [...new Set(options.filter(Boolean))];
+  if (!unique.includes(answer)) unique.push(answer);
+  return shuffle(unique).slice(0, 4);
+}
+
+const CASE_ENDING_SETS = [
+  {
+    family: "2nd declension masculine",
+    forms: [
+      { ending: "-ος", parsing: "nominative singular", function: "subject" },
+      { ending: "-ου", parsing: "genitive singular", function: "possession or relationship" },
+      { ending: "-ῳ", parsing: "dative singular", function: "indirect object, location, or means" },
+      { ending: "-ον", parsing: "accusative singular", function: "direct object" },
+      { ending: "-οι", parsing: "nominative plural", function: "plural subject" },
+      { ending: "-ων", parsing: "genitive plural", function: "plural possession or relationship" },
+      { ending: "-οις", parsing: "dative plural", function: "plural indirect object, location, or means" },
+      { ending: "-ους", parsing: "accusative plural", function: "plural direct object" },
+    ],
+  },
+  {
+    family: "2nd declension neuter",
+    forms: [
+      { ending: "-ον", parsing: "nominative or accusative singular", function: "subject or direct object by context" },
+      { ending: "-ου", parsing: "genitive singular", function: "possession or relationship" },
+      { ending: "-ῳ", parsing: "dative singular", function: "indirect object, location, or means" },
+      { ending: "-α", parsing: "nominative or accusative plural", function: "plural subject or direct object by context" },
+      { ending: "-ων", parsing: "genitive plural", function: "plural possession or relationship" },
+      { ending: "-οις", parsing: "dative plural", function: "plural indirect object, location, or means" },
+    ],
+  },
+  {
+    family: "1st declension feminine",
+    forms: [
+      { ending: "-η / -α", parsing: "nominative singular", function: "subject" },
+      { ending: "-ης / -ας", parsing: "genitive singular", function: "possession or relationship" },
+      { ending: "-ῃ / -ᾳ", parsing: "dative singular", function: "indirect object, location, or means" },
+      { ending: "-ην / -αν", parsing: "accusative singular", function: "direct object" },
+      { ending: "-αι", parsing: "nominative plural", function: "plural subject" },
+      { ending: "-ων", parsing: "genitive plural", function: "plural possession or relationship" },
+      { ending: "-αις", parsing: "dative plural", function: "plural indirect object, location, or means" },
+      { ending: "-ας", parsing: "accusative plural", function: "plural direct object" },
+    ],
+  },
+  {
+    family: "Greek article",
+    forms: [
+      { ending: "ὁ", parsing: "nominative masculine singular", function: "marks a masculine singular subject" },
+      { ending: "τοῦ", parsing: "genitive masculine or neuter singular", function: "marks possession or relationship" },
+      { ending: "τῷ", parsing: "dative masculine or neuter singular", function: "marks indirect object, location, or means" },
+      { ending: "τόν", parsing: "accusative masculine singular", function: "marks a masculine singular direct object" },
+      { ending: "ἡ", parsing: "nominative feminine singular", function: "marks a feminine singular subject" },
+      { ending: "τῆς", parsing: "genitive feminine singular", function: "marks feminine singular possession or relationship" },
+      { ending: "τῇ", parsing: "dative feminine singular", function: "marks feminine singular indirect object, location, or means" },
+      { ending: "τήν", parsing: "accusative feminine singular", function: "marks a feminine singular direct object" },
+      { ending: "τό", parsing: "nominative or accusative neuter singular", function: "marks a neuter singular subject or direct object" },
+      { ending: "οἱ", parsing: "nominative masculine plural", function: "marks masculine plural subjects" },
+      { ending: "τῶν", parsing: "genitive plural", function: "marks plural possession or relationship" },
+      { ending: "τοῖς", parsing: "dative masculine or neuter plural", function: "marks plural indirect object, location, or means" },
+      { ending: "τούς", parsing: "accusative masculine plural", function: "marks masculine plural direct objects" },
+      { ending: "αἱ", parsing: "nominative feminine plural", function: "marks feminine plural subjects" },
+      { ending: "ταῖς", parsing: "dative feminine plural", function: "marks feminine plural indirect object, location, or means" },
+      { ending: "τάς", parsing: "accusative feminine plural", function: "marks feminine plural direct objects" },
+      { ending: "τά", parsing: "nominative or accusative neuter plural", function: "marks neuter plural subjects or direct objects" },
+    ],
+  },
+];
+
+const CASE_PARSING_CHOICES = [
+  "nominative singular", "genitive singular", "dative singular", "accusative singular",
+  "nominative plural", "genitive plural", "dative plural", "accusative plural",
+  "nominative or accusative singular", "nominative or accusative plural",
+  "nominative masculine singular", "genitive masculine or neuter singular", "dative masculine or neuter singular",
+  "accusative masculine singular", "nominative feminine singular", "genitive feminine singular",
+  "dative feminine singular", "accusative feminine singular", "nominative or accusative neuter singular",
+  "nominative masculine plural", "dative masculine or neuter plural", "accusative masculine plural",
+  "nominative feminine plural", "dative feminine plural", "accusative feminine plural",
+  "nominative or accusative neuter plural",
+];
+
+const CASE_FUNCTION_CHOICES = [
+  "subject", "direct object", "possession or relationship", "indirect object, location, or means",
+  "plural subject", "plural direct object", "plural possession or relationship",
+  "plural indirect object, location, or means", "subject or direct object by context",
+  "plural subject or direct object by context", "marks a masculine singular subject",
+  "marks a feminine singular subject", "marks masculine plural direct objects",
+  "marks feminine plural direct objects", "marks neuter plural subjects or direct objects"
+];
+
+function buildCaseEndingItems() {
+  const items = [];
+  CASE_ENDING_SETS.forEach(set => {
+    set.forms.forEach(form => {
+      items.push({
+        id: `case:${set.family}:${form.ending}:parse`,
+        type: "cases",
+        label: form.ending,
+        meta: set.family,
+        prompt: `In the ${set.family}, what does ${form.ending} usually signal?`,
+        answer: form.parsing,
+        choices: _shuffleOptions([form.parsing, ...shuffle(CASE_PARSING_CHOICES).slice(0, 6)], form.parsing),
+        review: `${form.ending} = ${form.parsing}.`
+      });
+      items.push({
+        id: `case:${set.family}:${form.ending}:function`,
+        type: "cases",
+        label: form.ending,
+        meta: set.family,
+        prompt: `What job does ${form.ending} most often point toward?`,
+        answer: form.function,
+        choices: _shuffleOptions([form.function, ...shuffle(CASE_FUNCTION_CHOICES).slice(0, 6)], form.function),
+        review: `${form.ending} often points to ${form.function}.`
+      });
+    });
+  });
+  return items;
+}
+
+const VERB_PARADIGM_TESTS = [
+  { id: "vb_06", track: "verbBasic", title: "Person and Number", subtitle: "1st, 2nd, 3rd person; singular and plural", forms: [
+    ["1st person singular", "I"], ["2nd person singular", "you"], ["3rd person singular", "he / she / it"],
+    ["1st person plural", "we"], ["2nd person plural", "you all"], ["3rd person plural", "they"],
+  ] },
+  { id: "vb_07", track: "verbBasic", title: "Present Active Indicative", subtitle: "λύω personal endings", forms: [
+    ["λύω", "1st person singular"], ["λύεις", "2nd person singular"], ["λύει", "3rd person singular"],
+    ["λύομεν", "1st person plural"], ["λύετε", "2nd person plural"], ["λύουσι(ν)", "3rd person plural"],
+    ["-ω", "1st person singular ending"], ["-εις", "2nd person singular ending"], ["-ει", "3rd person singular ending"],
+    ["-ομεν", "1st person plural ending"], ["-ετε", "2nd person plural ending"], ["-ουσι(ν)", "3rd person plural ending"],
+  ] },
+  { id: "vb_24", track: "verbBasic", title: "How Greek Verbs Are Built", subtitle: "stem + connector + ending", forms: [
+    ["λυ-", "stem"], ["-ο-", "connecting vowel before μ or ν"], ["-ε-", "connecting vowel before other endings"],
+    ["-μεν", "1st person plural personal ending"], ["-τε", "2nd person plural personal ending"],
+    ["λύ-ο-μεν", "stem + connecting vowel + personal ending"], ["λύ-ε-τε", "stem + connecting vowel + personal ending"],
+  ] },
+  { id: "vb_25", track: "verbBasic", title: "Connecting Vowels", subtitle: "ο before μ/ν, ε elsewhere", forms: [
+    ["-ο-", "used before μ or ν"], ["-ε-", "used before most other endings"], ["λύομεν", "ο because the ending begins with μ"],
+    ["λύουσι(ν)", "ο before ν/σι pattern"], ["λύετε", "ε before τε"], ["λύεις", "ε before ς"],
+  ] },
+  { id: "vb_27", track: "verbBasic", title: "Augment", subtitle: "past-time marker", forms: [
+    ["ἔ-", "augment marking past time in the indicative"], ["ἔλυον", "I was loosing / they were loosing"],
+    ["ἔλυσα", "I loosed"], ["imperfect", "uses augment for past ongoing action"], ["aorist", "uses augment for past complete/whole action"],
+  ] },
+  { id: "vb_13", track: "verbBasic", title: "Future Tense", subtitle: "future σ marker", forms: [
+    ["λύσω", "I will loose"], ["λύσεις", "you will loose"], ["λύσει", "he / she / it will loose"],
+    ["λύσομεν", "we will loose"], ["λύσετε", "you all will loose"], ["λύσουσι(ν)", "they will loose"], ["-σ-", "future tense formative"],
+  ] },
+  { id: "vb_14", track: "verbBasic", title: "Aorist Basics", subtitle: "σα formative with augment", forms: [
+    ["ἔλυσα", "I loosed"], ["ἔλυσας", "you loosed"], ["ἔλυσε(ν)", "he / she / it loosed"],
+    ["ἐλύσαμεν", "we loosed"], ["ἐλύσατε", "you all loosed"], ["ἔλυσαν", "they loosed"],
+    ["-σα-", "first aorist active formative"], ["ἔ-", "augment marking past time"],
+  ] },
+  { id: "va_29", track: "verbAdv", title: "Morphological Construction", subtitle: "advanced stem, formative, ending recognition", forms: [
+    ["λυ-σ-ο-μεν", "stem + future formative + connecting vowel + ending"],
+    ["ἐ-λυ-σα-μεν", "augment + stem + aorist formative + ending"],
+    ["λε-λυ-κα-μεν", "reduplication + stem + perfect formative + ending"],
+    ["personal ending", "communicates person and number"], ["tense formative", "marks the tense-voice system"], ["stem", "carries the core lexical meaning"],
+  ] },
+  { id: "va_30", track: "verbAdv", title: "Connecting Vowels and Contracts", subtitle: "advanced connector recognition", forms: [
+    ["ο before μ/ν", "present active connecting vowel pattern"], ["ε before other endings", "present active connecting vowel pattern"],
+    ["contract verb", "vowel stem combines with the connecting vowel"], ["ἀγαπάω → ἀγαπῶ", "contracted present active 1st singular"],
+    ["ποιέω → ποιῶ", "contracted present active 1st singular"],
+  ] },
+  { id: "va_31", track: "verbAdv", title: "Tense Formatives and Stem Changes", subtitle: "diagnostic tense markers", forms: [
+    ["-σ-", "future active formative"], ["-σα-", "first aorist active formative"], ["-κα-", "perfect active formative"],
+    ["second aorist", "uses a different stem instead of the regular σα pattern"], ["liquid future", "does not use the standard σ formative"],
+  ] },
+  { id: "va_32", track: "verbAdv", title: "Augment and Reduplication", subtitle: "past and perfect markers", forms: [
+    ["augment", "marks past time in the indicative"], ["reduplication", "marks the perfect system"], ["ἔλυσα", "augment + aorist"],
+    ["λέλυκα", "reduplication + perfect"], ["ἐλύθην", "augment + aorist passive"], ["perfect", "completed action with ongoing result"],
+  ] },
+];
+
+const VERB_ANSWER_CHOICES = [
+  "1st person singular", "2nd person singular", "3rd person singular", "1st person plural", "2nd person plural", "3rd person plural",
+  "stem", "connecting vowel before μ or ν", "connecting vowel before other endings", "stem + connecting vowel + personal ending",
+  "augment marking past time in the indicative", "future tense formative", "first aorist active formative", "perfect active formative",
+  "personal ending", "tense formative", "marks the tense-voice system", "communicates person and number", "carries the core lexical meaning",
+  "uses a different stem instead of the regular σα pattern", "does not use the standard σ formative", "marks the perfect system",
+  "completed action with ongoing result", "present active connecting vowel pattern", "vowel stem combines with the connecting vowel"
+];
+
+function buildVerbParadigmLessonList() {
+  const list = document.getElementById("verbParadigmLessonList");
+  if (!list) return;
+  list.innerHTML = VERB_PARADIGM_TESTS.map(test => {
+    const complete = _lessonCompleteForWarning(test.track, test.id);
+    const selected = selectedVerbParadigmLesson === test.id;
+    return `
+      <button class="paradigm-lesson-card${selected ? " selected" : ""}" onclick="selectVerbParadigmLesson('${test.id}')" type="button">
+        <span class="material-symbols-outlined">${complete ? "check_circle" : "radio_button_unchecked"}</span>
+        <strong>${test.title}</strong>
+        <small>${test.subtitle}</small>
+      </button>`;
+  }).join("");
+}
+
+function selectVerbParadigmLesson(lessonId) {
+  selectedVerbParadigmLesson = lessonId;
+  buildVerbParadigmLessonList();
+}
+
+function buildVerbEndingItems(lessonId) {
+  const test = VERB_PARADIGM_TESTS.find(item => item.id === lessonId) || VERB_PARADIGM_TESTS[0];
+  return test.forms.flatMap(([form, answer]) => ([
+    {
+      id: `verb:${test.id}:${form}:recognize`,
+      type: "verbs",
+      label: form,
+      meta: test.title,
+      prompt: `What does ${form} identify?`,
+      answer,
+      choices: _shuffleOptions([answer, ...shuffle(VERB_ANSWER_CHOICES).slice(0, 8)], answer),
+      review: `${form} = ${answer}.`
+    },
+    {
+      id: `verb:${test.id}:${answer}:produce:${form}`,
+      type: "verbs",
+      label: answer,
+      meta: test.title,
+      prompt: `Which form matches: ${answer}?`,
+      answer: form,
+      choices: _shuffleOptions([form, ...shuffle(test.forms.map(([f]) => f)).slice(0, 6)], form),
+      review: `${answer} is ${form}.`
+    }
+  ]));
+}
+
+function getParadigmStats() {
+  return JSON.parse(localStorage.getItem("greekParadigmStats") || '{"tests":[],"items":{}}');
+}
+
+function saveParadigmStats(stats) {
+  localStorage.setItem("greekParadigmStats", JSON.stringify(stats));
+}
+
+function updateParadigmItemStats(itemId, wasCorrect) {
+  const stats = getParadigmStats();
+  if (!stats.items[itemId]) stats.items[itemId] = { correct: 0, wrong: 0 };
+  if (wasCorrect) stats.items[itemId].correct++;
+  else stats.items[itemId].wrong++;
+  saveParadigmStats(stats);
+}
+
+function saveParadigmTestScore(type, correct, total) {
+  const stats = getParadigmStats();
+  stats.tests.push({ type, correct, total, percent: Math.round((correct / total) * 100), date: new Date().toLocaleString() });
+  saveParadigmStats(stats);
+  if (typeof syncUserData === "function") syncUserData();
+}
+
+function getWeakParadigmItems(pool) {
+  const stats = getParadigmStats();
+  return pool
+    .map(item => {
+      const itemStats = stats.items[item.id];
+      if (!itemStats) return null;
+      const attempts = itemStats.correct + itemStats.wrong;
+      if (!attempts) return null;
+      const accuracy = itemStats.correct / attempts;
+      if (itemStats.wrong < 2 && accuracy >= 0.72) return null;
+      return { ...item, weakScore: calculateWeakScore(itemStats.correct, itemStats.wrong) };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.weakScore - a.weakScore);
+}
+
+function buildAdaptiveParadigmQueue(pool, amount, focusMode) {
+  const weak = getWeakParadigmItems(pool);
+  const source = focusMode && weak.length ? weak : pool;
+  const stats = getParadigmStats();
+  const weighted = source.flatMap(item => {
+    const stat = stats.items[item.id] || { correct: 0, wrong: 0 };
+    const weight = Math.max(1, Math.min(5, 1 + (stat.wrong || 0) * 2 - Math.floor((stat.correct || 0) / 2)));
+    return Array.from({ length: weight }, () => item);
+  });
+  const queue = [];
+  while (queue.length < amount && weighted.length) queue.push({ ...shuffle(weighted)[0] });
+  return queue;
+}
+
+function startCaseEndingTest() {
+  if (!_lessonCompleteForWarning("case")) {
+    const lessonName = LESSON_LABELS.cases || "Case Endings";
+    if (!_confirmUnfinishedLesson(lessonName)) return;
+  }
+  const amount = Math.max(8, Number(document.getElementById("caseTestAmount")?.value || 20));
+  const focusMode = document.getElementById("caseFocusMode")?.checked;
+  testWords = buildAdaptiveParadigmQueue(buildCaseEndingItems(), amount, focusMode);
+  if (!testWords.length) { alert("No case ending items are available yet."); return; }
+  _beginParadigmTest("cases", amount);
+}
+
+function startVerbEndingTest() {
+  const test = VERB_PARADIGM_TESTS.find(item => item.id === selectedVerbParadigmLesson) || VERB_PARADIGM_TESTS[0];
+  if (!_lessonCompleteForWarning(test.track, test.id)) {
+    if (!_confirmUnfinishedLesson(test.title)) return;
+  }
+  const amount = Math.max(8, Number(document.getElementById("verbTestAmount")?.value || 20));
+  const focusMode = document.getElementById("verbFocusMode")?.checked;
+  testWords = buildAdaptiveParadigmQueue(buildVerbEndingItems(test.id), amount, focusMode);
+  if (!testWords.length) { alert("No verb ending items are available yet."); return; }
+  _beginParadigmTest("verbs", amount);
+}
+
+function _beginParadigmTest(mode, amount) {
+  currentTestMode = mode;
+  currentParadigmTargetTotal = amount;
+  testIndex = 0;
+  testCorrect = 0;
+  missedWords = [];
+  answered = false;
+  currentTestSaved = false;
+  currentParadigmAnswer = null;
+  showScreen("testScreen");
+  renderTestWord();
+}
+
 function showLearnMenu() {
   hideBottomNav();
   buildChapterCheckboxes("learnChapterList", "learnChapter");
@@ -10110,10 +10453,13 @@ learnCard.addEventListener("touchend", e => {
 function showTestMenu() {
   hideBottomNav();
   buildChapterCheckboxes("testChapterList", "testChapter");
+  setTestMode(currentTestMode || "vocab");
+  buildVerbParadigmLessonList();
   showScreen("testMenu");
 }
 
 function startTest() {
+  currentTestMode = "vocab";
   const amount = Number(document.getElementById("testAmount").value);
   const chapters = getSelectedChapters("testChapter");
   const focusMode = document.getElementById("focusMode").checked;
@@ -10161,14 +10507,35 @@ function startTest() {
 
 function renderTestWord() {
   const word = testWords[testIndex];
+  const input = document.getElementById("answerInput");
+  const options = document.getElementById("testOptions");
+  const meta = document.getElementById("testPromptMeta");
+  const knownBtn = document.querySelector("#testScreen .test-card .main-btn.secondary");
 
-  document.getElementById("testGreek").textContent = word.greek;
+  document.getElementById("testGreek").textContent = currentTestMode === "vocab" ? word.greek : word.prompt;
   document.getElementById("testProgress").textContent = `${testIndex + 1} / ${testWords.length}`;
-  document.getElementById("answerInput").value = "";
+  if (meta) {
+    meta.textContent = currentTestMode === "vocab"
+      ? "Vocabulary"
+      : `${currentTestMode === "cases" ? "Case Endings" : "Verb Endings"} · ${word.meta || ""}`;
+  }
+  if (input) {
+    input.value = "";
+    input.disabled = false;
+    input.classList.toggle("hidden", currentTestMode !== "vocab");
+    input.placeholder = currentTestMode === "vocab" ? "Type the meaning..." : "";
+  }
+  if (knownBtn) knownBtn.classList.toggle("hidden", currentTestMode !== "vocab");
+  currentParadigmAnswer = null;
+  if (options) {
+    options.classList.toggle("hidden", currentTestMode === "vocab");
+    options.innerHTML = currentTestMode === "vocab" ? "" : (word.choices || []).map(choice => `
+      <button class="paradigm-option-btn" onclick="selectParadigmAnswer('${String(choice).replace(/'/g, "\\'")}')" type="button">${choice}</button>
+    `).join("");
+  }
   document.getElementById("feedback").textContent = "";
   document.getElementById("feedback").className = "feedback";
-  document.getElementById("answerInput").disabled = false;
-  document.getElementById("answerInput").focus();
+  if (currentTestMode === "vocab") input?.focus();
 
   answered = false;
 }
@@ -10180,8 +10547,17 @@ function submitAnswer() {
   }
 
   const word = testWords[testIndex];
-  const userAnswer = document.getElementById("answerInput").value;
-  const correct = isCorrect(userAnswer, word.meaning);
+  const userAnswer = currentTestMode === "vocab"
+    ? document.getElementById("answerInput").value
+    : currentParadigmAnswer;
+  if (currentTestMode !== "vocab" && !userAnswer) {
+    document.getElementById("feedback").textContent = "Choose an answer first.";
+    document.getElementById("feedback").className = "feedback incorrect";
+    return;
+  }
+  const correct = currentTestMode === "vocab"
+    ? isCorrect(userAnswer, word.meaning)
+    : userAnswer === word.answer;
 
   const feedback = document.getElementById("feedback");
 
@@ -10189,20 +10565,43 @@ function submitAnswer() {
     testCorrect++;
     feedback.textContent = "Correct!";
     feedback.classList.add("correct");
-    updateWordStats(word.id, true);
+    currentTestMode === "vocab" ? updateWordStats(word.id, true) : updateParadigmItemStats(word.id, true);
   } else {
-    feedback.textContent = `Incorrect. Answer: ${word.meaning}`;
+    feedback.textContent = currentTestMode === "vocab"
+      ? `Incorrect. Answer: ${word.meaning}`
+      : `Incorrect. Answer: ${word.answer}`;
     feedback.classList.add("incorrect");
     missedWords.push(word);
-    updateWordStats(word.id, false);
+    if (currentTestMode === "vocab") {
+      updateWordStats(word.id, false);
+    } else {
+      updateParadigmItemStats(word.id, false);
+      if (testWords.length < currentParadigmTargetTotal + 8) {
+        const repeatAt = Math.min(testWords.length, testIndex + 3 + Math.floor(Math.random() * 3));
+        testWords.splice(repeatAt, 0, { ...word });
+      }
+    }
   }
 
   document.getElementById("answerInput").disabled = true;
+  document.querySelectorAll("#testOptions .paradigm-option-btn").forEach(btn => {
+    btn.disabled = true;
+    btn.classList.toggle("correct", btn.textContent === word.answer);
+    btn.classList.toggle("incorrect", btn.classList.contains("selected") && btn.textContent !== word.answer);
+  });
   answered = true;
 
   setTimeout(() => {
     nextTestWord();
   }, correct ? 700 : 1600);
+}
+
+function selectParadigmAnswer(answer) {
+  if (answered) return;
+  currentParadigmAnswer = answer;
+  document.querySelectorAll("#testOptions .paradigm-option-btn").forEach(btn => {
+    btn.classList.toggle("selected", btn.textContent === answer);
+  });
 }
 
 function nextTestWord() {
@@ -10224,7 +10623,8 @@ function finishTest() {
    if (currentTestSaved) return;
   currentTestSaved = true;
 
-  saveTestScore(testCorrect, testWords.length);
+  if (currentTestMode === "vocab") saveTestScore(testCorrect, testWords.length);
+  else saveParadigmTestScore(currentTestMode, testCorrect, testWords.length);
 
   document.getElementById("scoreResult").textContent =
     `${testCorrect} / ${testWords.length}`;
@@ -10232,17 +10632,23 @@ function finishTest() {
   const missedContainer = document.getElementById("missedWords");
 
   if (missedWords.length === 0) {
-    missedContainer.innerHTML = "<p>You did not miss any words.</p>";
+    missedContainer.innerHTML = currentTestMode === "vocab"
+      ? "<p>You did not miss any words.</p>"
+      : "<p>You did not miss any endings.</p>";
   } else {
-    missedContainer.innerHTML = "<h3>Words to review</h3>";
+    missedContainer.innerHTML = currentTestMode === "vocab" ? "<h3>Words to review</h3>" : "<h3>Endings to review</h3>";
     missedWords.forEach(word => {
       const div = document.createElement("div");
       div.className = "review-word";
-      div.innerHTML = `<strong>${word.greek}</strong><br>${word.meaning}`;
+      div.innerHTML = currentTestMode === "vocab"
+        ? `<strong>${word.greek}</strong><br>${word.meaning}`
+        : `<strong>${word.label || word.prompt}</strong><br>${word.review || word.answer}`;
       missedContainer.appendChild(div);
     });
   }
   awardTestXP();
+  const studyBtn = document.querySelector("#resultsScreen .main-btn.secondary");
+  if (studyBtn) studyBtn.classList.toggle("hidden", currentTestMode !== "vocab");
   showScreen("resultsScreen");
 }
 
@@ -10253,7 +10659,7 @@ function awardTestXP() {
   if (earnedXP > 0) {
     addXP(
       earnedXP,
-      `${testCorrect} correct test answers!`,
+      currentTestMode === "vocab" ? `${testCorrect} correct test answers!` : `${testCorrect} correct paradigm answers!`,
       true
     );
   }
@@ -10277,7 +10683,7 @@ function awardVocabChapterXP(chapter) {
 }
 
 function studyMissedWords() {
-  if (missedWords.length === 0) return;
+  if (missedWords.length === 0 || currentTestMode !== "vocab") return;
   learnWords = missedWords;
   learnIndex = 0;
   showScreen("learnScreen");
@@ -10477,7 +10883,50 @@ function showProgress() {
     }
   }
 
+  const paradigmStats = getParadigmStats();
+  const paradigmTests = paradigmStats.tests || [];
+  const weakParadigmItems = Object.entries(paradigmStats.items || {})
+    .map(([id, stat]) => ({ id, wrong: stat.wrong || 0, correct: stat.correct || 0 }))
+    .filter(item => item.wrong > 0)
+    .sort((a, b) => b.wrong - a.wrong)
+    .slice(0, 10);
+
  html += `
+  </div>
+
+  <button class="collapse-btn progress-collapse-btn" onclick="toggleProgressSection('paradigmProgressSection', this)">
+  <span>Ending Drills</span>
+</button>
+  <div id="paradigmProgressSection" class="collapse-content">
+`;
+
+  if (paradigmTests.length === 0) {
+    html += `<p>No case or verb ending drills taken yet.</p>`;
+  } else {
+    const latestParadigm = paradigmTests[paradigmTests.length - 1];
+    const avgParadigm = Math.round(paradigmTests.reduce((sum, t) => sum + t.percent, 0) / paradigmTests.length);
+    html += `
+      <p><strong>Total drills:</strong> ${paradigmTests.length}</p>
+      <p><strong>Latest score:</strong> ${latestParadigm.percent}%</p>
+      <p><strong>Average score:</strong> ${avgParadigm}%</p>
+      <h3>Weak endings and patterns</h3>
+    `;
+    if (!weakParadigmItems.length) {
+      html += `<p>No weak endings yet.</p>`;
+    } else {
+      weakParadigmItems.forEach(item => {
+        const label = item.id.split(":").slice(1, 4).join(" · ");
+        html += `
+          <div class="review-word">
+            <strong>${label}</strong><br>
+            Missed: ${item.wrong} · Correct: ${item.correct}
+          </div>
+        `;
+      });
+    }
+  }
+
+html += `
   </div>
 
   <button class="collapse-btn progress-collapse-btn" onclick="toggleProgressSection('translationProgressSection', this)">
@@ -10538,6 +10987,7 @@ function resetTestData() {
   if (!confirmed) return;
 
   localStorage.removeItem("greekVocabStats");
+  localStorage.removeItem("greekParadigmStats");
   localStorage.removeItem("knownWords");
 
   knownWords = [];
@@ -15477,9 +15927,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.8";
+const APP_VERSION = "2.7.9";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.9 — Ending Drill Tests</div>
+<ul class="un-list">
+  <li><strong>New Test tabs</strong> for vocabulary, case endings, and verb endings.</li>
+  <li><strong>Adaptive ending drills</strong> repeat missed case and verb patterns and track weak spots over time.</li>
+</ul>
 <div class="un-version-label">v2.7.8 — Rhema Testament Navigation</div>
 <div class="un-section">
   <ul class="un-list">
@@ -15778,6 +16233,9 @@ async function restoreUserFromFirestore(user) {
       : (data.greekVocabStats.tests || []).length;
     localStorage.setItem("testsCompleted", String(restoredCount));
   }
+  if (data.greekParadigmStats) {
+    localStorage.setItem("greekParadigmStats", JSON.stringify(data.greekParadigmStats));
+  }
   if (typeof loadVerbDataFromSync === "function") loadVerbDataFromSync(data);
   friendsList = data.friends || [];
   friendRequestsIn = data.friendRequestsIn || [];
@@ -15830,6 +16288,7 @@ async function syncUserData() {
     hasSeenLearnWelcome: localStorage.getItem("hasSeenLearnWelcome") === "true",
     hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true",
     greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })(),
+    greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
     testsCompleted: parseInt(localStorage.getItem("testsCompleted") || "0"),
     ...(typeof getVerbSyncData === "function" ? getVerbSyncData() : {})
   };
@@ -15862,6 +16321,7 @@ function gatherMigrationData() {
     practiceToolsUnlocked: localStorage.getItem("practiceToolsUnlocked") === "true",
     lessonMode: localStorage.getItem("lessonMode") || "basic",
     vocabChapterXP,
+    greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
     lbXpJoined: localStorage.getItem("lbXpJoined") === "true",
     lbConsJoined: localStorage.getItem("lbConsJoined") === "true",
     lbScholarJoined: localStorage.getItem("lbScholarJoined") === "true",

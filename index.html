@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=2.7.8" rel="stylesheet"/>
+<link href="style.css?v=2.7.9" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -7886,6 +7886,21 @@ glacier: {
 </button>
 <div></div>
 </div>
+<div class="test-mode-tabs" role="tablist" aria-label="Test type">
+<button class="test-mode-tab active" id="testTabVocab" onclick="setTestMode('vocab')" type="button">
+<span class="material-symbols-outlined">translate</span>
+Vocabulary
+</button>
+<button class="test-mode-tab" id="testTabCases" onclick="setTestMode('cases')" type="button">
+<span class="material-symbols-outlined">view_column</span>
+Case Endings
+</button>
+<button class="test-mode-tab" id="testTabVerbs" onclick="setTestMode('verbs')" type="button">
+<span class="material-symbols-outlined">bolt</span>
+Verb Endings
+</button>
+</div>
+<div class="test-mode-panel active" id="vocabTestPanel">
 <label class="label">Number of words</label>
 <input id="testAmount" min="1" type="number" value="10"/>
 <div class="toggle-row">
@@ -7905,6 +7920,48 @@ glacier: {
 </div>
 <div class="chapter-grid" id="testChapterList"></div>
 <button class="main-btn" onclick="startTest()">Start Test</button>
+</div>
+<div class="test-mode-panel" id="casesTestPanel">
+<div class="paradigm-test-card">
+<span class="material-symbols-outlined">view_column</span>
+<div>
+<h3>Case Ending Drill</h3>
+<p>Practice noun endings, articles, case names, number, and function one ending at a time.</p>
+</div>
+</div>
+<label class="label">Number of questions</label>
+<input id="caseTestAmount" min="8" type="number" value="20"/>
+<div class="toggle-row">
+<span>Focus weak endings</span>
+<label class="switch">
+<input id="caseFocusMode" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+<p class="helper-text">Uses your saved misses to repeat the endings that need the most work.</p>
+<button class="main-btn" onclick="startCaseEndingTest()">Start Case Ending Test</button>
+</div>
+<div class="test-mode-panel" id="verbsTestPanel">
+<div class="paradigm-test-card">
+<span class="material-symbols-outlined">bolt</span>
+<div>
+<h3>Verb Ending Drill</h3>
+<p>Select the verb lesson you are working through. Rhema will only test the endings and patterns from that stage.</p>
+</div>
+</div>
+<label class="label">Number of questions</label>
+<input id="verbTestAmount" min="8" type="number" value="20"/>
+<div class="toggle-row">
+<span>Focus weak endings</span>
+<label class="switch">
+<input id="verbFocusMode" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+<div class="paradigm-lesson-grid" id="verbParadigmLessonList"></div>
+<p class="helper-text">Wrong answers are mixed back in later so the test feels like real recall practice, not a one-pass checklist.</p>
+<button class="main-btn" onclick="startVerbEndingTest()">Start Verb Ending Test</button>
+</div>
 </section>
 <section class="screen" id="testScreen">
 <div class="nav-bar">
@@ -7915,8 +7972,10 @@ glacier: {
 <div></div>
 </div>
 <div class="test-card">
+<div class="test-question-meta" id="testPromptMeta"></div>
 <div class="greek-word" id="testGreek"></div>
 <input id="answerInput" placeholder="Type the meaning..." type="text"/>
+<div class="paradigm-options hidden" id="testOptions"></div>
 <button class="main-btn" onclick="submitAnswer()">Submit</button>
 <button class="main-btn secondary" onclick="markWordAsKnown()">
   I know this word
@@ -15341,11 +15400,11 @@ glacier: {
 </section>
 
 </main>
-<script src="vocab.js?v=2.7.8"></script>
-<script src="app.js?v=2.7.8"></script>
-<script src="rhema-crossrefs-ui.js?v=2.7.8"></script>
-<script src="greek-verbs.js?v=2.7.8"></script>
-<script src="firebase-lb.js?v=2.7.8" type="module"></script>
+<script src="vocab.js?v=2.7.9"></script>
+<script src="app.js?v=2.7.9"></script>
+<script src="rhema-crossrefs-ui.js?v=2.7.9"></script>
+<script src="greek-verbs.js?v=2.7.9"></script>
+<script src="firebase-lb.js?v=2.7.9" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
