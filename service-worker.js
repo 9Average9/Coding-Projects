@@ -25,6 +25,8 @@ const FILES_TO_CACHE = [
   "./style.css?v=2.6.5",
   "./vocab.js?v=2.6.5",
   "./app.js?v=2.6.5",
+  "./rhema-crossrefs-ui.js?v=2.6.5",
+  "./greek-verbs.js?v=2.6.5",
   "./firebase-lb.js?v=2.6.5",
   "./manifest.json",
   "./icon-192.png",

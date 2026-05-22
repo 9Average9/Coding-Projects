@@ -49,6 +49,8 @@ let _sandboxEntriesCache = [];
 let _workspaceTab = 'observations';
 let _sandboxUnsubVerses = null;
 let _sandboxUnsubWordLog = null;
+let _sandboxUnsubTrails = null;
+let _sandboxTrailsCache = [];
 let _sandboxUnsubStudy = null;
 let _sandboxTab = 'notes';
 let _rhemaCrossRefMode = false;
@@ -76,6 +78,11 @@ let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
 let _studyPendingDeleteId = null;
+let _rhemaXrefView = 'main';
+let _rhemaXrefActive = { book: 'JOH', chapter: '1', verse: '1' };
+let _rhemaXrefBreadcrumb = [];
+let _rhemaXrefCategory = null;
+let _rhemaXrefSelect = { testament: 'NT', book: 'JOH', chapter: '1', verse: '1' };
 
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("alphabetViewHint");
@@ -8327,6 +8334,7 @@ async function openStudySandbox(studyId, studyObj) {
   _sandboxUnsubEntries?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
+  _sandboxUnsubTrails?.();
   _sandboxUnsubStudy?.();
   _sandboxUnsubEntries = window.Studies.listenEntries(studyId, entries => {
     _sandboxEntriesCache = entries;
@@ -8336,6 +8344,10 @@ async function openStudySandbox(studyId, studyObj) {
   _sandboxUnsubWordLog = window.Studies.listenWordLog(studyId, words => {
     _sandboxWordLogCache = words;
     _renderSandboxWordLog(words);
+  });
+  _sandboxUnsubTrails = window.Studies.listenTrails?.(studyId, trails => {
+    _sandboxTrailsCache = trails;
+    if (typeof _renderSandboxTrails === 'function') _renderSandboxTrails(trails);
   });
   // Live study-doc listener — updates collaborator count and Rhema positions in real time
   _sandboxUnsubStudy = window.Studies.listenStudy?.(studyId, updated => {
@@ -8380,9 +8392,11 @@ function closeStudySandbox() {
   _sandboxUnsubEntries?.();
   _sandboxUnsubVerses?.();
   _sandboxUnsubWordLog?.();
+  _sandboxUnsubTrails?.();
   _sandboxUnsubStudy?.();
-  _sandboxUnsubNotes = _sandboxUnsubEntries = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubStudy = null;
+  _sandboxUnsubNotes = _sandboxUnsubEntries = _sandboxUnsubVerses = _sandboxUnsubWordLog = _sandboxUnsubTrails = _sandboxUnsubStudy = null;
   _sandboxEntriesCache = [];
+  _sandboxTrailsCache = [];
   _activeSandboxStudy = null;
   document.getElementById('studySandbox')?.classList.add('hidden');
   document.getElementById('studyTabBar')?.classList.add('hidden');
@@ -17175,12 +17189,40 @@ let _rhemaFullChapter = false;
 const RHEMA_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
 
 const RHEMA_BOOK_ABBR = {
+  GEN:'Ge', EXO:'Ex', LEV:'Le', NUM:'Nu', DEU:'Dt', JOS:'Jos', JDG:'Jdg',
+  RUT:'Ru', '1SA':'1Sa', '2SA':'2Sa', '1KI':'1Ki', '2KI':'2Ki',
+  '1CH':'1Ch', '2CH':'2Ch', EZR:'Ezr', NEH:'Ne', EST:'Est', JOB:'Job',
+  PSA:'Ps', PRO:'Pr', ECC:'Ec', SNG:'Sng', ISA:'Isa', JER:'Jer',
+  LAM:'Lam', EZK:'Ezk', DAN:'Da', HOS:'Hos', JOL:'Jl', AMO:'Am',
+  OBA:'Ob', JON:'Jon', MIC:'Mic', NAM:'Na', HAB:'Hab', ZEP:'Zep',
+  HAG:'Hag', ZEC:'Zec', MAL:'Mal',
   MAT:'Mt', MAR:'Mk', LUK:'Lk', JOH:'Jn', ACT:'Ac', ROM:'Rm',
   '1CO':'1Co', '2CO':'2Co', GAL:'Ga', EPH:'Ep', PHP:'Php', COL:'Co',
   '1TH':'1Th', '2TH':'2Th', '1TI':'1Ti', '2TI':'2Ti', TIT:'Ti', PHM:'Phm',
   HEB:'Hb', JAM:'Jm', '1PE':'1Pe', '2PE':'2Pe', '1JO':'1Jn', '2JO':'2Jn',
   '3JO':'3Jn', JUD:'Jd', REV:'Re'
 };
+
+const RHEMA_BOOK_NAMES = {
+  GEN:'Genesis', EXO:'Exodus', LEV:'Leviticus', NUM:'Numbers', DEU:'Deuteronomy',
+  JOS:'Joshua', JDG:'Judges', RUT:'Ruth', '1SA':'1 Samuel', '2SA':'2 Samuel',
+  '1KI':'1 Kings', '2KI':'2 Kings', '1CH':'1 Chronicles', '2CH':'2 Chronicles',
+  EZR:'Ezra', NEH:'Nehemiah', EST:'Esther', JOB:'Job', PSA:'Psalms',
+  PRO:'Proverbs', ECC:'Ecclesiastes', SNG:'Song of Solomon', ISA:'Isaiah',
+  JER:'Jeremiah', LAM:'Lamentations', EZK:'Ezekiel', DAN:'Daniel', HOS:'Hosea',
+  JOL:'Joel', AMO:'Amos', OBA:'Obadiah', JON:'Jonah', MIC:'Micah', NAM:'Nahum',
+  HAB:'Habakkuk', ZEP:'Zephaniah', HAG:'Haggai', ZEC:'Zechariah', MAL:'Malachi',
+  MAT:'Matthew', MAR:'Mark', LUK:'Luke', JOH:'John', ACT:'Acts', ROM:'Romans',
+  '1CO':'1 Corinthians', '2CO':'2 Corinthians', GAL:'Galatians', EPH:'Ephesians',
+  PHP:'Philippians', COL:'Colossians', '1TH':'1 Thessalonians',
+  '2TH':'2 Thessalonians', '1TI':'1 Timothy', '2TI':'2 Timothy', TIT:'Titus',
+  PHM:'Philemon', HEB:'Hebrews', JAM:'James', '1PE':'1 Peter', '2PE':'2 Peter',
+  '1JO':'1 John', '2JO':'2 John', '3JO':'3 John', JUD:'Jude', REV:'Revelation'
+};
+
+window.RhemaBookNames = RHEMA_BOOK_NAMES;
+window.RhemaBookAbbr = RHEMA_BOOK_ABBR;
+window.RhemaNTBookOrder = RHEMA_BOOK_ORDER;
 
 // ── POS Highlight system ──────────────────────────────────────────────────────
 
@@ -17447,7 +17489,7 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js'];
+    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
@@ -17491,6 +17533,7 @@ async function showRhema() {
 
 function closeRhema(keepSandbox = false) {
   _saveRhemaPosition();
+  if (typeof _closeRhemaXrefShell === 'function') _closeRhemaXrefShell();
   // If opened from a study sandbox, hide Save Verse button and update preview
   if (_studySandboxId) {
     document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');

@@ -9314,7 +9314,7 @@ glacier: {
 <span class="material-symbols-outlined">translate</span>
 <span class="rwi-label">Greek Only</span>
 </button>
-<button class="rhema-wheel-item rw-placeholder" id="wheelItemXref">
+<button class="rhema-wheel-item" id="wheelItemXref" onclick="openRhemaCrossReferences()">
 <span class="material-symbols-outlined">hub</span>
 <span class="rwi-label">Cross-Ref</span>
 </button>
@@ -9345,6 +9345,49 @@ glacier: {
 </div>
 </div>
 <!-- ── Book picker ── -->
+<!-- Scripture Trail Cross References -->
+<div class="rhema-xref-page hidden" id="rhemaXrefPage">
+<div class="rx-page-header">
+<button class="rx-icon-btn" onclick="rhemaCrossRefBack()"><span class="material-symbols-outlined">arrow_back</span></button>
+<h2 id="rxPageTitle">Cross References</h2>
+<button class="rx-icon-btn" onclick="openRhemaCrossRefInfo()"><span class="material-symbols-outlined">info</span></button>
+</div>
+<div class="rx-breadcrumb hidden" id="rxBreadcrumb"></div>
+<div class="rx-scroll" id="rxMainView"></div>
+</div>
+<div class="rhema-xref-page hidden" id="rhemaXrefSelectPage">
+<div class="rx-page-header">
+<button class="rx-icon-btn" onclick="closeRhemaCrossRefSelect()"><span class="material-symbols-outlined">close</span></button>
+<h2>Select Reference</h2>
+<span class="rx-header-spacer"></span>
+</div>
+<div class="rx-scroll">
+<section class="rx-select-section">
+<h3>1. Testament</h3>
+<div class="rx-testament-grid" id="rxTestamentGrid"></div>
+</section>
+<section class="rx-select-section">
+<h3>2. Book</h3>
+<select class="rx-book-select" id="rxBookSelect" onchange="rhemaXrefSelectBook(this.value)"></select>
+</section>
+<section class="rx-select-section">
+<h3>3. Chapter</h3>
+<div class="rx-number-grid" id="rxChapterGrid"></div>
+</section>
+<section class="rx-select-section">
+<h3>4. Verse</h3>
+<div class="rx-number-grid rx-verse-grid" id="rxVerseGrid"></div>
+</section>
+<div class="rx-selected-card" id="rxSelectedCard"></div>
+<button class="rx-primary-btn" onclick="applyRhemaXrefSelection()">View Cross References</button>
+</div>
+</div>
+<div class="rhema-xref-info hidden" id="rhemaXrefInfoModal" onclick="closeRhemaCrossRefInfo(event)">
+<div class="rhema-xref-info-card" onclick="event.stopPropagation()">
+<button class="sheet-x-close" onclick="closeRhemaCrossRefInfo()"><span class="material-symbols-outlined">close</span></button>
+<p>Cross references help you compare Scripture with Scripture. These links show verses that share direct wording, themes, Old/New Testament connections, parallel ideas, or prophecy fulfillment relationships.</p>
+</div>
+</div>
 <div class="rhema-picker-overlay hidden" id="rhemaBookPickerOverlay" onclick="closeRhemaPickerSheet()">
 <div class="rhema-picker-sheet" onclick="event.stopPropagation()">
 <div class="rhema-picker-hdr">
@@ -15270,6 +15313,7 @@ glacier: {
 </main>
 <script src="vocab.js?v=2.6.5"></script>
 <script src="app.js?v=2.6.5"></script>
+<script src="rhema-crossrefs-ui.js?v=2.6.5"></script>
 <script src="greek-verbs.js?v=2.6.5"></script>
 <script src="firebase-lb.js?v=2.6.5" type="module"></script>
 <!-- Leaderboard Intro Modal -->
@@ -15403,6 +15447,11 @@ glacier: {
 <p class="ss-hint">Tap any word in Rhema then press "Add to Word Log." Tap a logged word to see its definition and occurrences.</p>
 <div class="ss-wordlog-list" id="ssWordlogList"></div>
 </div>
+<!-- Saved Trails -->
+<div class="ss-pane" id="ssPaneTrails">
+<p class="ss-hint">Saved scripture trails keep your cross-reference path exactly as it was when you saved it.</p>
+<div class="ss-trails-list" id="ssTrailsList"></div>
+</div>
 <!-- Study Workspace -->
 <div class="ss-pane" id="ssPaneNotes">
 <div class="ws-tab-bar">
@@ -15464,6 +15513,10 @@ glacier: {
 <button class="ss-tab" data-tab="wordlog" onclick="switchSandboxTab('wordlog')">
 <span class="material-symbols-outlined ss-tab-icon">dictionary</span>
 <span>Word Log</span>
+</button>
+<button class="ss-tab" data-tab="trails" onclick="switchSandboxTab('trails')">
+<span class="material-symbols-outlined ss-tab-icon">route</span>
+<span>Trails</span>
 </button>
 <button class="ss-tab" data-tab="notes" onclick="switchSandboxTab('notes')">
 <span class="material-symbols-outlined ss-tab-icon">layers</span>

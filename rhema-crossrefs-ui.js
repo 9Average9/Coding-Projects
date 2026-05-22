@@ -1,0 +1,388 @@
+const RHEMA_XREF_CATEGORIES = [
+  { key: 'direct', title: 'Direct Cross References', short: 'Direct', icon: 'format_quote', desc: 'Verses that directly reference or relate to this verse.' },
+  { key: 'themes', title: 'Thematic Links', short: 'Themes', icon: 'hub', desc: 'Verses connected by common themes and topics.' },
+  { key: 'otNt', title: 'Old Testament / New Testament Connections', short: 'OT/NT Connections', icon: 'link', desc: 'Verses connected across the Old and New Testament.' },
+  { key: 'parallel', title: 'Parallel Ideas', short: 'Parallel Ideas', icon: 'sync_alt', desc: 'Verses with similar ideas or parallel concepts.' },
+  { key: 'prophecy', title: 'Prophecy Fulfillment Links', short: 'Prophecy', icon: 'workspace_premium', desc: 'Verses that show prophecy and its fulfillment.' }
+];
+
+function _xrefBookList() {
+  if (Array.isArray(window.RhemaKJVBooks) && window.RhemaKJVBooks.length) return window.RhemaKJVBooks;
+  return Object.keys(window.RhemaKJV || {}).map(code => ({
+    code,
+    name: window.RhemaBookNames?.[code] || window.RhemaNT?.names?.[code] || code,
+    testament: (window.RhemaNTBookOrder || []).includes(code) ? 'NT' : 'OT'
+  }));
+}
+
+function _xrefBookName(code) {
+  return window.RhemaBookNames?.[code] || window.RhemaKJVBooks?.find(b => b.code === code)?.name || window.RhemaNT?.names?.[code] || code;
+}
+
+function _xrefParseRef(ref) {
+  const m = String(ref || '').trim().match(/^([1-3]?[A-Z]{2,3})\s+(\d+):(\d+)(?:-(\d+))?$/);
+  if (!m) return null;
+  return { book: m[1], chapter: m[2], verse: m[3], endVerse: m[4] || null };
+}
+
+function _xrefKey(obj = _rhemaXrefActive) {
+  return `${obj.book} ${obj.chapter}:${obj.verse}${obj.endVerse ? '-' + obj.endVerse : ''}`;
+}
+
+function _xrefDisplay(ref) {
+  const parsed = _xrefParseRef(ref);
+  if (!parsed) return ref;
+  return `${_xrefBookName(parsed.book)} ${parsed.chapter}:${parsed.verse}${parsed.endVerse ? '-' + parsed.endVerse : ''}`;
+}
+
+function _xrefKjvText(refOrObj) {
+  const p = typeof refOrObj === 'string' ? _xrefParseRef(refOrObj) : refOrObj;
+  if (!p || !window.RhemaKJV) return '';
+  const chapter = (window.RhemaKJV[p.book] || {})[String(p.chapter)] || {};
+  const start = Number(p.verse);
+  const end = Number(p.endVerse || p.verse);
+  const verses = [];
+  for (let v = start; v <= end; v++) {
+    if (chapter[String(v)]) verses.push(chapter[String(v)]);
+  }
+  return verses.join(' ');
+}
+
+function _xrefCurrentData() {
+  return window.RhemaCrossRefs?.[_xrefKey()] || {};
+}
+
+function _xrefCategoryMeta(key) {
+  return RHEMA_XREF_CATEGORIES.find(c => c.key === key) || RHEMA_XREF_CATEGORIES[0];
+}
+
+function _xrefClip(text, max = 86) {
+  const clean = String(text || '').trim();
+  return clean.length > max ? clean.slice(0, max).trim() + '...' : clean;
+}
+
+function _xrefEscape(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+async function openRhemaCrossReferences() {
+  closeRhemaWheel();
+  await loadRhemaScripts();
+  _rhemaXrefActive = { book: _rhemaBook || 'JOH', chapter: _rhemaChapter || '1', verse: _rhemaVerse || '1' };
+  _rhemaXrefBreadcrumb = [_xrefKey(_rhemaXrefActive)];
+  _rhemaXrefCategory = null;
+  renderRhemaCrossReferences();
+}
+
+function _showRhemaXrefShell(view) {
+  document.getElementById('rhemaXrefPage')?.classList.toggle('hidden', view === 'select');
+  document.getElementById('rhemaXrefSelectPage')?.classList.toggle('hidden', view !== 'select');
+  document.getElementById('rhemaModal')?.classList.add('xref-open');
+  document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
+}
+
+function _closeRhemaXrefShell() {
+  document.getElementById('rhemaXrefPage')?.classList.add('hidden');
+  document.getElementById('rhemaXrefSelectPage')?.classList.add('hidden');
+  document.getElementById('rhemaXrefInfoModal')?.classList.add('hidden');
+  document.getElementById('rhemaModal')?.classList.remove('xref-open');
+  if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
+}
+
+function _xrefTopCardHtml() {
+  const ref = _xrefKey();
+  return `<button class="rx-top-card" onclick="openRhemaCrossRefSelect()">
+    <div>
+      <h3>${_xrefEscape(_xrefDisplay(ref))}</h3>
+      <p>${_xrefEscape(_xrefKjvText(_rhemaXrefActive))}</p>
+      <span class="rx-change"><span class="material-symbols-outlined">touch_app</span>Tap to change verse</span>
+    </div>
+    <span class="material-symbols-outlined rx-top-watermark">auto_stories</span>
+  </button>`;
+}
+
+function _renderXrefBreadcrumb() {
+  const el = document.getElementById('rxBreadcrumb');
+  if (!el) return;
+  if (_rhemaXrefBreadcrumb.length <= 1) {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+    return;
+  }
+  el.classList.remove('hidden');
+  el.innerHTML = _rhemaXrefBreadcrumb.map((ref, idx) => {
+    const active = idx === _rhemaXrefBreadcrumb.length - 1;
+    return `<button class="${active ? 'active' : ''}" onclick="rhemaXrefJumpBreadcrumb(${idx})">${_xrefEscape(_xrefDisplay(ref))}</button>`;
+  }).join('<span class="material-symbols-outlined">chevron_right</span>');
+  requestAnimationFrame(() => { el.scrollLeft = el.scrollWidth; });
+}
+
+function renderRhemaCrossReferences() {
+  _rhemaXrefView = 'main';
+  _showRhemaXrefShell('main');
+  const title = document.getElementById('rxPageTitle');
+  if (title) title.textContent = 'Cross References';
+  _renderXrefBreadcrumb();
+  const data = _xrefCurrentData();
+  const body = document.getElementById('rxMainView');
+  if (!body) return;
+  body.innerHTML = _xrefTopCardHtml() + `<div class="rx-category-list">${RHEMA_XREF_CATEGORIES.map(cat => {
+    const refs = data[cat.key] || [];
+    const preview = refs.slice(0, 3).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('');
+    const chips = cat.key === 'themes' ? refs.slice(0, 5).map(item => `<span>${_xrefEscape(item.label)}</span>`).join('') : '';
+    return `<button class="rx-category-card" onclick="openRhemaXrefCategory('${cat.key}')">
+      <span class="rx-category-icon material-symbols-outlined">${cat.icon}</span>
+      <span class="rx-category-copy">
+        <span class="rx-category-title">${cat.title} <em>${refs.length}</em></span>
+        <span class="rx-category-desc">${cat.desc}</span>
+        ${chips ? `<span class="rx-chip-row">${chips}</span>` : preview}
+      </span>
+      <span class="material-symbols-outlined rx-card-arrow">chevron_right</span>
+    </button>`;
+  }).join('')}</div>`;
+}
+
+function openRhemaXrefCategory(key) {
+  _rhemaXrefCategory = key;
+  _rhemaXrefView = 'trail';
+  renderRhemaXrefTrail();
+}
+
+function renderRhemaXrefTrail() {
+  const cat = _xrefCategoryMeta(_rhemaXrefCategory);
+  const title = document.getElementById('rxPageTitle');
+  if (title) title.textContent = cat.title;
+  _showRhemaXrefShell('main');
+  _renderXrefBreadcrumb();
+  const refs = (_xrefCurrentData()[cat.key] || []);
+  const cards = refs.map(item => `<button class="rx-verse-card" onclick="rhemaXrefFollow('${item.ref.replace(/'/g, "\\'")}')">
+    <span class="rx-verse-copy">
+      <strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong>
+      <span>${_xrefEscape(_xrefKjvText(item.ref))}</span>
+      <em>${_xrefEscape(item.label)}</em>
+    </span>
+    <span class="rx-arrow-btn material-symbols-outlined">arrow_forward</span>
+  </button>`).join('');
+  const save = _studySandboxId ? `<button class="rx-save-trail-btn" onclick="saveCurrentRhemaTrail()"><span class="material-symbols-outlined">bookmark</span>Save Trail</button>` : '';
+  document.getElementById('rxMainView').innerHTML = _xrefTopCardHtml() +
+    `<div class="rx-active-category"><span class="material-symbols-outlined">${cat.icon}</span><div><strong>${cat.title} <em>${refs.length}</em></strong><p>${cat.desc}</p></div></div>` +
+    `<div class="rx-verse-stack">${cards || '<p class="rx-empty">No starter links are loaded for this verse yet.</p>'}</div>${save}`;
+}
+
+function rhemaXrefFollow(ref) {
+  const parsed = _xrefParseRef(ref);
+  if (!parsed) return;
+  _rhemaXrefActive = parsed;
+  _rhemaBook = parsed.book;
+  _rhemaChapter = parsed.chapter;
+  _rhemaVerse = parsed.verse;
+  _rhemaXrefBreadcrumb.push(_xrefKey(parsed));
+  syncRhemaPicker();
+  renderRhemaXrefTrail();
+}
+
+function rhemaXrefJumpBreadcrumb(idx) {
+  const parsed = _xrefParseRef(_rhemaXrefBreadcrumb[idx]);
+  if (!parsed) return;
+  _rhemaXrefBreadcrumb = _rhemaXrefBreadcrumb.slice(0, idx + 1);
+  _rhemaXrefActive = parsed;
+  _rhemaBook = parsed.book;
+  _rhemaChapter = parsed.chapter;
+  _rhemaVerse = parsed.verse;
+  syncRhemaPicker();
+  _rhemaXrefView === 'trail' ? renderRhemaXrefTrail() : renderRhemaCrossReferences();
+}
+
+function rhemaCrossRefBack() {
+  if (_rhemaXrefBreadcrumb.length > 1) {
+    rhemaXrefJumpBreadcrumb(_rhemaXrefBreadcrumb.length - 2);
+    return;
+  }
+  if (_rhemaXrefView === 'trail') {
+    _rhemaXrefCategory = null;
+    renderRhemaCrossReferences();
+    return;
+  }
+  _closeRhemaXrefShell();
+}
+
+function openRhemaCrossRefSelect() {
+  _rhemaXrefSelect = {
+    testament: _xrefBookList().find(b => b.code === _rhemaXrefActive.book)?.testament || 'NT',
+    book: _rhemaXrefActive.book,
+    chapter: _rhemaXrefActive.chapter,
+    verse: _rhemaXrefActive.verse
+  };
+  _rhemaXrefView = 'select';
+  _showRhemaXrefShell('select');
+  renderRhemaXrefSelect();
+}
+
+function closeRhemaCrossRefSelect() {
+  _showRhemaXrefShell('main');
+  _rhemaXrefView = _rhemaXrefCategory ? 'trail' : 'main';
+}
+
+function renderRhemaXrefSelect() {
+  const testamentGrid = document.getElementById('rxTestamentGrid');
+  if (testamentGrid) {
+    testamentGrid.innerHTML = ['OT', 'NT'].map(t => `<button class="${_rhemaXrefSelect.testament === t ? 'active' : ''}" onclick="rhemaXrefSelectTestament('${t}')"><span class="material-symbols-outlined">auto_stories</span>${t === 'OT' ? 'Old Testament' : 'New Testament'}</button>`).join('');
+  }
+  const books = _xrefBookList().filter(b => b.testament === _rhemaXrefSelect.testament);
+  const bookSelect = document.getElementById('rxBookSelect');
+  if (bookSelect) {
+    bookSelect.innerHTML = books.map(b => `<option value="${b.code}"${b.code === _rhemaXrefSelect.book ? ' selected' : ''}>${_xrefEscape(b.name)}</option>`).join('');
+  }
+  const chapters = Object.keys(window.RhemaKJV?.[_rhemaXrefSelect.book] || {}).sort((a,b) => +a - +b);
+  if (!chapters.includes(_rhemaXrefSelect.chapter)) _rhemaXrefSelect.chapter = chapters[0] || '1';
+  document.getElementById('rxChapterGrid').innerHTML = chapters.map(ch => `<button class="${ch === _rhemaXrefSelect.chapter ? 'active' : ''}" onclick="rhemaXrefSelectChapter('${ch}')">${ch}</button>`).join('');
+  const verses = Object.keys(window.RhemaKJV?.[_rhemaXrefSelect.book]?.[_rhemaXrefSelect.chapter] || {}).sort((a,b) => +a - +b);
+  if (!verses.includes(_rhemaXrefSelect.verse)) _rhemaXrefSelect.verse = verses[0] || '1';
+  document.getElementById('rxVerseGrid').innerHTML = verses.map(v => `<button class="${v === _rhemaXrefSelect.verse ? 'active' : ''}" onclick="rhemaXrefSelectVerse('${v}')">${v}</button>`).join('');
+  const selected = document.getElementById('rxSelectedCard');
+  if (selected) selected.innerHTML = `<span>Selected Reference</span><strong>${_xrefEscape(_xrefDisplay(_xrefKey(_rhemaXrefSelect)))}</strong><p>${_xrefEscape(_xrefKjvText(_rhemaXrefSelect))}</p>`;
+}
+
+function rhemaXrefSelectTestament(testament) {
+  _rhemaXrefSelect.testament = testament;
+  const first = _xrefBookList().find(b => b.testament === testament);
+  if (first) _rhemaXrefSelect = { testament, book: first.code, chapter: '1', verse: '1' };
+  renderRhemaXrefSelect();
+}
+
+function rhemaXrefSelectBook(code) {
+  _rhemaXrefSelect.book = code;
+  _rhemaXrefSelect.chapter = '1';
+  _rhemaXrefSelect.verse = '1';
+  renderRhemaXrefSelect();
+}
+
+function rhemaXrefSelectChapter(ch) {
+  _rhemaXrefSelect.chapter = ch;
+  _rhemaXrefSelect.verse = '1';
+  renderRhemaXrefSelect();
+}
+
+function rhemaXrefSelectVerse(v) {
+  _rhemaXrefSelect.verse = v;
+  renderRhemaXrefSelect();
+}
+
+function applyRhemaXrefSelection() {
+  _rhemaXrefActive = { ..._rhemaXrefSelect };
+  _rhemaBook = _rhemaXrefActive.book;
+  _rhemaChapter = _rhemaXrefActive.chapter;
+  _rhemaVerse = _rhemaXrefActive.verse;
+  _rhemaXrefBreadcrumb = [_xrefKey(_rhemaXrefActive)];
+  _rhemaXrefCategory = null;
+  syncRhemaPicker();
+  renderRhemaCrossReferences();
+}
+
+function openRhemaCrossRefInfo() {
+  document.getElementById('rhemaXrefInfoModal')?.classList.remove('hidden');
+}
+
+function closeRhemaCrossRefInfo(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('rhemaXrefInfoModal')?.classList.add('hidden');
+}
+
+async function saveCurrentRhemaTrail() {
+  if (!_studySandboxId || !_rhemaXrefCategory) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const cat = _xrefCategoryMeta(_rhemaXrefCategory);
+  const refs = (_xrefCurrentData()[_rhemaXrefCategory] || []).map(item => ({
+    reference: _xrefDisplay(item.ref),
+    rawRef: item.ref,
+    label: item.label,
+    text: _xrefKjvText(item.ref)
+  }));
+  const defaultTitle = `${_xrefDisplay(_rhemaXrefBreadcrumb[0])} Trail`;
+  const title = (prompt('Trail title', defaultTitle) || defaultTitle).trim();
+  const trail = {
+    title,
+    startVerse: _xrefDisplay(_rhemaXrefBreadcrumb[0]),
+    currentVerse: _xrefDisplay(_xrefKey()),
+    activeRef: _xrefKey(),
+    categoryKey: _rhemaXrefCategory,
+    categoryPath: cat.title,
+    breadcrumbTrail: _rhemaXrefBreadcrumb.map(_xrefDisplay),
+    rawBreadcrumbTrail: [..._rhemaXrefBreadcrumb],
+    connections: refs
+  };
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
+  const ok = await window.Studies?.saveTrail?.(_studySandboxId, uid, displayName, trail);
+  _showStudyToast(ok ? 'Trail saved.' : 'Could not save trail.');
+}
+
+function openSavedRhemaTrail(trailId) {
+  const trail = _sandboxTrailsCache.find(t => t.id === trailId);
+  if (!trail) return;
+  const active = _xrefParseRef(trail.activeRef || trail.rawBreadcrumbTrail?.at?.(-1));
+  if (!active) return;
+  _rhemaXrefActive = active;
+  _rhemaXrefBreadcrumb = (trail.rawBreadcrumbTrail || [trail.activeRef]).filter(Boolean);
+  _rhemaXrefCategory = trail.categoryKey || 'direct';
+  _rhemaBook = active.book;
+  _rhemaChapter = active.chapter;
+  _rhemaVerse = active.verse;
+  _rhemaXrefView = 'trail';
+  switchSandboxTab('rhema');
+  showRhema().then(() => {
+    _showRhemaXrefShell('main');
+    renderRhemaXrefTrail();
+  });
+}
+
+function _renderSandboxTrails(trails) {
+  const list = document.getElementById('ssTrailsList');
+  if (!list) return;
+  if (!trails?.length) {
+    list.innerHTML = '<p class="ss-hint">No trails saved yet. Open Cross-Ref from Rhema, follow a trail, then tap Save Trail.</p>';
+    return;
+  }
+  list.innerHTML = trails.map(t => {
+    const date = t.savedAt?.toDate ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(t.savedAt.toDate()) : '';
+    return `<div class="ss-trail-item">
+      <button onclick="openSavedRhemaTrail('${t.id}')">
+        <strong>${_xrefEscape(t.title || 'Saved Trail')}</strong>
+        <span>${_xrefEscape((t.breadcrumbTrail || []).join(' -> '))}</span>
+        <em>${_xrefEscape(t.categoryPath || '')}${date ? ' - ' + date : ''}</em>
+      </button>
+      <button class="ss-trail-del" onclick="deleteSandboxTrail('${t.id}')"><span class="material-symbols-outlined">delete</span></button>
+    </div>`;
+  }).join('');
+}
+
+async function deleteSandboxTrail(trailId) {
+  const studyId = _studySandboxId || _activeSandboxStudy?.id;
+  if (!studyId) return;
+  await window.Studies?.deleteTrail?.(studyId, trailId);
+}
+
+Object.assign(window, {
+  openRhemaCrossReferences,
+  renderRhemaCrossReferences,
+  openRhemaXrefCategory,
+  renderRhemaXrefTrail,
+  rhemaXrefFollow,
+  rhemaXrefJumpBreadcrumb,
+  rhemaCrossRefBack,
+  openRhemaCrossRefSelect,
+  closeRhemaCrossRefSelect,
+  renderRhemaXrefSelect,
+  rhemaXrefSelectTestament,
+  rhemaXrefSelectBook,
+  rhemaXrefSelectChapter,
+  rhemaXrefSelectVerse,
+  applyRhemaXrefSelection,
+  openRhemaCrossRefInfo,
+  closeRhemaCrossRefInfo,
+  saveCurrentRhemaTrail,
+  openSavedRhemaTrail,
+  deleteSandboxTrail
+});
