@@ -7,14 +7,111 @@ initializeApp();
 const db = getFirestore();
 const messaging = getMessaging();
 
-// Runs every minute; sends reminders to users whose local time exactly matches their reminder time.
+function getLocalParts(date, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(date);
+
+  const pick = type => parts.find(p => p.type === type)?.value;
+  const hour = Number(pick("hour"));
+  return {
+    year: Number(pick("year")),
+    month: Number(pick("month")),
+    day: Number(pick("day")),
+    weekday: pick("weekday"),
+    hour: hour === 24 ? 0 : hour,
+    minute: Number(pick("minute"))
+  };
+}
+
+function zonedTimeToUtc({ year, month, day, hour, minute }, timeZone) {
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute);
+  const localAtGuess = getLocalParts(new Date(utcGuess), timeZone);
+  const localAsUtc = Date.UTC(
+    localAtGuess.year,
+    localAtGuess.month - 1,
+    localAtGuess.day,
+    localAtGuess.hour,
+    localAtGuess.minute
+  );
+  return new Date(utcGuess - (localAsUtc - utcGuess));
+}
+
+function reminderAllowsWeekday(frequency, weekday) {
+  const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
+  const isWeekend = ["Sat", "Sun"].includes(weekday);
+  if (frequency === "weekdays") return isWeekday;
+  if (frequency === "weekends") return isWeekend;
+  return true;
+}
+
+function calculateNextReminderDate(reminder, afterDate = new Date()) {
+  const [hour, minute] = String(reminder.time || "").split(":").map(Number);
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) return null;
+
+  const timeZone = reminder.timezone || "UTC";
+  const frequency = reminder.frequency || "daily";
+  const base = getLocalParts(afterDate, timeZone);
+
+  for (let offset = 0; offset <= 8; offset++) {
+    const localDay = new Date(Date.UTC(base.year, base.month - 1, base.day + offset));
+    const candidate = zonedTimeToUtc({
+      year: localDay.getUTCFullYear(),
+      month: localDay.getUTCMonth() + 1,
+      day: localDay.getUTCDate(),
+      hour,
+      minute
+    }, timeZone);
+    const candidateLocal = getLocalParts(candidate, timeZone);
+    if (!reminderAllowsWeekday(frequency, candidateLocal.weekday)) continue;
+    if (candidate > afterDate) return candidate;
+  }
+  return null;
+}
+
+async function backfillReminderNextSendAt(now) {
+  if (now.getUTCMinutes() !== 0) return;
+  const snap = await db.collection("users")
+    .where("reminder.enabled", "==", true)
+    .limit(500)
+    .get();
+  if (snap.empty) return;
+
+  const batch = db.batch();
+  let updates = 0;
+  snap.docs.forEach(userDoc => {
+    const reminder = userDoc.data().reminder || {};
+    if (reminder.nextSendAt || !reminder.time) return;
+    const nextSendAt = calculateNextReminderDate(reminder, now);
+    if (!nextSendAt) return;
+    batch.update(userDoc.ref, { "reminder.nextSendAt": nextSendAt });
+    updates++;
+  });
+
+  if (updates) {
+    await batch.commit();
+    console.log(`Backfilled nextSendAt for ${updates} reminder users`);
+  }
+}
+
+// Runs every minute, but only reads users whose reminder.nextSendAt is due.
 exports.sendScheduledReminders = functions.pubsub
   .schedule("every 1 minutes")
   .onRun(async () => {
     const now = new Date();
+    await backfillReminderNextSendAt(now);
 
     const snap = await db.collection("users")
       .where("reminder.enabled", "==", true)
+      .where("reminder.nextSendAt", "<=", now)
+      .limit(100)
       .get();
 
     if (snap.empty) return null;
@@ -24,46 +121,22 @@ exports.sendScheduledReminders = functions.pubsub
       const reminder = data.reminder || {};
       const tokens = data.fcmTokens || [];
 
-      if (!tokens.length || !reminder.time) continue;
-
-      const tz = reminder.timezone || "UTC";
-      const freq = reminder.frequency || "daily";
-
-      const fmt = new Intl.DateTimeFormat("en-US", {
-        timeZone: tz,
-        weekday: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      });
-      const parts = fmt.formatToParts(now);
-      const weekday = parts.find(p => p.type === "weekday")?.value;
-      const ch = parseInt(parts.find(p => p.type === "hour")?.value || "0");
-      const cm = parseInt(parts.find(p => p.type === "minute")?.value || "0");
-
-      if (!weekday) continue;
-
-      const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
-      const isWeekend = ["Sat", "Sun"].includes(weekday);
-      if (freq === "weekdays" && !isWeekday) continue;
-      if (freq === "weekends" && !isWeekend) continue;
-
-      const [rh, rm] = reminder.time.split(":").map(Number);
-      const reminderMinutes = rh * 60 + rm;
-      const currentMinutes = ch * 60 + cm;
-
-      if (reminderMinutes !== currentMinutes) continue;
-
-      if (reminder.lastSent) {
-        const lastLocal = reminder.lastSent.toDate().toLocaleDateString("en-US", { timeZone: tz });
-        const todayLocal = now.toLocaleDateString("en-US", { timeZone: tz });
-        if (lastLocal === todayLocal) continue;
+      if (!reminder.time) {
+        await userDoc.ref.update({ "reminder.enabled": false });
+        continue;
       }
 
-      console.log(`Sending reminder to ${userDoc.id} at ${ch}:${String(cm).padStart(2,"0")} ${tz}`);
+      const nextSendAt = calculateNextReminderDate(reminder, new Date(now.getTime() + 60 * 1000));
+      if (!tokens.length) {
+        if (nextSendAt) await userDoc.ref.update({ "reminder.nextSendAt": nextSendAt });
+        continue;
+      }
 
-      // Mark sent before FCM so we always record that the function ran
-      await userDoc.ref.update({ "reminder.lastSent": now });
+      console.log(`Sending reminder to ${userDoc.id}`);
+
+      const update = { "reminder.lastSent": now };
+      if (nextSendAt) update["reminder.nextSendAt"] = nextSendAt;
+      await userDoc.ref.update(update);
 
       try {
         const result = await messaging.sendEachForMulticast({
@@ -83,6 +156,28 @@ exports.sendScheduledReminders = functions.pubsub
       }
     }
 
+    return null;
+  });
+
+exports.onUserReminderWritten = functions.firestore
+  .document("users/{uid}")
+  .onWrite(async (change) => {
+    if (!change.after.exists) return null;
+    const before = change.before.exists ? (change.before.data().reminder || {}) : {};
+    const after = change.after.data().reminder || {};
+    if (!after.enabled || !after.time) return null;
+
+    const scheduleChanged =
+      before.enabled !== after.enabled ||
+      before.time !== after.time ||
+      before.frequency !== after.frequency ||
+      before.timezone !== after.timezone;
+
+    if (!scheduleChanged && after.nextSendAt) return null;
+
+    const nextSendAt = calculateNextReminderDate(after);
+    if (!nextSendAt) return null;
+    await change.after.ref.update({ "reminder.nextSendAt": nextSendAt });
     return null;
   });
 

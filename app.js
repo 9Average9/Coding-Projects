@@ -15209,10 +15209,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.6.2";
+const APP_VERSION = "2.6.3";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.6.2 — Bug Fixes</div>
+<div class="un-version-label">v2.6.3 — Bug Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Fixed knowledge checks and quiz buttons</strong> in new advanced verb lessons (va_29–va_32) — they now respond correctly and unlock the quiz as expected.</li>

@@ -814,10 +814,76 @@ async function fcmRemoveToken(uid, token) {
   }
 }
 
+function getReminderLocalParts(date, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(date);
+  const pick = type => parts.find(p => p.type === type)?.value;
+  const hour = Number(pick("hour"));
+  return {
+    year: Number(pick("year")),
+    month: Number(pick("month")),
+    day: Number(pick("day")),
+    weekday: pick("weekday"),
+    hour: hour === 24 ? 0 : hour,
+    minute: Number(pick("minute"))
+  };
+}
+
+function reminderLocalToUtc({ year, month, day, hour, minute }, timeZone) {
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute);
+  const localAtGuess = getReminderLocalParts(new Date(utcGuess), timeZone);
+  const localAsUtc = Date.UTC(
+    localAtGuess.year,
+    localAtGuess.month - 1,
+    localAtGuess.day,
+    localAtGuess.hour,
+    localAtGuess.minute
+  );
+  return new Date(utcGuess - (localAsUtc - utcGuess));
+}
+
+function reminderFrequencyAllowsDay(frequency, weekday) {
+  const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
+  const isWeekend = ["Sat", "Sun"].includes(weekday);
+  if (frequency === "weekdays") return isWeekday;
+  if (frequency === "weekends") return isWeekend;
+  return true;
+}
+
+function calculateReminderNextSendAt({ time, frequency, timezone }, afterDate = new Date()) {
+  const [hour, minute] = String(time || "").split(":").map(Number);
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) return null;
+  const timeZone = timezone || "UTC";
+  const base = getReminderLocalParts(afterDate, timeZone);
+  for (let offset = 0; offset <= 8; offset++) {
+    const localDay = new Date(Date.UTC(base.year, base.month - 1, base.day + offset));
+    const candidate = reminderLocalToUtc({
+      year: localDay.getUTCFullYear(),
+      month: localDay.getUTCMonth() + 1,
+      day: localDay.getUTCDate(),
+      hour,
+      minute
+    }, timeZone);
+    const local = getReminderLocalParts(candidate, timeZone);
+    if (!reminderFrequencyAllowsDay(frequency || "daily", local.weekday)) continue;
+    if (candidate > afterDate) return candidate;
+  }
+  return null;
+}
+
 async function fcmSaveReminder(uid, { time, frequency, timezone }) {
   try {
+    const nextSendAt = calculateReminderNextSendAt({ time, frequency, timezone });
     await setDoc(doc(db, "users", uid), {
-      reminder: { enabled: true, time, frequency, timezone, lastSent: null },
+      reminder: { enabled: true, time, frequency, timezone, lastSent: null, nextSendAt },
       updatedAt: serverTimestamp()
     }, { merge: true });
     return true;
