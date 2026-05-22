@@ -9721,7 +9721,7 @@ function _doHomeFlip() {
   const vt = document.getElementById('homeVerseText');
   if (vt) {
     const text = _homeFlipIsGreek ? verse.greek : _homeFlipEnVerse;
-    if (text) _morphTextEl(vt, text, 18);
+    if (text) _morphTextEl(vt, text, 30);
   }
 
   const sn = document.getElementById('hccSnippet');
@@ -9730,7 +9730,7 @@ function _doHomeFlip() {
     if (_homeFlipIsGreek) {
       try { snText = JSON.parse(localStorage.getItem('rhemaLastPos') || '{}').greek || ''; } catch { snText = ''; }
     }
-    if (snText) _morphTextEl(sn, snText, 38);
+    if (snText) _morphTextEl(sn, snText, 55);
   }
 }
 
