@@ -9481,6 +9481,7 @@ function showNavPage(page) {
   if (page === 'home') {
     showScreen('homeScreen');
     populateHomeScreen();
+    _startHomeFlip();
   } else if (page === 'profile') {
     showScreen('profilePage');
     updateProfileUI();
