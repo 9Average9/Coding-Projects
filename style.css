@@ -12855,6 +12855,13 @@ body.sepia .rhema-sheet { background: #fffcf2; }
   line-height: 1.6;
   color: var(--font-color);
 }
+.rhema-def-quick { margin-bottom: 14px; }
+.rhema-def-quick-text {
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--font-color);
+}
+.rhema-def-quick-text strong { font-weight: 800; }
 .rhema-def-kjv {
   font-size: 0.78rem;
   color: var(--muted-color);
@@ -12871,6 +12878,11 @@ body.sepia .rhema-sheet { background: #fffcf2; }
   line-height: 1.65;
 }
 .rhema-def-abbott b { font-weight: 700; }
+.rhema-def-mm {
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+.rhema-def-mm b { font-weight: 700; }
 
 /* ── Occurrences tab ── */
 .rhema-occ-total {

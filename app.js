@@ -17285,7 +17285,7 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-kjv.js', 'rhema-syntax.js'];
+    const files = ['rhema-nt.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
@@ -19225,54 +19225,87 @@ function renderRhemaParsing(surface, strongs, morph) {
     buildFormHint(surface, strongs, morph);
 }
 
+function rhemaPlainDefinitionText(value) {
+  return String(value || '')
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getRhemaQuickDefinition(lex) {
+  const source = lex.quick_def || lex.brief || lex.extended || lex.strongs_def || lex.kjv_def || '';
+  const plain = rhemaPlainDefinitionText(source).replace(/^--\s*/, '');
+  if (!plain) return '';
+  const firstThought = plain.split(/(?:;|\.)\s+/)[0].trim();
+  const answer = firstThought || plain;
+  return answer.length > 150 ? answer.slice(0, 147).trimEnd() + '...' : answer;
+}
+
 function renderRhemaDefinition(strongs) {
   const lex = (window.RhemaLexicon || {})[strongs];
   if (!lex) return `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
 
-  let html = '';
+  const sections = [];
 
   if (lex.lemma) {
-    html += `<div class="rhema-def-section">
+    sections.push(`<div class="rhema-def-section">
       <div class="rhema-def-label">Root Word</div>
       <div class="rhema-def-text" style="font-size:1.1rem;font-weight:700">${lex.lemma}</div>
       ${lex.translit ? `<div class="rhema-def-text" style="opacity:.6;font-style:italic">${lex.translit}</div>` : ''}
-    </div>`;
-    html += `<div class="rhema-def-sep"></div>`;
+    </div>`);
+  }
+
+  const quickDefinition = getRhemaQuickDefinition(lex);
+  if (quickDefinition) {
+    sections.push(`<div class="rhema-def-section rhema-def-quick">
+      <div class="rhema-def-label">Quick Definition</div>
+      <div class="rhema-def-quick-text"><strong>${quickDefinition}</strong></div>
+    </div>`);
   }
 
   if (lex.abbott_smith) {
-    html += `<div class="rhema-def-section">
+    sections.push(`<div class="rhema-def-section">
       <div class="rhema-def-label">Abbott-Smith Lexicon</div>
       <div class="rhema-def-text rhema-def-abbott">${lex.abbott_smith}</div>
-    </div>`;
+    </div>`);
+  }
+
+  const moultonMilligan = lex.moulton_milligan || (window.RhemaMoultonMilligan || {})[strongs] || '';
+  if (moultonMilligan) {
+    sections.push(`<div class="rhema-def-section">
+      <div class="rhema-def-label">Moulton-Milligan Lexicon</div>
+      <div class="rhema-def-text rhema-def-mm">${moultonMilligan}</div>
+    </div>`);
   }
 
   if (lex.extended || lex.brief) {
-    if (lex.abbott_smith) html += `<div class="rhema-def-sep"></div>`;
-    html += `<div class="rhema-def-section">
+    sections.push(`<div class="rhema-def-section">
       <div class="rhema-def-label">Dodson Lexicon</div>
       <div class="rhema-def-text">${lex.extended || lex.brief}</div>
-    </div>`;
+    </div>`);
   }
 
   if (lex.strongs_def) {
-    if (lex.abbott_smith || lex.extended || lex.brief) html += `<div class="rhema-def-sep"></div>`;
-    html += `<div class="rhema-def-section">
+    sections.push(`<div class="rhema-def-section">
       <div class="rhema-def-label">Strong's Definition</div>
       <div class="rhema-def-text">${lex.strongs_def}</div>
       ${lex.kjv_def ? `<div class="rhema-def-kjv">KJV: ${lex.kjv_def}</div>` : ''}
-    </div>`;
+    </div>`);
   }
 
   if (lex.deriv) {
-    html += `<div class="rhema-def-sep"></div>`;
-    html += `<div class="rhema-def-section">
+    sections.push(`<div class="rhema-def-section">
       <div class="rhema-def-label">Etymology</div>
       <div class="rhema-def-text" style="opacity:.7">${lex.deriv}</div>
-    </div>`;
+    </div>`);
   }
 
-  return html || `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
+  return sections.join('<div class="rhema-def-sep"></div>') || `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
 }
 
 function renderRhemaOccurrences(strongs) {

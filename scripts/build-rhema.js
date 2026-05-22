@@ -222,6 +222,44 @@ function parseTbesg(text) {
 
 // ── Compute occurrences ───────────────────────────────────────────────────────
 
+// Optional Moulton-Milligan source.
+// Expected format: tab-separated rows with a Strong's number in the first column
+// (G1510 or 1510) and the formatted lexicon entry in the remaining columns.
+function parseMoultonMilligan(text) {
+  const result = {};
+  const lines = text.split('\n');
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const fields = line.split('\t').map(field => field.trim()).filter(Boolean);
+    if (fields.length < 2) continue;
+    const match = fields[0].match(/^G?0*(\d{1,4})$/i);
+    if (!match) continue;
+    const num = parseInt(match[1], 10);
+    if (isNaN(num) || num <= 0 || num > 5624) continue;
+    const def = fields.slice(1).join(' ')
+      .replace(/<BR \/>/gi, '<br>')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (def) result[num] = def;
+  }
+  return result;
+}
+
+function loadMoultonMilligan() {
+  const sourcePath = process.env.MM_LEXICON_FILE;
+  if (!sourcePath) {
+    console.log('\nSkipping Moulton-Milligan lexicon (set MM_LEXICON_FILE to a Strong\'s-keyed TSV source).');
+    return {};
+  }
+  const resolved = path.resolve(sourcePath);
+  const raw = fs.readFileSync(resolved, 'utf8');
+  const parsed = parseMoultonMilligan(raw);
+  console.log(`\nLoaded Moulton-Milligan lexicon from ${resolved}`);
+  console.log(`  ${Object.keys(parsed).length} entries`);
+  return parsed;
+}
+
 function computeOccurrences(ntText) {
   const occ = {};
   for (const [bookCode, chapters] of Object.entries(ntText)) {
@@ -311,6 +349,9 @@ async function main() {
   const tbesg = parseTbesg(tbesgRaw);
   console.log(`  ${Object.keys(tbesg).length} entries`);
 
+  // 4c. Moulton-Milligan (optional public-domain source)
+  const moultonMilligan = loadMoultonMilligan();
+
   // 5. KJV NT
   console.log('\nDownloading KJV New Testament...');
   const kjvText = {};
@@ -347,9 +388,11 @@ async function main() {
       strongs_def:  entry.strongs_def   || '',
       kjv_def:      entry.kjv_def       || '',
       deriv:        entry.derivation    || '',
+      quick_def:    dod.brief || dod.extended || entry.strongs_def || entry.kjv_def || '',
       brief:        dod.brief           || '',
       extended:     dod.extended        || '',
       abbott_smith: tbesg[num]          || '',
+      moulton_milligan: moultonMilligan[num] || '',
     };
   }
 
