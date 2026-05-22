@@ -10200,9 +10200,7 @@ function shuffle(array) {
 
 function getStats() {
   const stats = JSON.parse(localStorage.getItem("greekVocabStats")) || { tests: [], words: {} };
-  if (localStorage.getItem("testsCompleted") === null) {
-    localStorage.setItem("testsCompleted", String((stats.tests || []).length));
-  }
+  localStorage.setItem("testsCompleted", String((stats.tests || []).length));
   return stats;
 }
 
@@ -15579,12 +15577,14 @@ async function restoreUserFromFirestore(user) {
   };
   localStorage.setItem("profileData", JSON.stringify(profileData));
 
-  if (data.completedLessons) {
-    completedLessons = data.completedLessons;
+  {
+    const local = JSON.parse(localStorage.getItem("completedLessons") || "{}");
+    completedLessons = { ...local, ...(data.completedLessons || {}) };
     localStorage.setItem("completedLessons", JSON.stringify(completedLessons));
   }
-  if (data.completedAdvancedLessons) {
-    completedAdvancedLessons = data.completedAdvancedLessons;
+  {
+    const local = JSON.parse(localStorage.getItem("completedAdvancedLessons") || "{}");
+    completedAdvancedLessons = { ...local, ...(data.completedAdvancedLessons || {}) };
     localStorage.setItem("completedAdvancedLessons", JSON.stringify(completedAdvancedLessons));
   }
   if (data.knownWords) {
@@ -15895,6 +15895,7 @@ window.__onAuthStateReady = async (user) => {
   _authReady = true;
   if (user) {
     await restoreUserFromFirestore(user);
+    syncUserData();
     hideAuthModal();
     updateProfileUI();
     updateProfileBadges?.();
@@ -16844,11 +16845,7 @@ function showLbUserInfo(id) {
   document.getElementById("lbUserTime").textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   const tests = isMe
-    ? (() => {
-        const stored = localStorage.getItem("testsCompleted");
-        if (stored !== null) return parseInt(stored);
-        try { return (JSON.parse(localStorage.getItem("greekVocabStats") || "{}").tests || []).length; } catch { return 0; }
-      })()
+    ? (() => { try { return (JSON.parse(localStorage.getItem("greekVocabStats") || "{}").tests || []).length; } catch { return 0; } })()
     : (e.testsCompleted || 0);
   document.getElementById("lbUserTests").textContent = tests;
 
