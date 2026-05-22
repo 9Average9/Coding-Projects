@@ -99,6 +99,7 @@ function showAdvVerbLesson(lessonId) {
   currentVerbAdvLesson = lessonId;
 
   _updateVerbAdvTopBar(lessonId);
+  _shuffleVerbKCOptions(section);
   _restoreOpenedVerbBlocks(section, lessonId, "adv");
   _restoreAnsweredVerbKCs(lessonId, section);
   _checkVerbAdvQuizAvailability(lessonId);
@@ -108,6 +109,17 @@ function showAdvVerbLesson(lessonId) {
     const s = savedScores[lessonId];
     _updateVerbAdvLessonScore(lessonId, s.correct, s.total, s.passed);
   }
+}
+
+function _shuffleVerbKCOptions(section) {
+  section.querySelectorAll(".knowledge-check:not(.answered) .kc-options").forEach(opts => {
+    const buttons = Array.from(opts.querySelectorAll(".kc-opt"));
+    for (let i = buttons.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      opts.appendChild(buttons[j]);
+      [buttons[i], buttons[j]] = [buttons[j], buttons[i]];
+    }
+  });
 }
 
 function handleVerbLearnBack() {
