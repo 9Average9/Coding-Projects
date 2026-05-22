@@ -16149,6 +16149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   populateHomeScreen();
   setNavActive('home');
   showBottomNav();
+  _startHomeFlip();
 });
 
 
