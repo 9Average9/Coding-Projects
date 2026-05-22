@@ -9371,8 +9371,25 @@ glacier: {
 </section>
 <section class="rx-select-section">
 <h3>2. Book</h3>
-<select class="rx-book-select" id="rxBookSelect" onchange="rhemaXrefSelectBook(this.value)"></select>
+<button class="rx-book-btn" id="rxBookBtn" onclick="openRxBookPicker()">
+<span class="material-symbols-outlined">menu_book</span>
+<span id="rxBookBtnLabel">Select Book</span>
+<span class="material-symbols-outlined rx-book-btn-chevron">expand_more</span>
+</button>
 </section>
+<div class="rhema-picker-overlay hidden" id="rxBookPickerOverlay" onclick="closeRxBookPicker()">
+<div class="rhema-picker-sheet" onclick="event.stopPropagation()">
+<div class="rhema-picker-hdr">
+<span class="rhema-picker-title">Select Book</span>
+<button class="rhema-picker-x" onclick="closeRxBookPicker()">✕</button>
+</div>
+<div class="rhema-picker-search-row">
+<span class="material-symbols-outlined rhema-picker-search-icon">search</span>
+<input class="rhema-picker-search-input" id="rxBookSearchInput" oninput="rxFilterBooks(this.value)" placeholder="Search books…"/>
+</div>
+<div class="rhema-book-list" id="rxBookList"></div>
+</div>
+</div>
 <section class="rx-select-section">
 <h3>3. Chapter</h3>
 <div class="rx-number-grid" id="rxChapterGrid"></div>
@@ -9389,6 +9406,16 @@ glacier: {
 <div class="rhema-xref-info-card" onclick="event.stopPropagation()">
 <button class="sheet-x-close" onclick="closeRhemaCrossRefInfo()"><span class="material-symbols-outlined">close</span></button>
 <p>Cross references help you compare Scripture with Scripture. These links show verses that share direct wording, themes, Old/New Testament connections, parallel ideas, or prophecy fulfillment relationships.</p>
+</div>
+</div>
+<div class="rx-trail-save-overlay hidden" id="rxTrailSaveModal" onclick="rxTrailSaveDismiss()">
+<div class="rx-trail-save-card" onclick="event.stopPropagation()">
+<div class="rx-trail-save-icon"><span class="material-symbols-outlined">bookmark_add</span></div>
+<h3>Name Your Trail</h3>
+<p>Give this cross-reference journey a title</p>
+<input class="rx-trail-save-input" id="rxTrailSaveInput" type="text" placeholder="Trail name…" maxlength="60" onkeydown="if(event.key==='Enter')rxTrailSaveConfirm()"/>
+<button class="rx-primary-btn" onclick="rxTrailSaveConfirm()"><span class="material-symbols-outlined">bookmark</span>Save Trail</button>
+<button class="rx-trail-save-cancel" onclick="rxTrailSaveDismiss()">Cancel</button>
 </div>
 </div>
 <div class="rhema-picker-overlay hidden" id="rhemaBookPickerOverlay" onclick="closeRhemaPickerSheet()">
@@ -15782,6 +15809,11 @@ glacier: {
 <button class="modal-close" onclick="closeReminderModalDirect()">×</button>
 <h2>Set Study Reminders</h2>
 <p>Pick a time to receive a daily push notification reminding you to study Greek.</p>
+<div class="reminder-notif-warning hidden" id="reminderNotifWarning">
+<span class="material-symbols-outlined">notifications_off</span>
+<span>Notifications must be enabled to receive reminders.</span>
+<button class="reminder-notif-enable-btn" onclick="enableNotificationsFromPrompt()">Enable</button>
+</div>
 <div class="reminder-field">
 <label class="reminder-label">Reminder Time</label>
 <div class="reminder-time-wrapper">
