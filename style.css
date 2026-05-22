@@ -14228,8 +14228,7 @@ body .app:has(#settingsScreen.screen.active) {
 .hcc-sub { display: block; font-size: 0.75rem; opacity: 0.75; margin-top: 1px; }
 .hcc-book-deco { font-size: 3.5rem !important; opacity: 0.15; position: absolute; right: 14px; top: 10px; }
 .hcc-footer { display: flex; align-items: center; gap: 12px; }
-.hcc-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.25); border-radius: 3px; overflow: hidden; }
-.hcc-bar-fill { height: 100%; background: white; border-radius: 3px; transition: width 0.4s ease; }
+.hcc-snippet { flex: 1; min-width: 0; font-size: 0.78rem; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hcc-resume-btn {
   background: white; color: var(--secondary-color); border: none; border-radius: 20px;
   padding: 6px 16px; font-size: 0.82rem; font-weight: 800; cursor: pointer; flex-shrink: 0;

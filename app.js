@@ -9629,7 +9629,8 @@ function _saveRhemaPosition() {
     }, 2000);
     return;
   }
-  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now() };
+  const verseSnippet = window.RhemaKJV ? ((window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '') : '';
+  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now(), snippet: verseSnippet };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
   if (uid && window.LB) {
     window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
@@ -9652,6 +9653,8 @@ function _updateHomeContinueCard() {
     const passageText = `${bookName} ${pos.chapter}:${pos.verse}`;
     const passageEl = document.getElementById('hccPassage');
     if (passageEl) passageEl.textContent = passageText;
+    const snippetEl = document.getElementById('hccSnippet');
+    if (snippetEl) snippetEl.textContent = pos.snippet || '';
     card.style.display = '';
     empty.style.display = 'none';
   } catch {
