@@ -9534,62 +9534,62 @@ function showHome() {
 }
 
 const HOME_VERSES = [
-  { text: "Your word I have treasured in my heart, that I may not sin against you.", ref: "Psalm 119:11" },
-  { text: "The grass withers, the flower fades, but the word of our God will stand forever.", ref: "Isaiah 40:8" },
-  { text: "Do not let this Book of the Law depart from your mouth; meditate on it day and night.", ref: "Joshua 1:8" },
-  { text: "For the word of God is alive and active, sharper than any double-edged sword.", ref: "Hebrews 4:12" },
-  { text: "Blessed is the one who reads aloud the words of this prophecy, and blessed are those who hear it.", ref: "Revelation 1:3" },
-  { text: "Let the word of Christ dwell in you richly as you teach and admonish one another with all wisdom.", ref: "Colossians 3:16" },
-  { text: "I can do all things through him who strengthens me.", ref: "Philippians 4:13" },
-  { text: "If God is for us, who can be against us?", ref: "Romans 8:31" },
-  { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref: "Joshua 1:9" },
-  { text: "Neither death nor life, nor angels nor rulers, nor things present nor things to come, nor powers, nor height nor depth, nor anything else in all creation, will be able to separate us from the love of God in Christ Jesus our Lord.", ref: "Romans 8:38–39" },
-  { text: "My grace is sufficient for you, for my power is made perfect in weakness.", ref: "2 Corinthians 12:9" },
-  { text: "In this world you will have trouble. But take heart! I have overcome the world.", ref: "John 16:33" },
-  { text: "God is faithful, and he will not let you be tempted beyond your ability, but with the temptation he will also provide the way of escape.", ref: "1 Corinthians 10:13" },
-  { text: "Those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", ref: "Isaiah 40:31" },
-  { text: "Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you, I will uphold you with my righteous right hand.", ref: "Isaiah 41:10" },
-  { text: "We know that in all things God works for the good of those who love him, who have been called according to his purpose.", ref: "Romans 8:28" },
-  { text: "In all these things we are more than conquerors through him who loved us.", ref: "Romans 8:37" },
-  { text: "The Lord is my light and my salvation — whom shall I fear? The Lord is the stronghold of my life — of whom shall I be afraid?", ref: "Psalm 27:1" },
-  { text: "Count it all joy, my brothers, when you meet trials of various kinds, for you know that the testing of your faith produces steadfastness.", ref: "James 1:2–3" },
-  { text: "After you have suffered a little while, the God of all grace, who has called you to his eternal glory in Christ, will himself restore, confirm, strengthen, and establish you.", ref: "1 Peter 5:10" },
-  { text: "God gave us a spirit not of fear but of power and love and self-control.", ref: "2 Timothy 1:7" },
-  { text: "Be strong in the Lord and in the strength of his might.", ref: "Ephesians 6:10" },
-  { text: "The Lord himself goes before you and will be with you; he will never leave you nor forsake you. Do not be afraid; do not be discouraged.", ref: "Deuteronomy 31:8" },
-  { text: "The steadfast love of the Lord never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.", ref: "Lamentations 3:22–23" },
-  { text: "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff, they comfort me.", ref: "Psalm 23:4" },
-  { text: "I consider that our present sufferings are not worth comparing with the glory that will be revealed in us.", ref: "Romans 8:18" },
-  { text: "Our light and momentary troubles are achieving for us an eternal glory that far outweighs them all.", ref: "2 Corinthians 4:17" },
-  { text: "The Lord is good, a stronghold in the day of trouble; he knows those who take refuge in him.", ref: "Nahum 1:7" },
-  { text: "I lift up my eyes to the mountains — where does my help come from? My help comes from the Lord, the Maker of heaven and earth.", ref: "Psalm 121:1–2" },
-  { text: "Be strong and courageous and do it. Do not be afraid and do not be dismayed, for the Lord God, even my God, is with you. He will not leave you or forsake you.", ref: "1 Chronicles 28:20" },
-  { text: "Though I have fallen, I will rise. Though I sit in darkness, the Lord will be my light.", ref: "Micah 7:8" },
-  { text: "The righteous falls seven times and rises again, but the wicked stumble in times of calamity.", ref: "Proverbs 24:16" },
-  { text: "You keep him in perfect peace whose mind is stayed on you, because he trusts in you.", ref: "Isaiah 26:3" },
-  { text: "The Lord your God is in your midst, a mighty one who will save; he will rejoice over you with gladness; he will quiet you by his love.", ref: "Zephaniah 3:17" },
-  { text: "Since we are surrounded by so great a cloud of witnesses, let us lay aside every weight and sin which clings so closely, and let us run with endurance the race that is set before us.", ref: "Hebrews 12:1" },
-  { text: "May the God of hope fill you with all joy and peace in believing, so that by the power of the Holy Spirit you may abound in hope.", ref: "Romans 15:13" },
-  { text: "He gives power to the faint, and to him who has no might he increases strength.", ref: "Isaiah 40:29" },
-  { text: "The Lord is my rock, my fortress and my deliverer; my God is my rock, in whom I take refuge, my shield and the horn of my salvation, my stronghold.", ref: "Psalm 18:2" },
-  { text: "The Lord is faithful. He will establish you and guard you against the evil one.", ref: "2 Thessalonians 3:3" },
-  { text: "You are from God and have overcome them, for he who is in you is greater than he who is in the world.", ref: "1 John 4:4" },
-  { text: "The Lord will fight for you; you need only to be still.", ref: "Exodus 14:14" },
-  { text: "Commit your work to the Lord, and your plans will be established.", ref: "Proverbs 16:3" },
-  { text: "Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God.", ref: "Philippians 4:6" },
-  { text: "The peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus.", ref: "Philippians 4:7" },
-  { text: "He heals the brokenhearted and binds up their wounds.", ref: "Psalm 147:3" },
-  { text: "The name of the Lord is a strong tower; the righteous man runs into it and is safe.", ref: "Proverbs 18:10" },
-  { text: "Let us hold fast the confession of our hope without wavering, for he who promised is faithful.", ref: "Hebrews 10:23" },
-  { text: "When you pass through the waters, I will be with you; and through the rivers, they shall not overwhelm you; when you walk through fire you shall not be burned.", ref: "Isaiah 43:2" },
-  { text: "Blessed is the man who remains steadfast under trial, for when he has stood the test he will receive the crown of life.", ref: "James 1:12" },
-  { text: "Do not throw away your confidence; it will be richly rewarded. You need to persevere so that when you have done the will of God, you will receive what he has promised.", ref: "Hebrews 10:35–36" },
-  { text: "He who began a good work in you will carry it on to completion until the day of Christ Jesus.", ref: "Philippians 1:6" },
-  { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11" },
-  { text: "In God I trust and am not afraid. What can man do to me?", ref: "Psalm 56:11" },
-  { text: "Now to him who is able to do far more abundantly than all that we ask or think, according to the power at work within us — to him be glory.", ref: "Ephesians 3:20–21" },
-  { text: "Cast your burden on the Lord, and he will sustain you; he will never permit the righteous to be moved.", ref: "Psalm 55:22" },
-  { text: "I am the Lord your God who takes hold of your right hand and says to you, Do not fear; I will help you.", ref: "Isaiah 41:13" }
+  { text: "Your word I have treasured in my heart, that I may not sin against you.", ref: "Psalm 119:11", greek: "ἐν τῇ καρδίᾳ μου ἔκρυψα τὰ λόγιά σου ὅπως ἂν μὴ ἁμάρτω σοι" },
+  { text: "The grass withers, the flower fades, but the word of our God will stand forever.", ref: "Isaiah 40:8", greek: "τὸ δὲ ῥῆμα τοῦ θεοῦ ἡμῶν μένει εἰς τὸν αἰῶνα" },
+  { text: "Do not let this Book of the Law depart from your mouth; meditate on it day and night.", ref: "Joshua 1:8", greek: "οὐκ ἀποστήσεται ἡ βίβλος τοῦ νόμου τούτου ἐκ τοῦ στόματός σου καὶ μελετήσεις ἐν αὐτῷ ἡμέρας καὶ νυκτός" },
+  { text: "For the word of God is alive and active, sharper than any double-edged sword.", ref: "Hebrews 4:12", greek: "ζῶν γὰρ ὁ λόγος τοῦ θεοῦ καὶ ἐνεργὴς καὶ τομώτερος ὑπὲρ πᾶσαν μάχαιραν δίστομον" },
+  { text: "Blessed is the one who reads aloud the words of this prophecy, and blessed are those who hear it.", ref: "Revelation 1:3", greek: "μακάριος ὁ ἀναγινώσκων καὶ οἱ ἀκούοντες τοὺς λόγους τῆς προφητείας" },
+  { text: "Let the word of Christ dwell in you richly as you teach and admonish one another with all wisdom.", ref: "Colossians 3:16", greek: "ὁ λόγος τοῦ Χριστοῦ ἐνοικείτω ἐν ὑμῖν πλουσίως ἐν πάσῃ σοφίᾳ" },
+  { text: "I can do all things through him who strengthens me.", ref: "Philippians 4:13", greek: "πάντα ἰσχύω ἐν τῷ ἐνδυναμοῦντί με" },
+  { text: "If God is for us, who can be against us?", ref: "Romans 8:31", greek: "εἰ ὁ θεὸς ὑπὲρ ἡμῶν τίς καθ' ἡμῶν" },
+  { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref: "Joshua 1:9", greek: "ἴσχυε καὶ ἀνδρίζου μὴ δειλία μηδὲ φοβηθῇς ὅτι μετὰ σοῦ κύριος ὁ θεός σου εἰς πάντα οὗ ἐὰν πορεύῃ" },
+  { text: "Neither death nor life, nor angels nor rulers, nor things present nor things to come, nor powers, nor height nor depth, nor anything else in all creation, will be able to separate us from the love of God in Christ Jesus our Lord.", ref: "Romans 8:38–39", greek: "πέπεισμαι γὰρ ὅτι οὔτε θάνατος οὔτε ζωὴ οὔτε ἄγγελοι οὔτε ἀρχαὶ οὔτε ἐνεστῶτα οὔτε μέλλοντα οὔτε δυνάμεις οὔτε ὕψωμα οὔτε βάθος οὔτε τις κτίσις ἑτέρα δυνήσεται ἡμᾶς χωρίσαι ἀπὸ τῆς ἀγάπης τοῦ θεοῦ τῆς ἐν Χριστῷ Ἰησοῦ τῷ κυρίῳ ἡμῶν" },
+  { text: "My grace is sufficient for you, for my power is made perfect in weakness.", ref: "2 Corinthians 12:9", greek: "ἀρκεῖ σοι ἡ χάρις μου ἡ γὰρ δύναμις ἐν ἀσθενείᾳ τελεῖται" },
+  { text: "In this world you will have trouble. But take heart! I have overcome the world.", ref: "John 16:33", greek: "ἐν τῷ κόσμῳ θλῖψιν ἕξετε ἀλλὰ θαρσεῖτε ἐγὼ νενίκηκα τὸν κόσμον" },
+  { text: "God is faithful, and he will not let you be tempted beyond your ability, but with the temptation he will also provide the way of escape.", ref: "1 Corinthians 10:13", greek: "πιστὸς δὲ ὁ θεός ὃς οὐκ ἐάσει ὑμᾶς πειρασθῆναι ὑπὲρ ὃ δύνασθε ἀλλὰ ποιήσει σὺν τῷ πειρασμῷ καὶ τὴν ἔκβασιν" },
+  { text: "Those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", ref: "Isaiah 40:31", greek: "οἱ δὲ ὑπομένοντες τὸν θεὸν ἀλλάξουσιν ἰσχύν πτεροφυήσουσιν ὡς ἀετοί δραμοῦνται καὶ οὐ κοπιάσουσιν πορεύσονται καὶ οὐ πεινάσουσιν" },
+  { text: "Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you, I will uphold you with my righteous right hand.", ref: "Isaiah 41:10", greek: "μὴ φοβοῦ ὅτι μετὰ σοῦ εἰμί μὴ πλανῶ ὅτι ἐγώ εἰμι ὁ θεός σου ἐνίσχυσά σε καὶ ἐβοήθησά σοι" },
+  { text: "We know that in all things God works for the good of those who love him, who have been called according to his purpose.", ref: "Romans 8:28", greek: "οἴδαμεν δὲ ὅτι τοῖς ἀγαπῶσιν τὸν θεὸν πάντα συνεργεῖ εἰς ἀγαθόν" },
+  { text: "In all these things we are more than conquerors through him who loved us.", ref: "Romans 8:37", greek: "ἀλλ' ἐν τούτοις πᾶσιν ὑπερνικῶμεν διὰ τοῦ ἀγαπήσαντος ἡμᾶς" },
+  { text: "The Lord is my light and my salvation — whom shall I fear? The Lord is the stronghold of my life — of whom shall I be afraid?", ref: "Psalm 27:1", greek: "κύριος φωτισμός μου καὶ σωτήρ μου τίνα φοβηθήσομαι κύριος ὑπερασπιστὴς τῆς ζωῆς μου ἀπὸ τίνος δειλιάσω" },
+  { text: "Count it all joy, my brothers, when you meet trials of various kinds, for you know that the testing of your faith produces steadfastness.", ref: "James 1:2–3", greek: "πᾶσαν χαρὰν ἡγήσασθε ἀδελφοί μου ὅταν πειρασμοῖς περιπέσητε ποικίλοις γινώσκοντες ὅτι τὸ δοκίμιον ὑμῶν τῆς πίστεως κατεργάζεται ὑπομονήν" },
+  { text: "After you have suffered a little while, the God of all grace, who has called you to his eternal glory in Christ, will himself restore, confirm, strengthen, and establish you.", ref: "1 Peter 5:10", greek: "ὁ δὲ θεὸς πάσης χάριτος ὁ καλέσας ὑμᾶς εἰς τὴν αἰώνιον αὐτοῦ δόξαν ἐν Χριστῷ ὀλίγον παθόντας αὐτὸς καταρτίσει στηρίξει σθενώσει θεμελιώσει" },
+  { text: "God gave us a spirit not of fear but of power and love and self-control.", ref: "2 Timothy 1:7", greek: "οὐ γὰρ ἔδωκεν ἡμῖν ὁ θεὸς πνεῦμα δειλίας ἀλλὰ δυνάμεως καὶ ἀγάπης καὶ σωφρονισμοῦ" },
+  { text: "Be strong in the Lord and in the strength of his might.", ref: "Ephesians 6:10", greek: "ἐνδυναμοῦσθε ἐν κυρίῳ καὶ ἐν τῷ κράτει τῆς ἰσχύος αὐτοῦ" },
+  { text: "The Lord himself goes before you and will be with you; he will never leave you nor forsake you. Do not be afraid; do not be discouraged.", ref: "Deuteronomy 31:8", greek: "καὶ κύριος ὁ συμπορευόμενος μετὰ σοῦ οὐκ ἀνήσει σε οὐδὲ ἐγκαταλείψει σε μὴ φοβοῦ μηδὲ δειλία" },
+  { text: "The steadfast love of the Lord never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.", ref: "Lamentations 3:22–23", greek: "τὰ ἐλέη κυρίου ὅτι οὐκ ἐξέλιπον ὅτι οὐ συνετελέσθησαν οἱ οἰκτιρμοί αὐτοῦ καινὰ εἰς τὰ πρωΐ πολλὴ ἡ πίστις σου" },
+  { text: "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff, they comfort me.", ref: "Psalm 23:4", greek: "ἐὰν γὰρ καὶ πορευθῶ ἐν μέσῳ σκιᾶς θανάτου οὐ φοβηθήσομαι κακά ὅτι σὺ μετ' ἐμοῦ εἶ ἡ ῥάβδος σου καὶ ἡ βακτηρία σου αὗταί με παρεκάλεσαν" },
+  { text: "I consider that our present sufferings are not worth comparing with the glory that will be revealed in us.", ref: "Romans 8:18", greek: "λογίζομαι γὰρ ὅτι οὐκ ἄξια τὰ παθήματα τοῦ νῦν καιροῦ πρὸς τὴν μέλλουσαν δόξαν ἀποκαλυφθῆναι εἰς ἡμᾶς" },
+  { text: "Our light and momentary troubles are achieving for us an eternal glory that far outweighs them all.", ref: "2 Corinthians 4:17", greek: "τὸ γὰρ παραυτίκα ἐλαφρὸν τῆς θλίψεως ἡμῶν καθ' ὑπερβολὴν εἰς ὑπερβολὴν αἰώνιον βάρος δόξης κατεργάζεται ἡμῖν" },
+  { text: "The Lord is good, a stronghold in the day of trouble; he knows those who take refuge in him.", ref: "Nahum 1:7", greek: "χρηστὸς κύριος τοῖς ὑπομένουσιν αὐτὸν ἐν ἡμέρᾳ θλίψεως" },
+  { text: "I lift up my eyes to the mountains — where does my help come from? My help comes from the Lord, the Maker of heaven and earth.", ref: "Psalm 121:1–2", greek: "ἦρα τοὺς ὀφθαλμούς μου εἰς τὰ ὄρη ὅθεν ἥξει ἡ βοήθειά μου ἡ βοήθειά μου παρὰ κυρίου τοῦ ποιήσαντος τὸν οὐρανὸν καὶ τὴν γῆν" },
+  { text: "Be strong and courageous and do it. Do not be afraid and do not be dismayed, for the Lord God, even my God, is with you. He will not leave you or forsake you.", ref: "1 Chronicles 28:20", greek: "ἴσχυε καὶ ἀνδρίζου καὶ ποίει μὴ φοβοῦ μηδὲ πτοηθῇς ὅτι κύριος ὁ θεός μου μετὰ σοῦ ἔσται" },
+  { text: "Though I have fallen, I will rise. Though I sit in darkness, the Lord will be my light.", ref: "Micah 7:8", greek: "μὴ ἐπίχαιρέ μοι ἡ ἐχθρά μου ὅτι πέπτωκα καὶ ἀναστήσομαι ὅτι ἐὰν καθίσω ἐν τῷ σκότει κύριος φωτιεῖ μοι" },
+  { text: "The righteous falls seven times and rises again, but the wicked stumble in times of calamity.", ref: "Proverbs 24:16", greek: "ἑπτάκις γὰρ πεσεῖται ὁ δίκαιος καὶ ἀναστήσεται οἱ δὲ ἀσεβεῖς ἀσθενήσουσιν ἐν κακοῖς" },
+  { text: "You keep him in perfect peace whose mind is stayed on you, because he trusts in you.", ref: "Isaiah 26:3", greek: "τὸ ἀντεχόμενον σὺ φυλάξεις εἰρήνην εἰρήνην ὅτι ἐπὶ σοὶ ἤλπισαν" },
+  { text: "The Lord your God is in your midst, a mighty one who will save; he will rejoice over you with gladness; he will quiet you by his love.", ref: "Zephaniah 3:17", greek: "κύριος ὁ θεός σου ἐν σοί δυνατός σώσει σε ἐπάξει ἐπὶ σὲ εὐφροσύνην καὶ καινιεῖ σε ἐν τῇ ἀγαπήσει αὐτοῦ" },
+  { text: "Since we are surrounded by so great a cloud of witnesses, let us lay aside every weight and sin which clings so closely, and let us run with endurance the race that is set before us.", ref: "Hebrews 12:1", greek: "τοιγαροῦν καὶ ἡμεῖς τοσοῦτον ἔχοντες περικείμενον ἡμῖν νέφος μαρτύρων ὄγκον ἀποθέμενοι πάντα καὶ τὴν εὐπερίστατον ἁμαρτίαν δι' ὑπομονῆς τρέχωμεν τὸν προκείμενον ἡμῖν ἀγῶνα" },
+  { text: "May the God of hope fill you with all joy and peace in believing, so that by the power of the Holy Spirit you may abound in hope.", ref: "Romans 15:13", greek: "ὁ δὲ θεὸς τῆς ἐλπίδος πληρώσαι ὑμᾶς πάσης χαρᾶς καὶ εἰρήνης ἐν τῷ πιστεύειν εἰς τὸ περισσεύειν ὑμᾶς ἐν τῇ ἐλπίδι ἐν δυνάμει πνεύματος ἁγίου" },
+  { text: "He gives power to the faint, and to him who has no might he increases strength.", ref: "Isaiah 40:29", greek: "ὁ διδοὺς τοῖς πεινῶσιν ἰσχύν καὶ τοῖς μὴ ἔχουσιν ἰσχὺν δύναμιν πληθύνει" },
+  { text: "The Lord is my rock, my fortress and my deliverer; my God is my rock, in whom I take refuge, my shield and the horn of my salvation, my stronghold.", ref: "Psalm 18:2", greek: "κύριος στερέωμά μου καὶ καταφυγή μου καὶ ῥύστης μου ὁ θεός μου βοηθός μου ἐλπιῶ ἐπ' αὐτόν ὑπερασπιστής μου καὶ κέρας σωτηρίας μου" },
+  { text: "The Lord is faithful. He will establish you and guard you against the evil one.", ref: "2 Thessalonians 3:3", greek: "πιστὸς δέ ἐστιν ὁ κύριος ὃς στηρίξει ὑμᾶς καὶ φυλάξει ἀπὸ τοῦ πονηροῦ" },
+  { text: "You are from God and have overcome them, for he who is in you is greater than he who is in the world.", ref: "1 John 4:4", greek: "ὑμεῖς ἐκ τοῦ θεοῦ ἐστε τεκνία καὶ νενικήκατε αὐτούς ὅτι μείζων ἐστὶν ὁ ἐν ὑμῖν ἢ ὁ ἐν τῷ κόσμῳ" },
+  { text: "The Lord will fight for you; you need only to be still.", ref: "Exodus 14:14", greek: "κύριος πολεμήσει περὶ ὑμῶν καὶ ὑμεῖς σιγήσετε" },
+  { text: "Commit your work to the Lord, and your plans will be established.", ref: "Proverbs 16:3", greek: "ἀποκάλυψον πρὸς κύριον τὰ ἔργα σου καὶ κατορθωθήσονται αἱ διάνοιαί σου" },
+  { text: "Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God.", ref: "Philippians 4:6", greek: "μηδὲν μεριμνᾶτε ἀλλ' ἐν παντὶ τῇ προσευχῇ καὶ τῇ δεήσει μετὰ εὐχαριστίας τὰ αἰτήματα ὑμῶν γνωριζέσθω πρὸς τὸν θεόν" },
+  { text: "The peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus.", ref: "Philippians 4:7", greek: "ἡ εἰρήνη τοῦ θεοῦ ἡ ὑπερέχουσα πάντα νοῦν φρουρήσει τὰς καρδίας ὑμῶν καὶ τὰ νοήματα ὑμῶν ἐν Χριστῷ Ἰησοῦ" },
+  { text: "He heals the brokenhearted and binds up their wounds.", ref: "Psalm 147:3", greek: "ὁ ἰώμενος τοὺς συντετριμμένους τῇ καρδίᾳ καὶ δεσμεύων τὰ συντρίμματα αὐτῶν" },
+  { text: "The name of the Lord is a strong tower; the righteous man runs into it and is safe.", ref: "Proverbs 18:10", greek: "πύργος ἰσχυρὸς ὄνομα κυρίου εἰς αὐτὸν δὲ τρέχει δίκαιος καὶ ὑψοῦται" },
+  { text: "Let us hold fast the confession of our hope without wavering, for he who promised is faithful.", ref: "Hebrews 10:23", greek: "κατέχωμεν τὴν ὁμολογίαν τῆς ἐλπίδος ἀκλινῆ πιστὸς γὰρ ὁ ἐπαγγειλάμενος" },
+  { text: "When you pass through the waters, I will be with you; and through the rivers, they shall not overwhelm you; when you walk through fire you shall not be burned.", ref: "Isaiah 43:2", greek: "ἐὰν διαβαίνῃς δι' ὕδατος μετὰ σοῦ εἰμί καὶ ποταμοὶ οὐ συγκλύσουσίν σε ἐὰν διέλθῃς διὰ πυρός οὐ μὴ κατακαυθῇς" },
+  { text: "Blessed is the man who remains steadfast under trial, for when he has stood the test he will receive the crown of life.", ref: "James 1:12", greek: "μακάριος ἀνὴρ ὃς ὑπομένει πειρασμόν ὅτι δόκιμος γενόμενος λήμψεται τὸν στέφανον τῆς ζωῆς" },
+  { text: "Do not throw away your confidence; it will be richly rewarded. You need to persevere so that when you have done the will of God, you will receive what he has promised.", ref: "Hebrews 10:35–36", greek: "μὴ ἀποβάλητε οὖν τὴν παρρησίαν ὑμῶν ἥτις ἔχει μεγάλην μισθαποδοσίαν ὑπομονῆς γὰρ ἔχετε χρείαν" },
+  { text: "He who began a good work in you will carry it on to completion until the day of Christ Jesus.", ref: "Philippians 1:6", greek: "πεποιθὼς αὐτὸ τοῦτο ὅτι ὁ ἐναρξάμενος ἐν ὑμῖν ἔργον ἀγαθὸν ἐπιτελέσει ἄχρι ἡμέρας Χριστοῦ Ἰησοῦ" },
+  { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11", greek: "ἐγὼ γὰρ οἶδα τοὺς λογισμοὺς οὓς ἐγὼ λογίζομαι ἐφ' ὑμᾶς λέγει κύριος λογισμοὺς εἰρήνης καὶ οὐ κακῶν" },
+  { text: "In God I trust and am not afraid. What can man do to me?", ref: "Psalm 56:11", greek: "ἐπὶ τῷ θεῷ ἤλπισα οὐ φοβηθήσομαι τί ποιήσει μοι ἄνθρωπος" },
+  { text: "Now to him who is able to do far more abundantly than all that we ask or think, according to the power at work within us — to him be glory.", ref: "Ephesians 3:20–21", greek: "τῷ δὲ δυναμένῳ ὑπὲρ πάντα ποιῆσαι ὑπερεκπερισσοῦ ὧν αἰτούμεθα ἢ νοοῦμεν κατὰ τὴν δύναμιν τὴν ἐνεργουμένην ἐν ἡμῖν αὐτῷ ἡ δόξα" },
+  { text: "Cast your burden on the Lord, and he will sustain you; he will never permit the righteous to be moved.", ref: "Psalm 55:22", greek: "ἐπίρριψον ἐπὶ κύριον τὴν μέριμνάν σου καὶ αὐτός σε διαθρέψει οὐ δώσει εἰς τὸν αἰῶνα σάλον τῷ δικαίῳ" },
+  { text: "I am the Lord your God who takes hold of your right hand and says to you, Do not fear; I will help you.", ref: "Isaiah 41:13", greek: "ὅτι ἐγὼ ὁ θεός σου ὁ κρατῶν τῆς δεξιᾶς σου ὁ λέγων σοι μὴ φοβοῦ ἐβοήθησά σοι" }
 ];
 
 function populateHomeScreen() {
@@ -9687,11 +9687,12 @@ let _homeFlipEnVerse = '';
 let _homeFlipEnSnippet = '';
 
 function _startHomeFlip() {
-  if (_homeFlipTimer) return;
+  clearInterval(_homeFlipTimer);
   _homeFlipIsGreek = false;
-  _homeFlipEnVerse = document.getElementById('homeVerseText')?.textContent || '';
-  _homeFlipEnSnippet = document.getElementById('hccSnippet')?.textContent || '';
-  _homeFlipTimer = setInterval(_doHomeFlip, 30000);
+  const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  _homeFlipEnVerse = HOME_VERSES[doy % HOME_VERSES.length].text;
+  try { _homeFlipEnSnippet = JSON.parse(localStorage.getItem('rhemaLastPos') || '{}').snippet || ''; } catch { _homeFlipEnSnippet = ''; }
+  _homeFlipTimer = setInterval(_doHomeFlip, 15000);
 }
 
 function _stopHomeFlip() {
@@ -9706,50 +9707,30 @@ function _stopHomeFlip() {
   }
 }
 
-function _homeFlipGetGreek(ref) {
-  if (!window.RhemaNT) return '';
-  const m = String(ref).match(/^(.+?)\s+(\d+):(\d+)/);
-  if (!m) return '';
-  const name = m[1].trim().toLowerCase(), ch = m[2], v = m[3];
-  const code = Object.keys(window.RhemaNT.names || {})
-    .find(k => (window.RhemaNT.names[k] || '').toLowerCase() === name);
-  if (!code) return '';
-  const words = (((window.RhemaNT.text || {})[code] || {})[ch] || {})[v] || [];
-  return words.map(w => w[0]).join(' ');
-}
-
 function _doHomeFlip() {
   if (!document.getElementById('homeScreen')?.classList.contains('active')) {
     _stopHomeFlip();
     return;
   }
-  const wantGreek = !_homeFlipIsGreek;
+  _homeFlipIsGreek = !_homeFlipIsGreek;
+
+  const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const verse = HOME_VERSES[doy % HOME_VERSES.length];
 
   const vt = document.getElementById('homeVerseText');
   if (vt) {
-    let text = '';
-    if (wantGreek) {
-      const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-      text = _homeFlipGetGreek(HOME_VERSES[doy % HOME_VERSES.length].ref);
-    } else {
-      text = _homeFlipEnVerse;
-    }
+    const text = _homeFlipIsGreek ? verse.greek : _homeFlipEnVerse;
     if (text) _morphTextEl(vt, text, 18);
-    else if (wantGreek) return; // no greek available — skip this cycle
   }
 
   const sn = document.getElementById('hccSnippet');
   if (sn) {
-    let text = '';
-    if (wantGreek) {
-      try { text = JSON.parse(localStorage.getItem('rhemaLastPos') || '{}').greek || ''; } catch {}
-    } else {
-      text = _homeFlipEnSnippet;
+    let snText = _homeFlipEnSnippet;
+    if (_homeFlipIsGreek) {
+      try { snText = JSON.parse(localStorage.getItem('rhemaLastPos') || '{}').greek || ''; } catch { snText = ''; }
     }
-    if (text) _morphTextEl(sn, text, 38);
+    if (snText) _morphTextEl(sn, snText, 38);
   }
-
-  _homeFlipIsGreek = wantGreek;
 }
 
 function _morphTextEl(el, toText, staggerMs) {
