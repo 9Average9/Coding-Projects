@@ -1,5 +1,5 @@
 const RHEMA_XREF_CATEGORIES = [
-  { key: 'direct', title: 'Direct Cross References', short: 'Direct', icon: 'format_quote', desc: 'Verses that directly reference or relate to this verse.' },
+  { key: 'direct', title: 'Direct Cross References', short: 'Direct', icon: 'menu_book', desc: 'Verses that directly reference or relate to this verse.' },
   { key: 'themes', title: 'Thematic Links', short: 'Themes', icon: 'hub', desc: 'Verses connected by common themes and topics.' },
   { key: 'otNt', title: 'Old Testament / New Testament Connections', short: 'OT/NT Connections', icon: 'link', desc: 'Verses connected across the Old and New Testament.' },
   { key: 'parallel', title: 'Parallel Ideas', short: 'Parallel Ideas', icon: 'sync_alt', desc: 'Verses with similar ideas or parallel concepts.' },
@@ -150,7 +150,7 @@ function renderRhemaCrossReferences() {
   body.innerHTML = _xrefTopCardHtml() + `<div class="rx-category-list">${RHEMA_XREF_CATEGORIES.map(cat => {
     const refs = data[cat.key] || [];
     const isEmpty = refs.length === 0;
-    const preview = !isEmpty ? refs.slice(0, 3).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('') : '';
+    const preview = !isEmpty ? refs.slice(0, 2).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('') : '';
     const chips = cat.key === 'themes' && !isEmpty ? refs.slice(0, 5).map(item => `<span>${_xrefEscape(item.label)}</span>`).join('') : '';
     return `<button class="rx-category-card${isEmpty ? ' rx-no-data' : ''}" data-xref-cat="${cat.key}" onclick="openRhemaXrefCategory('${cat.key}')">
       <span class="rx-category-icon material-symbols-outlined">${cat.icon}</span>
@@ -198,7 +198,7 @@ function renderRhemaXrefTrail() {
   </button>`).join('');
   const save = _studySandboxId ? `<button class="rx-save-trail-btn" onclick="saveCurrentRhemaTrail()"><span class="material-symbols-outlined">bookmark</span>Save Trail</button>` : '';
   document.getElementById('rxMainView').innerHTML = _xrefTopCardHtml() +
-    `<div class="rx-active-category"><span class="material-symbols-outlined">${cat.icon}</span><div><strong>${cat.title} <em>${refs.length}</em></strong><p>${cat.desc}</p></div></div>` +
+    `<div class="rx-active-category" data-xref-cat="${cat.key}"><span class="material-symbols-outlined">${cat.icon}</span><div><strong>${cat.title} <em>${refs.length}</em></strong><p>${cat.desc}</p></div></div>` +
     `<div class="rx-verse-stack">${cards || '<p class="rx-empty">No starter links are loaded for this verse yet.</p>'}</div>${save}`;
 }
 
