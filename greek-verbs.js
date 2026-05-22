@@ -12,14 +12,19 @@ let currentVerbAdvLesson = null;
 
 // ── Lesson ID Arrays ───────────────────────────────────────────────────────────
 const VERB_BASIC_LESSONS = [
-  "vb_01","vb_02","vb_03","vb_04","vb_05","vb_06","vb_07","vb_08",
-  "vb_09","vb_10","vb_11","vb_12","vb_13","vb_14","vb_15","vb_16",
-  "vb_17","vb_18","vb_19","vb_20","vb_21","vb_22"
+  "vb_01","vb_02","vb_03","vb_04","vb_05","vb_06","vb_07",
+  "vb_23","vb_24","vb_25","vb_26",
+  "vb_08","vb_09","vb_10","vb_11","vb_12",
+  "vb_27",
+  "vb_13","vb_14","vb_15","vb_16","vb_17","vb_18","vb_19","vb_20",
+  "vb_28",
+  "vb_21","vb_22"
 ];
 
 const VERB_ADV_LESSONS = [
-  "va_01","va_02","va_03","va_04","va_05","va_06","va_07","va_08",
-  "va_09","va_10","va_11","va_12","va_13","va_14","va_15","va_16",
+  "va_01","va_02","va_29","va_30",
+  "va_03","va_04","va_05","va_06","va_07","va_08","va_09","va_31","va_32",
+  "va_10","va_11","va_12","va_13","va_14","va_15","va_16",
   "va_17","va_18","va_19","va_20","va_21","va_22","va_23","va_24",
   "va_25","va_26","va_27","va_28"
 ];
@@ -29,22 +34,30 @@ const VERB_BASIC_LESSON_TITLES = {
   vb_01:"What Verbs Are in English", vb_02:"Subjects and Actions",
   vb_03:"Time and Action",           vb_04:"Commands and Statements",
   vb_05:"Intro to Greek Verbs",      vb_06:"Person and Number",
-  vb_07:"Present Active Indicative", vb_08:"Understanding Endings",
+  vb_07:"Present Active Indicative",
+  vb_23:"What Is a Paradigm?",       vb_24:"How Greek Verbs Are Built",
+  vb_25:"Connecting Vowels",         vb_26:"Reading Verb Patterns",
+  vb_08:"Understanding Endings",
   vb_09:"Active Voice",              vb_10:"Middle and Passive Basics",
   vb_11:"Indicative Mood",           vb_12:"Imperfect Tense",
+  vb_27:"Augment — Marking Past Time",
   vb_13:"Future Tense",              vb_14:"Aorist Basics",
   vb_15:"Second Aorists",            vb_16:"Perfect Tense",
   vb_17:"Imperatives",               vb_18:"Infinitives",
   vb_19:"Participles",               vb_20:"Principal Parts",
+  vb_28:"Contract Verbs",
   vb_21:"Reading Full Parses",       vb_22:"Reading Real NT Verbs"
 };
 
 const VERB_ADV_LESSON_TITLES = {
   va_01:"Verbs and Communication",          va_02:"Embedded Subjects",
+  va_29:"Morphological Construction",       va_30:"Connecting Vowels and Contracts",
   va_03:"Present Tense and Imperfective",   va_04:"Imperfect in Narrative",
   va_05:"Future Tense Nuance",              va_06:"Aorist Overview",
   va_07:"Constative and Ingressive Ideas",  va_08:"Culminative Ideas",
-  va_09:"Second Aorists",                   va_10:"Aspect and Time",
+  va_09:"Second Aorists",
+  va_31:"Tense Formatives and Stem Changes",va_32:"Augment and Reduplication",
+  va_10:"Aspect and Time",
   va_11:"Active Voice in Depth",            va_12:"Middle Voice Nuance",
   va_13:"Passive Voice Nuance",             va_14:"Deponent Discussion",
   va_15:"Imperatives and Force",            va_16:"Subjunctive Introduction",
@@ -1076,6 +1089,102 @@ const VERB_ADV_KC_DATA = {
     { correct: true, feedback: "Exactly! Final integration means bringing together everything learned — tense, voice, mood, aspect, syntax, participles, infinitives, conditionals — and applying them in reading real NT texts holistically." },
     { feedback: "Passing quizzes demonstrates knowledge of isolated points. Integration is about applying all skills together in connected reading." },
     { feedback: "Learning more vocabulary is valuable, but integration means applying what you know more deeply — not just adding more items." }
+  ],
+  kc_va_29_1: [
+    { feedback: "Personal endings communicate person and number, not the tense system." },
+    { correct: true, feedback: "Exactly! The -ο- in λύομεν is the connecting vowel that smooths the junction between stem and ending." },
+    { feedback: "The tense formative is a separate element inserted between stem and connecting vowel to mark the tense system." },
+    { feedback: "In λύομεν, the -μεν is the personal ending." }
+  ],
+  kc_va_29_2: [
+    { feedback: "The ending communicates person and number — not the core lexical meaning." },
+    { feedback: "The connecting vowel is structural glue; it carries no lexical meaning." },
+    { correct: true, feedback: "Correct! The stem carries the core lexical meaning. λυ- means 'loose/release'; γραφ- means 'write'." },
+    { feedback: "The augment marks past time; it does not carry the verb's core lexical meaning." }
+  ],
+  kc_va_29_3: [
+    { feedback: "The action comes from the stem, not the ending." },
+    { correct: true, feedback: "Correct! The personal ending communicates both person (1st/2nd/3rd) and number (singular/plural) — and thereby embeds the subject within the verb." },
+    { feedback: "Time is communicated by the augment and tense formative, not the personal ending alone." },
+    { feedback: "Voice is carried by the ending system as a whole, but the primary role of the personal ending is person and number." }
+  ],
+  kc_va_29_4: [
+    { feedback: "The augment appears at the front of past-indicative forms, not at the end." },
+    { feedback: "The stem is the core carrier of meaning, positioned before the tense formative and ending." },
+    { feedback: "The tense formative comes after the stem and before the connecting vowel and ending." },
+    { correct: true, feedback: "Correct! In the morphological template, the personal ending always comes last — it closes the verb form and identifies person and number." }
+  ],
+  kc_va_30_1: [
+    { feedback: "Mute-consonant stems undergo different changes. Contract verbs are specifically vowel-final stems." },
+    { correct: true, feedback: "Exactly! The stem-final vowel (ε, α, or ο) meets the connecting vowel and contracts into a single merged vowel or diphthong." },
+    { feedback: "Contract verbs use the same personal endings as regular verbs." },
+    { feedback: "Contraction follows systematic rules: ε + ο → ου; ε + ε → ει, etc." }
+  ],
+  kc_va_30_2: [
+    { feedback: "The velar is not dropped — it merges with σ to produce ξ." },
+    { correct: true, feedback: "Correct! Velar consonants (κ, γ, χ) combine with σ to produce ξ (xi). For example, ἄγω → ἄξω in the future." },
+    { feedback: "Adding σ to a velar produces a change — the velar + σ merge into ξ." },
+    { feedback: "These patterns are systematic and predictable." }
+  ],
+  kc_va_30_3: [
+    { correct: true, feedback: "Correct! When ε meets ε in contraction, the result is the diphthong ει. This is part of the systematic ε-contract pattern." },
+    { feedback: "ε + ε does not become η. The η result comes from temporal augment on ε-initial stems." },
+    { feedback: "ε + ε does not become αι. Check the ε-contract table: ε + ε → ει." },
+    { feedback: "ε + ε does not disappear — both vowels participate in the contraction to produce ει." }
+  ],
+  kc_va_30_4: [
+    { feedback: "φιλέω is an ε-contract verb. ἀγαπάω ends in -άω, making it the alpha-contract." },
+    { feedback: "ο-contract verbs end in -όω (e.g., πληρόω). ἀγαπάω ends in -άω." },
+    { correct: true, feedback: "Correct! ἀγαπάω ends in α, making it a classic alpha-contract verb. Its stem final α interacts with connecting vowels and endings to produce contracted forms." },
+    { feedback: "ἀγαπάω is not a liquid verb (liquid stems end in λ, μ, ν, ρ). It is an alpha-contract." }
+  ],
+  kc_va_31_1: [
+    { feedback: "Future active uses -σ- as its tense formative, not -θη-." },
+    { feedback: "The perfect active uses -κ-. -θη- marks the aorist passive." },
+    { correct: true, feedback: "Correct! The -θη- marker is the characteristic tense formative of the aorist passive system." },
+    { feedback: "The imperfect uses no tense formative. -θη- specifically marks the aorist passive." }
+  ],
+  kc_va_31_2: [
+    { feedback: "The reduplication prefix (λε-) signals the perfect system, but the tense formative itself is -κ-." },
+    { correct: true, feedback: "Exactly! The -κ- in λέλυκα is the perfect active tense formative, positioned between the stem (λυ-) and the ending." },
+    { feedback: "The -α- is part of the perfect active ending pattern, not the tense formative." },
+    { feedback: "λυ- is the lexical stem, not a tense marker." }
+  ],
+  kc_va_31_3: [
+    { feedback: "Liquid verbs do form futures — they just do so without the standard -σ- tense formative." },
+    { correct: true, feedback: "Correct! When a stem ends in a liquid (λ, μ, ν, ρ), adding σ is phonologically difficult. The σ drops, and the stem vowel lengthens to compensate — producing forms like κρινῶ from κρίνω." },
+    { feedback: "Liquid verbs do not default to aorist forms. They form distinct futures through compensatory lengthening." },
+    { feedback: "Liquid verbs are active verbs. Their unusual futures are a phonological adaptation, not a voice shift." }
+  ],
+  kc_va_31_4: [
+    { feedback: "Tense formatives appear between stem and ending — they are not the same as the augment." },
+    { feedback: "Tense formatives do not replace the stem — they augment it with a tense signal." },
+    { correct: true, feedback: "Correct! Tense formatives are morphological signals inserted between the stem and the personal ending to identify which tense-voice system the form belongs to." },
+    { feedback: "Tense formatives are present in the indicative and some other forms, but they are not limited to irregular verbs." }
+  ],
+  kc_va_32_1: [
+    { feedback: "The augment appears only in the indicative mood. Aorist subjunctive/infinitive/participle forms lack it." },
+    { correct: true, feedback: "Correct! The augment appears only in the indicative mood — it is a signal of past indicative time, not simply past aspect." },
+    { feedback: "Imperatives do not carry the augment." },
+    { feedback: "Infinitives do not carry the augment." }
+  ],
+  kc_va_32_2: [
+    { feedback: "Future forms use the -σ- tense formative, not reduplication." },
+    { feedback: "Aorist forms use augment and -σα- tense formative. Reduplication belongs to the perfect system." },
+    { feedback: "Imperfect forms use augment + present stem + secondary endings." },
+    { correct: true, feedback: "Correct! Reduplication — duplicating the initial consonant + ε — is the characteristic morphological signal of the perfect tense system." }
+  ],
+  kc_va_32_3: [
+    { feedback: "A temporal augment changes the vowel quality — it does not add a separate prefix syllable." },
+    { correct: true, feedback: "Correct! A temporal augment lengthens the initial vowel. ε lengthens to η. So ἐλπίζω (ε-initial) → ἤλπιζον in the imperfect." },
+    { feedback: "The initial vowel is lengthened, not removed. ε → η; ο → ω; α → η." },
+    { feedback: "Temporal augments apply to vowel-initial stems and lengthen the vowel — not drop it." }
+  ],
+  kc_va_32_4: [
+    { feedback: "Reduplication signals completed action with ongoing result — it is the marker of the perfect, not ongoing present action." },
+    { feedback: "Reduplication is not merely decorative or emphatic — it carries grammatical meaning as the perfect's signature marker." },
+    { feedback: "Reduplication belongs to the perfect system, not the imperfect or pluperfect exclusively." },
+    { correct: true, feedback: "Correct! Reduplication in the perfect tense communicates that the action is completed and its result continues. It encodes the perfect's stative aspect." }
   ]
 };
 
@@ -1276,5 +1385,33 @@ const VERB_ADV_QUIZ_DATA = {
     { text:"Which BEST represents the goal of this verb curriculum?", options:["Passing quizzes and completing lessons","Developing the ability to think through Greek meaning naturally, not just identify labels","Memorizing verb paradigms for all six principal parts","Translating every NT verse into English"], correct:1 },
     { text:"At the integration stage, how should students approach new NT passages?", options:["Parse every word before attempting meaning","Bring accumulated grammatical and syntactical knowledge to bear while following the text's flow","Ignore grammar and focus only on English translation","Read only passages covered in this curriculum"], correct:1 },
     { text:"Which statement BEST reflects the purpose of Greek verb study?", options:["Grammar study is the final goal — knowing labels is enough","Grammar study serves reading — the goal is to think through how Greek communicates, not merely name forms","Advanced Greek is only for seminary professors","Greek verbs are too complex for most students"], correct:1 }
+  ]},
+  va_29: { title:"Morphological Construction", passMark:4, questions:[
+    { text:"Which describes the correct morphological template for Greek verb forms?", options:["Ending + Stem + Connecting Vowel","Stem + (Tense Formative) + Connecting Vowel + Personal Ending","Connecting Vowel + Stem + Ending","Personal Ending + Tense Formative + Stem"], correct:1 },
+    { text:"In λύσομεν, the -σ- between stem and connecting vowel is:", options:["The personal ending","A second stem","The tense formative marking the future system","The augment prefix"], correct:2 },
+    { text:"What makes morphological analysis useful for NT reading?", options:["It allows students to decode unfamiliar forms by recognizing component parts","It replaces the need to understand context","It only works for the most common vocabulary","It is useful only for parsing practice"], correct:0 },
+    { text:"In the present active indicative of λύω, which element is absent compared to the future?", options:["The personal ending","The connecting vowel","The tense formative","The lexical stem"], correct:2 },
+    { text:"Why does understanding verb morphology complement understanding verb function?", options:["Form and function are identical","Form alone is sufficient for translating Greek","Recognizing form is the entry point for identifying grammatical category; function explains what it communicates","Function should always be learned before form"], correct:2 }
+  ]},
+  va_30: { title:"Connecting Vowels and Contracts", passMark:4, questions:[
+    { text:"Contract verbs are verbs whose stems end in:", options:["A mute consonant","A liquid consonant","A vowel (α, ε, or ο)","A double consonant (ξ, ψ)"], correct:2 },
+    { text:"In φιλέω (love), when stem-final ε meets connecting vowel ο, the result is:", options:["φιλεο- (both remain separate)","φιλου- (ε + ο contract to ου)","φιλα- (ε + ο contract to α)","φιλη- (ε + ο contract to η)"], correct:1 },
+    { text:"When a labial consonant (π, β, φ) combines with the -σ- future marker, they merge to produce:", options:["ξ (xi)","ψ (psi)","The labial drops and σ remains","σσ (double sigma)"], correct:1 },
+    { text:"Which principle best explains apparent stem irregularities in Greek verbs?", options:["Irregularities are random and must be memorized","Systematic phonological rules govern every apparent alteration","Most verbs have completely unique paradigms","Contract verbs use different personal endings"], correct:1 },
+    { text:"Liquid verbs (stems ending in λ, μ, ν, ρ) differ primarily in that:", options:["They use a completely different set of personal endings","They never form aorists","They do not use the standard -σ- future tense formative but form futures through compensatory lengthening","They are all deponent verbs"], correct:2 }
+  ]},
+  va_31: { title:"Tense Formatives and Stem Changes", passMark:4, questions:[
+    { text:"Which tense formative is characteristic of the aorist passive system?", options:["-σ-","-κ-","-θη-","-α-"], correct:2 },
+    { text:"In ἔλυσα, the -σα- represents:", options:["Connecting vowel and personal ending combined","First aorist active tense formative (σ) plus thematic vowel (α)","The augment and the stem","The perfect active tense formative"], correct:1 },
+    { text:"If a student spots -κ- between stem and ending, the most likely identification is:", options:["Future active","Aorist passive","Perfect active","Imperfect active"], correct:2 },
+    { text:"Why are tense formatives 'diagnostic markers'?", options:["They replace the need to identify the personal ending","They narrow parsing possibilities to a specific tense-voice system before the ending is analyzed","They indicate the mood of the verb","They are only present in irregular verbs"], correct:1 },
+    { text:"Which tense uses no tense formative in active forms but signals itself through reduplication?", options:["Aorist","Future","Perfect","Imperfect"], correct:2 }
+  ]},
+  va_32: { title:"Augment and Reduplication", passMark:4, questions:[
+    { text:"The syllabic augment consists of:", options:["Lengthening the initial vowel of a vowel-initial stem","Adding ε- before consonant-initial stems to signal past indicative time","Reduplicating the initial consonant of the stem","Adding -κ- after the stem"], correct:1 },
+    { text:"In ἤκουον (I was hearing — from ἀκούω), the augment is:", options:["A syllabic augment (ε- prefix added)","A temporal augment (initial α lengthened to η)","Reduplication of the first consonant","There is no augment in this form"], correct:1 },
+    { text:"In which mood does the augment NOT appear, even for past-time verb systems?", options:["Indicative","Subjunctive","Only the imperative","Augment appears in all moods"], correct:1 },
+    { text:"Reduplication in γέγραφα (from γράφω) consists of:", options:["The augment ε- before the stem","The γε- prefix formed by repeating initial consonant (γ) + ε","The perfect tense formative -κ-","A temporal lengthening of the initial vowel"], correct:1 },
+    { text:"If a verb stem begins with an aspirated consonant (φ, θ, χ), the reduplication prefix uses:", options:["The aspirated consonant itself + ε","The corresponding unaspirated consonant + ε (e.g., πε- for φ-initial stems)","Simply ε- as a syllabic augment","No prefix — aspirated stems never reduplicate"], correct:1 }
   ]}
 };
