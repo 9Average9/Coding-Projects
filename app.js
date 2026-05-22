@@ -10199,10 +10199,11 @@ function shuffle(array) {
 }
 
 function getStats() {
-  return JSON.parse(localStorage.getItem("greekVocabStats")) || {
-    tests: [],
-    words: {}
-  };
+  const stats = JSON.parse(localStorage.getItem("greekVocabStats")) || { tests: [], words: {} };
+  if (localStorage.getItem("testsCompleted") === null) {
+    localStorage.setItem("testsCompleted", String((stats.tests || []).length));
+  }
+  return stats;
 }
 
 function saveStats(stats) {
@@ -16843,7 +16844,11 @@ function showLbUserInfo(id) {
   document.getElementById("lbUserTime").textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   const tests = isMe
-    ? parseInt(localStorage.getItem("testsCompleted") || "0")
+    ? (() => {
+        const stored = localStorage.getItem("testsCompleted");
+        if (stored !== null) return parseInt(stored);
+        try { return (JSON.parse(localStorage.getItem("greekVocabStats") || "{}").tests || []).length; } catch { return 0; }
+      })()
     : (e.testsCompleted || 0);
   document.getElementById("lbUserTests").textContent = tests;
 
