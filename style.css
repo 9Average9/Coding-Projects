@@ -12216,7 +12216,9 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rx-top-card {
   min-height: 0;
   height: auto;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   border: 0;
   border-radius: 22px;
   padding: 22px 78px 24px 22px;
@@ -12226,22 +12228,37 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
     var(--card-color)
   );
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
-  overflow: visible;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
 }
 
 .rx-top-card-copy {
+  display: block;
   position: relative;
   z-index: 1;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .rx-top-card h3 {
+  display: block;
+  position: relative;
+  z-index: 2;
   color: var(--text-color);
   font-size: clamp(1.35rem, 7vw, 1.85rem);
   line-height: 1.08;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 0;
   margin-bottom: 16px;
 }
 
 .rx-top-card p {
+  position: relative;
+  z-index: 2;
   max-width: none;
   font-size: 1.03rem;
   line-height: 1.65;
