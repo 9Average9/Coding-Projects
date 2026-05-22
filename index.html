@@ -12368,18 +12368,17 @@ glacier: {
       <div class="lesson-block-header">The morphological template<small class="block-time">~ 2 min</small></div>
       <div class="lesson-block-content">
         <p>Every Greek verb form is built from this six-slot template:</p>
-        <div class="pattern-box">
-          [<span class="aug-piece">augment</span>] + [<span class="redup-piece">reduplication</span>] + <span class="stem-piece">stem</span> + [<span class="tf-piece">tense formative</span>] + [<span class="cv-piece">connecting vowel</span>] + <span class="ending-piece">personal ending</span>
-        </div>
-        <p>Not all six slots are filled for every form. But every slot has a specific function:</p>
-        <ul>
-          <li><strong class="aug-piece">Augment</strong> — signals past indicative time</li>
-          <li><strong class="redup-piece">Reduplication</strong> — signals the perfect tense system</li>
-          <li><strong class="stem-piece">Stem</strong> — carries the core lexical meaning</li>
-          <li><strong class="tf-piece">Tense Formative</strong> — signals which tense-voice system</li>
-          <li><strong class="cv-piece">Connecting Vowel</strong> — smooths stem-to-ending junction</li>
-          <li><strong class="ending-piece">Personal Ending</strong> — communicates person and number</li>
-        </ul>
+        <table class="verb-paradigm-table">
+          <thead><tr><th>Slot</th><th>Required?</th><th>Function</th></tr></thead>
+          <tbody>
+            <tr><td><span class="aug-piece">augment</span></td><td class="vpt-parse">optional</td><td class="vpt-trans">signals past indicative time</td></tr>
+            <tr><td><span class="redup-piece">reduplication</span></td><td class="vpt-parse">optional</td><td class="vpt-trans">signals perfect tense system</td></tr>
+            <tr><td><span class="stem-piece">stem</span></td><td class="vpt-parse">always</td><td class="vpt-trans">carries core lexical meaning</td></tr>
+            <tr><td><span class="tf-piece">tense formative</span></td><td class="vpt-parse">optional</td><td class="vpt-trans">signals which tense-voice system</td></tr>
+            <tr><td><span class="cv-piece">connecting vowel</span></td><td class="vpt-parse">optional</td><td class="vpt-trans">smooths stem-to-ending junction</td></tr>
+            <tr><td><span class="ending-piece">personal ending</span></td><td class="vpt-parse">always</td><td class="vpt-trans">communicates person and number</td></tr>
+          </tbody>
+        </table>
         <p class="highlight">When you analyze a form, you are not decoding chaos. You are reading a predictable structure.</p>
       </div>
     </div>
