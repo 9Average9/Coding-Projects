@@ -8321,14 +8321,16 @@ body.dark button.continue-learning-btn {
   position: relative;
   background: rgb(255, 252, 242);
   border-radius: 22px;
-  padding: 20px 16px 14px;
+  padding: 16px 14px 12px;
   max-width: 500px;
   width: calc(100vw - 24px);
   max-height: 88vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   box-shadow: 0 24px 64px rgba(0,0,0,0.32);
 }
 
@@ -8352,25 +8354,25 @@ body.dark button.continue-learning-btn {
 }
 
 .lm-heading {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  margin: 0 0 2px;
+  margin: 0;
   padding-right: 36px;
   color: #1a1a1a;
   text-align: center;
 }
 
 .lm-subheading {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #777;
-  margin: 0 0 2px;
+  margin: 0;
   text-align: center;
 }
 
 /* ── Section card ── */
 .lm-section {
   border-radius: 14px;
-  padding: 12px;
+  padding: 8px;
   border: 1px solid rgba(0,0,0,0.08);
 }
 
@@ -8387,19 +8389,19 @@ body.dark button.continue-learning-btn {
 .lm-section-head {
   display: flex;
   align-items: center;
-  gap: 11px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 7px;
 }
 
 .lm-section-icon-wrap {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   color: #fff;
   flex-shrink: 0;
 }
@@ -8426,15 +8428,15 @@ body.dark button.continue-learning-btn {
 .lm-pair {
   display: flex;
   align-items: stretch;
-  gap: 6px;
+  gap: 4px;
 }
 
 /* ── Track card (foundations: centered) ── */
 .lm-track-card {
   flex: 1;
   background: #fff;
-  border-radius: 12px;
-  padding: 12px 10px 10px;
+  border-radius: 10px;
+  padding: 10px 8px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8442,42 +8444,45 @@ body.dark button.continue-learning-btn {
   cursor: pointer;
   border: 1px solid rgba(0,0,0,0.07);
   transition: transform 0.12s, box-shadow 0.12s;
-  gap: 6px;
+  gap: 5px;
 }
 
 .lm-track-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
 
 .lm-track-card strong {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a1a1a;
   line-height: 1.25;
 }
 
 .lm-track-card p {
-  font-size: 0.74rem;
-  line-height: 1.45;
+  font-size: 0.72rem;
+  line-height: 1.4;
   color: #555;
   margin: 0;
   flex: 1;
 }
 
 .lm-track-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   flex-shrink: 0;
 }
 
+/* Basic = theme accent, Advanced/Found = gold */
+.lm-ticon-basic { background: var(--accent-color, #4f8cff); }
 .lm-ticon-found { background: #c9a227; }
-.lm-ticon-verbs { background: var(--accent-color, #d45f1e); width: 38px; height: 38px; font-size: 1rem; }
+.lm-ticon-adv   { background: #c9a227; }
+.lm-ticon-verbs { background: var(--accent-color, #4f8cff); width: 34px; height: 34px; font-size: 0.95rem; }
 
-.lm-sigma-sm { font-size: 1rem; font-weight: 700; }
+.lm-sigma-sm { font-size: 0.95rem; font-weight: 700; }
 
 /* ── Verbs track card (inline icon+title) ── */
 .lm-vtrack {
@@ -8501,10 +8506,10 @@ body.dark button.continue-learning-btn {
 
 .lm-choose-btn {
   width: 100%;
-  padding: 10px 0;
+  padding: 8px 0;
   border: none;
-  border-radius: 10px;
-  font-size: 0.88rem;
+  border-radius: 9px;
+  font-size: 0.84rem;
   font-weight: 700;
   color: #fff;
   cursor: pointer;
@@ -8513,19 +8518,22 @@ body.dark button.continue-learning-btn {
 }
 
 .lm-choose-btn:hover { opacity: 0.88; }
+/* Basic = theme accent, Advanced = gold */
+.lm-choose-basic { background: var(--accent-color, #4f8cff); }
 .lm-choose-found { background: #c9a227; }
-.lm-choose-verbs { background: var(--accent-color, #d45f1e); }
+.lm-choose-adv   { background: #c9a227; }
+.lm-choose-verbs { background: var(--accent-color, #4f8cff); }
 
 /* OR badge — circle with border */
 .lm-or-badge {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
   align-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.3px;
   color: #555;
@@ -8540,17 +8548,17 @@ body.dark button.continue-learning-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
 .lm-then-badge {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.8px;
   color: #555;
   border: 1.5px solid rgba(0,0,0,0.15);
   border-radius: 20px;
-  padding: 3px 12px;
+  padding: 2px 10px;
   background: rgb(255, 252, 242);
 }
 
@@ -8559,7 +8567,7 @@ body.dark button.continue-learning-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 1px solid rgba(0,0,0,0.08);
 }
 
