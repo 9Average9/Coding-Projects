@@ -15342,6 +15342,17 @@ function backToProfileFromProgress() {
 const APP_VERSION = "2.6.5";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.6.5 — Lesson Polish &amp; Navigation Fix</div>
+<div class="un-section">
+  <ul class="un-list">
+    <li><strong>Lesson blocks now look like cards when open</strong> — Open lesson blocks in all 4 tracks now have a visible card boundary with a shadow, stronger border, and tinted background so content no longer appears as plain floating text.</li>
+    <li><strong>Bottom nav hides in lessons</strong> — The bottom navigation bar now hides automatically whenever you enter any lesson track and only reappears when you press the back button from the main track menu to go home.</li>
+    <li><strong>10 new high-contrast themes</strong> — Polar White, Volcanic, Lemon Drop, Blueprint, Jade Night, Deep Sunset, Arctic, Neon Night, Gold Noir, and Coral Deep — all with bold primary/secondary color contrast.</li>
+    <li><strong>Profile lesson count corrected</strong> — Your lesson progress now reflects all 80 completable lessons across all four tracks.</li>
+    <li><strong>Lesson 10 intro block styled</strong> — The opening paragraph in Basic Lesson 10 now appears in its own styled card with proper padding.</li>
+    <li><strong>Home settings button removed</strong> — The gear icon on the home screen has been removed; settings are in your profile.</li>
+  </ul>
+</div>
 <div class="un-version-label">v2.6.3 — Bug Fixes</div>
 <div class="un-section">
   <ul class="un-list">
