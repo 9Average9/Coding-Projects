@@ -6,6 +6,8 @@ const RHEMA_XREF_CATEGORIES = [
   { key: 'prophecy', title: 'Prophecy Fulfillment Links', short: 'Prophecy', icon: 'workspace_premium', desc: 'Verses that show prophecy and its fulfillment.' }
 ];
 
+let _rhemaXrefCursor = 0;
+
 function _xrefBookList() {
   if (Array.isArray(window.RhemaKJVBooks) && window.RhemaKJVBooks.length) return window.RhemaKJVBooks;
   return Object.keys(window.RhemaKJV || {}).map(code => ({
@@ -83,6 +85,7 @@ async function openRhemaCrossReferences() {
   await loadRhemaScripts();
   _rhemaXrefActive = { book: _rhemaBook || 'JOH', chapter: _rhemaChapter || '1', verse: _rhemaVerse || '1' };
   _rhemaXrefBreadcrumb = [_xrefKey(_rhemaXrefActive)];
+  _rhemaXrefCursor = 0;
   _rhemaXrefCategory = null;
   renderRhemaCrossReferences();
 }
@@ -119,15 +122,20 @@ function _renderXrefBreadcrumb() {
   if (!el) return;
   if (_rhemaXrefBreadcrumb.length <= 1) {
     el.classList.add('hidden');
-    el.innerHTML = '';
     return;
   }
   el.classList.remove('hidden');
-  el.innerHTML = _rhemaXrefBreadcrumb.map((ref, idx) => {
-    const active = idx === _rhemaXrefBreadcrumb.length - 1;
+  const scroll = document.getElementById('rxBreadcrumbScroll');
+  if (!scroll) return;
+  scroll.innerHTML = _rhemaXrefBreadcrumb.map((ref, idx) => {
+    const active = idx === _rhemaXrefCursor;
     return `<button class="${active ? 'active' : ''}" onclick="rhemaXrefJumpBreadcrumb(${idx})">${_xrefEscape(_xrefDisplay(ref))}</button>`;
   }).join('<span class="material-symbols-outlined">chevron_right</span>');
-  requestAnimationFrame(() => { el.scrollLeft = el.scrollWidth; });
+  requestAnimationFrame(() => {
+    const activeBtn = scroll.querySelector('button.active');
+    if (activeBtn) activeBtn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    else scroll.scrollLeft = scroll.scrollWidth;
+  });
 }
 
 function renderRhemaCrossReferences() {
@@ -141,21 +149,33 @@ function renderRhemaCrossReferences() {
   if (!body) return;
   body.innerHTML = _xrefTopCardHtml() + `<div class="rx-category-list">${RHEMA_XREF_CATEGORIES.map(cat => {
     const refs = data[cat.key] || [];
-    const preview = refs.slice(0, 3).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('');
-    const chips = cat.key === 'themes' ? refs.slice(0, 5).map(item => `<span>${_xrefEscape(item.label)}</span>`).join('') : '';
-    return `<button class="rx-category-card" onclick="openRhemaXrefCategory('${cat.key}')">
+    const isEmpty = refs.length === 0;
+    const preview = !isEmpty ? refs.slice(0, 3).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('') : '';
+    const chips = cat.key === 'themes' && !isEmpty ? refs.slice(0, 5).map(item => `<span>${_xrefEscape(item.label)}</span>`).join('') : '';
+    return `<button class="rx-category-card${isEmpty ? ' rx-no-data' : ''}" data-xref-cat="${cat.key}" onclick="openRhemaXrefCategory('${cat.key}')">
       <span class="rx-category-icon material-symbols-outlined">${cat.icon}</span>
       <span class="rx-category-copy">
-        <span class="rx-category-title">${cat.title} <em>${refs.length}</em></span>
+        <span class="rx-category-title">${cat.title} <em>${isEmpty ? '—' : refs.length}</em></span>
         <span class="rx-category-desc">${cat.desc}</span>
-        ${chips ? `<span class="rx-chip-row">${chips}</span>` : preview}
+        ${isEmpty ? '' : chips ? `<span class="rx-chip-row">${chips}</span>` : preview}
       </span>
-      <span class="material-symbols-outlined rx-card-arrow">chevron_right</span>
+      <span class="material-symbols-outlined rx-card-arrow">${isEmpty ? 'block' : 'chevron_right'}</span>
     </button>`;
   }).join('')}</div>`;
 }
 
 function openRhemaXrefCategory(key) {
+  const refs = _xrefCurrentData()[key] || [];
+  if (!refs.length) {
+    const card = document.querySelector(`[data-xref-cat="${key}"]`);
+    if (card) {
+      card.classList.remove('rx-shaking');
+      void card.offsetWidth;
+      card.classList.add('rx-shaking');
+      setTimeout(() => card.classList.remove('rx-shaking'), 400);
+    }
+    return;
+  }
   _rhemaXrefCategory = key;
   _rhemaXrefView = 'trail';
   renderRhemaXrefTrail();
@@ -190,25 +210,34 @@ function rhemaXrefFollow(ref) {
   _rhemaChapter = parsed.chapter;
   _rhemaVerse = parsed.verse;
   _rhemaXrefBreadcrumb.push(_xrefKey(parsed));
+  _rhemaXrefCursor = _rhemaXrefBreadcrumb.length - 1;
+  _rhemaXrefCategory = null;
   syncRhemaPicker();
-  renderRhemaXrefTrail();
+  renderRhemaCrossReferences();
 }
 
 function rhemaXrefJumpBreadcrumb(idx) {
   const parsed = _xrefParseRef(_rhemaXrefBreadcrumb[idx]);
   if (!parsed) return;
-  _rhemaXrefBreadcrumb = _rhemaXrefBreadcrumb.slice(0, idx + 1);
+  _rhemaXrefCursor = idx;
   _rhemaXrefActive = parsed;
   _rhemaBook = parsed.book;
   _rhemaChapter = parsed.chapter;
   _rhemaVerse = parsed.verse;
+  _rhemaXrefCategory = null;
   syncRhemaPicker();
-  _rhemaXrefView === 'trail' ? renderRhemaXrefTrail() : renderRhemaCrossReferences();
+  renderRhemaCrossReferences();
+}
+
+function clearRhemaXrefBreadcrumb() {
+  _rhemaXrefBreadcrumb = [_xrefKey(_rhemaXrefActive)];
+  _rhemaXrefCursor = 0;
+  _renderXrefBreadcrumb();
 }
 
 function rhemaCrossRefBack() {
-  if (_rhemaXrefBreadcrumb.length > 1) {
-    rhemaXrefJumpBreadcrumb(_rhemaXrefBreadcrumb.length - 2);
+  if (_rhemaXrefCursor > 0) {
+    rhemaXrefJumpBreadcrumb(_rhemaXrefCursor - 1);
     return;
   }
   if (_rhemaXrefView === 'trail') {
@@ -287,6 +316,7 @@ function applyRhemaXrefSelection() {
   _rhemaChapter = _rhemaXrefActive.chapter;
   _rhemaVerse = _rhemaXrefActive.verse;
   _rhemaXrefBreadcrumb = [_xrefKey(_rhemaXrefActive)];
+  _rhemaXrefCursor = 0;
   _rhemaXrefCategory = null;
   syncRhemaPicker();
   renderRhemaCrossReferences();
@@ -337,6 +367,8 @@ function openSavedRhemaTrail(trailId) {
   if (!active) return;
   _rhemaXrefActive = active;
   _rhemaXrefBreadcrumb = (trail.rawBreadcrumbTrail || [trail.activeRef]).filter(Boolean);
+  const _restoredCursorIdx = trail.activeRef ? _rhemaXrefBreadcrumb.lastIndexOf(trail.activeRef) : -1;
+  _rhemaXrefCursor = _restoredCursorIdx >= 0 ? _restoredCursorIdx : _rhemaXrefBreadcrumb.length - 1;
   _rhemaXrefCategory = trail.categoryKey || 'direct';
   _rhemaBook = active.book;
   _rhemaChapter = active.chapter;
@@ -382,6 +414,7 @@ Object.assign(window, {
   renderRhemaXrefTrail,
   rhemaXrefFollow,
   rhemaXrefJumpBreadcrumb,
+  clearRhemaXrefBreadcrumb,
   rhemaCrossRefBack,
   openRhemaCrossRefSelect,
   closeRhemaCrossRefSelect,

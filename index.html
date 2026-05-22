@@ -9352,7 +9352,10 @@ glacier: {
 <h2 id="rxPageTitle">Cross References</h2>
 <button class="rx-icon-btn" onclick="openRhemaCrossRefInfo()"><span class="material-symbols-outlined">info</span></button>
 </div>
-<div class="rx-breadcrumb hidden" id="rxBreadcrumb"></div>
+<div class="rx-breadcrumb hidden" id="rxBreadcrumb">
+<div class="rx-breadcrumb-scroll" id="rxBreadcrumbScroll"></div>
+<button class="rx-breadcrumb-clear" onclick="clearRhemaXrefBreadcrumb()" aria-label="Clear trail"><span class="material-symbols-outlined">close</span></button>
+</div>
 <div class="rx-scroll" id="rxMainView"></div>
 </div>
 <div class="rhema-xref-page hidden" id="rhemaXrefSelectPage">

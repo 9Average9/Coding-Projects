@@ -11641,14 +11641,22 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rx-breadcrumb {
   display: flex;
   align-items: center;
+  padding-bottom: 10px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.rx-breadcrumb-scroll {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
   gap: 4px;
   overflow-x: auto;
-  padding: 0 16px 10px;
+  padding: 0 16px;
   scrollbar-width: none;
-  flex-shrink: 0;
 }
-.rx-breadcrumb::-webkit-scrollbar { display: none; }
-.rx-breadcrumb button {
+.rx-breadcrumb-scroll::-webkit-scrollbar { display: none; }
+.rx-breadcrumb-scroll button {
   border: none;
   background: transparent;
   color: var(--muted-color);
@@ -11656,11 +11664,51 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   font-weight: 700;
   white-space: nowrap;
   padding: 4px 3px;
+  flex-shrink: 0;
 }
-.rx-breadcrumb button.active { color: var(--secondary-color); }
-.rx-breadcrumb .material-symbols-outlined {
+.rx-breadcrumb-scroll button.active { color: var(--secondary-color); }
+.rx-breadcrumb-scroll .material-symbols-outlined {
   font-size: 16px;
   color: color-mix(in srgb, var(--secondary-color) 32%, var(--muted-color));
+  flex-shrink: 0;
+}
+.rx-breadcrumb-clear {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 0 10px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--muted-color);
+  position: relative;
+}
+.rx-breadcrumb-clear::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: -6px;
+  bottom: 0;
+  width: 28px;
+  background: linear-gradient(to right, transparent, var(--primary-color));
+  pointer-events: none;
+}
+.rx-breadcrumb-clear .material-symbols-outlined { font-size: 18px; }
+@keyframes rx-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-5px); }
+  40%       { transform: translateX(5px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(3px); }
+}
+.rx-category-card.rx-shaking { animation: rx-shake 0.35s ease; }
+.rx-category-card.rx-no-data {
+  opacity: 0.4;
+  cursor: default;
+}
+.rx-category-card.rx-no-data .rx-category-icon {
+  background: color-mix(in srgb, var(--muted-color) 12%, var(--card-color));
+  color: var(--muted-color);
 }
 .rx-top-card {
   position: relative;
