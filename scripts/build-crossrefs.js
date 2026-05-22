@@ -28,56 +28,10 @@ const LABELS = [
   'OT foundation',
   'Prophecy connection',
   'Parallel idea',
-  'Related theme',
-  'Shared wording',
-  'Same passage',
-  'Creation theme',
-  'Similar concept',
-  'Eternal life',
-  'Created by the word',
-  'Ancient origin',
-  'All things created',
-  'Related teaching',
-  'Fulfillment connection',
-  'Prophecy foundation'
+  'Related theme'
 ];
 const LABEL_INDEX = Object.fromEntries(LABELS.map((label, index) => [label, index]));
 const CATEGORY_OUT = { direct: 'd', themes: 't', otNt: 'o', parallel: 'p', prophecy: 'f' };
-
-const CURATED = {
-  'JOH 1:1': {
-    direct: [
-      ['REV 19:13', 'Shared wording'],
-      ['1JO 1:1', 'Shared wording'],
-      ['JOH 1:14', 'Same passage']
-    ],
-    themes: [
-      ['COL 1:15-16', 'Creation theme'],
-      ['HEB 1:3', 'Similar concept'],
-      ['1JO 1:1-2', 'Eternal life']
-    ],
-    otNt: [
-      ['GEN 1:1', 'Creation theme'],
-      ['PSA 33:6', 'Created by the word'],
-      ['PRO 8:22-25', 'OT foundation'],
-      ['ISA 9:6', 'OT foundation'],
-      ['MIC 5:2', 'Ancient origin'],
-      ['HEB 1:1-3', 'NT connection'],
-      ['COL 1:15-16', 'All things created']
-    ],
-    parallel: [
-      ['PHP 2:6-11', 'Parallel idea'],
-      ['HEB 1:1-3', 'Related teaching'],
-      ['2CO 4:4', 'Similar concept'],
-      ['COL 1:15', 'Parallel idea']
-    ],
-    prophecy: [
-      ['MIC 5:2', 'Prophecy fulfillment'],
-      ['JOH 1:14', 'Fulfillment connection'],
-      ['ISA 53:1-12', 'Prophecy foundation']
-    ]
-  }
-};
 
 function fetchText(url, redirects = 0) {
   return new Promise((resolve, reject) => {
@@ -150,14 +104,6 @@ function classify(source, refs) {
 
     if (refBook !== srcBook) {
       addUnique(result.themes, ref, 'Related theme', seenByCategory.themes);
-    }
-  }
-
-  for (const [category, items] of Object.entries(CURATED[source] || {})) {
-    for (const [ref, label] of items.slice().reverse()) {
-      const clean = ref.replace(/^([1-3]?[A-Z]{2,3})\s+(\d+):(\d+)-(\d+)$/, '$1 $2:$3-$4');
-      result[category] = result[category].filter(item => item.ref !== clean);
-      result[category].unshift({ ref: clean, label });
     }
   }
 
