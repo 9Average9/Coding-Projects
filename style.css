@@ -14366,6 +14366,7 @@ label.study-color-swatch.custom-color-dot {
   overflow: hidden;
   background: conic-gradient(red, orange, yellow, lime, cyan, blue, violet, red);
   outline: none;
+  border-color: white;
 }
 
 .study-icon-grid {

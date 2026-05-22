@@ -8172,13 +8172,18 @@ function closeStudyCreateSheet() {
 function selectStudyColor(el) {
   _studyCreateColor = el.dataset.color;
   document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
+  const dot = document.getElementById('studyCustomColorDot');
+  if (dot) dot.style.borderColor = '';
   el.classList.add('selected');
 }
 function setStudyCustomColor(value) {
   _studyCreateColor = value;
   document.querySelectorAll('.study-color-swatch').forEach(s => s.classList.remove('selected'));
   const dot = document.getElementById('studyCustomColorDot');
-  if (dot) dot.classList.add('selected');
+  if (dot) {
+    dot.classList.add('selected');
+    dot.style.borderColor = value;
+  }
 }
 function selectStudyIcon(el) {
   _studyCreateIcon = el.dataset.icon;
