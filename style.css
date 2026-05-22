@@ -1661,6 +1661,28 @@ body.dark .lesson-interactive {
   border-top: 1px solid color-mix(in srgb, var(--font-color) 20%, transparent);
 }
 
+.lesson-intro-block {
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(36, 52, 71, 0.12);
+  border-radius: 18px;
+  margin: 14px 0;
+  padding: 16px 20px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+  margin-left: -4px;
+  margin-right: -4px;
+}
+
+.lesson-intro-block p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+body.dark .lesson-intro-block {
+  background: rgba(17, 24, 39, 0.72);
+  border-color: rgba(255,255,255,0.12);
+}
+
 .lesson-block {
   background: rgba(255,255,255,0.72);
   border: 1px solid rgba(36, 52, 71, 0.12);
