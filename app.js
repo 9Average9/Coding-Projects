@@ -11336,6 +11336,7 @@ function showNewLearnMenu() {
 }
 
 function _openBasicLearnMenu() {
+  hideBottomNav();
   showScreen("newLearnMenu");
   updateLessonMenuProgress();
   const overlay = document.getElementById("learnWelcomeOverlay");
@@ -11345,6 +11346,7 @@ function _openBasicLearnMenu() {
 }
 
 function showAdvancedLearnMenu() {
+  hideBottomNav();
   showScreen("advancedLearnMenu");
   updateLessonMenuProgress();
 }
