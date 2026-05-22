@@ -15209,10 +15209,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.6.1";
+const APP_VERSION = "2.6.2";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.6.1 — Bug Fixes</div>
+<div class="un-version-label">v2.6.2 — Bug Fixes</div>
 <div class="un-section">
   <ul class="un-list">
     <li><strong>Fixed knowledge checks and quiz buttons</strong> in new advanced verb lessons (va_29–va_32) — they now respond correctly and unlock the quiz as expected.</li>
@@ -16571,6 +16571,7 @@ function avatarPickerOverlayClick(e) {
 function selectAvatarIcon(icon) {
   localStorage.setItem("profilePicType", "icon");
   localStorage.setItem("profilePicValue", icon);
+  localStorage.removeItem("profilePicRemoteURL");
   _applyProfileAvatar();
   closeAvatarPicker();
   window.LB?.syncAvatar();
@@ -16580,6 +16581,11 @@ function selectAvatarIcon(icon) {
 function handleAvatarPhoto(input) {
   const file = input.files[0];
   if (!file) return;
+  const previousAvatar = {
+    type: localStorage.getItem("profilePicType") || "icon",
+    value: localStorage.getItem("profilePicValue") || "school",
+    remoteUrl: localStorage.getItem("profilePicRemoteURL") || ""
+  };
   const reader = new FileReader();
   reader.onload = e => {
     const img = new Image();
@@ -16592,29 +16598,44 @@ function handleAvatarPhoto(input) {
       const y = (img.height - size) / 2;
       ctx.drawImage(img, x, y, size, size, 0, 0, 120, 120);
       const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-      localStorage.setItem("profilePicType", "photo");
-      localStorage.setItem("profilePicValue", dataUrl);
-      _applyProfileAvatar();
+      const avatarEl = document.getElementById("profileAvatar");
+      if (avatarEl) avatarEl.innerHTML = `<img src="${dataUrl}" alt="avatar" class="avatar-photo-img">`;
       closeAvatarPicker();
 
       const user = window.Auth?.getCurrentUser();
-      if (user && window.Auth?.uploadAvatarPhoto) {
-        try {
-          const remoteUrl = await window.Auth.uploadAvatarPhoto(user.uid, dataUrl);
-          localStorage.setItem("profilePicRemoteURL", remoteUrl);
-          _applyProfileAvatar();
-          window.LB?.syncAvatar();
-          syncUserData();
-        } catch (err) {
-          console.warn("Avatar upload failed:", err);
-          window.LB?.syncAvatar();
-          syncUserData();
-        }
+      if (!user || !window.Auth?.uploadAvatarPhoto) {
+        _restorePreviousAvatar(previousAvatar);
+        alert("Sign in before uploading a profile photo.");
+        return;
+      }
+
+      try {
+        const remoteUrl = await window.Auth.uploadAvatarPhoto(user.uid, dataUrl);
+        localStorage.setItem("profilePicType", "photo");
+        localStorage.setItem("profilePicRemoteURL", remoteUrl);
+        localStorage.removeItem("profilePicValue");
+        _applyProfileAvatar();
+        window.LB?.syncAvatar();
+        syncUserData();
+      } catch (err) {
+        console.warn("Avatar upload failed:", err);
+        _restorePreviousAvatar(previousAvatar);
+        alert("Photo upload failed. Your previous avatar was kept.");
       }
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+  input.value = "";
+}
+
+function _restorePreviousAvatar(previousAvatar) {
+  localStorage.setItem("profilePicType", previousAvatar.type || "icon");
+  if (previousAvatar.remoteUrl) localStorage.setItem("profilePicRemoteURL", previousAvatar.remoteUrl);
+  else localStorage.removeItem("profilePicRemoteURL");
+  if (previousAvatar.type === "photo") localStorage.removeItem("profilePicValue");
+  else localStorage.setItem("profilePicValue", previousAvatar.value || "school");
+  _applyProfileAvatar();
 }
 
 function _applyProfileAvatar() {
