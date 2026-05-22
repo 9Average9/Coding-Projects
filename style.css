@@ -12216,6 +12216,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 .rx-top-card {
   min-height: 0;
   height: auto;
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
@@ -12230,7 +12231,6 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.1);
   overflow: hidden;
   isolation: isolate;
-  contain: layout paint;
 }
 
 .rx-top-card-copy {
