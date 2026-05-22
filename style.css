@@ -8309,90 +8309,301 @@ body.dark button.continue-learning-btn {
 
 /* ===== LESSON MODE MODAL ===== */
 
-.lesson-mode-modal-card {
-  padding: 28px 24px 24px;
-  max-width: 480px;
-  width: 100%;
-}
+/* ===== LESSON MODE MODAL — redesigned ===== */
 
-.lesson-mode-modal-card h2 {
-  margin: 0 0 20px;
-  font-size: 1.25rem;
-  font-weight: 800;
-  padding-right: 0;
-}
-
-.lesson-mode-options {
+.lm-card {
+  position: relative;
+  background: var(--card-bg, #fff);
+  border-radius: 20px;
+  padding: 24px 20px 16px;
+  max-width: 520px;
+  width: calc(100vw - 32px);
+  max-height: 92vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 0;
 }
 
-.lesson-mode-option {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--card-bg, rgba(0,0,0,0.04));
-  border: 1px solid var(--border-color, rgba(0,0,0,0.08));
-}
-
-.lesson-mode-icon {
+.lm-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color, rgba(0,0,0,0.12));
+  background: var(--card-bg, #fff);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 50%;
-  background: var(--accent, #3b82f6);
+}
+
+.lm-heading {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  padding-right: 36px;
+  color: var(--text-color);
+}
+
+.lm-subheading {
+  font-size: 0.88rem;
+  opacity: 0.6;
+  margin: 0 0 14px;
+  color: var(--text-color);
+}
+
+/* ── Section card ── */
+.lm-section {
+  border-radius: 16px;
+  padding: 14px 14px 14px;
+  border: 1px solid rgba(0,0,0,0.06);
+  margin-bottom: 0;
+}
+
+.lm-section-found {
+  background: rgba(201,162,39,0.07);
+  border-color: rgba(201,162,39,0.18);
+}
+
+.lm-section-verbs {
+  background: rgba(var(--accent-rgb, 100,120,220), 0.06);
+  border-color: rgba(var(--accent-rgb, 100,120,220), 0.16);
+}
+
+.lm-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lm-section-icon-wrap {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
   color: #fff;
-  font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
-.lesson-mode-icon.advanced {
-  background: #c9a227;
-  color: #fff;
+.lm-sicon-found { background: #c9a227; }
+.lm-sicon-verbs { background: var(--accent-color, #4f8cff); }
+
+.lm-sigma-lg { font-size: 1.2rem; font-weight: 700; }
+
+.lm-section-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-.lesson-mode-info {
-  flex: 1;
-}
-
-.lesson-mode-info strong {
-  display: block;
+.lm-section-info strong {
   font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 4px;
+  color: var(--text-color);
 }
 
-.lesson-mode-info p {
-  font-size: 0.86rem;
-  line-height: 1.45;
-  margin: 0;
-  opacity: 0.8;
+.lm-section-info span {
+  font-size: 0.8rem;
+  opacity: 0.65;
+  color: var(--text-color);
 }
 
-.lesson-mode-actions {
+/* ── Pair row (two track cards + OR) ── */
+.lm-pair {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-  margin-bottom: 16px;
+  align-items: stretch;
+  gap: 0;
 }
 
-.lesson-mode-actions .main-btn {
+.lm-track-card {
   flex: 1;
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.07);
+  transition: transform 0.12s, box-shadow 0.12s;
+  gap: 6px;
+}
+
+.lm-track-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
+
+.lm-track-card strong {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1.25;
+}
+
+.lm-track-card p {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  opacity: 0.72;
+  margin: 0;
+  color: var(--text-color);
+  flex: 1;
+}
+
+.lm-track-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  padding: 10px 12px;
+  color: #fff;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
+.lm-ticon-found { background: #c9a227; }
+.lm-ticon-verbs { background: var(--accent-color, #4f8cff); }
+
+.lm-sigma-sm { font-size: 1rem; font-weight: 700; }
+
+.lm-choose-btn {
+  width: 100%;
+  padding: 9px 0;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: opacity 0.15s;
+}
+
+.lm-choose-btn:hover { opacity: 0.88; }
+.lm-choose-found { background: #c9a227; }
+.lm-choose-verbs { background: var(--accent-color, #4f8cff); }
+
+/* OR badge */
+.lm-or-badge {
+  width: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-color);
+  opacity: 0.45;
+}
+
+/* THEN row */
+.lm-then-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.lm-then-badge {
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--text-color);
+  opacity: 0.45;
+  border: 1.5px solid var(--border-color, rgba(0,0,0,0.12));
+  border-radius: 20px;
+  padding: 3px 10px;
+  background: var(--card-bg, #fff);
+}
+
+/* Footer */
+.lm-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color, rgba(0,0,0,0.08));
+  margin-top: 14px;
+}
+
+.lm-footer-q {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color, rgba(0,0,0,0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+.lm-footer-text {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.lm-footer-text small {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+/* Toggle switch */
+.lm-toggle-wrap { position: relative; display: inline-flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+.lm-toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.lm-toggle-track {
+  width: 40px;
+  height: 23px;
+  background: var(--border-color, rgba(0,0,0,0.15));
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.lm-toggle-input:checked ~ .lm-toggle-track {
+  background: var(--accent-color, #4f8cff);
+}
+
+.lm-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 17px;
+  height: 17px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: left 0.2s;
+}
+
+.lm-toggle-input:checked ~ .lm-toggle-track .lm-toggle-thumb {
+  left: 20px;
+}
+
+/* Dark mode */
+body.dark .lm-section-found { background: rgba(201,162,39,0.1); border-color: rgba(201,162,39,0.22); }
+body.dark .lm-section-verbs { background: rgba(var(--accent-rgb,100,120,220),0.1); border-color: rgba(var(--accent-rgb,100,120,220),0.2); }
+body.dark .lm-track-card { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); }
+body.dark .lm-then-badge { background: var(--card-bg); }
+
+/* Legacy class kept so JS selectLessonMode still works */
 .advanced-btn {
   background: #c9a227 !important;
   color: #fff !important;
@@ -8402,28 +8613,6 @@ body.dark button.continue-learning-btn {
 .advanced-btn:hover {
   background: #b8911e !important;
   border-color: #b8911e !important;
-}
-
-.lesson-mode-dont-ask {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  opacity: 0.75;
-}
-
-.lesson-mode-dont-ask input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.lesson-mode-dont-ask small {
-  font-size: 0.75rem;
-  opacity: 0.8;
 }
 
 /* ===== ADVANCED LEARN MENU ===== */
