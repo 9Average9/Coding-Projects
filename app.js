@@ -10686,6 +10686,126 @@ glacier: {
   text: "#172b3a",
   muted: "#5e7685",
   buttonText: "#ffffff"
+},
+
+polar: {
+  primary: "#f0f8ff",
+  light: "#f8fcff",
+  secondary: "#0a0a0a",
+  accent: "#2563eb",
+  card: "rgba(248,252,255,0.92)",
+  border: "#c5d5e8",
+  text: "#060a10",
+  muted: "#4a5568",
+  buttonText: "#ffffff"
+},
+
+volcanic: {
+  primary: "#100807",
+  light: "#1c1209",
+  secondary: "#e83010",
+  accent: "#ff6b35",
+  card: "rgba(28,18,9,0.97)",
+  border: "#3d1a12",
+  text: "#f5ece8",
+  muted: "#a89088",
+  buttonText: "#ffffff"
+},
+
+lemon: {
+  primary: "#fffde7",
+  light: "#fffff5",
+  secondary: "#1a0050",
+  accent: "#7c3aed",
+  card: "rgba(255,253,235,0.95)",
+  border: "#e8e098",
+  text: "#1a1500",
+  muted: "#5c5a40",
+  buttonText: "#ffffff"
+},
+
+blueprint: {
+  primary: "#f8f9ff",
+  light: "#ffffff",
+  secondary: "#003bdb",
+  accent: "#3b82f6",
+  card: "rgba(255,255,255,0.95)",
+  border: "#c0cef8",
+  text: "#0a1040",
+  muted: "#4a5580",
+  buttonText: "#ffffff"
+},
+
+jade_night: {
+  primary: "#030c05",
+  light: "#061409",
+  secondary: "#00d97e",
+  accent: "#34d399",
+  card: "rgba(6,20,9,0.97)",
+  border: "#0d3018",
+  text: "#e0f5eb",
+  muted: "#7ab892",
+  buttonText: "#000000"
+},
+
+deep_sunset: {
+  primary: "#fff5ef",
+  light: "#fffbf8",
+  secondary: "#4d0015",
+  accent: "#c0001e",
+  card: "rgba(255,251,248,0.95)",
+  border: "#f0c4b0",
+  text: "#200505",
+  muted: "#6b4040",
+  buttonText: "#ffffff"
+},
+
+arctic: {
+  primary: "#f0f6fc",
+  light: "#f8fbfe",
+  secondary: "#001730",
+  accent: "#0ea5e9",
+  card: "rgba(248,251,254,0.95)",
+  border: "#b0c8e0",
+  text: "#050f1e",
+  muted: "#4a6070",
+  buttonText: "#ffffff"
+},
+
+neon_night: {
+  primary: "#080714",
+  light: "#110f20",
+  secondary: "#8b00ff",
+  accent: "#d946ef",
+  card: "rgba(17,15,32,0.97)",
+  border: "#2d1b50",
+  text: "#f0eeff",
+  muted: "#9988cc",
+  buttonText: "#ffffff"
+},
+
+gold_noir: {
+  primary: "#fdfbf5",
+  light: "#fffef9",
+  secondary: "#111009",
+  accent: "#d4a011",
+  card: "rgba(255,254,250,0.95)",
+  border: "#e8dfc5",
+  text: "#1a1608",
+  muted: "#5c5440",
+  buttonText: "#ffffff"
+},
+
+coral_deep: {
+  primary: "#fff4f1",
+  light: "#fff9f8",
+  secondary: "#c0001e",
+  accent: "#ff4d5a",
+  card: "rgba(255,249,248,0.95)",
+  border: "#f8c0b0",
+  text: "#280008",
+  muted: "#7a4040",
+  buttonText: "#ffffff"
 }
 };
 
@@ -14476,10 +14596,18 @@ function updateProfileUI() {
   }
 
   const isAdvMode = getLessonMode() === "advanced";
-  const completedLessonCount = isAdvMode
-    ? REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length
-    : REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
-  const totalLessons = REQUIRED_LESSONS.length;
+  const basicDone = REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
+  const advDone = REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length;
+  const verbBasicDone = typeof VERB_BASIC_LESSONS !== "undefined" && typeof completedVerbBasicLessons !== "undefined"
+    ? VERB_BASIC_LESSONS.filter(id => completedVerbBasicLessons[id] === true).length
+    : 0;
+  const verbAdvDone = typeof VERB_ADV_LESSONS !== "undefined" && typeof completedVerbAdvancedLessons !== "undefined"
+    ? VERB_ADV_LESSONS.filter(id => completedVerbAdvancedLessons[id] === true).length
+    : 0;
+  const completedLessonCount = basicDone + advDone + verbBasicDone + verbAdvDone;
+  const totalLessons = REQUIRED_LESSONS.length + REQUIRED_ADVANCED_LESSONS.length +
+    (typeof VERB_BASIC_LESSONS !== "undefined" ? VERB_BASIC_LESSONS.length : 0) +
+    (typeof VERB_ADV_LESSONS !== "undefined" ? VERB_ADV_LESSONS.length : 0);
 
   const lessonsStat = document.getElementById("profileLessonsStat");
   const vocabStat = document.getElementById("profileVocabStat");
