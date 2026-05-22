@@ -15011,7 +15011,10 @@ function switchLessonBreakdownTab(tab, navigate) {
   if (advTab) advTab.classList.toggle("active", tab === "advanced");
   if (vbTab) vbTab.classList.toggle("active", tab === "verbBasic");
   if (vaTab) vaTab.classList.toggle("active", tab === "verbAdv");
-  if (card) card.classList.toggle("adv-tab-active", tab === "advanced" || tab === "verbAdv");
+  if (card) {
+    card.classList.toggle("adv-tab-active", tab === "advanced");
+    card.classList.toggle("verb-adv-tab-active", tab === "verbAdv");
+  }
 
   localStorage.setItem("lessonMode", tab);
   if (navigate) {
