@@ -15353,7 +15353,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.6.5";
+const APP_VERSION = "2.6.6";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v2.6.5 — Lesson Polish &amp; Navigation Fix</div>

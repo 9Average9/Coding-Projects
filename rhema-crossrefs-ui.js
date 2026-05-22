@@ -49,7 +49,18 @@ function _xrefKjvText(refOrObj) {
 }
 
 function _xrefCurrentData() {
-  return window.RhemaCrossRefs?.[_xrefKey()] || {};
+  const raw = window.RhemaCrossRefs?.[_xrefKey()] || {};
+  if (raw.direct || raw.themes || raw.otNt || raw.parallel || raw.prophecy) return raw;
+  const map = { d: 'direct', t: 'themes', o: 'otNt', p: 'parallel', f: 'prophecy' };
+  const labels = window.RhemaCrossRefLabels || [];
+  const expanded = {};
+  for (const [shortKey, category] of Object.entries(map)) {
+    expanded[category] = (raw[shortKey] || []).map(value => {
+      const [ref, labelIndex] = String(value).split('|');
+      return { ref, label: labels[Number(labelIndex)] || 'Related reference' };
+    });
+  }
+  return expanded;
 }
 
 function _xrefCategoryMeta(key) {
