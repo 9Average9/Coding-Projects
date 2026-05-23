@@ -11772,6 +11772,8 @@ function applyHomeBackdrop(backdropName = "none") {
   if (home) {
     home.classList.remove(...HOME_BACKDROPS.map(name => `home-backdrop-${name}`));
     home.classList.add(`home-backdrop-${safeName}`);
+    const imageUrl = safeName === "none" ? "" : `url("assets/home-backgrounds/${safeName}.jpg")`;
+    home.style.setProperty("--home-backdrop-image", imageUrl);
   }
   document.querySelectorAll(".home-backdrop-option").forEach(btn => {
     btn.classList.toggle("selected", btn.classList.contains(`home-backdrop-${safeName}`));
@@ -12405,13 +12407,23 @@ function closeLearnWelcome() {
   if (overlay) overlay.classList.remove("open");
 }
 
+function _localFlagSet(key) {
+  const value = localStorage.getItem(key);
+  return value === "1" || value === "true";
+}
+
+function _hasCompletedAppWelcomeCoach() {
+  return _localFlagSet("appWelcomeCoachSeenV275");
+}
+
 function maybeShowHomeIntroModal() {
   if (localStorage.getItem("hasSeenHomeIntro") === "true") return;
   if (!_hasSignedInUser()) return;
+  if (_welcomeCoachQueuedAfterAuth) return;
   if (document.getElementById("authModal")?.classList.contains("open")) return;
   const coachOverlay = document.getElementById("appCoachOverlay");
   if (coachOverlay && !coachOverlay.classList.contains("hidden")) return;
-  if (localStorage.getItem("appWelcomeCoachSeenV275") !== "true") return;
+  if (!_hasCompletedAppWelcomeCoach()) return;
 
   localStorage.setItem("hasSeenHomeIntro", "true");
   showInfoModal();
@@ -16500,9 +16512,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.6";
+const APP_VERSION = "3.0.7";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.7 &mdash; Onboarding + Background Fix</div>
+<ul>
+  <li><strong>Welcome modal timing fixed</strong> so it cannot open until the first app coach onboarding is completed.</li>
+  <li><strong>Home background selector wired directly to image assets</strong> so the selected artwork appears behind Home instead of only decorative CSS shapes.</li>
+</ul>
 <div class="un-version-label">v3.0.6 &mdash; Onboarding + Background Fix</div>
 <ul class="un-list">
   <li><strong>Welcome modal timing fixed</strong> so it waits until the first coach tour is finished instead of covering coach spotlights.</li>
@@ -16880,6 +16897,7 @@ async function restoreUserFromFirestore(user) {
   if (data.translationXPCount) localStorage.setItem("translationXPCount", String(data.translationXPCount));
   if (data.lessonModePromptDismissed) localStorage.setItem("lessonModePromptDismissed", "true");
   if (data.hasSeenLearnWelcome) localStorage.setItem("hasSeenLearnWelcome", "true");
+  if (data.appWelcomeCoachSeenV275) localStorage.setItem("appWelcomeCoachSeenV275", "1");
   if (data.hasSeenHomeIntro) localStorage.setItem("hasSeenHomeIntro", "true");
   if (data.greekVocabStats) {
     localStorage.setItem("greekVocabStats", JSON.stringify(data.greekVocabStats));
@@ -16943,6 +16961,7 @@ async function syncUserData() {
     translationXPCount: parseInt(localStorage.getItem("translationXPCount") || "0"),
     lessonModePromptDismissed: localStorage.getItem("lessonModePromptDismissed") === "true",
     hasSeenLearnWelcome: localStorage.getItem("hasSeenLearnWelcome") === "true",
+    appWelcomeCoachSeenV275: _hasCompletedAppWelcomeCoach(),
     hasSeenHomeIntro: localStorage.getItem("hasSeenHomeIntro") === "true",
     greekVocabStats: (() => { try { return JSON.parse(localStorage.getItem("greekVocabStats") || "null"); } catch { return null; } })(),
     greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
@@ -16981,6 +17000,7 @@ function gatherMigrationData() {
     highContrastMode: getHighContrastMode(),
     appTheme: localStorage.getItem("appTheme") || null,
     homeBackdrop: localStorage.getItem("homeBackdrop") || "none",
+    appWelcomeCoachSeenV275: _hasCompletedAppWelcomeCoach(),
     vocabChapterXP,
     greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
     lbXpJoined: localStorage.getItem("lbXpJoined") === "true",
@@ -19440,7 +19460,7 @@ const COACH_TEST_MODE = false;
 let _suppressRhemaCoachOnce = false;
 
 function _coachHasSeen(key, force = false) {
-  return !force && !COACH_TEST_MODE && localStorage.getItem(key) === '1';
+  return !force && !COACH_TEST_MODE && _localFlagSet(key);
 }
 
 function _coachMarkSeen(key) {

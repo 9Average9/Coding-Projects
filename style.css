@@ -15133,6 +15133,7 @@ body.dark .bn-item::before {
   overflow-y: auto; height: 100%;
   padding: 0 20px; -webkit-overflow-scrolling: touch;
   position: relative;
+  isolation: isolate;
   overscroll-behavior: contain;
 }
 /* Fog overlays — pointer-events:none so they don't block taps */
@@ -15292,6 +15293,9 @@ body.dark .bn-item::before {
 }
 #homeScreen.home-backdrop-sunrise .home-scroll::after {
   background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04)), url("assets/home-backgrounds/sunrise.jpg") center / cover no-repeat !important;
+}
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::after {
+  background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05)), var(--home-backdrop-image) center / cover no-repeat !important;
 }
 #homeScreen::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 56px;
