@@ -9701,10 +9701,12 @@ let _homeFlipTimer = null;
 let _homeFlipIsGreek = false;
 let _homeFlipEnVerse = '';
 let _homeFlipEnSnippet = '';
+let _homeFlipPausedForCoach = false;
 
 function _startHomeFlip() {
   clearInterval(_homeFlipTimer);
   _homeFlipIsGreek = false;
+  if (_homeFlipPausedForCoach) return;
   const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   _homeFlipEnVerse = HOME_VERSES[doy % HOME_VERSES.length].text;
   try { _homeFlipEnSnippet = JSON.parse(localStorage.getItem('rhemaLastPos') || '{}').snippet || ''; } catch { _homeFlipEnSnippet = ''; }
@@ -9720,6 +9722,19 @@ function _stopHomeFlip() {
     const sn = document.getElementById('hccSnippet');
     if (sn && _homeFlipEnSnippet) sn.textContent = _homeFlipEnSnippet;
     _homeFlipIsGreek = false;
+  }
+}
+
+function _pauseHomeFlipForCoach() {
+  _homeFlipPausedForCoach = true;
+  _stopHomeFlip();
+}
+
+function _resumeHomeFlipAfterCoach() {
+  if (!_homeFlipPausedForCoach) return;
+  _homeFlipPausedForCoach = false;
+  if (document.getElementById('homeScreen')?.classList.contains('active')) {
+    _startHomeFlip();
   }
 }
 
@@ -16357,9 +16372,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.18";
+const APP_VERSION = "2.7.19";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.19 &mdash; Rhema Source Notes</div>
+<ul class="un-list">
+  <li><strong>Rhema Nerd Page added</strong> in Profile with source credits, dataset notes, and a plain-English explanation of how Rhema works.</li>
+  <li><strong>Coach tours stay visually steady</strong> by pausing the Greek/English home animation during guided walkthroughs.</li>
+</ul>
 <div class="un-version-label">v2.7.18 — Coach Tour Launch Polish</div>
 <ul class="un-list">
   <li><strong>Coach tours now run once by default</strong> and can be replayed from Profile without stacking multiple tours.</li>
@@ -19367,6 +19387,16 @@ function closeCoachReplayModal(event) {
   }
 }
 
+function openRhemaNerdModal() {
+  document.getElementById('rhemaNerdModal')?.classList.add('open');
+}
+
+function closeRhemaNerdModal(event) {
+  if (!event || event.target.id === 'rhemaNerdModal') {
+    document.getElementById('rhemaNerdModal')?.classList.remove('open');
+  }
+}
+
 function startCoachReplay(type) {
   closeCoachReplayModal();
   if (type === 'app') startAppWelcomeCoach(true);
@@ -19393,6 +19423,7 @@ function startCoachReplay(type) {
 
 function _startAppCoach(steps, seenKey) {
   if (!document.getElementById('appCoachOverlay') || !steps?.length) return;
+  _pauseHomeFlipForCoach();
   _appCoachSteps = steps;
   _appCoachIdx = 0;
   _appCoachSeenKey = seenKey;
@@ -19526,6 +19557,7 @@ function _endAppCoach() {
     showNavPage('home');
     setTimeout(() => showInfoModal(), 250);
   }
+  _resumeHomeFlipAfterCoach();
 }
 
 Object.assign(window, {
@@ -19535,6 +19567,8 @@ Object.assign(window, {
   startWordLibraryCoach,
   openCoachReplayModal,
   closeCoachReplayModal,
+  openRhemaNerdModal,
+  closeRhemaNerdModal,
   startCoachReplay,
   appCoachNext,
   appCoachBack
@@ -19604,6 +19638,7 @@ function startRhemaCoach(force = false) {
   _coachIdx = 0;
   _coachSyntaxDone = false;
   _rhemaCoachSeenKey = 'rhemaCoachSeenV275';
+  _pauseHomeFlipForCoach();
   setTimeout(() => _showCoachStep(), 120);
 }
 
@@ -19616,6 +19651,7 @@ function startRhemaSyntaxCoach(force = false) {
   _coachSteps = _RHEMA_SYNTAX_COACH_STEPS;
   _coachIdx = 0;
   _rhemaCoachSeenKey = 'rhemaSyntaxCoachSeenV275';
+  _pauseHomeFlipForCoach();
   _showCoachStep();
 }
 
@@ -19743,6 +19779,7 @@ function _endRhemaCoach() {
   const overlay = document.getElementById('rhemaCoachOverlay');
   if (overlay) overlay.classList.add('hidden');
   _coachMarkSeen(_rhemaCoachSeenKey);
+  _resumeHomeFlipAfterCoach();
 }
 
 Object.assign(window, {

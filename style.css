@@ -13309,12 +13309,135 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   line-height: 1.35;
 }
 
+.rhema-nerd-card {
+  max-width: 640px;
+  max-height: min(84svh, 760px);
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 24%, var(--border-color));
+  background:
+    radial-gradient(circle at 86% 8%, color-mix(in srgb, var(--secondary-color) 12%, transparent), transparent 28%),
+    linear-gradient(155deg, color-mix(in srgb, var(--secondary-color) 7%, var(--card-color)), var(--card-color) 48%),
+    var(--card-color);
+}
+.nerd-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 7px 11px;
+  margin-bottom: 12px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, var(--card-color));
+  color: var(--secondary-color);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.nerd-kicker .material-symbols-outlined {
+  font-size: 1rem !important;
+}
+.rhema-nerd-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.55rem;
+  letter-spacing: 0;
+}
+.rhema-nerd-card h3 {
+  margin: 0 0 8px;
+  color: var(--font-color);
+  font-size: 1rem;
+}
+.rhema-nerd-card p,
+.rhema-nerd-card li {
+  color: var(--muted-color);
+  line-height: 1.58;
+  font-size: 0.92rem;
+}
+.nerd-lead {
+  margin: 0 0 16px;
+}
+.nerd-section {
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, var(--border-color));
+  border-radius: 18px;
+  padding: 15px;
+  margin-top: 12px;
+  background: color-mix(in srgb, var(--card-color) 92%, var(--secondary-color));
+}
+.nerd-section p {
+  margin: 0;
+}
+.nerd-section p + p {
+  margin-top: 10px;
+}
+.nerd-hero-note {
+  border-color: color-mix(in srgb, var(--secondary-color) 34%, var(--border-color));
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--secondary-color) 10%, transparent);
+}
+.nerd-hero-note strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--secondary-color);
+  font-size: 1rem;
+}
+.nerd-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.nerd-source-item {
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, var(--border-color));
+  border-radius: 16px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--card-color) 96%, var(--secondary-color));
+}
+.nerd-source-item .material-symbols-outlined {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  color: var(--secondary-color);
+  background: color-mix(in srgb, var(--secondary-color) 12%, var(--card-color));
+  font-size: 1.25rem !important;
+}
+.nerd-source-item strong {
+  color: var(--font-color);
+  font-size: 0.94rem;
+}
+.nerd-source-item p {
+  margin: 0;
+  font-size: 0.84rem;
+}
+.nerd-flow ol {
+  margin: 0;
+  padding-left: 20px;
+}
+.nerd-flow li + li {
+  margin-top: 7px;
+}
+.nerd-honesty {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 10%, var(--card-color)), var(--card-color));
+}
+
 @media (max-width: 420px) {
   .app-coach-card,
   .rhema-coach-card {
     width: calc(100vw - 24px);
     max-height: 58svh;
     padding: 18px 18px 15px;
+  }
+  .rhema-nerd-card {
+    width: calc(100vw - 24px);
+    max-height: 86svh;
+    padding: 21px 18px;
+  }
+  .nerd-source-grid {
+    grid-template-columns: 1fr;
   }
 }
 /* Shake animation for placeholder buttons */

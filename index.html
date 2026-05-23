@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=2.7.18" rel="stylesheet"/>
+<link href="style.css?v=2.7.19" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8455,6 +8455,12 @@ Verb Endings
 <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
 </button>
 <div class="prof-menu-sep"></div>
+<button class="prof-menu-row" id="profileNerdBtn" onclick="openRhemaNerdModal()">
+<span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">science</span></span>
+<span class="prof-menu-name">Rhema Nerd Page</span>
+<span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+</button>
+<div class="prof-menu-sep"></div>
 <button class="prof-menu-row" id="profileSettingsBtn" onclick="openSettingsFromProfile()">
 <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">settings</span></span>
 <span class="prof-menu-name">Settings</span>
@@ -15422,11 +15428,11 @@ Verb Endings
 </section>
 
 </main>
-<script src="vocab.js?v=2.7.18"></script>
-<script src="app.js?v=2.7.18"></script>
-<script src="rhema-crossrefs-ui.js?v=2.7.18"></script>
-<script src="greek-verbs.js?v=2.7.18"></script>
-<script src="firebase-lb.js?v=2.7.18" type="module"></script>
+<script src="vocab.js?v=2.7.19"></script>
+<script src="app.js?v=2.7.19"></script>
+<script src="rhema-crossrefs-ui.js?v=2.7.19"></script>
+<script src="greek-verbs.js?v=2.7.19"></script>
+<script src="firebase-lb.js?v=2.7.19" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -16279,6 +16285,77 @@ Verb Endings
 <button onclick="startCoachReplay('xref')"><span class="material-symbols-outlined">hub</span><strong>Cross References Tour</strong><small>Scripture trails, breadcrumbs, categories, and saved trails.</small></button>
 <button onclick="startCoachReplay('syntax')"><span class="material-symbols-outlined">account_tree</span><strong>Syntax Tour</strong><small>Clause boxes, phrase chips, arrows, and structure help.</small></button>
 <button onclick="startCoachReplay('wordlib')"><span class="material-symbols-outlined">local_library</span><strong>Word Library Tour</strong><small>Search inflected Greek forms, transliteration, or English meanings.</small></button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="rhemaNerdModal" onclick="closeRhemaNerdModal(event)">
+<div class="modal-card rhema-nerd-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeRhemaNerdModal()">&times;</button>
+<div class="nerd-kicker"><span class="material-symbols-outlined">science</span> Source Notes</div>
+<h2>Rhema Nerd Page</h2>
+<p class="nerd-lead">A transparent look at what Rhema is doing under the hood: local texts, lexicons, grammar parsing, cross references, and saved study work. This is the little control-room window for the curious ones.</p>
+
+<div class="nerd-section nerd-hero-note">
+<strong>What makes Rhema different?</strong>
+<p>Rhema tries to put the text, the Greek form, the lexicons, the syntax, the English Bible, cross references, and your own notes in one calm flow. It is designed to help users compare evidence without forcing a theological conclusion for them.</p>
+</div>
+
+<div class="nerd-section">
+<h3>How the word sheets work</h3>
+<p>When you tap a Greek word, Rhema reads the word's Strong's number, lemma, surface form, and morphology code from the bundled Greek text data. It then turns the morphology into plain-English grammar, pulls matching lexicon entries, shows related forms and occurrences, and keeps the full definitions visible so the user can see the range of meaning.</p>
+</div>
+
+<div class="nerd-source-grid">
+<div class="nerd-source-item">
+<span class="material-symbols-outlined">menu_book</span>
+<strong>Greek New Testament</strong>
+<p>Bundled local Greek NT data with word-level forms, lemmas, Strong's numbers, and morphology used for Rhema parsing and word lookup.</p>
+</div>
+<div class="nerd-source-item">
+<span class="material-symbols-outlined">translate</span>
+<strong>KJV Bible</strong>
+<p>Public-domain King James Version text is bundled locally for English verse display, Cross References, Study Rhema, and offline reading support.</p>
+</div>
+<div class="nerd-source-item">
+<span class="material-symbols-outlined">auto_stories</span>
+<strong>Septuagint / LXX</strong>
+<p>A local Septuagint text dataset powers Old Testament Greek navigation. It gives Rhema a path toward OT Greek study alongside the New Testament tools.</p>
+</div>
+<div class="nerd-source-item">
+<span class="material-symbols-outlined">dictionary</span>
+<strong>Lexicons</strong>
+<p>Rhema combines Strong's-style gloss data, Dodson glosses, Abbott-Smith, and Moulton &amp; Milligan so users can compare quick direction with fuller lexical range.</p>
+</div>
+<div class="nerd-source-item">
+<span class="material-symbols-outlined">account_tree</span>
+<strong>Syntax</strong>
+<p>The syntax view uses local clause/phrase data where available and Rhema's own helper logic to explain grammar roles in accessible language.</p>
+</div>
+<div class="nerd-source-item">
+<span class="material-symbols-outlined">hub</span>
+<strong>Cross References</strong>
+<p>Cross Reference trails are stored locally and shaped from public cross-reference resources such as OpenBible.info-style links and Treasury of Scripture Knowledge-style connections.</p>
+</div>
+</div>
+
+<div class="nerd-section">
+<h3>Credits and source families</h3>
+<p><strong>Lexical credit:</strong> James Strong's numbering system, John Jeffrey Dodson's Greek-English gloss work, G. Abbott-Smith's manual Greek lexicon, and J. H. Moulton with George Milligan's vocabulary work are used as source families for Rhema's definitions and usage notes.</p>
+<p><strong>Bible and reference credit:</strong> The KJV is public domain. Cross-reference data is built from public-domain and open cross-reference traditions, including OpenBible.info Cross References and Treasury of Scripture Knowledge-style datasets. Syntax work follows the kind of clause and phrase analysis used by open Greek NT projects such as Macula/Clear Bible data where available.</p>
+</div>
+
+<div class="nerd-section nerd-flow">
+<h3>What happens when Rhema loads?</h3>
+<ol>
+<li>It loads local JavaScript datasets for the Bible text, Greek forms, lexicons, syntax, and cross references.</li>
+<li>It indexes verse and word data in the browser so taps feel fast and much of the experience can work offline after caching.</li>
+<li>It saves personal material separately: notes, trails, progress, studies, reminders, and profile data belong to the user, not the public source datasets.</li>
+</ol>
+</div>
+
+<div class="nerd-section nerd-honesty">
+<h3>A helpful limit</h3>
+<p>Rhema is a study tool, not a commentary pretending to be neutral. It gives structured data, lexical range, grammar helps, and comparison trails so the user can make careful observations. Cross references and grammar labels are aids, so they should be weighed with the text itself and other serious resources.</p>
 </div>
 </div>
 </div>
