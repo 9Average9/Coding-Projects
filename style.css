@@ -16311,21 +16311,6 @@ body.dark .quiz-answer-correct { color: #a5d6a7; }
   background: var(--lesson-accent);
 }
 
-#advancedLearnMenu .adv-learn-lesson.active .lesson-lead::after,
-#advVerbsLearnMenu .adv-verb-lesson.active .lesson-lead::after {
-  content: "Advanced";
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: var(--lesson-accent-soft);
-  color: var(--lesson-accent);
-  font-size: 0.68rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
 
 #newLearnMenu .learn-lesson.active .lesson-block,
 #basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block,
@@ -16701,11 +16686,6 @@ body.dark #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block {
 #advVerbsLearnMenu .lesson-number-wrap {
   border-radius: 50%;
   background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
-}
-
-#advancedLearnMenu .lesson-label,
-#advVerbsLearnMenu .lesson-label {
-  display: none !important;
 }
 
 #newLearnMenu .lesson-number,
