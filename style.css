@@ -18047,10 +18047,6 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 118px) !important;
 }
 
-body:has(#homeScreen.screen.active) .bottom-nav {
-  bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
-}
-
 /* Settled Home state: match the post-tab-switch layout on first load */
 html.home-active[class*="home-backdrop-"]:not(.home-backdrop-none),
 body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
@@ -18076,10 +18072,6 @@ body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
 body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) .app,
 body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
   background-color: transparent !important;
-}
-
-body.home-active .bottom-nav {
-  bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) - 18px)) !important;
 }
 
 body.home-active #homeScreen .home-scroll {
