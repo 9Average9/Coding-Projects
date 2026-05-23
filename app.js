@@ -9526,6 +9526,82 @@ function showScreen(id) {
   const target = document.getElementById(id);
   if (target) target.classList.add("active");
 
+  _updateAppHeaderForScreen(id);
+}
+
+const LESSON_HEADER_FACTS = [
+  "Koine Greek was the everyday Greek of the New Testament world.",
+  "The word Koine means common, shared, or public.",
+  "Greek word endings often carry the job a word is doing in a sentence.",
+  "Cases are like built-in sentence labels for Greek nouns.",
+  "The Septuagint is an ancient Greek translation of the Old Testament.",
+  "Many New Testament writers quote the Old Testament in Greek.",
+  "Greek verbs can pack person, number, tense, voice, and mood into one form.",
+  "Word order in Greek is flexible because endings do so much work.",
+  "The article in Greek often does more than the English word the.",
+  "A lemma is the dictionary form of a Greek word.",
+  "An inflected form is the exact shape a word takes in a sentence.",
+  "The nominative case often marks the subject of a clause.",
+  "The genitive case often marks relationship, source, or possession.",
+  "The dative case often points to interest, means, location, or recipient.",
+  "The accusative case often marks the direct object or extent of an action.",
+  "Participles are verbal adjectives: part verb, part adjective, fully worth your attention.",
+  "The aorist usually views an action as a whole event.",
+  "The present tense often highlights ongoing or repeated action.",
+  "The perfect tense often points to a completed action with continuing result.",
+  "Many early Christians heard Scripture read aloud before they ever read it privately.",
+  "Papyrus letters help scholars understand ordinary Koine Greek usage.",
+  "Greek accents help pronunciation history, but endings do the heavy grammar lifting.",
+  "Learning nouns first gives verb lessons a sturdier floor to stand on.",
+  "Small Greek words can do surprisingly large jobs in a sentence.",
+  "Reading slowly is not failure; it is how the language starts opening up.",
+  "The New Testament was written in a real historical language, not a secret code.",
+  "Greek conjunctions show how thoughts are stitched together.",
+  "Prepositions often change shade depending on the case that follows.",
+  "The same Greek root can show up in several different-looking forms.",
+  "A good parsing habit is boring at first and powerful later."
+];
+
+let _lessonHeaderFactBag = [];
+
+function _nextLessonHeaderFact() {
+  if (!_lessonHeaderFactBag.length) {
+    _lessonHeaderFactBag = LESSON_HEADER_FACTS
+      .map((text, sort) => ({ text, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(item => item.text);
+  }
+  return _lessonHeaderFactBag.pop();
+}
+
+function _isLessonScreenId(id) {
+  return [
+    "newLearnMenu",
+    "advancedLearnMenu",
+    "basicVerbsLearnMenu",
+    "advVerbsLearnMenu",
+    "learnMenu",
+    "learnScreen"
+  ].includes(id);
+}
+
+function _updateAppHeaderForScreen(id) {
+  const header = document.querySelector(".app-header");
+  if (!header) return;
+  const title = header.querySelector("h1");
+  const subtitle = header.querySelector("p");
+  const hint = header.querySelector(".header-info-hint");
+  if (_isLessonScreenId(id)) {
+    if (title) title.textContent = "Basic Greek";
+    if (subtitle) subtitle.textContent = _nextLessonHeaderFact();
+    if (hint) hint.innerHTML = `<span class="material-symbols-outlined">auto_awesome</span> Tiny Greek fact`;
+    header.classList.add("lesson-header-mode");
+  } else {
+    if (title) title.textContent = "Basic Greek Trainer";
+    if (subtitle) subtitle.textContent = "Study the Greek New Testament — down to every word.";
+    if (hint) hint.innerHTML = `<span class="material-symbols-outlined">info</span> About this app`;
+    header.classList.remove("lesson-header-mode");
+  }
 }
 
 function showHome() {
@@ -12137,6 +12213,7 @@ function showLearnLesson(lesson) {
   currentLearnLesson = lesson;
 
   updateLessonTopBar(lesson);
+  _updateAppHeaderForScreen("newLearnMenu");
 
   restoreOpenedLessonBlocks(lessonSection, lesson);
   updateCompleteLessonButton(lesson);
@@ -12321,6 +12398,7 @@ function showLearnDashboard() {
     action.title = "About this track";
     action.onclick = showBasicTrackInfoModal;
   }
+  _updateAppHeaderForScreen("newLearnMenu");
 }
 function handleLearnBack() {
   if (typeof currentVerbBasicLesson !== "undefined" && currentVerbBasicLesson) {
@@ -12389,6 +12467,7 @@ function showAdvancedLesson(lessonId) {
   }
   currentAdvLearnLesson = lessonId;
   updateAdvLessonTopBar(lessonId);
+  _updateAppHeaderForScreen("advancedLearnMenu");
 }
 
 function showAdvancedLearnDashboard() {
@@ -12405,6 +12484,7 @@ function showAdvancedLearnDashboard() {
     action.title = "About this track";
     action.onclick = showAdvancedTrackInfoModal;
   }
+  _updateAppHeaderForScreen("advancedLearnMenu");
   updateLessonMenuProgress();
 }
 
@@ -16372,9 +16452,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.19";
+const APP_VERSION = "3.0.0";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.0 &mdash; First Official Ready-To-Use Release</div>
+<ul class="un-list">
+  <li><strong>Basic Greek is now ready for real users</strong> with lessons, drills, Rhema, Study Rhema, Cross References, Trails, syntax help, lexicons, achievements, coach tours, and profile tools all working together.</li>
+  <li><strong>This is the big refinement release</strong>: cleaner onboarding, steadier coach tours, source transparency, stronger lesson navigation, and a more polished app feel.</li>
+  <li><strong>Boat loads of features, but still calm</strong>: the goal is a study app that feels deep without feeling like a cockpit full of mystery switches.</li>
+</ul>
 <div class="un-version-label">v2.7.19 &mdash; Rhema Source Notes</div>
 <ul class="un-list">
   <li><strong>Rhema Nerd Page added</strong> in Profile with source credits, dataset notes, and a plain-English explanation of how Rhema works.</li>
@@ -19351,7 +19437,7 @@ STUDY_RHEMA_COACH_STEPS[4].body = 'Workspace organizes notes into Observe, Inter
 XREF_COACH_STEPS[3].body = 'Breadcrumbs will appear near the top once you start moving verse to verse. They show the route you took, so John 1:1 → Hebrews 1:3 → Colossians 1:15 does not become a foggy memory five minutes later.';
 
 const WORD_LIBRARY_COACH_STEPS = [
-  { before: async () => { await loadRhemaScripts(); openWordLibrary(); }, target: () => _coachFirst(['#wordLibraryOverlay .wl-sheet', '#wordLibraryOverlay']), position: 'center', title: 'Word Library', body: 'The Word Library is for searching Greek words without needing to already know the dictionary form. It is especially helpful when the word on the page is inflected and does not look like the lexicon entry.' },
+  { before: async () => { await loadRhemaScripts(); openWordLibrary(); }, target: () => null, position: 'center', title: 'Word Library', body: 'The Word Library is for searching Greek words without needing to already know the dictionary form. It is especially helpful when the word on the page is inflected and does not look like the lexicon entry.' },
   { target: () => _coachFirst(['#wlSearchInput', '.wl-search-row']), title: 'Search exact forms or meanings', body: 'You can search Greek letters, transliteration, or English meanings. Rhema tries to connect what you typed to real forms in the New Testament text, not just a generic dictionary heading.' },
   { target: () => _coachFirst(['#wlKbdToggleBtn', '.wl-search-row']), title: 'Greek keyboard built in', body: 'The alpha button opens a small Greek keyboard. Useful when you want to search the real Greek form and your phone keyboard is being dramatic.' },
   { target: () => _coachFirst(['#wlResults', '#wordLibraryOverlay .wl-sheet']), title: 'Results become study doors', body: 'Results can lead you into definitions, occurrences, and forms. Use it when you remember a word, half-remember a word, or only know the English idea you are chasing.' }

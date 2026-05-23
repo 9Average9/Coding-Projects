@@ -95,6 +95,7 @@ function showBasicVerbLesson(lessonId) {
   currentVerbBasicLesson = lessonId;
 
   _updateVerbBasicTopBar(lessonId);
+  if (typeof _updateAppHeaderForScreen === "function") _updateAppHeaderForScreen("basicVerbsLearnMenu");
   _restoreOpenedVerbBlocks(section, lessonId, "basic");
   _updateVerbCompleteButton(lessonId, "basic");
 }
@@ -112,6 +113,7 @@ function showAdvVerbLesson(lessonId) {
   currentVerbAdvLesson = lessonId;
 
   _updateVerbAdvTopBar(lessonId);
+  if (typeof _updateAppHeaderForScreen === "function") _updateAppHeaderForScreen("advVerbsLearnMenu");
   _shuffleVerbKCOptions(section);
   _restoreOpenedVerbBlocks(section, lessonId, "adv");
   _restoreAnsweredVerbKCs(lessonId, section);
@@ -159,6 +161,7 @@ function showVerbBasicDashboard() {
     action.title = "About this track";
     action.onclick = _showVerbsBasicInfoModal;
   }
+  if (typeof _updateAppHeaderForScreen === "function") _updateAppHeaderForScreen("basicVerbsLearnMenu");
   updateVerbBasicMenuProgress();
 }
 
@@ -176,6 +179,7 @@ function showVerbAdvDashboard() {
     action.title = "About this track";
     action.onclick = _showVerbsAdvInfoModal;
   }
+  if (typeof _updateAppHeaderForScreen === "function") _updateAppHeaderForScreen("advVerbsLearnMenu");
   updateVerbAdvMenuProgress();
 }
 

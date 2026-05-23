@@ -103,6 +103,22 @@ body {
 .header-info-hint .material-symbols-outlined {
   font-size: 13px !important;
 }
+.app-header.lesson-header-mode {
+  border-bottom-color: color-mix(in srgb, var(--secondary-color) 22%, transparent);
+}
+.app-header.lesson-header-mode h1 {
+  letter-spacing: 0.02em;
+}
+.app-header.lesson-header-mode p {
+  max-width: 520px;
+  margin: 0 auto;
+  color: var(--muted-color);
+  line-height: 1.45;
+}
+.app-header.lesson-header-mode .header-info-hint {
+  color: var(--secondary-color);
+  opacity: 0.68;
+}
 body.dark .header:hover, body.dark .header:focus {
   background: rgba(255,255,255,0.05);
 }
@@ -8869,6 +8885,35 @@ body.dark button.continue-learning-btn {
 }
 
 /* ── Pair row ── */
+.lm-creator-note {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 9px;
+  align-items: start;
+  margin: -2px 0 12px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--accent-color) 32%, rgba(0,0,0,0.08));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 12%, #fff), rgba(255,255,255,0.72));
+  color: #4b3c1f;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+.lm-creator-note .material-symbols-outlined {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-color) 18%, #fff);
+  color: var(--accent-color);
+  font-size: 1rem !important;
+}
+.lm-creator-note strong {
+  color: color-mix(in srgb, var(--accent-color) 58%, #1a1a1a);
+}
+
 .lm-pair {
   display: flex;
   align-items: stretch;
@@ -9079,6 +9124,14 @@ body.dark .lm-arrow-btn { background: rgba(255,255,255,0.06); border-color: rgba
 body.dark .lm-dot { background: rgba(255,255,255,0.22); }
 body.dark .lm-section-info strong { color: #f0f0ee; }
 body.dark .lm-section-info span { color: #aaa; }
+body.dark .lm-creator-note {
+  background: rgba(255,255,255,0.06);
+  border-color: color-mix(in srgb, var(--accent-color) 28%, rgba(255,255,255,0.12));
+  color: #ddd;
+}
+body.dark .lm-creator-note strong {
+  color: color-mix(in srgb, var(--accent-color) 72%, #fff);
+}
 body.dark .lm-section-found { background: rgba(201,162,39,0.1); border-color: rgba(201,162,39,0.25); }
 body.dark .lm-section-verbs { background: rgba(var(--accent-rgb,210,95,30),0.1); border-color: rgba(var(--accent-rgb,210,95,30),0.25); }
 body.dark .lm-track-card { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.09); }
