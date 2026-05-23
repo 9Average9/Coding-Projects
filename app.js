@@ -10347,6 +10347,13 @@ function saveParadigmTestScore(type, correct, total) {
   const stats = getParadigmStats();
   stats.tests.push({ type, correct, total, percent: Math.round((correct / total) * 100), date: new Date().toLocaleString() });
   saveParadigmStats(stats);
+
+  if (type === "cases") unlockAchievement("firstCaseDrill");
+  if (type === "verbs") unlockAchievement("firstVerbDrill");
+  if (type === "cases" && total > 0 && correct === total) unlockAchievement("caseDrillPerfect");
+  if (type === "verbs" && total > 0 && correct === total) unlockAchievement("verbDrillPerfect");
+  if ((stats.tests || []).length >= 10) unlockAchievement("endingDrillTen");
+
   if (typeof syncUserData === "function") syncUserData();
 }
 
@@ -10757,8 +10764,13 @@ function awardVocabChapterXP(chapter) {
 
   localStorage.setItem(key, "true");
 
-  addXP(75, `You finished Chapter ${getDisplayChapterNumber(Number(chapter))} vocab!`, true);
   unlockAchievement("firstVocabChapter");
+
+  const completedVocabChapters = getCompletedVocabChaptersCount();
+  if (completedVocabChapters >= 5) unlockAchievement("vocabFiveChapters");
+  if (completedVocabChapters >= 10) unlockAchievement("vocabTenChapters");
+
+  addXP(75, `You finished Chapter ${getDisplayChapterNumber(Number(chapter))} vocab!`, true);
 }
 
 function studyMissedWords() {
@@ -11868,9 +11880,15 @@ function gradeTranslation(result) {
   localStorage.setItem("translationXPCount", translationXPCount);
 
   if (translationXPCount % 5 === 0) {
-    addXP(50, "You completed 5 translation practices!", true);
-
     unlockAchievement("firstFiveTranslations");
+    addXP(50, "You completed 5 translation practices!", true);
+  }
+
+  if (translationXPCount >= 25) unlockAchievement("translation25");
+  if (translationXPCount >= 100) unlockAchievement("translation100");
+
+  if (typeof syncUserData === "function") {
+    syncUserData();
   }
 }
 
@@ -14420,6 +14438,11 @@ function completeLesson(lessonId) {
 
   const nowVocabUnlocked = vocabLessonsCompleted();
   const nowAllComplete = allRequiredLessonsCompleted();
+  const basicLessonCount = REQUIRED_LESSONS.filter(id => completedLessons[id] === true).length;
+
+  unlockAchievement("firstLesson");
+  if (basicLessonCount >= 5) unlockAchievement("basicFiveLessons");
+  if (nowAllComplete) unlockAchievement("allLessonsComplete");
 
   addXP(100, "Lesson completed!", true);
 
@@ -14459,8 +14482,12 @@ function completeAdvancedLesson(lessonId) {
   updateLockedModalProgress();
   updatePracticeToolLocks();
 
-  addXP(150, "Advanced lesson completed!", true);
   unlockAchievement("firstAdvancedLesson");
+
+  const advancedLessonCount = REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons[id] === true).length;
+  if (advancedLessonCount >= 5) unlockAchievement("advancedFiveLessons");
+
+  addXP(150, "Advanced lesson completed!", true);
 
   const nowVocabUnlocked = vocabLessonsCompleted();
   const nowAllComplete = allRequiredLessonsCompleted();
@@ -15356,7 +15383,20 @@ const PROFILE_RANKS = [
   { xp: 1500, title: "Text Apprentice", desc: "You can follow basic Greek structure." },
   { xp: 2200, title: "Koine Reader", desc: "You are reading with growing confidence." },
   { xp: 3000, title: "NT Greek Reader", desc: "You are steadily working with New Testament Greek." },
-  { xp: 4000, title: "Greek Interpreter", desc: "You are reading with structure, context, and care." }
+  { xp: 4000, title: "Greek Interpreter", desc: "You are reading with structure, context, and care." },
+  { xp: 5500, title: "Syntax Tracker", desc: "You are noticing how Greek clauses fit together." },
+  { xp: 7500, title: "Text Analyst", desc: "Your study now blends vocabulary, parsing, and context." },
+  { xp: 10000, title: "Koine Specialist", desc: "You are building durable Greek reading habits." },
+  { xp: 13500, title: "Scripture Linguist", desc: "You can trace meaning through forms, syntax, and discourse." },
+  { xp: 17500, title: "Greek Exegete", desc: "You are reading with careful grammatical judgment." },
+  { xp: 22500, title: "Rhema Scholar", desc: "You are using lessons, drills, and translation together." },
+  { xp: 30000, title: "Koine Strategist", desc: "Greek structure is becoming a working tool." },
+  { xp: 40000, title: "Textual Craftsman", desc: "You are steadily building advanced reading skill." },
+  { xp: 55000, title: "Greek Sage", desc: "You have sustained a serious long-term Greek practice." },
+  { xp: 75000, title: "Master Reader", desc: "You are moving through Greek with deep discipline." },
+  { xp: 100000, title: "Rhema Master", desc: "A high-level milestone for exceptional Greek study." },
+  { xp: 150000, title: "Koine Luminary", desc: "A rare rank for extraordinary consistency." },
+  { xp: 250000, title: "Rhema Legend", desc: "A summit rank for a long, serious Greek journey." }
 ];
 
 function getProfileTitleFromXP(xp) {
@@ -15552,23 +15592,16 @@ function updateProfileAttention() {
 }
 
 function getNextTitleXP(xp) {
-  const levels = [250, 600, 1000, 1500, 2200, 3000, 4000];
-
-  for (const level of levels) {
-    if (xp < level) return level;
-  }
-
-  return null;
+  const nextRank = PROFILE_RANKS.find(rank => xp < rank.xp);
+  return nextRank ? nextRank.xp : null;
 }
 
 function getPreviousTitleXP(xp) {
-  const levels = [0, 250, 600, 1000, 1500, 2200, 3000, 4000];
+  let previous = PROFILE_RANKS[0]?.xp || 0;
 
-  let previous = 0;
-
-  for (const level of levels) {
-    if (xp >= level) previous = level;
-  }
+  PROFILE_RANKS.forEach(rank => {
+    if (xp >= rank.xp) previous = rank.xp;
+  });
 
   return previous;
 }
@@ -15589,6 +15622,7 @@ function addXP(amount, reason = "Progress made", showModal = true) {
   saveProfileData();
   updateProfileUI();
   window.LB?.syncXP(profileData.xp);
+  checkProgressAchievements();
   syncUserData();
 
   if (showModal) {
@@ -15903,6 +15937,102 @@ const ACHIEVEMENT_DATA = {
     icon: "🌟",
     title: "Advanced Track Complete",
     desc: "Completed the full Advanced Verb Track."
+  },
+
+  xp1000: {
+    icon: "1K",
+    title: "1,000 XP",
+    desc: "Earned your first 1,000 XP."
+  },
+
+  xp5000: {
+    icon: "5K",
+    title: "5,000 XP",
+    desc: "Built serious study momentum."
+  },
+
+  xp10000: {
+    icon: "10K",
+    title: "10,000 XP",
+    desc: "Reached a major Rhema study milestone."
+  },
+
+  xp25000: {
+    icon: "25K",
+    title: "25,000 XP",
+    desc: "Sustained a high-volume Greek practice."
+  },
+
+  xp50000: {
+    icon: "50K",
+    title: "50,000 XP",
+    desc: "Reached an elite long-term XP milestone."
+  },
+
+  vocabFiveChapters: {
+    icon: "V5",
+    title: "Vocab Builder",
+    desc: "Completed 5 full vocab chapters."
+  },
+
+  vocabTenChapters: {
+    icon: "V10",
+    title: "Vocab Climber",
+    desc: "Completed 10 full vocab chapters."
+  },
+
+  translation25: {
+    icon: "T25",
+    title: "Translation Habit",
+    desc: "Completed 25 translation practices."
+  },
+
+  translation100: {
+    icon: "T100",
+    title: "Translation Discipline",
+    desc: "Completed 100 translation practices."
+  },
+
+  firstCaseDrill: {
+    icon: "C1",
+    title: "Case Drill Started",
+    desc: "Completed your first case ending drill."
+  },
+
+  caseDrillPerfect: {
+    icon: "C+",
+    title: "Case Ending Perfect",
+    desc: "Finished a case ending drill without missing one."
+  },
+
+  firstVerbDrill: {
+    icon: "V1",
+    title: "Verb Drill Started",
+    desc: "Completed your first verb ending drill."
+  },
+
+  verbDrillPerfect: {
+    icon: "V+",
+    title: "Verb Ending Perfect",
+    desc: "Finished a verb ending drill without missing one."
+  },
+
+  endingDrillTen: {
+    icon: "E10",
+    title: "Ending Drill Rhythm",
+    desc: "Completed 10 case or verb ending drills."
+  },
+
+  basicFiveLessons: {
+    icon: "B5",
+    title: "Foundation Builder",
+    desc: "Completed 5 Basic Foundation lessons."
+  },
+
+  advancedFiveLessons: {
+    icon: "A5",
+    title: "Advanced Momentum",
+    desc: "Completed 5 Advanced Foundation lessons."
   }
 };
 function unlockAchievement(id) {
@@ -15912,7 +16042,55 @@ function unlockAchievement(id) {
   localStorage.setItem("achievements", JSON.stringify(achievements));
 }
 
+function checkProgressAchievements() {
+  const xp = profileData?.xp || 0;
+  [
+    ["xp1000", 1000],
+    ["xp5000", 5000],
+    ["xp10000", 10000],
+    ["xp25000", 25000],
+    ["xp50000", 50000]
+  ].forEach(([id, threshold]) => {
+    if (xp >= threshold) unlockAchievement(id);
+  });
+
+  const completedVocabChapters = getCompletedVocabChaptersCount();
+  if (completedVocabChapters >= 1) unlockAchievement("firstVocabChapter");
+  if (completedVocabChapters >= 5) unlockAchievement("vocabFiveChapters");
+  if (completedVocabChapters >= 10) unlockAchievement("vocabTenChapters");
+
+  const translationAttempts = Math.max(
+    Number(localStorage.getItem("translationXPCount")) || 0,
+    typeof getTranslationAttemptsCount === "function" ? getTranslationAttemptsCount() : 0
+  );
+  if (translationAttempts >= 5) unlockAchievement("firstFiveTranslations");
+  if (translationAttempts >= 25) unlockAchievement("translation25");
+  if (translationAttempts >= 100) unlockAchievement("translation100");
+
+  const basicLessonCount = typeof REQUIRED_LESSONS !== "undefined"
+    ? REQUIRED_LESSONS.filter(id => completedLessons?.[id] === true).length
+    : 0;
+  const advancedLessonCount = typeof REQUIRED_ADVANCED_LESSONS !== "undefined"
+    ? REQUIRED_ADVANCED_LESSONS.filter(id => completedAdvancedLessons?.[id] === true).length
+    : 0;
+  if (basicLessonCount >= 1) unlockAchievement("firstLesson");
+  if (basicLessonCount >= 5) unlockAchievement("basicFiveLessons");
+  if (typeof REQUIRED_LESSONS !== "undefined" && basicLessonCount >= REQUIRED_LESSONS.length) unlockAchievement("allLessonsComplete");
+  if (advancedLessonCount >= 1) unlockAchievement("firstAdvancedLesson");
+  if (advancedLessonCount >= 5) unlockAchievement("advancedFiveLessons");
+  if (typeof REQUIRED_ADVANCED_LESSONS !== "undefined" && advancedLessonCount >= REQUIRED_ADVANCED_LESSONS.length) unlockAchievement("allAdvancedComplete");
+
+  const paradigmStats = typeof getParadigmStats === "function" ? getParadigmStats() : { tests: [] };
+  const paradigmTests = paradigmStats.tests || [];
+  if (paradigmTests.some(test => test.type === "cases")) unlockAchievement("firstCaseDrill");
+  if (paradigmTests.some(test => test.type === "verbs")) unlockAchievement("firstVerbDrill");
+  if (paradigmTests.some(test => test.type === "cases" && test.total > 0 && test.correct === test.total)) unlockAchievement("caseDrillPerfect");
+  if (paradigmTests.some(test => test.type === "verbs" && test.total > 0 && test.correct === test.total)) unlockAchievement("verbDrillPerfect");
+  if (paradigmTests.length >= 10) unlockAchievement("endingDrillTen");
+}
+
 function showAchievementsModal() {
+  checkProgressAchievements();
   renderAchievements();
   document.getElementById("achievementsModal")?.classList.add("open");
 }
@@ -16178,12 +16356,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.13";
+const APP_VERSION = "2.7.14";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.7.13 — High Contrast Themes</div>
+<div class="un-version-label">v2.7.14 — Expanded Ranks and Achievements</div>
 <ul class="un-list">
-  <li><strong>High Contrast Theme toggle</strong> in Settings makes the selected theme more vibrant without changing the theme itself.</li>
+  <li><strong>Expanded rank ladder</strong> now reaches much higher XP totals for long-term study.</li>
+  <li><strong>New achievements</strong> reward XP milestones, vocab chapters, translations, and case/verb ending drills.</li>
 </ul>
 <div class="un-version-label">v2.7.12 — Lesson Menu Polish</div>
 <ul class="un-list">
@@ -17730,16 +17909,7 @@ function closeLbUserModal() {
 
 // ── Friends ───────────────────────────────────────────────────────────────────
 
-const FRIEND_RANKS = [
-  { xp: 0,    title: "Beginner" },
-  { xp: 250,  title: "Letter Reader" },
-  { xp: 600,  title: "Word Builder" },
-  { xp: 1000, title: "Phrase Reader" },
-  { xp: 1500, title: "Text Apprentice" },
-  { xp: 2200, title: "Koine Reader" },
-  { xp: 3000, title: "NT Greek Reader" },
-  { xp: 4000, title: "Greek Interpreter" }
-];
+const FRIEND_RANKS = PROFILE_RANKS.map(({ xp, title }) => ({ xp, title }));
 
 function _frRank(xp) {
   let title = FRIEND_RANKS[0].title;
