@@ -16512,9 +16512,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.7";
+const APP_VERSION = "3.0.8";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.8 &mdash; Home + Nav Polish</div>
+<ul>
+  <li><strong>Home background images now fill the full Home screen</strong> without clipped scroll-layer bars when returning home.</li>
+  <li><strong>Bottom navigation visually refined</strong> into a theme-aware floating glass pill with a sculpted active tab bump.</li>
+  <li><strong>Basic lesson buttons improved</strong> with stronger text contrast on light themes.</li>
+</ul>
 <div class="un-version-label">v3.0.7 &mdash; Onboarding + Background Fix</div>
 <ul>
   <li><strong>Welcome modal timing fixed</strong> so it cannot open until the first app coach onboarding is completed.</li>

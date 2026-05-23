@@ -17647,3 +17647,169 @@ body.dark #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block {
     height: 50px;
   }
 }
+
+/* Visual polish overrides: Home backdrop, lesson button contrast, bottom nav */
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)),
+    var(--home-backdrop-image) center / cover no-repeat !important;
+  overflow: hidden;
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::before,
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::after,
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none)::before,
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none)::after {
+  display: none !important;
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 18%, rgba(255,255,255,0.34)), transparent 42%),
+    linear-gradient(0deg, color-mix(in srgb, var(--primary-color) 12%, rgba(255,255,255,0.22)), transparent 34%);
+}
+
+#newLearnMenu .learn-path-grid button,
+#basicVerbsLearnMenu .learn-path-grid button {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 9%, rgba(255,255,255,0.96)), color-mix(in srgb, var(--card-color) 82%, #ffffff) 74%)
+    !important;
+}
+
+#newLearnMenu .lesson-text strong,
+#basicVerbsLearnMenu .lesson-text strong,
+#newLearnMenu .lesson-text small,
+#basicVerbsLearnMenu .lesson-text small {
+  color: color-mix(in srgb, var(--font-color) 88%, #0f172a) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+}
+
+#newLearnMenu .lesson-label,
+#basicVerbsLearnMenu .lesson-label {
+  color: color-mix(in srgb, var(--secondary-color) 78%, #111827) !important;
+}
+
+.bottom-nav {
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  width: min(calc(100% - 34px), 440px) !important;
+  height: 66px;
+  align-items: center !important;
+  padding: 7px 10px 8px !important;
+  border-radius: 999px !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, rgba(255,255,255,0.72)) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.56)),
+    color-mix(in srgb, var(--card-color) 72%, rgba(255,255,255,0.68)) !important;
+  box-shadow:
+    0 22px 46px rgba(15, 23, 42, 0.18),
+    0 8px 18px rgba(15, 23, 42, 0.09),
+    inset 0 1px 0 rgba(255,255,255,0.8) !important;
+  backdrop-filter: blur(22px) saturate(1.18);
+  -webkit-backdrop-filter: blur(22px) saturate(1.18);
+  overflow: visible;
+  isolation: isolate;
+}
+
+.bottom-nav::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  left: calc((100% - 20px) / 10);
+  width: calc((100% - 20px) / 5);
+  height: 44px;
+  border-radius: 999px 999px 24px 24px;
+  background:
+    radial-gradient(120% 96% at 50% 0%, color-mix(in srgb, var(--secondary-color) 13%, rgba(255,255,255,0.84)), rgba(255,255,255,0.5) 72%),
+    color-mix(in srgb, var(--card-color) 72%, rgba(255,255,255,0.74));
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 13%, rgba(255,255,255,0.62));
+  border-bottom-color: transparent;
+  box-shadow:
+    0 -2px 10px color-mix(in srgb, var(--secondary-color) 10%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.76);
+  transform: translateX(0);
+  transition: transform 0.24s cubic-bezier(.2,.8,.2,1), opacity 0.18s ease;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bottom-nav:has(.bn-item:nth-child(1).active)::before { transform: translateX(0); opacity: 1; }
+.bottom-nav:has(.bn-item:nth-child(2).active)::before { transform: translateX(100%); opacity: 1; }
+.bottom-nav:has(.bn-item:nth-child(3).active)::before { transform: translateX(200%); opacity: 1; }
+.bottom-nav:has(.bn-item:nth-child(4).active)::before { transform: translateX(300%); opacity: 1; }
+.bottom-nav:has(.bn-item:nth-child(5).active)::before { transform: translateX(400%); opacity: 1; }
+
+.bn-item {
+  height: 52px;
+  padding: 6px 2px 7px !important;
+  gap: 2px !important;
+  color: color-mix(in srgb, var(--muted-color) 88%, var(--font-color)) !important;
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  z-index: 2;
+}
+
+.bn-item::before {
+  display: none !important;
+}
+
+.bn-item > span {
+  z-index: 2;
+}
+
+.bn-item .material-symbols-outlined {
+  font-size: 1.42rem !important;
+  color: currentColor !important;
+  font-variation-settings: 'FILL' 0, 'wght' 430, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+.bn-item.active {
+  color: var(--secondary-color) !important;
+  font-weight: 850 !important;
+}
+
+.bn-item.active .material-symbols-outlined {
+  color: var(--secondary-color) !important;
+  font-variation-settings: 'FILL' 1, 'wght' 650, 'GRAD' 0, 'opsz' 24 !important;
+  transform: translateY(-1px);
+}
+
+.bn-item::after {
+  bottom: 2px !important;
+  width: 4px !important;
+  height: 4px !important;
+  background: var(--secondary-color) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color) 10%, transparent) !important;
+}
+
+body.dark .bottom-nav {
+  background:
+    linear-gradient(180deg, rgba(30,41,59,0.82), rgba(15,23,42,0.68)),
+    color-mix(in srgb, var(--card-color) 72%, rgba(15,23,42,0.74)) !important;
+  border-color: color-mix(in srgb, var(--secondary-color) 18%, rgba(255,255,255,0.18)) !important;
+  box-shadow:
+    0 22px 50px rgba(0,0,0,0.44),
+    0 8px 18px rgba(0,0,0,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+
+body.dark .bottom-nav::before {
+  background:
+    radial-gradient(120% 96% at 50% 0%, color-mix(in srgb, var(--secondary-color) 20%, rgba(255,255,255,0.12)), rgba(30,41,59,0.72) 72%),
+    color-mix(in srgb, var(--card-color) 82%, rgba(15,23,42,0.78));
+  border-color: color-mix(in srgb, var(--secondary-color) 18%, rgba(255,255,255,0.12));
+  border-bottom-color: transparent;
+  box-shadow:
+    0 -2px 12px color-mix(in srgb, var(--secondary-color) 12%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+@supports not selector(.bottom-nav:has(.bn-item.active)) {
+  .bn-item.active {
+    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+    border-radius: 999px;
+  }
+}
