@@ -16595,3 +16595,250 @@ body.dark #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block {
     padding: 16px 16px 18px !important;
   }
 }
+
+/* =========================================================
+   LESSON MENU + COMPLETED BLOCK POLISH v2.7.12
+========================================================= */
+
+#newLearnMenu .learn-path-grid,
+#basicVerbsLearnMenu .learn-path-grid,
+#advancedLearnMenu .learn-path-grid,
+#advVerbsLearnMenu .learn-path-grid {
+  display: grid !important;
+  gap: 12px !important;
+  padding: 14px 14px 34px !important;
+}
+
+#newLearnMenu .learn-path-grid button,
+#basicVerbsLearnMenu .learn-path-grid button,
+#advancedLearnMenu .learn-path-grid button,
+#advVerbsLearnMenu .learn-path-grid button {
+  position: relative;
+  width: 100% !important;
+  min-height: 104px;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px 42px 16px 14px !important;
+  border-radius: 20px !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+  border-left: 1px solid color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 6%, var(--card-color)), var(--card-color) 72%)
+    !important;
+  color: var(--font-color) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.075) !important;
+  text-align: left !important;
+  overflow: hidden;
+}
+
+#advancedLearnMenu .learn-path-grid button,
+#advVerbsLearnMenu .learn-path-grid button {
+  border-radius: 16px !important;
+  border-color: color-mix(in srgb, var(--secondary-color) 28%, var(--border-color)) !important;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 10%, var(--card-color)), var(--card-color) 74%)
+    !important;
+}
+
+#newLearnMenu .learn-path-grid button::before,
+#basicVerbsLearnMenu .learn-path-grid button::before,
+#advancedLearnMenu .learn-path-grid button::before,
+#advVerbsLearnMenu .learn-path-grid button::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--secondary-color);
+  opacity: 0.9;
+}
+
+#newLearnMenu .learn-path-grid button::after,
+#basicVerbsLearnMenu .learn-path-grid button::after,
+#advancedLearnMenu .learn-path-grid button::after,
+#advVerbsLearnMenu .learn-path-grid button::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--secondary-color);
+  border-top: 2px solid var(--secondary-color);
+  transform: translateY(-50%) rotate(45deg);
+  opacity: 0.85;
+}
+
+#newLearnMenu .lesson-number-wrap,
+#basicVerbsLearnMenu .lesson-number-wrap,
+#advancedLearnMenu .lesson-number-wrap,
+#advVerbsLearnMenu .lesson-number-wrap {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  gap: 0;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
+}
+
+#advancedLearnMenu .lesson-number-wrap,
+#advVerbsLearnMenu .lesson-number-wrap {
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
+}
+
+#newLearnMenu .lesson-number,
+#basicVerbsLearnMenu .lesson-number,
+#advancedLearnMenu .lesson-number,
+#advVerbsLearnMenu .lesson-number {
+  color: var(--secondary-color) !important;
+  font-size: 1.22rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+}
+
+#newLearnMenu .lesson-label,
+#basicVerbsLearnMenu .lesson-label,
+#advancedLearnMenu .lesson-label,
+#advVerbsLearnMenu .lesson-label {
+  color: color-mix(in srgb, var(--font-color) 58%, var(--secondary-color)) !important;
+  font-size: 0.58rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1 !important;
+}
+
+#newLearnMenu .lesson-text,
+#basicVerbsLearnMenu .lesson-text,
+#advancedLearnMenu .lesson-text,
+#advVerbsLearnMenu .lesson-text {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+#newLearnMenu .lesson-text strong,
+#basicVerbsLearnMenu .lesson-text strong,
+#advancedLearnMenu .lesson-text strong,
+#advVerbsLearnMenu .lesson-text strong {
+  color: var(--font-color) !important;
+  font-size: 1rem !important;
+  font-weight: 950 !important;
+  line-height: 1.2 !important;
+}
+
+#newLearnMenu .lesson-text small,
+#basicVerbsLearnMenu .lesson-text small,
+#advancedLearnMenu .lesson-text small,
+#advVerbsLearnMenu .lesson-text small {
+  color: var(--muted-color) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.35 !important;
+}
+
+#newLearnMenu .lesson-status,
+#basicVerbsLearnMenu .lesson-status,
+#advancedLearnMenu .lesson-status,
+#advVerbsLearnMenu .lesson-status {
+  width: fit-content;
+  margin-top: 3px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: color-mix(in srgb, var(--font-color) 68%, var(--secondary-color)) !important;
+  font-size: 0.72rem !important;
+  font-weight: 850 !important;
+}
+
+#newLearnMenu .lesson-est-time,
+#basicVerbsLearnMenu .lesson-est-time,
+#advancedLearnMenu .lesson-est-time,
+#advVerbsLearnMenu .lesson-est-time {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  color: var(--muted-color) !important;
+}
+
+#newLearnMenu .lesson-progress-badge,
+#basicVerbsLearnMenu .lesson-progress-badge,
+#advancedLearnMenu .lesson-progress-badge,
+#advVerbsLearnMenu .lesson-progress-badge {
+  width: calc(100% - 28px) !important;
+  margin: 12px 14px 2px !important;
+  border-radius: 16px !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, var(--border-color)) !important;
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)) !important;
+  color: var(--secondary-color) !important;
+}
+
+#basicVerbsLearnMenu .advanced-learn-header {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 8%, var(--card-color)), var(--card-color))
+    !important;
+  border-bottom-color: color-mix(in srgb, var(--secondary-color) 18%, var(--border-color)) !important;
+}
+
+#basicVerbsLearnMenu .advanced-learn-badge {
+  background: var(--secondary-color) !important;
+  color: var(--btn-text-color) !important;
+}
+
+#newLearnMenu .learn-lesson.active .lesson-block.visited .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.visited .lesson-block-header::after,
+#advancedLearnMenu .adv-learn-lesson.active .lesson-block.visited .lesson-block-header::after,
+#advVerbsLearnMenu .adv-verb-lesson.active .lesson-block.visited .lesson-block-header::after,
+#newLearnMenu .learn-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#advancedLearnMenu .adv-learn-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#advVerbsLearnMenu .adv-verb-lesson.active .lesson-block.visited.open .lesson-block-header::after {
+  content: "✓" !important;
+  width: 28px !important;
+  height: 28px !important;
+  right: 12px !important;
+  top: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50%;
+  background: color-mix(in srgb, #16a34a 14%, transparent);
+  color: #15803d !important;
+  font-size: 1rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  transform: translateY(-50%) !important;
+}
+
+@media (max-width: 760px) {
+  #newLearnMenu .learn-path-grid,
+  #basicVerbsLearnMenu .learn-path-grid,
+  #advancedLearnMenu .learn-path-grid,
+  #advVerbsLearnMenu .learn-path-grid {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  #newLearnMenu .learn-path-grid button,
+  #basicVerbsLearnMenu .learn-path-grid button,
+  #advancedLearnMenu .learn-path-grid button,
+  #advVerbsLearnMenu .learn-path-grid button {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    min-height: 98px;
+    padding: 14px 38px 14px 12px !important;
+    border-radius: 18px !important;
+  }
+
+  #newLearnMenu .lesson-number-wrap,
+  #basicVerbsLearnMenu .lesson-number-wrap,
+  #advancedLearnMenu .lesson-number-wrap,
+  #advVerbsLearnMenu .lesson-number-wrap {
+    width: 50px;
+    height: 50px;
+  }
+}

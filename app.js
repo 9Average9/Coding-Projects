@@ -16031,9 +16031,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.11";
+const APP_VERSION = "2.7.12";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.12 — Lesson Menu Polish</div>
+<ul class="un-list">
+  <li><strong>Lesson menu cards refreshed</strong> across foundations and verbs.</li>
+  <li><strong>Completed lesson sections now show a stable checkmark</strong> instead of rotating the open/close arrow.</li>
+</ul>
 <div class="un-version-label">v2.7.11 — Lesson Redesign</div>
 <ul class="un-list">
   <li><strong>Refreshed lesson pages</strong> for foundations and verbs while preserving the same lesson flow.</li>
