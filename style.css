@@ -13070,6 +13070,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   pointer-events: all;
 }
 .app-coach-overlay.hidden { display: none; }
+.app-coach-overlay.coach-full-blur::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 14, 26, 0.36);
+  backdrop-filter: blur(10px) saturate(1.04);
+  -webkit-backdrop-filter: blur(10px) saturate(1.04);
+  animation: coachBlurIn 0.28s ease both;
+}
 .app-coach-spotlight {
   position: fixed;
   border-radius: 18px;
@@ -13169,6 +13178,11 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 @keyframes coachPulse {
   0%, 100% { outline-offset: 3px; }
   50% { outline-offset: 7px; }
+}
+
+@keyframes coachBlurIn {
+  from { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(10px) saturate(1.04); -webkit-backdrop-filter: blur(10px) saturate(1.04); }
 }
 
 @media (max-width: 420px) {

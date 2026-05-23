@@ -16357,9 +16357,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.15";
+const APP_VERSION = "2.7.16";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.16 — Coach Intro Blur</div>
+<ul class="un-list">
+  <li><strong>Coach welcome step polished</strong> with a softened blurred background before the tour begins spotlighting specific parts of the app.</li>
+</ul>
 <div class="un-version-label">v2.7.15 — Coach Onboarding Tours</div>
 <ul class="un-list">
   <li><strong>New app walkthrough</strong> introduces Lessons, Community, Home, Studies, Rhema, and Profile with guided coach marks.</li>
@@ -19321,6 +19325,7 @@ function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
   const MARGIN = 14;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+  const overlay = document.getElementById('appCoachOverlay');
   const cardW = Math.min(360, vw - MARGIN * 2);
   card.style.width = `${cardW}px`;
   card.style.visibility = 'hidden';
@@ -19329,12 +19334,14 @@ function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
   card.style.transform = '';
   const rect = target ? target.getBoundingClientRect() : null;
   if (!rect || rect.width < 4 || rect.height < 4) {
+    overlay?.classList.add('coach-full-blur');
     spotlight.classList.add('no-target');
     spotlight.style.left = `${vw / 2 - 60}px`;
     spotlight.style.top = `${vh / 2 - 60}px`;
     spotlight.style.width = '120px';
     spotlight.style.height = '120px';
   } else {
+    overlay?.classList.remove('coach-full-blur');
     spotlight.classList.remove('no-target');
     spotlight.style.left = `${Math.max(MARGIN, rect.left - PAD)}px`;
     spotlight.style.top = `${Math.max(MARGIN, rect.top - PAD)}px`;
