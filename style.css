@@ -17883,3 +17883,75 @@ body.dark .bottom-nav::before {
 .bottom-nav:has(.bn-item.active)::before {
   opacity: 0 !important;
 }
+
+/* Final Home cleanup: no edge bars, simple full-page backdrop, content clears nav */
+body.home-active {
+  overflow: hidden !important;
+  background: var(--primary-color) !important;
+}
+
+body .app:has(#homeScreen.screen.active) {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  background: var(--primary-color) !important;
+}
+
+body .app:has(#homeScreen.screen.active) #statusBarBg,
+#homeScreen::before,
+#homeScreen::after,
+#homeScreen .home-scroll::before,
+#homeScreen .home-scroll::after {
+  display: none !important;
+  content: none !important;
+}
+
+#homeScreen.screen.active {
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--primary-color) !important;
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    var(--home-backdrop-image) center / cover no-repeat,
+    var(--primary-color) !important;
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none)::before {
+  display: none !important;
+  content: none !important;
+}
+
+#homeScreen .home-scroll {
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 18px)
+    20px
+    calc(env(safe-area-inset-bottom, 0px) + 112px) !important;
+  background: transparent !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  isolation: auto !important;
+}
+
+#homeScreen .home-scroll > * {
+  position: relative;
+  z-index: 1;
+}
+
+#homeScreen .home-top-row {
+  padding-top: 0 !important;
+}
