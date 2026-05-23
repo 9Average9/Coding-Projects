@@ -285,11 +285,41 @@ body.dark .header:hover, body.dark .header:focus {
 .paradigm-lesson-card .material-symbols-outlined {
   grid-row: span 2;
   color: var(--secondary-color);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
 }
 
 .paradigm-lesson-card.selected {
   border-color: var(--secondary-color);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary-color) 20%, transparent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 18%, transparent), transparent 68%),
+    var(--card-color);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--secondary-color) 28%, transparent),
+    0 12px 28px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+
+.paradigm-lesson-card.selected .material-symbols-outlined {
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+}
+
+.paradigm-lesson-card.selected strong::after {
+  content: "Selected";
+  display: inline-flex;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  font-size: 0.66rem;
+  font-weight: 900;
+  vertical-align: middle;
 }
 
 .test-question-meta {
@@ -8714,10 +8744,78 @@ body.dark button.continue-learning-btn {
   text-align: center;
 }
 
+.lm-carousel-nav {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 6px;
+}
+
+.lm-carousel-nav > div {
+  text-align: center;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+.lm-arrow-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #fff;
+  color: var(--accent-color, #d45f1e);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+.lm-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.lm-dot {
+  width: 7px;
+  height: 7px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.18);
+  padding: 0;
+  cursor: pointer;
+}
+
+.lm-dot.active {
+  width: 18px;
+  border-radius: 999px;
+  background: var(--accent-color, #d45f1e);
+}
+
+.lm-slides {
+  min-height: 318px;
+}
+
+.lm-slide {
+  display: none;
+}
+
+.lm-slide.active {
+  display: block;
+  animation: lessonModeSlideIn 0.18s ease;
+}
+
+@keyframes lessonModeSlideIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 /* ── Section card ── */
 .lm-section {
   border-radius: 14px;
-  padding: 8px;
+  padding: 12px;
   border: 1px solid rgba(0,0,0,0.08);
 }
 
@@ -8735,7 +8833,7 @@ body.dark button.continue-learning-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 7px;
+  margin-bottom: 12px;
 }
 
 .lm-section-icon-wrap {
@@ -8765,8 +8863,9 @@ body.dark button.continue-learning-btn {
 }
 
 .lm-section-info span {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: #666;
+  line-height: 1.42;
 }
 
 /* ── Pair row ── */
@@ -8781,7 +8880,7 @@ body.dark button.continue-learning-btn {
   flex: 1;
   background: #fff;
   border-radius: 10px;
-  padding: 10px 8px 8px;
+  padding: 14px 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8802,8 +8901,8 @@ body.dark button.continue-learning-btn {
 }
 
 .lm-track-card p {
-  font-size: 0.72rem;
-  line-height: 1.4;
+  font-size: 0.78rem;
+  line-height: 1.45;
   color: #555;
   margin: 0;
   flex: 1;
@@ -8975,6 +9074,9 @@ body.dark .lm-card { background: var(--card-bg, #1e2030); box-shadow: 0 24px 64p
 body.dark .lm-close-btn { background: var(--card-bg, #1e2030); border-color: rgba(255,255,255,0.12); color: #ddd; }
 body.dark .lm-heading { color: #f0f0ee; }
 body.dark .lm-subheading { color: #aaa; }
+body.dark .lm-carousel-nav > div { color: #f0f0ee; }
+body.dark .lm-arrow-btn { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+body.dark .lm-dot { background: rgba(255,255,255,0.22); }
 body.dark .lm-section-info strong { color: #f0f0ee; }
 body.dark .lm-section-info span { color: #aaa; }
 body.dark .lm-section-found { background: rgba(201,162,39,0.1); border-color: rgba(201,162,39,0.25); }
@@ -8989,6 +9091,49 @@ body.dark .lm-footer-q { border-color: rgba(255,255,255,0.2); color: #aaa; }
 body.dark .lm-footer-text { color: #aaa; }
 body.dark .lm-footer-text small { color: #777; }
 body.dark .lm-toggle-track { background: rgba(255,255,255,0.15); }
+
+.unfinished-lesson-card {
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 24%, transparent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 12%, transparent), transparent 58%),
+    var(--primary-light);
+}
+
+.unfinished-lesson-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
+  color: var(--secondary-color);
+}
+
+.unfinished-lesson-icon .material-symbols-outlined {
+  font-size: 2rem;
+}
+
+.unfinished-lesson-card h2 {
+  margin-top: 0;
+}
+
+.unfinished-lesson-card p {
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.unfinished-lesson-actions {
+  display: grid;
+  gap: 10px;
+}
+
+body.dark .unfinished-lesson-card {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 14%, transparent), transparent 58%),
+    var(--card-bg, #1e2030);
+}
 
 /* Legacy class kept so JS selectLessonMode still works */
 .advanced-btn {

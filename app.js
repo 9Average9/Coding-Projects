@@ -10,6 +10,8 @@ let currentTestMode = "vocab";
 let currentParadigmAnswer = null;
 let currentParadigmTargetTotal = 20;
 let selectedVerbParadigmLesson = "vb_06";
+let pendingUnfinishedLessonContinue = null;
+let currentLessonModeSlide = 0;
 let knownWords = JSON.parse(localStorage.getItem("knownWords")) || [];
 let currentTranslateSentence = null;
 let translationProgress =
@@ -10037,8 +10039,57 @@ function _lessonCompleteForWarning(kind, lessonId) {
   return true;
 }
 
-function _confirmUnfinishedLesson(lessonName) {
-  return confirm(`You haven't completed the "${lessonName}" lesson, so you may not know how to complete this quiz. Would you like to continue anyway?`);
+function _showUnfinishedLessonModal({ lessonName, track, lessonId, onContinue }) {
+  pendingUnfinishedLessonContinue = onContinue;
+  const title = document.getElementById("unfinishedLessonTitle");
+  const body = document.getElementById("unfinishedLessonBody");
+  const modal = document.getElementById("unfinishedLessonModal");
+  if (title) title.textContent = "Lesson not completed yet";
+  if (body) {
+    body.textContent = `You haven't completed the "${lessonName}" lesson, so you may not know how to complete this quiz. Would you like to continue anyway?`;
+  }
+  if (modal) {
+    modal.dataset.track = track || "";
+    modal.dataset.lessonId = lessonId || "";
+    modal.classList.add("open");
+  }
+}
+
+function closeUnfinishedLessonModal() {
+  const modal = document.getElementById("unfinishedLessonModal");
+  if (modal) modal.classList.remove("open");
+  pendingUnfinishedLessonContinue = null;
+}
+
+function continueUnfinishedLessonQuiz() {
+  const next = pendingUnfinishedLessonContinue;
+  closeUnfinishedLessonModal();
+  if (typeof next === "function") next();
+}
+
+function takeUnfinishedLessonFirst() {
+  const modal = document.getElementById("unfinishedLessonModal");
+  const track = modal?.dataset.track;
+  const lessonId = modal?.dataset.lessonId;
+  closeUnfinishedLessonModal();
+  navigateToParadigmLesson(track, lessonId);
+}
+
+function navigateToParadigmLesson(track, lessonId) {
+  if (track === "case") {
+    _openBasicLearnMenu();
+    showLearnLesson(lessonId || "cases");
+    return;
+  }
+  if (track === "verbBasic" && typeof showBasicVerbsTrack === "function") {
+    showBasicVerbsTrack();
+    if (typeof showBasicVerbLesson === "function") showBasicVerbLesson(lessonId);
+    return;
+  }
+  if (track === "verbAdv" && typeof showAdvVerbsTrack === "function") {
+    showAdvVerbsTrack();
+    if (typeof showAdvVerbLesson === "function") showAdvVerbLesson(lessonId);
+  }
 }
 
 function _shuffleOptions(options, answer) {
@@ -10324,8 +10375,18 @@ function buildAdaptiveParadigmQueue(pool, amount, focusMode) {
 function startCaseEndingTest() {
   if (!_lessonCompleteForWarning("case")) {
     const lessonName = LESSON_LABELS.cases || "Case Endings";
-    if (!_confirmUnfinishedLesson(lessonName)) return;
+    _showUnfinishedLessonModal({
+      lessonName,
+      track: "case",
+      lessonId: "cases",
+      onContinue: _startCaseEndingTestNow
+    });
+    return;
   }
+  _startCaseEndingTestNow();
+}
+
+function _startCaseEndingTestNow() {
   const amount = Math.max(8, Number(document.getElementById("caseTestAmount")?.value || 20));
   const focusMode = document.getElementById("caseFocusMode")?.checked;
   testWords = buildAdaptiveParadigmQueue(buildCaseEndingItems(), amount, focusMode);
@@ -10336,11 +10397,21 @@ function startCaseEndingTest() {
 function startVerbEndingTest() {
   const test = VERB_PARADIGM_TESTS.find(item => item.id === selectedVerbParadigmLesson) || VERB_PARADIGM_TESTS[0];
   if (!_lessonCompleteForWarning(test.track, test.id)) {
-    if (!_confirmUnfinishedLesson(test.title)) return;
+    _showUnfinishedLessonModal({
+      lessonName: test.title,
+      track: test.track,
+      lessonId: test.id,
+      onContinue: () => _startVerbEndingTestNow(test.id)
+    });
+    return;
   }
+  _startVerbEndingTestNow(test.id);
+}
+
+function _startVerbEndingTestNow(lessonId) {
   const amount = Math.max(8, Number(document.getElementById("verbTestAmount")?.value || 20));
   const focusMode = document.getElementById("verbFocusMode")?.checked;
-  testWords = buildAdaptiveParadigmQueue(buildVerbEndingItems(test.id), amount, focusMode);
+  testWords = buildAdaptiveParadigmQueue(buildVerbEndingItems(lessonId), amount, focusMode);
   if (!testWords.length) { alert("No verb ending items are available yet."); return; }
   _beginParadigmTest("verbs", amount);
 }
@@ -11941,6 +12012,7 @@ function showAdvancedLearnMenu() {
 
 function showLessonModeModal() {
   document.getElementById("lessonModeModal")?.classList.add("open");
+  setLessonModeSlide(currentLessonModeSlide || 0);
 }
 
 function hideLessonModeModal() {
@@ -11951,6 +12023,38 @@ function hideLessonModeModal() {
     showNavPage('home');
   }
 }
+
+function setLessonModeSlide(index) {
+  const slides = Array.from(document.querySelectorAll(".lm-slide"));
+  if (!slides.length) return;
+  currentLessonModeSlide = (index + slides.length) % slides.length;
+  slides.forEach((slide, i) => slide.classList.toggle("active", i === currentLessonModeSlide));
+  document.querySelectorAll(".lm-dot").forEach((dot, i) => dot.classList.toggle("active", i === currentLessonModeSlide));
+  const label = document.getElementById("lessonModeSlideLabel");
+  if (label) label.textContent = currentLessonModeSlide === 0 ? "Greek Foundations" : "Greek Verbs";
+}
+
+function moveLessonModeSlide(direction) {
+  setLessonModeSlide((currentLessonModeSlide || 0) + direction);
+}
+
+function initLessonModeSwipe() {
+  const slides = document.querySelector(".lm-slides");
+  if (!slides || slides.dataset.swipeReady === "true") return;
+  slides.dataset.swipeReady = "true";
+  let startX = 0;
+  slides.addEventListener("touchstart", (event) => {
+    startX = event.touches?.[0]?.clientX || 0;
+  }, { passive: true });
+  slides.addEventListener("touchend", (event) => {
+    const endX = event.changedTouches?.[0]?.clientX || 0;
+    const delta = endX - startX;
+    if (Math.abs(delta) < 42) return;
+    moveLessonModeSlide(delta < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+document.addEventListener("DOMContentLoaded", initLessonModeSwipe);
 
 function selectLessonMode(mode) {
   const dontAsk = document.getElementById("lessonModeDontAsk")?.checked;
@@ -15927,9 +16031,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.9";
+const APP_VERSION = "2.7.10";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.10 — Drill Flow Polish</div>
+<ul class="un-list">
+  <li><strong>Clearer verb drill selection</strong> so the active lesson is obvious before starting.</li>
+  <li><strong>Custom lesson warning</strong> with a direct path into the unfinished lesson.</li>
+  <li><strong>Cleaner lesson path picker</strong> with arrows between Foundations and Verbs.</li>
+</ul>
 <div class="un-version-label">v2.7.9 — Ending Drill Tests</div>
 <ul class="un-list">
   <li><strong>New Test tabs</strong> for vocabulary, case endings, and verb endings.</li>

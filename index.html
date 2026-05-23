@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=2.7.9" rel="stylesheet"/>
+<link href="style.css?v=2.7.10" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -15400,11 +15400,11 @@ Verb Endings
 </section>
 
 </main>
-<script src="vocab.js?v=2.7.9"></script>
-<script src="app.js?v=2.7.9"></script>
-<script src="rhema-crossrefs-ui.js?v=2.7.9"></script>
-<script src="greek-verbs.js?v=2.7.9"></script>
-<script src="firebase-lb.js?v=2.7.9" type="module"></script>
+<script src="vocab.js?v=2.7.10"></script>
+<script src="app.js?v=2.7.10"></script>
+<script src="rhema-crossrefs-ui.js?v=2.7.10"></script>
+<script src="greek-verbs.js?v=2.7.10"></script>
+<script src="firebase-lb.js?v=2.7.10" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -15944,48 +15944,61 @@ Verb Endings
 <div class="lm-card" onclick="event.stopPropagation()">
 <button class="lm-close-btn" onclick="hideLessonModeModal()">×</button>
 <h2 class="lm-heading">Choose your lesson path</h2>
-<p class="lm-subheading">Pick the path that fits your goals.</p>
+<p class="lm-subheading">Pick one path now. You can switch any time.</p>
+<div class="lm-carousel-nav">
+<button class="lm-arrow-btn" onclick="moveLessonModeSlide(-1)" type="button" aria-label="Previous lesson group">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div>
+<span id="lessonModeSlideLabel">Greek Foundations</span>
+<div class="lm-dots" aria-hidden="true">
+<button class="lm-dot active" onclick="setLessonModeSlide(0)" type="button"></button>
+<button class="lm-dot" onclick="setLessonModeSlide(1)" type="button"></button>
+</div>
+</div>
+<button class="lm-arrow-btn" onclick="moveLessonModeSlide(1)" type="button" aria-label="Next lesson group">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="lm-slides">
 
 <!-- Section 1: Greek Foundations -->
-<div class="lm-section lm-section-found">
+<div class="lm-section lm-section-found lm-slide active">
 <div class="lm-section-head">
 <div class="lm-section-icon-wrap lm-sicon-found">
 <span class="material-symbols-outlined">account_balance</span>
 </div>
 <div class="lm-section-info">
 <strong>Greek Foundations</strong>
-<span>Build a strong foundation from the ground up.</span>
+<span>Start here if you want the alphabet, noun cases, grammar basics, and reading confidence before diving into verbs.</span>
 </div>
 </div>
 <div class="lm-pair">
 <div class="lm-track-card" onclick="selectLessonMode('basic')">
 <div class="lm-track-icon lm-ticon-basic"><span class="material-symbols-outlined">school</span></div>
 <strong>Start Basic</strong>
-<p>Greek fundamentals step by step. Great for getting started.</p>
+<p>A calmer first pass through the foundations. It teaches the essentials without asking you to master every detail at once.</p>
 <button class="lm-choose-btn lm-choose-basic">Choose</button>
 </div>
 <div class="lm-or-badge">OR</div>
 <div class="lm-track-card" onclick="selectLessonMode('advanced')">
 <div class="lm-track-icon lm-ticon-found"><span class="material-symbols-outlined">school</span></div>
 <strong>Start Advanced</strong>
-<p>Everything in Basic, plus deeper explanations, more examples, and knowledge checks.</p>
+<p>The same foundation with more explanation, more examples, and knowledge checks so you can slow down and understand why the forms work.</p>
 <button class="lm-choose-btn lm-choose-found">Choose</button>
 </div>
 </div>
 </div>
 
-<!-- THEN separator -->
-<div class="lm-then-row"><div class="lm-then-badge">THEN</div></div>
-
 <!-- Section 2: Greek Verbs -->
-<div class="lm-section lm-section-verbs">
+<div class="lm-section lm-section-verbs lm-slide">
 <div class="lm-section-head">
 <div class="lm-section-icon-wrap lm-sicon-verbs">
 <span class="lm-sigma-lg">Σ</span>
 </div>
 <div class="lm-section-info">
 <strong>Greek Verbs</strong>
-<span>Dive deep into Greek verb systems.</span>
+<span>Use this path when you are ready to work through person, number, tense forms, stems, endings, and real Greek verb parsing.</span>
 </div>
 </div>
 <div class="lm-pair">
@@ -15994,7 +16007,7 @@ Verb Endings
 <div class="lm-track-icon lm-ticon-verbs"><span class="lm-sigma-sm">Σ</span></div>
 <strong>Greek Verbs — Basic</strong>
 </div>
-<p>22-lesson verb curriculum from English foundations through Greek verb systems.</p>
+<p>A step-by-step verb curriculum that begins with English foundations, then builds toward Greek personal endings, stems, tense markers, and complete parses.</p>
 <button class="lm-choose-btn lm-choose-verbs">Choose</button>
 </div>
 <div class="lm-or-badge">OR</div>
@@ -16003,8 +16016,9 @@ Verb Endings
 <div class="lm-track-icon lm-ticon-adv"><span class="lm-sigma-sm">Σ</span></div>
 <strong>Greek Verbs — Advanced</strong>
 </div>
-<p>28 in-depth lessons on Greek verbal aspect, voice, syntax, and NT reading. Quizzes required.</p>
+<p>A deeper track for verbal aspect, voice, syntax, participles, principal parts, and careful NT reading. Best after you have the basics in place.</p>
 <button class="lm-choose-btn lm-choose-adv">Choose</button>
+</div>
 </div>
 </div>
 </div>
@@ -16017,6 +16031,20 @@ Verb Endings
 <input type="checkbox" id="lessonModeDontAsk" class="lm-toggle-input">
 <span class="lm-toggle-track"><span class="lm-toggle-thumb"></span></span>
 </label>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="unfinishedLessonModal" onclick="if(event.target===this)closeUnfinishedLessonModal()">
+<div class="modal-card unfinished-lesson-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeUnfinishedLessonModal()">&times;</button>
+<div class="unfinished-lesson-icon">
+<span class="material-symbols-outlined">school</span>
+</div>
+<h2 id="unfinishedLessonTitle">Lesson not completed yet</h2>
+<p id="unfinishedLessonBody"></p>
+<div class="unfinished-lesson-actions">
+<button class="main-btn" onclick="continueUnfinishedLessonQuiz()">Go for it anyways</button>
+<button class="main-btn secondary" onclick="takeUnfinishedLessonFirst()">I'll take the lesson first</button>
 </div>
 </div>
 </div>
