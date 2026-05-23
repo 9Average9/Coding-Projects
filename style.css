@@ -16650,6 +16650,11 @@ body.dark #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block {
     !important;
 }
 
+#advVerbsLearnMenu .learn-path-grid button {
+  min-height: 80px !important;
+  padding: 12px 42px 12px 14px !important;
+}
+
 #newLearnMenu .learn-path-grid button::before,
 #basicVerbsLearnMenu .learn-path-grid button::before,
 #advancedLearnMenu .learn-path-grid button::before,
@@ -16696,6 +16701,11 @@ body.dark #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block {
 #advVerbsLearnMenu .lesson-number-wrap {
   border-radius: 50%;
   background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
+}
+
+#advancedLearnMenu .lesson-label,
+#advVerbsLearnMenu .lesson-label {
+  display: none !important;
 }
 
 #newLearnMenu .lesson-number,
@@ -16840,6 +16850,11 @@ body.dark #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block {
     min-height: 98px;
     padding: 14px 38px 14px 12px !important;
     border-radius: 18px !important;
+  }
+
+  #advVerbsLearnMenu .learn-path-grid button {
+    min-height: 80px !important;
+    padding: 12px 38px 12px 12px !important;
   }
 
   #newLearnMenu .lesson-number-wrap,
