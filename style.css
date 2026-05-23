@@ -14781,45 +14781,62 @@ body.high-contrast-theme .sett-theme-card {
 }
 
 .home-backdrop-card {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 10px;
   padding: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.home-backdrop-card::-webkit-scrollbar {
+  display: none;
+}
+.home-backdrop-card {
+  scrollbar-width: none;
 }
 .home-backdrop-option {
   position: relative;
   display: grid;
-  grid-template-columns: 44px 1fr 18px;
-  align-items: center;
-  gap: 10px;
-  min-height: 62px;
-  padding: 9px 10px;
+  grid-template-columns: 1fr 18px;
+  grid-template-rows: 58px auto;
+  align-items: start;
+  gap: 8px 8px;
+  flex: 0 0 124px;
+  min-height: 110px;
+  padding: 8px;
   border: 1px solid color-mix(in srgb, var(--border-color) 46%, transparent);
-  border-radius: 16px;
+  border-radius: 18px;
   background: color-mix(in srgb, var(--card-color) 82%, rgba(255,255,255,0.52));
   color: var(--font-color);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 750;
   text-align: left;
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+  scroll-snap-align: start;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
 }
 .home-backdrop-option:active { transform: scale(0.985); }
 .home-backdrop-option.selected {
   border-color: color-mix(in srgb, var(--secondary-color) 62%, var(--border-color));
-  background: color-mix(in srgb, var(--secondary-color) 9%, var(--card-color));
+  background: color-mix(in srgb, var(--secondary-color) 7%, var(--card-color));
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--secondary-color) 10%, transparent);
 }
 .home-backdrop-preview {
   position: relative;
   display: block;
-  width: 44px;
-  height: 36px;
-  border-radius: 13px;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 58px;
+  border-radius: 15px;
   overflow: hidden;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--secondary-color) 13%, white), color-mix(in srgb, var(--primary-light) 86%, white));
   border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, var(--border-color));
+}
+.home-backdrop-option > span:not(.home-backdrop-preview):not(.home-backdrop-check) {
+  line-height: 1.15;
+  padding: 0 1px 1px;
 }
 .home-backdrop-preview::before,
 .home-backdrop-preview::after {
@@ -14832,6 +14849,8 @@ body.high-contrast-theme .sett-theme-card {
   display: none !important;
   color: var(--secondary-color) !important;
   font-size: 1rem !important;
+  justify-self: end;
+  align-self: center;
 }
 .home-backdrop-option.selected .home-backdrop-check { display: block !important; }
 .home-backdrop-none .home-backdrop-preview::before {
@@ -15107,17 +15126,21 @@ body.dark .bn-item::before {
   pointer-events: none;
   z-index: 0;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.28s ease, background 0.28s ease;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 86%, transparent 100%);
 }
-#homeScreen:not(.home-backdrop-none) .home-scroll::before,
+#homeScreen:not(.home-backdrop-none) .home-scroll::before {
+  opacity: 0.52;
+}
 #homeScreen:not(.home-backdrop-none) .home-scroll::after {
-  opacity: 1;
+  opacity: 0.42;
 }
 #homeScreen:not(.home-backdrop-none) .home-scroll::before {
   background:
-    radial-gradient(circle at 80% 8%, color-mix(in srgb, var(--secondary-color) 11%, transparent), transparent 32%),
-    radial-gradient(circle at 9% 30%, color-mix(in srgb, var(--accent-color) 8%, transparent), transparent 28%);
-  filter: blur(0.2px);
+    radial-gradient(circle at 80% 8%, color-mix(in srgb, var(--secondary-color) 13%, transparent), transparent 34%),
+    radial-gradient(circle at 9% 30%, color-mix(in srgb, var(--accent-color) 10%, transparent), transparent 30%);
+  filter: blur(12px);
 }
 #homeScreen.home-backdrop-mountains .home-scroll::after {
   background:

@@ -16492,12 +16492,17 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.3";
+const APP_VERSION = "3.0.4";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.3 &mdash; Home Backdrops</div>
+<div class="un-version-label">v3.0.4 &mdash; Home Background Mood</div>
 <ul class="un-list">
-  <li><strong>Custom Home Backdrops added</strong> so the Home screen can have a soft decorative scene without changing your theme colors.</li>
+  <li><strong>Home customization refined</strong> into a lightweight Change Home Background selector that keeps the app theme fully in control.</li>
+  <li><strong>Background art softened</strong> so it feels like ambient scenery behind the Home UI instead of a full illustrated theme.</li>
+</ul>
+<div class="un-version-label">v3.0.3 &mdash; Home Backgrounds</div>
+<ul class="un-list">
+  <li><strong>Custom Home Backgrounds added</strong> so the Home screen can have a soft decorative scene without changing your theme colors.</li>
   <li><strong>Bottom navigation refined</strong> with a clearer active bubble/divot and filled selected icon.</li>
 </ul>
 <div class="un-version-label">v3.0.2 &mdash; Floating Navigation Polish</div>
