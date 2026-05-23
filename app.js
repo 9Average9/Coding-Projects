@@ -16453,9 +16453,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.1";
+const APP_VERSION = "3.0.2";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.2 &mdash; Floating Navigation Polish</div>
+<ul class="un-list">
+  <li><strong>Bottom navigation refreshed</strong> with a softer floating glass style and clearer active icon state.</li>
+</ul>
 <div class="un-version-label">v3.0.1 &mdash; Auth-Safe Coach Launch</div>
 <ul class="un-list">
   <li><strong>Welcome coach timing fixed</strong> so it cannot launch over the account creation or sign-in screen.</li>
