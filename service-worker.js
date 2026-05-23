@@ -17,14 +17,14 @@ const messaging = firebase.messaging();
 // two notifications (APNs auto-display + our manual call).
 messaging.onBackgroundMessage(function () {});
 
-const CACHE_NAME = "basic-greek-trainer-v3.0.8";
+const CACHE_NAME = "basic-greek-trainer-v3.0.12";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=3.0.8",
+  "./style.css?v=3.0.12",
   "./vocab.js?v=3.0.8",
-  "./app.js?v=3.0.8",
+  "./app.js?v=3.0.12",
   "./rhema-crossrefs-ui.js?v=3.0.8",
   "./greek-verbs.js?v=3.0.8",
   "./firebase-lb.js?v=3.0.8",
@@ -86,7 +86,12 @@ self.addEventListener("activate", (event) => {
           .filter((name) => name !== CACHE_NAME)
           .map((name) => caches.delete(name))
       );
-    }).then(() => self.clients.claim())
+    })
+      .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: "window", includeUncontrolled: true }))
+      .then((clients) => {
+        clients.forEach((client) => client.navigate(client.url));
+      })
   );
 });
 

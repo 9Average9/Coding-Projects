@@ -16536,9 +16536,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.8";
+const APP_VERSION = "3.0.12";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.12 &mdash; PWA Cache Refresh</div>
+<ul>
+  <li><strong>Installed app refresh fixed</strong> so the PWA updates its cached Home and nav styling instead of keeping an older build.</li>
+</ul>
 <div class="un-version-label">v3.0.8 &mdash; Home + Nav Polish</div>
 <ul>
   <li><strong>Home background images now fill the full Home screen</strong> without clipped scroll-layer bars when returning home.</li>
@@ -16709,7 +16713,17 @@ function isRunningAsInstalledApp() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+    let refreshing = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+
+    navigator.serviceWorker.register("./service-worker.js").then((registration) => {
+      registration.update().catch(() => {});
+    }).catch((error) => {
       console.warn("Service worker registration failed:", error);
     });
   }
