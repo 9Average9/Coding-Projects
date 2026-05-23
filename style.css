@@ -13145,6 +13145,74 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--muted-color);
   margin-bottom: 18px;
 }
+.app-coach-body p {
+  margin: 0 0 12px;
+}
+.coach-longpress-demo {
+  position: relative;
+  min-height: 142px;
+  margin-top: 10px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 28%, var(--border-color));
+  background:
+    radial-gradient(circle at 30% 24%, color-mix(in srgb, var(--secondary-color) 16%, transparent), transparent 36%),
+    color-mix(in srgb, var(--card-color) 88%, var(--secondary-color));
+}
+.coach-phone-line {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  right: 16px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  color: var(--font-color);
+  background: color-mix(in srgb, var(--card-color) 92%, white);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+}
+.coach-phone-line strong {
+  color: var(--secondary-color);
+}
+.coach-finger {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  left: 50%;
+  top: 42px;
+  background: color-mix(in srgb, var(--secondary-color) 85%, white);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--secondary-color) 36%, transparent);
+  animation: coachLongPress 2.2s ease-in-out infinite;
+}
+.coach-finger::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 36px;
+  left: 10px;
+  top: 22px;
+  border-radius: 999px;
+  background: inherit;
+}
+.coach-mini-wheel-demo {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%) scale(0.92);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 6px;
+  opacity: 0;
+  animation: coachWheelAppear 2.2s ease-in-out infinite;
+}
+.coach-mini-wheel-demo span {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--secondary-color);
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, var(--card-color));
+}
 .app-coach-actions {
   display: flex;
   align-items: center;
@@ -13183,6 +13251,62 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 @keyframes coachBlurIn {
   from { opacity: 0; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
   to { opacity: 1; backdrop-filter: blur(10px) saturate(1.04); -webkit-backdrop-filter: blur(10px) saturate(1.04); }
+}
+
+@keyframes coachLongPress {
+  0%, 100% { transform: translate(-50%, 0) scale(0.82); opacity: 0; box-shadow: 0 0 0 0 color-mix(in srgb, var(--secondary-color) 34%, transparent); }
+  18% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  48% { opacity: 1; transform: translate(-50%, 0) scale(0.9); box-shadow: 0 0 0 22px color-mix(in srgb, var(--secondary-color) 0%, transparent); }
+  68% { opacity: 0; transform: translate(-50%, 14px) scale(0.85); }
+}
+
+@keyframes coachWheelAppear {
+  0%, 44% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.86); }
+  56%, 82% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.9); }
+}
+
+.coach-replay-card {
+  max-width: 520px;
+}
+.coach-replay-card p {
+  color: var(--muted-color);
+  line-height: 1.55;
+}
+.coach-replay-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.coach-replay-list button {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 3px 12px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, var(--border-color));
+  border-radius: 14px;
+  padding: 13px;
+  background: color-mix(in srgb, var(--secondary-color) 7%, var(--card-color));
+  color: var(--font-color);
+}
+.coach-replay-list .material-symbols-outlined {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--secondary-color);
+  background: color-mix(in srgb, var(--secondary-color) 12%, var(--card-color));
+}
+.coach-replay-list strong {
+  font-size: 0.95rem;
+}
+.coach-replay-list small {
+  color: var(--muted-color);
+  line-height: 1.35;
 }
 
 @media (max-width: 420px) {

@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=2.7.16" rel="stylesheet"/>
+<link href="style.css?v=2.7.17" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8449,6 +8449,12 @@ Verb Endings
 <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
 </button>
 <div class="prof-menu-sep"></div>
+<button class="prof-menu-row" id="profileCoachBtn" onclick="openCoachReplayModal()">
+<span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">psychology_alt</span></span>
+<span class="prof-menu-name">Coach Tours</span>
+<span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
+</button>
+<div class="prof-menu-sep"></div>
 <button class="prof-menu-row" id="profileSettingsBtn" onclick="openSettingsFromProfile()">
 <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">settings</span></span>
 <span class="prof-menu-name">Settings</span>
@@ -8535,6 +8541,10 @@ Verb Endings
 <span>Rhēma (ῥῆμα) means the specific word spoken — and that is what this feature is about. Open any verse across all 27 NT books and tap any Greek word to instantly see:</span>
 <span style="margin-top:6px;display:block">Full grammatical parsing · Root word &amp; transliteration · Two lexicons (Strong's &amp; Dodson) · Etymology · Every NT verse where that word appears — with cross-reference jumping and a navigation trail.</span>
 <span style="margin-top:8px;display:block">Tools like <strong>Bible Hub</strong> and <strong>Blue Letter Bible</strong> are excellent and worth using alongside this — they have broader commentary, maps, and cross-Bible comparisons. The key difference: Rhēma is built into this app, works completely offline after the first load, and is built on the <strong>Byzantine Majority Text</strong> — the manuscript tradition represented by over 80% of surviving Greek manuscripts and behind the KJV and NKJV. Most web tools use the Critical Text (Nestle-Aland). Neither is wrong — they are different traditions, and it matters to know which one you are working from.</span>
+</div>
+<div>
+<strong>What Makes Rhema Special</strong>
+<span>Honestly, Rhema is not trying to be full Bible software. It will not replace major lexicons, commentaries, or careful study. What sets it apart is flow: the word data, syntax help, cross references, word library, saved trails, and study notes live right beside the text so you can observe first and keep your own thoughts attached to the passage instead of scattering them across five tools.</span>
 </div>
 <div>
 <strong>Vocab — 300 Words, 80% of the NT</strong>
@@ -15412,11 +15422,11 @@ Verb Endings
 </section>
 
 </main>
-<script src="vocab.js?v=2.7.16"></script>
-<script src="app.js?v=2.7.16"></script>
-<script src="rhema-crossrefs-ui.js?v=2.7.16"></script>
-<script src="greek-verbs.js?v=2.7.16"></script>
-<script src="firebase-lb.js?v=2.7.16" type="module"></script>
+<script src="vocab.js?v=2.7.17"></script>
+<script src="app.js?v=2.7.17"></script>
+<script src="rhema-crossrefs-ui.js?v=2.7.17"></script>
+<script src="greek-verbs.js?v=2.7.17"></script>
+<script src="firebase-lb.js?v=2.7.17" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -16254,6 +16264,21 @@ Verb Endings
 <span id="appCoachNextLabel">Next</span>
 <span class="material-symbols-outlined">arrow_forward</span>
 </button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="coachReplayModal" onclick="closeCoachReplayModal(event)">
+<div class="modal-card coach-replay-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeCoachReplayModal()">×</button>
+<h2>Coach Tours</h2>
+<p>Replay a guided tour whenever you want a refresher. Pick the part of the app you want the coach to walk through.</p>
+<div class="coach-replay-list">
+<button onclick="startCoachReplay('app')"><span class="material-symbols-outlined">explore</span><strong>Main App Tour</strong><small>Lessons, Community, Home, Studies, Rhema, and Profile.</small></button>
+<button onclick="startCoachReplay('rhema')"><span class="material-symbols-outlined">auto_stories</span><strong>Main Rhema Tour</strong><small>Greek text, tools, English view, and verse picker.</small></button>
+<button onclick="startCoachReplay('study')"><span class="material-symbols-outlined">groups</span><strong>Study Rhema Tour</strong><small>Open a study first, then replay notes, trails, Workspace, and keyboard help.</small></button>
+<button onclick="startCoachReplay('xref')"><span class="material-symbols-outlined">hub</span><strong>Cross References Tour</strong><small>Scripture trails, breadcrumbs, categories, and saved trails.</small></button>
+<button onclick="startCoachReplay('syntax')"><span class="material-symbols-outlined">account_tree</span><strong>Syntax Tour</strong><small>Clause boxes, phrase chips, arrows, and structure help.</small></button>
+<button onclick="startCoachReplay('wordlib')"><span class="material-symbols-outlined">local_library</span><strong>Word Library Tour</strong><small>Search inflected Greek forms, transliteration, or English meanings.</small></button>
 </div>
 </div>
 </div>

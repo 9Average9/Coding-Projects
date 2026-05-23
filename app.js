@@ -16357,9 +16357,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.16";
+const APP_VERSION = "2.7.17";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.17 — Coach Tour Polish</div>
+<ul class="un-list">
+  <li><strong>Coach tours refined</strong> with better placement, richer explanations, a long-press animation, Word Library tour, and replay options from Profile.</li>
+</ul>
 <div class="un-version-label">v2.7.16 — Coach Intro Blur</div>
 <ul class="un-list">
   <li><strong>Coach welcome step polished</strong> with a softened blurred background before the tour begins spotlighting specific parts of the app.</li>
@@ -19277,6 +19281,56 @@ const XREF_COACH_STEPS = [
   { target: () => _coachFirst(['.rx-save-trail-btn', '.rx-page-header']), title: 'Save Trail in Study Rhema', body: 'When Cross References is opened inside a study, Save Trail stores the current scripture trail so it can be restored later from the study Trails tab.' }
 ];
 
+APP_WELCOME_COACH_STEPS[0].body = 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place. Tiny tour, big map. Let’s get you oriented.';
+APP_WELCOME_COACH_STEPS[1] = {
+  before: () => showNavPage('lessons'),
+  target: () => _coachFirst(['#lessonModeModal .lm-card', '.lesson-progress-badge', '.learn-path-grid']),
+  position: 'bottom',
+  title: 'Lessons are the foundation',
+  body: 'This lesson-path picker helps you choose how to begin: foundations first, verbs first, basic pace, or deeper track. You can switch later, so this is not a scary covenant document. The point is simply to give your study an order.'
+};
+APP_WELCOME_COACH_STEPS[2].before = () => {
+  if (typeof hideLessonModeModal === 'function') hideLessonModeModal();
+  showNavPage('community');
+  showLbTab('studies');
+};
+APP_WELCOME_COACH_STEPS[2].body = 'The Studies tab shows shared studies from you and your friends. A study is more than a post: it can become a shared passage workspace with notes, saved verses, word logs, and scripture trails.';
+APP_WELCOME_COACH_STEPS[3].before = () => {
+  if (typeof hideLessonModeModal === 'function') hideLessonModeModal();
+  showNavPage('community');
+  showLbTab('xp');
+};
+APP_WELCOME_COACH_STEPS[3].body = 'XP rewards steady work: lessons, tests, vocabulary, translation, and study habits. It is not the point of Greek study, but it gives your effort a visible shape. Sometimes a little scoreboard keeps the lamp on.';
+APP_WELCOME_COACH_STEPS[4].body = 'The Scholar board is more about careful practice than raw activity. It helps deeper testing and review work show up, so someone doing slow, thoughtful study is not invisible beside someone farming XP.';
+APP_WELCOME_COACH_STEPS[5].body = 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live, so it is worth checking when the app feels different.';
+APP_WELCOME_COACH_STEPS[6].body = 'Your Studies is where you make focused study spaces. Use this when you want to work through a passage seriously, invite people in, save trail discoveries, and keep your notes tied to the actual text.';
+APP_WELCOME_COACH_STEPS[7].body = 'Rhema is the Greek word-study reader. It is special because it stays inside your study flow: tap words, compare English, inspect parsing, check lexicons, use syntax, open cross references, and keep a trail without leaving the app.';
+APP_WELCOME_COACH_STEPS[8].body = 'Your profile keeps XP, rank, streak, lesson progress, known words, translation attempts, achievements, settings, reminders, and reset controls. It is also where you can replay these coach tours later.';
+
+STUDY_RHEMA_COACH_STEPS[1] = {
+  before: () => switchSandboxTab('rhema'),
+  target: () => _coachFirst(['#rhemaVerseDisplay', '#ssRhemaPosition']),
+  position: 'center',
+  offsetY: 34,
+  title: 'Long-press for study notes',
+  body: 'In Study Rhema, long-press means touch and hold for a moment instead of quick tapping. Holding a verse opens the study note wheel so you can save a thought while the passage is still right there.',
+  demo: 'longpress'
+};
+STUDY_RHEMA_COACH_STEPS[3].position = 'center';
+STUDY_RHEMA_COACH_STEPS[3].offsetY = 44;
+STUDY_RHEMA_COACH_STEPS[3].body = 'A trail saves the breadcrumb path, connected verses, labels, and text so you can return to the route instead of trying to remember it. It is your “how did I get here?” answer, saved.';
+STUDY_RHEMA_COACH_STEPS[4].position = 'center';
+STUDY_RHEMA_COACH_STEPS[4].body = 'Workspace organizes notes into Observe, Interpret, Apply, and Question. It keeps your thinking separated enough to be useful, but close enough that you can still see one study taking shape.';
+
+XREF_COACH_STEPS[3].body = 'Breadcrumbs will appear near the top once you start moving verse to verse. They show the route you took, so John 1:1 → Hebrews 1:3 → Colossians 1:15 does not become a foggy memory five minutes later.';
+
+const WORD_LIBRARY_COACH_STEPS = [
+  { before: async () => { await loadRhemaScripts(); openWordLibrary(); }, target: () => _coachFirst(['#wordLibraryOverlay .wl-sheet', '#wordLibraryOverlay']), position: 'center', title: 'Word Library', body: 'The Word Library is for searching Greek words without needing to already know the dictionary form. It is especially helpful when the word on the page is inflected and does not look like the lexicon entry.' },
+  { target: () => _coachFirst(['#wlSearchInput', '.wl-search-row']), title: 'Search exact forms or meanings', body: 'You can search Greek letters, transliteration, or English meanings. Rhema tries to connect what you typed to real forms in the New Testament text, not just a generic dictionary heading.' },
+  { target: () => _coachFirst(['#wlKbdToggleBtn', '.wl-search-row']), title: 'Greek keyboard built in', body: 'The alpha button opens a small Greek keyboard. Useful when you want to search the real Greek form and your phone keyboard is being dramatic.' },
+  { target: () => _coachFirst(['#wlResults', '#wordLibraryOverlay .wl-sheet']), title: 'Results become study doors', body: 'Results can lead you into definitions, occurrences, and forms. Use it when you remember a word, half-remember a word, or only know the English idea you are chasing.' }
+];
+
 function startAppWelcomeCoach() {
   if (_coachHasSeen('appWelcomeCoachSeenV275')) return;
   _startAppCoach(APP_WELCOME_COACH_STEPS, 'appWelcomeCoachSeenV275');
@@ -19290,6 +19344,36 @@ function startStudyRhemaCoach() {
 function startCrossRefCoach() {
   if (_coachHasSeen('crossRefCoachSeenV275')) return;
   _startAppCoach(XREF_COACH_STEPS, 'crossRefCoachSeenV275');
+}
+
+function startWordLibraryCoach() {
+  if (_coachHasSeen('wordLibraryCoachSeenV275')) return;
+  _startAppCoach(WORD_LIBRARY_COACH_STEPS, 'wordLibraryCoachSeenV275');
+}
+
+function openCoachReplayModal() {
+  document.getElementById('coachReplayModal')?.classList.add('open');
+}
+
+function closeCoachReplayModal(event) {
+  if (!event || event.target.id === 'coachReplayModal') {
+    document.getElementById('coachReplayModal')?.classList.remove('open');
+  }
+}
+
+function startCoachReplay(type) {
+  closeCoachReplayModal();
+  if (type === 'app') startAppWelcomeCoach();
+  if (type === 'rhema') showRhema().then(() => setTimeout(() => startRhemaCoach(), 650));
+  if (type === 'study') {
+    _showStudyToast('Open one of your studies, then choose Study Rhema Coach again from Profile.');
+  }
+  if (type === 'xref') showRhema().then(() => setTimeout(() => openRhemaCrossReferences(), 700));
+  if (type === 'syntax') showRhema().then(() => setTimeout(() => {
+    if (!_rhemaSyntaxMode) toggleWheelTool('syntax');
+    setTimeout(() => startRhemaSyntaxCoach(), 700);
+  }, 700));
+  if (type === 'wordlib') showRhema().then(() => setTimeout(() => startWordLibraryCoach(), 700));
 }
 
 function _startAppCoach(steps, seenKey) {
@@ -19308,16 +19392,37 @@ function _showAppCoachStep() {
   if (!overlay || !spotlight || !card) return;
   const step = _appCoachSteps[_appCoachIdx];
   if (!step) { _endAppCoach(); return; }
-  if (typeof step.before === 'function') step.before();
-  setTimeout(() => {
+  const afterBefore = () => setTimeout(() => {
     overlay.classList.remove('hidden');
     document.getElementById('appCoachStep').textContent = `${_appCoachIdx + 1} of ${_appCoachSteps.length}`;
     document.getElementById('appCoachTitle').textContent = step.title;
-    document.getElementById('appCoachBody').textContent = step.body;
+    document.getElementById('appCoachBody').innerHTML = _coachBodyHtml(step);
     document.getElementById('appCoachNextLabel').textContent = _appCoachIdx === _appCoachSteps.length - 1 ? 'Done' : 'Next';
     document.getElementById('appCoachBackBtn').style.visibility = _appCoachIdx === 0 ? 'hidden' : 'visible';
     _placeAppCoachCard(typeof step.target === 'function' ? step.target() : null, card, spotlight, step.position || 'below');
   }, 260);
+  if (typeof step.before === 'function') {
+    const result = step.before();
+    if (result && typeof result.then === 'function') result.then(afterBefore).catch(afterBefore);
+    else afterBefore();
+  } else {
+    afterBefore();
+  }
+}
+
+function _coachBodyHtml(step) {
+  const body = `<p>${step.body}</p>`;
+  if (step.demo === 'longpress') {
+    return body + `
+      <div class="coach-longpress-demo" aria-hidden="true">
+        <div class="coach-phone-line">John 1:1 ... <strong>λόγος</strong> ...</div>
+        <div class="coach-finger"></div>
+        <div class="coach-mini-wheel-demo">
+          <span>Observe</span><span>Interpret</span><span>Apply</span><span>Question</span>
+        </div>
+      </div>`;
+  }
+  return body;
 }
 
 function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
@@ -19355,6 +19460,12 @@ function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
     if (!rect) {
       top = vh / 2 - cardH / 2;
       left = vw / 2 - cardW / 2;
+    } else if (preferred === 'center') {
+      top = vh / 2 - cardH / 2;
+      left = vw / 2 - cardW / 2;
+    } else if (preferred === 'bottom') {
+      top = vh - cardH - MARGIN - 8;
+      left = vw / 2 - cardW / 2;
     } else if (preferred === 'above') {
       top = rect.top - cardH - 18;
       left = rect.left + rect.width / 2 - cardW / 2;
@@ -19367,6 +19478,9 @@ function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
       top = rect.bottom + 18;
       left = rect.left + rect.width / 2 - cardW / 2;
       if (top + cardH > vh - MARGIN) top = rect.top - cardH - 18;
+    }
+    if (typeof _appCoachSteps[_appCoachIdx]?.offsetY === 'number') {
+      top += _appCoachSteps[_appCoachIdx].offsetY;
     }
     top = Math.max(MARGIN, Math.min(top, vh - cardH - MARGIN));
     left = Math.max(MARGIN, Math.min(left, vw - cardW - MARGIN));
@@ -19394,6 +19508,7 @@ function _endAppCoach() {
   document.getElementById('appCoachOverlay')?.classList.add('hidden');
   _coachMarkSeen(_appCoachSeenKey);
   if (_appCoachSeenKey === 'appWelcomeCoachSeenV275') {
+    showNavPage('home');
     setTimeout(() => showInfoModal(), 250);
   }
 }
@@ -19402,6 +19517,10 @@ Object.assign(window, {
   startAppWelcomeCoach,
   startStudyRhemaCoach,
   startCrossRefCoach,
+  startWordLibraryCoach,
+  openCoachReplayModal,
+  closeCoachReplayModal,
+  startCoachReplay,
   appCoachNext,
   appCoachBack
 });
