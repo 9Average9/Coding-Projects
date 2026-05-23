@@ -40,6 +40,7 @@ let _lessonBreakdownNavigate = true;
 let _browseSearch = "";
 let _currentFriendSheetUid = null;
 let _authReady = false;
+let _welcomeCoachQueuedAfterAuth = false;
 
 // Personal Studies state
 let _myStudies = [];
@@ -16452,9 +16453,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.0";
+const APP_VERSION = "3.0.1";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.1 &mdash; Auth-Safe Coach Launch</div>
+<ul class="un-list">
+  <li><strong>Welcome coach timing fixed</strong> so it cannot launch over the account creation or sign-in screen.</li>
+  <li><strong>The first coach now waits for confirmed auth</strong> and only runs after a real account creation or sign-in flow.</li>
+</ul>
 <div class="un-version-label">v3.0.0 &mdash; First Official Ready-To-Use Release</div>
 <ul class="un-list">
   <li><strong>Basic Greek is now ready for real users</strong> with lessons, drills, Rhema, Study Rhema, Cross References, Trails, syntax help, lexicons, achievements, coach tours, and profile tools all working together.</li>
@@ -16915,6 +16921,23 @@ function hideAuthModal() {
   document.getElementById("authModal")?.classList.remove("open");
 }
 
+function _hasSignedInUser() {
+  return !!window.Auth?.getCurrentUser?.();
+}
+
+function queueAppWelcomeCoachAfterAuth() {
+  _welcomeCoachQueuedAfterAuth = true;
+  setTimeout(_maybeStartAppWelcomeCoachAfterAuth, 180);
+}
+
+function _maybeStartAppWelcomeCoachAfterAuth() {
+  if (!_welcomeCoachQueuedAfterAuth) return;
+  if (!_authReady || !_hasSignedInUser()) return;
+  if (document.getElementById("authModal")?.classList.contains("open")) return;
+  _welcomeCoachQueuedAfterAuth = false;
+  startAppWelcomeCoach();
+}
+
 function switchAuthTab(tab) {
   const isCreate = tab === "create";
   document.getElementById("authCreateForm").style.display = isCreate ? "block" : "none";
@@ -17012,7 +17035,7 @@ async function submitCreateAccount() {
     updateProfileUI();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
-    setTimeout(() => startAppWelcomeCoach(), 120);
+    queueAppWelcomeCoachAfterAuth();
 
     // Show in-app notification prompt for new accounts
     setTimeout(() => {
@@ -17045,6 +17068,7 @@ async function submitLogin() {
 
   try {
     await window.Auth.login(username, password);
+    queueAppWelcomeCoachAfterAuth();
     // Auth state change will trigger restoreUserFromFirestore
   } catch (e) {
     const msg = e.code === "auth/invalid-credential" || e.code === "auth/user-not-found" || e.code === "auth/wrong-password"
@@ -17142,9 +17166,13 @@ window.__onAuthStateReady = async (user) => {
       const streakStat = document.getElementById("profileStreakStat");
       if (streakStat) streakStat.textContent = getStreakDays();
     });
+    _maybeStartAppWelcomeCoachAfterAuth();
   } else {
     _unsubUserDoc?.();
     _unsubUserDoc = null;
+    _welcomeCoachQueuedAfterAuth = false;
+    document.getElementById('appCoachOverlay')?.classList.add('hidden');
+    _resumeHomeFlipAfterCoach();
     showAuthModal();
   }
 };
@@ -17193,11 +17221,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setNavActive('home');
   showBottomNav();
   _startHomeFlip();
-  setTimeout(() => {
-    if (!document.getElementById("authModal")?.classList.contains("open")) {
-      startAppWelcomeCoach();
-    }
-  }, 120);
 });
 
 
@@ -19444,6 +19467,7 @@ const WORD_LIBRARY_COACH_STEPS = [
 ];
 
 function startAppWelcomeCoach(force = false) {
+  if (!force && (!_authReady || !_hasSignedInUser() || document.getElementById("authModal")?.classList.contains("open"))) return;
   if (_coachHasSeen('appWelcomeCoachSeenV275', force)) return;
   _startAppCoach(APP_WELCOME_COACH_STEPS, 'appWelcomeCoachSeenV275');
 }
