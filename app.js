@@ -8372,6 +8372,7 @@ async function openStudySandbox(studyId, studyObj) {
 
   // Refresh home studies (dot update)
   _loadMyStudies();
+  setTimeout(() => startStudyRhemaCoach(), 900);
 }
 
 function closeStudySandbox() {
@@ -16356,13 +16357,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.14";
+const APP_VERSION = "2.7.15";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v2.7.14 — Expanded Ranks and Achievements</div>
+<div class="un-version-label">v2.7.15 — Coach Onboarding Tours</div>
 <ul class="un-list">
-  <li><strong>Expanded rank ladder</strong> now reaches much higher XP totals for long-term study.</li>
-  <li><strong>New achievements</strong> reward XP milestones, vocab chapters, translations, and case/verb ending drills.</li>
+  <li><strong>New app walkthrough</strong> introduces Lessons, Community, Home, Studies, Rhema, and Profile with guided coach marks.</li>
+  <li><strong>Study Rhema walkthrough</strong> explains study-only tools like long-press notes, saved trails, Workspace, and the Greek keyboard.</li>
+  <li><strong>Cross References and Syntax coaches</strong> now use dedicated first-time flags and only advance when Next is tapped.</li>
 </ul>
 <div class="un-version-label">v2.7.12 — Lesson Menu Polish</div>
 <ul class="un-list">
@@ -16891,6 +16893,7 @@ async function submitCreateAccount() {
     updateProfileUI();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
+    setTimeout(() => startAppWelcomeCoach(), 900);
 
     // Show in-app notification prompt for new accounts
     setTimeout(() => {
@@ -17071,6 +17074,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setNavActive('home');
   showBottomNav();
   _startHomeFlip();
+  setTimeout(() => {
+    if (!document.getElementById("authModal")?.classList.contains("open")) {
+      startAppWelcomeCoach();
+    }
+  }, 1800);
 });
 
 
@@ -19205,6 +19213,192 @@ function _syncToolWandIndicator() {
 
 // ── Coach mark onboarding ─────────────────────────────────────────────────────
 
+const COACH_TEST_MODE = true; // Testing mode: coaches appear every time. Set false for the final one-time release.
+
+function _coachHasSeen(key) {
+  return !COACH_TEST_MODE && localStorage.getItem(key) === '1';
+}
+
+function _coachMarkSeen(key) {
+  if (!COACH_TEST_MODE) localStorage.setItem(key, '1');
+}
+
+function _coachVisible(el) {
+  if (!el) return null;
+  const rect = el.getBoundingClientRect();
+  if (rect.width < 4 || rect.height < 4) return null;
+  return el;
+}
+
+function _coachFirst(selectors) {
+  const list = Array.isArray(selectors) ? selectors : [selectors];
+  for (const selector of list) {
+    const el = typeof selector === 'function' ? selector() : document.querySelector(selector);
+    if (_coachVisible(el)) return el;
+  }
+  return null;
+}
+
+let _appCoachSteps = [];
+let _appCoachIdx = 0;
+let _appCoachSeenKey = 'appWelcomeCoachSeenV275';
+let _appCoachFinishing = false;
+
+const APP_WELCOME_COACH_STEPS = [
+  { title: 'Welcome to Basic Greek', body: 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place.' },
+  { before: () => showNavPage('lessons'), target: () => _coachFirst(['.lesson-progress-badge', '.learn-path-grid']), title: 'Lessons are the foundation', body: 'Start here when you want guided structure. The basic and advanced tracks teach foundations and verbs in order, and checks keep you from just scrolling past the material.' },
+  { before: () => { showNavPage('community'); showLbTab('studies'); }, target: () => _coachFirst(['.comm-tabs', '#lbPaneStudies']), title: 'Community study board', body: 'The Studies tab shows shared studies from you and your friends. This is where a passage can become a group workspace instead of a private note lost somewhere else.' },
+  { before: () => { showNavPage('community'); showLbTab('xp'); }, target: () => _coachFirst(['button[data-tab="xp"]', '#lbPaneXP']), title: 'XP leaderboard', body: 'XP rewards steady work: lessons, tests, vocab, translation, and study habits. It is not the goal, but it helps your progress feel visible.' },
+  { before: () => { showNavPage('community'); showLbTab('scholar'); }, target: () => _coachFirst(['button[data-tab="scholar"]', '#lbPaneScholar']), title: 'Scholar board', body: 'The Scholar board highlights careful practice quality, not just activity. It gives deeper testing and review work its own place.' },
+  { before: () => showNavPage('home'), target: () => _coachFirst(['.home-actions-grid', '#notifBtn']), title: 'Home quick actions', body: 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live.' },
+  { target: () => _coachFirst(['#homeStudiesSection', '.hs-start-btn']), title: 'Create studies here', body: 'Your Studies is where you make focused study spaces. A study can hold Rhema work, saved verses, word logs, scripture trails, and notes.' },
+  { target: () => _coachFirst(['#homeContinueCard', '#homeContinueEmpty']), title: 'Rhema lives close by', body: 'Rhema is the Greek word-study reader. You can open a passage, tap words, compare KJV, use syntax, and explore cross references. Rhema has its own first-time coach when opened.' },
+  { before: () => showNavPage('profile'), target: () => _coachFirst(['#profileJourneySection', '.profile-action-row', '.profile-header']), title: 'Profile tracks your journey', body: 'Your profile keeps XP, rank, streak, lesson progress, known words, translation attempts, achievements, settings, reminders, and reset controls.' }
+];
+
+const STUDY_RHEMA_COACH_STEPS = [
+  { target: () => _coachFirst(['#studyTabBar', '#ssPaneRhema']), title: 'Study Rhema', body: 'Inside a study, Rhema works like the main Rhema reader, but the position and saved material belong to this study so every passage has its own workspace.' },
+  { before: () => switchSandboxTab('rhema'), target: () => _coachFirst(['#rhemaVerseDisplay', '#ssRhemaPosition']), title: 'Long-press for study notes', body: 'In Study Rhema, long-press a verse to save a thought directly into the study workspace while the passage is still in front of you.' },
+  { target: () => _coachFirst(['#studyTabBar button[data-tab="trails"]', '#studyTabBar']), title: 'Saved trails from cross references', body: 'When you save a cross-reference trail from Study Rhema, it appears in Trails. Opening it later restores the exact path you saved.' },
+  { before: () => switchSandboxTab('trails'), target: () => _coachFirst(['#ssPaneTrails', '#ssTrailsList']), title: 'Trails preserve discovery', body: 'A trail saves the breadcrumb path, connected verses, labels, and text so you can return to the route instead of trying to remember it.' },
+  { before: () => switchSandboxTab('notes'), target: () => _coachFirst(['#ssPaneNotes', '.ws-tab-bar']), title: 'Workspace is where thoughts land', body: 'Workspace organizes notes into Observe, Interpret, Apply, and Question. Long-press notes from Rhema land here, and you can add your own thoughts too.' },
+  { target: () => _coachFirst(['#wsKbdToggleBtn', '.ss-compose']), title: 'Greek keyboard', body: 'The alpha button opens a Greek keyboard so you can type Greek forms directly into your notes.' }
+];
+
+const XREF_COACH_STEPS = [
+  { target: () => _coachFirst(['.rx-top-card', '#rxMainView']), title: 'Cross References start with one verse', body: 'The top card is the active verse. Tap it to choose another reference, and every category below reloads around that verse.' },
+  { target: () => _coachFirst(['.rx-category-card', '#rxMainView']), title: 'Categories are scripture trails', body: 'Each card groups a different kind of connection: direct references, themes, Old/New Testament links, parallel ideas, or prophecy fulfillment.' },
+  { target: () => _coachFirst(['.rx-category-card .rx-mini-list', '.rx-category-card']), title: 'Only a preview appears here', body: 'Category cards show a small preview so the page stays calm. The arrow opens the full stacked list for that category.' },
+  { target: () => _coachFirst(['.rx-breadcrumb', '.rx-page-header']), title: 'Breadcrumbs keep your path', body: 'When you tap a connected verse, it becomes the new active verse and the breadcrumb remembers the route you took.' },
+  { target: () => _coachFirst(['.rx-save-trail-btn', '.rx-page-header']), title: 'Save Trail in Study Rhema', body: 'When Cross References is opened inside a study, Save Trail stores the current scripture trail so it can be restored later from the study Trails tab.' }
+];
+
+function startAppWelcomeCoach() {
+  if (_coachHasSeen('appWelcomeCoachSeenV275')) return;
+  _startAppCoach(APP_WELCOME_COACH_STEPS, 'appWelcomeCoachSeenV275');
+}
+
+function startStudyRhemaCoach() {
+  if (_coachHasSeen('studyRhemaCoachSeenV275')) return;
+  _startAppCoach(STUDY_RHEMA_COACH_STEPS, 'studyRhemaCoachSeenV275');
+}
+
+function startCrossRefCoach() {
+  if (_coachHasSeen('crossRefCoachSeenV275')) return;
+  _startAppCoach(XREF_COACH_STEPS, 'crossRefCoachSeenV275');
+}
+
+function _startAppCoach(steps, seenKey) {
+  if (!document.getElementById('appCoachOverlay') || !steps?.length) return;
+  _appCoachSteps = steps;
+  _appCoachIdx = 0;
+  _appCoachSeenKey = seenKey;
+  _appCoachFinishing = false;
+  setTimeout(() => _showAppCoachStep(), 180);
+}
+
+function _showAppCoachStep() {
+  const overlay = document.getElementById('appCoachOverlay');
+  const spotlight = document.getElementById('appCoachSpotlight');
+  const card = document.getElementById('appCoachCard');
+  if (!overlay || !spotlight || !card) return;
+  const step = _appCoachSteps[_appCoachIdx];
+  if (!step) { _endAppCoach(); return; }
+  if (typeof step.before === 'function') step.before();
+  setTimeout(() => {
+    overlay.classList.remove('hidden');
+    document.getElementById('appCoachStep').textContent = `${_appCoachIdx + 1} of ${_appCoachSteps.length}`;
+    document.getElementById('appCoachTitle').textContent = step.title;
+    document.getElementById('appCoachBody').textContent = step.body;
+    document.getElementById('appCoachNextLabel').textContent = _appCoachIdx === _appCoachSteps.length - 1 ? 'Done' : 'Next';
+    document.getElementById('appCoachBackBtn').style.visibility = _appCoachIdx === 0 ? 'hidden' : 'visible';
+    _placeAppCoachCard(typeof step.target === 'function' ? step.target() : null, card, spotlight, step.position || 'below');
+  }, 260);
+}
+
+function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
+  const PAD = 9;
+  const MARGIN = 14;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const cardW = Math.min(360, vw - MARGIN * 2);
+  card.style.width = `${cardW}px`;
+  card.style.visibility = 'hidden';
+  card.style.left = '0px';
+  card.style.top = '0px';
+  card.style.transform = '';
+  const rect = target ? target.getBoundingClientRect() : null;
+  if (!rect || rect.width < 4 || rect.height < 4) {
+    spotlight.classList.add('no-target');
+    spotlight.style.left = `${vw / 2 - 60}px`;
+    spotlight.style.top = `${vh / 2 - 60}px`;
+    spotlight.style.width = '120px';
+    spotlight.style.height = '120px';
+  } else {
+    spotlight.classList.remove('no-target');
+    spotlight.style.left = `${Math.max(MARGIN, rect.left - PAD)}px`;
+    spotlight.style.top = `${Math.max(MARGIN, rect.top - PAD)}px`;
+    spotlight.style.width = `${Math.min(vw - MARGIN * 2, rect.width + PAD * 2)}px`;
+    spotlight.style.height = `${Math.min(vh - MARGIN * 2, rect.height + PAD * 2)}px`;
+  }
+  requestAnimationFrame(() => {
+    const cardH = Math.min(card.offsetHeight, vh - MARGIN * 2);
+    let top;
+    let left;
+    if (!rect) {
+      top = vh / 2 - cardH / 2;
+      left = vw / 2 - cardW / 2;
+    } else if (preferred === 'above') {
+      top = rect.top - cardH - 18;
+      left = rect.left + rect.width / 2 - cardW / 2;
+      if (top < MARGIN) top = rect.bottom + 18;
+    } else if (preferred === 'right') {
+      top = rect.top + rect.height / 2 - cardH / 2;
+      left = rect.right + 18;
+      if (left + cardW > vw - MARGIN) left = rect.left - cardW - 18;
+    } else {
+      top = rect.bottom + 18;
+      left = rect.left + rect.width / 2 - cardW / 2;
+      if (top + cardH > vh - MARGIN) top = rect.top - cardH - 18;
+    }
+    top = Math.max(MARGIN, Math.min(top, vh - cardH - MARGIN));
+    left = Math.max(MARGIN, Math.min(left, vw - cardW - MARGIN));
+    card.style.top = `${top}px`;
+    card.style.left = `${left}px`;
+    card.style.visibility = '';
+  });
+}
+
+function appCoachNext() {
+  if (_appCoachFinishing) return;
+  _appCoachIdx++;
+  if (_appCoachIdx >= _appCoachSteps.length) _endAppCoach();
+  else _showAppCoachStep();
+}
+
+function appCoachBack() {
+  if (_appCoachIdx <= 0) return;
+  _appCoachIdx--;
+  _showAppCoachStep();
+}
+
+function _endAppCoach() {
+  _appCoachFinishing = true;
+  document.getElementById('appCoachOverlay')?.classList.add('hidden');
+  _coachMarkSeen(_appCoachSeenKey);
+  if (_appCoachSeenKey === 'appWelcomeCoachSeenV275') {
+    setTimeout(() => showInfoModal(), 250);
+  }
+}
+
+Object.assign(window, {
+  startAppWelcomeCoach,
+  startStudyRhemaCoach,
+  startCrossRefCoach,
+  appCoachNext,
+  appCoachBack
+});
+
 const _RHEMA_COACH_STEPS = [
   {
     targetFn: () => document.getElementById('rhemaVerseDisplay'),
@@ -19256,24 +19450,27 @@ const _RHEMA_SYNTAX_COACH_STEPS = [
 let _coachSteps = [];
 let _coachIdx = 0;
 let _coachSyntaxDone = false;
+let _rhemaCoachSeenKey = 'rhemaCoachSeenV275';
 
 function startRhemaCoach() {
   if (_studySandboxId) return;
-  if (localStorage.getItem('coachSeenV250')) return;
+  if (_coachHasSeen('rhemaCoachSeenV275')) return;
   _coachSteps = _RHEMA_COACH_STEPS;
   _coachIdx = 0;
   _coachSyntaxDone = false;
+  _rhemaCoachSeenKey = 'rhemaCoachSeenV275';
   setTimeout(() => _showCoachStep(), 350);
 }
 
 function startRhemaSyntaxCoach() {
   if (_coachSyntaxDone || _studySandboxId) return;
-  if (localStorage.getItem('coachSeenV250')) return;
+  if (_coachHasSeen('rhemaSyntaxCoachSeenV275')) return;
   const firstNode = document.querySelector('.rsx-dg-node');
   if (!firstNode) return;
   _coachSyntaxDone = true;
   _coachSteps = _RHEMA_SYNTAX_COACH_STEPS;
   _coachIdx = 0;
+  _rhemaCoachSeenKey = 'rhemaSyntaxCoachSeenV275';
   _showCoachStep();
 }
 
@@ -19400,8 +19597,15 @@ function rhemaCoachBack() {
 function _endRhemaCoach() {
   const overlay = document.getElementById('rhemaCoachOverlay');
   if (overlay) overlay.classList.add('hidden');
-  localStorage.setItem('coachSeenV250', '1');
+  _coachMarkSeen(_rhemaCoachSeenKey);
 }
+
+Object.assign(window, {
+  startRhemaCoach,
+  startRhemaSyntaxCoach,
+  rhemaCoachNext,
+  rhemaCoachBack
+});
 
 // ── Syntax Analyzer ───────────────────────────────────────────────────────────
 

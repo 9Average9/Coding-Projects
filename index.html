@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=2.7.14" rel="stylesheet"/>
+<link href="style.css?v=2.7.15" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8521,7 +8521,7 @@ Verb Endings
 <div class="welcome-icon">
 <span class="material-symbols-outlined">auto_stories</span>
 </div>
-<h2>About This App</h2>
+<h2>Welcome to Basic Greek</h2>
 <p class="welcome-lead">
       The Bible is God's communication to us. This app is built to help you engage it more deeply — not to replace formal study, but to put real tools in the hands of everyday believers who want to go further than a translation alone can take them.
     </p>
@@ -8550,7 +8550,7 @@ Verb Endings
 <span>A richer understanding of Scripture is available to anyone willing to put in the time. This app is one place to start — accessible, free, and built with the everyday believer in mind.</span>
 </p>
 <button class="main-btn welcome-start-btn" onclick="hideInfoModal()">
-      Let's Go
+      Start Exploring
     </button>
 </div>
 </div>
@@ -9400,14 +9400,13 @@ Verb Endings
 </div>
 </div>
 <!-- ── Coach mark onboarding overlay ── -->
-<div class="rhema-coach-overlay hidden" id="rhemaCoachOverlay" onclick="rhemaCoachNext()">
+<div class="rhema-coach-overlay hidden" id="rhemaCoachOverlay">
 <div class="rhema-coach-spotlight" id="rhemaCoachSpotlight"></div>
 <div class="rhema-coach-card" id="rhemaCoachCard" onclick="event.stopPropagation()">
 <div class="rhema-coach-step-label" id="rhemaCoachStep"></div>
 <div class="rhema-coach-title" id="rhemaCoachTitle"></div>
 <div class="rhema-coach-body" id="rhemaCoachBody"></div>
 <div class="rhema-coach-actions">
-<button class="rhema-coach-skip" onclick="rhemaCoachSkip()">Skip</button>
 <button class="rhema-coach-back" id="rhemaCoachBackBtn" onclick="rhemaCoachBack()">Back</button>
 <button class="rhema-coach-next" onclick="rhemaCoachNext()">
 <span id="rhemaCoachNextLabel">Next</span>
@@ -15413,11 +15412,11 @@ Verb Endings
 </section>
 
 </main>
-<script src="vocab.js?v=2.7.14"></script>
-<script src="app.js?v=2.7.14"></script>
-<script src="rhema-crossrefs-ui.js?v=2.7.14"></script>
-<script src="greek-verbs.js?v=2.7.14"></script>
-<script src="firebase-lb.js?v=2.7.14" type="module"></script>
+<script src="vocab.js?v=2.7.15"></script>
+<script src="app.js?v=2.7.15"></script>
+<script src="rhema-crossrefs-ui.js?v=2.7.15"></script>
+<script src="greek-verbs.js?v=2.7.15"></script>
+<script src="firebase-lb.js?v=2.7.15" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -16242,6 +16241,21 @@ Verb Endings
 <button class="rhema-sandbox-nav-btn" onclick="rhemaNextVerse()">
 <span class="material-symbols-outlined">chevron_right</span>
 </button>
+</div>
+<div class="app-coach-overlay hidden" id="appCoachOverlay">
+<div class="app-coach-spotlight" id="appCoachSpotlight"></div>
+<div class="app-coach-card" id="appCoachCard" onclick="event.stopPropagation()">
+<div class="app-coach-step-label" id="appCoachStep"></div>
+<div class="app-coach-title" id="appCoachTitle"></div>
+<div class="app-coach-body" id="appCoachBody"></div>
+<div class="app-coach-actions">
+<button class="app-coach-back" id="appCoachBackBtn" onclick="appCoachBack()">Back</button>
+<button class="app-coach-next" onclick="appCoachNext()">
+<span id="appCoachNextLabel">Next</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
 </div>
 </body>
 </html>

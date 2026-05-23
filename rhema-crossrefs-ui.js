@@ -88,6 +88,9 @@ async function openRhemaCrossReferences() {
   _rhemaXrefCursor = 0;
   _rhemaXrefCategory = null;
   renderRhemaCrossReferences();
+  setTimeout(() => {
+    if (typeof startCrossRefCoach === 'function') startCrossRefCoach();
+  }, 550);
 }
 
 function _showRhemaXrefShell(view) {
