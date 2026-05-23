@@ -1,0 +1,29 @@
+name: Deploy Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: firebase-hosting-main
+  cancel-in-progress: true
+
+jobs:
+  deploy-hosting:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy Hosting
+        run: firebase deploy --only hosting --project greek-vocab-leaderboard --token "${{ secrets.FIREBASE_TOKEN }}"
