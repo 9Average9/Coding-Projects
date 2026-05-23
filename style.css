@@ -17927,13 +17927,13 @@ body .app:has(#homeScreen.screen.active) #statusBarBg,
 }
 
 /* Viewport-level Home backdrop fix for iOS safe areas and long Home lists */
-html.home-backdrop-none,
-body.home-backdrop-none {
+html.page-home-backdrop-none,
+body.page-home-backdrop-none {
   background: var(--primary-color) !important;
 }
 
-html[class*="home-backdrop-"]:not(.home-backdrop-none),
-body[class*="home-backdrop-"]:not(.home-backdrop-none) {
+html[class*="page-home-backdrop-"]:not(.page-home-backdrop-none),
+body[class*="page-home-backdrop-"]:not(.page-home-backdrop-none) {
   min-height: 100%;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
@@ -17941,13 +17941,13 @@ body[class*="home-backdrop-"]:not(.home-backdrop-none) {
     var(--primary-color) !important;
 }
 
-body[class*="home-backdrop-"]:not(.home-backdrop-none) #statusBarBg {
+body[class*="page-home-backdrop-"]:not(.page-home-backdrop-none) #statusBarBg {
   display: none !important;
   background: transparent !important;
 }
 
-body[class*="home-backdrop-"]:not(.home-backdrop-none) .app:has(#homeScreen.screen.active),
-body[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
+body[class*="page-home-backdrop-"]:not(.page-home-backdrop-none) .app:has(#homeScreen.screen.active),
+body[class*="page-home-backdrop-"]:not(.page-home-backdrop-none) #homeScreen.screen.active {
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
     var(--home-backdrop-image) center / cover no-repeat,
@@ -17989,4 +17989,68 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
 
 body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 112px) !important;
+}
+
+/* Final polish: lesson contrast, backdrop thumbnails, active nav icon */
+#newLearnMenu .lesson-number-wrap,
+#basicVerbsLearnMenu .lesson-number-wrap {
+  background: color-mix(in srgb, var(--secondary-color) 10%, rgba(255,255,255,0.92)) !important;
+  border-color: color-mix(in srgb, var(--secondary-color) 32%, rgba(15,23,42,0.18)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.62);
+}
+
+#newLearnMenu .lesson-number,
+#basicVerbsLearnMenu .lesson-number {
+  color: color-mix(in srgb, var(--secondary-color) 74%, #0f172a) !important;
+  text-shadow: none !important;
+}
+
+#newLearnMenu .lesson-label,
+#basicVerbsLearnMenu .lesson-label {
+  color: #1f2937 !important;
+  opacity: 0.92;
+  text-shadow: none !important;
+}
+
+#newLearnMenu .lesson-text strong,
+#basicVerbsLearnMenu .lesson-text strong {
+  color: #111827 !important;
+  text-shadow: none !important;
+}
+
+.home-backdrop-option.home-backdrop-waves .home-backdrop-preview { background: url("assets/home-backgrounds/waves-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-mountains .home-backdrop-preview { background: url("assets/home-backgrounds/mountains-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-forest .home-backdrop-preview { background: url("assets/home-backgrounds/forest-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-ocean .home-backdrop-preview { background: url("assets/home-backgrounds/ocean-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-desert .home-backdrop-preview { background: url("assets/home-backgrounds/desert-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-clouds .home-backdrop-preview { background: url("assets/home-backgrounds/clouds-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-leaves .home-backdrop-preview { background: url("assets/home-backgrounds/leaves-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-abstract .home-backdrop-preview { background: url("assets/home-backgrounds/abstract-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-city .home-backdrop-preview { background: url("assets/home-backgrounds/city-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-night-sky .home-backdrop-preview { background: url("assets/home-backgrounds/night-sky-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-ancient-scroll .home-backdrop-preview { background: url("assets/home-backgrounds/ancient-scroll-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-greek-columns .home-backdrop-preview { background: url("assets/home-backgrounds/greek-columns-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-garden .home-backdrop-preview { background: url("assets/home-backgrounds/garden-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-option.home-backdrop-sunrise .home-backdrop-preview { background: url("assets/home-backgrounds/sunrise-thumb.jpg") center / cover no-repeat !important; }
+
+.home-backdrop-option:not(.home-backdrop-none) .home-backdrop-preview::before {
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02)) !important;
+}
+
+.bn-item .material-symbols-outlined {
+  transition: transform 0.18s ease, color 0.18s ease, font-variation-settings 0.18s ease !important;
+}
+
+.bn-item.active .material-symbols-outlined {
+  font-size: 1.62rem !important;
+  font-variation-settings: 'FILL' 1, 'wght' 720, 'GRAD' 0, 'opsz' 24 !important;
+  transform: translateY(-2px) scale(1.04) !important;
+  text-shadow: 0 6px 16px color-mix(in srgb, var(--secondary-color) 24%, transparent);
+}
+
+.bn-item.active::after {
+  width: 5px !important;
+  height: 5px !important;
+  bottom: 1px !important;
+  opacity: 0.9;
 }

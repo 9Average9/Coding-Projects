@@ -11778,13 +11778,14 @@ const HOME_BACKDROPS = [
 function applyHomeBackdrop(backdropName = "none") {
   const safeName = HOME_BACKDROPS.includes(backdropName) ? backdropName : "none";
   const backdropClasses = HOME_BACKDROPS.map(name => `home-backdrop-${name}`);
+  const pageBackdropClasses = HOME_BACKDROPS.map(name => `page-home-backdrop-${name}`);
   const imageUrl = safeName === "none" ? "" : `url("assets/home-backgrounds/${safeName}.jpg")`;
 
-  document.documentElement.classList.remove(...backdropClasses);
-  document.documentElement.classList.add(`home-backdrop-${safeName}`);
+  document.documentElement.classList.remove(...backdropClasses, ...pageBackdropClasses);
+  document.documentElement.classList.add(`page-home-backdrop-${safeName}`);
   document.documentElement.style.setProperty("--home-backdrop-image", imageUrl);
-  document.body?.classList.remove(...backdropClasses);
-  document.body?.classList.add(`home-backdrop-${safeName}`);
+  document.body?.classList.remove(...backdropClasses, ...pageBackdropClasses);
+  document.body?.classList.add(`page-home-backdrop-${safeName}`);
   document.body?.style.setProperty("--home-backdrop-image", imageUrl);
 
   const home = document.getElementById("homeScreen");
@@ -16531,9 +16532,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.14";
+const APP_VERSION = "3.0.15";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
+<ul>
+  <li><strong>Lesson card contrast, background thumbnails, and active nav icons polished</strong> for cleaner light-theme readability and selection feedback.</li>
+</ul>
 <div class="un-version-label">v3.0.14 &mdash; PWA Home Nav Anchor Fix</div>
 <ul>
   <li><strong>Installed app Home nav fixed</strong> by removing the remaining Home-only fixed viewport rules that changed the nav anchor in iOS PWA mode.</li>
