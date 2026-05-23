@@ -9527,7 +9527,21 @@ function showScreen(id) {
   const target = document.getElementById(id);
   if (target) target.classList.add("active");
 
+  _syncHomeViewportState(id);
   _updateAppHeaderForScreen(id);
+}
+
+function _syncHomeViewportState(id) {
+  const isHome = id === "homeScreen";
+  document.body.classList.toggle("home-active", isHome);
+  document.documentElement.classList.toggle("home-active", isHome);
+  if (isHome) {
+    applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
+    showBottomNav();
+    requestAnimationFrame(() => {
+      document.getElementById("homeScroll")?.style.setProperty("--home-ready", "1");
+    });
+  }
 }
 
 const LESSON_HEADER_FACTS = [
@@ -11811,6 +11825,7 @@ window.addEventListener("load", () => {
 
   applyAppTheme(savedTheme);
   applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
+  _syncHomeViewportState(document.querySelector(".screen.active")?.id || "homeScreen");
 });
 
 function getReadableButtonTextColor(buttonColor) {

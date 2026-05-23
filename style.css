@@ -18009,3 +18009,79 @@ body.home-active #homeScreen .home-scroll::-webkit-scrollbar {
 body.home-active #homeScreen .home-scroll > div:last-child[style] {
   height: 0 !important;
 }
+
+/* Home active viewport fallback: removes remaining iOS bottom strip and lowers nav */
+html:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)),
+body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    var(--home-backdrop-image) center / cover fixed no-repeat,
+    var(--primary-color) !important;
+}
+
+body:has(#homeScreen.screen.active) #statusBarBg {
+  display: none !important;
+  background: transparent !important;
+}
+
+body:has(#homeScreen.screen.active) .app,
+body:has(#homeScreen.screen.active) #homeScreen.screen.active {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)) .app,
+body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)) #homeScreen.screen.active {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    var(--home-backdrop-image) center / cover no-repeat,
+    var(--primary-color) !important;
+}
+
+body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 118px) !important;
+}
+
+body:has(#homeScreen.screen.active) .bottom-nav {
+  bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Settled Home state: match the post-tab-switch layout on first load */
+html.home-active[class*="home-backdrop-"]:not(.home-backdrop-none),
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    var(--home-backdrop-image) !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+}
+
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) .app,
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
+  background-color: transparent !important;
+}
+
+body.home-active .bottom-nav {
+  bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) - 18px)) !important;
+}
+
+body.home-active #homeScreen .home-scroll {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 112px) !important;
+}
