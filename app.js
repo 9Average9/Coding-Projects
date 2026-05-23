@@ -11723,6 +11723,7 @@ function applyAppTheme(themeName) {
     btn.classList.toggle("selected", btn.classList.contains(themeName));
   });
   updateHighContrastSettingsUI();
+  applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
 }
 
 function setAppTheme(themeName) {
@@ -11747,6 +11748,43 @@ function toggleHighContrastMode() {
   syncUserData();
 }
 
+const HOME_BACKDROPS = [
+  "none",
+  "mountains",
+  "forest",
+  "ocean",
+  "desert",
+  "clouds",
+  "leaves",
+  "waves",
+  "abstract",
+  "city",
+  "night-sky",
+  "ancient-scroll",
+  "greek-columns",
+  "garden",
+  "sunrise"
+];
+
+function applyHomeBackdrop(backdropName = "none") {
+  const safeName = HOME_BACKDROPS.includes(backdropName) ? backdropName : "none";
+  const home = document.getElementById("homeScreen");
+  if (home) {
+    home.classList.remove(...HOME_BACKDROPS.map(name => `home-backdrop-${name}`));
+    home.classList.add(`home-backdrop-${safeName}`);
+  }
+  document.querySelectorAll(".home-backdrop-option").forEach(btn => {
+    btn.classList.toggle("selected", btn.classList.contains(`home-backdrop-${safeName}`));
+  });
+}
+
+function setHomeBackdrop(backdropName) {
+  const safeName = HOME_BACKDROPS.includes(backdropName) ? backdropName : "none";
+  localStorage.setItem("homeBackdrop", safeName);
+  applyHomeBackdrop(safeName);
+  syncUserData();
+}
+
 
 
 
@@ -11761,6 +11799,7 @@ window.addEventListener("load", () => {
   localStorage.setItem("darkMode", isDark ? "true" : "false");
 
   applyAppTheme(savedTheme);
+  applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
 });
 
 function getReadableButtonTextColor(buttonColor) {
@@ -16453,9 +16492,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.2";
+const APP_VERSION = "3.0.3";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.3 &mdash; Home Backdrops</div>
+<ul class="un-list">
+  <li><strong>Custom Home Backdrops added</strong> so the Home screen can have a soft decorative scene without changing your theme colors.</li>
+  <li><strong>Bottom navigation refined</strong> with a clearer active bubble/divot and filled selected icon.</li>
+</ul>
 <div class="un-version-label">v3.0.2 &mdash; Floating Navigation Polish</div>
 <ul class="un-list">
   <li><strong>Bottom navigation refreshed</strong> with a softer floating glass style and clearer active icon state.</li>
@@ -16801,6 +16845,12 @@ async function restoreUserFromFirestore(user) {
     const toggle = document.getElementById("darkModeToggle");
     if (toggle) toggle.checked = data.appTheme === "midnight";
   }
+  if (data.homeBackdrop) {
+    localStorage.setItem("homeBackdrop", data.homeBackdrop);
+    applyHomeBackdrop(data.homeBackdrop);
+  } else {
+    applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
+  }
   if (data.advQuizScores) localStorage.setItem("advQuizScores", JSON.stringify(data.advQuizScores));
   if (data.answeredKCs) localStorage.setItem("answeredKCs", JSON.stringify(data.answeredKCs));
   if (data.openedLessonBlocks) localStorage.setItem("openedLessonBlocks", JSON.stringify(data.openedLessonBlocks));
@@ -16863,6 +16913,7 @@ async function syncUserData() {
     darkMode: localStorage.getItem("darkMode") === "true",
     highContrastMode: getHighContrastMode(),
     appTheme: localStorage.getItem("appTheme") || null,
+    homeBackdrop: localStorage.getItem("homeBackdrop") || "none",
     advQuizScores: (() => { try { return JSON.parse(localStorage.getItem("advQuizScores") || "{}"); } catch { return {}; } })(),
     answeredKCs: (() => { try { return JSON.parse(localStorage.getItem("answeredKCs") || "{}"); } catch { return {}; } })(),
     openedLessonBlocks: (() => { try { return JSON.parse(localStorage.getItem("openedLessonBlocks") || "{}"); } catch { return {}; } })(),
@@ -16906,6 +16957,7 @@ function gatherMigrationData() {
     darkMode: localStorage.getItem("darkMode") === "true",
     highContrastMode: getHighContrastMode(),
     appTheme: localStorage.getItem("appTheme") || null,
+    homeBackdrop: localStorage.getItem("homeBackdrop") || "none",
     vocabChapterXP,
     greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
     lbXpJoined: localStorage.getItem("lbXpJoined") === "true",
