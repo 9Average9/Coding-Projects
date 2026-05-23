@@ -8372,7 +8372,7 @@ async function openStudySandbox(studyId, studyObj) {
 
   // Refresh home studies (dot update)
   _loadMyStudies();
-  setTimeout(() => startStudyRhemaCoach(), 900);
+  setTimeout(() => startStudyRhemaCoach(), 220);
 }
 
 function closeStudySandbox() {
@@ -16357,9 +16357,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.17";
+const APP_VERSION = "2.7.18";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.18 — Coach Tour Launch Polish</div>
+<ul class="un-list">
+  <li><strong>Coach tours now run once by default</strong> and can be replayed from Profile without stacking multiple tours.</li>
+  <li><strong>First-time onboarding appears faster</strong> so it feels like part of the launch experience instead of a delayed popup.</li>
+</ul>
 <div class="un-version-label">v2.7.17 — Coach Tour Polish</div>
 <ul class="un-list">
   <li><strong>Coach tours refined</strong> with better placement, richer explanations, a long-press animation, Word Library tour, and replay options from Profile.</li>
@@ -16901,7 +16906,7 @@ async function submitCreateAccount() {
     updateProfileUI();
     updatePracticeToolLocks();
     updateLessonCompletionUI();
-    setTimeout(() => startAppWelcomeCoach(), 900);
+    setTimeout(() => startAppWelcomeCoach(), 120);
 
     // Show in-app notification prompt for new accounts
     setTimeout(() => {
@@ -17086,7 +17091,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!document.getElementById("authModal")?.classList.contains("open")) {
       startAppWelcomeCoach();
     }
-  }, 1800);
+  }, 120);
 });
 
 
@@ -19221,10 +19226,11 @@ function _syncToolWandIndicator() {
 
 // ── Coach mark onboarding ─────────────────────────────────────────────────────
 
-const COACH_TEST_MODE = true; // Testing mode: coaches appear every time. Set false for the final one-time release.
+const COACH_TEST_MODE = false;
+let _suppressRhemaCoachOnce = false;
 
-function _coachHasSeen(key) {
-  return !COACH_TEST_MODE && localStorage.getItem(key) === '1';
+function _coachHasSeen(key, force = false) {
+  return !force && !COACH_TEST_MODE && localStorage.getItem(key) === '1';
 }
 
 function _coachMarkSeen(key) {
@@ -19331,23 +19337,23 @@ const WORD_LIBRARY_COACH_STEPS = [
   { target: () => _coachFirst(['#wlResults', '#wordLibraryOverlay .wl-sheet']), title: 'Results become study doors', body: 'Results can lead you into definitions, occurrences, and forms. Use it when you remember a word, half-remember a word, or only know the English idea you are chasing.' }
 ];
 
-function startAppWelcomeCoach() {
-  if (_coachHasSeen('appWelcomeCoachSeenV275')) return;
+function startAppWelcomeCoach(force = false) {
+  if (_coachHasSeen('appWelcomeCoachSeenV275', force)) return;
   _startAppCoach(APP_WELCOME_COACH_STEPS, 'appWelcomeCoachSeenV275');
 }
 
-function startStudyRhemaCoach() {
-  if (_coachHasSeen('studyRhemaCoachSeenV275')) return;
+function startStudyRhemaCoach(force = false) {
+  if (_coachHasSeen('studyRhemaCoachSeenV275', force)) return;
   _startAppCoach(STUDY_RHEMA_COACH_STEPS, 'studyRhemaCoachSeenV275');
 }
 
-function startCrossRefCoach() {
-  if (_coachHasSeen('crossRefCoachSeenV275')) return;
+function startCrossRefCoach(force = false) {
+  if (_coachHasSeen('crossRefCoachSeenV275', force)) return;
   _startAppCoach(XREF_COACH_STEPS, 'crossRefCoachSeenV275');
 }
 
-function startWordLibraryCoach() {
-  if (_coachHasSeen('wordLibraryCoachSeenV275')) return;
+function startWordLibraryCoach(force = false) {
+  if (_coachHasSeen('wordLibraryCoachSeenV275', force)) return;
   _startAppCoach(WORD_LIBRARY_COACH_STEPS, 'wordLibraryCoachSeenV275');
 }
 
@@ -19363,17 +19369,26 @@ function closeCoachReplayModal(event) {
 
 function startCoachReplay(type) {
   closeCoachReplayModal();
-  if (type === 'app') startAppWelcomeCoach();
-  if (type === 'rhema') showRhema().then(() => setTimeout(() => startRhemaCoach(), 650));
+  if (type === 'app') startAppWelcomeCoach(true);
+  if (type === 'rhema') showRhema().then(() => setTimeout(() => startRhemaCoach(true), 260));
   if (type === 'study') {
     _showStudyToast('Open one of your studies, then choose Study Rhema Coach again from Profile.');
   }
-  if (type === 'xref') showRhema().then(() => setTimeout(() => openRhemaCrossReferences(), 700));
-  if (type === 'syntax') showRhema().then(() => setTimeout(() => {
+  if (type === 'xref') {
+    _suppressRhemaCoachOnce = true;
+    showRhema().then(() => setTimeout(() => openRhemaCrossReferences(true), 260));
+  }
+  if (type === 'syntax') {
+    _suppressRhemaCoachOnce = true;
+    showRhema().then(() => setTimeout(() => {
     if (!_rhemaSyntaxMode) toggleWheelTool('syntax');
-    setTimeout(() => startRhemaSyntaxCoach(), 700);
-  }, 700));
-  if (type === 'wordlib') showRhema().then(() => setTimeout(() => startWordLibraryCoach(), 700));
+    setTimeout(() => startRhemaSyntaxCoach(true), 260);
+    }, 260));
+  }
+  if (type === 'wordlib') {
+    _suppressRhemaCoachOnce = true;
+    showRhema().then(() => setTimeout(() => startWordLibraryCoach(true), 260));
+  }
 }
 
 function _startAppCoach(steps, seenKey) {
@@ -19382,7 +19397,7 @@ function _startAppCoach(steps, seenKey) {
   _appCoachIdx = 0;
   _appCoachSeenKey = seenKey;
   _appCoachFinishing = false;
-  setTimeout(() => _showAppCoachStep(), 180);
+  setTimeout(() => _showAppCoachStep(), 40);
 }
 
 function _showAppCoachStep() {
@@ -19400,7 +19415,7 @@ function _showAppCoachStep() {
     document.getElementById('appCoachNextLabel').textContent = _appCoachIdx === _appCoachSteps.length - 1 ? 'Done' : 'Next';
     document.getElementById('appCoachBackBtn').style.visibility = _appCoachIdx === 0 ? 'hidden' : 'visible';
     _placeAppCoachCard(typeof step.target === 'function' ? step.target() : null, card, spotlight, step.position || 'below');
-  }, 260);
+  }, 90);
   if (typeof step.before === 'function') {
     const result = step.before();
     if (result && typeof result.then === 'function') result.then(afterBefore).catch(afterBefore);
@@ -19578,19 +19593,23 @@ let _coachIdx = 0;
 let _coachSyntaxDone = false;
 let _rhemaCoachSeenKey = 'rhemaCoachSeenV275';
 
-function startRhemaCoach() {
+function startRhemaCoach(force = false) {
   if (_studySandboxId) return;
-  if (_coachHasSeen('rhemaCoachSeenV275')) return;
+  if (_suppressRhemaCoachOnce && !force) {
+    _suppressRhemaCoachOnce = false;
+    return;
+  }
+  if (_coachHasSeen('rhemaCoachSeenV275', force)) return;
   _coachSteps = _RHEMA_COACH_STEPS;
   _coachIdx = 0;
   _coachSyntaxDone = false;
   _rhemaCoachSeenKey = 'rhemaCoachSeenV275';
-  setTimeout(() => _showCoachStep(), 350);
+  setTimeout(() => _showCoachStep(), 120);
 }
 
-function startRhemaSyntaxCoach() {
+function startRhemaSyntaxCoach(force = false) {
   if (_coachSyntaxDone || _studySandboxId) return;
-  if (_coachHasSeen('rhemaSyntaxCoachSeenV275')) return;
+  if (_coachHasSeen('rhemaSyntaxCoachSeenV275', force)) return;
   const firstNode = document.querySelector('.rsx-dg-node');
   if (!firstNode) return;
   _coachSyntaxDone = true;

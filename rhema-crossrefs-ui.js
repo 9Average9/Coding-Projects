@@ -80,7 +80,7 @@ function _xrefEscape(value) {
   })[c]);
 }
 
-async function openRhemaCrossReferences() {
+async function openRhemaCrossReferences(forceCoach = false) {
   closeRhemaWheel();
   await loadRhemaScripts();
   _rhemaXrefActive = { book: _rhemaBook || 'JOH', chapter: _rhemaChapter || '1', verse: _rhemaVerse || '1' };
@@ -89,8 +89,8 @@ async function openRhemaCrossReferences() {
   _rhemaXrefCategory = null;
   renderRhemaCrossReferences();
   setTimeout(() => {
-    if (typeof startCrossRefCoach === 'function') startCrossRefCoach();
-  }, 550);
+    if (typeof startCrossRefCoach === 'function') startCrossRefCoach(forceCoach);
+  }, 160);
 }
 
 function _showRhemaXrefShell(view) {
