@@ -9481,7 +9481,15 @@ function setNavActive(page) {
     b.classList.toggle('active', b.dataset.page === page));
 }
 
+let _prevNavPage = 'home';
+
 function showNavPage(page) {
+  if (page === 'lessons') {
+    const cur = document.querySelector('.screen.active');
+    if (cur?.id === 'communityPage') _prevNavPage = 'community';
+    else if (cur?.id === 'profilePage') _prevNavPage = 'profile';
+    else _prevNavPage = 'home';
+  }
   setNavActive(page);
   showBottomNav();
   if (page === 'home') {
@@ -12153,10 +12161,11 @@ function showLessonModeModal() {
 
 function hideLessonModeModal() {
   document.getElementById("lessonModeModal")?.classList.remove("open");
-  // If no screen is active (nav was hidden to show this modal), go home safely
   const anyActive = document.querySelector('.screen.active');
   if (!anyActive || anyActive.id === 'homeScreen') {
     showNavPage('home');
+  } else if (NAV_SCREENS.includes(anyActive.id)) {
+    showBottomNav();
   }
 }
 
@@ -12289,7 +12298,9 @@ function handleLearnBack() {
   } else if (currentAdvLearnLesson) {
     showAdvancedLearnDashboard();
   } else {
-    showHome();
+    const prev = _prevNavPage || 'home';
+    _prevNavPage = 'home';
+    showNavPage(prev);
   }
 }
 
