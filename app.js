@@ -11768,11 +11768,20 @@ const HOME_BACKDROPS = [
 
 function applyHomeBackdrop(backdropName = "none") {
   const safeName = HOME_BACKDROPS.includes(backdropName) ? backdropName : "none";
+  const backdropClasses = HOME_BACKDROPS.map(name => `home-backdrop-${name}`);
+  const imageUrl = safeName === "none" ? "" : `url("assets/home-backgrounds/${safeName}.jpg")`;
+
+  document.documentElement.classList.remove(...backdropClasses);
+  document.documentElement.classList.add(`home-backdrop-${safeName}`);
+  document.documentElement.style.setProperty("--home-backdrop-image", imageUrl);
+  document.body?.classList.remove(...backdropClasses);
+  document.body?.classList.add(`home-backdrop-${safeName}`);
+  document.body?.style.setProperty("--home-backdrop-image", imageUrl);
+
   const home = document.getElementById("homeScreen");
   if (home) {
-    home.classList.remove(...HOME_BACKDROPS.map(name => `home-backdrop-${name}`));
+    home.classList.remove(...backdropClasses);
     home.classList.add(`home-backdrop-${safeName}`);
-    const imageUrl = safeName === "none" ? "" : `url("assets/home-backgrounds/${safeName}.jpg")`;
     home.style.setProperty("--home-backdrop-image", imageUrl);
   }
   document.querySelectorAll(".home-backdrop-option").forEach(btn => {

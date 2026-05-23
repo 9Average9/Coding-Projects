@@ -17955,3 +17955,57 @@ body .app:has(#homeScreen.screen.active) #statusBarBg,
 #homeScreen .home-top-row {
   padding-top: 0 !important;
 }
+
+/* Viewport-level Home backdrop fix for iOS safe areas and long Home lists */
+html.home-backdrop-none,
+body.home-backdrop-none.home-active {
+  background: var(--primary-color) !important;
+}
+
+html[class*="home-backdrop-"]:not(.home-backdrop-none),
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
+  min-height: 100%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    var(--home-backdrop-image) center / cover fixed no-repeat,
+    var(--primary-color) !important;
+}
+
+body.home-active #statusBarBg {
+  display: none !important;
+  background: transparent !important;
+}
+
+body.home-active .app,
+body.home-active #homeScreen.screen.active {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) .app,
+body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
+    var(--home-backdrop-image) center / cover no-repeat,
+    var(--primary-color) !important;
+}
+
+body.home-active #homeScreen .home-scroll {
+  height: 100dvh !important;
+  max-height: none !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 148px) !important;
+  scrollbar-width: none;
+}
+
+body.home-active #homeScreen .home-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+body.home-active #homeScreen .home-scroll > div:last-child[style] {
+  height: 0 !important;
+}
