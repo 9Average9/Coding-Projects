@@ -17880,13 +17880,6 @@ body.dark .bottom-nav::before {
   opacity: 0 !important;
 }
 
-/* Final Home cleanup: no edge bars, simple full-page backdrop, content clears nav */
-body .app:has(#homeScreen.screen.active) {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  background: var(--primary-color) !important;
-}
-
 body .app:has(#homeScreen.screen.active) #statusBarBg,
 #homeScreen::before,
 #homeScreen::after,
@@ -17894,19 +17887,6 @@ body .app:has(#homeScreen.screen.active) #statusBarBg,
 #homeScreen .home-scroll::after {
   display: none !important;
   content: none !important;
-}
-
-#homeScreen.screen.active {
-  width: 100% !important;
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  background: var(--primary-color) !important;
 }
 
 #homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) {
@@ -17923,7 +17903,6 @@ body .app:has(#homeScreen.screen.active) #statusBarBg,
 
 #homeScreen .home-scroll {
   width: 100% !important;
-  height: 100dvh !important;
   min-height: 0 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
@@ -17975,13 +17954,6 @@ body[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active
     var(--primary-color) !important;
 }
 
-body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
-  height: 100dvh !important;
-  max-height: none !important;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 148px) !important;
-  scrollbar-width: none;
-}
-
 body:has(#homeScreen.screen.active) #homeScreen .home-scroll::-webkit-scrollbar {
   display: none;
 }
@@ -17990,7 +17962,6 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll > div:last-child[st
   height: 0 !important;
 }
 
-/* Home active viewport fallback: removes remaining iOS bottom strip and lowers nav */
 html:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)),
 body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)) {
   background:
@@ -18002,17 +17973,6 @@ body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-n
 body:has(#homeScreen.screen.active) #statusBarBg {
   display: none !important;
   background: transparent !important;
-}
-
-body:has(#homeScreen.screen.active) .app,
-body:has(#homeScreen.screen.active) #homeScreen.screen.active {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-  max-width: none !important;
-  margin: 0 !important;
-  overflow: hidden !important;
 }
 
 body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)) .app,

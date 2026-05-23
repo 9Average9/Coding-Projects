@@ -16531,9 +16531,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.13";
+const APP_VERSION = "3.0.14";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.14 &mdash; PWA Home Nav Anchor Fix</div>
+<ul>
+  <li><strong>Installed app Home nav fixed</strong> by removing the remaining Home-only fixed viewport rules that changed the nav anchor in iOS PWA mode.</li>
+</ul>
 <div class="un-version-label">v3.0.13 &mdash; Home Nav Position Fix</div>
 <ul>
   <li><strong>Home tab nav placement fixed</strong> by removing the Home-only viewport state so the bottom nav uses the same position as Profile and Community.</li>
