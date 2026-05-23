@@ -16492,9 +16492,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.4";
+const APP_VERSION = "3.0.5";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.5 &mdash; Home Background Art</div>
+<ul class="un-list">
+  <li><strong>Generated Home background images added</strong> for the Change Home Background options while keeping your selected theme in control of the UI.</li>
+  <li><strong>Background images optimized</strong> so the Home screen can feel more immersive without making the app heavy.</li>
+</ul>
 <div class="un-version-label">v3.0.4 &mdash; Home Background Mood</div>
 <ul class="un-list">
   <li><strong>Home customization refined</strong> into a lightweight Change Home Background selector that keeps the app theme fully in control.</li>
