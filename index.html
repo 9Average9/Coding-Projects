@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=2.7.12" rel="stylesheet"/>
+<link href="style.css?v=2.7.13" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8037,6 +8037,20 @@ Verb Endings
 <div class="sett-section-label">App Theme</div>
 <p class="sett-section-desc">Choose a polished preset theme.</p>
 <div class="sett-card sett-theme-card">
+<div class="sett-row">
+<span class="sett-row-icon-wrap">
+<span class="material-symbols-outlined">contrast</span>
+</span>
+<span class="sett-row-text">
+<span class="sett-row-name">High Contrast Theme</span>
+<span class="sett-row-sub">Make the current theme more vibrant</span>
+</span>
+<label class="switch">
+<input id="highContrastToggle" onchange="toggleHighContrastMode()" type="checkbox"/>
+<span class="slider"></span>
+</label>
+</div>
+<div class="sett-sep"></div>
 <button class="theme-preset sett-theme-row parchment" onclick="setAppTheme('parchment')">
 <span class="sett-theme-swatch" style="background:#efe4c8;border-color:#d6c49a"></span>
 <span class="sett-row-name">Classic Parchment</span>
@@ -15400,11 +15414,11 @@ Verb Endings
 </section>
 
 </main>
-<script src="vocab.js?v=2.7.12"></script>
-<script src="app.js?v=2.7.12"></script>
-<script src="rhema-crossrefs-ui.js?v=2.7.12"></script>
-<script src="greek-verbs.js?v=2.7.12"></script>
-<script src="firebase-lb.js?v=2.7.12" type="module"></script>
+<script src="vocab.js?v=2.7.13"></script>
+<script src="app.js?v=2.7.13"></script>
+<script src="rhema-crossrefs-ui.js?v=2.7.13"></script>
+<script src="greek-verbs.js?v=2.7.13"></script>
+<script src="firebase-lb.js?v=2.7.13" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

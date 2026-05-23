@@ -11048,6 +11048,7 @@ function showSettings() {
   hideBottomNav();
   showScreen("settingsScreen");
   updateLessonModeSettingsUI();
+  updateHighContrastSettingsUI();
 }
 
 function resetTestData() {
@@ -11468,8 +11469,129 @@ coral_deep: {
 }
 };
 
+function _hexToRgb(hex) {
+  const clean = String(hex || "").replace("#", "").trim();
+  if (!/^[0-9a-f]{6}$/i.test(clean)) return null;
+  return {
+    r: parseInt(clean.slice(0, 2), 16),
+    g: parseInt(clean.slice(2, 4), 16),
+    b: parseInt(clean.slice(4, 6), 16)
+  };
+}
+
+function _rgbToHex({ r, g, b }) {
+  const toHex = value => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function _mixHex(a, b, amount = 0.5) {
+  const rgbA = _hexToRgb(a);
+  const rgbB = _hexToRgb(b);
+  if (!rgbA || !rgbB) return a;
+  return _rgbToHex({
+    r: rgbA.r + (rgbB.r - rgbA.r) * amount,
+    g: rgbA.g + (rgbB.g - rgbA.g) * amount,
+    b: rgbA.b + (rgbB.b - rgbA.b) * amount
+  });
+}
+
+function _hexLuminance(hex) {
+  const rgb = _hexToRgb(hex);
+  if (!rgb) return 0.5;
+  const convert = value => {
+    const c = value / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * convert(rgb.r) + 0.7152 * convert(rgb.g) + 0.0722 * convert(rgb.b);
+}
+
+function _rgbToHsl({ r, g, b }) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      default: h = (r - g) / d + 4;
+    }
+    h /= 6;
+  }
+  return { h, s, l };
+}
+
+function _hslToRgb({ h, s, l }) {
+  if (s === 0) {
+    const gray = l * 255;
+    return { r: gray, g: gray, b: gray };
+  }
+  const hueToRgb = (p, q, t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  return {
+    r: hueToRgb(p, q, h + 1 / 3) * 255,
+    g: hueToRgb(p, q, h) * 255,
+    b: hueToRgb(p, q, h - 1 / 3) * 255
+  };
+}
+
+function _boostHexColor(hex, { saturation = 0, lightness = 0 } = {}) {
+  const rgb = _hexToRgb(hex);
+  if (!rgb) return hex;
+  const hsl = _rgbToHsl(rgb);
+  hsl.s = Math.max(0, Math.min(1, hsl.s + saturation));
+  hsl.l = Math.max(0, Math.min(1, hsl.l + lightness));
+  return _rgbToHex(_hslToRgb(hsl));
+}
+
+function getHighContrastMode() {
+  return localStorage.getItem("highContrastMode") === "true";
+}
+
+function enhanceThemeContrast(theme) {
+  const darkTheme = _hexLuminance(theme.primary) < 0.28;
+  const secondary = _boostHexColor(theme.secondary, {
+    saturation: 0.24,
+    lightness: darkTheme ? 0.14 : -0.13
+  });
+  const accent = _boostHexColor(theme.accent, {
+    saturation: 0.24,
+    lightness: darkTheme ? 0.12 : -0.05
+  });
+  const primary = _boostHexColor(theme.primary, {
+    saturation: 0.08,
+    lightness: darkTheme ? -0.04 : 0.025
+  });
+  const light = _boostHexColor(theme.light, {
+    saturation: 0.06,
+    lightness: darkTheme ? -0.03 : 0.02
+  });
+  return {
+    ...theme,
+    primary,
+    light,
+    secondary,
+    accent,
+    border: _mixHex(theme.border, secondary, darkTheme ? 0.52 : 0.42),
+    muted: darkTheme ? _mixHex(theme.muted, "#ffffff", 0.18) : _boostHexColor(theme.muted, { saturation: 0.08, lightness: -0.09 })
+  };
+}
+
 function applyAppTheme(themeName) {
-  const theme = APP_THEMES[themeName] || APP_THEMES.parchment;
+  const baseTheme = APP_THEMES[themeName] || APP_THEMES.parchment;
+  const theme = getHighContrastMode() ? enhanceThemeContrast(baseTheme) : baseTheme;
 
   document.documentElement.style.setProperty("--primary-color", theme.primary);
   document.documentElement.style.setProperty("--primary-light", theme.light);
@@ -11482,10 +11604,12 @@ function applyAppTheme(themeName) {
   document.documentElement.style.setProperty("--btn-text-color", theme.buttonText);
 
   document.body.classList.toggle("dark", themeName === "midnight");
+  document.body.classList.toggle("high-contrast-theme", getHighContrastMode());
 
   document.querySelectorAll(".theme-preset").forEach(btn => {
     btn.classList.toggle("selected", btn.classList.contains(themeName));
   });
+  updateHighContrastSettingsUI();
 }
 
 function setAppTheme(themeName) {
@@ -11495,6 +11619,18 @@ function setAppTheme(themeName) {
   localStorage.removeItem("fontColor");
 
   applyAppTheme(themeName);
+  syncUserData();
+}
+
+function updateHighContrastSettingsUI() {
+  const toggle = document.getElementById("highContrastToggle");
+  if (toggle) toggle.checked = getHighContrastMode();
+}
+
+function toggleHighContrastMode() {
+  const enabled = document.getElementById("highContrastToggle")?.checked === true;
+  localStorage.setItem("highContrastMode", String(enabled));
+  applyAppTheme(localStorage.getItem("appTheme") || "royal");
   syncUserData();
 }
 
@@ -16031,9 +16167,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.12";
+const APP_VERSION = "2.7.13";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.13 — High Contrast Themes</div>
+<ul class="un-list">
+  <li><strong>High Contrast Theme toggle</strong> in Settings makes the selected theme more vibrant without changing the theme itself.</li>
+</ul>
 <div class="un-version-label">v2.7.12 — Lesson Menu Polish</div>
 <ul class="un-list">
   <li><strong>Lesson menu cards refreshed</strong> across foundations and verbs.</li>
@@ -16333,6 +16473,7 @@ async function restoreUserFromFirestore(user) {
     });
   }
   if (data.darkMode != null) localStorage.setItem("darkMode", String(data.darkMode));
+  if (data.highContrastMode != null) localStorage.setItem("highContrastMode", String(data.highContrastMode));
   if (data.appTheme) {
     localStorage.setItem("appTheme", data.appTheme);
     applyAppTheme(data.appTheme);
@@ -16399,6 +16540,7 @@ async function syncUserData() {
     lbScholarBest: parseInt(localStorage.getItem("lbScholarBest") || "0"),
     lastSeenAppVersion: APP_VERSION,
     darkMode: localStorage.getItem("darkMode") === "true",
+    highContrastMode: getHighContrastMode(),
     appTheme: localStorage.getItem("appTheme") || null,
     advQuizScores: (() => { try { return JSON.parse(localStorage.getItem("advQuizScores") || "{}"); } catch { return {}; } })(),
     answeredKCs: (() => { try { return JSON.parse(localStorage.getItem("answeredKCs") || "{}"); } catch { return {}; } })(),
@@ -16440,6 +16582,9 @@ function gatherMigrationData() {
     achievements: JSON.parse(localStorage.getItem("achievements") || "[]"),
     practiceToolsUnlocked: localStorage.getItem("practiceToolsUnlocked") === "true",
     lessonMode: localStorage.getItem("lessonMode") || "basic",
+    darkMode: localStorage.getItem("darkMode") === "true",
+    highContrastMode: getHighContrastMode(),
+    appTheme: localStorage.getItem("appTheme") || null,
     vocabChapterXP,
     greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
     lbXpJoined: localStorage.getItem("lbXpJoined") === "true",

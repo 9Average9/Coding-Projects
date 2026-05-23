@@ -14325,6 +14325,14 @@ body .app:has(#settingsScreen.screen.active) {
 }
 .theme-preset.selected .sett-theme-check { display: block !important; }
 
+body.high-contrast-theme #settingsScreen #highContrastToggle + .slider {
+  background: var(--secondary-color);
+}
+
+body.high-contrast-theme .sett-theme-card {
+  border-color: color-mix(in srgb, var(--secondary-color) 38%, var(--border-color));
+}
+
 /* Reset old theme-preset span rules that bleed onto text/check spans in settings rows */
 .sett-theme-row .sett-theme-swatch {
   width: 32px !important;
