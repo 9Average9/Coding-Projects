@@ -16031,9 +16031,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "2.7.10";
+const APP_VERSION = "2.7.11";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v2.7.11 — Lesson Redesign</div>
+<ul class="un-list">
+  <li><strong>Refreshed lesson pages</strong> for foundations and verbs while preserving the same lesson flow.</li>
+  <li><strong>Basic and advanced tracks now share cleaner matching styles</strong> with theme-aware cards, section headers, and lesson blocks.</li>
+</ul>
 <div class="un-version-label">v2.7.10 — Drill Flow Polish</div>
 <ul class="un-list">
   <li><strong>Clearer verb drill selection</strong> so the active lesson is obvious before starting.</li>
