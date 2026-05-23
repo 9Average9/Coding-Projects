@@ -9533,14 +9533,9 @@ function showScreen(id) {
 
 function _syncHomeViewportState(id) {
   const isHome = id === "homeScreen";
-  document.body.classList.toggle("home-active", isHome);
-  document.documentElement.classList.toggle("home-active", isHome);
   if (isHome) {
     applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
     showBottomNav();
-    requestAnimationFrame(() => {
-      document.getElementById("homeScroll")?.style.setProperty("--home-ready", "1");
-    });
   }
 }
 
@@ -16536,9 +16531,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.12";
+const APP_VERSION = "3.0.13";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.13 &mdash; Home Nav Position Fix</div>
+<ul>
+  <li><strong>Home tab nav placement fixed</strong> by removing the Home-only viewport state so the bottom nav uses the same position as Profile and Community.</li>
+</ul>
 <div class="un-version-label">v3.0.12 &mdash; PWA Cache Refresh</div>
 <ul>
   <li><strong>Installed app refresh fixed</strong> so the PWA updates its cached Home and nav styling instead of keeping an older build.</li>

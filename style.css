@@ -6832,11 +6832,7 @@ textarea,
 select {
   font-size: 16px !important;
 }
-body.home-active {
-  overflow: hidden;
-}
-
-body:not(.home-active) {
+body {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -17885,11 +17881,6 @@ body.dark .bottom-nav::before {
 }
 
 /* Final Home cleanup: no edge bars, simple full-page backdrop, content clears nav */
-body.home-active {
-  overflow: hidden !important;
-  background: var(--primary-color) !important;
-}
-
 body .app:has(#homeScreen.screen.active) {
   height: 100dvh !important;
   min-height: 100dvh !important;
@@ -17958,12 +17949,12 @@ body .app:has(#homeScreen.screen.active) #statusBarBg,
 
 /* Viewport-level Home backdrop fix for iOS safe areas and long Home lists */
 html.home-backdrop-none,
-body.home-backdrop-none.home-active {
+body.home-backdrop-none {
   background: var(--primary-color) !important;
 }
 
 html[class*="home-backdrop-"]:not(.home-backdrop-none),
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
+body[class*="home-backdrop-"]:not(.home-backdrop-none) {
   min-height: 100%;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
@@ -17971,42 +17962,31 @@ body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
     var(--primary-color) !important;
 }
 
-body.home-active #statusBarBg {
+body[class*="home-backdrop-"]:not(.home-backdrop-none) #statusBarBg {
   display: none !important;
   background: transparent !important;
 }
 
-body.home-active .app,
-body.home-active #homeScreen.screen.active {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-  max-width: none !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) .app,
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
+body[class*="home-backdrop-"]:not(.home-backdrop-none) .app:has(#homeScreen.screen.active),
+body[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
     var(--home-backdrop-image) center / cover no-repeat,
     var(--primary-color) !important;
 }
 
-body.home-active #homeScreen .home-scroll {
+body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   height: 100dvh !important;
   max-height: none !important;
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 148px) !important;
   scrollbar-width: none;
 }
 
-body.home-active #homeScreen .home-scroll::-webkit-scrollbar {
+body:has(#homeScreen.screen.active) #homeScreen .home-scroll::-webkit-scrollbar {
   display: none;
 }
 
-body.home-active #homeScreen .home-scroll > div:last-child[style] {
+body:has(#homeScreen.screen.active) #homeScreen .home-scroll > div:last-child[style] {
   height: 0 !important;
 }
 
@@ -18047,33 +18027,6 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 118px) !important;
 }
 
-/* Settled Home state: match the post-tab-switch layout on first load */
-html.home-active[class*="home-backdrop-"]:not(.home-backdrop-none),
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
-  min-height: 100vh !important;
-  min-height: 100dvh !important;
-  background-color: transparent !important;
-  background-image:
-    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
-    var(--home-backdrop-image) !important;
-  background-position: center !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  background-attachment: fixed !important;
-}
-
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-}
-
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) .app,
-body.home-active[class*="home-backdrop-"]:not(.home-backdrop-none) #homeScreen.screen.active {
-  background-color: transparent !important;
-}
-
-body.home-active #homeScreen .home-scroll {
+body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 112px) !important;
 }
