@@ -17813,3 +17813,73 @@ body.dark .bottom-nav::before {
     border-radius: 999px;
   }
 }
+
+/* Final CSS-only fixes: Basic text contrast, full Home fog, no nav dome */
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) {
+  background:
+    var(--home-backdrop-image) center / cover no-repeat,
+    var(--primary-color) !important;
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none)::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  height: auto !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.08) 38%, rgba(255,255,255,0.18)),
+    radial-gradient(circle at 80% 8%, color-mix(in srgb, var(--secondary-color) 16%, transparent), transparent 38%),
+    radial-gradient(circle at 12% 28%, color-mix(in srgb, var(--accent-color) 14%, transparent), transparent 36%) !important;
+  filter: blur(10px) saturate(1.03);
+  -webkit-filter: blur(10px) saturate(1.03);
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none)::after,
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::before,
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::after {
+  display: none !important;
+}
+
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll {
+  background: transparent !important;
+}
+
+#newLearnMenu .learn-path-grid button,
+#basicVerbsLearnMenu .learn-path-grid button {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.96), color-mix(in srgb, var(--card-color) 88%, #ffffff) 72%)
+    !important;
+}
+
+#newLearnMenu .lesson-text strong,
+#basicVerbsLearnMenu .lesson-text strong {
+  color: #111827 !important;
+  text-shadow: none !important;
+}
+
+#newLearnMenu .lesson-text small,
+#basicVerbsLearnMenu .lesson-text small {
+  color: #334155 !important;
+  text-shadow: none !important;
+}
+
+#newLearnMenu .lesson-label,
+#basicVerbsLearnMenu .lesson-label,
+#newLearnMenu .lesson-number,
+#basicVerbsLearnMenu .lesson-number {
+  color: color-mix(in srgb, var(--secondary-color) 62%, #111827) !important;
+}
+
+.bottom-nav::before,
+body.dark .bottom-nav::before {
+  display: none !important;
+  content: none !important;
+}
+
+.bottom-nav:has(.bn-item.active)::before {
+  opacity: 0 !important;
+}
