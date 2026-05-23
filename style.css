@@ -14894,20 +14894,20 @@ body.high-contrast-theme .sett-theme-card {
   background: radial-gradient(circle at 22% 18%, color-mix(in srgb, var(--secondary-color) 16%, transparent), transparent 42%);
   opacity: 0.55;
 }
-.home-backdrop-waves .home-backdrop-preview { background-image: url("assets/home-backgrounds/waves-thumb.jpg"); }
-.home-backdrop-mountains .home-backdrop-preview { background-image: url("assets/home-backgrounds/mountains-thumb.jpg"); }
-.home-backdrop-forest .home-backdrop-preview { background-image: url("assets/home-backgrounds/forest-thumb.jpg"); }
-.home-backdrop-ocean .home-backdrop-preview { background-image: url("assets/home-backgrounds/ocean-thumb.jpg"); }
-.home-backdrop-desert .home-backdrop-preview { background-image: url("assets/home-backgrounds/desert-thumb.jpg"); }
-.home-backdrop-clouds .home-backdrop-preview { background-image: url("assets/home-backgrounds/clouds-thumb.jpg"); }
-.home-backdrop-leaves .home-backdrop-preview { background-image: url("assets/home-backgrounds/leaves-thumb.jpg"); }
-.home-backdrop-abstract .home-backdrop-preview { background-image: url("assets/home-backgrounds/abstract-thumb.jpg"); }
-.home-backdrop-city .home-backdrop-preview { background-image: url("assets/home-backgrounds/city-thumb.jpg"); }
-.home-backdrop-night-sky .home-backdrop-preview { background-image: url("assets/home-backgrounds/night-sky-thumb.jpg"); }
-.home-backdrop-ancient-scroll .home-backdrop-preview { background-image: url("assets/home-backgrounds/ancient-scroll-thumb.jpg"); }
-.home-backdrop-greek-columns .home-backdrop-preview { background-image: url("assets/home-backgrounds/greek-columns-thumb.jpg"); }
-.home-backdrop-garden .home-backdrop-preview { background-image: url("assets/home-backgrounds/garden-thumb.jpg"); }
-.home-backdrop-sunrise .home-backdrop-preview { background-image: url("assets/home-backgrounds/sunrise-thumb.jpg"); }
+.home-backdrop-waves .home-backdrop-preview { background: url("assets/home-backgrounds/waves-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-mountains .home-backdrop-preview { background: url("assets/home-backgrounds/mountains-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-forest .home-backdrop-preview { background: url("assets/home-backgrounds/forest-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-ocean .home-backdrop-preview { background: url("assets/home-backgrounds/ocean-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-desert .home-backdrop-preview { background: url("assets/home-backgrounds/desert-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-clouds .home-backdrop-preview { background: url("assets/home-backgrounds/clouds-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-leaves .home-backdrop-preview { background: url("assets/home-backgrounds/leaves-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-abstract .home-backdrop-preview { background: url("assets/home-backgrounds/abstract-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-city .home-backdrop-preview { background: url("assets/home-backgrounds/city-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-night-sky .home-backdrop-preview { background: url("assets/home-backgrounds/night-sky-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-ancient-scroll .home-backdrop-preview { background: url("assets/home-backgrounds/ancient-scroll-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-greek-columns .home-backdrop-preview { background: url("assets/home-backgrounds/greek-columns-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-garden .home-backdrop-preview { background: url("assets/home-backgrounds/garden-thumb.jpg") center / cover no-repeat !important; }
+.home-backdrop-sunrise .home-backdrop-preview { background: url("assets/home-backgrounds/sunrise-thumb.jpg") center / cover no-repeat !important; }
 
 /* Collapse content inside sett-card */
 .sett-collapse-content {
@@ -15244,52 +15244,54 @@ body.dark .bn-item::before {
     linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--secondary-color) 7%, transparent) 56% 59%, transparent 60%);
 }
 #homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::after {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   filter: saturate(0.9) contrast(0.9);
 }
+#homeScreen[class*="home-backdrop-"]:not(.home-backdrop-none) .home-scroll::before {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 44%, rgba(255,255,255,0.78)) 0%, color-mix(in srgb, var(--primary-color) 20%, rgba(255,255,255,0.32)) 38%, transparent 82%),
+    radial-gradient(circle at 84% 8%, color-mix(in srgb, var(--secondary-color) 14%, transparent), transparent 36%) !important;
+}
 #homeScreen.home-backdrop-waves .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06)), url("assets/home-backgrounds/waves.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06)), url("assets/home-backgrounds/waves.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-mountains .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), url("assets/home-backgrounds/mountains.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), url("assets/home-backgrounds/mountains.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-forest .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)), url("assets/home-backgrounds/forest.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)), url("assets/home-backgrounds/forest.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-ocean .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), url("assets/home-backgrounds/ocean.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), url("assets/home-backgrounds/ocean.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-desert .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06)), url("assets/home-backgrounds/desert.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06)), url("assets/home-backgrounds/desert.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-clouds .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04)), url("assets/home-backgrounds/clouds.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04)), url("assets/home-backgrounds/clouds.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-leaves .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)), url("assets/home-backgrounds/leaves.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)), url("assets/home-backgrounds/leaves.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-abstract .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04)), url("assets/home-backgrounds/abstract.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04)), url("assets/home-backgrounds/abstract.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-city .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)), url("assets/home-backgrounds/city.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)), url("assets/home-backgrounds/city.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-night-sky .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03)), url("assets/home-backgrounds/night-sky.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03)), url("assets/home-backgrounds/night-sky.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-ancient-scroll .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)), url("assets/home-backgrounds/ancient-scroll.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)), url("assets/home-backgrounds/ancient-scroll.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-greek-columns .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), url("assets/home-backgrounds/greek-columns.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), url("assets/home-backgrounds/greek-columns.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-garden .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06)), url("assets/home-backgrounds/garden.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06)), url("assets/home-backgrounds/garden.jpg") center / cover no-repeat !important;
 }
 #homeScreen.home-backdrop-sunrise .home-scroll::after {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04)), url("assets/home-backgrounds/sunrise.jpg");
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04)), url("assets/home-backgrounds/sunrise.jpg") center / cover no-repeat !important;
 }
 #homeScreen::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 56px;

@@ -12404,13 +12404,21 @@ function closeLearnWelcome() {
   const overlay = document.getElementById("learnWelcomeOverlay");
   if (overlay) overlay.classList.remove("open");
 }
-document.addEventListener("DOMContentLoaded", () => {
-  const hasSeenHomeIntro = localStorage.getItem("hasSeenHomeIntro");
 
-  if (!hasSeenHomeIntro) {
-    showInfoModal();
-    localStorage.setItem("hasSeenHomeIntro", "true");
-  }
+function maybeShowHomeIntroModal() {
+  if (localStorage.getItem("hasSeenHomeIntro") === "true") return;
+  if (!_hasSignedInUser()) return;
+  if (document.getElementById("authModal")?.classList.contains("open")) return;
+  const coachOverlay = document.getElementById("appCoachOverlay");
+  if (coachOverlay && !coachOverlay.classList.contains("hidden")) return;
+  if (localStorage.getItem("appWelcomeCoachSeenV275") !== "true") return;
+
+  localStorage.setItem("hasSeenHomeIntro", "true");
+  showInfoModal();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(maybeShowHomeIntroModal, 450);
 });
 function showLearnInfo() {
   const overlay = document.getElementById("learnWelcomeOverlay");
@@ -16492,9 +16500,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.5";
+const APP_VERSION = "3.0.6";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.6 &mdash; Onboarding + Background Fix</div>
+<ul class="un-list">
+  <li><strong>Welcome modal timing fixed</strong> so it waits until the first coach tour is finished instead of covering coach spotlights.</li>
+  <li><strong>Home background images strengthened</strong> so the generated artwork shows instead of the older fallback shapes.</li>
+</ul>
 <div class="un-version-label">v3.0.5 &mdash; Home Background Art</div>
 <ul class="un-list">
   <li><strong>Generated Home background images added</strong> for the Change Home Background options while keeping your selected theme in control of the UI.</li>
@@ -17002,6 +17015,7 @@ function _maybeStartAppWelcomeCoachAfterAuth() {
   if (document.getElementById("authModal")?.classList.contains("open")) return;
   _welcomeCoachQueuedAfterAuth = false;
   startAppWelcomeCoach();
+  setTimeout(maybeShowHomeIntroModal, 500);
 }
 
 function switchAuthTab(tab) {
@@ -17233,6 +17247,7 @@ window.__onAuthStateReady = async (user) => {
       if (streakStat) streakStat.textContent = getStreakDays();
     });
     _maybeStartAppWelcomeCoachAfterAuth();
+    setTimeout(maybeShowHomeIntroModal, 500);
   } else {
     _unsubUserDoc?.();
     _unsubUserDoc = null;
@@ -19731,7 +19746,7 @@ function _endAppCoach() {
   _coachMarkSeen(_appCoachSeenKey);
   if (_appCoachSeenKey === 'appWelcomeCoachSeenV275') {
     showNavPage('home');
-    setTimeout(() => showInfoModal(), 250);
+    setTimeout(maybeShowHomeIntroModal, 250);
   }
   _resumeHomeFlipAfterCoach();
 }
