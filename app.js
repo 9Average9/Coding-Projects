@@ -16768,7 +16768,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.34";
+const APP_VERSION = "3.0.35";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -20278,7 +20278,7 @@ let _appCoachFinishing = false;
 const APP_WELCOME_COACH_STEPS = [
   { title: 'Welcome to Basic Greek', body: 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place.' },
   { before: () => showNavPage('lessons'), target: () => _coachFirst(['.lesson-progress-badge', '.learn-path-grid']), title: 'Lessons are the foundation', body: 'Start here when you want guided structure. The basic and advanced tracks teach foundations and verbs in order, and checks keep you from just scrolling past the material.' },
-  { before: () => { showNavPage('community'); showLbTab('posts'); }, target: () => _coachFirst(['#lbPanePosts', '.comm-tabs']), title: 'Community posts', body: 'Posts are the main community feed: share verses, questions, links, prayer notes, and encouragements with friends. Fresh posts stay for 7 days so the board feels alive instead of cluttered.' },
+  { before: () => { showNavPage('community'); showLbTab('posts'); }, target: () => _coachFirst(['.community-post-add', '#lbPanePosts', '.comm-tabs']), title: 'Community posts', body: 'Posts are the main community feed: share verses, questions, links, prayer notes, and encouragements with friends. Attach MSB or BSB verses, react to one another, optionally alert your friends, and keep the board fresh as posts clear after 7 days.' },
   { before: () => { showNavPage('community'); showLbTab('xp'); }, target: () => _coachFirst(['button[data-tab="xp"]', '#lbPaneXP']), title: 'XP leaderboard', body: 'XP rewards steady work: lessons, tests, vocab, translation, and study habits. It is not the goal, but it helps your progress feel visible.' },
   { before: () => { showNavPage('community'); showLbTab('scholar'); }, target: () => _coachFirst(['button[data-tab="scholar"]', '#lbPaneScholar']), title: 'Scholar board', body: 'The Scholar board highlights careful practice quality, not just activity. It gives deeper testing and review work its own place.' },
   { before: () => showNavPage('home'), target: () => _coachFirst(['.home-actions-grid', '#notifBtn']), title: 'Home quick actions', body: 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live.' },
@@ -20318,8 +20318,8 @@ APP_WELCOME_COACH_STEPS[2].before = () => {
   showLbTab('posts');
 };
 APP_WELCOME_COACH_STEPS[2].title = 'Community posts';
-APP_WELCOME_COACH_STEPS[2].target = () => _coachFirst(['#lbPanePosts', '.comm-tabs']);
-APP_WELCOME_COACH_STEPS[2].body = 'Posts are the main community feed. Share a verse, question, link, prayer note, or encouragement with friends, and the board clears older posts after 7 days so it stays fresh.';
+APP_WELCOME_COACH_STEPS[2].target = () => _coachFirst(['.community-post-add', '#lbPanePosts', '.comm-tabs']);
+APP_WELCOME_COACH_STEPS[2].body = 'Posts are the main community feed. Use the plus button to share a verse, question, link, prayer note, or encouragement with friends. You can attach MSB or BSB Scripture, alert friends when something matters, react to posts, and the board clears older posts after 7 days so it stays fresh.';
 APP_WELCOME_COACH_STEPS[3].before = () => {
   if (typeof hideLessonModeModal === 'function') hideLessonModeModal();
   showNavPage('community');
