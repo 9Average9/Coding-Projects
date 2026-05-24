@@ -17198,7 +17198,7 @@ body.dark .quiz-answer-correct { color: #a5d6a7; }
 #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block-header::after {
   right: 16px !important;
   top: 50% !important;
-  transform: translateY(-50%) rotate(135deg) !important;
+  transform: translateY(-50%) rotate(315deg) !important;
   width: 9px !important;
   height: 9px !important;
   border-color: var(--lesson-accent) !important;
@@ -17209,7 +17209,7 @@ body.dark .quiz-answer-correct { color: #a5d6a7; }
 #basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.open .lesson-block-header::after,
 #advancedLearnMenu .adv-learn-lesson.active .lesson-block.open .lesson-block-header::after,
 #advVerbsLearnMenu .adv-verb-lesson.active .lesson-block.open .lesson-block-header::after {
-  transform: translateY(-35%) rotate(315deg) !important;
+  transform: translateY(-35%) rotate(135deg) !important;
 }
 
 #newLearnMenu .learn-lesson.active .block-time,
