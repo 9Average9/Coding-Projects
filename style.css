@@ -17830,6 +17830,48 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   font-size: 1.48rem !important;
 }
 
+/* Final accordion chevron reset */
+#newLearnMenu .learn-lesson.active .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block-header::after,
+#advancedLearnMenu .adv-learn-lesson.active .lesson-block-header::after,
+#advVerbsLearnMenu .adv-verb-lesson.active .lesson-block-header::after,
+#newLearnMenu .learn-lesson.active .lesson-block.visited .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.visited .lesson-block-header::after,
+#advancedLearnMenu .adv-learn-lesson.active .lesson-block.visited .lesson-block-header::after,
+#advVerbsLearnMenu .adv-verb-lesson.active .lesson-block.visited .lesson-block-header::after {
+  content: "expand_more" !important;
+  font-family: "Material Symbols Outlined" !important;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24 !important;
+  position: absolute !important;
+  right: 16px !important;
+  top: 50% !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: var(--lesson-accent, var(--secondary-color)) !important;
+  font-size: 1.55rem !important;
+  font-weight: normal !important;
+  line-height: 1 !important;
+  opacity: 0.95 !important;
+  transform: translateY(-50%) rotate(0deg) !important;
+  transition: transform 0.18s ease !important;
+}
+
+#newLearnMenu .learn-lesson.active .lesson-block.open .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.open .lesson-block-header::after,
+#advancedLearnMenu .adv-learn-lesson.active .lesson-block.open .lesson-block-header::after,
+#advVerbsLearnMenu .adv-verb-lesson.active .lesson-block.open .lesson-block-header::after,
+#newLearnMenu .learn-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#advancedLearnMenu .adv-learn-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#advVerbsLearnMenu .adv-verb-lesson.active .lesson-block.visited.open .lesson-block-header::after {
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
 /* Lessons compact polish */
 #advancedLearnMenu,
 #advVerbsLearnMenu {
