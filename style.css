@@ -18210,6 +18210,64 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .cp-actions small { font-size: 0.74rem; }
 .cp-delete { margin-left: auto; color: #ef4444 !important; }
 .cp-delete .material-symbols-outlined { font-size: 1.05rem; }
+.cp-prayer-btn {
+  margin: 12px 0 0 12px;
+  width: calc(100% - 12px);
+  border: none;
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #fff;
+  background: var(--secondary-color);
+  font-weight: 900;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--secondary-color) 22%, transparent);
+}
+.cp-prayer-btn.active {
+  color: var(--secondary-color);
+  background: color-mix(in srgb, var(--secondary-color) 13%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--secondary-color) 24%, transparent);
+}
+.cp-prayer-btn small {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.24);
+}
+.cp-comment-btn .material-symbols-outlined { font-size: 1rem; }
+.cp-reaction-stack {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+.cp-reaction-stack span,
+.cp-reaction-stack em {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin-left: -8px;
+  border: 2px solid rgba(255,255,255,0.92);
+  background: color-mix(in srgb, var(--secondary-color) 12%, white);
+  color: var(--secondary-color);
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.cp-reaction-stack span:first-child { margin-left: 0; }
+.cp-reaction-stack .avatar-photo-img { width: 100%; height: 100%; object-fit: cover; }
 .community-post-composer { max-width: 460px; }
 .cpc-kicker {
   display: inline-flex;
@@ -18264,8 +18322,15 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent);
   margin: 4px 0 12px;
 }
-.cpc-verse-head { display:flex; align-items:center; gap:7px; color: var(--font-color); margin-bottom: 10px; }
+.cpc-verse-head { display:flex; align-items:center; gap:7px; color: var(--font-color); margin-bottom: 10px; flex-wrap: wrap; }
 .cpc-verse-head .material-symbols-outlined { color: var(--secondary-color); }
+.cpc-verse-head small {
+  flex-basis: 100%;
+  margin-left: 28px;
+  color: var(--muted-color);
+  font-size: 0.73rem;
+  line-height: 1.25;
+}
 .cpc-verse-head button { margin-left:auto; border:none; background:transparent; color:var(--secondary-color); font-weight:850; }
 .cpc-verse-controls { display:grid; grid-template-columns: 76px 1fr auto; gap: 8px; }
 .cpc-verse-controls button {
@@ -18291,6 +18356,70 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .cpc-alert-row span { display:grid; gap:2px; }
 .cpc-alert-row small { color: var(--muted-color); font-size: 0.76rem; }
 .cpc-submit { width: 100%; }
+.community-comments-card,
+.community-reactions-card { max-width: 460px; }
+.community-comments-list {
+  max-height: 46vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+}
+.community-comment-row,
+.community-reaction-person {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--secondary-color) 7%, white);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent);
+}
+.community-comment-avatar,
+.community-reaction-person > span {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--secondary-color) 12%, white);
+  color: var(--secondary-color);
+}
+.community-comment-avatar .avatar-photo-img,
+.community-reaction-person .avatar-photo-img { width: 100%; height: 100%; object-fit: cover; }
+.community-comment-row strong,
+.community-reaction-person strong { color: var(--font-color); font-size: 0.88rem; }
+.community-comment-row p { margin: 3px 0; color: var(--font-color); font-size: 0.9rem; line-height: 1.4; }
+.community-comment-row small { color: var(--muted-color); font-size: 0.72rem; }
+.community-comment-empty { text-align: center; color: var(--muted-color); padding: 18px; margin: 0; }
+.community-comment-compose {
+  display: grid;
+  gap: 9px;
+}
+.community-comment-compose textarea {
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+  padding: 12px;
+  color: var(--font-color);
+  background: rgba(255,255,255,0.82);
+  font: inherit;
+}
+.community-reaction-people {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+.community-reaction-person { align-items: center; }
+.community-reaction-person em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 1.25rem;
+}
 @media (max-width: 420px) {
   .community-posts-head { padding: 16px; }
   .community-post-add { width: 52px; height: 52px; }

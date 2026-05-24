@@ -94,6 +94,8 @@ let _communityPosts = [];
 let _communityPostsUnsub = null;
 let _communityPostKind = 'insight';
 let _communityPostVerse = null;
+let _communityCommentsPostId = null;
+let _communityCommentsUnsub = null;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
@@ -16770,7 +16772,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.36";
+const APP_VERSION = "3.0.37";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18120,9 +18122,16 @@ function _renderCommunityPosts() {
     const meta = _communityKindMeta(post.kind);
     const mine = uid && post.authorUid === uid;
     const reactions = post.reactions || {};
-    const reactionEntries = Object.values(reactions);
+    const reactionEntries = Object.entries(reactions).map(([reactUid, value]) =>
+      typeof value === 'string'
+        ? { uid: reactUid, emoji: value, name: 'Friend', avatar: 'person' }
+        : { uid: reactUid, emoji: value?.emoji, name: value?.name || 'Friend', avatar: value?.avatar || 'person' }
+    ).filter(r => r.emoji);
     const daysLeft = Math.max(1, Math.ceil(((post.expiresAtMs || Date.now()) - Date.now()) / 86400000));
     const link = post.linkUrl ? _communityPostLink(post.linkUrl) : '';
+    const commentCount = Number(post.commentCount || 0);
+    const prayers = Object.keys(post.prayers || {}).length;
+    const myPrayer = !!post.prayers?.[uid];
     return `<article class="community-post-card community-post-${post.kind || 'insight'}">
       <div class="cp-top">
         <span class="cp-avatar">${_renderAvatar(post.authorAvatar || 'person')}</span>
@@ -18136,16 +18145,30 @@ function _renderCommunityPosts() {
       ${post.question ? `<div class="cp-question"><span class="material-symbols-outlined">question_mark</span>${_lbEscape(post.question)}</div>` : ''}
       ${post.verse ? _communityPostVerseHtml(post.verse) : ''}
       ${link}
+      ${post.kind === 'prayer' ? `<button class="cp-prayer-btn${myPrayer ? ' active' : ''}" onclick="prayForCommunityPost('${post.id}')"><span class="material-symbols-outlined">volunteer_activism</span>${myPrayer ? 'You let them know you prayed' : 'Let them know you prayed'}${prayers ? `<small>${prayers}</small>` : ''}</button>` : ''}
       <div class="cp-actions">
         ${['🙏','🔥','❤️','🙌'].map(emoji => {
-          const active = reactions[uid] === emoji;
-          const count = reactionEntries.filter(r => r === emoji).length;
+          const activeVal = reactions[uid];
+          const active = (typeof activeVal === 'string' ? activeVal : activeVal?.emoji) === emoji;
+          const count = reactionEntries.filter(r => r.emoji === emoji).length;
           return `<button class="${active ? 'active' : ''}" onclick="reactCommunityPost('${post.id}','${emoji}')"><span>${emoji}</span>${count ? `<small>${count}</small>` : ''}</button>`;
         }).join('')}
+        <button class="cp-comment-btn" onclick="openCommunityComments('${post.id}')"><span class="material-symbols-outlined">chat_bubble</span><small>${commentCount}</small></button>
         ${mine ? `<button class="cp-delete" onclick="deleteCommunityPost('${post.id}')"><span class="material-symbols-outlined">delete</span></button>` : ''}
       </div>
+      ${_communityReactionStackHtml(post.id, reactionEntries)}
     </article>`;
   }).join('');
+}
+
+function _communityReactionStackHtml(postId, entries) {
+  if (!entries.length) return '';
+  const shown = entries.slice(0, 3);
+  const extra = entries.length - shown.length;
+  return `<button class="cp-reaction-stack" onclick="openCommunityReactions('${postId}')">
+    ${shown.map(r => `<span title="${_lbEscape(r.name)}">${_renderAvatar(r.avatar || 'person')}</span>`).join('')}
+    ${extra > 0 ? `<em>+${extra}</em>` : ''}
+  </button>`;
 }
 
 function _communityPostTime(post) {
@@ -18196,7 +18219,7 @@ async function openCommunityPostComposer() {
   if (ref) ref.value = '';
   if (version) version.value = _rhemaTextMode === 'critical' ? 'BSB' : 'MSB';
   if (alertFriends) alertFriends.checked = false;
-  document.getElementById('communityPostVersePreview').textContent = 'Add a reference like John 3:16.';
+  document.getElementById('communityPostVersePreview').textContent = 'No verse will be sent unless you type a reference like John 3:16 and preview it.';
   document.getElementById('communityPostComposer')?.classList.add('open');
   await loadRhemaScripts().catch(() => {});
 }
@@ -18262,7 +18285,7 @@ function clearCommunityPostVerse() {
   const ref = document.getElementById('communityPostRef');
   const preview = document.getElementById('communityPostVersePreview');
   if (ref) ref.value = '';
-  if (preview) preview.textContent = 'Add a reference like John 3:16.';
+  if (preview) preview.textContent = 'No verse will be sent unless you type a reference like John 3:16 and preview it.';
 }
 
 async function submitCommunityPost() {
@@ -18299,6 +18322,74 @@ async function reactCommunityPost(postId, emoji) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   await window.CommunityPosts?.react?.(postId, uid, emoji);
+}
+
+async function prayForCommunityPost(postId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  await window.CommunityPosts?.pray?.(postId, uid);
+}
+
+function openCommunityComments(postId) {
+  _communityCommentsPostId = postId;
+  const post = _communityPosts.find(p => p.id === postId);
+  const title = document.getElementById('communityCommentsTitle');
+  if (title) title.textContent = post?.verse?.ref || _communityKindMeta(post?.kind).label || 'Post Comments';
+  const input = document.getElementById('communityCommentInput');
+  if (input) input.value = '';
+  document.getElementById('communityCommentsModal')?.classList.add('open');
+  const list = document.getElementById('communityCommentsList');
+  if (list) list.innerHTML = '<p class="study-board-empty">Loading comments...</p>';
+  if (_communityCommentsUnsub) _communityCommentsUnsub();
+  _communityCommentsUnsub = window.CommunityPosts?.listenComments?.(postId, comments => {
+    const el = document.getElementById('communityCommentsList');
+    if (!el) return;
+    if (!comments.length) {
+      el.innerHTML = '<p class="community-comment-empty">No comments yet. Start the conversation.</p>';
+      return;
+    }
+    el.innerHTML = comments.map(c => `<div class="community-comment-row">
+      <span class="community-comment-avatar">${_renderAvatar(c.authorAvatar || 'person')}</span>
+      <div><strong>${_lbEscape(c.authorName || 'Someone')}</strong><p>${_lbEscape(c.body || '')}</p><small>${_communityPostTime(c)}</small></div>
+    </div>`).join('');
+  }) || null;
+}
+
+function closeCommunityComments() {
+  document.getElementById('communityCommentsModal')?.classList.remove('open');
+  if (_communityCommentsUnsub) { _communityCommentsUnsub(); _communityCommentsUnsub = null; }
+  _communityCommentsPostId = null;
+}
+
+async function submitCommunityComment() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const input = document.getElementById('communityCommentInput');
+  const text = input?.value.trim() || '';
+  if (!uid || !_communityCommentsPostId || !text) return;
+  const btn = document.getElementById('communityCommentSubmit');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+  const ok = await window.CommunityPosts?.addComment?.(_communityCommentsPostId, uid, text);
+  if (btn) { btn.disabled = false; btn.textContent = 'Comment'; }
+  if (ok && input) input.value = '';
+}
+
+function openCommunityReactions(postId) {
+  const post = _communityPosts.find(p => p.id === postId);
+  const people = document.getElementById('communityReactionPeople');
+  if (!post || !people) return;
+  const entries = Object.values(post.reactions || {}).map(value =>
+    typeof value === 'string'
+      ? { emoji: value, name: 'Friend', avatar: 'person' }
+      : { emoji: value?.emoji, name: value?.name || 'Friend', avatar: value?.avatar || 'person' }
+  ).filter(r => r.emoji);
+  people.innerHTML = entries.length
+    ? entries.map(r => `<div class="community-reaction-person"><span>${_renderAvatar(r.avatar)}</span><strong>${_lbEscape(r.name)}</strong><em>${r.emoji}</em></div>`).join('')
+    : '<p class="community-comment-empty">No reactions yet.</p>';
+  document.getElementById('communityReactionsModal')?.classList.add('open');
+}
+
+function closeCommunityReactions() {
+  document.getElementById('communityReactionsModal')?.classList.remove('open');
 }
 
 async function deleteCommunityPost(postId) {

@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.36" rel="stylesheet"/>
+<link href="style.css?v=3.0.37" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -15516,10 +15516,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.36"></script>
+<script src="app.js?v=3.0.37"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.36" type="module"></script>
+<script src="firebase-lb.js?v=3.0.37" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -15873,6 +15873,7 @@ Verb Endings
 <div class="cpc-verse-head">
 <span class="material-symbols-outlined">auto_stories</span>
 <strong>Attach a verse</strong>
+<small>Optional - only attaches after you type a reference and preview it.</small>
 <button type="button" onclick="clearCommunityPostVerse()">Clear</button>
 </div>
 <div class="cpc-verse-controls">
@@ -15883,13 +15884,35 @@ Verb Endings
 <input id="communityPostRef" placeholder="John 3:16"/>
 <button type="button" onclick="updateCommunityPostVersePreview()">Preview</button>
 </div>
-<p class="cpc-verse-preview" id="communityPostVersePreview">Add a reference like John 3:16.</p>
+<p class="cpc-verse-preview" id="communityPostVersePreview">No verse will be sent unless you type a reference like John 3:16 and preview it.</p>
 </div>
 <label class="cpc-alert-row">
 <input id="communityPostAlertFriends" type="checkbox"/>
 <span><strong>Alert my friends</strong><small>Send a push so they know there is something fresh to read.</small></span>
 </label>
 <button class="main-btn cpc-submit" id="communityPostSubmitBtn" onclick="submitCommunityPost()">Post to Community</button>
+</div>
+</div>
+<!-- Community Post Comments -->
+<div class="modal-overlay" id="communityCommentsModal" onclick="if(event.target===this)closeCommunityComments()">
+<div class="modal-card community-comments-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeCommunityComments()">&times;</button>
+<div class="cpc-kicker"><span class="material-symbols-outlined">chat_bubble</span> Comments</div>
+<h2 id="communityCommentsTitle">Post Comments</h2>
+<div class="community-comments-list" id="communityCommentsList"></div>
+<div class="community-comment-compose">
+<textarea id="communityCommentInput" maxlength="500" placeholder="Add a thoughtful comment..."></textarea>
+<button class="main-btn" id="communityCommentSubmit" onclick="submitCommunityComment()">Comment</button>
+</div>
+</div>
+</div>
+<!-- Community Reaction People -->
+<div class="modal-overlay" id="communityReactionsModal" onclick="if(event.target===this)closeCommunityReactions()">
+<div class="modal-card community-reactions-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeCommunityReactions()">&times;</button>
+<div class="cpc-kicker"><span class="material-symbols-outlined">favorite</span> Reactions</div>
+<h2>Who Reacted</h2>
+<div class="community-reaction-people" id="communityReactionPeople"></div>
 </div>
 </div>
 <!-- View All Studies Modal -->

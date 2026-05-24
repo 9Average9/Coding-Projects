@@ -214,6 +214,24 @@ exports.onEncouragementCreated = functions.firestore
       const studyName = snap.data().studyName || "a study";
       title = "Study Invitation";
       body = `${fromName} invited you to join "${studyName}".`;
+    } else if (type === "communityPost") {
+      const kind = snap.data().postKind || "post";
+      const labels = { insight: "an insight", question: "a question", encouragement: "an encouragement", prayer: "a prayer post" };
+      title = "New Community Post";
+      body = `${fromName} shared ${labels[kind] || "a post"} with you.`;
+    } else if (type === "postReaction") {
+      const postTitle = snap.data().postTitle || "your post";
+      const emoji = snap.data().emoji || "reacted";
+      title = "Someone Reacted";
+      body = `${fromName} reacted ${emoji} to "${postTitle}".`;
+    } else if (type === "postComment") {
+      const postTitle = snap.data().postTitle || "your post";
+      title = "New Comment";
+      body = `${fromName} commented on "${postTitle}".`;
+    } else if (type === "postPrayer") {
+      const postTitle = snap.data().postTitle || "your prayer post";
+      title = "They Prayed For You";
+      body = `${fromName} prayed for your "${postTitle}" post.`;
     } else if (type === "encouragement") {
       title = "Study Encouragement";
       body = `${fromName} is encouraging you to study your Greek!`;

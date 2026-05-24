@@ -855,13 +855,94 @@ async function reactCommunityPost(postId, uid, emoji) {
     const ref = doc(db, "communityPosts", postId);
     const snap = await getDoc(ref);
     if (!snap.exists()) return false;
-    const current = snap.data().reactions?.[uid];
+    const data = snap.data();
+    const current = data.reactions?.[uid];
+    const currentEmoji = typeof current === "string" ? current : current?.emoji;
+    const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
+    const fromAvatar = localStorage.getItem("selectedAvatar") || "person";
     await updateDoc(ref, {
-      [`reactions.${uid}`]: current === emoji ? deleteField() : emoji
+      [`reactions.${uid}`]: currentEmoji === emoji
+        ? deleteField()
+        : { emoji, name: fromName, avatar: fromAvatar, reactedAtMs: Date.now() }
     });
+    if (currentEmoji !== emoji && data.authorUid && data.authorUid !== uid) {
+      fcmSendPushNotification(data.authorUid, "postReaction", fromName, uid, {
+        postId,
+        emoji,
+        postTitle: communityPostTitle(data)
+      });
+    }
     return true;
   } catch (e) {
     console.warn("reactCommunityPost:", e);
+    return false;
+  }
+}
+
+function communityPostTitle(post = {}) {
+  const raw = post.question || post.verse?.ref || post.body || "your post";
+  const text = String(raw).replace(/\s+/g, " ").trim();
+  return text.length > 46 ? text.slice(0, 43) + "..." : text || "your post";
+}
+
+function listenPostComments(postId, callback) {
+  const q = query(collection(db, "communityPosts", postId, "comments"), orderBy("createdAtMs", "asc"), limit(80));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("listenPostComments:", err); callback([]); });
+}
+
+async function addPostComment(postId, uid, text) {
+  try {
+    const clean = String(text || "").trim();
+    if (!clean) return false;
+    const postRef = doc(db, "communityPosts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return false;
+    const post = postSnap.data();
+    const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
+    const fromAvatar = localStorage.getItem("selectedAvatar") || "person";
+    await addDoc(collection(db, "communityPosts", postId, "comments"), {
+      body: clean,
+      authorUid: uid,
+      authorName: fromName,
+      authorAvatar: fromAvatar,
+      createdAt: serverTimestamp(),
+      createdAtMs: Date.now()
+    });
+    await updateDoc(postRef, { commentCount: increment(1) });
+    if (post.authorUid && post.authorUid !== uid) {
+      fcmSendPushNotification(post.authorUid, "postComment", fromName, uid, {
+        postId,
+        postTitle: communityPostTitle(post)
+      });
+    }
+    return true;
+  } catch (e) {
+    console.warn("addPostComment:", e);
+    return false;
+  }
+}
+
+async function prayForPost(postId, uid) {
+  try {
+    const postRef = doc(db, "communityPosts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return false;
+    const post = postSnap.data();
+    const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
+    const fromAvatar = localStorage.getItem("selectedAvatar") || "person";
+    await updateDoc(postRef, {
+      [`prayers.${uid}`]: { name: fromName, avatar: fromAvatar, prayedAtMs: Date.now() }
+    });
+    if (post.authorUid && post.authorUid !== uid) {
+      fcmSendPushNotification(post.authorUid, "postPrayer", fromName, uid, {
+        postId,
+        postTitle: communityPostTitle(post)
+      });
+    }
+    return true;
+  } catch (e) {
+    console.warn("prayForPost:", e);
     return false;
   }
 }
@@ -923,6 +1004,9 @@ window.CommunityPosts = {
   listen: listenCommunityPosts,
   add: addCommunityPost,
   react: reactCommunityPost,
+  listenComments: listenPostComments,
+  addComment: addPostComment,
+  pray: prayForPost,
   delete: deleteCommunityPost
 };
 
