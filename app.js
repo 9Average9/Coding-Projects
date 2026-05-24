@@ -41,6 +41,10 @@ let _browseSearch = "";
 let _currentFriendSheetUid = null;
 let _authReady = false;
 let _welcomeCoachQueuedAfterAuth = false;
+let _appLaunchStartedAt = Date.now();
+let _appLaunchReleased = false;
+let _appUpdateReloadPending = false;
+let _appUpdateReloadTimer = null;
 
 // Personal Studies state
 let _myStudies = [];
@@ -9621,6 +9625,7 @@ function showNavPage(page) {
   } else if (page === 'rhema') {
     showRhema();
   }
+  setTimeout(_applyPendingAppUpdateReload, 50);
 }
 
 function showScreen(id) {
@@ -16668,7 +16673,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.25";
+const APP_VERSION = "3.0.26";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -16848,6 +16853,70 @@ const UPDATE_NOTES_HTML = `
 
 let deferredInstallPrompt = null;
 
+function setAppLaunchText(text) {
+  const el = document.getElementById('appLaunchText');
+  if (el && text) el.textContent = text;
+}
+
+function showAppLaunchScreen(text = 'Preparing your study space') {
+  const splash = document.getElementById('appLaunchScreen');
+  if (!splash) return;
+  setAppLaunchText(text);
+  splash.classList.remove('dismissed', 'hidden');
+}
+
+function hideAppLaunchScreen(reason = 'ready') {
+  if (_appLaunchReleased) return;
+  const splash = document.getElementById('appLaunchScreen');
+  if (!splash) return;
+  const minVisible = reason === 'timeout' ? 0 : 650;
+  const wait = Math.max(0, minVisible - (Date.now() - _appLaunchStartedAt));
+  setTimeout(() => {
+    _appLaunchReleased = true;
+    splash.classList.add('dismissed');
+    setTimeout(() => splash.classList.add('hidden'), 380);
+  }, wait);
+}
+
+function _isAppInInterruptibleStartupState() {
+  return !_appLaunchReleased || document.hidden;
+}
+
+function _isSafeForUpdateReload() {
+  const activeScreen = document.querySelector('.screen.active')?.id;
+  const rhemaOpen = document.getElementById('rhemaModal')?.classList.contains('open');
+  const studyOpen = !document.getElementById('studySandbox')?.classList.contains('hidden');
+  const blockingModal = [...document.querySelectorAll('.modal-overlay.open, .study-sheet-overlay.open, .swm-modal:not(.hidden), .wl-overlay:not(.hidden)')]
+    .some(el => el.id !== 'appLaunchScreen');
+  return activeScreen === 'homeScreen' && !rhemaOpen && !studyOpen && !blockingModal;
+}
+
+function _applyPendingAppUpdateReload() {
+  if (!_appUpdateReloadPending) return;
+  if (!_isAppInInterruptibleStartupState() && !_isSafeForUpdateReload()) return;
+  _appUpdateReloadPending = false;
+  showAppLaunchScreen('Updating Greek');
+  setTimeout(() => window.location.reload(), 260);
+}
+
+function queueAppUpdateReload() {
+  if (_appUpdateReloadPending) return;
+  _appUpdateReloadPending = true;
+  if (_isAppInInterruptibleStartupState() || _isSafeForUpdateReload()) {
+    _applyPendingAppUpdateReload();
+    return;
+  }
+  _showStudyToast?.('Update ready. Applying when you return home.');
+  clearInterval(_appUpdateReloadTimer);
+  _appUpdateReloadTimer = setInterval(_applyPendingAppUpdateReload, 1000);
+  setTimeout(() => {
+    if (!_appUpdateReloadPending) return;
+    _appUpdateReloadPending = false;
+    showAppLaunchScreen('Updating Greek');
+    setTimeout(() => window.location.reload(), 420);
+  }, 30000);
+}
+
 function isRunningAsInstalledApp() {
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
@@ -16862,7 +16931,7 @@ function registerServiceWorker() {
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (refreshing) return;
       refreshing = true;
-      window.location.reload();
+      queueAppUpdateReload();
     });
 
     navigator.serviceWorker.register("./service-worker.js").then((registration) => {
@@ -17372,6 +17441,7 @@ async function submitLogin() {
 window.__onAuthStateReady = async (user) => {
   _authReady = true;
   if (user) {
+    setAppLaunchText('Syncing your study space');
     await restoreUserFromFirestore(user);
     syncUserData();
     hideAuthModal();
@@ -17380,7 +17450,7 @@ window.__onAuthStateReady = async (user) => {
     updatePracticeToolLocks();
     updateLessonCompletionUI();
     populateHomeScreen();
-    _loadMyStudies();
+    await _loadMyStudies();
     _startEncouragementListener(user.uid);
     // If friends modal was opened while auth was still loading, populate it now
     if (document.getElementById("friendsModal")?.classList.contains("open")) {
@@ -17466,6 +17536,7 @@ window.__onAuthStateReady = async (user) => {
     });
     _maybeStartAppWelcomeCoachAfterAuth();
     setTimeout(maybeShowHomeIntroModal, 500);
+    hideAppLaunchScreen('ready');
   } else {
     _unsubUserDoc?.();
     _unsubUserDoc = null;
@@ -17473,6 +17544,7 @@ window.__onAuthStateReady = async (user) => {
     document.getElementById('appCoachOverlay')?.classList.add('hidden');
     _resumeHomeFlipAfterCoach();
     showAuthModal();
+    hideAppLaunchScreen('ready');
   }
 };
 
@@ -17484,6 +17556,9 @@ if (window.__pendingAuthResolved) {
 // ── Startup ──────────────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", () => {
+  _appLaunchStartedAt = Date.now();
+  setAppLaunchText('Preparing your study space');
+  setTimeout(() => hideAppLaunchScreen('timeout'), 2800);
   registerServiceWorker();
   initFCMForeground();
 
@@ -17520,6 +17595,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setNavActive('home');
   showBottomNav();
   _startHomeFlip();
+  if (window.__pendingAuthResolved) setAppLaunchText('Finishing setup');
 });
 
 
