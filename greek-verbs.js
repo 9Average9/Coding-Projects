@@ -220,6 +220,9 @@ function updateVerbBasicMenuProgress() {
   const done = VERB_BASIC_LESSONS.filter(id => completedVerbBasicLessons[id] === true).length;
   const el = document.getElementById("verbBasicProgressText");
   if (el) el.textContent = `${done} of ${VERB_BASIC_LESSONS.length} complete`;
+  if (typeof syncLessonProgressBadge === "function") {
+    syncLessonProgressBadge(el, done, VERB_BASIC_LESSONS.length);
+  }
 
   VERB_BASIC_LESSONS.forEach(id => {
     const statusEl = document.querySelector(`[data-verb-lesson-status="${id}"]`);
@@ -237,6 +240,9 @@ function updateVerbAdvMenuProgress() {
   const done = VERB_ADV_LESSONS.filter(id => completedVerbAdvancedLessons[id] === true).length;
   const el = document.getElementById("verbAdvProgressText");
   if (el) el.textContent = `${done} of ${VERB_ADV_LESSONS.length} complete`;
+  if (typeof syncLessonProgressBadge === "function") {
+    syncLessonProgressBadge(el, done, VERB_ADV_LESSONS.length, true);
+  }
 
   VERB_ADV_LESSONS.forEach(id => {
     const statusEl = document.querySelector(`[data-verb-lesson-status="${id}"]`);

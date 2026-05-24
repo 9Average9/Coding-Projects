@@ -16415,6 +16415,31 @@ function updateLessonMenuProgress() {
   const advEl = document.getElementById("advancedLessonsProgressText");
   if (basicEl) basicEl.textContent = `${basicDone} of ${REQUIRED_LESSONS.length} complete`;
   if (advEl) advEl.textContent = `${advDone} of ${REQUIRED_ADVANCED_LESSONS.length} complete`;
+  syncLessonProgressBadge(basicEl, basicDone, REQUIRED_LESSONS.length);
+  syncLessonProgressBadge(advEl, advDone, REQUIRED_ADVANCED_LESSONS.length, true);
+}
+
+function syncLessonProgressBadge(textEl, done, total, advanced = false) {
+  const badge = textEl?.closest?.(".lesson-progress-badge");
+  if (!badge || !total) return;
+  const pct = Math.round((done / total) * 100);
+  badge.classList.add("lesson-progress-enhanced");
+  badge.classList.toggle("advanced-progress", !!advanced);
+  badge.style.setProperty("--lesson-progress", `${pct}%`);
+  let ring = badge.querySelector(".lesson-progress-ring");
+  if (!ring) {
+    ring = document.createElement("span");
+    ring.className = "lesson-progress-ring";
+    badge.insertBefore(ring, badge.firstChild);
+  }
+  ring.textContent = `${pct}%`;
+  let subtitle = badge.querySelector(".lesson-progress-subtitle");
+  if (!subtitle) {
+    subtitle = document.createElement("small");
+    subtitle.className = "lesson-progress-subtitle";
+    textEl.insertAdjacentElement("afterend", subtitle);
+  }
+  subtitle.textContent = done === total ? "Track complete. Strong work." : "Keep going! You're making great progress.";
 }
 
 function updateStudyStreak() {
@@ -16533,7 +16558,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.17";
+const APP_VERSION = "3.0.18";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
