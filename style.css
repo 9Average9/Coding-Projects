@@ -16523,36 +16523,45 @@ body.sandbox-open #rhemaModal {
 /* ── Word Library ────────────────────────────────────────────────────────── */
 .wl-overlay {
   position: fixed; inset: 0; z-index: 1400;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: flex; flex-direction: column;
+  background: var(--primary-color);
   opacity: 0; transition: opacity 0.22s ease;
 }
 .wl-overlay.hidden { display: none; }
 .wl-overlay.open { opacity: 1; }
 .wl-sheet {
   background: var(--primary-color);
-  border-radius: 22px 22px 0 0; border-top: 1.5px solid var(--border-color);
+  border-radius: 0;
   display: flex; flex-direction: column;
-  max-height: 88svh; min-height: 50svh;
+  width: 100%;
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
   overflow: hidden;
-  transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  transform: none;
+  transition: none;
 }
-.wl-overlay.open .wl-sheet { transform: translateY(0); }
+.wl-overlay.open .wl-sheet { transform: none; }
 .wl-handle {
   width: 36px; height: 4px; border-radius: 2px;
   background: color-mix(in srgb, var(--muted-color) 35%, transparent);
   margin: 12px auto 0; flex-shrink: 0;
 }
 .wl-header {
-  display: flex; align-items: center; gap: 10px; padding: 12px 20px 10px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 10px;
+  flex-shrink: 0;
+  background: var(--primary-color);
 }
 .wl-header-icon { font-size: 22px; color: var(--accent-color, #4f8cff); }
 .wl-title { flex: 1; font-size: 1rem; font-weight: 800; color: var(--text-color); }
 .wl-close { background: none; border: none; cursor: pointer; color: var(--muted-color); padding: 4px; }
 .wl-close .material-symbols-outlined { font-size: 22px; }
 .wl-search-row {
-  display: flex; align-items: center; gap: 8px; padding: 4px 16px 10px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 16px 10px;
+  flex-shrink: 0;
+  background: var(--primary-color);
 }
 .wl-search-icon { font-size: 20px; color: var(--muted-color); flex-shrink: 0; }
 .wl-search-input {
@@ -16684,8 +16693,9 @@ body.sandbox-open #rhemaModal {
 .hs-info-btn .material-symbols-outlined { font-size: 1rem; }
 
 .wl-results {
-  flex: 1; min-height: 0; overflow-y: auto; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 12px);
+  flex: 1; min-height: 0; overflow-y: auto; padding: 4px 0 calc(env(safe-area-inset-bottom,0px) + 18px);
   overscroll-behavior: contain;
+  background: var(--primary-color);
 }
 .wl-hint {
   padding: 32px 20px; text-align: center; color: var(--muted-color); font-size: 0.85rem; line-height: 1.5;
@@ -16708,7 +16718,28 @@ body.sandbox-open #rhemaModal {
 .wl-result-form-tag {
   font-size: 0.58rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--accent-color, #4f8cff); background: color-mix(in srgb, var(--accent-color, #4f8cff) 14%, transparent);
-  border-radius: 6px; padding: 2px 6px; flex-shrink: 0;
+  border-radius: 999px; padding: 3px 7px; flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.rhema-wl-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 46px 0 16px;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+  color: var(--secondary-color);
+  font-weight: 800;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.rhema-wl-back .material-symbols-outlined {
+  font-size: 17px;
 }
 
 /* ── Workspace compose verse bar ────────────────────────────────────────────── */

@@ -70,6 +70,8 @@ let _wlOpen = false;
 let _wlIndex = null;
 let _ntSurfaceIndex = null;
 let _wlSelectedForm = null;
+let _wlSavedQuery = '';
+let _wlOpenedDetail = false;
 let _wlKbdVisible = false;
 let _writingModalType = null;
 let _swmDisplayBook = '', _swmDisplayChapter = '', _swmDisplayVerse = '';
@@ -8850,19 +8852,26 @@ function openWordLibrary() {
   if (!window.RhemaLexicon) { _showStudyToast('Word data not loaded yet.'); return; }
   _wlOpen = true;
   _wlSelectedForm = null;
+  _wlOpenedDetail = false;
   const overlay = document.getElementById('wordLibraryOverlay');
   if (!overlay) return;
   overlay.classList.remove('hidden');
   requestAnimationFrame(() => overlay.classList.add('open'));
   const input = document.getElementById('wlSearchInput');
-  if (input) { input.value = ''; setTimeout(() => input.focus(), 350); }
+  if (input) {
+    input.value = _wlSavedQuery || '';
+    input.readOnly = _wlKbdVisible;
+    setTimeout(() => { if (!_wlKbdVisible) input.focus(); }, 180);
+  }
   document.getElementById('wlResults').innerHTML = '<p class="wl-hint">Search by Greek (ἀγαπ…), transliteration (agap…), or English meaning.</p>';
   // Build keyboard if needed
   _buildWlKeyboard();
+  if (_wlSavedQuery) wlOnSearch(_wlSavedQuery);
 }
 
 function closeWordLibrary() {
   _wlOpen = false;
+  if (!_wlOpenedDetail) _wlSavedQuery = '';
   const overlay = document.getElementById('wordLibraryOverlay');
   if (!overlay) return;
   overlay.classList.remove('open');
@@ -8882,6 +8891,16 @@ function toggleWlKeyboard() {
   _wlKbdVisible = !_wlKbdVisible;
   document.getElementById('wlGreekKeyboard')?.classList.toggle('hidden', !_wlKbdVisible);
   document.getElementById('wlKbdToggleBtn')?.classList.toggle('active', _wlKbdVisible);
+  const input = document.getElementById('wlSearchInput');
+  if (input) {
+    input.readOnly = _wlKbdVisible;
+    if (_wlKbdVisible) input.blur();
+    else input.focus();
+  }
+}
+
+function isWlGreekKeyboardActive() {
+  return _wlKbdVisible;
 }
 
 function wlKbdInput(char) {
@@ -8889,7 +8908,7 @@ function wlKbdInput(char) {
   if (!input) return;
   input.value += char;
   wlOnSearch(input.value);
-  input.focus();
+  input.blur();
 }
 
 function wlKbdBackspace() {
@@ -8897,6 +8916,7 @@ function wlKbdBackspace() {
   if (!input) return;
   input.value = input.value.slice(0, -1);
   wlOnSearch(input.value);
+  input.blur();
 }
 
 // ── Workspace Greek keyboard ──────────────────────────────────────────────────
@@ -8916,6 +8936,16 @@ function toggleWsKeyboard() {
   _wsKbdVisible = !_wsKbdVisible;
   document.getElementById('wsGreekKeyboard')?.classList.toggle('hidden', !_wsKbdVisible);
   document.getElementById('wsKbdToggleBtn')?.classList.toggle('active', _wsKbdVisible);
+  const input = document.getElementById('ssNoteInput');
+  if (input) {
+    input.readOnly = _wsKbdVisible;
+    if (_wsKbdVisible) input.blur();
+    else input.focus();
+  }
+}
+
+function isWsGreekKeyboardActive() {
+  return _wsKbdVisible;
 }
 
 function wsKbdInput(char) {
@@ -8924,7 +8954,7 @@ function wsKbdInput(char) {
   input.value += char;
   input.style.height = 'auto';
   input.style.height = input.scrollHeight + 'px';
-  input.focus();
+  input.blur();
 }
 
 function wsKbdBackspace() {
@@ -8933,6 +8963,7 @@ function wsKbdBackspace() {
   input.value = input.value.slice(0, -1);
   input.style.height = 'auto';
   input.style.height = input.scrollHeight + 'px';
+  input.blur();
 }
 
 function openWlInfoModal() {
@@ -8945,8 +8976,22 @@ function closeWlInfoModal() {
 
 let _wlSearchTimer = null;
 function wlOnSearch(q) {
+  _wlSavedQuery = q || '';
   clearTimeout(_wlSearchTimer);
   _wlSearchTimer = setTimeout(() => _wlDoSearch(q), 120);
+}
+
+function _wlFormLabel(strongs, surface) {
+  const morph = _findMorphForSurface(strongs, surface);
+  const rows = decodeMorph(morph);
+  const caseRow = rows.find(r => r.label === 'Case');
+  if (caseRow?.value) return caseRow.value;
+  const moodRow = rows.find(r => r.label === 'Mood');
+  if (moodRow?.value) return moodRow.value;
+  const formRow = rows.find(r => r.label === 'Form');
+  if (formRow?.value) return formRow.value;
+  const posRow = rows.find(r => r.label === 'Part of Speech');
+  return posRow?.value || 'Form';
 }
 
 function _wlDoSearch(q) {
@@ -8965,11 +9010,12 @@ function _wlDoSearch(q) {
     html += `<div class="wl-section-label">Exact Forms in NT</div>`;
     html += formEntries.map(f => {
       const lex = (window.RhemaLexicon || {})[f.strongs] || {};
+      const formLabel = _wlFormLabel(f.strongs, f.surface);
       return `<div class="wl-result-item wl-result-form" onclick="openWlWordDetail(${f.strongs},'${f.surface.replace(/'/g,"\\'")}')">
         <span class="wl-result-lemma">${f.surface}</span>
         <span class="wl-result-translit">${lex.translit || ''}</span>
         <span class="wl-result-brief">${(lex.brief||'').split(',')[0].trim()}</span>
-        <span class="wl-result-form-tag">form</span>
+        <span class="wl-result-form-tag">Form: ${formLabel}</span>
         <span class="wl-result-count">${f.count}×</span>
       </div>`;
     }).join('');
@@ -8990,8 +9036,11 @@ function _wlDoSearch(q) {
 }
 
 function openWlWordDetail(strongs, formSurface) {
+  _wlSavedQuery = document.getElementById('wlSearchInput')?.value || _wlSavedQuery || '';
+  _wlOpenedDetail = true;
   _wlSelectedForm = formSurface || null;
   const lex = (window.RhemaLexicon || {})[strongs] || {};
+  document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
   if (!lex.lemma) return;
   const surface = formSurface || lex.lemma;
   const morph = formSurface ? _findMorphForSurface(strongs, formSurface) : _findAnyMorphForStrongs(strongs);
@@ -9007,10 +9056,18 @@ function openWlWordDetail(strongs, formSurface) {
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   // Show definition tab
   showRhemaTab('definition', _rhemaActiveWord);
+  document.getElementById('rhemaWlBackBtn')?.classList.remove('hidden');
   const sheet = document.getElementById('rhemaSheet');
   sheet?.classList.add('open');
   document.getElementById('rhemaSheetBackdrop')?.classList.add('visible');
   closeWordLibrary();
+}
+
+function returnToWordLibrarySearch() {
+  closeRhemaSheet();
+  document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
+  _wlOpenedDetail = false;
+  openWordLibrary();
 }
 
 function _findMorphForSurface(strongs, surface) {
@@ -16700,7 +16757,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.27";
+const APP_VERSION = "3.0.28";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -21328,6 +21385,7 @@ function closeRhemaSheet() {
   document.getElementById('rhemaSheetBackdrop')?.classList.remove('visible');
   document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
   if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
+  document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
   _rhemaActiveWord = null;
 }
 

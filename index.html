@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.27" rel="stylesheet"/>
+<link href="style.css?v=3.0.28" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -9395,6 +9395,10 @@ Verb Endings
 <!-- Word detail bottom sheet -->
 <div class="rhema-sheet" id="rhemaSheet">
 <button class="sheet-x-close" onclick="closeRhemaSheet()"><span class="material-symbols-outlined">close</span></button>
+<button class="rhema-wl-back hidden" id="rhemaWlBackBtn" onclick="returnToWordLibrarySearch()">
+<span class="material-symbols-outlined">search</span>
+<span>Back to search</span>
+</button>
 <div class="rhema-sheet-top">
 <span class="rhema-sheet-surface" id="rhemaSheetSurface"></span>
 <span class="rhema-sheet-strongs" id="rhemaSheetStrongs"></span>
@@ -15495,7 +15499,7 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.27"></script>
+<script src="app.js?v=3.0.28"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.8"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
 <script src="firebase-lb.js?v=3.0.25" type="module"></script>
@@ -15660,7 +15664,7 @@ Verb Endings
 <button class="ws-kbd-toggle" id="wsKbdToggleBtn" onclick="toggleWsKeyboard()" title="Greek keyboard">
 <span class="ws-kbd-icon">α</span>
 </button>
-<textarea class="ss-note-input" id="ssNoteInput" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="Add a note…" rows="2"></textarea>
+<textarea class="ss-note-input" id="ssNoteInput" onfocus="if(isWsGreekKeyboardActive())this.blur()" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="Add a note…" rows="2"></textarea>
 <button class="ss-send-btn" onclick="submitWorkspaceEntry()"><span class="material-symbols-outlined">send</span></button>
 </div>
 <div class="ws-greek-keyboard hidden" id="wsGreekKeyboard"></div>
@@ -15769,7 +15773,7 @@ Verb Endings
 </div>
 <div class="wl-search-row">
 <span class="material-symbols-outlined wl-search-icon">search</span>
-<input autocomplete="off" autocorrect="off" class="wl-search-input" id="wlSearchInput" oninput="wlOnSearch(this.value)" placeholder="Search Greek or transliteration…" spellcheck="false" type="text"/>
+<input autocomplete="off" autocorrect="off" class="wl-search-input" id="wlSearchInput" onfocus="if(isWlGreekKeyboardActive())this.blur()" oninput="wlOnSearch(this.value)" placeholder="Search Greek or transliteration…" spellcheck="false" type="text"/>
 <button class="wl-kbd-toggle" id="wlKbdToggleBtn" onclick="toggleWlKeyboard()" title="Greek keyboard">
 <span class="wl-kbd-icon">α</span>
 </button>
