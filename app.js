@@ -16760,7 +16760,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.31";
+const APP_VERSION = "3.0.32";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -20314,13 +20314,13 @@ const _RHEMA_COACH_STEPS = [
     targetFn: () => document.getElementById('rhemaToolBtn'),
     position: 'below',
     title: 'Study tools',
-    body: 'Open the tool wheel to turn on the Syntax tree, Greek-only mode, word highlighting, and more.',
+    body: 'Open the tool wheel to turn on the Syntax tree, Greek-only mode, word highlighting, and the Majority Text / Critical Text switch. That text switch lets you compare the Greek tradition behind the passage without leaving Rhema.',
   },
   {
     targetFn: () => document.getElementById('rhemaSwapBtn'),
     position: 'below',
-    title: 'English side-by-side',
-    body: 'Swap between Greek and English to compare, or stack them to read both at once.',
+    title: 'Paired English version',
+    body: 'This button shows the English partner for the Greek text you are reading. The default is MSB (Majority Standard Bible) with the Majority Text. When you switch to Critical Text, Rhema uses BSB (Berean Standard Bible), so the English and Greek stay paired together.',
   },
   {
     targetFn: () => document.querySelector('.rhema-picker'),

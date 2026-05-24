@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.31" rel="stylesheet"/>
+<link href="style.css?v=3.0.32" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -15499,7 +15499,7 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.31"></script>
+<script src="app.js?v=3.0.32"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
 <script src="firebase-lb.js?v=3.0.25" type="module"></script>
@@ -16374,11 +16374,12 @@ Verb Endings
 <button class="modal-close" onclick="closeRhemaNerdModal()">&times;</button>
 <div class="nerd-kicker"><span class="material-symbols-outlined">science</span> Source Notes</div>
 <h2>Rhema Nerd Page</h2>
-<p class="nerd-lead">A transparent look at what Rhema is doing under the hood: local texts, lexicons, grammar parsing, cross references, and saved study work. This is the little control-room window for the curious ones.</p>
+<p class="nerd-lead">A transparent look at what Rhema is doing under the hood: paired Greek and English texts, lexicons, grammar parsing, cross references, and saved study work. This is the little control-room window for the curious ones.</p>
 
 <div class="nerd-section nerd-hero-note">
 <strong>What makes Rhema different?</strong>
-<p>Rhema tries to put the text, the Greek form, the lexicons, the syntax, the English Bible, cross references, and your own notes in one calm flow. It is designed to help users compare evidence without forcing a theological conclusion for them.</p>
+<p>Rhema tries to put the Greek text, the matching English translation, the word forms, lexicons, syntax, cross references, and your own notes in one calm flow. The vision is not to force one manuscript tradition on the user, but to make the relationship visible: Majority Text Greek pairs naturally with the MSB (Majority Standard Bible), while Critical Text Greek pairs naturally with the BSB (Berean Standard Bible).</p>
+<p>That means the English button follows the Greek mode you are studying. In Majority Text mode, Rhema defaults to MSB so the English reading is aligned with the Byzantine/Majority tradition. If you switch to Critical Text mode, Rhema uses BSB so the English reading follows the critical-text tradition behind many modern translations. You can compare the differences without leaving the passage or breaking your study flow.</p>
 </div>
 
 <div class="nerd-section">
@@ -16390,12 +16391,12 @@ Verb Endings
 <div class="nerd-source-item">
 <span class="material-symbols-outlined">menu_book</span>
 <strong>Greek New Testament</strong>
-<p>Bundled local Greek NT data with word-level forms, lemmas, Strong's numbers, and morphology used for Rhema parsing and word lookup.</p>
+<p>Bundled local Greek NT data includes Majority Text and Critical Text views with word-level forms, lemmas, Strong's numbers, morphology, and variant markers where the two streams differ.</p>
 </div>
 <div class="nerd-source-item">
 <span class="material-symbols-outlined">translate</span>
 <strong>BSB / MSB Bible</strong>
-<p>Public-domain Berean Standard Bible and Majority Standard Bible text is bundled locally for English verse display, Cross References, Study Rhema, and offline reading support.</p>
+<p>Public-domain BSB (Berean Standard Bible) and MSB (Majority Standard Bible) text is bundled locally for English verse display, Cross References, Study Rhema, and offline reading support. MSB is the default partner for Majority Text; BSB is the partner for Critical Text.</p>
 </div>
 <div class="nerd-source-item">
 <span class="material-symbols-outlined">auto_stories</span>
@@ -16422,14 +16423,15 @@ Verb Endings
 <div class="nerd-section">
 <h3>Credits and source families</h3>
 <p><strong>Lexical credit:</strong> James Strong's numbering system, John Jeffrey Dodson's Greek-English gloss work, G. Abbott-Smith's manual Greek lexicon, and J. H. Moulton with George Milligan's vocabulary work are used as source families for Rhema's definitions and usage notes.</p>
-<p><strong>Bible and reference credit:</strong> The BSB and MSB are public-domain English Bible texts. Cross-reference data is built from public-domain and open cross-reference traditions, including OpenBible.info Cross References and Treasury of Scripture Knowledge-style datasets. Syntax work follows the kind of clause and phrase analysis used by open Greek NT projects such as Macula/Clear Bible data where available.</p>
+<p><strong>Bible and reference credit:</strong> The BSB and MSB are public-domain English Bible texts. MSB is used with the Majority Text stream, and BSB is used with the Critical Text stream, so Rhema can keep Greek and English aligned while still letting the user compare traditions. Cross-reference data is built from public-domain and open cross-reference traditions, including OpenBible.info Cross References and Treasury of Scripture Knowledge-style datasets. Syntax work follows the kind of clause and phrase analysis used by open Greek NT projects such as Macula/Clear Bible data where available.</p>
 </div>
 
 <div class="nerd-section nerd-flow">
 <h3>What happens when Rhema loads?</h3>
 <ol>
-<li>It loads local JavaScript datasets for the Bible text, Greek forms, lexicons, syntax, and cross references.</li>
+<li>It loads local JavaScript datasets for Majority Text Greek, Critical Text Greek, MSB, BSB, Greek forms, lexicons, syntax, and cross references.</li>
 <li>It indexes verse and word data in the browser so taps feel fast and much of the experience can work offline after caching.</li>
+<li>It keeps the paired English version in sync with the active Greek text: MSB with Majority Text by default, BSB with Critical Text when you switch.</li>
 <li>It saves personal material separately: notes, trails, progress, studies, reminders, and profile data belong to the user, not the public source datasets.</li>
 </ol>
 </div>
