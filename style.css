@@ -18056,23 +18056,14 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   opacity: 0.9;
 }
 
-body:has(#profilePage.screen.active),
-body:has(#communityPage.screen.active),
-html:has(#profilePage.screen.active),
-html:has(#communityPage.screen.active) {
-  background: var(--primary-color) !important;
-}
-
-body:has(#profilePage.screen.active) .app,
-body:has(#communityPage.screen.active) .app,
-body:has(#profilePage.screen.active) #profilePage.screen.active,
-body:has(#communityPage.screen.active) #communityPage.screen.active {
-  background: var(--primary-color) !important;
-  min-height: 100svh !important;
-}
-
 #newLearnMenu .lesson-text small,
-#basicVerbsLearnMenu .lesson-text small {
+#basicVerbsLearnMenu .lesson-text small,
+body #newLearnMenu.screen.active .learn-path-grid button .lesson-text small,
+body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-text small,
+body #newLearnMenu.screen.active .learn-path-grid button .lesson-est-time,
+body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time,
+body #newLearnMenu.screen.active .learn-path-grid button .lesson-est-time .material-symbols-outlined,
+body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time .material-symbols-outlined {
   color: #1f2937 !important;
   opacity: 0.96 !important;
   text-shadow: none !important;

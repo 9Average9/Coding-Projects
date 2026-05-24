@@ -16533,7 +16533,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.16";
+const APP_VERSION = "3.0.17";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -19392,12 +19392,14 @@ function _rhemaVariantMap(words, verse) {
       if (j >= b.length || (i < a.length && dp[i + 1][j] >= dp[i][j + 1])) i++;
       else j++;
     }
+    const currentPhrase = words.slice(startI, i).map(w => w[0]).join(' ').trim();
     const otherPhrase = otherWords.slice(startJ, j).map(w => w[0]).join(' ').trim();
-    if (!otherPhrase) continue;
+    if (!otherPhrase && !currentPhrase) continue;
     const label = _rhemaTextMode === 'critical' ? 'Majority' : 'Critical';
+    const text = otherPhrase || `omits ${currentPhrase}`;
     const from = startI < i ? startI : Math.max(0, startI - 1);
     const to = startI < i ? i : Math.min(words.length, from + 1);
-    for (let k = from; k < to; k++) variants[k] = { label, text: otherPhrase };
+    for (let k = from; k < to; k++) variants[k] = { label, text };
   }
   return variants;
 }
