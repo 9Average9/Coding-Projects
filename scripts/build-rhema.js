@@ -34,33 +34,33 @@ function fetchText(url, redirects = 0) {
 // ── Book mappings ─────────────────────────────────────────────────────────────
 
 const NT_BOOKS = [
-  { code: 'MAT', name: 'Matthew',          kjv: 'Matthew'          },
-  { code: 'MAR', name: 'Mark',             kjv: 'Mark'             },
-  { code: 'LUK', name: 'Luke',             kjv: 'Luke'             },
-  { code: 'JOH', name: 'John',             kjv: 'John'             },
-  { code: 'ACT', name: 'Acts',             kjv: 'Acts'             },
-  { code: 'ROM', name: 'Romans',           kjv: 'Romans'           },
-  { code: '1CO', name: '1 Corinthians',    kjv: '1Corinthians'     },
-  { code: '2CO', name: '2 Corinthians',    kjv: '2Corinthians'     },
-  { code: 'GAL', name: 'Galatians',        kjv: 'Galatians'        },
-  { code: 'EPH', name: 'Ephesians',        kjv: 'Ephesians'        },
-  { code: 'PHP', name: 'Philippians',      kjv: 'Philippians'      },
-  { code: 'COL', name: 'Colossians',       kjv: 'Colossians'       },
-  { code: '1TH', name: '1 Thessalonians',  kjv: '1Thessalonians'   },
-  { code: '2TH', name: '2 Thessalonians',  kjv: '2Thessalonians'   },
-  { code: '1TI', name: '1 Timothy',        kjv: '1Timothy'         },
-  { code: '2TI', name: '2 Timothy',        kjv: '2Timothy'         },
-  { code: 'TIT', name: 'Titus',            kjv: 'Titus'            },
-  { code: 'PHM', name: 'Philemon',         kjv: 'Philemon'         },
-  { code: 'HEB', name: 'Hebrews',          kjv: 'Hebrews'          },
-  { code: 'JAM', name: 'James',            kjv: 'James'            },
-  { code: '1PE', name: '1 Peter',          kjv: '1Peter'           },
-  { code: '2PE', name: '2 Peter',          kjv: '2Peter'           },
-  { code: '1JO', name: '1 John',           kjv: '1John'            },
-  { code: '2JO', name: '2 John',           kjv: '2John'            },
-  { code: '3JO', name: '3 John',           kjv: '3John'            },
-  { code: 'JUD', name: 'Jude',             kjv: 'Jude'             },
-  { code: 'REV', name: 'Revelation',       kjv: 'Revelation'       },
+  { code: 'MAT', name: 'Matthew',          source: 'Matthew'          },
+  { code: 'MAR', name: 'Mark',             source: 'Mark'             },
+  { code: 'LUK', name: 'Luke',             source: 'Luke'             },
+  { code: 'JOH', name: 'John',             source: 'John'             },
+  { code: 'ACT', name: 'Acts',             source: 'Acts'             },
+  { code: 'ROM', name: 'Romans',           source: 'Romans'           },
+  { code: '1CO', name: '1 Corinthians',    source: '1Corinthians'     },
+  { code: '2CO', name: '2 Corinthians',    source: '2Corinthians'     },
+  { code: 'GAL', name: 'Galatians',        source: 'Galatians'        },
+  { code: 'EPH', name: 'Ephesians',        source: 'Ephesians'        },
+  { code: 'PHP', name: 'Philippians',      source: 'Philippians'      },
+  { code: 'COL', name: 'Colossians',       source: 'Colossians'       },
+  { code: '1TH', name: '1 Thessalonians',  source: '1Thessalonians'   },
+  { code: '2TH', name: '2 Thessalonians',  source: '2Thessalonians'   },
+  { code: '1TI', name: '1 Timothy',        source: '1Timothy'         },
+  { code: '2TI', name: '2 Timothy',        source: '2Timothy'         },
+  { code: 'TIT', name: 'Titus',            source: 'Titus'            },
+  { code: 'PHM', name: 'Philemon',         source: 'Philemon'         },
+  { code: 'HEB', name: 'Hebrews',          source: 'Hebrews'          },
+  { code: 'JAM', name: 'James',            source: 'James'            },
+  { code: '1PE', name: '1 Peter',          source: '1Peter'           },
+  { code: '2PE', name: '2 Peter',          source: '2Peter'           },
+  { code: '1JO', name: '1 John',           source: '1John'            },
+  { code: '2JO', name: '2 John',           source: '2John'            },
+  { code: '3JO', name: '3 John',           source: '3John'            },
+  { code: 'JUD', name: 'Jude',             source: 'Jude'             },
+  { code: 'REV', name: 'Revelation',       source: 'Revelation'       },
 ];
 
 // ── Parse RP2018 CSV ──────────────────────────────────────────────────────────
@@ -181,17 +181,6 @@ function parseCcatCsv(csvText) {
 }
 
 
-function parseKjvBook(bookJson) {
-  const result = {};
-  for (const ch of bookJson.chapters) {
-    const chNum = String(ch.chapter);
-    result[chNum] = {};
-    for (const v of ch.verses) {
-      result[chNum][String(v.verse)] = v.text;
-    }
-  }
-  return result;
-}
 
 // ── Parse TBESG (Abbott-Smith via STEPBible, CC BY 4.0) ──────────────────────
 // Format: tab-separated, lines starting with G[0-9] are entries
@@ -352,23 +341,6 @@ async function main() {
   // 4c. Moulton-Milligan (optional public-domain source)
   const moultonMilligan = loadMoultonMilligan();
 
-  // 5. KJV NT
-  console.log('\nDownloading KJV New Testament...');
-  const kjvText = {};
-  const KJV_BASE = 'https://raw.githubusercontent.com/aruljohn/Bible-kjv/master/';
-
-  for (const book of NT_BOOKS) {
-    process.stdout.write(`  ${book.kjv}... `);
-    try {
-      const raw = await fetchText(`${KJV_BASE}${book.kjv}.json`);
-      const bookData = JSON.parse(raw);
-      kjvText[book.code] = parseKjvBook(bookData);
-      process.stdout.write('✓\n');
-    } catch (e) {
-      process.stdout.write(`✗ ${e.message}\n`);
-    }
-  }
-
   // 5. Occurrences
   console.log('\nComputing occurrences...');
   const occ = computeOccurrences(ntText);
@@ -405,15 +377,12 @@ async function main() {
 
   const ntJs  = `window.RhemaNT = ${JSON.stringify({ books: bookOrder, names: bookNames, text: ntText })};`;
   const lexJs = `window.RhemaLexicon = ${JSON.stringify(lexicon)};\nwindow.RhemaOcc = ${JSON.stringify(occ)};`;
-  const kjvJs = `window.RhemaKJV = ${JSON.stringify(kjvText)};`;
 
   fs.writeFileSync(path.join(OUT_DIR, 'rhema-nt.js'),      ntJs);
   fs.writeFileSync(path.join(OUT_DIR, 'rhema-lexicon.js'), lexJs);
-  fs.writeFileSync(path.join(OUT_DIR, 'rhema-kjv.js'),     kjvJs);
 
   console.log(`  rhema-nt.js      ${(ntJs.length  / 1024 / 1024).toFixed(2)} MB`);
   console.log(`  rhema-lexicon.js ${(lexJs.length / 1024 / 1024).toFixed(2)} MB`);
-  console.log(`  rhema-kjv.js     ${(kjvJs.length / 1024 / 1024).toFixed(2)} MB`);
   console.log('\nDone!');
 }
 

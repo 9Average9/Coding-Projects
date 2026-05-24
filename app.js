@@ -8424,12 +8424,12 @@ function closeStudySandbox() {
     _rhemaChapter    = _studySandboxMainRhemaPos.chapter;
     _rhemaVerse      = _studySandboxMainRhemaPos.verse;
     _rhemaSyntaxMode = _studySandboxMainRhemaPos.syntaxMode || false;
-    _rhemaShowKjv    = _studySandboxMainRhemaPos.showKjv    || false;
+    _rhemaShowEnglish    = _studySandboxMainRhemaPos.showEnglish    || false;
     _rhemaGreekOnly  = _studySandboxMainRhemaPos.greekOnly  || false;
     _studySandboxMainRhemaPos = null;
   } else {
     _rhemaSyntaxMode = false;
-    _rhemaShowKjv = false;
+    _rhemaShowEnglish = false;
     _rhemaGreekOnly = false;
   }
   _rhemaPosHighlights.clear();
@@ -8527,14 +8527,14 @@ function switchWorkspaceTab(type) {
 
 function _updateWsVerseDisplay() {
   const refEl = document.getElementById('wsVerseRef');
-  const kjvEl = document.getElementById('wsVerseKjv');
+  const EnglishEl = document.getElementById('wsVerseEnglish');
   if (!refEl) return;
   const bookName = _rhemaBookName(_rhemaBook) || '';
   refEl.textContent = (bookName && _rhemaChapter && _rhemaVerse)
     ? `${bookName} ${_rhemaChapter}:${_rhemaVerse}` : '';
-  if (kjvEl) {
-    kjvEl.textContent = (window.RhemaKJV && _rhemaBook && _rhemaChapter && _rhemaVerse)
-      ? ((window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '') : '';
+  if (EnglishEl) {
+    EnglishEl.textContent = (_rhemaBook && _rhemaChapter && _rhemaVerse)
+      ? _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse) : '';
   }
 }
 
@@ -8668,7 +8668,7 @@ function openWritingModal(type) {
   if (icon) icon.textContent = meta.icon;
   if (name) name.textContent = meta.name;
   if (chip) chip.style.color = meta.color;
-  // Verse card + KJV
+  // Verse card + English
   _updateSwmVerseDisplay();
   // Clear textarea
   const ta = document.getElementById('swmTextarea');
@@ -8681,7 +8681,7 @@ function openWritingModal(type) {
 
 function _updateSwmVerseDisplay() {
   const card = document.getElementById('swmVerseCard');
-  const kjv = document.getElementById('swmKjvText');
+  const English = document.getElementById('swmEnglishText');
   if (card) {
     const bookName = _rhemaBookName(_swmDisplayBook);
     const words = (_rhemaText()[_swmDisplayBook] || {})[_swmDisplayChapter]?.[_swmDisplayVerse] || [];
@@ -8689,9 +8689,9 @@ function _updateSwmVerseDisplay() {
     card.innerHTML = `<div class="swm-verse-ref">${bookName} ${_swmDisplayChapter}:${_swmDisplayVerse}</div>
       <div class="swm-verse-text">${snippet}${words.length > 14 ? '…' : ''}</div>`;
   }
-  if (kjv) {
-    kjv.textContent = (window.RhemaKJV && _swmDisplayBook && _swmDisplayChapter && _swmDisplayVerse)
-      ? ((window.RhemaKJV[_swmDisplayBook] || {})[_swmDisplayChapter]?.[_swmDisplayVerse] || '') : '';
+  if (English) {
+    English.textContent = (_swmDisplayBook && _swmDisplayChapter && _swmDisplayVerse)
+      ? _rhemaEnglishText(_swmDisplayBook, _swmDisplayChapter, _swmDisplayVerse) : '';
   }
 }
 
@@ -9133,11 +9133,11 @@ function jumpToRhemaFromStudy(book, chapter, verse) {
   if (!_studySandboxMainRhemaPos) {
     _studySandboxMainRhemaPos = {
       book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse,
-      syntaxMode: _rhemaSyntaxMode, showKjv: _rhemaShowKjv, greekOnly: _rhemaGreekOnly
+      syntaxMode: _rhemaSyntaxMode, showEnglish: _rhemaShowEnglish, greekOnly: _rhemaGreekOnly
     };
   }
   _rhemaBook = book; _rhemaChapter = chapter; _rhemaVerse = verse;
-  _rhemaSyntaxMode = false; _rhemaShowKjv = false; _rhemaGreekOnly = false;
+  _rhemaSyntaxMode = false; _rhemaShowEnglish = false; _rhemaGreekOnly = false;
   document.getElementById('rhemaSaveToStudyBtn')?.classList.remove('hidden');
   // Switch sandbox tab indicator to Rhema without resetting position
   _sandboxTab = 'rhema';
@@ -9245,11 +9245,11 @@ function openSandboxRhema() {
   // Stash the main Rhema position AND modes so we can restore them when sandbox closes
   _studySandboxMainRhemaPos = {
     book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse,
-    syntaxMode: _rhemaSyntaxMode, showKjv: _rhemaShowKjv, greekOnly: _rhemaGreekOnly
+    syntaxMode: _rhemaSyntaxMode, showEnglish: _rhemaShowEnglish, greekOnly: _rhemaGreekOnly
   };
   // Start study Rhema clean — no modes carry in from main
   _rhemaSyntaxMode = false;
-  _rhemaShowKjv = false;
+  _rhemaShowEnglish = false;
   _rhemaGreekOnly = false;
   _rhemaPosHighlights.clear();
   _rhemaHighlightBarOn = false;
@@ -9906,7 +9906,7 @@ function _saveRhemaPosition() {
     }, 2000);
     return;
   }
-  const verseSnippet = window.RhemaKJV ? ((window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '') : '';
+  const verseSnippet = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
   const greekSnippet = _rhemaData() ? (((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {})[_rhemaVerse] || []).map(w => w[0]).join(' ') : '';
   const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, textMode: _rhemaTextMode, ts: Date.now(), snippet: verseSnippet, greek: greekSnippet };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
@@ -16757,7 +16757,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.28";
+const APP_VERSION = "3.0.29";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -16925,7 +16925,7 @@ const UPDATE_NOTES_HTML = `
   <ul class="un-list">
     <li><strong>Study Workspace</strong> — Your studies now have a full Workspace tab (Observe, Interpret, Apply, Question). Long-press any verse in Rhema while a study is open to capture a thought. Greek verse and English translation appear together for comparison as you navigate.</li>
     <li><strong>Greek keyboard in Workspace</strong> — Tap the α button in the workspace note compose area to toggle a Greek character keyboard for typing directly in Greek.</li>
-    <li><strong>Writing modal improvement</strong> — English (KJV) verse now appears below the Greek verse in the writing modal. Use the left/right arrows to navigate verses and compare Greek and English side by side.</li>
+    <li><strong>Writing modal improvement</strong> — English verse text now appears below the Greek verse in the writing modal. Use the left/right arrows to navigate verses and compare Greek and English side by side.</li>
     <li><strong>Rhema coach — one time only</strong> — The Rhema and Syntax onboarding coach now shows only once per device. It won't keep reappearing after you've completed it.</li>
     <li><strong>Coach back button</strong> — Added a Back button to the coach walkthrough so you can revisit previous steps.</li>
     <li><strong>Sheet close buttons</strong> — Every bottom sheet now has an ✕ close button for accessibility, in addition to swipe-to-dismiss.</li>
@@ -18850,7 +18850,7 @@ let _rhemaLoading = false;
 let _rhemaBook = 'JOH';
 let _rhemaChapter = '3';
 let _rhemaVerse = '16';
-let _rhemaShowKjv    = false;
+let _rhemaShowEnglish    = false;
 let _rhemaGreekOnly  = false;
 let _rhemaSyntaxMode = false;
 let _rhemaTextMode = localStorage.getItem('rhemaTextMode') === 'critical' ? 'critical' : 'majority';
@@ -18865,6 +18865,42 @@ let _rhemaFullChapter = false;
 const RHEMA_OT_BOOK_ORDER = ['GEN','EXO','LEV','NUM','DEU','JOS','JDG','RUT','1SA','2SA','1KI','2KI','1CH','2CH','EZR','NEH','EST','JOB','PSA','PRO','ECC','SNG','ISA','JER','LAM','EZK','DAN','HOS','JOL','AMO','OBA','JON','MIC','NAM','HAB','ZEP','HAG','ZEC','MAL'];
 const RHEMA_NT_BOOK_ORDER = ['MAT','MAR','LUK','JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV'];
 const RHEMA_BOOK_ORDER = [...RHEMA_OT_BOOK_ORDER, ...RHEMA_NT_BOOK_ORDER];
+
+function _rhemaEnglishVersion() {
+  return _rhemaTextMode === 'critical' ? 'BSB' : 'MSB';
+}
+
+function _rhemaEnglishLabel(version = _rhemaEnglishVersion()) {
+  return version === 'BSB' ? 'BSB' : 'MSB';
+}
+
+function _rhemaEnglishData(version = _rhemaEnglishVersion()) {
+  return version === 'BSB' ? window.RhemaBSB : window.RhemaMSB;
+}
+
+function _rhemaEnglishText(book, chapter, verse, version = _rhemaEnglishVersion()) {
+  return ((_rhemaEnglishData(version)?.[book] || {})[String(chapter)] || {})[String(verse)] || '';
+}
+
+function _rhemaEnglishRangeText(refOrObj, version = _rhemaEnglishVersion()) {
+  const parsed = typeof refOrObj === 'string' && typeof _xrefParseRef === 'function'
+    ? _xrefParseRef(refOrObj)
+    : refOrObj;
+  if (!parsed) return '';
+  const start = Number(parsed.verse);
+  const end = Number(parsed.endVerse || parsed.verse);
+  const verses = [];
+  for (let v = start; v <= end; v++) {
+    const text = _rhemaEnglishText(parsed.book, parsed.chapter, v, version);
+    if (text) verses.push(text);
+  }
+  return verses.join(' ');
+}
+
+function _syncRhemaEnglishAlias() {
+  window.RhemaEnglish = _rhemaEnglishData();
+  window.RhemaEnglishBooks = window.RhemaEnglishBooks || window.RhemaMSBBooks || window.RhemaBSBBooks || [];
+}
 
 const RHEMA_BOOK_ABBR = {
   GEN:'Ge', EXO:'Ex', LEV:'Le', NUM:'Nu', DEU:'Dt', JOS:'Jos', JDG:'Jdg',
@@ -19221,14 +19257,14 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-critical.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
+    const files = ['rhema-nt.js', 'rhema-critical.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-msb.js', 'rhema-bsb.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
       s.src = file + '?v=' + APP_VERSION;
       s.onload = () => {
         loaded++;
-        if (loaded === files.length) { _ensureRhemaBibleData(); _rhemaLoaded = true; resolve(); }
+        if (loaded === files.length) { _syncRhemaEnglishAlias(); _ensureRhemaBibleData(); _rhemaLoaded = true; resolve(); }
       };
       s.onerror = () => {
         if (!failed) { failed = true; reject(new Error('Failed to load ' + file)); }
@@ -19286,14 +19322,14 @@ function closeRhema(keepSandbox = false) {
         _rhemaChapter = _studySandboxMainRhemaPos.chapter;
         _rhemaVerse   = _studySandboxMainRhemaPos.verse;
         _rhemaSyntaxMode = _studySandboxMainRhemaPos.syntaxMode || false;
-        _rhemaShowKjv    = _studySandboxMainRhemaPos.showKjv    || false;
+        _rhemaShowEnglish    = _studySandboxMainRhemaPos.showEnglish    || false;
         _rhemaGreekOnly  = _studySandboxMainRhemaPos.greekOnly  || false;
         _studySandboxMainRhemaPos = null;
       }
     } else {
       // Tab-switch within study (keepSandbox=true) — reset modes for isolation
       _rhemaSyntaxMode = false;
-      _rhemaShowKjv = false;
+      _rhemaShowEnglish = false;
       _rhemaGreekOnly = false;
     }
     if (!keepSandbox) _studySandboxId = null;
@@ -19716,6 +19752,10 @@ function _rhemaVariantMap(words, verse) {
 function showRhemaVariant(label, text) {
   const toast = document.getElementById('rhemaChapterToast');
   if (!toast) return;
+  toast.classList.add('hidden');
+  toast.style.animation = 'none';
+  void toast.offsetWidth;
+  toast.style.animation = '';
   toast.textContent = `${label}: ${text}`;
   toast.classList.remove('hidden');
   clearTimeout(showRhemaVariant._timer);
@@ -19765,7 +19805,7 @@ function renderRhemaVerse() {
   closeRhemaSyntaxSheet();
 
   const display = document.getElementById('rhemaVerseDisplay');
-  const kjvDiv  = document.getElementById('rhemaKjvDisplay');
+  const EnglishDiv  = document.getElementById('rhemaEnglishDisplay');
   if (!display) return;
 
   if (_rhemaFullChapter) {
@@ -19786,13 +19826,12 @@ function renderRhemaVerse() {
              `<div class="rhema-chapter-verse-label">${vn}</div>` + inner + `</div>`;
     }).join('');
 
-    if (kjvDiv && window.RhemaKJV) {
-      const kjvChap = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter] || {};
-      kjvDiv.innerHTML = _rhemaSyntaxMode ? '' : verseNums.map(vn => {
+    if (EnglishDiv) {
+      EnglishDiv.innerHTML = _rhemaSyntaxMode ? '' : verseNums.map(vn => {
         const v = String(vn);
         return `<div class="rhema-chapter-block" data-verse="${v}">` +
                `<div class="rhema-chapter-verse-label">${vn}</div>` +
-               `<div class="rhema-chapter-kjv">${kjvChap[v] || ''}</div></div>`;
+               `<div class="rhema-chapter-english">${_rhemaEnglishText(_rhemaBook, _rhemaChapter, v)}</div></div>`;
       }).join('');
     }
 
@@ -19807,13 +19846,13 @@ function renderRhemaVerse() {
     if (_rhemaSyntaxMode) {
       display.classList.remove('greek-only');
       display.innerHTML = _renderSyntaxView(words, null);
-      if (kjvDiv) kjvDiv.innerHTML = '';
+      if (EnglishDiv) EnglishDiv.innerHTML = '';
       requestAnimationFrame(() => _initDiagramScroll(display.querySelector('.rsx-diagram')));
     } else {
       display.classList.toggle('greek-only', _rhemaGreekOnly);
       display.innerHTML = _renderVerseWords(words, null);
-      if (kjvDiv && window.RhemaKJV) {
-        kjvDiv.textContent = (window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '';
+      if (EnglishDiv) {
+        EnglishDiv.textContent = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
       }
     }
   }
@@ -19827,8 +19866,8 @@ function renderRhemaVerse() {
   if (_studySandboxId) _initStudyLongPress();
 }
 
-function toggleRhemaKjv() {
-  _rhemaShowKjv = !_rhemaShowKjv;
+function toggleRhemaEnglish() {
+  _rhemaShowEnglish = !_rhemaShowEnglish;
   updateRhemaSwapVisibility();
   closeRhemaSheet();
 }
@@ -19848,6 +19887,7 @@ function toggleRhemaTextMode() {
   }
   _rhemaTextMode = _rhemaTextMode === 'critical' ? 'majority' : 'critical';
   localStorage.setItem('rhemaTextMode', _rhemaTextMode);
+  _syncRhemaEnglishAlias();
   _syncRhemaTextModeBtn();
   _syncToolWandIndicator();
   renderRhemaVerse();
@@ -19971,7 +20011,7 @@ const APP_WELCOME_COACH_STEPS = [
   { before: () => { showNavPage('community'); showLbTab('scholar'); }, target: () => _coachFirst(['button[data-tab="scholar"]', '#lbPaneScholar']), title: 'Scholar board', body: 'The Scholar board highlights careful practice quality, not just activity. It gives deeper testing and review work its own place.' },
   { before: () => showNavPage('home'), target: () => _coachFirst(['.home-actions-grid', '#notifBtn']), title: 'Home quick actions', body: 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live.' },
   { target: () => _coachFirst(['#homeStudiesSection', '.hs-start-btn']), title: 'Create studies here', body: 'Your Studies is where you make focused study spaces. A study can hold Rhema work, saved verses, word logs, scripture trails, and notes.' },
-  { target: () => _coachFirst(['#homeContinueCard', '#homeContinueEmpty']), title: 'Rhema lives close by', body: 'Rhema is the Greek word-study reader. You can open a passage, tap words, compare KJV, use syntax, and explore cross references. Rhema has its own first-time coach when opened.' },
+  { target: () => _coachFirst(['#homeContinueCard', '#homeContinueEmpty']), title: 'Rhema lives close by', body: 'Rhema is the Greek word-study reader. You can open a passage, tap words, compare English, use syntax, and explore cross references. Rhema has its own first-time coach when opened.' },
   { before: () => showNavPage('profile'), target: () => _coachFirst(['#profileJourneySection', '.profile-action-row', '.profile-header']), title: 'Profile tracks your journey', body: 'Your profile keeps XP, rank, streak, lesson progress, known words, translation attempts, achievements, settings, reminders, and reset controls.' }
 ];
 
@@ -21317,13 +21357,16 @@ function toggleRhemaChapterMode() {
 
 function updateRhemaSwapVisibility() {
   const gr  = document.getElementById('rhemaVerseDisplay');
-  const kjv = document.getElementById('rhemaKjvDisplay');
+  const English = document.getElementById('rhemaEnglishDisplay');
   const btn = document.getElementById('rhemaSwapBtn');
   const hint = document.getElementById('rhemaTapHint');
-  if (gr)   gr.classList.toggle('hidden', _rhemaShowKjv);
-  if (kjv)  kjv.classList.toggle('hidden', !_rhemaShowKjv);
-  if (btn)  btn.classList.toggle('active', _rhemaShowKjv);
-  if (hint) hint.classList.toggle('hidden', _rhemaShowKjv);
+  if (gr)   gr.classList.toggle('hidden', _rhemaShowEnglish);
+  if (English)  English.classList.toggle('hidden', !_rhemaShowEnglish);
+  if (btn) {
+    btn.textContent = _rhemaEnglishLabel();
+    btn.classList.toggle('active', _rhemaShowEnglish);
+  }
+  if (hint) hint.classList.toggle('hidden', _rhemaShowEnglish);
 }
 
 // ── Word detail sheet ─────────────────────────────────────────────────────────
@@ -21695,7 +21738,7 @@ function renderRhemaDefinition(strongs) {
     sections.push(`<div class="rhema-def-section">
       <div class="rhema-def-label">Strong's Definition</div>
       <div class="rhema-def-text">${lex.strongs_def}</div>
-      ${lex.kjv_def ? `<div class="rhema-def-kjv">KJV: ${lex.kjv_def}</div>` : ''}
+      ${lex.kjv_def ? `<div class="rhema-def-english">Glosses: ${lex.kjv_def}</div>` : ''}
     </div>`);
   }
 
@@ -21752,7 +21795,7 @@ function renderRhemaOccurrences(strongs) {
 let _rhemaBVCode    = null;
 let _rhemaBVStrongs = null;
 let _rhemaBVRefs    = [];
-let _rhemaBVKjv     = false;
+let _rhemaBVEnglish     = false;
 
 function openRhemaBookVerses(code, strongs) {
   const bookText = (_rhemaText() || {})[code];
@@ -21775,28 +21818,28 @@ function openRhemaBookVerses(code, strongs) {
   _rhemaBVCode    = code;
   _rhemaBVStrongs = strongs;
   _rhemaBVRefs    = refs;
-  _rhemaBVKjv     = false;
+  _rhemaBVEnglish     = false;
   renderRhemaBookVerses();
 }
 
-function toggleRhemaBookViewKjv() {
-  _rhemaBVKjv = !_rhemaBVKjv;
+function toggleRhemaBookViewEnglish() {
+  _rhemaBVEnglish = !_rhemaBVEnglish;
   renderRhemaBookVerses();
 }
 
-function _kjvHighlight(kjvText, strongs) {
+function _EnglishHighlight(EnglishText, strongs) {
   const lex = (window.RhemaLexicon || {})[strongs] || {};
   const raw = (lex.kjv_def || '').replace(/^-+/, '').trim();
-  if (!raw) return kjvText;
+  if (!raw) return EnglishText;
   // Try full phrase then first word; skip tiny function words
   const candidates = [raw, raw.split(' ')[0]].filter(c => c.length > 2);
   for (const term of candidates) {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const re = new RegExp(`\\b(${escaped}\\w{0,4})\\b`, 'i');
-    const result = kjvText.replace(re, '<span class="xref-match">$1</span>');
-    if (result !== kjvText) return result;
+    const result = EnglishText.replace(re, '<span class="xref-match">$1</span>');
+    if (result !== EnglishText) return result;
   }
-  return kjvText;
+  return EnglishText;
 }
 
 function renderRhemaBookVerses() {
@@ -21807,9 +21850,9 @@ function renderRhemaBookVerses() {
 
   const rows = refs.map(({ ch, v, wordIdx, words }) => {
     let previewHtml;
-    if (_rhemaBVKjv) {
-      const raw = (window.RhemaKJV?.[code]?.[ch]?.[v]) || '';
-      const highlighted = _kjvHighlight(raw, strongs);
+    if (_rhemaBVEnglish) {
+      const raw = _rhemaEnglishText(code, ch, v);
+      const highlighted = _EnglishHighlight(raw, strongs);
       previewHtml = `<span class="rhema-xref-verse-text">${highlighted}</span>`;
     } else {
       const start = Math.max(0, wordIdx - 3);
@@ -21827,12 +21870,12 @@ function renderRhemaBookVerses() {
 
   const content = document.getElementById('rhemaTabContent');
   if (!content) return;
-  const kjvCls = `rhema-xref-kjv-btn${_rhemaBVKjv ? ' active' : ''}`;
+  const EnglishCls = `rhema-xref-english-btn${_rhemaBVEnglish ? ' active' : ''}`;
   content.innerHTML = `
     <div class="rhema-xref-header">
       <button class="rhema-xref-back-btn" onclick="showRhemaTab('occurrences')">← Occurrences</button>
       <span class="rhema-xref-title">${bookName} · ${refs.length} verse${refs.length !== 1 ? 's' : ''}</span>
-      <button class="${kjvCls}" onclick="toggleRhemaBookViewKjv()">KJV</button>
+      <button class="${EnglishCls}" onclick="toggleRhemaBookViewEnglish()">${_rhemaEnglishLabel()}</button>
     </div>
     <div>${rows}</div>`;
 }

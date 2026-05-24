@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.28" rel="stylesheet"/>
+<link href="style.css?v=3.0.29" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8608,7 +8608,7 @@ Verb Endings
 <strong>Rhēma — NT Word Study</strong>
 <span>Rhēma (ῥῆμα) means the specific word spoken — and that is what this feature is about. Open any verse across all 27 NT books and tap any Greek word to instantly see:</span>
 <span style="margin-top:6px;display:block">Full grammatical parsing · Root word &amp; transliteration · Two lexicons (Strong's &amp; Dodson) · Etymology · Every NT verse where that word appears — with cross-reference jumping and a navigation trail.</span>
-<span style="margin-top:8px;display:block">Tools like <strong>Bible Hub</strong> and <strong>Blue Letter Bible</strong> are excellent and worth using alongside this — they have broader commentary, maps, and cross-Bible comparisons. The key difference: Rhēma is built into this app, works completely offline after the first load, and is built on the <strong>Byzantine Majority Text</strong> — the manuscript tradition represented by over 80% of surviving Greek manuscripts and behind the KJV and NKJV. Most web tools use the Critical Text (Nestle-Aland). Neither is wrong — they are different traditions, and it matters to know which one you are working from.</span>
+<span style="margin-top:8px;display:block">Tools like <strong>Bible Hub</strong> and <strong>Blue Letter Bible</strong> are excellent and worth using alongside this — they have broader commentary, maps, and cross-Bible comparisons. The key difference: Rhēma is built into this app, works completely offline after the first load, and is built on the <strong>Byzantine Majority Text</strong> — the manuscript tradition represented by over 80% of surviving Greek manuscripts and represented in Majority Text editions. Most web tools use the Critical Text (Nestle-Aland). Neither is wrong — they are different traditions, and it matters to know which one you are working from.</span>
 </div>
 <div>
 <strong>What Makes Rhema Special</strong>
@@ -9334,7 +9334,7 @@ Verb Endings
 <span class="material-symbols-outlined">auto_fix_high</span>
 <span class="rhema-tool-dot"></span>
 </button>
-<button class="rhema-swap-btn" id="rhemaSwapBtn" onclick="toggleRhemaKjv()">KJV</button>
+<button class="rhema-swap-btn" id="rhemaSwapBtn" onclick="toggleRhemaEnglish()">MSB</button>
 </div>
 </div>
 <div class="rhema-picker">
@@ -9372,7 +9372,7 @@ Verb Endings
 <div class="rhema-content-area">
 <div class="rhema-loading" id="rhemaLoadingMsg">Loading Rhēma data…</div>
 <div class="rhema-verse-display" id="rhemaVerseDisplay"></div>
-<div class="rhema-kjv-display hidden" id="rhemaKjvDisplay"></div>
+<div class="rhema-english-display hidden" id="rhemaEnglishDisplay"></div>
 </div>
 </div>
 <!-- Verse nav: last flex child of #rhemaSlide — always at physical screen bottom -->
@@ -15499,8 +15499,8 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.28"></script>
-<script src="rhema-crossrefs-ui.js?v=3.0.8"></script>
+<script src="app.js?v=3.0.29"></script>
+<script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
 <script src="firebase-lb.js?v=3.0.25" type="module"></script>
 <!-- Leaderboard Intro Modal -->
@@ -15748,7 +15748,7 @@ Verb Endings
 <div class="swm-verse-card" id="swmVerseCard"></div>
 <div class="swm-verse-nav-row">
 <button class="swm-verse-arrow" onclick="swmNavVerse(-1)"><span class="material-symbols-outlined">chevron_left</span></button>
-<div class="swm-kjv-text" id="swmKjvText"></div>
+<div class="swm-english-text" id="swmEnglishText"></div>
 <button class="swm-verse-arrow" onclick="swmNavVerse(1)"><span class="material-symbols-outlined">chevron_right</span></button>
 </div>
 <div class="swm-body">
@@ -16394,8 +16394,8 @@ Verb Endings
 </div>
 <div class="nerd-source-item">
 <span class="material-symbols-outlined">translate</span>
-<strong>KJV Bible</strong>
-<p>Public-domain King James Version text is bundled locally for English verse display, Cross References, Study Rhema, and offline reading support.</p>
+<strong>BSB / MSB Bible</strong>
+<p>Public-domain Berean Standard Bible and Majority Standard Bible text is bundled locally for English verse display, Cross References, Study Rhema, and offline reading support.</p>
 </div>
 <div class="nerd-source-item">
 <span class="material-symbols-outlined">auto_stories</span>
@@ -16422,7 +16422,7 @@ Verb Endings
 <div class="nerd-section">
 <h3>Credits and source families</h3>
 <p><strong>Lexical credit:</strong> James Strong's numbering system, John Jeffrey Dodson's Greek-English gloss work, G. Abbott-Smith's manual Greek lexicon, and J. H. Moulton with George Milligan's vocabulary work are used as source families for Rhema's definitions and usage notes.</p>
-<p><strong>Bible and reference credit:</strong> The KJV is public domain. Cross-reference data is built from public-domain and open cross-reference traditions, including OpenBible.info Cross References and Treasury of Scripture Knowledge-style datasets. Syntax work follows the kind of clause and phrase analysis used by open Greek NT projects such as Macula/Clear Bible data where available.</p>
+<p><strong>Bible and reference credit:</strong> The BSB and MSB are public-domain English Bible texts. Cross-reference data is built from public-domain and open cross-reference traditions, including OpenBible.info Cross References and Treasury of Scripture Knowledge-style datasets. Syntax work follows the kind of clause and phrase analysis used by open Greek NT projects such as Macula/Clear Bible data where available.</p>
 </div>
 
 <div class="nerd-section nerd-flow">

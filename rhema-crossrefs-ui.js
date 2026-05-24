@@ -7,10 +7,24 @@ const RHEMA_XREF_CATEGORIES = [
 ];
 
 let _rhemaXrefCursor = 0;
+let _rhemaXrefEnglishVersion = null;
+
+function _xrefEnglishVersion() {
+  return _rhemaXrefEnglishVersion || (typeof _rhemaEnglishVersion === 'function' ? _rhemaEnglishVersion() : 'MSB');
+}
+
+function _xrefEnglishData(version = _xrefEnglishVersion()) {
+  if (typeof _rhemaEnglishData === 'function') return _rhemaEnglishData(version);
+  return version === 'BSB' ? window.RhemaBSB : window.RhemaMSB;
+}
+
+function _xrefEnglishLabel(version = _xrefEnglishVersion()) {
+  return version === 'BSB' ? 'BSB' : 'MSB';
+}
 
 function _xrefBookList() {
-  if (Array.isArray(window.RhemaKJVBooks) && window.RhemaKJVBooks.length) return window.RhemaKJVBooks;
-  return Object.keys(window.RhemaKJV || {}).map(code => ({
+  if (Array.isArray(window.RhemaEnglishBooks) && window.RhemaEnglishBooks.length) return window.RhemaEnglishBooks;
+  return Object.keys(_xrefEnglishData() || {}).map(code => ({
     code,
     name: window.RhemaBookNames?.[code] || window.RhemaNT?.names?.[code] || code,
     testament: (window.RhemaNTBookOrder || []).includes(code) ? 'NT' : 'OT'
@@ -18,7 +32,7 @@ function _xrefBookList() {
 }
 
 function _xrefBookName(code) {
-  return window.RhemaBookNames?.[code] || window.RhemaKJVBooks?.find(b => b.code === code)?.name || window.RhemaNT?.names?.[code] || code;
+  return window.RhemaBookNames?.[code] || window.RhemaEnglishBooks?.find(b => b.code === code)?.name || window.RhemaNT?.names?.[code] || code;
 }
 
 function _xrefParseRef(ref) {
@@ -37,10 +51,10 @@ function _xrefDisplay(ref) {
   return `${_xrefBookName(parsed.book)} ${parsed.chapter}:${parsed.verse}${parsed.endVerse ? '-' + parsed.endVerse : ''}`;
 }
 
-function _xrefKjvText(refOrObj) {
+function _xrefEnglishText(refOrObj) {
   const p = typeof refOrObj === 'string' ? _xrefParseRef(refOrObj) : refOrObj;
-  if (!p || !window.RhemaKJV) return '';
-  const chapter = (window.RhemaKJV[p.book] || {})[String(p.chapter)] || {};
+  if (!p) return '';
+  const chapter = (_xrefEnglishData()?.[p.book] || {})[String(p.chapter)] || {};
   const start = Number(p.verse);
   const end = Number(p.endVerse || p.verse);
   const verses = [];
@@ -83,6 +97,7 @@ function _xrefEscape(value) {
 async function openRhemaCrossReferences(forceCoach = false) {
   closeRhemaWheel();
   await loadRhemaScripts();
+  _rhemaXrefEnglishVersion = typeof _rhemaEnglishVersion === 'function' ? _rhemaEnglishVersion() : 'MSB';
   _rhemaXrefActive = { book: _rhemaBook || 'JOH', chapter: _rhemaChapter || '1', verse: _rhemaVerse || '1' };
   _rhemaXrefBreadcrumb = [_xrefKey(_rhemaXrefActive)];
   _rhemaXrefCursor = 0;
@@ -91,6 +106,12 @@ async function openRhemaCrossReferences(forceCoach = false) {
   setTimeout(() => {
     if (typeof startCrossRefCoach === 'function') startCrossRefCoach(forceCoach);
   }, 160);
+}
+
+function setRhemaXrefEnglishVersion(version) {
+  _rhemaXrefEnglishVersion = version === 'BSB' ? 'BSB' : 'MSB';
+  if (_rhemaXrefView === 'trail') renderRhemaXrefTrail();
+  else renderRhemaCrossReferences();
 }
 
 function _showRhemaXrefShell(view) {
@@ -113,10 +134,13 @@ function _xrefTopCardHtml() {
   return `<div class="rx-top-card" role="button" tabindex="0" onclick="openRhemaCrossRefSelect()" onkeydown="if(event.key==='Enter'||event.key===' ')openRhemaCrossRefSelect()">
     <div class="rx-top-card-copy">
       <h3>${_xrefEscape(_xrefDisplay(ref))}</h3>
-      <p>${_xrefEscape(_xrefKjvText(_rhemaXrefActive))}</p>
+      <p>${_xrefEscape(_xrefEnglishText(_rhemaXrefActive))}</p>
       <span class="rx-change"><span class="material-symbols-outlined">touch_app</span>Tap to change verse</span>
     </div>
     <span class="material-symbols-outlined rx-top-watermark">auto_stories</span>
+  </div>
+  <div class="rx-translation-toggle" aria-label="English translation">
+    ${['MSB', 'BSB'].map(version => `<button class="${_xrefEnglishVersion() === version ? 'active' : ''}" onclick="setRhemaXrefEnglishVersion('${version}')">${version}</button>`).join('')}
   </div>`;
 }
 
@@ -153,7 +177,7 @@ function renderRhemaCrossReferences() {
   body.innerHTML = _xrefTopCardHtml() + `<div class="rx-category-list">${RHEMA_XREF_CATEGORIES.map(cat => {
     const refs = data[cat.key] || [];
     const isEmpty = refs.length === 0;
-    const preview = !isEmpty ? refs.slice(0, 2).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefKjvText(item.ref)))}</span></div>`).join('') : '';
+    const preview = !isEmpty ? refs.slice(0, 2).map(item => `<div class="rx-preview-line"><strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong><span>${_xrefEscape(_xrefClip(_xrefEnglishText(item.ref)))}</span></div>`).join('') : '';
     const chips = cat.key === 'themes' && !isEmpty ? refs.slice(0, 5).map(item => `<span>${_xrefEscape(item.label)}</span>`).join('') : '';
     return `<button class="rx-category-card${isEmpty ? ' rx-no-data' : ''}" data-xref-cat="${cat.key}" onclick="openRhemaXrefCategory('${cat.key}')">
       <span class="rx-category-icon"><span class="material-symbols-outlined">${cat.icon}</span></span>
@@ -194,7 +218,7 @@ function renderRhemaXrefTrail() {
   const cards = refs.map(item => `<button class="rx-verse-card" onclick="rhemaXrefFollow('${item.ref.replace(/'/g, "\\'")}')">
     <span class="rx-verse-copy">
       <strong>${_xrefEscape(_xrefDisplay(item.ref))}</strong>
-      <span>${_xrefEscape(_xrefKjvText(item.ref))}</span>
+      <span>${_xrefEscape(_xrefEnglishText(item.ref))}</span>
       <em>${_xrefEscape(item.label)}</em>
     </span>
     <span class="rx-arrow-btn material-symbols-outlined">arrow_forward</span>
@@ -282,14 +306,14 @@ function renderRhemaXrefSelect() {
   }
   const bookBtn = document.getElementById('rxBookBtnLabel');
   if (bookBtn) bookBtn.textContent = books.find(b => b.code === _rhemaXrefSelect.book)?.name || 'Select Book';
-  const chapters = Object.keys(window.RhemaKJV?.[_rhemaXrefSelect.book] || {}).sort((a,b) => +a - +b);
+  const chapters = Object.keys(_xrefEnglishData()?.[_rhemaXrefSelect.book] || {}).sort((a,b) => +a - +b);
   if (!chapters.includes(_rhemaXrefSelect.chapter)) _rhemaXrefSelect.chapter = chapters[0] || '1';
   document.getElementById('rxChapterGrid').innerHTML = chapters.map(ch => `<button class="${ch === _rhemaXrefSelect.chapter ? 'active' : ''}" onclick="rhemaXrefSelectChapter('${ch}')">${ch}</button>`).join('');
-  const verses = Object.keys(window.RhemaKJV?.[_rhemaXrefSelect.book]?.[_rhemaXrefSelect.chapter] || {}).sort((a,b) => +a - +b);
+  const verses = Object.keys(_xrefEnglishData()?.[_rhemaXrefSelect.book]?.[_rhemaXrefSelect.chapter] || {}).sort((a,b) => +a - +b);
   if (!verses.includes(_rhemaXrefSelect.verse)) _rhemaXrefSelect.verse = verses[0] || '1';
   document.getElementById('rxVerseGrid').innerHTML = verses.map(v => `<button class="${v === _rhemaXrefSelect.verse ? 'active' : ''}" onclick="rhemaXrefSelectVerse('${v}')">${v}</button>`).join('');
   const selected = document.getElementById('rxSelectedCard');
-  if (selected) selected.innerHTML = `<span>Selected Reference</span><strong>${_xrefEscape(_xrefDisplay(_xrefKey(_rhemaXrefSelect)))}</strong><p>${_xrefEscape(_xrefKjvText(_rhemaXrefSelect))}</p>`;
+  if (selected) selected.innerHTML = `<span>Selected Reference</span><strong>${_xrefEscape(_xrefDisplay(_xrefKey(_rhemaXrefSelect)))}</strong><p>${_xrefEscape(_xrefEnglishText(_rhemaXrefSelect))}</p>`;
 }
 
 function rhemaXrefSelectTestament(testament) {
@@ -394,7 +418,8 @@ async function saveCurrentRhemaTrail() {
     reference: _xrefDisplay(item.ref),
     rawRef: item.ref,
     label: item.label,
-    text: _xrefKjvText(item.ref)
+    text: _xrefEnglishText(item.ref),
+    translation: _xrefEnglishLabel()
   }));
   const defaultTitle = `${_xrefDisplay(_rhemaXrefBreadcrumb[0])} Trail`;
   const title = await _promptTrailTitle(defaultTitle);
@@ -406,6 +431,7 @@ async function saveCurrentRhemaTrail() {
     activeRef: _xrefKey(),
     categoryKey: _rhemaXrefCategory,
     categoryPath: cat.title,
+    translation: _xrefEnglishLabel(),
     breadcrumbTrail: _rhemaXrefBreadcrumb.map(_xrefDisplay),
     rawBreadcrumbTrail: [..._rhemaXrefBreadcrumb],
     connections: refs
@@ -482,6 +508,7 @@ Object.assign(window, {
   openRhemaCrossRefInfo,
   closeRhemaCrossRefInfo,
   saveCurrentRhemaTrail,
+  setRhemaXrefEnglishVersion,
   openSavedRhemaTrail,
   deleteSandboxTrail,
   openRxBookPicker,
