@@ -57,6 +57,10 @@ service cloud.firestore {
         (request.auth.uid in resource.data.audienceUids &&
          request.resource.data.diff(resource.data).affectedKeys()
            .hasOnly(['reactions', 'prayers', 'commentCount'])) ||
+        // Author can share recent posts with a newly accepted friend.
+        (request.auth.uid == resource.data.authorUid &&
+         request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['audienceUids'])) ||
         // Author can soft-delete the post.
         (request.auth.uid == resource.data.authorUid &&
          request.resource.data.diff(resource.data).affectedKeys()

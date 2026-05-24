@@ -1,11 +1,38 @@
 const functions = require("firebase-functions/v1");
 const { initializeApp } = require("firebase-admin/app");
-const { getFirestore } = require("firebase-admin/firestore");
+const { FieldValue, getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 
 initializeApp();
 const db = getFirestore();
 const messaging = getMessaging();
+
+async function shareRecentCommunityPostsBetweenFriends(uidA, uidB) {
+  if (!uidA || !uidB) return;
+  const now = Date.now();
+  const pairs = [
+    { authorUid: uidA, newAudienceUid: uidB },
+    { authorUid: uidB, newAudienceUid: uidA }
+  ];
+
+  for (const pair of pairs) {
+    const snap = await db.collection("communityPosts")
+      .where("authorUid", "==", pair.authorUid)
+      .limit(30)
+      .get();
+
+    const batch = db.batch();
+    let count = 0;
+    snap.docs.forEach(doc => {
+      const post = doc.data();
+      if (post.isActive === false) return;
+      if (post.expiresAtMs && post.expiresAtMs <= now) return;
+      batch.update(doc.ref, { audienceUids: FieldValue.arrayUnion(pair.newAudienceUid) });
+      count += 1;
+    });
+    if (count) await batch.commit();
+  }
+}
 
 function getLocalParts(date, timeZone) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -198,6 +225,7 @@ exports.onEncouragementCreated = functions.firestore
     } else if (type === "friendAccepted") {
       title = "Friend Request Accepted!";
       body = `${fromName} accepted your friend request.`;
+      await shareRecentCommunityPostsBetweenFriends(targetUid, snap.data().fromUid);
     } else if (type === "studySession") {
       const studyName = snap.data().studyName || "Greek";
       title = "Studying Now 📖";

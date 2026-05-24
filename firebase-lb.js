@@ -477,9 +477,20 @@ async function frAcceptRequest(uid, fromUid, myName) {
       updateDoc(doc(db, "users", uid),     { friendRequestsIn:  arrayRemove(fromUid), friends: arrayUnion(fromUid), updatedAt: serverTimestamp() }),
       updateDoc(doc(db, "users", fromUid), { friendRequestsOut: arrayRemove(uid),     friends: arrayUnion(uid),     updatedAt: serverTimestamp() })
     ]);
+    await shareRecentCommunityPostsWithFriend(uid, fromUid).catch(() => {});
     if (myName) fcmSendPushNotification(fromUid, "friendAccepted", myName, uid);
     return true;
   } catch { return false; }
+}
+
+async function shareRecentCommunityPostsWithFriend(uid, friendUid) {
+  const now = Date.now();
+  const shareMine = query(collection(db, "communityPosts"), where("authorUid", "==", uid), limit(30));
+  const snap = await getDocs(shareMine);
+  await Promise.all(snap.docs
+    .filter(d => d.data().isActive !== false)
+    .filter(d => !d.data().expiresAtMs || d.data().expiresAtMs > now)
+    .map(d => updateDoc(d.ref, { audienceUids: arrayUnion(friendUid) }).catch(() => {})));
 }
 
 async function frDeclineRequest(uid, fromUid) {

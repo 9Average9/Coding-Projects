@@ -16772,7 +16772,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.38";
+const APP_VERSION = "3.0.39";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18137,7 +18137,7 @@ function _renderCommunityPosts() {
         <span class="cp-avatar">${_renderAvatar(post.authorAvatar || 'person')}</span>
         <div class="cp-author">
           <strong>${_lbEscape(post.authorName || 'Someone')}</strong>
-          <small>${_communityPostTime(post)} Â· ${daysLeft}d left</small>
+          <small>${_communityPostTime(post)} - ${daysLeft}d left</small>
         </div>
         <span class="cp-kind"><span class="material-symbols-outlined">${meta.icon}</span>${meta.label}</span>
       </div>
