@@ -85,6 +85,8 @@ let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
 let _studyPendingDeleteId = null;
+let _studyPendingDeleteMode = 'delete';
+let _studyMembersInviteOpen = false;
 let _rhemaXrefView = 'main';
 let _rhemaXrefActive = { book: 'JOH', chapter: '1', verse: '1' };
 let _rhemaXrefBreadcrumb = [];
@@ -8055,11 +8057,12 @@ function _renderHomeStudies() {
   const cards = visible.map(s => {
     const doneToday = uid && (s.lastSessionDates || {})[uid] === today;
     const isCreator = s.creatorUid === uid;
+    const isCollaborator = uid && !isCreator && s.collaboratorUids?.includes(uid);
     return `<div class="hs-study-card${_studyDeleteMode ? ' jiggle' : ''}" style="--study-color:${s.color}"
       onclick="${_studyDeleteMode ? 'void(0)' : `openStudySandbox('${s.id}')`}"
       ontouchstart="_startStudyLongPress('${s.id}',event)" ontouchmove="_onStudyLongPressMove(event)" ontouchend="_cancelStudyLongPress()" ontouchcancel="_cancelStudyLongPress()"
       onmousedown="_startStudyLongPress('${s.id}',event)" onmousemove="_onStudyLongPressMove(event)" onmouseup="_cancelStudyLongPress()" onmouseleave="_cancelStudyLongPress()">
-      ${_studyDeleteMode && isCreator ? `<button class="hs-delete-btn" onclick="event.stopPropagation();confirmDeleteStudy('${s.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
+      ${_studyDeleteMode && (isCreator || isCollaborator) ? `<button class="hs-delete-btn" onclick="event.stopPropagation();confirmDeleteStudy('${s.id}')"><span class="material-symbols-outlined">${isCreator ? 'close' : 'logout'}</span></button>` : ''}
       ${doneToday ? '<span class="study-card-done-dot"></span>' : ''}
       <span class="hs-study-icon material-symbols-outlined">${s.icon}</span>
       <span class="hs-study-name">${s.name}</span>
@@ -8119,29 +8122,46 @@ function _exitStudyDeleteMode() {
 
 function confirmDeleteStudy(studyId) {
   _studyPendingDeleteId = studyId;
+  const uid = window.Auth?.getCurrentUser()?.uid;
   const study = _myStudies.find(s => s.id === studyId);
+  const isCreator = uid && study?.creatorUid === uid;
+  _studyPendingDeleteMode = isCreator ? 'delete' : 'leave';
   const nameEl = document.getElementById('studyDeleteConfirmName');
+  const titleEl = document.querySelector('#studyDeleteConfirm .study-sheet-title');
+  const msgEl = document.getElementById('studyDeleteConfirmMessage');
+  const actionEl = document.getElementById('studyDeleteConfirmAction');
   if (nameEl) nameEl.textContent = `"${study?.name || 'this study'}"`;
+  if (titleEl) titleEl.textContent = isCreator ? 'Delete Study?' : 'Leave Study?';
+  if (msgEl) {
+    msgEl.textContent = isCreator
+      ? 'This permanently erases all notes, saved verses, and word log. Cannot be undone.'
+      : 'This won\'t delete the study, only remove you from it. Would you like to continue?';
+  }
+  if (actionEl) actionEl.textContent = isCreator ? 'Yes, Delete Everything' : 'Yes, Leave Study';
   document.getElementById('studyDeleteConfirm')?.classList.add('open');
 }
 
 function closeStudyDeleteConfirm() {
   document.getElementById('studyDeleteConfirm')?.classList.remove('open');
   _studyPendingDeleteId = null;
+  _studyPendingDeleteMode = 'delete';
 }
 
 async function executeDeleteStudy() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid || !_studyPendingDeleteId) return;
   const studyId = _studyPendingDeleteId; // capture before clearing
+  const mode = _studyPendingDeleteMode;
   // Optimistically remove immediately (like iOS)
   _myStudies = _myStudies.filter(s => s.id !== studyId);
   if (!_myStudies.length) _studyDeleteMode = false;
   _renderHomeStudies();
   closeStudyDeleteConfirm();
-  const ok = await window.Studies?.delete(studyId, uid);
+  const ok = mode === 'leave'
+    ? await window.Studies?.leaveCollab(studyId, uid)
+    : await window.Studies?.delete(studyId, uid);
   if (!ok) {
-    _showStudyToast('Could not delete. Only the creator can delete a study.');
+    _showStudyToast(mode === 'leave' ? 'Could not leave this study.' : 'Could not delete. Only the creator can delete a study.');
     await _loadMyStudies(); // restore if Firestore rejected it
   }
 }
@@ -8149,6 +8169,14 @@ async function executeDeleteStudy() {
 function _studyMemberLabel(s) {
   const count = (s.collaboratorUids || []).length;
   return count > 1 ? `${count} members` : 'Solo';
+}
+
+function _updateSandboxMembersButton(study = _activeSandboxStudy) {
+  const membersEl = document.getElementById('ssMembers');
+  if (!membersEl || !study) return;
+  membersEl.textContent = _studyMemberLabel(study);
+  membersEl.classList.toggle('hidden', _sandboxTab === 'rhema');
+  membersEl.setAttribute('aria-label', `View ${_studyMemberLabel(study)}`);
 }
 
 // Create sheet
@@ -8321,7 +8349,7 @@ async function openStudySandbox(studyId, studyObj) {
   const membersEl = document.getElementById('ssMembers');
   if (iconEl) { iconEl.textContent = study.icon; iconEl.style.color = study.color; }
   if (titleEl) titleEl.textContent = study.name;
-  if (membersEl) membersEl.textContent = _studyMemberLabel(study);
+  if (membersEl) _updateSandboxMembersButton(study);
 
   // Switch to Rhema tab first
   switchSandboxTab('rhema');
@@ -8366,7 +8394,7 @@ async function openStudySandbox(studyId, studyObj) {
     if (!updated) return;
     _activeSandboxStudy = updated;
     const membersEl = document.getElementById('ssMembers');
-    if (membersEl) membersEl.textContent = _studyMemberLabel(updated);
+    if (membersEl) _updateSandboxMembersButton(updated);
     _updateSandboxRhemaPreview();
   });
 
@@ -8426,6 +8454,7 @@ function switchSandboxTab(tab) {
   _sandboxTab = tab;
   document.querySelectorAll('#studyTabBar .ss-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.ss-pane').forEach(p => p.classList.toggle('active', p.id === `ssPane${tab.charAt(0).toUpperCase()+tab.slice(1)}`));
+  _updateSandboxMembersButton();
   if (tab === 'rhema') openSandboxRhema();
   if (tab === 'notes') { _buildWsKeyboard(); }
 }
@@ -9302,10 +9331,23 @@ function closeStudyBoardSheet() {
 }
 
 async function openStudyMembersModal() {
-  const s = _studyBoardStudies.find(x => x.id === _studyBoardSheetId);
+  const s = _studyBoardSheetId
+    ? _studyBoardStudies.find(x => x.id === _studyBoardSheetId)
+    : _activeSandboxStudy;
   if (!s) return;
+  _studyMembersInviteOpen = false;
   const list = document.getElementById('studyMembersList');
+  const inviteSection = document.getElementById('studyMembersInviteSection');
+  const inviteList = document.getElementById('studyMembersInviteList');
   if (!list) return;
+  if (inviteList) {
+    inviteList.classList.add('hidden');
+    inviteList.innerHTML = '';
+  }
+  if (inviteSection) {
+    const uid = window.Auth?.getCurrentUser()?.uid;
+    inviteSection.style.display = uid && s.collaboratorUids?.includes(uid) ? '' : 'none';
+  }
 
   const renderRows = (rows) => {
     list.innerHTML = rows.map(r => `
@@ -9332,6 +9374,72 @@ async function openStudyMembersModal() {
 
 function closeStudyMembersModal() {
   document.getElementById('studyMembersModal')?.classList.remove('open');
+  document.getElementById('studyMembersInviteList')?.classList.add('hidden');
+  _studyMembersInviteOpen = false;
+}
+
+function _studyMembersModalStudy() {
+  return _studyBoardSheetId
+    ? _studyBoardStudies.find(x => x.id === _studyBoardSheetId)
+    : _activeSandboxStudy;
+}
+
+async function toggleStudyMembersInviteList() {
+  const list = document.getElementById('studyMembersInviteList');
+  if (!list) return;
+  _studyMembersInviteOpen = !_studyMembersInviteOpen;
+  list.classList.toggle('hidden', !_studyMembersInviteOpen);
+  if (_studyMembersInviteOpen) await _renderStudyMembersInviteList();
+}
+
+async function _renderStudyMembersInviteList() {
+  const list = document.getElementById('studyMembersInviteList');
+  const study = _studyMembersModalStudy();
+  if (!list || !study) return;
+  const blocked = new Set([
+    ...(study.collaboratorUids || []),
+    ...(study.pendingCollaboratorUids || [])
+  ]);
+  const candidates = (friendsList || []).filter(uid => !blocked.has(uid));
+  if (!candidates.length) {
+    list.innerHTML = '<p class="ss-hint" style="margin:0;padding:4px 0">No available friends to invite.</p>';
+    return;
+  }
+  list.innerHTML = '<p class="ss-hint" style="margin:0;padding:4px 0">Loading friends...</p>';
+  try {
+    const users = await Promise.all(candidates.map(uid => window.Friends?.getUser(uid).catch(() => null)));
+    list.innerHTML = users.filter(Boolean).map(u => {
+      const uid = u.uid || u.id;
+      const name = u.displayName || u.username || 'Friend';
+      return `<button class="study-invite-friend-btn" data-uid="${uid}" onclick="inviteStudyMember('${uid}')">
+        <span class="study-invite-friend-name">${name}</span>
+        <span class="material-symbols-outlined study-invite-friend-check">add_circle</span>
+      </button>`;
+    }).join('') || '<p class="ss-hint" style="margin:0">No available friends to invite.</p>';
+  } catch {
+    list.innerHTML = '<p class="ss-hint" style="margin:0">Could not load friends.</p>';
+  }
+}
+
+async function inviteStudyMember(uid) {
+  const study = _studyMembersModalStudy();
+  if (!study) return;
+  const btn = document.querySelector(`#studyMembersInviteList .study-invite-friend-btn[data-uid="${uid}"]`);
+  if (btn) { btn.classList.add('invited'); btn.disabled = true; }
+  const myName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
+  const ok = await window.Studies?.inviteCollab(study.id, study.name, uid, myName);
+  if (ok) {
+    study.pendingCollaboratorUids = [...new Set([...(study.pendingCollaboratorUids || []), uid])];
+    if (_activeSandboxStudy?.id === study.id) _activeSandboxStudy = study;
+    if (btn) {
+      btn.querySelector('.study-invite-friend-check').textContent = 'check_circle';
+      btn.querySelector('.study-invite-friend-name').textContent += ' invited';
+    }
+    _showStudyToast('Invite sent.');
+  } else {
+    if (btn) { btn.classList.remove('invited'); btn.disabled = false; }
+    _showStudyToast('Could not send invite.');
+  }
 }
 
 function openStudiesInfoModal() {
@@ -16560,7 +16668,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.24";
+const APP_VERSION = "3.0.25";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>

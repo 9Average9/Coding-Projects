@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.23" rel="stylesheet"/>
+<link href="style.css?v=3.0.25" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -15483,10 +15483,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.24"></script>
+<script src="app.js?v=3.0.25"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.8"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.23" type="module"></script>
+<script src="firebase-lb.js?v=3.0.25" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -15597,7 +15597,7 @@ Verb Endings
 <span class="ss-icon material-symbols-outlined" id="ssIcon">menu_book</span>
 <span class="ss-title" id="ssTitle">Study</span>
 </div>
-<div class="ss-members" id="ssMembers"></div>
+<button class="ss-members" id="ssMembers" onclick="openStudyMembersModal()" type="button"></button>
 </div>
 <div class="ss-body">
 <!-- Rhema -->
@@ -15795,6 +15795,13 @@ Verb Endings
 <button class="modal-close" onclick="closeStudyMembersModal()">×</button>
 <h2 style="margin-bottom:14px">Members</h2>
 <div class="study-members-list" id="studyMembersList"></div>
+<div class="study-members-invite" id="studyMembersInviteSection">
+<button class="study-members-add-btn" onclick="toggleStudyMembersInviteList()" type="button">
+<span class="material-symbols-outlined">person_add</span>
+<span>Invite more friends</span>
+</button>
+<div class="study-invite-friends-list hidden" id="studyMembersInviteList"></div>
+</div>
 </div>
 </div>
 <!-- Studies Info Modal -->
@@ -15845,8 +15852,8 @@ Verb Endings
 <button class="sheet-x-close" onclick="closeStudyDeleteConfirm()"><span class="material-symbols-outlined">close</span></button>
 <h2 class="study-sheet-title" style="color:#ef4444">Delete Study?</h2>
 <p class="study-sheet-sub" id="studyDeleteConfirmName" style="font-weight:700;color:var(--text-color)"></p>
-<p class="study-sheet-sub">This permanently erases all notes, saved verses, and word log. Cannot be undone.</p>
-<button class="main-btn" onclick="executeDeleteStudy()" style="background:#ef4444;width:100%;margin-bottom:10px">Yes, Delete Everything</button>
+<p class="study-sheet-sub" id="studyDeleteConfirmMessage">This permanently erases all notes, saved verses, and word log. Cannot be undone.</p>
+<button class="main-btn" id="studyDeleteConfirmAction" onclick="executeDeleteStudy()" style="background:#ef4444;width:100%;margin-bottom:10px">Yes, Delete Everything</button>
 <button class="text-btn" onclick="closeStudyDeleteConfirm()" style="width:100%">Cancel</button>
 </div>
 </div>

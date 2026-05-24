@@ -737,6 +737,22 @@ async function studyDenyCollab(studyId, requesterUid) {
   } catch (e) { console.warn("studyDenyCollab:", e); return false; }
 }
 
+async function studyLeaveCollab(studyId, uid) {
+  try {
+    const ref = doc(db, "studies", studyId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return false;
+    const data = snap.data();
+    if (data.creatorUid === uid) return false;
+    if (!data.collaboratorUids?.includes(uid)) return false;
+    await updateDoc(ref, {
+      collaboratorUids: arrayRemove(uid),
+      pendingCollaboratorUids: arrayRemove(uid)
+    });
+    return true;
+  } catch (e) { console.warn("studyLeaveCollab:", e); return false; }
+}
+
 // Copy a study as your own personal copy (no approval needed)
 async function studyCopy(sourceStudyId, uid, displayName) {
   try {
@@ -768,7 +784,7 @@ async function studyDeletePermanent(studyId, uid) {
     const snap = await getDoc(studyRef);
     if (!snap.exists() || snap.data().creatorUid !== uid) return false;
     // Delete all subcollection documents first
-    for (const sub of ['notes', 'savedVerses', 'wordLog', 'trails']) {
+    for (const sub of ['notes', 'entries', 'savedVerses', 'wordLog', 'trails']) {
       const subSnap = await getDocs(collection(db, "studies", studyId, sub));
       for (const d of subSnap.docs) await deleteDoc(d.ref);
     }
@@ -810,7 +826,7 @@ window.Studies = {
   listenVerses: studyListenVerses, saveVerse: studySaveVerse, deleteVerse: studyDeleteVerse,
   listenTrails: studyListenTrails, saveTrail: studySaveTrail, deleteTrail: studyDeleteTrail,
   listenWordLog: studyListenWordLog, logWord: studyLogWord, deleteWordLog: studyDeleteWordLog,
-  requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
+  requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab, leaveCollab: studyLeaveCollab,
   inviteCollab: studyInviteCollab, selfApproveInvite: studySelfApproveInvite,
   copy: studyCopy, delete: studyDeletePermanent, listenEncouragements, getEncouragementMessages,
   deleteMsg: deleteEncouragementMsg,

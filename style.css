@@ -15911,7 +15911,28 @@ label.study-color-swatch.custom-color-dot {
 .ss-title-wrap { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .ss-icon { font-size: 22px; }
 .ss-title { font-size: 1rem; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ss-members { font-size: 0.75rem; color: var(--muted-color); flex-shrink: 0; }
+.ss-members {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+  color: var(--secondary-color);
+  padding: 5px 9px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ss-members::after {
+  content: "›";
+  font-size: 0.9rem;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+.ss-members:active { transform: scale(0.97); }
 
 .ss-tabs {
   display: flex; gap: 0;
@@ -16524,6 +16545,27 @@ body.sandbox-open #rhemaModal {
 
 /* Study members list */
 .study-members-list { display: flex; flex-direction: column; gap: 10px; }
+.study-members-invite {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+.study-members-add-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1.5px solid color-mix(in srgb, var(--secondary-color) 35%, var(--border-color));
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+  color: var(--secondary-color);
+  font-weight: 800;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.study-members-add-btn .material-symbols-outlined { font-size: 20px; }
 .study-member-row {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 10px; background: var(--card-color);
