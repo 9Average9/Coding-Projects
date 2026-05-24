@@ -9386,9 +9386,7 @@ function _startEncouragementListener(uid) {
 }
 
 function _mergeStudyNotificationMessages(msgs = []) {
-  const keepIds = new Set();
   const upsert = (id, item) => {
-    keepIds.add(id);
     const existing = _notifItems.find(n => n.id === id);
     if (existing) Object.assign(existing, item, { read: existing.read || item.read });
     else _notifItems.push(item);
@@ -9418,11 +9416,6 @@ function _mergeStudyNotificationMessages(msgs = []) {
     });
     if (!_myStudies.find(s => s.id === m.studyId)) _loadMyStudies();
   });
-
-  _notifItems = _notifItems.filter(n => {
-    if (!['collab_request', 'study_invite', 'collab_approved'].includes(n.type)) return true;
-    return keepIds.has(n.id);
-  });
 }
 
 async function notifApproveCollab(studyId, requesterUid, requesterName, itemId) {
@@ -9430,7 +9423,7 @@ async function notifApproveCollab(studyId, requesterUid, requesterName, itemId) 
   if (!uid) return;
   const item = _notifItems.find(n => n.id === itemId);
   await window.Studies?.approveCollab(studyId, requesterUid, requesterName);
-  if (item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
+  if (item?.msgId) await window.Studies?.deleteMsg(uid, item.msgId);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   await _loadMyStudies();
@@ -9441,7 +9434,7 @@ async function notifDenyCollab(studyId, requesterUid, itemId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   const item = _notifItems.find(n => n.id === itemId);
   await window.Studies?.denyCollab(studyId, requesterUid);
-  if (uid && item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
+  if (uid && item?.msgId) await window.Studies?.deleteMsg(uid, item.msgId);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   _loadNotifications();
@@ -9454,7 +9447,7 @@ async function notifJoinStudy(studyId, itemId) {
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
   const ok = await window.Studies?.selfApproveInvite(studyId, uid, displayName);
   if (ok) {
-    if (item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
+    if (item?.msgId) await window.Studies?.deleteMsg(uid, item.msgId);
     _notifItems = _notifItems.filter(n => n.id !== itemId);
     _updateNotifBadge();
     _loadNotifications();
@@ -9471,7 +9464,7 @@ async function notifDenyStudyInvite(studyId, itemId) {
   if (!uid) return;
   const item = _notifItems.find(n => n.id === itemId);
   await window.Studies?.denyCollab(studyId, uid);
-  if (item?.msgId) window.Studies?.deleteMsg(uid, item.msgId);
+  if (item?.msgId) await window.Studies?.deleteMsg(uid, item.msgId);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   _loadNotifications();
@@ -9936,13 +9929,6 @@ function _updateNotifBadge() {
 // Remove resolved incoming friend requests from the notif list and update badges.
 // Preserves friend_accepted notifications — they stay until tapped.
 function _syncFriendRequestNotifs() {
-  _notifItems = _notifItems.filter(n =>
-    n.type === 'friend_accepted' ||
-    n.type === 'collab_request' ||
-    n.type === 'collab_approved' ||
-    n.type === 'study_invite' ||
-    (n.type === 'friend_request' && (friendRequestsIn || []).includes(n.requesterUid))
-  );
   _updateNotifBadge();
 }
 
@@ -9975,10 +9961,13 @@ async function _loadNotifications() {
     requesterName: name,
     read: (_notifItems.find(n => n.id === 'fr_' + reqUid)?.read) || false
   }));
+  const existingFriendItems = _notifItems.filter(n => n.type === 'friend_request');
+  const friendItemIds = new Set(updatedIncoming.map(n => n.id));
+  const preservedFriendItems = existingFriendItems.filter(n => !friendItemIds.has(n.id));
   const acceptedItems = _notifItems.filter(n => n.type === 'friend_accepted');
   const collabItems   = _notifItems.filter(n => n.type === 'collab_request' || n.type === 'collab_approved');
   const inviteItems   = _notifItems.filter(n => n.type === 'study_invite');
-  _notifItems = [...updatedIncoming, ...acceptedItems, ...collabItems, ...inviteItems];
+  _notifItems = [...updatedIncoming, ...preservedFriendItems, ...acceptedItems, ...collabItems, ...inviteItems];
   _updateNotifBadge();
 
   if (!_notifItems.length) {
@@ -10073,9 +10062,9 @@ function notifDismissAccepted(uid) {
   _loadNotifications();
 }
 
-function notifDismissCollab(itemId, msgId) {
+async function notifDismissCollab(itemId, msgId) {
   const currentUid = window.Auth?.getCurrentUser()?.uid;
-  if (currentUid && msgId) window.Studies?.deleteMsg(currentUid, msgId);
+  if (currentUid && msgId) await window.Studies?.deleteMsg(currentUid, msgId);
   _notifItems = _notifItems.filter(n => n.id !== itemId);
   _updateNotifBadge();
   _loadNotifications();
@@ -16571,7 +16560,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.23";
+const APP_VERSION = "3.0.24";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17327,8 +17316,13 @@ window.__onAuthStateReady = async (user) => {
       // Rebuild incoming-request notif items, preserving accepted notifications
       const incomingItems = (friendRequestsIn || []).map(uid => ({
         id: 'fr_' + uid, type: 'friend_request', requesterUid: uid,
-        requesterName: 'Someone', read: false
+        requesterName: _notifItems.find(n => n.id === 'fr_' + uid)?.requesterName || 'Someone',
+        read: _notifItems.find(n => n.id === 'fr_' + uid)?.read || false
       }));
+      const incomingIds = new Set(incomingItems.map(n => n.id));
+      const preservedIncoming = _notifItems.filter(n =>
+        n.type === 'friend_request' && !incomingIds.has(n.id)
+      );
       // Keep existing accepted notifications that haven't been read/dismissed
       const existingAccepted = _notifItems.filter(n => n.type === 'friend_accepted');
       // Add newly detected accepted requests
@@ -17347,7 +17341,7 @@ window.__onAuthStateReady = async (user) => {
         n.type === 'collab_approved' ||
         n.type === 'study_invite'
       );
-      _notifItems = [...incomingItems, ...existingAccepted, ...studyItems];
+      _notifItems = [...incomingItems, ...preservedIncoming, ...existingAccepted, ...studyItems];
       _updateNotifBadge();
       const modal = document.getElementById("friendsModal");
       if (modal?.classList.contains("open")) {
@@ -18536,7 +18530,10 @@ async function acceptRequestAction(uid) {
   const myName = localStorage.getItem("authDisplayName") || "Someone";
   _syncFriendRequestNotifs();
   const ok = await window.Friends.acceptRequest(me.uid, uid, myName);
-  if (!ok) {
+  if (ok) {
+    _notifItems = _notifItems.filter(n => n.id !== 'fr_' + uid);
+    _updateNotifBadge();
+  } else {
     // Rollback on failure
     friendRequestsIn = [...new Set([...friendRequestsIn, uid])];
     friendsList = friendsList.filter(id => id !== uid);
@@ -18553,6 +18550,7 @@ async function declineRequestAction(uid) {
   if (!me) return;
   if (await window.Friends.declineRequest(me.uid, uid)) {
     friendRequestsIn = friendRequestsIn.filter(id => id !== uid);
+    _notifItems = _notifItems.filter(n => n.id !== 'fr_' + uid);
     updateFriendsBadge();
     _syncFriendRequestNotifs();
     renderFriendRequests();
