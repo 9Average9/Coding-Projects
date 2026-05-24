@@ -286,6 +286,15 @@ function getAvatar() {
   return localStorage.getItem("profilePicValue") || "school";
 }
 
+async function getUsersByUid(uids = []) {
+  const unique = [...new Set((uids || []).filter(Boolean))];
+  const entries = await Promise.all(unique.map(async uid => {
+    const snap = await getDoc(doc(db, "users", uid)).catch(() => null);
+    return [uid, snap?.exists() ? snap.data() : null];
+  }));
+  return new Map(entries.filter(([, data]) => data));
+}
+
 async function uploadAvatarPhoto(uid, dataUrl) {
   const res = await fetch(dataUrl);
   const blob = await res.blob();
@@ -889,7 +898,7 @@ async function studyDeletePermanent(studyId, uid) {
 // Community Posts
 function listenCommunityPosts(uid, friendUids = [], callback) {
   const q = query(collection(db, "communityPosts"), where("audienceUids", "array-contains", uid), limit(80));
-  return onSnapshot(q, snap => {
+  return onSnapshot(q, async snap => {
     const now = Date.now();
     const friendSet = new Set(friendUids || []);
     const posts = snap.docs
@@ -898,7 +907,33 @@ function listenCommunityPosts(uid, friendUids = [], callback) {
       .filter(p => !p.expiresAtMs || p.expiresAtMs > now)
       .filter(p => p.authorUid === uid || friendSet.has(p.authorUid))
       .sort((a, b) => (b.createdAtMs || b.createdAt?.seconds * 1000 || 0) - (a.createdAtMs || a.createdAt?.seconds * 1000 || 0));
-    callback(posts);
+    const uids = [];
+    posts.forEach(post => {
+      uids.push(post.authorUid);
+      Object.keys(post.reactions || {}).forEach(reactUid => uids.push(reactUid));
+      Object.keys(post.prayers || {}).forEach(prayerUid => uids.push(prayerUid));
+    });
+    const users = await getUsersByUid(uids);
+    callback(posts.map(post => {
+      const author = users.get(post.authorUid);
+      const reactions = {};
+      Object.entries(post.reactions || {}).forEach(([reactUid, value]) => {
+        const reactor = users.get(reactUid);
+        const emoji = typeof value === "string" ? value : value?.emoji;
+        reactions[reactUid] = {
+          ...(typeof value === "object" && value ? value : {}),
+          emoji,
+          name: reactor?.displayName || reactor?.username || value?.name || "Friend",
+          avatar: reactor?.avatar || value?.avatar || "person"
+        };
+      });
+      return {
+        ...post,
+        authorName: author?.displayName || author?.username || post.authorName,
+        authorAvatar: author?.avatar || post.authorAvatar,
+        reactions
+      };
+    }));
   }, err => {
     console.warn("listenCommunityPosts:", err);
     callback([]);
@@ -951,7 +986,7 @@ async function reactCommunityPost(postId, uid, emoji) {
     const current = data.reactions?.[uid];
     const currentEmoji = typeof current === "string" ? current : current?.emoji;
     const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
-    const fromAvatar = localStorage.getItem("selectedAvatar") || "person";
+    const fromAvatar = getAvatar();
     await updateDoc(ref, {
       [`reactions.${uid}`]: currentEmoji === emoji
         ? deleteField()
@@ -992,7 +1027,7 @@ async function addPostComment(postId, uid, text) {
     if (!postSnap.exists()) return false;
     const post = postSnap.data();
     const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
-    const fromAvatar = localStorage.getItem("selectedAvatar") || "person";
+    const fromAvatar = getAvatar();
     await addDoc(collection(db, "communityPosts", postId, "comments"), {
       body: clean,
       authorUid: uid,
@@ -1022,7 +1057,7 @@ async function prayForPost(postId, uid) {
     if (!postSnap.exists()) return false;
     const post = postSnap.data();
     const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
-    const fromAvatar = localStorage.getItem("selectedAvatar") || "person";
+    const fromAvatar = getAvatar();
     await updateDoc(postRef, {
       [`prayers.${uid}`]: { name: fromName, avatar: fromAvatar, prayedAtMs: Date.now() }
     });

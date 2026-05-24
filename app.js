@@ -16772,7 +16772,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.40";
+const APP_VERSION = "3.0.41";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18088,6 +18088,12 @@ function _renderAvatar(avatarValue) {
   return `<span class="material-symbols-outlined">${icon}</span>`;
 }
 
+function _currentProfileAvatarValue() {
+  return localStorage.getItem("profilePicType") === "photo"
+    ? (localStorage.getItem("profilePicRemoteURL") || "person")
+    : (localStorage.getItem("profilePicValue") || "person");
+}
+
 function _lbAvatarHtml(entry) {
   return `<span class="lb-avatar">${_renderAvatar(entry.avatar)}</span>`;
 }
@@ -18329,7 +18335,7 @@ async function submitCommunityPost() {
   const btn = document.getElementById('communityPostSubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
-  const avatar = localStorage.getItem('selectedAvatar') || 'person';
+  const avatar = _currentProfileAvatarValue();
   const id = await window.CommunityPosts?.add?.(uid, displayName, avatar, friendsList, {
     kind: _communityPostKind,
     body,
