@@ -788,6 +788,19 @@ function listenEncouragements(uid, callback) {
   }, err => console.warn("listenEncouragements:", err));
 }
 
+async function getEncouragementMessages(uid) {
+  try {
+    const q = query(collection(db, "encouragements", uid, "messages"), limit(40));
+    const snap = await getDocs(q);
+    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    msgs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    return msgs;
+  } catch (e) {
+    console.warn("getEncouragementMessages:", e);
+    return [];
+  }
+}
+
 window.Studies = {
   create: studyCreate, get: studyGet, getMine: studyGetMine, getFriends: studyGetFriends,
   openSession: studyOpenSession, saveRhemaPos: studySaveRhemaPos,
@@ -799,7 +812,7 @@ window.Studies = {
   listenWordLog: studyListenWordLog, logWord: studyLogWord, deleteWordLog: studyDeleteWordLog,
   requestCollab: studyRequestCollab, approveCollab: studyApproveCollab, denyCollab: studyDenyCollab,
   inviteCollab: studyInviteCollab, selfApproveInvite: studySelfApproveInvite,
-  copy: studyCopy, delete: studyDeletePermanent, listenEncouragements,
+  copy: studyCopy, delete: studyDeletePermanent, listenEncouragements, getEncouragementMessages,
   deleteMsg: deleteEncouragementMsg,
   getMemberNames: studyGetMemberNames
 };

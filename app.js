@@ -9380,41 +9380,48 @@ async function _openCollabStudy(studyId) {
 function _startEncouragementListener(uid) {
   _unsubEncouragements?.();
   _unsubEncouragements = window.Studies?.listenEncouragements?.(uid, msgs => {
-    const collab = msgs.filter(m => m.type === 'studyCollabRequest' && !m._read);
-    collab.forEach(m => {
-      const existing = _notifItems.find(n => n.id === 'collab_' + m.id);
-      if (!existing) {
-        _notifItems.push({
-          id: 'collab_' + m.id, type: 'collab_request',
-          requesterUid: m.fromUid, requesterName: m.fromName,
-          studyId: m.studyId, studyName: m.studyName || '', msgId: m.id, read: false
-        });
-      }
-    });
-    const invites = msgs.filter(m => m.type === 'studyInvite' && !m._read);
-    invites.forEach(m => {
-      const existing = _notifItems.find(n => n.id === 'invite_' + m.id);
-      if (!existing) {
-        _notifItems.push({
-          id: 'invite_' + m.id, type: 'study_invite',
-          fromName: m.fromName, fromUid: m.fromUid,
-          studyId: m.studyId, studyName: m.studyName, msgId: m.id, read: false
-        });
-      }
-    });
-    const approved = msgs.filter(m => m.type === 'studyCollabApproved' && !m._read);
-    approved.forEach(m => {
-      const existing = _notifItems.find(n => n.id === 'collab_approved_' + m.id);
-      if (!existing) {
-        _notifItems.push({
-          id: 'collab_approved_' + m.id, type: 'collab_approved',
-          fromName: m.fromName, studyId: m.studyId, studyName: m.studyName, msgId: m.id, read: false
-        });
-        // Instantly surface the newly approved study without waiting for a refresh
-        if (!_myStudies.find(s => s.id === m.studyId)) _loadMyStudies();
-      }
-    });
+    _mergeStudyNotificationMessages(msgs);
     _updateNotifBadge();
+  });
+}
+
+function _mergeStudyNotificationMessages(msgs = []) {
+  const keepIds = new Set();
+  const upsert = (id, item) => {
+    keepIds.add(id);
+    const existing = _notifItems.find(n => n.id === id);
+    if (existing) Object.assign(existing, item, { read: existing.read || item.read });
+    else _notifItems.push(item);
+  };
+
+  msgs.filter(m => m.type === 'studyCollabRequest' && !m._read).forEach(m => {
+    upsert('collab_' + m.id, {
+      id: 'collab_' + m.id, type: 'collab_request',
+      requesterUid: m.fromUid, requesterName: m.fromName || 'Someone',
+      studyId: m.studyId, studyName: m.studyName || '', msgId: m.id, read: false
+    });
+  });
+
+  msgs.filter(m => m.type === 'studyInvite' && !m._read).forEach(m => {
+    upsert('invite_' + m.id, {
+      id: 'invite_' + m.id, type: 'study_invite',
+      fromName: m.fromName || 'Someone', fromUid: m.fromUid,
+      studyId: m.studyId, studyName: m.studyName || '', msgId: m.id, read: false
+    });
+  });
+
+  msgs.filter(m => m.type === 'studyCollabApproved' && !m._read).forEach(m => {
+    upsert('collab_approved_' + m.id, {
+      id: 'collab_approved_' + m.id, type: 'collab_approved',
+      fromName: m.fromName || 'Someone', studyId: m.studyId,
+      studyName: m.studyName || '', msgId: m.id, read: false
+    });
+    if (!_myStudies.find(s => s.id === m.studyId)) _loadMyStudies();
+  });
+
+  _notifItems = _notifItems.filter(n => {
+    if (!['collab_request', 'study_invite', 'collab_approved'].includes(n.type)) return true;
+    return keepIds.has(n.id);
   });
 }
 
@@ -9931,6 +9938,9 @@ function _updateNotifBadge() {
 function _syncFriendRequestNotifs() {
   _notifItems = _notifItems.filter(n =>
     n.type === 'friend_accepted' ||
+    n.type === 'collab_request' ||
+    n.type === 'collab_approved' ||
+    n.type === 'study_invite' ||
     (n.type === 'friend_request' && (friendRequestsIn || []).includes(n.requesterUid))
   );
   _updateNotifBadge();
@@ -9945,6 +9955,9 @@ async function _loadNotifications() {
     return;
   }
   listEl.innerHTML = '<p class="lb-loading">Loading…</p>';
+
+  const studyMsgs = await window.Studies?.getEncouragementMessages?.(uid).catch(() => []);
+  if (studyMsgs) _mergeStudyNotificationMessages(studyMsgs);
 
   // Look up display names for each incoming friend request
   const requesters = await Promise.all(
@@ -16558,7 +16571,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.22";
+const APP_VERSION = "3.0.23";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17329,7 +17342,12 @@ window.__onAuthStateReady = async (user) => {
           }).catch(() => {});
         }
       });
-      _notifItems = [...incomingItems, ...existingAccepted];
+      const studyItems = _notifItems.filter(n =>
+        n.type === 'collab_request' ||
+        n.type === 'collab_approved' ||
+        n.type === 'study_invite'
+      );
+      _notifItems = [...incomingItems, ...existingAccepted, ...studyItems];
       _updateNotifBadge();
       const modal = document.getElementById("friendsModal");
       if (modal?.classList.contains("open")) {
