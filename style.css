@@ -18543,12 +18543,17 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll > div:last-child[st
   height: 0 !important;
 }
 
-html:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)),
+html:has(> body #homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)),
 body:has(#homeScreen.screen.active[class*="home-backdrop-"]:not(.home-backdrop-none)) {
   background:
     linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)),
     var(--home-backdrop-image) center / cover fixed no-repeat,
     var(--primary-color) !important;
+}
+
+html:not(:has(> body #homeScreen.screen.active)),
+body:not(:has(#homeScreen.screen.active)) {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
 }
 
 body:has(#homeScreen.screen.active) #statusBarBg {

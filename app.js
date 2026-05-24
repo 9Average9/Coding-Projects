@@ -45,6 +45,7 @@ let _appLaunchStartedAt = Date.now();
 let _appLaunchReleased = false;
 let _appUpdateReloadPending = false;
 let _appUpdateReloadTimer = null;
+let _homeBackdropPreload = null;
 
 // Personal Studies state
 let _myStudies = [];
@@ -9649,6 +9650,8 @@ function _syncHomeViewportState(id) {
   if (isHome) {
     applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
     showBottomNav();
+  } else {
+    _clearPageHomeBackdrop();
   }
 }
 
@@ -11896,13 +11899,19 @@ function applyHomeBackdrop(backdropName = "none") {
   const backdropClasses = HOME_BACKDROPS.map(name => `home-backdrop-${name}`);
   const pageBackdropClasses = HOME_BACKDROPS.map(name => `page-home-backdrop-${name}`);
   const imageUrl = safeName === "none" ? "" : `url("assets/home-backgrounds/${safeName}.jpg")`;
+  const homeActive = document.getElementById("homeScreen")?.classList.contains("active");
 
   document.documentElement.classList.remove(...backdropClasses, ...pageBackdropClasses);
-  document.documentElement.classList.add(`page-home-backdrop-${safeName}`);
-  document.documentElement.style.setProperty("--home-backdrop-image", imageUrl);
   document.body?.classList.remove(...backdropClasses, ...pageBackdropClasses);
-  document.body?.classList.add(`page-home-backdrop-${safeName}`);
-  document.body?.style.setProperty("--home-backdrop-image", imageUrl);
+  document.documentElement.style.removeProperty("--home-backdrop-image");
+  document.body?.style.removeProperty("--home-backdrop-image");
+  if (homeActive) {
+    document.documentElement.classList.add(`page-home-backdrop-${safeName}`);
+    document.documentElement.style.setProperty("--home-backdrop-image", imageUrl);
+    document.body?.classList.add(`page-home-backdrop-${safeName}`);
+    document.body?.style.setProperty("--home-backdrop-image", imageUrl);
+  }
+  _preloadHomeBackdrop(safeName);
 
   const home = document.getElementById("homeScreen");
   if (home) {
@@ -11913,6 +11922,24 @@ function applyHomeBackdrop(backdropName = "none") {
   document.querySelectorAll(".home-backdrop-option").forEach(btn => {
     btn.classList.toggle("selected", btn.classList.contains(`home-backdrop-${safeName}`));
   });
+}
+
+function _clearPageHomeBackdrop() {
+  const pageBackdropClasses = HOME_BACKDROPS.map(name => `page-home-backdrop-${name}`);
+  document.documentElement.classList.remove(...pageBackdropClasses);
+  document.documentElement.style.removeProperty("--home-backdrop-image");
+  document.body?.classList.remove(...pageBackdropClasses);
+  document.body?.style.removeProperty("--home-backdrop-image");
+}
+
+function _preloadHomeBackdrop(backdropName = "none") {
+  const safeName = HOME_BACKDROPS.includes(backdropName) ? backdropName : "none";
+  if (safeName === "none") return;
+  const src = `assets/home-backgrounds/${safeName}.jpg`;
+  if (_homeBackdropPreload?.src?.includes(src)) return;
+  _homeBackdropPreload = new Image();
+  _homeBackdropPreload.decoding = "async";
+  _homeBackdropPreload.src = src;
 }
 
 function setHomeBackdrop(backdropName) {
@@ -16673,7 +16700,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.26";
+const APP_VERSION = "3.0.27";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
