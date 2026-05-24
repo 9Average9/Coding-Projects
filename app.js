@@ -16760,7 +16760,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.30";
+const APP_VERSION = "3.0.31";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>

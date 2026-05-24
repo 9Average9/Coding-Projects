@@ -85,25 +85,27 @@ const BOOKS = [
 const BOOK_BY_NAME = new Map(BOOKS.map(book => [book.name.toLowerCase(), book]));
 BOOK_BY_NAME.set('psalm', BOOKS.find(book => book.code === 'PSA'));
 
-function fetchText(url, redirects = 0) {
+function fetchBuffer(url, redirects = 0) {
   return new Promise((resolve, reject) => {
     if (redirects > 5) return reject(new Error('Too many redirects'));
     https.get(url, { headers: { 'User-Agent': 'rhema-english-build/1.0' } }, res => {
       if ([301, 302, 307, 308].includes(res.statusCode)) {
-        return fetchText(res.headers.location, redirects + 1).then(resolve, reject);
+        return fetchBuffer(res.headers.location, redirects + 1).then(resolve, reject);
       }
       if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
     }).on('error', reject);
   });
 }
 
 async function readSource(source) {
   const localPath = path.join(TMP_DIR, source.local);
-  if (fs.existsSync(localPath)) return fs.readFileSync(localPath, 'utf8');
-  return fetchText(source.url);
+  const bytes = fs.existsSync(localPath) ? fs.readFileSync(localPath) : await fetchBuffer(source.url);
+  const utf8 = bytes.toString('utf8');
+  if (!utf8.includes('\uFFFD')) return utf8;
+  return new TextDecoder('windows-1252').decode(bytes);
 }
 
 function parsePlainText(raw) {
