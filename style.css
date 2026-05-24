@@ -18240,14 +18240,13 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 .cp-comment-btn .material-symbols-outlined { font-size: 1rem; }
 .cp-reaction-stack {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
   border: none;
   background: transparent;
   display: flex;
   align-items: center;
-  padding: 0;
+  width: fit-content;
+  margin: 10px 0 0 12px;
+  padding: 0 4px 0 0;
 }
 .cp-reaction-stack span,
 .cp-reaction-stack em {

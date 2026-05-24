@@ -16772,7 +16772,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.39";
+const APP_VERSION = "3.0.40";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17276,6 +17276,10 @@ async function restoreUserFromFirestore(user) {
 async function syncUserData() {
   const user = window.Auth?.getCurrentUser();
   if (!user) return;
+  const savedUsername = localStorage.getItem("authUsername") || "";
+  const savedDisplayName = localStorage.getItem("authDisplayName") || "";
+  const displayName = profileData.displayName || savedDisplayName;
+  if (!savedUsername || !displayName || displayName === "User") return;
 
   const vocabChapterXP = {};
   Object.keys(localStorage).filter(k => k.startsWith("vocabChapterXP_")).forEach(k => {
@@ -17283,8 +17287,8 @@ async function syncUserData() {
   });
 
   const data = {
-    username: localStorage.getItem("authUsername") || "",
-    displayName: profileData.displayName || "",
+    username: savedUsername,
+    displayName,
     joinDate: localStorage.getItem("appJoinDate") || null,
     xp: profileData.xp || 0,
     color: profileData.color || "#d4a93a",
@@ -17456,7 +17460,30 @@ async function submitCreateAccount() {
     btn.textContent = "Creating account…";
     const oldAnonymousUid = localStorage.getItem("lbUserId");
     const migration = gatherMigrationData();
-    await window.Auth.createAccount(username, password, displayName, migration);
+    const previousProfileData = { ...(profileData || {}) };
+    const previousUsername = localStorage.getItem("authUsername");
+    const previousDisplayName = localStorage.getItem("authDisplayName");
+    localStorage.setItem("authUsername", username);
+    localStorage.setItem("authDisplayName", displayName);
+    profileData = {
+      ...(profileData || {}),
+      displayName,
+      username,
+      isCreated: true
+    };
+    localStorage.setItem("profileData", JSON.stringify(profileData));
+
+    try {
+      await window.Auth.createAccount(username, password, displayName, migration);
+    } catch (e) {
+      if (previousUsername == null) localStorage.removeItem("authUsername");
+      else localStorage.setItem("authUsername", previousUsername);
+      if (previousDisplayName == null) localStorage.removeItem("authDisplayName");
+      else localStorage.setItem("authDisplayName", previousDisplayName);
+      profileData = previousProfileData;
+      localStorage.setItem("profileData", JSON.stringify(profileData));
+      throw e;
+    }
 
     localStorage.setItem("authUsername", username);
     localStorage.setItem("authDisplayName", displayName);
@@ -17465,6 +17492,7 @@ async function submitCreateAccount() {
     }
 
     profileData = {
+      ...profileData,
       displayName,
       username,
       color: migration.color || "#d4a93a",

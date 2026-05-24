@@ -34,6 +34,115 @@ async function shareRecentCommunityPostsBetweenFriends(uidA, uidB) {
   }
 }
 
+async function deleteQueryInBatches(query, batchSize = 250) {
+  const snap = await query.limit(batchSize).get();
+  if (snap.empty) return;
+  const batch = db.batch();
+  snap.docs.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+  if (snap.size === batchSize) return deleteQueryInBatches(query, batchSize);
+}
+
+async function cleanupDeletedUserData(uid) {
+  const userRef = db.collection("users").doc(uid);
+  const userSnap = await userRef.get();
+  const userData = userSnap.exists ? userSnap.data() : {};
+  const username = (userData.username || "").toLowerCase().trim();
+  const displayName = (userData.displayName || "").toLowerCase().trim();
+
+  const baseBatch = db.batch();
+  if (username) baseBatch.delete(db.collection("usernames").doc(username));
+  if (displayName) baseBatch.delete(db.collection("displayNames").doc(displayName));
+  baseBatch.delete(userRef);
+  baseBatch.delete(db.collection("xp_board").doc(uid));
+  baseBatch.delete(db.collection("scholar_board").doc(uid));
+  baseBatch.delete(db.collection("consistency_board").doc(uid));
+  await baseBatch.commit();
+
+  const friendSnap = await db.collection("users")
+    .where("friends", "array-contains", uid)
+    .limit(300)
+    .get();
+  if (!friendSnap.empty) {
+    const batch = db.batch();
+    friendSnap.docs.forEach(doc => batch.update(doc.ref, {
+      friends: FieldValue.arrayRemove(uid),
+      friendRequestsIn: FieldValue.arrayRemove(uid),
+      friendRequestsOut: FieldValue.arrayRemove(uid),
+      updatedAt: FieldValue.serverTimestamp()
+    }));
+    await batch.commit();
+  }
+
+  await deleteQueryInBatches(db.collection("encouragements").doc(uid).collection("messages"));
+
+  const authoredPosts = await db.collection("communityPosts")
+    .where("authorUid", "==", uid)
+    .limit(300)
+    .get();
+  if (!authoredPosts.empty) {
+    const batch = db.batch();
+    authoredPosts.docs.forEach(doc => batch.update(doc.ref, {
+      isActive: false,
+      deletedAt: FieldValue.serverTimestamp()
+    }));
+    await batch.commit();
+  }
+
+  const audiencePosts = await db.collection("communityPosts")
+    .where("audienceUids", "array-contains", uid)
+    .limit(300)
+    .get();
+  if (!audiencePosts.empty) {
+    const batch = db.batch();
+    let count = 0;
+    audiencePosts.docs.forEach(doc => {
+      if (doc.data().authorUid === uid) return;
+      batch.update(doc.ref, {
+        [`reactions.${uid}`]: FieldValue.delete(),
+        [`prayers.${uid}`]: FieldValue.delete()
+      });
+      count += 1;
+    });
+    if (count) await batch.commit();
+  }
+
+  const comments = await db.collectionGroup("comments")
+    .where("authorUid", "==", uid)
+    .limit(300)
+    .get();
+  if (!comments.empty) {
+    const batch = db.batch();
+    comments.docs.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+  }
+
+  const studies = await db.collection("studies")
+    .where("collaboratorUids", "array-contains", uid)
+    .limit(300)
+    .get();
+  for (const studyDoc of studies.docs) {
+    const study = studyDoc.data();
+    if (study.creatorUid !== uid) {
+      await studyDoc.ref.update({
+        collaboratorUids: FieldValue.arrayRemove(uid),
+        pendingCollaboratorUids: FieldValue.arrayRemove(uid)
+      });
+      continue;
+    }
+
+    for (const sub of ["notes", "entries", "savedVerses", "wordLog", "trails"]) {
+      await deleteQueryInBatches(studyDoc.ref.collection(sub));
+    }
+    await studyDoc.ref.delete();
+  }
+}
+
+exports.cleanupDeletedAuthUser = functions.auth.user().onDelete(async user => {
+  await cleanupDeletedUserData(user.uid);
+  return null;
+});
+
 function getLocalParts(date, timeZone) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone,

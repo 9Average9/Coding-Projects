@@ -6,6 +6,7 @@ import {
   setDoc,
   getDoc,
   addDoc,
+  collectionGroup,
   deleteDoc,
   collection,
   query,
@@ -40,7 +41,8 @@ import {
   getStorage,
   ref as storageRef,
   uploadBytes,
-  getDownloadURL
+  getDownloadURL,
+  deleteObject
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 const firebaseConfig = {
@@ -171,7 +173,8 @@ async function deleteAccount(password) {
     deleteDoc(doc(db, "users", uid)).catch(() => {}),
     deleteDoc(doc(db, "xp_board", uid)).catch(() => {}),
     deleteDoc(doc(db, "scholar_board", uid)).catch(() => {}),
-    deleteDoc(doc(db, "consistency_board", uid)).catch(() => {})
+    deleteDoc(doc(db, "consistency_board", uid)).catch(() => {}),
+    deleteObject(storageRef(storage, `avatars/${uid}.jpg`)).catch(() => {})
   ]);
 
   await deleteUser(user);
@@ -202,6 +205,36 @@ async function cleanupAccountSocialData(uid, userData = null) {
       }).catch(() => {});
     }));
   } catch (e) { console.warn("cleanupAccountSocialData post activity:", e); }
+
+  try {
+    const authoredComments = await getDocs(query(collectionGroup(db, "comments"), where("authorUid", "==", uid), limit(100)));
+    await Promise.all(authoredComments.docs.map(d => {
+      const postRef = d.ref.parent.parent;
+      return Promise.all([
+        deleteDoc(d.ref).catch(() => {}),
+        postRef ? updateDoc(postRef, { commentCount: increment(-1) }).catch(() => {}) : Promise.resolve()
+      ]);
+    }));
+  } catch (e) { console.warn("cleanupAccountSocialData comments:", e); }
+
+  try {
+    const studies = await getDocs(query(collection(db, "studies"), where("collaboratorUids", "array-contains", uid), limit(100)));
+    await Promise.all(studies.docs.map(async d => {
+      const study = d.data();
+      if (study.creatorUid !== uid) {
+        return updateDoc(d.ref, {
+          collaboratorUids: arrayRemove(uid),
+          pendingCollaboratorUids: arrayRemove(uid)
+        }).catch(() => {});
+      }
+
+      for (const sub of ["notes", "entries", "savedVerses", "wordLog", "trails"]) {
+        const subSnap = await getDocs(collection(db, "studies", d.id, sub)).catch(() => null);
+        if (subSnap) await Promise.all(subSnap.docs.map(child => deleteDoc(child.ref).catch(() => {})));
+      }
+      return deleteDoc(d.ref).catch(() => {});
+    }));
+  } catch (e) { console.warn("cleanupAccountSocialData studies:", e); }
 
   try {
     const messages = await getDocs(collection(db, "encouragements", uid, "messages"));
