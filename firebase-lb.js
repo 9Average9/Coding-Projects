@@ -85,41 +85,52 @@ async function createAccount(username, password, displayName, migrationData = {}
   const cred = await createUserWithEmailAndPassword(auth, toEmail(username), password);
   const uid = cred.user.uid;
   const joinDate = migrationData.joinDate || new Date().toISOString();
+  const usernameKey = username.toLowerCase().trim();
+  const displayNameKey = displayName.toLowerCase().trim();
 
-  await Promise.all([
-    setDoc(doc(db, "usernames", username.toLowerCase().trim()), { uid }),
-    setDoc(doc(db, "displayNames", displayName.toLowerCase().trim()), { uid, displayName })
-  ]);
+  try {
+    await Promise.all([
+      setDoc(doc(db, "usernames", usernameKey), { uid }),
+      setDoc(doc(db, "displayNames", displayNameKey), { uid, displayName })
+    ]);
 
-  const userData = {
-    username,
-    displayName,
-    joinDate,
-    xp: migrationData.xp || 0,
-    color: migrationData.color || "#d4a93a",
-    greekExperience: migrationData.greekExperience || "new",
-    avatar: migrationData.avatar || "school",
-    streak: migrationData.streak || 0,
-    lastStudyDate: migrationData.lastStudyDate || null,
-    totalStudySeconds: migrationData.totalStudySeconds || 0,
-    completedLessons: migrationData.completedLessons || {},
-    completedAdvancedLessons: migrationData.completedAdvancedLessons || {},
-    knownWords: migrationData.knownWords || [],
-    translationProgress: migrationData.translationProgress || {},
-    achievements: migrationData.achievements || [],
-    practiceToolsUnlocked: migrationData.practiceToolsUnlocked || false,
-    lessonMode: migrationData.lessonMode || "basic",
-    vocabChapterXP: migrationData.vocabChapterXP || {},
-    lbXpJoined: migrationData.lbXpJoined || false,
-    lbConsJoined: migrationData.lbConsJoined || false,
-    lbScholarJoined: migrationData.lbScholarJoined || false,
-    lbScholarBest: migrationData.lbScholarBest || 0,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  };
+    const userData = {
+      username,
+      displayName,
+      joinDate,
+      xp: migrationData.xp || 0,
+      color: migrationData.color || "#d4a93a",
+      greekExperience: migrationData.greekExperience || "new",
+      avatar: migrationData.avatar || "school",
+      streak: migrationData.streak || 0,
+      lastStudyDate: migrationData.lastStudyDate || null,
+      totalStudySeconds: migrationData.totalStudySeconds || 0,
+      completedLessons: migrationData.completedLessons || {},
+      completedAdvancedLessons: migrationData.completedAdvancedLessons || {},
+      knownWords: migrationData.knownWords || [],
+      translationProgress: migrationData.translationProgress || {},
+      achievements: migrationData.achievements || [],
+      practiceToolsUnlocked: migrationData.practiceToolsUnlocked || false,
+      lessonMode: migrationData.lessonMode || "basic",
+      vocabChapterXP: migrationData.vocabChapterXP || {},
+      lbXpJoined: migrationData.lbXpJoined || false,
+      lbConsJoined: migrationData.lbConsJoined || false,
+      lbScholarJoined: migrationData.lbScholarJoined || false,
+      lbScholarBest: migrationData.lbScholarBest || 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
 
-  await setDoc(doc(db, "users", uid), userData);
-  return { uid, joinDate, displayName, username };
+    await setDoc(doc(db, "users", uid), userData);
+    return { uid, joinDate, displayName, username };
+  } catch (e) {
+    await Promise.all([
+      deleteDoc(doc(db, "usernames", usernameKey)).catch(() => {}),
+      deleteDoc(doc(db, "displayNames", displayNameKey)).catch(() => {}),
+      deleteUser(cred.user).catch(() => {})
+    ]);
+    throw e;
+  }
 }
 
 async function login(username, password) {
@@ -137,19 +148,24 @@ async function deleteAccount(password) {
   const uid = user.uid;
 
   const username = localStorage.getItem("authUsername") || "";
-  const credential = EmailAuthProvider.credential(toEmail(username), password);
+  const email = user.email || toEmail(username);
+  const credential = EmailAuthProvider.credential(email, password);
   await reauthenticateWithCredential(user, credential);
 
+  let userData = null;
   try {
     const snap = await getDoc(doc(db, "users", uid));
     if (snap.exists()) {
-      const { username: u, displayName } = snap.data();
+      userData = snap.data();
+      const { username: u, displayName } = userData;
       await Promise.all([
         deleteDoc(doc(db, "usernames", (u || "").toLowerCase().trim())).catch(() => {}),
         deleteDoc(doc(db, "displayNames", (displayName || "").toLowerCase().trim())).catch(() => {})
       ]);
     }
   } catch {}
+
+  await cleanupAccountSocialData(uid, userData);
 
   await Promise.all([
     deleteDoc(doc(db, "users", uid)).catch(() => {}),
@@ -159,6 +175,38 @@ async function deleteAccount(password) {
   ]);
 
   await deleteUser(user);
+}
+
+async function cleanupAccountSocialData(uid, userData = null) {
+  try {
+    const friendUids = userData?.friends || [];
+    await Promise.all(friendUids.map(friendUid =>
+      updateDoc(doc(db, "users", friendUid), {
+        friends: arrayRemove(uid),
+        friendRequestsIn: arrayRemove(uid),
+        friendRequestsOut: arrayRemove(uid),
+        updatedAt: serverTimestamp()
+      }).catch(() => {})
+    ));
+  } catch (e) { console.warn("cleanupAccountSocialData friends:", e); }
+
+  try {
+    const audiencePosts = await getDocs(query(collection(db, "communityPosts"), where("audienceUids", "array-contains", uid), limit(100)));
+    await Promise.all(audiencePosts.docs.map(d => {
+      if (d.data().authorUid === uid) {
+        return updateDoc(d.ref, { isActive: false, deletedAt: serverTimestamp() }).catch(() => {});
+      }
+      return updateDoc(d.ref, {
+        [`reactions.${uid}`]: deleteField(),
+        [`prayers.${uid}`]: deleteField()
+      }).catch(() => {});
+    }));
+  } catch (e) { console.warn("cleanupAccountSocialData post activity:", e); }
+
+  try {
+    const messages = await getDocs(collection(db, "encouragements", uid, "messages"));
+    await Promise.all(messages.docs.map(d => deleteDoc(d.ref).catch(() => {})));
+  } catch (e) { console.warn("cleanupAccountSocialData messages:", e); }
 }
 
 function onAuthChange(callback) {
