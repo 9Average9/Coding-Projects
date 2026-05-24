@@ -16760,7 +16760,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.32";
+const APP_VERSION = "3.0.33";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17797,18 +17797,28 @@ function closeNotifPrompt() {
   document.getElementById("notifPromptModal")?.classList.remove("open");
 }
 
+function syncNotificationPermissionUI(permission = (typeof Notification !== "undefined" ? Notification.permission : "default")) {
+  const granted = permission === "granted";
+  if (granted) closeNotifPrompt();
+  document.getElementById("reminderNotifWarning")?.classList.toggle("hidden", granted);
+  updateReminderButtonUI();
+}
+
 async function enableNotificationsFromPrompt() {
   const btn = document.getElementById("notifPromptModal")?.querySelector(".notif-prompt-enable-btn");
+  const inlineBtn = document.querySelector(".reminder-notif-enable-btn");
+  if (inlineBtn) inlineBtn.disabled = true;
   if (btn) { btn.disabled = true; btn.textContent = "Enabling…"; }
   try {
     const permission = await Notification.requestPermission();
-    closeNotifPrompt();
     if (permission === "granted") {
       const user = window.Auth?.getCurrentUser();
       if (user) await window.FCM?.registerToken(user.uid).catch(() => {});
     }
+    syncNotificationPermissionUI(permission);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Enable Notifications"; }
+    if (inlineBtn) inlineBtn.disabled = false;
   }
 }
 
@@ -17870,6 +17880,7 @@ async function saveReminderSettings() {
     alert("Please allow notifications in your browser or device settings to enable reminders.");
     return;
   }
+  syncNotificationPermissionUI(permission);
 
   const timeInput = document.getElementById("reminderTimeInput");
   const freqRadio = document.querySelector("input[name='reminderFreq']:checked");
