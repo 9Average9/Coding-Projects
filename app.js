@@ -9908,7 +9908,7 @@ function _saveRhemaPosition() {
   }
   const verseSnippet = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
   const greekSnippet = _rhemaData() ? (((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {})[_rhemaVerse] || []).map(w => w[0]).join(' ') : '';
-  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, textMode: _rhemaTextMode, ts: Date.now(), snippet: verseSnippet, greek: greekSnippet };
+  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, textMode: _rhemaTextMode, translation: _rhemaEnglishLabel(), ts: Date.now(), snippet: verseSnippet, greek: greekSnippet };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
   if (uid && window.LB) {
     window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
@@ -9932,7 +9932,10 @@ function _updateHomeContinueCard() {
     const passageEl = document.getElementById('hccPassage');
     if (passageEl) passageEl.textContent = passageText;
     const snippetEl = document.getElementById('hccSnippet');
-    if (snippetEl) snippetEl.textContent = pos.snippet || '';
+    if (snippetEl) {
+      const hasCurrentEnglish = pos.translation === 'MSB' || pos.translation === 'BSB';
+      snippetEl.textContent = hasCurrentEnglish ? (pos.snippet || '') : (pos.greek || '');
+    }
     card.style.display = '';
     empty.style.display = 'none';
   } catch {
@@ -9949,7 +9952,7 @@ function resumeRhema() {
       _rhemaBook = pos.book || 'JOH';
       _rhemaChapter = pos.chapter || '3';
       _rhemaVerse = pos.verse || '16';
-      _rhemaTextMode = pos.textMode === 'critical' ? 'critical' : _rhemaTextMode;
+      _rhemaTextMode = pos.textMode === 'critical' ? 'critical' : 'majority';
     } catch {}
   }
   showRhema();
@@ -16757,7 +16760,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.29";
+const APP_VERSION = "3.0.30";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
