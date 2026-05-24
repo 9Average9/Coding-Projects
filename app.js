@@ -46,6 +46,8 @@ let _appLaunchReleased = false;
 let _appUpdateReloadPending = false;
 let _appUpdateReloadTimer = null;
 let _homeBackdropPreload = null;
+let _pendingFirstRunNotificationPrompt = false;
+let _deferWelcomeUntilNotificationPromptCloses = false;
 
 // Personal Studies state
 let _myStudies = [];
@@ -16768,7 +16770,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.35";
+const APP_VERSION = "3.0.36";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -16956,6 +16958,7 @@ function setAppLaunchText(text) {
 function showAppLaunchScreen(text = 'Preparing your study space') {
   const splash = document.getElementById('appLaunchScreen');
   if (!splash) return;
+  if (_appLaunchReleased) return;
   setAppLaunchText(text);
   splash.classList.remove('dismissed', 'hidden');
 }
@@ -17489,12 +17492,8 @@ async function submitCreateAccount() {
     updateLessonCompletionUI();
     queueAppWelcomeCoachAfterAuth();
 
-    // Show in-app notification prompt for new accounts
-    setTimeout(() => {
-      if (Notification?.permission === "default") {
-        document.getElementById("notifPromptModal")?.classList.add("open");
-      }
-    }, 1200);
+    // Show the notification prompt only after the first automatic app coach finishes.
+    _pendingFirstRunNotificationPrompt = typeof Notification !== "undefined" && Notification.permission === "default";
   } catch (e) {
     errEl.textContent = e.message || "Something went wrong. Please try again.";
   } finally {
@@ -17810,6 +17809,10 @@ function completeProfileFocusIfProfileMade() {
 
 function closeNotifPrompt() {
   document.getElementById("notifPromptModal")?.classList.remove("open");
+  if (_deferWelcomeUntilNotificationPromptCloses) {
+    _deferWelcomeUntilNotificationPromptCloses = false;
+    setTimeout(maybeShowHomeIntroModal, 250);
+  }
 }
 
 function syncNotificationPermissionUI(permission = (typeof Notification !== "undefined" ? Notification.permission : "default")) {
@@ -20274,6 +20277,7 @@ let _appCoachSteps = [];
 let _appCoachIdx = 0;
 let _appCoachSeenKey = 'appWelcomeCoachSeenV275';
 let _appCoachFinishing = false;
+let _appCoachReplayMode = false;
 
 const APP_WELCOME_COACH_STEPS = [
   { title: 'Welcome to Basic Greek', body: 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place.' },
@@ -20359,7 +20363,7 @@ const WORD_LIBRARY_COACH_STEPS = [
 function startAppWelcomeCoach(force = false) {
   if (!force && (!_authReady || !_hasSignedInUser() || document.getElementById("authModal")?.classList.contains("open"))) return;
   if (_coachHasSeen('appWelcomeCoachSeenV275', force)) return;
-  _startAppCoach(APP_WELCOME_COACH_STEPS, 'appWelcomeCoachSeenV275');
+  _startAppCoach(APP_WELCOME_COACH_STEPS, 'appWelcomeCoachSeenV275', force);
 }
 
 function startStudyRhemaCoach(force = false) {
@@ -20421,13 +20425,14 @@ function startCoachReplay(type) {
   }
 }
 
-function _startAppCoach(steps, seenKey) {
+function _startAppCoach(steps, seenKey, replayMode = false) {
   if (!document.getElementById('appCoachOverlay') || !steps?.length) return;
   _pauseHomeFlipForCoach();
   _appCoachSteps = steps;
   _appCoachIdx = 0;
   _appCoachSeenKey = seenKey;
   _appCoachFinishing = false;
+  _appCoachReplayMode = !!replayMode;
   setTimeout(() => _showAppCoachStep(), 40);
 }
 
@@ -20555,8 +20560,20 @@ function _endAppCoach() {
   _coachMarkSeen(_appCoachSeenKey);
   if (_appCoachSeenKey === 'appWelcomeCoachSeenV275') {
     showNavPage('home');
-    setTimeout(maybeShowHomeIntroModal, 250);
+    const shouldShowNotificationPrompt =
+      !_appCoachReplayMode &&
+      _pendingFirstRunNotificationPrompt &&
+      typeof Notification !== "undefined" &&
+      Notification.permission === "default";
+    _pendingFirstRunNotificationPrompt = false;
+    if (shouldShowNotificationPrompt) {
+      _deferWelcomeUntilNotificationPromptCloses = true;
+      setTimeout(() => document.getElementById("notifPromptModal")?.classList.add("open"), 250);
+    } else {
+      setTimeout(maybeShowHomeIntroModal, 250);
+    }
   }
+  _appCoachReplayMode = false;
   _resumeHomeFlipAfterCoach();
 }
 
