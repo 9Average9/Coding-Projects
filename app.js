@@ -9734,8 +9734,8 @@ function _saveRhemaPosition() {
     return;
   }
   const verseSnippet = window.RhemaKJV ? ((window.RhemaKJV[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || '') : '';
-  const greekSnippet = window.RhemaNT ? ((((window.RhemaNT.text || {})[_rhemaBook] || {})[_rhemaChapter] || {})[_rhemaVerse] || []).map(w => w[0]).join(' ') : '';
-  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, ts: Date.now(), snippet: verseSnippet, greek: greekSnippet };
+  const greekSnippet = _rhemaData() ? (((_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {})[_rhemaVerse] || []).map(w => w[0]).join(' ') : '';
+  const pos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, textMode: _rhemaTextMode, ts: Date.now(), snippet: verseSnippet, greek: greekSnippet };
   localStorage.setItem('rhemaLastPos', JSON.stringify(pos));
   if (uid && window.LB) {
     window.LB.saveRhemaPosition?.(uid, pos)?.catch?.(() => {});
@@ -9776,6 +9776,7 @@ function resumeRhema() {
       _rhemaBook = pos.book || 'JOH';
       _rhemaChapter = pos.chapter || '3';
       _rhemaVerse = pos.verse || '16';
+      _rhemaTextMode = pos.textMode === 'critical' ? 'critical' : _rhemaTextMode;
     } catch {}
   }
   showRhema();
@@ -16532,7 +16533,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.15";
+const APP_VERSION = "3.0.16";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18543,6 +18544,7 @@ let _rhemaVerse = '16';
 let _rhemaShowKjv    = false;
 let _rhemaGreekOnly  = false;
 let _rhemaSyntaxMode = false;
+let _rhemaTextMode = localStorage.getItem('rhemaTextMode') === 'critical' ? 'critical' : 'majority';
 let _rhemaActiveTab = 'parsing';
 let _rhemaActiveWord = null;
 let _rhemaTrail = [];       // full cross-ref trail — never auto-shrinks
@@ -18608,7 +18610,19 @@ function _rhemaData() {
 }
 
 function _rhemaText() {
-  return _rhemaData()?.text || {};
+  const baseText = _rhemaData()?.text || {};
+  if (_rhemaTextMode !== 'critical' || !window.RhemaCriticalNT?.text) return baseText;
+  return { ...baseText, ...window.RhemaCriticalNT.text };
+}
+
+function _rhemaTextForMode(mode) {
+  const baseText = _rhemaData()?.text || {};
+  if (mode === 'critical' && window.RhemaCriticalNT?.text) return { ...baseText, ...window.RhemaCriticalNT.text };
+  return baseText;
+}
+
+function _rhemaOtherTextMode() {
+  return _rhemaTextMode === 'critical' ? 'majority' : 'critical';
 }
 
 function _rhemaBookName(code) {
@@ -18898,7 +18912,7 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
+    const files = ['rhema-nt.js', 'rhema-critical.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-kjv.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
@@ -19334,16 +19348,84 @@ function rhemaClearHistory() {
 
 // ── Verse rendering ───────────────────────────────────────────────────────────
 
+function _escapeRhemaAttr(value = '') {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function _normalizeRhemaSurface(value = '') {
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[()⸀⸂⸃⸆⸇.,;··]/g, '')
+    .replace(/ς/g, 'σ')
+    .toLowerCase();
+}
+
+function _rhemaVariantMap(words, verse) {
+  if (!_rhemaData() || !window.RhemaCriticalNT?.text || !RHEMA_NT_BOOK_ORDER.includes(_rhemaBook)) return {};
+  const otherText = _rhemaTextForMode(_rhemaOtherTextMode());
+  const otherWords = (otherText[_rhemaBook] || {})[_rhemaChapter]?.[verse || _rhemaVerse] || [];
+  if (!otherWords.length) return {};
+
+  const a = words.map(w => _normalizeRhemaSurface(w[0]));
+  const b = otherWords.map(w => _normalizeRhemaSurface(w[0]));
+  const dp = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+  for (let i = a.length - 1; i >= 0; i--) {
+    for (let j = b.length - 1; j >= 0; j--) {
+      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+
+  const variants = {};
+  let i = 0, j = 0;
+  while (i < a.length || j < b.length) {
+    if (i < a.length && j < b.length && a[i] === b[j]) {
+      i++; j++;
+      continue;
+    }
+    const startI = i;
+    const startJ = j;
+    while (i < a.length || j < b.length) {
+      if (i < a.length && j < b.length && a[i] === b[j]) break;
+      if (j >= b.length || (i < a.length && dp[i + 1][j] >= dp[i][j + 1])) i++;
+      else j++;
+    }
+    const otherPhrase = otherWords.slice(startJ, j).map(w => w[0]).join(' ').trim();
+    if (!otherPhrase) continue;
+    const label = _rhemaTextMode === 'critical' ? 'Majority' : 'Critical';
+    const from = startI < i ? startI : Math.max(0, startI - 1);
+    const to = startI < i ? i : Math.min(words.length, from + 1);
+    for (let k = from; k < to; k++) variants[k] = { label, text: otherPhrase };
+  }
+  return variants;
+}
+
+function showRhemaVariant(label, text) {
+  const toast = document.getElementById('rhemaChapterToast');
+  if (!toast) return;
+  toast.textContent = `${label}: ${text}`;
+  toast.classList.remove('hidden');
+  clearTimeout(showRhemaVariant._timer);
+  showRhemaVariant._timer = setTimeout(() => toast.classList.add('hidden'), 2600);
+}
+
 function _renderVerseWords(words, verse) {
   const vArg = verse ? `, '${verse}'` : '';
+  const variantMap = _rhemaVariantMap(words, verse);
   if (_rhemaGreekOnly) {
     return words.map((w, i) => {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
       const posKey = normalizePosKey(w[2]);
       const hlColor = _rhemaPosHighlights.has(posKey) ? HIGHLIGHT_CATS[posKey]?.color : null;
       const style = hlColor ? ` style="background:${hlColor};border-radius:4px"` : '';
-      const cls = isXref ? 'rhema-word xref' : 'rhema-word';
-      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span></span>` +
+      const variant = variantMap[i];
+      const cls = `${isXref ? 'rhema-word xref' : 'rhema-word'}${variant ? ' has-variant' : ''}`;
+      const variantTag = variant
+        ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
+        : '';
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span>${variantTag}</span>` +
              (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '');
     }).join('');
   } else {
@@ -19352,12 +19434,16 @@ function _renderVerseWords(words, verse) {
       const posKey = normalizePosKey(w[2]);
       const hlColor = _rhemaPosHighlights.has(posKey) ? HIGHLIGHT_CATS[posKey]?.color : null;
       const style = hlColor ? ` style="background:${hlColor};border-radius:4px"` : '';
-      const cls = isXref ? 'rhema-word xref' : 'rhema-word';
+      const variant = variantMap[i];
+      const cls = `${isXref ? 'rhema-word xref' : 'rhema-word'}${variant ? ' has-variant' : ''}`;
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
       const rawGloss = lex.brief || '';
       const gloss = rawGloss.split(',')[0].split(';')[0].trim();
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
-      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span>${glossHtml}</span>`;
+      const variantTag = variant
+        ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
+        : '';
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span>${variantTag}${glossHtml}</span>`;
     }).join('');
   }
 }
@@ -19443,6 +19529,20 @@ function toggleRhemaMode() {
   renderRhemaVerse();
 }
 
+function toggleRhemaTextMode() {
+  if (!window.RhemaCriticalNT?.text || !RHEMA_NT_BOOK_ORDER.includes(_rhemaBook)) {
+    showRhemaVariant('Critical Text', 'Available for New Testament passages');
+    closeRhemaWheel();
+    return;
+  }
+  _rhemaTextMode = _rhemaTextMode === 'critical' ? 'majority' : 'critical';
+  localStorage.setItem('rhemaTextMode', _rhemaTextMode);
+  _syncRhemaTextModeBtn();
+  _syncToolWandIndicator();
+  renderRhemaVerse();
+  closeRhemaWheel();
+}
+
 // ── Tool Wheel ────────────────────────────────────────────────────────────────
 
 function openRhemaWheel() {
@@ -19486,23 +19586,35 @@ function toggleWheelTool(tool) {
   } else if (tool === 'wordlibrary') {
     closeRhemaWheel();
     setTimeout(() => openWordLibrary(), 200);
+  } else if (tool === 'critical') {
+    toggleRhemaTextMode();
   }
 }
 
 function _syncWheelBtn(tool, active) {
-  const ids = { syntax: 'wheelItemSyntax', 'greek-only': 'wheelItemGreek', highlight: 'wheelItemHighlight' };
+  const ids = { syntax: 'wheelItemSyntax', 'greek-only': 'wheelItemGreek', highlight: 'wheelItemHighlight', critical: 'wheelItemCritical' };
   document.getElementById(ids[tool])?.classList.toggle('active', active);
+}
+
+function _syncRhemaTextModeBtn() {
+  const btn = document.getElementById('wheelItemCritical');
+  if (!btn) return;
+  const label = btn.querySelector('.rwi-label');
+  if (label) label.textContent = _rhemaTextMode === 'critical' ? 'Majority Text' : 'Critical Text';
+  btn.classList.toggle('active', _rhemaTextMode === 'critical');
 }
 
 function _syncWheelState() {
   _syncWheelBtn('syntax', _rhemaSyntaxMode);
   _syncWheelBtn('greek-only', _rhemaGreekOnly);
   _syncWheelBtn('highlight', _rhemaHighlightBarOn);
+  _syncWheelBtn('critical', _rhemaTextMode === 'critical');
+  _syncRhemaTextModeBtn();
   document.getElementById('wheelItemXref')?.classList.toggle('active', _rhemaCrossRefMode);
 }
 
 function _syncToolWandIndicator() {
-  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn;
+  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn || _rhemaTextMode === 'critical';
   document.getElementById('rhemaToolBtn')?.classList.toggle('has-active', hasActive);
 }
 

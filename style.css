@@ -11949,8 +11949,8 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   position: absolute;
   transform: translate(-50%, -50%) scale(0);
   opacity: 0;
-  width: 74px;
-  height: 74px;
+  width: 78px;
+  height: 78px;
   border-radius: 50%;
   background: var(--card-color);
   border: 2px solid var(--border-color);
@@ -11965,7 +11965,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease, background 0.15s;
 }
 .rhema-wheel-item .material-symbols-outlined { font-size: 22px; }
-.rwi-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.8; }
+.rwi-label { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; opacity: 0.8; line-height: 1.05; }
 .rhema-wheel-item.active {
   background: var(--secondary-color);
   border-color: var(--secondary-color);
@@ -11973,12 +11973,13 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 .rhema-wheel-item.rw-placeholder { opacity: 0; }
 .rhema-wheel-overlay.open .rhema-wheel-item.rw-placeholder { opacity: 0.45; }
-/* Pentagon positions (r=122px, clockwise from top) */
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(1) { transform: translate(calc(-50% + 0px),    calc(-50% + -122px)) scale(1); opacity: 1; transition-delay: 0s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(2) { transform: translate(calc(-50% + 116px),  calc(-50% + -38px))  scale(1); opacity: 1; transition-delay: 0.04s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(3) { transform: translate(calc(-50% + 71px),   calc(-50% + 99px))   scale(1); opacity: 1; transition-delay: 0.08s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(4) { transform: translate(calc(-50% + -71px),  calc(-50% + 99px))   scale(1); opacity: 1; transition-delay: 0.12s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(5) { transform: translate(calc(-50% + -116px), calc(-50% + -38px))  scale(1); opacity: 1; transition-delay: 0.16s; }
+/* Hex positions (r=124px, clockwise from top) */
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(1) { transform: translate(calc(-50% + 0px),    calc(-50% + -124px)) scale(1); opacity: 1; transition-delay: 0s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(2) { transform: translate(calc(-50% + 107px),  calc(-50% + -62px))  scale(1); opacity: 1; transition-delay: 0.04s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(3) { transform: translate(calc(-50% + 107px),  calc(-50% + 62px))   scale(1); opacity: 1; transition-delay: 0.08s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(4) { transform: translate(calc(-50% + 0px),    calc(-50% + 124px))  scale(1); opacity: 1; transition-delay: 0.12s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(5) { transform: translate(calc(-50% + -107px), calc(-50% + 62px))   scale(1); opacity: 1; transition-delay: 0.16s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(6) { transform: translate(calc(-50% + -107px), calc(-50% + -62px))  scale(1); opacity: 1; transition-delay: 0.2s; }
 
 /* Scripture Trail Cross References */
 .rhema-xref-page {
@@ -18053,4 +18054,88 @@ body:has(#homeScreen.screen.active) #homeScreen .home-scroll {
   height: 5px !important;
   bottom: 1px !important;
   opacity: 0.9;
+}
+
+body:has(#profilePage.screen.active),
+body:has(#communityPage.screen.active),
+html:has(#profilePage.screen.active),
+html:has(#communityPage.screen.active) {
+  background: var(--primary-color) !important;
+}
+
+body:has(#profilePage.screen.active) .app,
+body:has(#communityPage.screen.active) .app,
+body:has(#profilePage.screen.active) #profilePage.screen.active,
+body:has(#communityPage.screen.active) #communityPage.screen.active {
+  background: var(--primary-color) !important;
+  min-height: 100svh !important;
+}
+
+#newLearnMenu .lesson-text small,
+#basicVerbsLearnMenu .lesson-text small {
+  color: #1f2937 !important;
+  opacity: 0.96 !important;
+  text-shadow: none !important;
+}
+
+.lesson-block.visited .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.visited .lesson-block-header::after,
+#advancedLearnMenu .lesson-block.visited .lesson-block-header::after,
+#advVerbsLearnMenu .lesson-block.visited .lesson-block-header::after {
+  content: "expand_more" !important;
+  font-family: "Material Symbols Outlined" !important;
+  font-size: 24px !important;
+  color: currentColor !important;
+  font-weight: normal !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) rotate(0deg) !important;
+}
+
+.lesson-block.visited.open .lesson-block-header::after,
+#basicVerbsLearnMenu .basic-verb-lesson.active .lesson-block.visited.open .lesson-block-header::after,
+#advancedLearnMenu .lesson-block.visited.open .lesson-block-header::after,
+#advVerbsLearnMenu .lesson-block.visited.open .lesson-block-header::after {
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
+.lm-section-verbs .lm-pair {
+  position: relative;
+  gap: 12px;
+}
+
+.lm-section-verbs .lm-track-card {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 14px;
+}
+
+.lm-section-verbs .lm-or-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  pointer-events: none;
+}
+
+.rhema-word.has-variant {
+  border-color: color-mix(in srgb, var(--secondary-color) 38%, var(--border-color));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--secondary-color) 14%, transparent);
+}
+
+.rhema-variant-tag {
+  align-self: center;
+  margin-top: 2px;
+  padding: 2px 5px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 42%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 11%, rgba(255,255,255,0.9));
+  color: var(--secondary-color);
+  font-size: 0.54rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
