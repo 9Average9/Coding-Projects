@@ -18,7 +18,8 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
-  increment
+  increment,
+  deleteField
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
   getAuth,
@@ -793,6 +794,91 @@ async function studyDeletePermanent(studyId, uid) {
   } catch (e) { console.warn("studyDeletePermanent:", e); return false; }
 }
 
+// Community Posts
+function listenCommunityPosts(uid, friendUids = [], callback) {
+  const q = query(collection(db, "communityPosts"), where("audienceUids", "array-contains", uid), limit(80));
+  return onSnapshot(q, snap => {
+    const now = Date.now();
+    const friendSet = new Set(friendUids || []);
+    const posts = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(p => p.isActive !== false)
+      .filter(p => !p.expiresAtMs || p.expiresAtMs > now)
+      .filter(p => p.authorUid === uid || friendSet.has(p.authorUid))
+      .sort((a, b) => (b.createdAtMs || b.createdAt?.seconds * 1000 || 0) - (a.createdAtMs || a.createdAt?.seconds * 1000 || 0));
+    callback(posts);
+  }, err => {
+    console.warn("listenCommunityPosts:", err);
+    callback([]);
+  });
+}
+
+async function addCommunityPost(uid, displayName, avatar, friendUids = [], post = {}) {
+  try {
+    const now = Date.now();
+    const audienceUids = [...new Set([uid, ...(friendUids || [])])];
+    const ref = await addDoc(collection(db, "communityPosts"), {
+      authorUid: uid,
+      authorName: displayName || "Someone",
+      authorAvatar: avatar || "person",
+      kind: post.kind || "insight",
+      body: String(post.body || "").trim(),
+      question: String(post.question || "").trim(),
+      linkUrl: String(post.linkUrl || "").trim(),
+      verse: post.verse || null,
+      alertFriends: !!post.alertFriends,
+      audienceUids,
+      reactions: {},
+      commentCount: 0,
+      createdAt: serverTimestamp(),
+      createdAtMs: now,
+      expiresAtMs: now + 7 * 24 * 60 * 60 * 1000,
+      isActive: true
+    });
+    if (post.alertFriends) {
+      for (const fuid of friendUids || []) {
+        fcmSendPushNotification(fuid, "communityPost", displayName || "Someone", uid, {
+          postId: ref.id,
+          postKind: post.kind || "insight"
+        });
+      }
+    }
+    return ref.id;
+  } catch (e) {
+    console.warn("addCommunityPost:", e);
+    return null;
+  }
+}
+
+async function reactCommunityPost(postId, uid, emoji) {
+  try {
+    const ref = doc(db, "communityPosts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return false;
+    const current = snap.data().reactions?.[uid];
+    await updateDoc(ref, {
+      [`reactions.${uid}`]: current === emoji ? deleteField() : emoji
+    });
+    return true;
+  } catch (e) {
+    console.warn("reactCommunityPost:", e);
+    return false;
+  }
+}
+
+async function deleteCommunityPost(postId, uid) {
+  try {
+    const ref = doc(db, "communityPosts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists() || snap.data().authorUid !== uid) return false;
+    await updateDoc(ref, { isActive: false, deletedAt: serverTimestamp() });
+    return true;
+  } catch (e) {
+    console.warn("deleteCommunityPost:", e);
+    return false;
+  }
+}
+
 // Listen for incoming encouragement messages (for in-app notifications)
 function listenEncouragements(uid, callback) {
   // No orderBy — avoids needing a composite index; sort client-side
@@ -831,6 +917,13 @@ window.Studies = {
   copy: studyCopy, delete: studyDeletePermanent, listenEncouragements, getEncouragementMessages,
   deleteMsg: deleteEncouragementMsg,
   getMemberNames: studyGetMemberNames
+};
+
+window.CommunityPosts = {
+  listen: listenCommunityPosts,
+  add: addCommunityPost,
+  react: reactCommunityPost,
+  delete: deleteCommunityPost
 };
 
 async function studyGetMemberNames(uids) {

@@ -88,6 +88,10 @@ let _lastSavedSandboxPos = null;      // track last-written study position to sk
 let _studyBoardLastLoad = 0;         // timestamp of last board query
 let _studyBoardSheetId = null;      // study shown in community board sheet
 let _studyBoardStudies = [];
+let _communityPosts = [];
+let _communityPostsUnsub = null;
+let _communityPostKind = 'insight';
+let _communityPostVerse = null;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
@@ -8161,6 +8165,10 @@ async function executeDeleteStudy() {
   const mode = _studyPendingDeleteMode;
   // Optimistically remove immediately (like iOS)
   _myStudies = _myStudies.filter(s => s.id !== studyId);
+  _studyBoardStudies = _studyBoardStudies.filter(s => s.id !== studyId);
+  _studyBoardLastLoad = 0;
+  if (_studyBoardSheetId === studyId) closeStudyBoardSheet();
+  if (_lbActiveTab === 'studies') _renderStudyBoard(_studyBoardStudies);
   if (!_myStudies.length) _studyDeleteMode = false;
   _renderHomeStudies();
   closeStudyDeleteConfirm();
@@ -8170,6 +8178,7 @@ async function executeDeleteStudy() {
   if (!ok) {
     _showStudyToast(mode === 'leave' ? 'Could not leave this study.' : 'Could not delete. Only the creator can delete a study.');
     await _loadMyStudies(); // restore if Firestore rejected it
+    await _loadStudyBoard(true);
   }
 }
 
@@ -9675,8 +9684,7 @@ function showNavPage(page) {
     showScreen('communityPage');
     localStorage.setItem('communityLastVisit', Date.now().toString());
     document.getElementById('commNavDot')?.classList.add('hidden');
-    showLbTab('studies');
-    _loadStudyBoard();
+    showLbTab('posts');
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -16760,7 +16768,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.33";
+const APP_VERSION = "3.0.34";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17570,6 +17578,11 @@ window.__onAuthStateReady = async (user) => {
       friendsList        = data.friends           || [];
       friendRequestsIn   = data.friendRequestsIn  || [];
       friendRequestsOut  = data.friendRequestsOut || [];
+      const friendsChanged = prevList.length !== friendsList.length || prevList.some(uid => !friendsList.includes(uid));
+      if (friendsChanged && _lbActiveTab === 'posts') {
+        if (_communityPostsUnsub) { _communityPostsUnsub(); _communityPostsUnsub = null; }
+        _startCommunityPosts();
+      }
 
       // Detect accepted requests: uid left requestsOut AND is now in friends
       const newlyAccepted = prevOut.filter(uid =>
@@ -17627,6 +17640,8 @@ window.__onAuthStateReady = async (user) => {
   } else {
     _unsubUserDoc?.();
     _unsubUserDoc = null;
+    if (_communityPostsUnsub) { _communityPostsUnsub(); _communityPostsUnsub = null; }
+    _communityPosts = [];
     _welcomeCoachQueuedAfterAuth = false;
     document.getElementById('appCoachOverlay')?.classList.add('hidden');
     _resumeHomeFlipAfterCoach();
@@ -18021,9 +18036,11 @@ function showLbTab(tab) {
   document.querySelectorAll(".lb-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   document.querySelectorAll(".lb-tab-pane").forEach(p => p.classList.toggle("active", p.dataset.tab === tab));
   if (_lbUnsub) { _lbUnsub(); _lbUnsub = null; }
+  if (tab !== "posts" && _communityPostsUnsub) { _communityPostsUnsub(); _communityPostsUnsub = null; }
   if (tab === "xp")              _renderXPBoard();
   else if (tab === "scholar")    _renderScholarBoard();
   else if (tab === "studies")    _loadStudyBoard();
+  else if (tab === "posts")      _startCommunityPosts();
 }
 
 function _lbEscape(str) {
@@ -18047,6 +18064,247 @@ function _rankBadgeHtml(rank) {
   const cls = ["lb-rank-gold", "lb-rank-silver", "lb-rank-bronze"];
   if (rank <= 3) return `<span class="lb-rank-badge ${cls[rank-1]}">${labels[rank-1]}</span>`;
   return `<span class="lb-rank-num">#${rank}</span>`;
+}
+
+// Community Posts
+function _startCommunityPosts() {
+  const list = document.getElementById('communityPostList');
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!list) return;
+  if (!uid) {
+    list.innerHTML = '<p class="study-board-empty">Sign in to see posts from friends.</p>';
+    return;
+  }
+  if (!window.CommunityPosts?.listen) {
+    list.innerHTML = '<p class="study-board-empty">Loading community posts...</p>';
+    setTimeout(() => { if (_lbActiveTab === 'posts') _startCommunityPosts(); }, 500);
+    return;
+  }
+  if (_communityPostsUnsub) {
+    _renderCommunityPosts();
+    return;
+  }
+  list.innerHTML = '<p class="study-board-empty">Loading posts...</p>';
+  _communityPostsUnsub = window.CommunityPosts?.listen?.(uid, friendsList, posts => {
+    _communityPosts = posts || [];
+    _renderCommunityPosts();
+  }) || null;
+}
+
+function _communityKindMeta(kind) {
+  return {
+    insight: { icon: 'lightbulb', label: 'Insight' },
+    question: { icon: 'help', label: 'Question' },
+    encouragement: { icon: 'volunteer_activism', label: 'Encouragement' },
+    prayer: { icon: 'favorite', label: 'Prayer' }
+  }[kind] || { icon: 'forum', label: 'Post' };
+}
+
+function _renderCommunityPosts() {
+  const list = document.getElementById('communityPostList');
+  if (!list) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!_communityPosts.length) {
+    list.innerHTML = `<div class="community-post-empty">
+      <span class="material-symbols-outlined">forum</span>
+      <strong>Start the week&apos;s conversation</strong>
+      <p>Share a verse, question, link, prayer, or encouragement. Posts clear after 7 days so the board stays fresh.</p>
+      <button onclick="openCommunityPostComposer()">Create the first post</button>
+    </div>`;
+    return;
+  }
+  list.innerHTML = _communityPosts.map(post => {
+    const meta = _communityKindMeta(post.kind);
+    const mine = uid && post.authorUid === uid;
+    const reactions = post.reactions || {};
+    const reactionEntries = Object.values(reactions);
+    const daysLeft = Math.max(1, Math.ceil(((post.expiresAtMs || Date.now()) - Date.now()) / 86400000));
+    const link = post.linkUrl ? _communityPostLink(post.linkUrl) : '';
+    return `<article class="community-post-card community-post-${post.kind || 'insight'}">
+      <div class="cp-top">
+        <span class="cp-avatar">${_renderAvatar(post.authorAvatar || 'person')}</span>
+        <div class="cp-author">
+          <strong>${_lbEscape(post.authorName || 'Someone')}</strong>
+          <small>${_communityPostTime(post)} Â· ${daysLeft}d left</small>
+        </div>
+        <span class="cp-kind"><span class="material-symbols-outlined">${meta.icon}</span>${meta.label}</span>
+      </div>
+      <p class="cp-body">${_lbEscape(post.body || '')}</p>
+      ${post.question ? `<div class="cp-question"><span class="material-symbols-outlined">question_mark</span>${_lbEscape(post.question)}</div>` : ''}
+      ${post.verse ? _communityPostVerseHtml(post.verse) : ''}
+      ${link}
+      <div class="cp-actions">
+        ${['🙏','🔥','❤️','🙌'].map(emoji => {
+          const active = reactions[uid] === emoji;
+          const count = reactionEntries.filter(r => r === emoji).length;
+          return `<button class="${active ? 'active' : ''}" onclick="reactCommunityPost('${post.id}','${emoji}')"><span>${emoji}</span>${count ? `<small>${count}</small>` : ''}</button>`;
+        }).join('')}
+        ${mine ? `<button class="cp-delete" onclick="deleteCommunityPost('${post.id}')"><span class="material-symbols-outlined">delete</span></button>` : ''}
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function _communityPostTime(post) {
+  const ms = post.createdAtMs || (post.createdAt?.seconds ? post.createdAt.seconds * 1000 : Date.now());
+  const diff = Date.now() - ms;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+  return `${Math.floor(diff / 86400000)}d ago`;
+}
+
+function _communityPostVerseHtml(verse) {
+  return `<div class="cp-verse">
+    <div><strong>${_lbEscape(verse.ref || '')}</strong><span>${_lbEscape(verse.version || '')}</span></div>
+    <p>${_lbEscape(verse.text || '')}</p>
+  </div>`;
+}
+
+function _communityPostLink(raw) {
+  try {
+    const url = new URL(raw);
+    if (!['http:', 'https:'].includes(url.protocol)) return '';
+    return `<a class="cp-link" href="${_lbEscape(url.href)}" target="_blank" rel="noopener">
+      <span class="material-symbols-outlined">link</span>${_lbEscape(url.hostname)}
+    </a>`;
+  } catch {
+    return '';
+  }
+}
+
+async function openCommunityPostComposer() {
+  if (!window.Auth?.getCurrentUser()) {
+    alert('Sign in to post with your friends.');
+    return;
+  }
+  _communityPostKind = 'insight';
+  _communityPostVerse = null;
+  document.querySelectorAll('.cpc-kind').forEach(btn => btn.classList.toggle('active', btn.dataset.kind === 'insight'));
+  const body = document.getElementById('communityPostBody');
+  const question = document.getElementById('communityPostQuestion');
+  const link = document.getElementById('communityPostLink');
+  const ref = document.getElementById('communityPostRef');
+  const version = document.getElementById('communityPostVersion');
+  const alertFriends = document.getElementById('communityPostAlertFriends');
+  if (body) body.value = '';
+  if (question) question.value = '';
+  if (link) link.value = '';
+  if (ref) ref.value = '';
+  if (version) version.value = _rhemaTextMode === 'critical' ? 'BSB' : 'MSB';
+  if (alertFriends) alertFriends.checked = false;
+  document.getElementById('communityPostVersePreview').textContent = 'Add a reference like John 3:16.';
+  document.getElementById('communityPostComposer')?.classList.add('open');
+  await loadRhemaScripts().catch(() => {});
+}
+
+function closeCommunityPostComposer() {
+  document.getElementById('communityPostComposer')?.classList.remove('open');
+}
+
+function selectCommunityPostKind(kind) {
+  _communityPostKind = kind || 'insight';
+  document.querySelectorAll('.cpc-kind').forEach(btn => btn.classList.toggle('active', btn.dataset.kind === _communityPostKind));
+}
+
+function _parseCommunityVerseRef(input) {
+  const raw = String(input || '').trim().replace(/\s+/g, ' ');
+  const match = raw.match(/^(.+?)\s+(\d+):(\d+)$/);
+  if (!match) return null;
+  const wanted = match[1].toLowerCase().replace(/\./g, '');
+  const books = window.RhemaEnglishBooks || [];
+  const aliases = new Map();
+  books.forEach(book => {
+    aliases.set(book.name.toLowerCase(), book);
+    aliases.set(book.name.toLowerCase().slice(0, 3), book);
+    aliases.set(book.code.toLowerCase(), book);
+  });
+  aliases.set('john', books.find(b => b.code === 'JOH'));
+  aliases.set('jn', books.find(b => b.code === 'JOH'));
+  aliases.set('acts', books.find(b => b.code === 'ACT'));
+  aliases.set('act', books.find(b => b.code === 'ACT'));
+  const book = aliases.get(wanted);
+  if (!book) return null;
+  return { book, chapter: match[2], verse: match[3] };
+}
+
+async function updateCommunityPostVersePreview() {
+  await loadRhemaScripts().catch(() => {});
+  const preview = document.getElementById('communityPostVersePreview');
+  const refInput = document.getElementById('communityPostRef')?.value || '';
+  const version = document.getElementById('communityPostVersion')?.value || 'MSB';
+  const parsed = _parseCommunityVerseRef(refInput);
+  if (!parsed) {
+    _communityPostVerse = null;
+    if (preview) preview.textContent = 'Use a reference like John 3:16.';
+    return;
+  }
+  const text = _rhemaEnglishText(parsed.book.code, parsed.chapter, parsed.verse, version);
+  if (!text) {
+    _communityPostVerse = null;
+    if (preview) preview.textContent = `${parsed.book.name} ${parsed.chapter}:${parsed.verse} is not available in ${version}.`;
+    return;
+  }
+  _communityPostVerse = {
+    version,
+    book: parsed.book.code,
+    ref: `${parsed.book.name} ${parsed.chapter}:${parsed.verse}`,
+    text
+  };
+  if (preview) preview.textContent = text;
+}
+
+function clearCommunityPostVerse() {
+  _communityPostVerse = null;
+  const ref = document.getElementById('communityPostRef');
+  const preview = document.getElementById('communityPostVersePreview');
+  if (ref) ref.value = '';
+  if (preview) preview.textContent = 'Add a reference like John 3:16.';
+}
+
+async function submitCommunityPost() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const body = document.getElementById('communityPostBody')?.value.trim() || '';
+  const question = document.getElementById('communityPostQuestion')?.value.trim() || '';
+  const linkUrl = document.getElementById('communityPostLink')?.value.trim() || '';
+  if (!body && !question && !_communityPostVerse && !linkUrl) {
+    alert('Add a thought, question, verse, or link first.');
+    return;
+  }
+  const btn = document.getElementById('communityPostSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
+  const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
+  const avatar = localStorage.getItem('selectedAvatar') || 'person';
+  const id = await window.CommunityPosts?.add?.(uid, displayName, avatar, friendsList, {
+    kind: _communityPostKind,
+    body,
+    question,
+    linkUrl,
+    verse: _communityPostVerse,
+    alertFriends: !!document.getElementById('communityPostAlertFriends')?.checked
+  });
+  if (btn) { btn.disabled = false; btn.textContent = 'Post to Community'; }
+  if (!id) {
+    alert('Could not post right now. Try again.');
+    return;
+  }
+  closeCommunityPostComposer();
+}
+
+async function reactCommunityPost(postId, emoji) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  await window.CommunityPosts?.react?.(postId, uid, emoji);
+}
+
+async function deleteCommunityPost(postId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  _communityPosts = _communityPosts.filter(p => p.id !== postId);
+  _renderCommunityPosts();
+  const ok = await window.CommunityPosts?.delete?.(postId, uid);
+  if (!ok) _startCommunityPosts();
 }
 
 let _lbEntryCache = {};
@@ -20020,7 +20278,7 @@ let _appCoachFinishing = false;
 const APP_WELCOME_COACH_STEPS = [
   { title: 'Welcome to Basic Greek', body: 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place.' },
   { before: () => showNavPage('lessons'), target: () => _coachFirst(['.lesson-progress-badge', '.learn-path-grid']), title: 'Lessons are the foundation', body: 'Start here when you want guided structure. The basic and advanced tracks teach foundations and verbs in order, and checks keep you from just scrolling past the material.' },
-  { before: () => { showNavPage('community'); showLbTab('studies'); }, target: () => _coachFirst(['.comm-tabs', '#lbPaneStudies']), title: 'Community study board', body: 'The Studies tab shows shared studies from you and your friends. This is where a passage can become a group workspace instead of a private note lost somewhere else.' },
+  { before: () => { showNavPage('community'); showLbTab('posts'); }, target: () => _coachFirst(['#lbPanePosts', '.comm-tabs']), title: 'Community posts', body: 'Posts are the main community feed: share verses, questions, links, prayer notes, and encouragements with friends. Fresh posts stay for 7 days so the board feels alive instead of cluttered.' },
   { before: () => { showNavPage('community'); showLbTab('xp'); }, target: () => _coachFirst(['button[data-tab="xp"]', '#lbPaneXP']), title: 'XP leaderboard', body: 'XP rewards steady work: lessons, tests, vocab, translation, and study habits. It is not the goal, but it helps your progress feel visible.' },
   { before: () => { showNavPage('community'); showLbTab('scholar'); }, target: () => _coachFirst(['button[data-tab="scholar"]', '#lbPaneScholar']), title: 'Scholar board', body: 'The Scholar board highlights careful practice quality, not just activity. It gives deeper testing and review work its own place.' },
   { before: () => showNavPage('home'), target: () => _coachFirst(['.home-actions-grid', '#notifBtn']), title: 'Home quick actions', body: 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live.' },
@@ -20057,9 +20315,11 @@ APP_WELCOME_COACH_STEPS[1] = {
 APP_WELCOME_COACH_STEPS[2].before = () => {
   if (typeof hideLessonModeModal === 'function') hideLessonModeModal();
   showNavPage('community');
-  showLbTab('studies');
+  showLbTab('posts');
 };
-APP_WELCOME_COACH_STEPS[2].body = 'The Studies tab shows shared studies from you and your friends. A study is more than a post: it can become a shared passage workspace with notes, saved verses, word logs, and scripture trails.';
+APP_WELCOME_COACH_STEPS[2].title = 'Community posts';
+APP_WELCOME_COACH_STEPS[2].target = () => _coachFirst(['#lbPanePosts', '.comm-tabs']);
+APP_WELCOME_COACH_STEPS[2].body = 'Posts are the main community feed. Share a verse, question, link, prayer note, or encouragement with friends, and the board clears older posts after 7 days so it stays fresh.';
 APP_WELCOME_COACH_STEPS[3].before = () => {
   if (typeof hideLessonModeModal === 'function') hideLessonModeModal();
   showNavPage('community');

@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.33" rel="stylesheet"/>
+<link href="style.css?v=3.0.34" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8561,7 +8561,10 @@ Verb Endings
 </button>
 </div>
 <div class="lb-tabs comm-tabs">
-<button class="lb-tab-btn active" data-tab="studies" onclick="showLbTab('studies')">
+<button class="lb-tab-btn active" data-tab="posts" onclick="showLbTab('posts')">
+<span class="material-symbols-outlined">forum</span> Posts
+      </button>
+<button class="lb-tab-btn" data-tab="studies" onclick="showLbTab('studies')">
 <span class="material-symbols-outlined">menu_book</span> Studies
       </button>
 <button class="lb-tab-btn" data-tab="xp" onclick="showLbTab('xp')">
@@ -8569,9 +8572,23 @@ Verb Endings
       </button>
 <button class="lb-tab-btn" data-tab="scholar" onclick="showLbTab('scholar')">
 <span class="material-symbols-outlined">school</span> Scholar
-      </button>
+</button>
 </div>
-<div class="lb-tab-pane active" data-tab="studies" id="lbPaneStudies">
+<div class="lb-tab-pane active" data-tab="posts" id="lbPanePosts">
+<div class="community-posts-head">
+<div>
+<h2>Faith Feed</h2>
+<p>Share what you're noticing, ask a question, encourage friends, or attach a verse for the week.</p>
+</div>
+<button class="community-post-add" onclick="openCommunityPostComposer()" aria-label="Add post">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="community-post-list" id="communityPostList">
+<p class="study-board-empty">Loading posts...</p>
+</div>
+</div>
+<div class="lb-tab-pane" data-tab="studies" id="lbPaneStudies">
 <div class="study-board-list" id="studyBoardList">
 <p class="study-board-empty">Add friends to see their studies here.</p>
 </div>
@@ -15499,10 +15516,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.33"></script>
+<script src="app.js?v=3.0.34"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.25" type="module"></script>
+<script src="firebase-lb.js?v=3.0.34" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -15834,6 +15851,45 @@ Verb Endings
 <h3>Deleting a study</h3>
 <p><strong>Long-press</strong> any study card on the home screen to enter delete mode. A red ✕ will appear on studies you created. Tap it to permanently remove that study and all its notes.</p>
 </div>
+</div>
+</div>
+<!-- Community Post Composer -->
+<div class="modal-overlay" id="communityPostComposer" onclick="if(event.target===this)closeCommunityPostComposer()">
+<div class="modal-card community-post-composer" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeCommunityPostComposer()">&times;</button>
+<div class="cpc-kicker"><span class="material-symbols-outlined">edit_note</span> Community Post</div>
+<h2>Share With Friends</h2>
+<p class="cpc-sub">Encourage, ask, link, or share a verse. Posts stay on the board for 7 days.</p>
+<div class="cpc-kind-row">
+<button class="cpc-kind active" data-kind="insight" onclick="selectCommunityPostKind('insight')"><span class="material-symbols-outlined">lightbulb</span> Insight</button>
+<button class="cpc-kind" data-kind="question" onclick="selectCommunityPostKind('question')"><span class="material-symbols-outlined">help</span> Question</button>
+<button class="cpc-kind" data-kind="encouragement" onclick="selectCommunityPostKind('encouragement')"><span class="material-symbols-outlined">volunteer_activism</span> Encourage</button>
+<button class="cpc-kind" data-kind="prayer" onclick="selectCommunityPostKind('prayer')"><span class="material-symbols-outlined">favorite</span> Prayer</button>
+</div>
+<textarea class="cpc-textarea" id="communityPostBody" maxlength="900" placeholder="What do you want to share?"></textarea>
+<input class="cpc-input" id="communityPostQuestion" maxlength="180" placeholder="Optional question for friends"/>
+<input class="cpc-input" id="communityPostLink" inputmode="url" placeholder="Optional link"/>
+<div class="cpc-verse-box">
+<div class="cpc-verse-head">
+<span class="material-symbols-outlined">auto_stories</span>
+<strong>Attach a verse</strong>
+<button type="button" onclick="clearCommunityPostVerse()">Clear</button>
+</div>
+<div class="cpc-verse-controls">
+<select id="communityPostVersion" onchange="updateCommunityPostVersePreview()">
+<option value="MSB">MSB</option>
+<option value="BSB">BSB</option>
+</select>
+<input id="communityPostRef" placeholder="John 3:16"/>
+<button type="button" onclick="updateCommunityPostVersePreview()">Preview</button>
+</div>
+<p class="cpc-verse-preview" id="communityPostVersePreview">Add a reference like John 3:16.</p>
+</div>
+<label class="cpc-alert-row">
+<input id="communityPostAlertFriends" type="checkbox"/>
+<span><strong>Alert my friends</strong><small>Send a push so they know there is something fresh to read.</small></span>
+</label>
+<button class="main-btn cpc-submit" id="communityPostSubmitBtn" onclick="submitCommunityPost()">Post to Community</button>
 </div>
 </div>
 <!-- View All Studies Modal -->
