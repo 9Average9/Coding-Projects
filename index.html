@@ -279,8 +279,6 @@ glacier: {
   const theme = themes[savedTheme] || themes.royal;
 
   const root = document.documentElement;
-  const savedUiStyle = localStorage.getItem("uiStyle") || "modern-glass";
-  root.dataset.uiStyle = savedUiStyle;
 
   root.style.setProperty("--primary-color", theme.primary);
   root.style.setProperty("--primary-light", theme.light);
@@ -303,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.61" rel="stylesheet"/>
+<link href="style.css?v=3.0.62" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -409,17 +407,6 @@ glacier: {
 <!-- Hidden badge kept for backward compatibility -->
 <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
 </section>
-<div class="modal-overlay ui-style-overlay" id="uiStyleModal" onclick="closeUiStyleModal(event)">
-<div class="modal-card ui-style-card" onclick="event.stopPropagation()">
-<button class="sheet-x-close" onclick="closeUiStyleModal()" aria-label="Close styles"><span class="material-symbols-outlined">close</span></button>
-<div class="ui-style-head">
-<span class="ui-style-kicker">Visual system</span>
-<h2>Styles</h2>
-<p>Choose the app skin for Home, Profile, and Community. Rhema, Lessons, and Praises keep their structure while inheriting matching colors.</p>
-</div>
-<div class="ui-style-grid" id="uiStyleGrid"></div>
-</div>
-</div>
 <section class="screen" id="newLearnMenu">
 <div class="nav-bar">
 <button class="icon-btn" onclick="handleLearnBack()">
@@ -8534,12 +8521,6 @@ Verb Endings
 <span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
 </button>
 <div class="prof-menu-sep"></div>
-<button class="prof-menu-row" id="profileStylesBtn" onclick="openUiStyleModal()">
-<span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">palette</span></span>
-<span class="prof-menu-name">Styles</span>
-<span class="material-symbols-outlined prof-menu-chev">chevron_right</span>
-</button>
-<div class="prof-menu-sep"></div>
 <button class="prof-menu-row" id="profileNerdBtn" onclick="openRhemaNerdModal()">
 <span class="prof-menu-icon-wrap"><span class="material-symbols-outlined">science</span></span>
 <span class="prof-menu-name">Rhema Nerd Page</span>
@@ -15729,10 +15710,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.61"></script>
+<script src="app.js?v=3.0.62"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.61" type="module"></script>
+<script src="firebase-lb.js?v=3.0.62" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

@@ -17,20 +17,20 @@ const messaging = firebase.messaging();
 // two notifications (APNs auto-display + our manual call).
 messaging.onBackgroundMessage(function () {});
 
-const CACHE_NAME = "basic-greek-trainer-v3.0.61";
+const CACHE_NAME = "basic-greek-trainer-v3.0.62";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=3.0.61",
+  "./style.css?v=3.0.62",
   "./vocab.js?v=3.0.8",
-  "./app.js?v=3.0.61",
+  "./app.js?v=3.0.62",
   "./rhema-critical.js?v=3.0.23",
-  "./rhema-msb.js?v=3.0.61",
-  "./rhema-bsb.js?v=3.0.61",
+  "./rhema-msb.js?v=3.0.62",
+  "./rhema-bsb.js?v=3.0.62",
   "./rhema-crossrefs-ui.js?v=3.0.29",
   "./greek-verbs.js?v=3.0.23",
-  "./firebase-lb.js?v=3.0.61",
+  "./firebase-lb.js?v=3.0.62",
   "./assets/home-backgrounds/abstract.jpg",
   "./assets/home-backgrounds/ancient-scroll.jpg",
   "./assets/home-backgrounds/city.jpg",
@@ -59,18 +59,6 @@ const FILES_TO_CACHE = [
   "./assets/home-backgrounds/ocean-thumb.jpg",
   "./assets/home-backgrounds/sunrise-thumb.jpg",
   "./assets/home-backgrounds/waves-thumb.jpg",
-  "./assets/styles/notebook-bg.svg",
-  "./assets/styles/manuscript-bg.svg",
-  "./assets/styles/glass-bg.svg",
-  "./assets/styles/desk-bg.svg",
-  "./assets/styles/nature-bg.svg",
-  "./assets/styles/library-bg.svg",
-  "./assets/styles/campfire-bg.svg",
-  "./assets/styles/mono-bg.svg",
-  "./assets/styles/tape.svg",
-  "./assets/styles/bookmark.svg",
-  "./assets/styles/leaf-accent.svg",
-  "./assets/styles/ink-divider.svg",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"

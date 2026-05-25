@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600">
-  <defs><filter id="wash"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="4" seed="31"/><feGaussianBlur stdDeviation="2"/><feComponentTransfer><feFuncA type="table" tableValues="0 .22"/></feComponentTransfer></filter><linearGradient id="cream" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8f2dd"/><stop offset=".55" stop-color="#fffaf0"/><stop offset="1" stop-color="#dfead1"/></linearGradient></defs>
-  <rect width="900" height="1600" fill="url(#cream)"/><rect width="900" height="1600" filter="url(#wash)" fill="#71a36e"/>
-  <g opacity=".27" fill="none" stroke="#668f5c" stroke-width="7" stroke-linecap="round">
-    <path d="M50 300c120 80 140 210 90 360M780 130c-150 160-160 330-80 520M120 1200c180-90 330-60 480 120"/>
-    <path d="M120 360c45-48 92-68 142-60M118 450c64-42 123-48 174-17M698 280c-70-14-124 8-162 67M690 400c-70-6-116 20-140 78M238 1190c54-60 120-84 198-72"/>
-  </g>
-</svg>

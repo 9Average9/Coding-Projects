@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600">
-  <defs><radialGradient id="glow" cx="82%" cy="75%" r="55%"><stop stop-color="#c9953e" stop-opacity=".62"/><stop offset=".38" stop-color="#173a32" stop-opacity=".36"/><stop offset="1" stop-color="#07120f"/></radialGradient><filter id="grain"><feTurbulence baseFrequency=".035" numOctaves="3" seed="9"/><feComponentTransfer><feFuncA type="table" tableValues="0 .12"/></feComponentTransfer></filter></defs>
-  <rect width="900" height="1600" fill="#07120f"/>
-  <g opacity=".26"><rect x="42" y="90" width="92" height="1380" fill="#172820"/><rect x="160" y="70" width="70" height="1410" fill="#1d3128"/><rect x="255" y="100" width="105" height="1370" fill="#10221c"/><rect x="390" y="72" width="78" height="1404" fill="#243428"/><rect x="500" y="92" width="112" height="1370" fill="#15251e"/><rect x="640" y="80" width="70" height="1390" fill="#263525"/><rect x="742" y="98" width="96" height="1360" fill="#172720"/></g>
-  <rect width="900" height="1600" fill="url(#glow)"/><rect width="900" height="1600" filter="url(#grain)"/>
-</svg>
