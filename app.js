@@ -16841,7 +16841,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.54";
+const APP_VERSION = "3.0.55";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18426,7 +18426,7 @@ function _mercyCardHtml(post) {
       ${post.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
     </div>
     ${hasMedia ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}"${mediaStyle}>
-      ${hasPhoto ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl)}" alt="Mercy photo"></div>` : ''}
+      ${hasPhoto ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl)}" alt="Mercy photo" onload="syncMercyImageAspect(this)"></div>` : ''}
       ${scripture}
     </div>` : ''}
     ${slideDots}
@@ -18503,6 +18503,10 @@ function openMercyComposer(prefill = {}) {
   document.getElementById('mercySaveThis').checked = localStorage.getItem('merciesAutoSave') === 'true';
   toggleMercyNoPhoto();
   document.getElementById('mercyComposerModal')?.classList.add('open');
+  requestAnimationFrame(() => {
+    const card = document.querySelector('#mercyComposerModal .mercy-composer-card');
+    if (card) card.scrollTop = 0;
+  });
 }
 
 function closeMercyComposer() {
@@ -18892,6 +18896,12 @@ function updateMercyPhotoPreviewAspect() {
   if (wrap) wrap.style.setProperty('--mercy-photo-aspect', String(_mercyPhotoAspectRatio || (4 / 3)));
 }
 
+function syncMercyImageAspect(img) {
+  const media = img?.closest?.('.mercy-media');
+  if (!media || !img.naturalWidth || !img.naturalHeight) return;
+  media.style.setProperty('--mercy-photo-aspect', String(img.naturalWidth / img.naturalHeight));
+}
+
 async function getMercyImageDimensions(file) {
   let url = null;
   try {
@@ -19184,7 +19194,7 @@ function renderMerciesJournalEntries(entries = []) {
     const scripture = e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : '';
     return `<article class="mercy-card mercy-journal-card">
     <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div>${e.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(e.scripture.ref)}</span>` : ''}</div>
-    ${(img || scripture) ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">${img ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Mercy"></div>` : ''}${scripture}</div>${img && scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : ''}` : ''}
+    ${(img || scripture) ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">${img ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Mercy" onload="syncMercyImageAspect(this)"></div>` : ''}${scripture}</div>${img && scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : ''}` : ''}
     <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
     <div class="mercy-chips">
       ${tags.map(name => `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(name)}</span>`).join('')}

@@ -18501,7 +18501,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 .mercy-media::-webkit-scrollbar { display: none; }
 .mercy-slide { min-height: 330px; scroll-snap-align: center; background: color-mix(in srgb, var(--secondary-color) 8%, white); display: grid; place-items: center; overflow: hidden; }
-.mercy-media .mercy-slide { aspect-ratio: var(--mercy-photo-aspect, 4 / 3); min-height: auto; max-height: 760px; }
+.mercy-media .mercy-slide { aspect-ratio: var(--mercy-photo-aspect, 4 / 3); min-height: auto; max-height: none; }
 .mercy-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mercy-media .mercy-slide img { object-fit: contain; background: color-mix(in srgb, var(--secondary-color) 5%, var(--card-color)); }
 .mercy-slide-dots { display: flex; justify-content: center; gap: 6px; margin-top: 9px; }
