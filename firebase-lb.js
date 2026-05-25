@@ -280,6 +280,16 @@ async function syncUserData(uid, data) {
   } catch (e) { console.warn("syncUserData:", e); }
 }
 
+async function clearPendingMercyFriendEncouragement(uid) {
+  if (!uid) return;
+  try {
+    await updateDoc(doc(db, "users", uid), {
+      pendingMercyFriendEncouragement: null,
+      updatedAt: serverTimestamp()
+    });
+  } catch (e) { console.warn("clearPendingMercyFriendEncouragement:", e); }
+}
+
 // ── Leaderboard ───────────────────────────────────────────────────────────────
 
 function getUserId() {
@@ -1496,7 +1506,8 @@ window.Mercies = {
   saveJournal: saveMercyJournalEntry,
   listenJournal: listenMercyJournal,
   deleteJournal: deleteMercyJournalEntry,
-  saveSettings: saveMerciesSettings
+  saveSettings: saveMerciesSettings,
+  clearPendingFriendEncouragement: clearPendingMercyFriendEncouragement
 };
 
 async function studyGetMemberNames(uids) {

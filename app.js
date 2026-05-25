@@ -16848,7 +16848,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.52";
+const APP_VERSION = "3.0.53";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17692,6 +17692,7 @@ window.__onAuthStateReady = async (user) => {
       friendsList        = data.friends           || [];
       friendRequestsIn   = data.friendRequestsIn  || [];
       friendRequestsOut  = data.friendRequestsOut || [];
+      syncPendingMercyFriendEncouragement(data.pendingMercyFriendEncouragement);
       const friendsChanged = prevList.length !== friendsList.length || prevList.some(uid => !friendsList.includes(uid));
       if (friendsChanged && _lbActiveTab === 'posts') {
         if (_communityPostsUnsub) { _communityPostsUnsub(); _communityPostsUnsub = null; }
@@ -18331,6 +18332,32 @@ function savePendingMercyFriendEncouragement(friendUid, friendName = 'your frien
   refreshPendingMercyFriendEncouragement();
 }
 
+function syncPendingMercyFriendEncouragement(pending) {
+  if (!pending || !pending.friendUid) {
+    const local = refreshPendingMercyFriendEncouragement();
+    if (!local) document.getElementById('mercyPendingFriendAction')?.classList.add('hidden');
+    return;
+  }
+  const normalized = {
+    friendUid: pending.friendUid,
+    friendName: pending.friendName || 'your friend',
+    promptText: pending.promptText || _mercyFriendPrompt(pending.friendName || 'your friend'),
+    createdAtMs: Number(pending.createdAtMs || Date.now()),
+    expiresAtMs: Number(pending.expiresAtMs || Date.now() + 24 * 60 * 60 * 1000)
+  };
+  _pendingMercyFriendEncouragement = normalized;
+  localStorage.setItem('pendingMercyFriendEncouragement', JSON.stringify(normalized));
+  refreshPendingMercyFriendEncouragement();
+}
+
+function _mercyCountdownText(expiresAtMs) {
+  const remaining = Math.max(0, Number(expiresAtMs || 0) - Date.now());
+  const hours = Math.floor(remaining / 3600000);
+  const minutes = Math.ceil((remaining % 3600000) / 60000);
+  if (hours >= 1) return `${hours}h ${String(minutes).padStart(2, '0')}m left`;
+  return `${Math.max(1, minutes)}m left`;
+}
+
 function refreshPendingMercyFriendEncouragement() {
   let pending = _pendingMercyFriendEncouragement;
   if (!pending) {
@@ -18351,10 +18378,14 @@ function refreshPendingMercyFriendEncouragement() {
     const title = document.getElementById('mercyPendingFriendTitle');
     const sub = document.getElementById('mercyPendingFriendSub');
     if (title) title.textContent = `Encourage ${name}`;
-    if (sub) sub.textContent = 'Your weekly friend prompt is waiting today.';
+    if (sub) sub.textContent = `Locked to ${name}. Expires in ${_mercyCountdownText(pending.expiresAtMs)}.`;
   }
   return pending;
 }
+
+setInterval(() => {
+  if (_pendingMercyFriendEncouragement) refreshPendingMercyFriendEncouragement();
+}, 60000);
 
 function openPendingMercyFriendEncouragement() {
   const pending = refreshPendingMercyFriendEncouragement();
@@ -18372,6 +18403,7 @@ function clearPendingMercyFriendEncouragement(friendUid) {
   _pendingMercyFriendEncouragement = null;
   localStorage.removeItem('pendingMercyFriendEncouragement');
   document.getElementById('mercyPendingFriendAction')?.classList.add('hidden');
+  window.Mercies?.clearPendingFriendEncouragement?.(window.Auth?.getCurrentUser()?.uid).catch(() => {});
 }
 
 function _mercyCardHtml(post) {

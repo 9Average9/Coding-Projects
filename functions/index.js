@@ -401,6 +401,14 @@ exports.sendScheduledReminders = functions.pubsub
       const friendUid = friends[Math.floor(Math.random() * friends.length)];
       const friendSnap = await db.collection("users").doc(friendUid).get();
       const friendName = friendSnap.exists ? (friendSnap.data().displayName || friendSnap.data().username || "a friend") : "a friend";
+      const pendingPrompt = {
+        friendUid,
+        friendName,
+        promptText: `Encourage ${friendName} this week.`,
+        createdAtMs: now.getTime(),
+        expiresAtMs: now.getTime() + 24 * 60 * 60 * 1000
+      };
+      await userDoc.ref.update({ pendingMercyFriendEncouragement: pendingPrompt });
       await messaging.sendEachForMulticast({
         tokens,
         notification: { title: "Mercies", body: `Encourage ${friendName} this week.` },
