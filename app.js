@@ -101,6 +101,7 @@ let _merciesUnsub = null;
 let _merciesJournalUnsub = null;
 let _merciesJournalEntries = [];
 let _merciesVisibleCount = 12;
+let _merciesFilter = 'latest';
 let _mercyImageBlob = null;
 let _mercyImageDataUrl = null;
 let _mercyPromptMode = 'regular';
@@ -16785,7 +16786,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.44";
+const APP_VERSION = "3.0.45";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18182,10 +18183,15 @@ function _mercyFriendPrompt(friendName = "your friend") {
 }
 
 function showMerciesView(view) {
-  document.querySelectorAll('.mercies-tabs button').forEach(btn => btn.classList.toggle('active', btn.dataset.mercyView === view));
+  document.querySelectorAll('[data-mercy-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.mercyView === view));
   document.getElementById('merciesFeedView')?.classList.toggle('active', view === 'feed');
   document.getElementById('merciesJournalView')?.classList.toggle('active', view === 'journal');
   if (view === 'journal') startMerciesJournal();
+}
+
+function setMerciesFilter(filter) {
+  _merciesFilter = filter || 'latest';
+  renderMerciesFeed();
 }
 
 function startMerciesFeed() {
@@ -18213,8 +18219,15 @@ function startMerciesFeed() {
 function renderMerciesFeed() {
   const list = document.getElementById('merciesFeedList');
   if (!list) return;
-  const posts = _merciesPosts.slice(0, _merciesVisibleCount);
-  document.getElementById('merciesLoadMore')?.classList.toggle('hidden', _merciesPosts.length <= _merciesVisibleCount);
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const filtered = _merciesPosts.filter(post => {
+    if (_merciesFilter === 'mine') return post.authorUid === uid;
+    if (_merciesFilter === 'encouragement') return post.friendEncouragement || post.promptCategory === 'Friend Encouragement';
+    if (_merciesFilter === 'scripture') return !!post.scripture?.text;
+    return true;
+  });
+  const posts = filtered.slice(0, _merciesVisibleCount);
+  document.getElementById('merciesLoadMore')?.classList.toggle('hidden', filtered.length <= _merciesVisibleCount);
   if (!posts.length) {
     list.innerHTML = `<div class="mercies-empty"><span class="material-symbols-outlined">photo_camera</span><strong>No Mercies yet</strong><p>Post a photo and remember one ordinary blessing from today.</p><button onclick="openMercyComposer()">Post a Mercy</button></div>`;
     return;
@@ -18280,11 +18293,15 @@ function openMercyComposer(prefill = {}) {
   clearMercyPhoto();
   _populateMercyPromptSelect(prefill.promptText);
   _populateMercyFriendSelect(prefill.friendUid || '');
+  populateMercyBooks();
   const friendMode = document.getElementById('mercyFriendEncouragement');
   if (friendMode) friendMode.checked = !!prefill.friendUid;
+  const scriptureToggle = document.getElementById('mercyAttachScripture');
+  if (scriptureToggle) scriptureToggle.checked = false;
   document.getElementById('mercyBody').value = '';
   document.getElementById('mercyScriptureRef').value = '';
   document.getElementById('mercyScriptureText').value = '';
+  toggleMercyScripture();
   document.getElementById('mercySaveThis').checked = localStorage.getItem('merciesAutoSave') === 'true';
   document.getElementById('mercyComposerModal')?.classList.add('open');
 }
@@ -18336,6 +18353,75 @@ function onMercyFriendChanged() {
 }
 
 function onMercyPromptChanged() {}
+
+async function populateMercyBooks() {
+  await loadRhemaScripts().catch(() => {});
+  const sel = document.getElementById('mercyScriptureBook');
+  if (!sel) return;
+  const books = window.RhemaEnglishBooks || [];
+  sel.innerHTML = books.map(book => `<option value="${book.code}">${_lbEscape(book.name)}</option>`).join('');
+  if (books.find(book => book.code === 'PSA')) sel.value = 'PSA';
+  populateMercyChapters();
+}
+
+function populateMercyChapters() {
+  const book = document.getElementById('mercyScriptureBook')?.value;
+  const sel = document.getElementById('mercyScriptureChapter');
+  const data = window.RhemaMSB?.[book] || {};
+  if (!sel) return;
+  const chapters = Object.keys(data).map(Number).sort((a, b) => a - b);
+  sel.innerHTML = chapters.map(ch => `<option value="${ch}">${ch}</option>`).join('');
+  populateMercyVerses();
+}
+
+function populateMercyVerses() {
+  const book = document.getElementById('mercyScriptureBook')?.value;
+  const chapter = document.getElementById('mercyScriptureChapter')?.value;
+  const sel = document.getElementById('mercyScriptureVerse');
+  const data = window.RhemaMSB?.[book]?.[chapter] || {};
+  if (!sel) return;
+  const verses = Object.keys(data).map(Number).sort((a, b) => a - b);
+  sel.innerHTML = verses.map(v => `<option value="${v}">${v}</option>`).join('');
+  updateMercyScriptureFromPicker();
+}
+
+function updateMercyScriptureFromPicker() {
+  const book = document.getElementById('mercyScriptureBook')?.value;
+  const chapter = document.getElementById('mercyScriptureChapter')?.value;
+  const verse = document.getElementById('mercyScriptureVerse')?.value;
+  const bookName = (window.RhemaEnglishBooks || []).find(b => b.code === book)?.name || book;
+  const text = _rhemaEnglishText(book, chapter, verse, 'MSB');
+  const ref = document.getElementById('mercyScriptureRef');
+  const textEl = document.getElementById('mercyScriptureText');
+  if (ref) ref.value = book && chapter && verse ? `${bookName} ${chapter}:${verse}` : '';
+  if (textEl) textEl.value = text || '';
+  updateMercyScripturePreview();
+}
+
+function toggleMercyScripture() {
+  const enabled = !!document.getElementById('mercyAttachScripture')?.checked;
+  const controls = document.getElementById('mercyScriptureControls');
+  controls?.classList.toggle('disabled', !enabled);
+  controls?.querySelectorAll('select,input,textarea').forEach(el => {
+    el.disabled = !enabled;
+  });
+  if (enabled && !document.getElementById('mercyScriptureBook')?.options?.length) populateMercyBooks();
+  updateMercyScripturePreview();
+}
+
+function updateMercyScripturePreview() {
+  const preview = document.getElementById('mercyScripturePreview');
+  if (!preview) return;
+  const enabled = !!document.getElementById('mercyAttachScripture')?.checked;
+  const ref = document.getElementById('mercyScriptureRef')?.value || 'MSB Scripture';
+  const text = document.getElementById('mercyScriptureText')?.value || 'Select a verse to preview the card.';
+  const bg = document.getElementById('mercyScriptureBg')?.value || 'theme';
+  const font = document.getElementById('mercyScriptureFont')?.value || 'system';
+  const color = document.getElementById('mercyScriptureColor')?.value || '#123532';
+  preview.className = `mercy-scripture-preview mercy-scripture-${bg} mercy-font-${font}${enabled ? '' : ' disabled'}`;
+  preview.style.setProperty('--mercy-scripture-color', color);
+  preview.innerHTML = `<span>${_lbEscape(ref)}</span><p>${_lbEscape(text)}</p>`;
+}
 
 async function handleMercyPhotoSelected(input) {
   const file = input.files?.[0];
@@ -18396,8 +18482,9 @@ async function submitMercyPost() {
   if (!uid || !_mercyImageBlob) { alert('Choose a photo first.'); return; }
   const body = document.getElementById('mercyBody')?.value.trim() || '';
   if (!body) { alert('Write a short response first.'); return; }
-  const scriptureRef = document.getElementById('mercyScriptureRef')?.value.trim() || '';
-  const scriptureText = document.getElementById('mercyScriptureText')?.value.trim() || '';
+  const scriptureEnabled = !!document.getElementById('mercyAttachScripture')?.checked;
+  const scriptureRef = scriptureEnabled ? (document.getElementById('mercyScriptureRef')?.value.trim() || '') : '';
+  const scriptureText = scriptureEnabled ? (document.getElementById('mercyScriptureText')?.value.trim() || '') : '';
   if (scriptureRef && !scriptureText) { alert('Add verse text or remove the Scripture reference.'); return; }
   const friendUid = document.getElementById('mercyFriendSelect')?.value || null;
   const friendName = friendUid ? _selectedMercyFriendName() : null;
