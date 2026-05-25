@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600">
+  <defs><filter id="wood"><feTurbulence type="fractalNoise" baseFrequency=".018 .18" numOctaves="5" seed="21"/><feColorMatrix type="matrix" values=".55 .2 .05 0 0 .22 .38 .08 0 0 .08 .12 .18 0 0 0 0 0 .42 0"/></filter><radialGradient id="lamp" cx="82%" cy="12%" r="50%"><stop stop-color="#ffcb70" stop-opacity=".82"/><stop offset=".42" stop-color="#7a401c" stop-opacity=".35"/><stop offset="1" stop-color="#1a100a" stop-opacity="0"/></radialGradient></defs>
+  <rect width="900" height="1600" fill="#24150d"/>
+  <rect width="900" height="1600" filter="url(#wood)" opacity=".9"/>
+  <path d="M0 280h900M0 610h900M0 960h900M0 1290h900" stroke="#110b07" stroke-width="7" opacity=".45"/>
+  <rect width="900" height="1600" fill="url(#lamp)"/>
+</svg>

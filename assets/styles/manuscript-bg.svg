@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600">
+  <defs>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".025 .08" numOctaves="5" seed="12"/><feColorMatrix type="matrix" values=".7 .25 0 0 0 .2 .55 .15 0 0 .05 .15 .35 0 0 0 0 0 .22 0"/></filter>
+    <radialGradient id="age" cx="50%" cy="45%" r="74%"><stop stop-color="#f2d9a8"/><stop offset=".68" stop-color="#d6a86b"/><stop offset="1" stop-color="#7c4a22"/></radialGradient>
+  </defs>
+  <rect width="900" height="1600" fill="url(#age)"/>
+  <rect width="900" height="1600" filter="url(#grain)" opacity=".65"/>
+  <g opacity=".23" fill="none" stroke="#5a3218" stroke-width="2">
+    <path d="M96 220c180-45 390 30 610-18M110 310c220 28 380-42 680 10M80 1210c260-60 490 36 750-20"/>
+    <path d="M135 420h610M160 465h520M120 510h650M150 555h590M110 600h620"/>
+  </g>
+  <path d="M0 0h900v1600H0z" fill="none" stroke="#5b2d13" stroke-width="34" opacity=".28"/>
+</svg>

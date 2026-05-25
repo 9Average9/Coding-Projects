@@ -9781,9 +9781,8 @@ function expandHomeNavOnEntry() {
 }
 
 function bindHomeNavCollapse() {
-  const scroll = document.getElementById('homeScroll');
   const nav = document.getElementById('bottomNav');
-  if (!scroll || !nav || _homeNavScrollBound) return;
+  if (!nav || _homeNavScrollBound) return;
   _homeNavScrollBound = true;
   nav.addEventListener('click', e => {
     if (nav.classList.contains('home-collapsed')) {
@@ -9792,11 +9791,6 @@ function bindHomeNavCollapse() {
       expandHomeNavTemporarily();
     }
   }, true);
-  scroll.addEventListener('scroll', () => {
-    if (!document.getElementById('homeScreen')?.classList.contains('active')) return;
-    clearTimeout(_homeNavCollapseTimer);
-    setHomeNavCollapsed(true);
-  }, { passive: true });
 }
 
 let _prevNavPage = 'home';
@@ -12072,6 +12066,7 @@ function applyAppTheme(themeName) {
   });
   updateHighContrastSettingsUI();
   applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
+  applyUiStyle(localStorage.getItem("uiStyle") || "modern-glass", { silent: true });
 }
 
 function setAppTheme(themeName) {
@@ -16831,6 +16826,81 @@ function getStreakDays() {
   return parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 }
 
+const UI_STYLES = [
+  { id: "notebook", name: "Notebook / Journal", subtitle: "Lined paper, tape, and soft green journal cards.", thumbnail: "assets/styles/notebook-bg.svg" },
+  { id: "manuscript", name: "Ancient Manuscript", subtitle: "Parchment, faded ink, and old-world gold.", thumbnail: "assets/styles/manuscript-bg.svg" },
+  { id: "modern-glass", name: "Modern Glass", subtitle: "Frosted surfaces with a clean teal glow.", thumbnail: "assets/styles/glass-bg.svg" },
+  { id: "desk", name: "Cozy Study Desk", subtitle: "Warm wood, paper cards, and lamp light.", thumbnail: "assets/styles/desk-bg.svg" },
+  { id: "nature", name: "Nature Prayer", subtitle: "Watercolor greens and quiet botanical layers.", thumbnail: "assets/styles/nature-bg.svg" },
+  { id: "library", name: "Scholar Library", subtitle: "Deep shelves, leather, and gold accents.", thumbnail: "assets/styles/library-bg.svg" },
+  { id: "monochrome", name: "Minimal Monochrome", subtitle: "Sharp black, white, and gray with thin borders.", thumbnail: "assets/styles/mono-bg.svg" },
+  { id: "campfire", name: "Campfire Devotional", subtitle: "Night sky, warm glow, and cozy dark cards.", thumbnail: "assets/styles/campfire-bg.svg" }
+];
+
+const UI_STYLE_VARS = {
+  notebook: { primary: "#f7edcf", light: "#fffaf0", secondary: "#617856", accent: "#c88f55", card: "rgba(255, 250, 236, 0.92)", border: "#d9c49a", text: "#26301f", muted: "#6c705e", buttonText: "#ffffff" },
+  manuscript: { primary: "#dcb879", light: "#f3dca9", secondary: "#7b4a22", accent: "#b98631", card: "rgba(244, 215, 165, 0.9)", border: "#9b6831", text: "#2d1a0c", muted: "#694521", buttonText: "#fff6dd" },
+  "modern-glass": { primary: "#e8fbfb", light: "#f7ffff", secondary: "#087c7d", accent: "#38bdf8", card: "rgba(255,255,255,0.72)", border: "rgba(8,124,125,0.22)", text: "#0e2c2d", muted: "#48686b", buttonText: "#ffffff" },
+  desk: { primary: "#23160d", light: "#3a2415", secondary: "#b57936", accent: "#f1c16b", card: "rgba(46, 31, 20, 0.88)", border: "#7b542c", text: "#fff1d3", muted: "#d4b98b", buttonText: "#221408" },
+  nature: { primary: "#edf3de", light: "#fff9e8", secondary: "#647f4e", accent: "#97ad63", card: "rgba(255, 251, 238, 0.9)", border: "#becaa0", text: "#25331f", muted: "#68745d", buttonText: "#ffffff" },
+  library: { primary: "#07120f", light: "#10231d", secondary: "#c08a2a", accent: "#e2bd69", card: "rgba(11, 29, 24, 0.9)", border: "#9a7027", text: "#f4ead1", muted: "#c6b581", buttonText: "#07120f" },
+  monochrome: { primary: "#f7f7f7", light: "#ffffff", secondary: "#111111", accent: "#6b7280", card: "rgba(255,255,255,0.94)", border: "#cfcfcf", text: "#111111", muted: "#666666", buttonText: "#ffffff" },
+  campfire: { primary: "#071226", light: "#10203b", secondary: "#f97316", accent: "#ffb15c", card: "rgba(13, 21, 34, 0.9)", border: "#7c3b18", text: "#fff2dd", muted: "#d7aa78", buttonText: "#211008" }
+};
+
+function applyUiStyle(styleId, options = {}) {
+  const id = UI_STYLES.some(s => s.id === styleId) ? styleId : "modern-glass";
+  const vars = UI_STYLE_VARS[id] || UI_STYLE_VARS["modern-glass"];
+  document.documentElement.dataset.uiStyle = id;
+  document.documentElement.style.setProperty("--primary-color", vars.primary);
+  document.documentElement.style.setProperty("--primary-light", vars.light);
+  document.documentElement.style.setProperty("--secondary-color", vars.secondary);
+  document.documentElement.style.setProperty("--accent-color", vars.accent);
+  document.documentElement.style.setProperty("--card-color", vars.card);
+  document.documentElement.style.setProperty("--border-color", vars.border);
+  document.documentElement.style.setProperty("--font-color", vars.text);
+  document.documentElement.style.setProperty("--muted-color", vars.muted);
+  document.documentElement.style.setProperty("--btn-text-color", vars.buttonText);
+  localStorage.setItem("uiStyle", id);
+  document.querySelectorAll(".ui-style-option").forEach(btn => {
+    btn.classList.toggle("selected", btn.dataset.styleId === id);
+  });
+  const current = UI_STYLES.find(s => s.id === id);
+  const label = document.getElementById("profileStylesLabel");
+  if (label && current) label.textContent = current.name;
+  if (!options.silent) syncUserData();
+}
+
+function renderUiStyleGrid() {
+  const grid = document.getElementById("uiStyleGrid");
+  if (!grid) return;
+  const selected = localStorage.getItem("uiStyle") || "modern-glass";
+  grid.innerHTML = UI_STYLES.map(style => `
+    <button class="ui-style-option ${style.id === selected ? "selected" : ""}" data-style-id="${style.id}" onclick="setUiStyle('${style.id}')">
+      <span class="ui-style-thumb" style="background-image:url('${style.thumbnail}')">
+        <span class="ui-style-mini-card"></span>
+        <span class="ui-style-mini-row"></span>
+      </span>
+      <span class="ui-style-name">${style.name}</span>
+      <small>${style.subtitle}</small>
+    </button>
+  `).join("");
+}
+
+function setUiStyle(styleId) {
+  applyUiStyle(styleId);
+}
+
+function openUiStyleModal() {
+  renderUiStyleGrid();
+  document.getElementById("uiStyleModal")?.classList.add("open");
+}
+
+function closeUiStyleModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById("uiStyleModal")?.classList.remove("open");
+}
+
 function getPraiseStreakDays() {
   const last = localStorage.getItem("mercyLastPostDate");
   if (!last) return 0;
@@ -16955,9 +17025,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.60";
+const APP_VERSION = "3.0.61";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.61 &mdash; Visual Style System</div>
+<ul>
+  <li><strong>Styles added</strong> in Profile with designed previews for Notebook, Manuscript, Glass, Desk, Nature, Library, Monochrome, and Campfire looks.</li>
+  <li><strong>Home, Profile, and Community refreshed</strong> with custom textures, surfaces, shadows, accents, and style-aware nav colors.</li>
+  <li><strong>Home nav collapse adjusted</strong> so it uses the timer only instead of collapsing while scrolling.</li>
+</ul>
 <div class="un-version-label">v3.0.60 &mdash; Home Screen Polish</div>
 <ul>
   <li><strong>Study cards improved</strong> with member avatar stacks above the member count.</li>
@@ -17458,6 +17534,7 @@ async function restoreUserFromFirestore(user) {
   } else {
     applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
   }
+  if (data.uiStyle) applyUiStyle(data.uiStyle, { silent: true });
   if (data.advQuizScores) localStorage.setItem("advQuizScores", JSON.stringify(data.advQuizScores));
   if (data.merciesSettings) {
     localStorage.setItem("mercyDailyEnabled", String(!!data.merciesSettings.dailyEnabled));
@@ -17536,6 +17613,7 @@ async function syncUserData() {
     highContrastMode: getHighContrastMode(),
     appTheme: localStorage.getItem("appTheme") || null,
     homeBackdrop: localStorage.getItem("homeBackdrop") || "none",
+    uiStyle: localStorage.getItem("uiStyle") || "modern-glass",
     advQuizScores: (() => { try { return JSON.parse(localStorage.getItem("advQuizScores") || "{}"); } catch { return {}; } })(),
     answeredKCs: (() => { try { return JSON.parse(localStorage.getItem("answeredKCs") || "{}"); } catch { return {}; } })(),
     openedLessonBlocks: (() => { try { return JSON.parse(localStorage.getItem("openedLessonBlocks") || "{}"); } catch { return {}; } })(),
@@ -17581,6 +17659,7 @@ function gatherMigrationData() {
     highContrastMode: getHighContrastMode(),
     appTheme: localStorage.getItem("appTheme") || null,
     homeBackdrop: localStorage.getItem("homeBackdrop") || "none",
+    uiStyle: localStorage.getItem("uiStyle") || "modern-glass",
     appWelcomeCoachSeenV275: _hasCompletedAppWelcomeCoach(),
     vocabChapterXP,
     greekParadigmStats: (() => { try { return JSON.parse(localStorage.getItem("greekParadigmStats") || "null"); } catch { return null; } })(),
