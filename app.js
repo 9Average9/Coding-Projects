@@ -9754,6 +9754,7 @@ function showNavPage(page) {
     showLbTab('posts');
   } else if (page === 'mercies') {
     showScreen('merciesPage');
+    updatePraiseStreakUI();
     startMerciesFeed();
     bindMerciesNavCollapse();
     expandMerciesNavOnEntry();
@@ -15958,10 +15959,12 @@ function updateProfileUI() {
   const knownWordsStat = document.getElementById("profileKnownWordsStat");
   const timeStat = document.getElementById("profileTimeStat");
   const streakStat = document.getElementById("profileStreakStat");
+  const praiseStreakStat = document.getElementById("profilePraiseStreakStat");
   const modeBadge = document.getElementById("profileModeBadge");
 
   if (lessonsStat) lessonsStat.textContent = `${completedLessonCount} / ${totalLessons}`;
   if (streakStat) streakStat.textContent = getStreakDays();
+  if (praiseStreakStat) praiseStreakStat.textContent = getPraiseStreakDays();
   if (modeBadge) {
     modeBadge.textContent = isAdvMode ? "Advanced Track" : "Basic Track";
     modeBadge.classList.toggle("advanced", isAdvMode);
@@ -16751,6 +16754,39 @@ function getStreakDays() {
   return parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 }
 
+function getPraiseStreakDays() {
+  const last = localStorage.getItem("mercyLastPostDate");
+  if (!last) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (last !== today && last !== yesterday) return 0;
+  return parseInt(localStorage.getItem("mercyStreakDays") || "0", 10);
+}
+
+function updatePraiseStreakUI() {
+  const count = getPraiseStreakDays();
+  const top = document.getElementById("praiseStreakTop");
+  const profile = document.getElementById("profilePraiseStreakStat");
+  if (top) top.textContent = String(count);
+  if (profile) profile.textContent = String(count);
+}
+
+function waitForMerciesApi(timeout = 4000) {
+  if (window.Mercies?.add) return Promise.resolve(true);
+  return new Promise(resolve => {
+    const started = Date.now();
+    const timer = setInterval(() => {
+      if (window.Mercies?.add) {
+        clearInterval(timer);
+        resolve(true);
+      } else if (Date.now() - started >= timeout) {
+        clearInterval(timer);
+        resolve(false);
+      }
+    }, 100);
+  });
+}
+
 function getDisplayChapterNumber(mounceChapter) {
   const chapterMap = {
     4: 1,
@@ -16842,9 +16878,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.56";
+const APP_VERSION = "3.0.57";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.57 &mdash; Praises Posting + Streak Fix</div>
+<ul>
+  <li><strong>Praises posting hardened</strong> so the composer waits for Firebase, resets cleanly after errors, and no longer gets tangled with the first-open coach.</li>
+  <li><strong>Praise streak added</strong> on the Praises page and Profile, separate from the daily app-open streak.</li>
+</ul>
 <div class="un-version-label">v3.0.56 &mdash; Daily Praises Rename</div>
 <ul>
   <li><strong>Daily Mercies is now Daily Praises</strong> across the bottom nav, feed, composer, journal, settings, and push notification wording.</li>
@@ -17333,6 +17374,7 @@ async function restoreUserFromFirestore(user) {
   }
   if (typeof data.mercyStreakDays === "number") localStorage.setItem("mercyStreakDays", String(data.mercyStreakDays));
   if (data.mercyLastPostDate) localStorage.setItem("mercyLastPostDate", data.mercyLastPostDate);
+  updatePraiseStreakUI();
   if (data.answeredKCs) localStorage.setItem("answeredKCs", JSON.stringify(data.answeredKCs));
   if (data.openedLessonBlocks) localStorage.setItem("openedLessonBlocks", JSON.stringify(data.openedLessonBlocks));
   if (data.translationXPCount) localStorage.setItem("translationXPCount", String(data.translationXPCount));
@@ -18976,46 +19018,63 @@ async function submitMercyPost() {
   const taggedFriendNames = [...taggedMap.values()].filter(Boolean);
   const btn = document.getElementById('mercySubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
-  const post = {
-    body,
-    promptText: _currentMercyPromptText(),
-    promptCategory: document.getElementById('mercyFriendEncouragement')?.checked ? 'Friend Encouragement' : 'Daily Praise',
-    promptMode: _mercyPromptChoiceMode,
-    photoMode: _mercyOriginalImageFile ? 'full' : null,
-    imageAspectRatio: _mercyOriginalImageFile ? _mercyPhotoAspectRatio : null,
-    scripture: scriptureText ? { ref: scriptureRef || 'Scripture', text: scriptureText } : null,
-    scriptureCard: scriptureText ? {
-      bg: document.getElementById('mercyScriptureBg')?.value || 'theme',
-      font: document.getElementById('mercyScriptureFont')?.value || 'system',
-      color: document.getElementById('mercyScriptureColor')?.value || '#123532'
-    } : null,
-    taggedFriendUid: friendUid,
-    taggedFriendName: friendName,
-    taggedFriendUids,
-    taggedFriendNames,
-    friendEncouragement: !!document.getElementById('mercyFriendEncouragement')?.checked
-  };
-  const authorName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
-  const created = await window.Mercies?.add?.(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
-  if (btn) { btn.disabled = false; btn.textContent = 'Post Praise'; }
-  const id = typeof created === 'string' ? created : created?.id;
-  if (!id) { alert('Could not post this Praise right now. Try again.'); return; }
-  markMercyPostedToday();
-  if (document.getElementById('mercySaveThis')?.checked) {
-    await saveMercyToJournal(id, {
-      id,
-      ...post,
-      authorUid: uid,
-      imageUrl: created?.imageUrl || null,
-      imagePath: created?.imagePath || null,
-      imageDataUrl: _mercyImageDataUrl,
-      createdAtMs: created?.createdAtMs || Date.now()
-    });
+  try {
+    const ready = await waitForMerciesApi();
+    if (!ready) {
+      alert('Praises is still connecting. Try again in a moment.');
+      return;
+    }
+    const post = {
+      body,
+      promptText: _currentMercyPromptText(),
+      promptCategory: document.getElementById('mercyFriendEncouragement')?.checked ? 'Friend Encouragement' : 'Daily Praise',
+      promptMode: _mercyPromptChoiceMode,
+      photoMode: _mercyOriginalImageFile ? 'full' : null,
+      imageAspectRatio: _mercyOriginalImageFile ? _mercyPhotoAspectRatio : null,
+      scripture: scriptureText ? { ref: scriptureRef || 'Scripture', text: scriptureText } : null,
+      scriptureCard: scriptureText ? {
+        bg: document.getElementById('mercyScriptureBg')?.value || 'theme',
+        font: document.getElementById('mercyScriptureFont')?.value || 'system',
+        color: document.getElementById('mercyScriptureColor')?.value || '#123532'
+      } : null,
+      taggedFriendUid: friendUid,
+      taggedFriendName: friendName,
+      taggedFriendUids,
+      taggedFriendNames,
+      friendEncouragement: !!document.getElementById('mercyFriendEncouragement')?.checked
+    };
+    const authorName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
+    const created = await window.Mercies.add(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
+    const id = typeof created === 'string' ? created : created?.id;
+    if (!id) { alert('Could not post this Praise right now. Try again.'); return; }
+    if (typeof created?.streakDays === 'number') {
+      localStorage.setItem('mercyStreakDays', String(created.streakDays));
+      localStorage.setItem('mercyLastPostDate', new Date(created.createdAtMs || Date.now()).toISOString().slice(0, 10));
+      updatePraiseStreakUI();
+    } else {
+      markMercyPostedToday();
+    }
+    if (document.getElementById('mercySaveThis')?.checked) {
+      await saveMercyToJournal(id, {
+        id,
+        ...post,
+        authorUid: uid,
+        imageUrl: created?.imageUrl || null,
+        imagePath: created?.imagePath || null,
+        imageDataUrl: _mercyImageDataUrl,
+        createdAtMs: created?.createdAtMs || Date.now()
+      });
+    }
+    if (post.friendEncouragement && taggedFriendUids.includes(_pendingMercyFriendEncouragement?.friendUid)) {
+      clearPendingMercyFriendEncouragement(_pendingMercyFriendEncouragement.friendUid);
+    }
+    closeMercyComposer();
+  } catch (e) {
+    console.warn('submitMercyPost:', e);
+    alert('Could not post this Praise right now. Try again.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Post Praise'; }
   }
-  if (post.friendEncouragement && taggedFriendUids.includes(_pendingMercyFriendEncouragement?.friendUid)) {
-    clearPendingMercyFriendEncouragement(_pendingMercyFriendEncouragement.friendUid);
-  }
-  closeMercyComposer();
 }
 
 async function reactMercyPost(postId, label) {
@@ -19107,12 +19166,17 @@ async function deleteMercyJournalEntry(entryId) {
 
 function markMercyPostedToday() {
   const today = new Date().toISOString().slice(0, 10);
-  if (localStorage.getItem('mercyLastPostDate') === today) return;
+  if (localStorage.getItem('mercyLastPostDate') === today) {
+    updatePraiseStreakUI();
+    return parseInt(localStorage.getItem('mercyStreakDays') || '1', 10);
+  }
   const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const current = parseInt(localStorage.getItem('mercyStreakDays') || '0', 10);
   const next = localStorage.getItem('mercyLastPostDate') === yesterday ? current + 1 : 1;
   localStorage.setItem('mercyLastPostDate', today);
   localStorage.setItem('mercyStreakDays', String(next));
+  updatePraiseStreakUI();
+  return next;
 }
 
 function mercyDb() {
@@ -21682,7 +21746,7 @@ const WORD_LIBRARY_COACH_STEPS = [
 ];
 
 const PRAISES_COACH_STEPS = [
-  { before: () => showNavPage('mercies'), target: () => _coachFirst(['#merciesPage .mercies-hero', '#merciesPage']), title: 'Daily Praises', body: 'Praises is a photo-first feed for sharing ordinary blessings, Scripture reminders, prayerful gratitude, and encouragement with friends. The aim is simple: notice the Lord’s kindness and praise Him for it.' },
+  { target: () => _coachFirst(['#merciesPage .mercies-hero', '#merciesPage']), title: 'Daily Praises', body: 'Praises is a photo-first feed for sharing ordinary blessings, Scripture reminders, prayerful gratitude, and encouragement with friends. The aim is simple: notice the Lord’s kindness and praise Him for it.' },
   { target: () => _coachFirst(['.mercies-primary']), title: 'Post a Praise', body: 'Use Post a Praise to add a photo or text-only praise, choose a prompt, write your own prompt, or use no prompt at all. You can also attach a Scripture card.' },
   { target: () => _coachFirst(['#mercyPendingFriendAction', '.mercies-actions']), title: 'Friend encouragement', body: 'Weekly friend encouragement can give you a one-day prompt locked to one friend, so encouragement does not get lost when life gets busy.' },
   { target: () => _coachFirst(['.mercies-secondary']), title: 'Praises Journal', body: 'Praises Journal saves your own praises privately to your account and caches them on this device, so your reflections can come back with you when you sign in again.' },
@@ -21711,8 +21775,12 @@ function startWordLibraryCoach(force = false) {
 }
 
 function startPraisesCoach(force = false) {
+  const busyModalOpen = ['mercyComposerModal', 'merciesSettingsModal', 'praisesInfoModal'].some(id => document.getElementById(id)?.classList.contains('open'));
+  if (busyModalOpen) return;
+  if (!document.getElementById('merciesPage')?.classList.contains('active')) return;
   if (!force && document.getElementById('appCoachOverlay')?.classList.contains('open')) return;
   if (_coachHasSeen('praisesCoachSeenV3056', force)) return;
+  setMerciesNavCollapsed(false);
   _startAppCoach(PRAISES_COACH_STEPS, 'praisesCoachSeenV3056', force);
 }
 
@@ -21741,7 +21809,12 @@ function startCoachReplay(type) {
   if (type === 'app') startAppWelcomeCoach(true);
   if (type === 'praises') {
     showNavPage('mercies');
-    setTimeout(() => startPraisesCoach(true), 260);
+    setTimeout(() => {
+      closeMercyComposer?.();
+      closeMerciesSettings?.();
+      closePraisesInfoModal?.();
+      startPraisesCoach(true);
+    }, 260);
   }
   if (type === 'rhema') showRhema().then(() => setTimeout(() => startRhemaCoach(true), 260));
   if (type === 'study') {

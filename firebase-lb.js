@@ -1255,7 +1255,7 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       expiresAtMs: now + 21 * 24 * 60 * 60 * 1000,
       isActive: true
     });
-    await advanceMercyStreak(uid, now);
+    const streakDays = await advanceMercyStreak(uid, now);
     [...new Set([post.taggedFriendUid, ...(post.taggedFriendUids || [])].filter(Boolean))]
       .filter(tagUid => tagUid !== uid)
       .forEach(tagUid => {
@@ -1263,7 +1263,7 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
           mercyPostId: ref.id
         });
       });
-    return { id: ref.id, imageUrl, imagePath, createdAtMs: now };
+    return { id: ref.id, imageUrl, imagePath, createdAtMs: now, streakDays };
   } catch (e) {
     console.warn("addMercyPost:", e);
     return null;

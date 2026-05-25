@@ -18426,6 +18426,27 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+.mercies-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.praise-streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--secondary-color);
+  background: color-mix(in srgb, var(--secondary-color) 9%, white);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+  font-size: .72rem;
+  font-weight: 900;
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--secondary-color) 8%, transparent);
+}
+.praise-streak-pill .material-symbols-outlined { font-size: 1rem; font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20; }
 .mercies-hero h1 { margin: 12px 0 12px; color: var(--font-color); font-size: clamp(3.2rem, 17vw, 5.2rem); line-height: 0.85; font-family: Georgia, 'Times New Roman', serif; font-weight: 800; letter-spacing: 0; }
 .mercies-hero p,
 .mercies-muted { color: var(--muted-color); line-height: 1.5; margin: 0; font-size: 1.05rem; }
@@ -18781,6 +18802,7 @@ body.dark .mercy-toggle-card,
 body.dark .mercy-picker-button,
 body.dark .mercy-ref-pills button,
 body.dark .mercy-info-btn,
+body.dark .praise-streak-pill,
 body.dark .mercy-photo-picker,
 body.dark .mercy-field select,
 body.dark .mercy-friend-row select,

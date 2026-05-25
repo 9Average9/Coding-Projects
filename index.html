@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.56" rel="stylesheet"/>
+<link href="style.css?v=3.0.57" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8444,7 +8444,11 @@ Verb Endings
 </button>
 <div class="journey-stat">
 <strong id="profileStreakStat">0</strong>
-<span>Day Streak 🔥</span>
+<span>App Open Streak</span>
+</div>
+<div class="journey-stat">
+<strong id="profilePraiseStreakStat">0</strong>
+<span>Praise Streak</span>
 </div>
 <div class="journey-stat">
 <strong id="profileVocabStat">0</strong>
@@ -8551,7 +8555,10 @@ Verb Endings
 <div class="mercies-scroll" id="merciesScroll">
 <div class="mercies-hero">
 <div>
+<div class="mercies-kicker-row">
 <span class="mercies-kicker">Daily praises</span>
+<span class="praise-streak-pill"><span class="material-symbols-outlined">local_fire_department</span><strong id="praiseStreakTop">0</strong><span>day streak</span></span>
+</div>
 <h1>Praises</h1>
 <p>Capture one good gift, ordinary blessing, Scripture reminder, or encouragement for your friends.</p>
 </div>
@@ -15703,10 +15710,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.56"></script>
+<script src="app.js?v=3.0.57"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.56" type="module"></script>
+<script src="firebase-lb.js?v=3.0.57" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
