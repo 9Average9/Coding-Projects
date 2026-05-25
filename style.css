@@ -11495,7 +11495,7 @@ body.dark .lb-rank-bronze { color: #fbbf24; }
   border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 480px;
-  max-height: min(78vh, 680px);
+  max-height: min(72svh, 620px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -11574,7 +11574,7 @@ body.dark .friends-search-input { background: #111827; border-color: #374151; }
 .friends-tab-pane { display: none; flex-direction: column; flex: 1; overflow: hidden; padding: 10px 16px 0; }
 .friends-tab-pane.active { display: flex; }
 
-.fr-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 24px; overscroll-behavior: contain; }
+.fr-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 24px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 
 .fr-section-label {
   font-size: 0.72rem;
@@ -15537,6 +15537,7 @@ body.dark .bn-item::before {
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
+  scrollbar-gutter: stable;
 }
 .profile-page-scroll .profile-card { box-shadow: none; border-radius: 0; background: transparent; padding: 0; max-height: none; overflow: visible; }
 
@@ -18328,7 +18329,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   background: rgba(255,255,255,0.78); color: var(--font-color);
   box-shadow: 0 10px 24px rgba(0,0,0,0.06);
 }
-.mercies-actions { display: grid; gap: 12px; background: transparent !important; box-shadow: none !important; border: 0 !important; }
+.mercies-actions { display: grid; gap: 16px; background: none !important; box-shadow: none !important; border: 0 !important; isolation: isolate; }
 .mercies-actions::before,
 .mercies-actions::after { display: none !important; content: none !important; }
 .mercies-primary,
@@ -18342,7 +18343,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 .mercies-primary,
 .mercies-secondary { justify-content: flex-start; text-align: left; min-height: 104px; padding: 20px; position: relative; }
-.mercies-primary { background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 72%, #001a33), color-mix(in srgb, var(--secondary-color) 42%, #001027)); color: #fff; box-shadow: 0 18px 34px color-mix(in srgb, var(--secondary-color) 22%, transparent); }
+.mercies-primary { background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 72%, #001a33), color-mix(in srgb, var(--secondary-color) 42%, #001027)); color: #fff; box-shadow: 0 16px 28px color-mix(in srgb, var(--secondary-color) 18%, transparent); }
 .mercies-secondary,
 .mercies-load-more,
 .mercies-empty button,
@@ -18358,7 +18359,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercies-section-head.hidden { display: none !important; }
 .mercies-section-title { border: none; background: transparent; color: var(--font-color); font-family: Georgia, 'Times New Roman', serif; font-size: 1.55rem; font-weight: 850; padding: 0 0 8px; position: relative; }
 .mercies-section-title.active::after { content: ""; position: absolute; left: 0; bottom: 0; width: 48px; height: 4px; border-radius: 999px; background: var(--secondary-color); }
-#merciesFilterSelect { width: auto; max-width: 130px; border: none; background: transparent; color: var(--muted-color); font-weight: 850; font: inherit; padding: 6px 18px 6px 2px; outline: none; text-align: right; }
+#merciesFilterSelect { width: auto; max-width: 118px; border: none; background: transparent; color: var(--muted-color); font-weight: 850; font: inherit; padding: 6px 4px 6px 2px; outline: none; text-align: right; }
 .mercies-journal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .mercies-back-feed { border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent); border-radius: 999px; padding: 9px 12px; display: inline-flex; align-items: center; gap: 5px; color: var(--secondary-color); background: rgba(255,255,255,0.78); font-weight: 900; }
 .mercies-back-feed .material-symbols-outlined { font-size: 1rem; }
@@ -18435,8 +18436,8 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-photo-picker small,
 .mercy-save-row small,
 .mercy-setting-row small { display: block; color: var(--muted-color); font-size: 0.75rem; margin-top: 2px; }
-.mercy-photo-preview { position: relative; border-radius: 24px; overflow: hidden; margin: 14px 0; background: color-mix(in srgb, var(--secondary-color) 6%, white); }
-.mercy-photo-preview img { width: 100%; aspect-ratio: 4 / 3; max-height: 280px; object-fit: contain; display: block; background: color-mix(in srgb, var(--secondary-color) 6%, white); transform-origin: center; transition: transform .08s ease, object-fit .12s ease; touch-action: none; user-select: none; }
+.mercy-photo-preview { position: relative; border-radius: 24px; overflow: hidden; margin: 14px 0; background: color-mix(in srgb, var(--secondary-color) 6%, white); touch-action: none; }
+.mercy-photo-preview img { width: 100%; aspect-ratio: 4 / 3; max-height: 280px; object-fit: cover; display: block; background: color-mix(in srgb, var(--secondary-color) 6%, white); transform-origin: center; transition: transform .08s ease, object-fit .12s ease; touch-action: none; user-select: none; }
 .mercy-photo-preview button { position: absolute; right: 10px; bottom: 10px; border: none; border-radius: 999px; padding: 8px 12px; color: var(--secondary-color); background: rgba(255,255,255,0.88); font-weight: 900; }
 .mercy-edit-photo-btn { top: 10px !important; bottom: auto !important; width: 42px; height: 42px; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,.12); }
 .mercy-crop-grid { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right, transparent 33%, rgba(255,255,255,.72) 33%, rgba(255,255,255,.72) calc(33% + 1px), transparent calc(33% + 1px), transparent 66%, rgba(255,255,255,.72) 66%, rgba(255,255,255,.72) calc(66% + 1px), transparent calc(66% + 1px)), linear-gradient(to bottom, transparent 33%, rgba(255,255,255,.72) 33%, rgba(255,255,255,.72) calc(33% + 1px), transparent calc(33% + 1px), transparent 66%, rgba(255,255,255,.72) 66%, rgba(255,255,255,.72) calc(66% + 1px), transparent calc(66% + 1px)); box-shadow: inset 0 0 0 2px rgba(255,255,255,.86); }
@@ -18478,7 +18479,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
   border-radius: 18px;
   min-height: 48px;
-  padding: 11px 13px;
+  padding: 11px 12px;
   color: var(--font-color);
   background: color-mix(in srgb, var(--secondary-color) 7%, white);
   display: inline-flex;
@@ -18488,11 +18489,16 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   font-weight: 900;
   text-align: left;
 }
+.mercy-ref-pills button .material-symbols-outlined:first-child { color: var(--secondary-color); font-size: 1.08rem; flex: 0 0 auto; }
+.mercy-ref-pills button .material-symbols-outlined:last-child { color: var(--muted-color); font-size: 1rem; flex: 0 0 auto; }
+.mercy-ref-pills button strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .86rem; }
 .mercy-ref-pills { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, .75fr) minmax(0, .75fr); gap: 8px; }
 .mercy-friend-choice { width: 100%; border: 0; background: transparent; color: var(--font-color); min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-weight: 900; text-align: left; border-radius: 16px; }
 .mercy-friend-choice.selected,
 .mercy-friend-choice:active { background: color-mix(in srgb, var(--secondary-color) 12%, transparent); color: var(--secondary-color); }
 .mercy-friend-choice:disabled { opacity: .35; }
+#mercyFriendPickerOverlay .rhema-picker-sheet { max-height: min(64svh, 520px); }
+#mercyFriendPickerList { overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 .mercy-composer-card textarea { min-height: 96px; resize: vertical; }
 .mercy-friend-row { display: grid; gap: 8px; }
 .mercy-extra-friends { display: grid; gap: 8px; }
@@ -18585,9 +18591,9 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-save-row,
 .mercy-setting-row { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
 .mercy-setting-row { grid-template-columns: minmax(0, 1fr) auto; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); max-width: 100%; box-sizing: border-box; }
-.mercy-time-center { display: flex; justify-content: center; margin: -4px 0 8px; }
-.mercy-time-center input[type="time"] { max-width: 180px; text-align: center; }
-.mercy-settings-card input[type="time"] { margin: 0; }
+.mercy-time-center { display: flex; justify-content: center; width: 100%; padding: 0 12px; margin: -2px 0 12px; box-sizing: border-box; }
+.mercy-time-center input[type="time"] { width: min(100%, 168px); min-width: 0; text-align: center; }
+.mercy-settings-card input[type="time"] { margin: 0; flex: 0 1 168px; }
 .mercy-settings-card { overflow-x: hidden; }
 body.dark .mercy-card,
 body.dark .community-post-card,
@@ -18607,7 +18613,15 @@ body.dark .mercy-scripture-box textarea,
 body.dark .mercy-card-options select,
 body.dark .mercy-settings-card input[type="time"],
 body.dark .community-comments-card,
-body.dark .community-reactions-card {
+body.dark .community-reactions-card,
+body.dark .cpc-kind,
+body.dark .cpc-verse-box,
+body.dark .cpc-alert-row,
+body.dark .community-comment-row,
+body.dark .community-reaction-person,
+body.dark .mercy-slide,
+body.dark .mercy-extra-friend-row button,
+body.dark .mercy-add-friend {
   background: color-mix(in srgb, var(--secondary-color) 10%, #111827) !important;
   color: #f8fafc !important;
   border-color: color-mix(in srgb, var(--secondary-color) 26%, #374151) !important;
@@ -18623,7 +18637,10 @@ body.dark .mercy-card-top strong { color: #f8fafc !important; }
 body.dark .mercy-card-top small,
 body.dark .community-post-meta,
 body.dark .mercies-muted,
-body.dark .mercy-toggle-card small { color: #cbd5e1 !important; }
+body.dark .mercy-toggle-card small,
+body.dark .cpc-sub,
+body.dark .cpc-verse-head small,
+body.dark .cpc-alert-row small { color: #cbd5e1 !important; }
 @media (max-width: 420px) {
   .mercies-actions { grid-template-columns: 1fr; }
   .mercy-slide { min-height: 280px; }

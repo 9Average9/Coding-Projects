@@ -108,9 +108,6 @@ let _merciesFilter = 'latest';
 let _mercyImageBlob = null;
 let _mercyImageDataUrl = null;
 let _mercyOriginalImageFile = null;
-let _mercyPhotoPositionX = 50;
-let _mercyPhotoPositionY = 50;
-let _mercyPhotoZoom = 0;
 let _mercyPhotoPreviewUrl = null;
 let _mercyPostWithoutPhoto = false;
 let _mercyPhotoScale = 1;
@@ -118,6 +115,7 @@ let _mercyPhotoOffsetX = 0;
 let _mercyPhotoOffsetY = 0;
 let _mercyCropPointers = new Map();
 let _mercyCropDragStart = null;
+let _mercyPhotoSampled = false;
 let _mercyFriendPickerTargetId = null;
 let _mercyPromptMode = 'regular';
 let _unsubEncouragements = null;
@@ -16801,7 +16799,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.49";
+const APP_VERSION = "3.0.50";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18550,9 +18548,10 @@ function updateMercyRefPills() {
   const b = document.getElementById('mercyBookPill');
   const c = document.getElementById('mercyChapterPill');
   const v = document.getElementById('mercyVersePill');
-  if (b) b.textContent = bookName;
-  if (c) c.textContent = chapter ? `Ch ${chapter}` : 'Ch';
-  if (v) v.textContent = verse ? `v${verse}` : 'v';
+  const pillHtml = (icon, text) => `<span class="material-symbols-outlined">${icon}</span><strong>${_lbEscape(text)}</strong><span class="material-symbols-outlined">expand_more</span>`;
+  if (b) b.innerHTML = pillHtml('menu_book', bookName);
+  if (c) c.innerHTML = pillHtml('format_list_numbered', chapter ? `Chapter ${chapter}` : 'Chapter');
+  if (v) v.innerHTML = pillHtml('pin', verse ? `Verse ${verse}` : 'Verse');
 }
 
 function openMercyBookPicker() {
@@ -18645,7 +18644,7 @@ function updateMercyScripturePreview() {
   const preview = document.getElementById('mercyScripturePreview');
   if (!preview) return;
   const enabled = !!document.getElementById('mercyAttachScripture')?.checked;
-  const ref = document.getElementById('mercyScriptureRef')?.value || 'MSB Scripture';
+  const ref = document.getElementById('mercyScriptureRef')?.value || 'Scripture';
   const text = document.getElementById('mercyScriptureText')?.value || 'Select a verse to preview the card.';
   const bg = document.getElementById('mercyScriptureBg')?.value || 'theme';
   const font = document.getElementById('mercyScriptureFont')?.value || 'system';
@@ -18664,21 +18663,10 @@ async function handleMercyPhotoSelected(input) {
     _mercyPostWithoutPhoto = false;
     const noPhoto = document.getElementById('mercyNoPhoto');
     if (noPhoto) noPhoto.checked = false;
-    _mercyPhotoPositionX = 50;
-    _mercyPhotoPositionY = 50;
-    _mercyPhotoZoom = 0;
+    _mercyPhotoSampled = false;
     if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
     _mercyPhotoPreviewUrl = URL.createObjectURL(file);
-    const result = await compressMercyImage(file, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY, zoom: _mercyPhotoZoom });
-    _mercyImageBlob = result.blob;
-    _mercyImageDataUrl = result.dataUrl;
     document.getElementById('mercyPhotoPreview').src = _mercyPhotoPreviewUrl;
-    const x = document.getElementById('mercyPhotoPosX');
-    const y = document.getElementById('mercyPhotoPosY');
-    const z = document.getElementById('mercyPhotoZoom');
-    if (x) x.value = '50';
-    if (y) y.value = '50';
-    if (z) z.value = '0';
     resetMercyPhotoCrop(false);
     initMercyPhotoCropGestures();
     document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
@@ -18693,6 +18681,7 @@ function clearMercyPhoto() {
   _mercyImageBlob = null;
   _mercyImageDataUrl = null;
   _mercyOriginalImageFile = null;
+  _mercyPhotoSampled = false;
   if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
   _mercyPhotoPreviewUrl = null;
   document.getElementById('mercyPhotoPreviewWrap')?.classList.add('hidden');
@@ -18719,7 +18708,7 @@ function toggleMercyPhotoEditor() {
 function updateMercyPhotoPosition() {
   const img = document.getElementById('mercyPhotoPreview');
   if (img) {
-    img.style.objectFit = 'contain';
+    img.style.objectFit = 'cover';
     img.style.transform = `translate(${_mercyPhotoOffsetX}px, ${_mercyPhotoOffsetY}px) scale(${_mercyPhotoScale})`;
   }
 }
@@ -18728,9 +18717,7 @@ function resetMercyPhotoCrop(hideGrid = true) {
   _mercyPhotoScale = 1;
   _mercyPhotoOffsetX = 0;
   _mercyPhotoOffsetY = 0;
-  _mercyPhotoZoom = 0;
-  _mercyPhotoPositionX = 50;
-  _mercyPhotoPositionY = 50;
+  _mercyPhotoSampled = false;
   updateMercyPhotoPosition();
   if (hideGrid) {
     document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
@@ -18744,6 +18731,12 @@ function initMercyPhotoCropGestures() {
   wrap.dataset.cropGestures = 'true';
   wrap.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
+    const img = document.getElementById('mercyPhotoPreview');
+    if (_mercyPhotoSampled && img && _mercyPhotoPreviewUrl) {
+      _mercyPhotoSampled = false;
+      img.src = _mercyPhotoPreviewUrl;
+      updateMercyPhotoPosition();
+    }
     wrap.setPointerCapture?.(e.pointerId);
     _mercyCropPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     _mercyCropDragStart = {
@@ -18791,6 +18784,7 @@ async function sampleMercyPhotoCrop() {
   _mercyImageDataUrl = finalImage.dataUrl;
   const img = document.getElementById('mercyPhotoPreview');
   if (img) {
+    _mercyPhotoSampled = true;
     img.src = finalImage.dataUrl;
     img.style.transform = '';
     img.style.objectFit = 'cover';
@@ -18825,12 +18819,11 @@ async function compressMercyImage(file, options = {}) {
       const contain = Math.min(canvas.width / img.width, canvas.height / img.height);
       const cover = Math.max(canvas.width / img.width, canvas.height / img.height);
       const directScale = Math.max(1, Math.min(3, options.scale || 1));
-      const crop = Math.max(0, Math.min(100, options.zoom ?? 0)) / 100;
-      const drawScale = (contain + (cover - contain) * crop) * directScale;
+      const drawScale = Math.min(cover * directScale, cover * 3);
       const dw = img.width * drawScale;
       const dh = img.height * drawScale;
-      const dx = (canvas.width - dw) * ((options.x ?? 50) / 100) + (options.offsetX || 0) * (canvas.width / Math.max(1, document.getElementById('mercyPhotoPreview')?.clientWidth || canvas.width));
-      const dy = (canvas.height - dh) * ((options.y ?? 50) / 100) + (options.offsetY || 0) * (canvas.height / Math.max(1, document.getElementById('mercyPhotoPreview')?.clientHeight || canvas.height));
+      const dx = (canvas.width - dw) / 2 + (options.offsetX || 0) * (canvas.width / Math.max(1, document.getElementById('mercyPhotoPreview')?.clientWidth || canvas.width));
+      const dy = (canvas.height - dh) / 2 + (options.offsetY || 0) * (canvas.height / Math.max(1, document.getElementById('mercyPhotoPreview')?.clientHeight || canvas.height));
       ctx.drawImage(img, dx, dy, dw, dh);
     } else {
       canvas.width = Math.max(1, Math.round(img.width * scale));
@@ -20101,7 +20094,9 @@ async function renderFriendsList() {
   }
   el.innerHTML = `<div class="fr-loading">Loading...</div>`;
   try {
-    const users = (await Promise.all(friendsList.map(uid => window.Friends?.getUser(uid)))).filter(Boolean);
+    const users = (await Promise.all(friendsList.map(uid => window.Friends?.getUser(uid))))
+      .filter(Boolean)
+      .sort((a, b) => (a.displayName || a.username || '').localeCompare(b.displayName || b.username || ''));
     el.innerHTML = users.map(u => _frCardHTML(u, "friend")).join("") || `<div class="fr-empty"><p>Couldn't load friends</p></div>`;
   } catch {
     el.innerHTML = `<div class="fr-empty"><p>Couldn't load — <button class="lb-retry-btn" onclick="renderFriendsList()">Retry</button></p></div>`;
