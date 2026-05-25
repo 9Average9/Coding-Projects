@@ -279,6 +279,30 @@ function calculateNextMercyFriendDate(reminder, afterDate = new Date()) {
   return calculateNextReminderDate({ ...reminder, frequency: "daily" }, base);
 }
 
+function mercyDateKey(ms = Date.now(), timeZone = "UTC") {
+  const local = getLocalParts(new Date(ms), timeZone || "UTC");
+  return `${local.year}-${String(local.month).padStart(2, "0")}-${String(local.day).padStart(2, "0")}`;
+}
+
+const PRAISE_PROMPTS = [
+  "What good gift can you praise God for today?",
+  "What ordinary blessing did you notice today?",
+  "What truth from Scripture helped you think clearly today?",
+  "What is something you ate today that you enjoyed?",
+  "What conversation from today are you thankful for?",
+  "What simple comfort did you receive today?",
+  "What part of creation caught your attention today?",
+  "What task did you get through that you can thank God for?",
+  "What song, verse, or thought helped your heart today?",
+  "What small moment made your day lighter?",
+  "What is one answered prayer, large or small, you want to remember?",
+  "What is one reason to praise the Lord today?"
+];
+
+function randomPraisePrompt() {
+  return PRAISE_PROMPTS[Math.floor(Math.random() * PRAISE_PROMPTS.length)];
+}
+
 async function backfillReminderNextSendAt(now) {
   if (now.getUTCMinutes() !== 0) return;
   const snap = await db.collection("users")
@@ -370,16 +394,12 @@ exports.sendScheduledReminders = functions.pubsub
       const tokens = data.fcmTokens || [];
       const nextSendAt = calculateNextReminderDate(reminder, new Date(now.getTime() + 60 * 1000));
       await userDoc.ref.update({ "mercyReminder.lastSent": now, ...(nextSendAt ? { "mercyReminder.nextSendAt": nextSendAt } : {}) });
+      if (data.mercyLastPostDate === mercyDateKey(now.getTime(), reminder.timezone || "UTC")) continue;
       if (!tokens.length) continue;
-      const bodies = [
-        "Take a moment to offer today's praise.",
-        "What good gift can you thank God for today?",
-        "Capture one ordinary blessing and praise God for it.",
-        "Pause and remember the Lord's kindness today."
-      ];
+      const body = `Share your daily praise: ${randomPraisePrompt()}`;
       await messaging.sendEachForMulticast({
         tokens,
-        notification: { title: "Praises", body: bodies[Math.floor(Math.random() * bodies.length)] },
+        notification: { title: "Praises", body },
         webpush: { fcmOptions: { link: "/Greek-Vocab/?open=mercies" }, notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
       }).catch(e => console.error(`${userDoc.id} mercy reminder error:`, e.message));
     }

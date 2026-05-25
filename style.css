@@ -18527,7 +18527,15 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-media .mercy-slide img { object-fit: contain; background: color-mix(in srgb, var(--secondary-color) 5%, var(--card-color)); }
 .mercy-slide-dots { display: flex; justify-content: center; gap: 6px; margin-top: 9px; }
 .mercy-slide-dots span { width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--secondary-color) 42%, transparent); }
-.mercy-scripture-card { padding: 24px; color: var(--mercy-scripture-color, var(--font-color)); text-align: center; }
+.mercy-scripture-card {
+  align-self: center;
+  min-height: clamp(250px, 58vw, 360px);
+  height: auto !important;
+  aspect-ratio: 4 / 3 !important;
+  padding: 24px;
+  color: var(--mercy-scripture-color, var(--font-color));
+  text-align: center;
+}
 .mercy-scripture-card span { color: var(--secondary-color); font-weight: 900; }
 .mercy-scripture-card p { font-size: 1.25rem; line-height: 1.45; font-weight: 750; }
 .mercy-scripture-theme { background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 14%, white), rgba(255,255,255,0.78)); }
@@ -18757,8 +18765,17 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-scripture-sunrise { background: linear-gradient(135deg, #fff0ca, color-mix(in srgb, var(--secondary-color) 18%, #ffd3aa)); }
 .mercy-scripture-ocean { background: linear-gradient(135deg, #e9fbff, color-mix(in srgb, var(--secondary-color) 18%, #b6ddff)); }
 .mercy-scripture-forest { background: linear-gradient(135deg, #edf9ef, color-mix(in srgb, var(--secondary-color) 22%, #bde7c8)); }
+.mercy-scripture-linen { background: linear-gradient(135deg, #fffaf0, color-mix(in srgb, var(--secondary-color) 10%, #f0e6d6)); }
+.mercy-scripture-midnight { background: linear-gradient(135deg, #111827, color-mix(in srgb, var(--secondary-color) 32%, #020617)); }
+.mercy-scripture-rose { background: linear-gradient(135deg, #fff1f2, color-mix(in srgb, var(--secondary-color) 14%, #fecdd3)); }
+.mercy-scripture-gold { background: linear-gradient(135deg, #fff7d6, color-mix(in srgb, var(--secondary-color) 18%, #f8d56b)); }
+.mercy-scripture-slate { background: linear-gradient(135deg, #f8fafc, color-mix(in srgb, var(--secondary-color) 14%, #cbd5e1)); }
 .mercy-font-rounded { font-family: ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif; }
 .mercy-font-elegant { font-family: Georgia, Cambria, 'Times New Roman', serif; }
+.mercy-font-classic { font-family: "Times New Roman", Georgia, serif; letter-spacing: .01em; }
+.mercy-font-humanist { font-family: "Trebuchet MS", "Gill Sans", system-ui, sans-serif; }
+.mercy-font-compact { font-family: "Arial Narrow", Arial, system-ui, sans-serif; }
+.mercy-font-scripture { font-family: Palatino, "Palatino Linotype", Georgia, serif; }
 .mercy-save-row,
 .mercy-setting-row { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
 .mercy-setting-row { grid-template-columns: minmax(0, 1fr) auto; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); max-width: 100%; box-sizing: border-box; }

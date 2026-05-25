@@ -16878,9 +16878,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.58";
+const APP_VERSION = "3.0.59";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.59 &mdash; Praise Prompt + Coach Polish</div>
+<ul>
+  <li><strong>Praise prompts refreshed</strong> with worship-focused and ordinary daily-life prompts.</li>
+  <li><strong>Coach placement improved</strong> so the text card avoids covering the highlighted element.</li>
+  <li><strong>Verse cards polished</strong> with fixed presentation sizing plus more fonts and backgrounds.</li>
+</ul>
 <div class="un-version-label">v3.0.58 &mdash; Praise Photo Upload Fix</div>
 <ul>
   <li><strong>Praise photo uploads fixed</strong> by keeping optimized images under the Firebase Storage rule limit.</li>
@@ -18254,12 +18260,11 @@ function _rankBadgeHtml(rank) {
 
 // Mercies
 const MERCY_PROMPTS = [
-  "What is one good gift you can thank God for today?",
-  "What small mercy did you notice today?",
+  "What is one good gift you can praise God for today?",
+  "What is one ordinary blessing you noticed today?",
   "What truth from Scripture helped you think clearly today?",
   "What is one wise choice you made or want to make today?",
-  "What is one ordinary blessing you do not want to overlook?",
-  "What is something God has provided that you want to remember?",
+  "What is something God provided that you want to remember?",
   "What is one way you saw someone show kindness today?",
   "What is one lesson from today you want to carry into tomorrow?",
   "What is one reason to praise the Lord today?",
@@ -18268,7 +18273,16 @@ const MERCY_PROMPTS = [
   "Where did you need patience, humility, or wisdom today?",
   "What is one thing you can thank God for even if today was hard?",
   "What responsibility did you try to handle faithfully today?",
-  "What is one moment from today worth remembering?"
+  "What is one moment from today worth remembering?",
+  "What is something you ate today that you enjoyed?",
+  "What conversation from today are you thankful for?",
+  "What simple comfort did you receive today?",
+  "What part of creation caught your attention today?",
+  "What task did you get through that you can thank God for?",
+  "What song, verse, or thought helped your heart today?",
+  "What small moment made your day lighter?",
+  "What is one thing about your home, work, or routine you can praise God for?",
+  "What is one answered prayer, large or small, you want to remember?"
 ];
 
 const MERCY_FRIEND_PROMPTS = [
@@ -21943,9 +21957,17 @@ function _placeAppCoachCard(target, card, spotlight, preferred = 'below') {
       left = rect.right + 18;
       if (left + cardW > vw - MARGIN) left = rect.left - cardW - 18;
     } else {
-      top = rect.bottom + 18;
+      const belowTop = rect.bottom + 18;
+      const aboveTop = rect.top - cardH - 18;
+      const belowSpace = vh - rect.bottom - MARGIN;
+      const aboveSpace = rect.top - MARGIN;
+      top = belowSpace >= cardH + 18 || belowSpace >= aboveSpace ? belowTop : aboveTop;
       left = rect.left + rect.width / 2 - cardW / 2;
-      if (top + cardH > vh - MARGIN) top = rect.top - cardH - 18;
+      if (top + cardH > vh - MARGIN) top = aboveTop;
+      if (top < MARGIN) top = Math.min(vh - cardH - MARGIN, Math.max(MARGIN, rect.bottom + 18));
+      if (!(top + cardH < rect.top || top > rect.bottom)) {
+        top = aboveSpace > belowSpace ? MARGIN : vh - cardH - MARGIN;
+      }
     }
     if (typeof _appCoachSteps[_appCoachIdx]?.offsetY === 'number') {
       top += _appCoachSteps[_appCoachIdx].offsetY;
