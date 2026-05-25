@@ -1194,15 +1194,20 @@ function listenMerciesPosts(uid, friendUids = [], callback) {
 
 async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob, post = {}) {
   try {
+    if (imageBlob && !(imageBlob instanceof Blob) && typeof imageBlob === "object") {
+      post = imageBlob;
+      imageBlob = post.imageBlob || post.optimizedImageBlob || post.blob || null;
+    }
     if (!imageBlob) return null;
     const now = Date.now();
     const ext = imageBlob.type?.includes("webp") ? "webp" : "jpg";
-    const imagePath = `mercies/${uid}/${now}.${ext}`;
+    const ref = doc(collection(db, "merciesPosts"));
+    const imagePath = `mercies/${uid}/${ref.id}.${ext}`;
     const imageRef = storageRef(storage, imagePath);
     await uploadBytes(imageRef, imageBlob, { contentType: imageBlob.type || "image/jpeg" });
     const imageUrl = await getDownloadURL(imageRef);
     const audienceUids = [...new Set([uid, ...(friendUids || [])])];
-    const ref = await addDoc(collection(db, "merciesPosts"), {
+    await setDoc(ref, {
       authorUid: uid,
       authorName: displayName || "Someone",
       authorAvatar: avatar || "person",
@@ -1224,6 +1229,7 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       expiresAtMs: now + 21 * 24 * 60 * 60 * 1000,
       isActive: true
     });
+    await advanceMercyStreak(uid, now);
     if (post.taggedFriendUid && post.taggedFriendUid !== uid) {
       fcmSendPushNotification(post.taggedFriendUid, "mercyPostedTagged", displayName || "Someone", uid, {
         mercyPostId: ref.id
@@ -1232,6 +1238,32 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
     return ref.id;
   } catch (e) {
     console.warn("addMercyPost:", e);
+    return null;
+  }
+}
+
+function mercyDateKey(ms = Date.now()) {
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
+async function advanceMercyStreak(uid, now = Date.now()) {
+  try {
+    const userRef = doc(db, "users", uid);
+    const snap = await getDoc(userRef);
+    const data = snap.exists() ? snap.data() : {};
+    const today = mercyDateKey(now);
+    if (data.mercyLastPostDate === today) return data.mercyStreakDays || 1;
+    const yesterday = mercyDateKey(now - 24 * 60 * 60 * 1000);
+    const nextStreak = data.mercyLastPostDate === yesterday ? (data.mercyStreakDays || 0) + 1 : 1;
+    await setDoc(userRef, {
+      mercyLastPostDate: today,
+      mercyStreakDays: nextStreak,
+      mercyPostDays: arrayUnion(today),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return nextStreak;
+  } catch (e) {
+    console.warn("advanceMercyStreak:", e);
     return null;
   }
 }
@@ -1252,6 +1284,24 @@ async function reactMercyPost(postId, uid, label) {
     return true;
   } catch (e) {
     console.warn("reactMercyPost:", e);
+    return false;
+  }
+}
+
+async function deleteMercyPost(postId, uid) {
+  try {
+    const ref = doc(db, "merciesPosts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return false;
+    const data = snap.data();
+    if (data.authorUid !== uid) return false;
+    await updateDoc(ref, { isActive: false, deletedAt: serverTimestamp() });
+    if (data.imagePath) {
+      deleteObject(storageRef(storage, data.imagePath)).catch(() => {});
+    }
+    return true;
+  } catch (e) {
+    console.warn("deleteMercyPost:", e);
     return false;
   }
 }
@@ -1290,6 +1340,7 @@ window.Mercies = {
   listen: listenMerciesPosts,
   add: addMercyPost,
   react: reactMercyPost,
+  delete: deleteMercyPost,
   saveSettings: saveMerciesSettings
 };
 

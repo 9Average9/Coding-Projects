@@ -16782,7 +16782,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.42";
+const APP_VERSION = "3.0.43";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17266,6 +17266,8 @@ async function restoreUserFromFirestore(user) {
     if (data.merciesSettings.friendTime) localStorage.setItem("mercyFriendReminderTime", data.merciesSettings.friendTime);
     localStorage.setItem("merciesAutoSave", String(!!data.merciesSettings.autoSave));
   }
+  if (typeof data.mercyStreakDays === "number") localStorage.setItem("mercyStreakDays", String(data.mercyStreakDays));
+  if (data.mercyLastPostDate) localStorage.setItem("mercyLastPostDate", data.mercyLastPostDate);
   if (data.answeredKCs) localStorage.setItem("answeredKCs", JSON.stringify(data.answeredKCs));
   if (data.openedLessonBlocks) localStorage.setItem("openedLessonBlocks", JSON.stringify(data.openedLessonBlocks));
   if (data.translationXPCount) localStorage.setItem("translationXPCount", String(data.translationXPCount));
@@ -18245,6 +18247,7 @@ function _mercyCardHtml(post) {
       ${post.scripture?.ref ? `<span><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
       ${post.taggedFriendName ? `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(post.taggedFriendName)}</span>` : ''}
       ${mine ? `<button onclick="saveMercyToJournal('${post.id}')"><span class="material-symbols-outlined">bookmark</span>Journal</button>` : ''}
+      ${mine ? `<button onclick="deleteMercyPost('${post.id}')"><span class="material-symbols-outlined">delete</span>Delete</button>` : ''}
     </div>
     <div class="mercy-reactions">
       ${['Amen','Thankful','Praying','Encouraged'].map(label => {
@@ -18415,6 +18418,7 @@ async function submitMercyPost() {
   const id = await window.Mercies?.add?.(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
   if (btn) { btn.disabled = false; btn.textContent = 'Post Mercy'; }
   if (!id) { alert('Could not post this Mercy right now. Try again.'); return; }
+  markMercyPostedToday();
   if (document.getElementById('mercySaveThis')?.checked) await saveMercyToJournal(id, { id, ...post, authorUid: uid, imageDataUrl: _mercyImageDataUrl, createdAtMs: Date.now() });
   closeMercyComposer();
 }
@@ -18423,6 +18427,26 @@ async function reactMercyPost(postId, label) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   await window.Mercies?.react?.(postId, uid, label);
+}
+
+async function deleteMercyPost(postId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !postId) return;
+  if (!confirm('Delete this Mercy from your friends feed?')) return;
+  const ok = await window.Mercies?.delete?.(postId, uid);
+  if (!ok) { alert('Could not delete this Mercy right now.'); return; }
+  _merciesPosts = _merciesPosts.filter(post => post.id !== postId);
+  renderMerciesFeed();
+}
+
+function markMercyPostedToday() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (localStorage.getItem('mercyLastPostDate') === today) return;
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const current = parseInt(localStorage.getItem('mercyStreakDays') || '0', 10);
+  const next = localStorage.getItem('mercyLastPostDate') === yesterday ? current + 1 : 1;
+  localStorage.setItem('mercyLastPostDate', today);
+  localStorage.setItem('mercyStreakDays', String(next));
 }
 
 function mercyDb() {

@@ -18284,9 +18284,9 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 #merciesPage {
   background: linear-gradient(180deg, color-mix(in srgb, var(--primary-light) 88%, white), var(--primary-color));
   min-height: 100dvh;
-  padding: max(18px, env(safe-area-inset-top)) 18px calc(116px + env(safe-area-inset-bottom));
+  padding: max(18px, env(safe-area-inset-top)) 18px calc(140px + env(safe-area-inset-bottom));
 }
-.mercies-scroll { max-width: 520px; margin: 0 auto; display: grid; gap: 16px; }
+.mercies-scroll { max-width: 520px; margin: 0 auto; display: grid; gap: 16px; padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
 .mercies-hero {
   display: flex;
   align-items: flex-start;
@@ -18381,6 +18381,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-reactions small { margin-left: 4px; }
 .mercies-empty,
 .mercies-journal-note { border-radius: 24px; padding: 22px; text-align: center; background: rgba(255,255,255,0.72); color: var(--muted-color); border: 1px solid color-mix(in srgb, var(--secondary-color) 12%, transparent); }
+.mercies-empty { margin-bottom: calc(140px + env(safe-area-inset-bottom)); }
 .mercies-journal-note { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: left; }
 .mercy-composer-card,
 .mercy-settings-card { max-width: 480px; max-height: 86vh; overflow-y: auto; }
