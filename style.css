@@ -15778,6 +15778,34 @@ body.dark .bn-item::before {
   font-size: 0.82rem; font-weight: 700;
   color: var(--text-color); line-height: 1.2; word-break: break-word;
 }
+.hs-member-stack {
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  margin-top: 2px;
+}
+.hs-member-avatar {
+  width: 22px;
+  height: 22px;
+  margin-left: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--card-color);
+  background: color-mix(in srgb, var(--study-color, var(--secondary-color)) 14%, var(--card-color));
+  color: var(--study-color, var(--secondary-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.hs-member-avatar:first-child { margin-left: 0; }
+.hs-member-avatar .material-symbols-outlined { font-size: 14px !important; }
+.hs-member-avatar .avatar-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .hs-study-meta { font-size: 0.7rem; color: var(--muted-color); }
 
 .study-card-done-dot {
@@ -18140,6 +18168,129 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 
 .bottom-nav.mercies-collapsed .bn-item .material-symbols-outlined {
   font-size: 1.9rem !important;
+}
+
+/* Home quick actions: compact circular launchers. */
+#homeScreen .home-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin: 4px 0 24px !important;
+}
+
+#homeScreen .home-action-tile {
+  min-width: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  text-align: center !important;
+}
+
+#homeScreen .home-action-tile:active {
+  transform: scale(0.96);
+}
+
+#homeScreen .home-action-tile .hat-icon {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,0.78), transparent 38%),
+    color-mix(in srgb, var(--secondary-color) 14%, var(--card-color)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.07);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#homeScreen .home-action-tile .hat-icon .material-symbols-outlined {
+  font-size: 1.65rem !important;
+  color: var(--secondary-color) !important;
+}
+
+#homeScreen .home-action-tile .hat-text {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+}
+
+#homeScreen .home-action-tile .hat-text strong {
+  display: block;
+  font-size: clamp(0.62rem, 2.7vw, 0.76rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.12;
+  color: var(--font-color) !important;
+  overflow-wrap: anywhere;
+}
+
+#homeScreen .home-action-tile .hat-text small,
+#homeScreen .home-action-tile .hat-chev {
+  display: none !important;
+}
+
+/* Home-only nav dock: collapses inward into a centered control. */
+.bottom-nav.home-collapsed {
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 112px !important;
+  height: 68px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  transform: translateX(-50%) !important;
+  transition: width .28s cubic-bezier(.2,.8,.2,1), height .28s cubic-bezier(.2,.8,.2,1), left .28s cubic-bezier(.2,.8,.2,1), border-radius .28s ease, transform .28s ease !important;
+}
+
+.bottom-nav.home-collapsed .bn-item {
+  position: absolute !important;
+  inset: 0 !important;
+  height: 68px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(.5) !important;
+  transition: opacity .22s ease, transform .28s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.bottom-nav.home-collapsed .bn-item[data-page="home"],
+.bottom-nav.home-collapsed .bn-item[data-page="profile"],
+.bottom-nav.home-collapsed .bn-item[data-page="community"] {
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+.bottom-nav.home-collapsed .bn-item[data-page="home"] {
+  z-index: 4;
+  color: var(--secondary-color) !important;
+  transform: scale(1) !important;
+}
+
+.bottom-nav.home-collapsed .bn-item[data-page="profile"] {
+  z-index: 2;
+  opacity: .54 !important;
+  transform: translateX(-25px) scale(.64) !important;
+}
+
+.bottom-nav.home-collapsed .bn-item[data-page="community"] {
+  z-index: 2;
+  opacity: .54 !important;
+  transform: translateX(25px) scale(.64) !important;
+}
+
+.bottom-nav.home-collapsed .bn-item > span:not(.material-symbols-outlined),
+.bottom-nav.home-collapsed .bn-dot,
+.bottom-nav.home-collapsed .bn-item::after {
+  display: none !important;
+}
+
+.bottom-nav.home-collapsed .bn-item .material-symbols-outlined {
+  font-size: 1.82rem !important;
 }
 
 /* Community Posts */

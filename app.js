@@ -118,6 +118,8 @@ let _mercyLockedFriendUid = null;
 let _merciesFeedRetryTimer = null;
 let _merciesNavCollapseTimer = null;
 let _merciesNavScrollBound = false;
+let _homeNavCollapseTimer = null;
+let _homeNavScrollBound = false;
 let _pendingMercyFriendEncouragement = null;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -8072,7 +8074,38 @@ async function _loadMyStudies() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   _myStudies = await window.Studies?.getMine(uid) || [];
+  await _hydrateHomeStudyMembers(_myStudies);
   _renderHomeStudies();
+}
+
+async function _hydrateHomeStudyMembers(studies = []) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const needed = [...new Set(studies.flatMap(s => (s.collaboratorUids || []).slice(0, 3)).filter(Boolean))];
+  const entries = await Promise.all(needed.map(async memberUid => {
+    if (memberUid === uid) {
+      return [memberUid, {
+        uid: memberUid,
+        displayName: localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "You",
+        avatar: _currentProfileAvatarValue()
+      }];
+    }
+    const user = await (window.Friends?.getUser?.(memberUid) || Promise.resolve(null)).catch(() => null);
+    return [memberUid, user];
+  }));
+  const byUid = new Map(entries.filter(([, user]) => user));
+  studies.forEach(study => {
+    study._homeMemberProfiles = (study.collaboratorUids || [])
+      .slice(0, 3)
+      .map(memberUid => byUid.get(memberUid) || { uid: memberUid, avatar: "person" });
+  });
+}
+
+function _studyMemberAvatarStack(study) {
+  const members = study?._homeMemberProfiles || [];
+  if (!members.length) return '';
+  return `<span class="hs-member-stack" aria-hidden="true">${members.map(member =>
+    `<span class="hs-member-avatar">${_renderAvatar(member.avatar)}</span>`
+  ).join('')}</span>`;
 }
 
 function _renderHomeStudies() {
@@ -8104,6 +8137,7 @@ function _renderHomeStudies() {
       ${doneToday ? '<span class="study-card-done-dot"></span>' : ''}
       <span class="hs-study-icon material-symbols-outlined">${s.icon}</span>
       <span class="hs-study-name">${s.name}</span>
+      ${_studyMemberAvatarStack(s)}
       <span class="hs-study-meta">${_studyMemberLabel(s)}</span>
     </div>`;
   }).join('');
@@ -9696,6 +9730,13 @@ function setMerciesNavCollapsed(collapsed) {
   nav.classList.toggle('mercies-collapsed', !!collapsed && isMercies);
 }
 
+function setHomeNavCollapsed(collapsed) {
+  const nav = document.getElementById('bottomNav');
+  if (!nav) return;
+  const isHome = document.getElementById('homeScreen')?.classList.contains('active');
+  nav.classList.toggle('home-collapsed', !!collapsed && isHome);
+}
+
 function expandMerciesNavTemporarily() {
   setMerciesNavCollapsed(false);
   clearTimeout(_merciesNavCollapseTimer);
@@ -9727,6 +9768,37 @@ function bindMerciesNavCollapse() {
   }, { passive: true });
 }
 
+function expandHomeNavTemporarily() {
+  setHomeNavCollapsed(false);
+  clearTimeout(_homeNavCollapseTimer);
+  _homeNavCollapseTimer = setTimeout(() => setHomeNavCollapsed(true), 3000);
+}
+
+function expandHomeNavOnEntry() {
+  setHomeNavCollapsed(false);
+  clearTimeout(_homeNavCollapseTimer);
+  _homeNavCollapseTimer = setTimeout(() => setHomeNavCollapsed(true), 500);
+}
+
+function bindHomeNavCollapse() {
+  const scroll = document.getElementById('homeScroll');
+  const nav = document.getElementById('bottomNav');
+  if (!scroll || !nav || _homeNavScrollBound) return;
+  _homeNavScrollBound = true;
+  nav.addEventListener('click', e => {
+    if (nav.classList.contains('home-collapsed')) {
+      e.preventDefault();
+      e.stopPropagation();
+      expandHomeNavTemporarily();
+    }
+  }, true);
+  scroll.addEventListener('scroll', () => {
+    if (!document.getElementById('homeScreen')?.classList.contains('active')) return;
+    clearTimeout(_homeNavCollapseTimer);
+    setHomeNavCollapsed(true);
+  }, { passive: true });
+}
+
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
@@ -9744,6 +9816,8 @@ function showNavPage(page) {
     showScreen('homeScreen');
     populateHomeScreen();
     _startHomeFlip();
+    bindHomeNavCollapse();
+    expandHomeNavOnEntry();
   } else if (page === 'profile') {
     showScreen('profilePage');
     updateProfileUI();
@@ -9780,6 +9854,7 @@ function showScreen(id) {
   const target = document.getElementById(id);
   if (target) target.classList.add("active");
   if (id !== 'merciesPage') setMerciesNavCollapsed(false);
+  if (id !== 'homeScreen') setHomeNavCollapsed(false);
 
   _syncHomeViewportState(id);
   _updateAppHeaderForScreen(id);
@@ -9876,6 +9951,8 @@ function showHome() {
   showBottomNav();
   populateHomeScreen();
   _startHomeFlip();
+  bindHomeNavCollapse();
+  expandHomeNavOnEntry();
   // Wire fog scroll listener once
   const scr = document.getElementById('homeScroll');
   if (scr && !scr._fogBound) {
@@ -16878,9 +16955,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.59";
+const APP_VERSION = "3.0.60";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.60 &mdash; Home Screen Polish</div>
+<ul>
+  <li><strong>Study cards improved</strong> with member avatar stacks above the member count.</li>
+  <li><strong>Quick actions redesigned</strong> as four compact circular launch buttons.</li>
+  <li><strong>Home nav collapse added</strong> with a centered compact dock that expands on tap.</li>
+</ul>
 <div class="un-version-label">v3.0.59 &mdash; Praise Prompt + Coach Polish</div>
 <ul>
   <li><strong>Praise prompts refreshed</strong> with worship-focused and ordinary daily-life prompts.</li>
@@ -21689,7 +21772,7 @@ const APP_WELCOME_COACH_STEPS = [
   { before: () => { showNavPage('community'); showLbTab('posts'); }, target: () => _coachFirst(['.community-post-add', '#lbPanePosts', '.comm-tabs']), title: 'Community posts', body: 'Posts are the main community feed: share verses, questions, links, prayer notes, and encouragements with friends. Attach MSB or BSB verses, react to one another, optionally alert your friends, and keep the board fresh as posts clear after 7 days.' },
   { before: () => { showNavPage('community'); showLbTab('xp'); }, target: () => _coachFirst(['button[data-tab="xp"]', '#lbPaneXP']), title: 'XP leaderboard', body: 'XP rewards steady work: lessons, tests, vocab, translation, and study habits. It is not the goal, but it helps your progress feel visible.' },
   { before: () => { showNavPage('community'); showLbTab('scholar'); }, target: () => _coachFirst(['button[data-tab="scholar"]', '#lbPaneScholar']), title: 'Scholar board', body: 'The Scholar board highlights careful practice quality, not just activity. It gives deeper testing and review work its own place.' },
-  { before: () => showNavPage('home'), target: () => _coachFirst(['.home-actions-grid', '#notifBtn']), title: 'Home quick actions', body: 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live.' },
+  { before: () => showNavPage('home'), target: () => _coachFirst(['.home-actions-grid', '#notifBtn']), title: 'Home quick actions', body: 'Home is the launch point. Quick Actions open notifications, vocabulary, translation, and tests. The Notifications button is where app updates and activity notices live.' },
   { target: () => _coachFirst(['#homeStudiesSection', '.hs-start-btn']), title: 'Create studies here', body: 'Your Studies is where you make focused study spaces. A study can hold Rhema work, saved verses, word logs, scripture trails, and notes.' },
   { target: () => _coachFirst(['#homeContinueCard', '#homeContinueEmpty']), title: 'Rhema lives close by', body: 'Rhema is the Greek word-study reader. You can open a passage, tap words, compare English, use syntax, and explore cross references. Rhema has its own first-time coach when opened.' },
   { before: () => showNavPage('profile'), target: () => _coachFirst(['#profileJourneySection', '.profile-action-row', '.profile-header']), title: 'Profile tracks your journey', body: 'Your profile keeps XP, rank, streak, lesson progress, known words, translation attempts, achievements, settings, reminders, and reset controls.' }
@@ -21735,7 +21818,7 @@ APP_WELCOME_COACH_STEPS[3].before = () => {
 };
 APP_WELCOME_COACH_STEPS[3].body = 'XP rewards steady work: lessons, tests, vocabulary, translation, and study habits. It is not the point of Greek study, but it gives your effort a visible shape. Sometimes a little scoreboard keeps the lamp on.';
 APP_WELCOME_COACH_STEPS[4].body = 'The Scholar board is more about careful practice than raw activity. It helps deeper testing and review work show up, so someone doing slow, thoughtful study is not invisible beside someone farming XP.';
-APP_WELCOME_COACH_STEPS[5].body = 'Home is the launch point. Quick Actions open updates, vocabulary, translation, and tests. The What’s Going On tile is where app updates and activity notices live, so it is worth checking when the app feels different.';
+APP_WELCOME_COACH_STEPS[5].body = 'Home is the launch point. Quick Actions open notifications, vocabulary, translation, and tests. The Notifications button is where app updates and activity notices live, so it is worth checking when the app feels different.';
 APP_WELCOME_COACH_STEPS[6].body = 'Your Studies is where you make focused study spaces. Use this when you want to work through a passage seriously, invite people in, save trail discoveries, and keep your notes tied to the actual text.';
 APP_WELCOME_COACH_STEPS[7].body = 'Rhema is the Greek word-study reader. It is special because it stays inside your study flow: tap words, compare English, inspect parsing, check lexicons, use syntax, open cross references, and keep a trail without leaving the app.';
 APP_WELCOME_COACH_STEPS[8].body = 'Your profile keeps XP, rank, streak, lesson progress, known words, translation attempts, achievements, settings, reminders, and reset controls. It is also where you can replay these coach tours later.';
