@@ -372,14 +372,14 @@ exports.sendScheduledReminders = functions.pubsub
       await userDoc.ref.update({ "mercyReminder.lastSent": now, ...(nextSendAt ? { "mercyReminder.nextSendAt": nextSendAt } : {}) });
       if (!tokens.length) continue;
       const bodies = [
-        "Take a moment to remember today's mercy.",
+        "Take a moment to offer today's praise.",
         "What good gift can you thank God for today?",
-        "Capture one ordinary blessing from today.",
+        "Capture one ordinary blessing and praise God for it.",
         "Pause and remember the Lord's kindness today."
       ];
       await messaging.sendEachForMulticast({
         tokens,
-        notification: { title: "Mercies", body: bodies[Math.floor(Math.random() * bodies.length)] },
+        notification: { title: "Praises", body: bodies[Math.floor(Math.random() * bodies.length)] },
         webpush: { fcmOptions: { link: "/Greek-Vocab/?open=mercies" }, notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
       }).catch(e => console.error(`${userDoc.id} mercy reminder error:`, e.message));
     }
@@ -404,14 +404,14 @@ exports.sendScheduledReminders = functions.pubsub
       const pendingPrompt = {
         friendUid,
         friendName,
-        promptText: `Encourage ${friendName} this week.`,
+        promptText: `Encourage ${friendName} with a praise this week.`,
         createdAtMs: now.getTime(),
         expiresAtMs: now.getTime() + 24 * 60 * 60 * 1000
       };
       await userDoc.ref.update({ pendingMercyFriendEncouragement: pendingPrompt });
       await messaging.sendEachForMulticast({
         tokens,
-        notification: { title: "Mercies", body: `Encourage ${friendName} this week.` },
+        notification: { title: "Praises", body: `Encourage ${friendName} with a praise this week.` },
         data: { open: "mercies", friendUid, friendName },
         webpush: { fcmOptions: { link: `/Greek-Vocab/?open=mercies&friend=${encodeURIComponent(friendUid)}` }, notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
       }).catch(e => console.error(`${userDoc.id} mercy friend reminder error:`, e.message));
@@ -537,11 +537,11 @@ exports.onEncouragementCreated = functions.firestore
       title = "They Prayed For You";
       body = `${fromName} prayed for your "${postTitle}" post.`;
     } else if (type === "mercyPostedTagged") {
-      title = "New Mercy";
-      body = `${fromName} posted a Mercy about you.`;
+      title = "New Praise";
+      body = `${fromName} posted a Praise about you.`;
     } else if (type === "mercyComment") {
-      const postTitle = snap.data().postTitle || "your Mercy";
-      title = "New Mercy Comment";
+      const postTitle = snap.data().postTitle || "your Praise";
+      title = "New Praise Comment";
       body = `${fromName} commented on "${postTitle}".`;
     } else if (type === "encouragement") {
       title = "Study Encouragement";

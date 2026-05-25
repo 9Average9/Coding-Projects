@@ -9757,6 +9757,7 @@ function showNavPage(page) {
     startMerciesFeed();
     bindMerciesNavCollapse();
     expandMerciesNavOnEntry();
+    setTimeout(() => startPraisesCoach(false), 650);
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -16841,9 +16842,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.55";
+const APP_VERSION = "3.0.56";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.56 &mdash; Daily Praises Rename</div>
+<ul>
+  <li><strong>Daily Mercies is now Daily Praises</strong> across the bottom nav, feed, composer, journal, settings, and push notification wording.</li>
+  <li><strong>Praises coach added</strong> with a first-open walkthrough and a replay option in Profile &rarr; Coach Tours.</li>
+</ul>
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
 <ul>
   <li><strong>Lesson card contrast, background thumbnails, and active nav icons polished</strong> for cleaner light-theme readability and selection feedback.</li>
@@ -18261,19 +18267,19 @@ function startMerciesFeed() {
   refreshPendingMercyFriendEncouragement();
   clearTimeout(_merciesFeedRetryTimer);
   if (!uid) {
-    list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Mercies</strong><p>Your feed will load as soon as your account is ready.</p></div>';
+    list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Praises</strong><p>Your feed will load as soon as your account is ready.</p></div>';
     _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 900);
     return;
   }
   if (!window.Mercies?.listen) {
-    list.innerHTML = '<p class="study-board-empty">Loading Mercies...</p>';
+    list.innerHTML = '<p class="study-board-empty">Loading Praises...</p>';
     _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 500);
     return;
   }
   if (_merciesUnsub) { renderMerciesFeed(); return; }
-  list.innerHTML = '<p class="study-board-empty">Loading Mercies...</p>';
+  list.innerHTML = '<p class="study-board-empty">Loading Praises...</p>';
   _merciesFeedRetryTimer = setTimeout(() => {
-    if (list.textContent?.includes('Loading Mercies')) {
+    if (list.textContent?.includes('Loading Praises')) {
       list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">hourglass_empty</span><strong>Still loading</strong><p>Checking your feed connection...</p></div>';
       if (_merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
       setTimeout(startMerciesFeed, 1200);
@@ -18300,7 +18306,7 @@ function renderMerciesFeed() {
   const posts = filtered.slice(0, _merciesVisibleCount);
   document.getElementById('merciesLoadMore')?.classList.toggle('hidden', filtered.length <= _merciesVisibleCount);
   if (!posts.length) {
-    list.innerHTML = `<div class="mercies-empty"><span class="material-symbols-outlined">photo_camera</span><strong>No Mercies yet</strong><p>Post a photo and remember one ordinary blessing from today.</p><button onclick="openMercyComposer()">Post a Mercy</button></div>`;
+    list.innerHTML = `<div class="mercies-empty"><span class="material-symbols-outlined">photo_camera</span><strong>No Praises yet</strong><p>Post a photo and remember one ordinary blessing from today.</p><button onclick="openMercyComposer()">Post a Praise</button></div>`;
     return;
   }
   list.innerHTML = posts.map(_mercyCardHtml).join('');
@@ -18422,11 +18428,11 @@ function _mercyCardHtml(post) {
     <div class="mercy-card-top">
       <span class="mercy-avatar">${_renderAvatar(post.authorAvatar || 'person')}</span>
       <div><strong>${_lbEscape(post.authorName || 'Someone')}</strong><small>${_communityPostTime(post)}</small></div>
-      <span class="mercy-category">${_lbEscape(post.promptCategory || 'Mercy')}</span>
+      <span class="mercy-category">${_lbEscape(post.promptCategory || 'Praise')}</span>
       ${post.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
     </div>
     ${hasMedia ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}"${mediaStyle}>
-      ${hasPhoto ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl)}" alt="Mercy photo" onload="syncMercyImageAspect(this)"></div>` : ''}
+      ${hasPhoto ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl)}" alt="Praise photo" onload="syncMercyImageAspect(this)"></div>` : ''}
       ${scripture}
     </div>` : ''}
     ${slideDots}
@@ -18473,7 +18479,7 @@ function _mercyScriptureCard(scripture, options = {}) {
 }
 
 function openMercyComposer(prefill = {}) {
-  if (!window.Auth?.getCurrentUser()) { alert('Sign in to post a Mercy.'); return; }
+  if (!window.Auth?.getCurrentUser()) { alert('Sign in to post a Praise.'); return; }
   _mercyImageBlob = null;
   _mercyImageDataUrl = null;
   _mercyPostWithoutPhoto = false;
@@ -18944,7 +18950,7 @@ async function compressMercyImage(file, options = {}) {
     quality = Math.max(0.52, quality - 0.06);
     scale *= 0.86;
   }
-  if (!blob) throw new Error('Mercy image compression failed');
+  if (!blob) throw new Error('Praise image compression failed');
   dataUrl = canvas.toDataURL(type, quality);
   return { blob, dataUrl, type, aspectRatio: canvas.width / Math.max(1, canvas.height) };
 }
@@ -18973,7 +18979,7 @@ async function submitMercyPost() {
   const post = {
     body,
     promptText: _currentMercyPromptText(),
-    promptCategory: document.getElementById('mercyFriendEncouragement')?.checked ? 'Friend Encouragement' : 'Daily Mercy',
+    promptCategory: document.getElementById('mercyFriendEncouragement')?.checked ? 'Friend Encouragement' : 'Daily Praise',
     promptMode: _mercyPromptChoiceMode,
     photoMode: _mercyOriginalImageFile ? 'full' : null,
     imageAspectRatio: _mercyOriginalImageFile ? _mercyPhotoAspectRatio : null,
@@ -18991,9 +18997,9 @@ async function submitMercyPost() {
   };
   const authorName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
   const created = await window.Mercies?.add?.(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
-  if (btn) { btn.disabled = false; btn.textContent = 'Post Mercy'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'Post Praise'; }
   const id = typeof created === 'string' ? created : created?.id;
-  if (!id) { alert('Could not post this Mercy right now. Try again.'); return; }
+  if (!id) { alert('Could not post this Praise right now. Try again.'); return; }
   markMercyPostedToday();
   if (document.getElementById('mercySaveThis')?.checked) {
     await saveMercyToJournal(id, {
@@ -19023,7 +19029,7 @@ function openMercyComments(postId) {
   _mercyCommentsPostId = postId;
   const post = _merciesPosts.find(p => p.id === postId);
   const title = document.getElementById('communityCommentsTitle');
-  if (title) title.textContent = post?.scripture?.ref || 'Mercy Comments';
+  if (title) title.textContent = post?.scripture?.ref || 'Praise Comments';
   const input = document.getElementById('communityCommentInput');
   if (input) input.value = '';
   document.getElementById('communityCommentsModal')?.classList.add('open');
@@ -19081,9 +19087,9 @@ function openMercyReactions(postId) {
 async function deleteMercyPost(postId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid || !postId) return;
-  if (!confirm('Delete this Mercy from your friends feed?')) return;
+  if (!confirm('Delete this Praise from your friends feed?')) return;
   const ok = await window.Mercies?.delete?.(postId, uid);
-  if (!ok) { alert('Could not delete this Mercy right now.'); return; }
+  if (!ok) { alert('Could not delete this Praise right now.'); return; }
   _merciesPosts = _merciesPosts.filter(post => post.id !== postId);
   renderMerciesFeed();
 }
@@ -19091,7 +19097,7 @@ async function deleteMercyPost(postId) {
 async function deleteMercyJournalEntry(entryId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid || !entryId) return;
-  if (!confirm('Delete this saved Mercy from your Journal?')) return;
+  if (!confirm('Delete this saved Praise from your Journal?')) return;
   const ok = await window.Mercies?.deleteJournal?.(uid, entryId);
   if (!ok) { alert('Could not delete this journal entry right now.'); return; }
   await deleteMercyJournalCacheEntry(entryId);
@@ -19166,7 +19172,7 @@ async function renderMerciesJournal() {
       renderMerciesJournalEntries(entries);
     };
   } catch {
-    list.innerHTML = '<p class="study-board-empty">Mercies Journal is not available on this device.</p>';
+    list.innerHTML = '<p class="study-board-empty">Praises Journal is not available on this device.</p>';
   }
 }
 
@@ -19193,15 +19199,15 @@ function renderMerciesJournalEntries(entries = []) {
     const tags = e.taggedFriendNames?.length ? e.taggedFriendNames : (e.taggedFriendName ? [e.taggedFriendName] : []);
     const scripture = e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : '';
     return `<article class="mercy-card mercy-journal-card">
-    <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div>${e.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(e.scripture.ref)}</span>` : ''}</div>
-    ${(img || scripture) ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">${img ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Mercy" onload="syncMercyImageAspect(this)"></div>` : ''}${scripture}</div>${img && scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : ''}` : ''}
+    <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Praise')}</small></div>${e.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(e.scripture.ref)}</span>` : ''}</div>
+    ${(img || scripture) ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">${img ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Praise" onload="syncMercyImageAspect(this)"></div>` : ''}${scripture}</div>${img && scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : ''}` : ''}
     <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
     <div class="mercy-chips">
       ${tags.map(name => `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(name)}</span>`).join('')}
       <button onclick="deleteMercyJournalEntry('${e.id || e.localId}')"><span class="material-symbols-outlined">delete</span>Delete</button>
     </div>
   </article>`;
-  }).join('') : '<p class="study-board-empty">No saved Mercies yet.</p>';
+  }).join('') : '<p class="study-board-empty">No saved Praises yet.</p>';
 }
 
 async function cacheMercyJournalEntries(entries = []) {
@@ -19235,9 +19241,19 @@ function closeMerciesSettings() {
   document.getElementById('merciesSettingsModal')?.classList.remove('open');
 }
 
+function openPraisesInfoModal() {
+  document.getElementById('praisesInfoModal')?.classList.add('open');
+}
+
+function closePraisesInfoModal(event) {
+  if (!event || event.target.id === 'praisesInfoModal') {
+    document.getElementById('praisesInfoModal')?.classList.remove('open');
+  }
+}
+
 async function saveMerciesSettings() {
   const user = window.Auth?.getCurrentUser();
-  if (!user) { alert("Sign in to save Mercies settings."); return; }
+  if (!user) { alert("Sign in to save Praises settings."); return; }
   const settings = {
     dailyEnabled: !!document.getElementById('mercyDailyEnabled')?.checked,
     dailyTime: document.getElementById('mercyDailyTime')?.value || '20:00',
@@ -19248,12 +19264,12 @@ async function saveMerciesSettings() {
   if ((settings.dailyEnabled || settings.friendEnabled) && typeof Notification !== "undefined") {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      alert("Please allow notifications in your browser or device settings to enable Mercies reminders.");
+      alert("Please allow notifications in your browser or device settings to enable Praises reminders.");
       return;
     }
     const token = await window.FCM?.registerToken?.(user?.uid).catch(() => null);
     if (!token) {
-      alert("Could not register this device for Mercies reminders. Try closing and reopening the app, then save again.");
+      alert("Could not register this device for Praises reminders. Try closing and reopening the app, then save again.");
       return;
     }
     syncNotificationPermissionUI(permission);
@@ -21613,7 +21629,7 @@ const XREF_COACH_STEPS = [
   { target: () => _coachFirst(['.rx-save-trail-btn', '.rx-page-header']), title: 'Save Trail in Study Rhema', body: 'When Cross References is opened inside a study, Save Trail stores the current scripture trail so it can be restored later from the study Trails tab.' }
 ];
 
-APP_WELCOME_COACH_STEPS[0].body = 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place. Tiny tour, big map. Let’s get you oriented.';
+APP_WELCOME_COACH_STEPS[0].body = 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, Praises, progress, and community study in one place. Tiny tour, big map. Let’s get you oriented.';
 APP_WELCOME_COACH_STEPS[1] = {
   before: () => showNavPage('lessons'),
   target: () => _coachFirst(['#lessonModeModal .lm-card', '.lesson-progress-badge', '.learn-path-grid']),
@@ -21665,6 +21681,14 @@ const WORD_LIBRARY_COACH_STEPS = [
   { target: () => _coachFirst(['#wlResults', '#wordLibraryOverlay .wl-sheet']), title: 'Results become study doors', body: 'Results can lead you into definitions, occurrences, and forms. Use it when you remember a word, half-remember a word, or only know the English idea you are chasing.' }
 ];
 
+const PRAISES_COACH_STEPS = [
+  { before: () => showNavPage('mercies'), target: () => _coachFirst(['#merciesPage .mercies-hero', '#merciesPage']), title: 'Daily Praises', body: 'Praises is a photo-first feed for sharing ordinary blessings, Scripture reminders, prayerful gratitude, and encouragement with friends. The aim is simple: notice the Lord’s kindness and praise Him for it.' },
+  { target: () => _coachFirst(['.mercies-primary']), title: 'Post a Praise', body: 'Use Post a Praise to add a photo or text-only praise, choose a prompt, write your own prompt, or use no prompt at all. You can also attach a Scripture card.' },
+  { target: () => _coachFirst(['#mercyPendingFriendAction', '.mercies-actions']), title: 'Friend encouragement', body: 'Weekly friend encouragement can give you a one-day prompt locked to one friend, so encouragement does not get lost when life gets busy.' },
+  { target: () => _coachFirst(['.mercies-secondary']), title: 'Praises Journal', body: 'Praises Journal saves your own praises privately to your account and caches them on this device, so your reflections can come back with you when you sign in again.' },
+  { target: () => _coachFirst(['.mercies-icon-btn']), title: 'Praises settings', body: 'Settings control daily praise reminders, weekly friend encouragement reminders, and auto-saving to your Praises Journal. The info button explains the purpose and Scripture vision behind the feature.' }
+];
+
 function startAppWelcomeCoach(force = false) {
   if (!force && (!_authReady || !_hasSignedInUser() || document.getElementById("authModal")?.classList.contains("open"))) return;
   if (_coachHasSeen('appWelcomeCoachSeenV275', force)) return;
@@ -21684,6 +21708,12 @@ function startCrossRefCoach(force = false) {
 function startWordLibraryCoach(force = false) {
   if (_coachHasSeen('wordLibraryCoachSeenV275', force)) return;
   _startAppCoach(WORD_LIBRARY_COACH_STEPS, 'wordLibraryCoachSeenV275');
+}
+
+function startPraisesCoach(force = false) {
+  if (!force && document.getElementById('appCoachOverlay')?.classList.contains('open')) return;
+  if (_coachHasSeen('praisesCoachSeenV3056', force)) return;
+  _startAppCoach(PRAISES_COACH_STEPS, 'praisesCoachSeenV3056', force);
 }
 
 function openCoachReplayModal() {
@@ -21709,6 +21739,10 @@ function closeRhemaNerdModal(event) {
 function startCoachReplay(type) {
   closeCoachReplayModal();
   if (type === 'app') startAppWelcomeCoach(true);
+  if (type === 'praises') {
+    showNavPage('mercies');
+    setTimeout(() => startPraisesCoach(true), 260);
+  }
   if (type === 'rhema') showRhema().then(() => setTimeout(() => startRhemaCoach(true), 260));
   if (type === 'study') {
     _showStudyToast('Open one of your studies, then choose Study Rhema Coach again from Profile.');
@@ -21887,6 +21921,7 @@ Object.assign(window, {
   startStudyRhemaCoach,
   startCrossRefCoach,
   startWordLibraryCoach,
+  startPraisesCoach,
   openCoachReplayModal,
   closeCoachReplayModal,
   openRhemaNerdModal,

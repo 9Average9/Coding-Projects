@@ -18745,6 +18745,30 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-time-center input[type="time"] { width: min(100%, 168px); min-width: 0; text-align: center; }
 .mercy-settings-card input[type="time"] { margin: 0; flex: 0 1 168px; }
 .mercy-settings-card { overflow-x: hidden; }
+.mercy-settings-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mercy-settings-title-row h2 { margin-bottom: 8px; }
+.mercy-info-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-color);
+  background: color-mix(in srgb, var(--secondary-color) 7%, white);
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+  flex: 0 0 auto;
+}
+.praise-info-card .praise-info-verses {
+  color: var(--secondary-color);
+  font-weight: 900;
+}
 body.dark .mercy-card,
 body.dark .community-post-card,
 body.dark .mercies-secondary,
@@ -18756,6 +18780,7 @@ body.dark .mercy-photo-editor,
 body.dark .mercy-toggle-card,
 body.dark .mercy-picker-button,
 body.dark .mercy-ref-pills button,
+body.dark .mercy-info-btn,
 body.dark .mercy-photo-picker,
 body.dark .mercy-field select,
 body.dark .mercy-friend-row select,

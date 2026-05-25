@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.55" rel="stylesheet"/>
+<link href="style.css?v=3.0.56" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8551,18 +8551,18 @@ Verb Endings
 <div class="mercies-scroll" id="merciesScroll">
 <div class="mercies-hero">
 <div>
-<span class="mercies-kicker">Daily mercies</span>
-<h1>Mercies</h1>
+<span class="mercies-kicker">Daily praises</span>
+<h1>Praises</h1>
 <p>Capture one good gift, ordinary blessing, Scripture reminder, or encouragement for your friends.</p>
 </div>
-<button class="mercies-icon-btn" onclick="openMerciesSettings()" aria-label="Mercies settings">
+<button class="mercies-icon-btn" onclick="openMerciesSettings()" aria-label="Praises settings">
 <span class="material-symbols-outlined">tune</span>
 </button>
 </div>
 <div class="mercies-actions">
 <button class="mercies-primary" onclick="openMercyComposer()">
 <span class="mercies-action-icon material-symbols-outlined">photo_camera</span>
-<span><strong>Post a Mercy</strong><small>Share a blessing, encourage others.</small></span>
+<span><strong>Post a Praise</strong><small>Share a blessing, encourage others.</small></span>
 <span class="material-symbols-outlined mercies-action-chev">chevron_right</span>
 </button>
 <button class="mercies-reminder-action hidden" id="mercyPendingFriendAction" onclick="openPendingMercyFriendEncouragement()">
@@ -8572,7 +8572,7 @@ Verb Endings
 </button>
 <button class="mercies-secondary" onclick="showMerciesView('journal')">
 <span class="mercies-action-icon material-symbols-outlined">auto_stories</span>
-<span><strong>Mercies Journal</strong><small>View your past mercies and reflections.</small></span>
+<span><strong>Praises Journal</strong><small>View your past praises and reflections.</small></span>
 <span class="material-symbols-outlined mercies-action-chev">chevron_right</span>
 </button>
 </div>
@@ -8586,7 +8586,7 @@ Verb Endings
 </div>
 <div class="mercies-view active" id="merciesFeedView">
 <div class="mercies-feed" id="merciesFeedList">
-<p class="study-board-empty">Loading Mercies...</p>
+<p class="study-board-empty">Loading Praises...</p>
 </div>
 <button class="mercies-load-more hidden" id="merciesLoadMore" onclick="loadMoreMercies()">Load more</button>
 </div>
@@ -8600,7 +8600,7 @@ Verb Endings
 <span>Saved privately to your account and cached on this device.</span>
 </div>
 <div class="mercies-feed" id="merciesJournalList">
-<p class="study-board-empty">No saved Mercies yet.</p>
+<p class="study-board-empty">No saved Praises yet.</p>
 </div>
 </div>
 </div>
@@ -9692,7 +9692,7 @@ Verb Endings
 </button>
 <button class="bn-item" data-page="mercies" onclick="showNavPage('mercies')">
 <span class="material-symbols-outlined">photo_camera</span>
-<span>Mercies</span>
+<span>Praises</span>
 <span class="bn-dot"></span>
 </button>
 <button class="bn-item bn-home active" data-page="home" onclick="showNavPage('home')">
@@ -9724,13 +9724,13 @@ Verb Endings
 <div class="modal-overlay" id="mercyComposerModal" onclick="if(event.target===this)closeMercyComposer()">
 <div class="modal-card mercy-composer-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeMercyComposer()">&times;</button>
-<div class="mercies-kicker"><span class="material-symbols-outlined">photo_camera</span> Post a Mercy</div>
-<h2>Remember Today's Mercy</h2>
+<div class="mercies-kicker"><span class="material-symbols-outlined">photo_camera</span> Post a Praise</div>
+<h2>Remember Today's Praise</h2>
 <p class="mercies-muted">Share a photo-first moment of gratitude, Scripture, prayer, or encouragement with your friends.</p>
 <label class="mercy-toggle-card mercy-no-photo-toggle">
 <input id="mercyNoPhoto" type="checkbox" onchange="toggleMercyNoPhoto()"/>
 <span class="mercy-toggle-track"></span>
-<span><strong>Post without a photo</strong><small>Write a Mercy without opening the photo picker.</small></span>
+<span><strong>Post without a photo</strong><small>Write a Praise without opening the photo picker.</small></span>
 </label>
 <label class="mercy-photo-picker" id="mercyPhotoPicker">
 <input id="mercyPhotoInput" type="file" accept="image/*" onchange="handleMercyPhotoSelected(this)" hidden/>
@@ -9739,7 +9739,7 @@ Verb Endings
 <small>The app uploads an optimized feed image, not the original full-size photo.</small>
 </label>
 <div class="mercy-photo-preview hidden" id="mercyPhotoPreviewWrap">
-<img id="mercyPhotoPreview" alt="Mercy preview"/>
+<img id="mercyPhotoPreview" alt="Praise preview"/>
 <button type="button" onclick="clearMercyPhoto()">Change photo</button>
 </div>
 <div class="mercy-field">
@@ -9758,7 +9758,7 @@ Verb Endings
 <textarea class="hidden" id="mercyCustomPrompt" maxlength="180" placeholder="Write your own prompt..." oninput="onMercyPromptChanged()"></textarea>
 </div>
 <div class="mercy-friend-row">
-<div class="mercy-locked-friend hidden" id="mercyLockedFriendNotice"><span class="material-symbols-outlined">person_heart</span><span>This Mercy is for the friend from your reminder.</span></div>
+<div class="mercy-locked-friend hidden" id="mercyLockedFriendNotice"><span class="material-symbols-outlined">person_heart</span><span>This Praise is for the friend from your reminder.</span></div>
 <select id="mercyFriendSelect" onchange="onMercyFriendChanged()" hidden><option value="">Tag one friend (optional)</option></select>
 <button class="mercy-picker-button" id="mercyFriendPickerBtn" type="button" onclick="openMercyFriendPicker('mercyFriendSelect')"><span>Tag one friend (optional)</span><span class="material-symbols-outlined">expand_more</span></button>
 <div class="mercy-extra-friends" id="mercyExtraFriends"></div>
@@ -9793,21 +9793,36 @@ Verb Endings
 </div>
 </div>
 </section>
-<label class="mercy-save-row"><input id="mercySaveThis" type="checkbox"/><span>Save this to Mercies Journal <small>Saved privately to your account and cached on this device.</small></span></label>
-<button class="main-btn" id="mercySubmitBtn" onclick="submitMercyPost()">Post Mercy</button>
+<label class="mercy-save-row"><input id="mercySaveThis" type="checkbox"/><span>Save this to Praises Journal <small>Saved privately to your account and cached on this device.</small></span></label>
+<button class="main-btn" id="mercySubmitBtn" onclick="submitMercyPost()">Post Praise</button>
 </div>
 </div>
 <div class="modal-overlay" id="merciesSettingsModal" onclick="if(event.target===this)closeMerciesSettings()">
 <div class="modal-card mercy-settings-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeMerciesSettings()">&times;</button>
-<div class="mercies-kicker"><span class="material-symbols-outlined">tune</span> Mercies Settings</div>
-<h2>Mercies</h2>
-<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyDailyEnabled" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Daily Mercy reminder</strong><small>Take a moment to remember today's mercy.</small></span></label>
+<div class="mercy-settings-title-row">
+<div>
+<div class="mercies-kicker"><span class="material-symbols-outlined">tune</span> Praises Settings</div>
+<h2>Praises</h2>
+</div>
+<button class="mercy-info-btn" type="button" onclick="openPraisesInfoModal()" aria-label="About Daily Praises"><span class="material-symbols-outlined">info</span></button>
+</div>
+<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyDailyEnabled" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Daily Praise reminder</strong><small>Take a moment to remember today's praise.</small></span></label>
 <div class="mercy-time-center"><input id="mercyDailyTime" type="time" value="20:00"/></div>
 <label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyFriendReminderEnabled" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Weekly friend encouragement</strong><small>Once a week, randomly prompt you to encourage a friend.</small></span></label>
 <div class="mercy-time-center"><input id="mercyFriendReminderTime" type="time" value="18:00"/></div>
-<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyAutoSave" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Auto-save my Mercies</strong><small>Saved privately to your account and cached on this device.</small></span></label>
+<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyAutoSave" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Auto-save my Praises</strong><small>Saved privately to your account and cached on this device.</small></span></label>
 <button class="main-btn" onclick="saveMerciesSettings()">Save Settings</button>
+</div>
+</div>
+<div class="modal-overlay" id="praisesInfoModal" onclick="closePraisesInfoModal(event)">
+<div class="modal-card praise-info-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closePraisesInfoModal()">&times;</button>
+<div class="mercies-kicker"><span class="material-symbols-outlined">volunteer_activism</span> Daily Praises</div>
+<h2>Why Praises?</h2>
+<p>Praises is a place to share with other believers what you are daily praising God for: a gift, an ordinary blessing, a Scripture reminder, a prayer, or encouragement for a friend.</p>
+<p>You can choose a prompt, write your own, use no prompt, tag friends, or make a focused encouragement post about one friend.</p>
+<p class="praise-info-verses">Psalm 31:1 · Hebrews 13:15 · Colossians 3:17 · 1 Thessalonians 5:18</p>
 </div>
 </div>
 <div class="rhema-picker-overlay hidden" id="mercyBookPickerOverlay" onclick="closeMercyPickerSheet()">
@@ -15688,10 +15703,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.55"></script>
+<script src="app.js?v=3.0.56"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.55" type="module"></script>
+<script src="firebase-lb.js?v=3.0.56" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -16611,7 +16626,8 @@ Verb Endings
 <h2>Coach Tours</h2>
 <p>Replay a guided tour whenever you want a refresher. Pick the part of the app you want the coach to walk through.</p>
 <div class="coach-replay-list">
-<button onclick="startCoachReplay('app')"><span class="material-symbols-outlined">explore</span><strong>Main App Tour</strong><small>Lessons, Community, Home, Studies, Rhema, and Profile.</small></button>
+<button onclick="startCoachReplay('app')"><span class="material-symbols-outlined">explore</span><strong>Main App Tour</strong><small>Lessons, Praises, Community, Home, Studies, Rhema, and Profile.</small></button>
+<button onclick="startCoachReplay('praises')"><span class="material-symbols-outlined">photo_camera</span><strong>Praises Tour</strong><small>Daily praises, friend encouragement, Scripture cards, reminders, and journal saves.</small></button>
 <button onclick="startCoachReplay('rhema')"><span class="material-symbols-outlined">auto_stories</span><strong>Main Rhema Tour</strong><small>Greek text, tools, English view, and verse picker.</small></button>
 <button onclick="startCoachReplay('study')"><span class="material-symbols-outlined">groups</span><strong>Study Rhema Tour</strong><small>Open a study first, then replay notes, trails, Workspace, and keyboard help.</small></button>
 <button onclick="startCoachReplay('xref')"><span class="material-symbols-outlined">hub</span><strong>Cross References Tour</strong><small>Scripture trails, breadcrumbs, categories, and saved trails.</small></button>

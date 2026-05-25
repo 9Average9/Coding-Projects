@@ -1233,7 +1233,7 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       authorAvatar: avatar || "person",
       body: String(post.body || "").trim(),
       promptText: post.promptText || "",
-      promptCategory: post.promptCategory || "Daily Mercy",
+      promptCategory: post.promptCategory || "Daily Praise",
       promptMode: post.promptMode || "guided",
       imageUrl,
       imagePath,
@@ -1317,9 +1317,9 @@ async function reactMercyPost(postId, uid, label) {
 }
 
 function mercyPostTitle(post = {}) {
-  const raw = post.scripture?.ref || post.promptCategory || post.body || "your Mercy";
+  const raw = post.scripture?.ref || post.promptCategory || post.body || "your Praise";
   const text = String(raw).replace(/\s+/g, " ").trim();
-  return text.length > 46 ? text.slice(0, 43) + "..." : text || "your Mercy";
+  return text.length > 46 ? text.slice(0, 43) + "..." : text || "your Praise";
 }
 
 function listenMercyComments(postId, callback) {
@@ -1388,7 +1388,7 @@ function mercyJournalPayload(uid, post = {}) {
     savedAt: serverTimestamp(),
     savedAtMs: Date.now(),
     promptText: post.promptText || "",
-    promptCategory: post.promptCategory || "Mercy",
+    promptCategory: post.promptCategory || "Praise",
     body: post.body || "",
     imageUrl: post.imageUrl || null,
     imagePath: post.imagePath || null,
