@@ -18279,6 +18279,143 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
+
+/* Mercies */
+#merciesPage {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primary-light) 88%, white), var(--primary-color));
+  min-height: 100dvh;
+  padding: max(18px, env(safe-area-inset-top)) 18px calc(116px + env(safe-area-inset-bottom));
+}
+.mercies-scroll { max-width: 520px; margin: 0 auto; display: grid; gap: 16px; }
+.mercies-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 10px;
+}
+.mercies-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--secondary-color);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.mercies-hero h1 { margin: 8px 0 4px; color: var(--font-color); font-size: clamp(2.2rem, 12vw, 3.8rem); line-height: 0.95; }
+.mercies-hero p,
+.mercies-muted { color: var(--muted-color); line-height: 1.45; margin: 0; }
+.mercies-icon-btn {
+  width: 52px; height: 52px; border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 20%, transparent);
+  background: rgba(255,255,255,0.72); color: var(--secondary-color);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+}
+.mercies-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mercies-primary,
+.mercies-secondary,
+.mercies-load-more,
+.mercies-empty button,
+.mercy-chips button {
+  border: none; border-radius: 20px; min-height: 52px; padding: 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-weight: 900;
+}
+.mercies-primary { background: var(--secondary-color); color: var(--btn-text-color); box-shadow: 0 14px 28px color-mix(in srgb, var(--secondary-color) 20%, transparent); }
+.mercies-secondary,
+.mercies-load-more,
+.mercies-empty button,
+.mercy-chips button { background: rgba(255,255,255,0.76); color: var(--secondary-color); border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent); }
+.mercies-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 5px; border-radius: 999px; background: rgba(255,255,255,0.62); border: 1px solid rgba(255,255,255,0.75); }
+.mercies-tabs button { border: none; border-radius: 999px; padding: 11px; background: transparent; color: var(--muted-color); font-weight: 900; }
+.mercies-tabs button.active { background: var(--secondary-color); color: var(--btn-text-color); }
+.mercies-view { display: none; }
+.mercies-view.active { display: grid; gap: 14px; }
+.mercies-feed { display: grid; gap: 16px; }
+.mercy-card {
+  border-radius: 28px; padding: 14px;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+.mercy-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.mercy-avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; overflow: hidden; color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 12%, white); }
+.mercy-avatar .avatar-photo-img { width: 100%; height: 100%; object-fit: cover; }
+.mercy-card-top strong { display: block; color: var(--font-color); }
+.mercy-card-top small { color: var(--muted-color); font-size: 0.74rem; }
+.mercy-category { margin-left: auto; border-radius: 999px; padding: 7px 10px; color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 9%, white); font-size: 0.7rem; font-weight: 900; }
+.mercy-media {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  border-radius: 24px;
+  scrollbar-width: none;
+}
+.mercy-media::-webkit-scrollbar { display: none; }
+.mercy-slide { min-height: 330px; scroll-snap-align: center; background: color-mix(in srgb, var(--secondary-color) 8%, white); display: grid; place-items: center; overflow: hidden; }
+.mercy-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mercy-slide-dots { display: flex; justify-content: center; gap: 6px; margin-top: 9px; }
+.mercy-slide-dots span { width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--secondary-color) 42%, transparent); }
+.mercy-scripture-card { padding: 24px; color: var(--mercy-scripture-color, var(--font-color)); text-align: center; }
+.mercy-scripture-card span { color: var(--secondary-color); font-weight: 900; }
+.mercy-scripture-card p { font-size: 1.25rem; line-height: 1.45; font-weight: 750; }
+.mercy-scripture-theme { background: linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 14%, white), rgba(255,255,255,0.78)); }
+.mercy-scripture-light { background: #fff; }
+.mercy-scripture-deep { background: #15202b; }
+.mercy-scripture-parchment { background: #fff7e6; }
+.mercy-font-serif { font-family: Georgia, 'Times New Roman', serif; }
+.mercy-font-mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.mercy-prompt { margin-top: 13px; color: var(--secondary-color); font-size: 0.82rem; font-weight: 900; }
+.mercy-body { color: var(--font-color); line-height: 1.48; white-space: pre-wrap; }
+.mercy-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.mercy-chips span { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 8px 10px; background: color-mix(in srgb, var(--secondary-color) 8%, white); color: var(--secondary-color); font-weight: 850; font-size: 0.78rem; }
+.mercy-chips .material-symbols-outlined { font-size: 1rem; }
+.mercy-reactions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.mercy-reactions button { border: none; border-radius: 999px; padding: 9px 11px; color: var(--font-color); background: rgba(0,0,0,0.045); font-weight: 850; }
+.mercy-reactions button.active { color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 13%, white); }
+.mercy-reactions small { margin-left: 4px; }
+.mercies-empty,
+.mercies-journal-note { border-radius: 24px; padding: 22px; text-align: center; background: rgba(255,255,255,0.72); color: var(--muted-color); border: 1px solid color-mix(in srgb, var(--secondary-color) 12%, transparent); }
+.mercies-journal-note { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: left; }
+.mercy-composer-card,
+.mercy-settings-card { max-width: 480px; max-height: 86vh; overflow-y: auto; }
+.mercy-photo-picker { min-height: 190px; border: 2px dashed color-mix(in srgb, var(--secondary-color) 30%, transparent); border-radius: 24px; display: grid; place-items: center; text-align: center; gap: 6px; color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 6%, white); padding: 18px; margin: 14px 0; }
+.mercy-photo-picker .material-symbols-outlined { font-size: 2.4rem; }
+.mercy-photo-picker small,
+.mercy-save-row small,
+.mercy-setting-row small { display: block; color: var(--muted-color); font-size: 0.75rem; margin-top: 2px; }
+.mercy-photo-preview { position: relative; border-radius: 24px; overflow: hidden; margin: 14px 0; }
+.mercy-photo-preview img { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+.mercy-photo-preview button { position: absolute; right: 10px; bottom: 10px; border: none; border-radius: 999px; padding: 8px 12px; color: var(--secondary-color); background: rgba(255,255,255,0.88); font-weight: 900; }
+.mercy-field,
+.mercy-scripture-box,
+.mercy-save-row,
+.mercy-setting-row { display: grid; gap: 7px; margin: 12px 0; color: var(--font-color); font-weight: 850; }
+.mercy-field select,
+.mercy-friend-row select,
+.mercy-composer-card textarea,
+.mercy-scripture-box input,
+.mercy-scripture-box textarea,
+.mercy-card-options select,
+.mercy-settings-card input[type="time"] { width: 100%; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent); padding: 11px; color: var(--font-color); background: rgba(255,255,255,0.9); font: inherit; }
+.mercy-composer-card textarea { min-height: 96px; resize: vertical; }
+.mercy-friend-row { display: grid; gap: 8px; }
+.mercy-scripture-box { border-radius: 20px; padding: 12px; background: color-mix(in srgb, var(--secondary-color) 7%, white); border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent); }
+.mercy-scripture-box summary { cursor: pointer; color: var(--secondary-color); display: flex; align-items: center; gap: 6px; }
+.mercy-card-options { display: grid; grid-template-columns: 1fr 1fr 52px; gap: 8px; }
+.mercy-save-row,
+.mercy-setting-row { grid-template-columns: auto 1fr; align-items: center; }
+.mercy-setting-row { grid-template-columns: 1fr auto; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); }
+@media (max-width: 420px) {
+  .mercies-actions { grid-template-columns: 1fr; }
+  .mercy-slide { min-height: 280px; }
+  .mercy-card-options { grid-template-columns: 1fr; }
+}
 .community-post-composer { max-width: 460px; }
 .cpc-kicker {
   display: inline-flex;

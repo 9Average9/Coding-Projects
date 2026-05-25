@@ -107,6 +107,27 @@ async function cleanupDeletedUserData(uid) {
     if (count) await batch.commit();
   }
 
+  const mercyPosts = await db.collection("merciesPosts")
+    .where("audienceUids", "array-contains", uid)
+    .limit(300)
+    .get();
+  if (!mercyPosts.empty) {
+    const batch = db.batch();
+    let count = 0;
+    mercyPosts.docs.forEach(doc => {
+      if (doc.data().authorUid === uid) {
+        batch.update(doc.ref, {
+          isActive: false,
+          deletedAt: FieldValue.serverTimestamp()
+        });
+      } else {
+        batch.update(doc.ref, { [`reactions.${uid}`]: FieldValue.delete() });
+      }
+      count += 1;
+    });
+    if (count) await batch.commit();
+  }
+
   const comments = await db.collectionGroup("comments")
     .where("authorUid", "==", uid)
     .limit(300)
@@ -212,6 +233,11 @@ function calculateNextReminderDate(reminder, afterDate = new Date()) {
   return null;
 }
 
+function calculateNextMercyFriendDate(reminder, afterDate = new Date()) {
+  const base = new Date(afterDate.getTime() + (1 + Math.floor(Math.random() * 7)) * 86400000);
+  return calculateNextReminderDate({ ...reminder, frequency: "daily" }, base);
+}
+
 async function backfillReminderNextSendAt(now) {
   if (now.getUTCMinutes() !== 0) return;
   const snap = await db.collection("users")
@@ -292,6 +318,57 @@ exports.sendScheduledReminders = functions.pubsub
       }
     }
 
+    const mercyDailySnap = await db.collection("users")
+      .where("mercyReminder.enabled", "==", true)
+      .where("mercyReminder.nextSendAt", "<=", now)
+      .limit(100)
+      .get();
+
+    for (const userDoc of mercyDailySnap.docs) {
+      const data = userDoc.data();
+      const reminder = data.mercyReminder || {};
+      const tokens = data.fcmTokens || [];
+      const nextSendAt = calculateNextReminderDate(reminder, new Date(now.getTime() + 60 * 1000));
+      await userDoc.ref.update({ "mercyReminder.lastSent": now, ...(nextSendAt ? { "mercyReminder.nextSendAt": nextSendAt } : {}) });
+      if (!tokens.length) continue;
+      const bodies = [
+        "Take a moment to remember today's mercy.",
+        "What good gift can you thank God for today?",
+        "Capture one ordinary blessing from today.",
+        "Pause and remember the Lord's kindness today."
+      ];
+      await messaging.sendEachForMulticast({
+        tokens,
+        notification: { title: "Mercies", body: bodies[Math.floor(Math.random() * bodies.length)] },
+        webpush: { fcmOptions: { link: "/Greek-Vocab/?open=mercies" }, notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
+      }).catch(e => console.error(`${userDoc.id} mercy reminder error:`, e.message));
+    }
+
+    const mercyFriendSnap = await db.collection("users")
+      .where("mercyFriendReminder.enabled", "==", true)
+      .where("mercyFriendReminder.nextSendAt", "<=", now)
+      .limit(100)
+      .get();
+
+    for (const userDoc of mercyFriendSnap.docs) {
+      const data = userDoc.data();
+      const reminder = data.mercyFriendReminder || {};
+      const tokens = data.fcmTokens || [];
+      const friends = data.friends || [];
+      const nextSendAt = calculateNextMercyFriendDate(reminder, now);
+      await userDoc.ref.update({ "mercyFriendReminder.lastSent": now, ...(nextSendAt ? { "mercyFriendReminder.nextSendAt": nextSendAt } : {}) });
+      if (!tokens.length || !friends.length) continue;
+      const friendUid = friends[Math.floor(Math.random() * friends.length)];
+      const friendSnap = await db.collection("users").doc(friendUid).get();
+      const friendName = friendSnap.exists ? (friendSnap.data().displayName || friendSnap.data().username || "a friend") : "a friend";
+      await messaging.sendEachForMulticast({
+        tokens,
+        notification: { title: "Mercies", body: `Encourage ${friendName} this week.` },
+        data: { open: "mercies", friendUid, friendName },
+        webpush: { fcmOptions: { link: `/Greek-Vocab/?open=mercies&friend=${encodeURIComponent(friendUid)}` }, notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
+      }).catch(e => console.error(`${userDoc.id} mercy friend reminder error:`, e.message));
+    }
+
     return null;
   });
 
@@ -301,19 +378,31 @@ exports.onUserReminderWritten = functions.firestore
     if (!change.after.exists) return null;
     const before = change.before.exists ? (change.before.data().reminder || {}) : {};
     const after = change.after.data().reminder || {};
-    if (!after.enabled || !after.time) return null;
-
-    const scheduleChanged =
-      before.enabled !== after.enabled ||
-      before.time !== after.time ||
-      before.frequency !== after.frequency ||
-      before.timezone !== after.timezone;
-
-    if (!scheduleChanged && after.nextSendAt) return null;
-
-    const nextSendAt = calculateNextReminderDate(after);
-    if (!nextSendAt) return null;
-    await change.after.ref.update({ "reminder.nextSendAt": nextSendAt });
+    const updates = {};
+    if (after.enabled && after.time) {
+      const scheduleChanged =
+        before.enabled !== after.enabled ||
+        before.time !== after.time ||
+        before.frequency !== after.frequency ||
+        before.timezone !== after.timezone;
+      if ((scheduleChanged || !after.nextSendAt)) {
+        const nextSendAt = calculateNextReminderDate(after);
+        if (nextSendAt) updates["reminder.nextSendAt"] = nextSendAt;
+      }
+    }
+    const beforeMercy = change.before.exists ? (change.before.data().mercyReminder || {}) : {};
+    const afterMercy = change.after.data().mercyReminder || {};
+    if (afterMercy.enabled && afterMercy.time && (beforeMercy.enabled !== afterMercy.enabled || beforeMercy.time !== afterMercy.time || !afterMercy.nextSendAt)) {
+      const next = calculateNextReminderDate(afterMercy);
+      if (next) updates["mercyReminder.nextSendAt"] = next;
+    }
+    const beforeFriend = change.before.exists ? (change.before.data().mercyFriendReminder || {}) : {};
+    const afterFriend = change.after.data().mercyFriendReminder || {};
+    if (afterFriend.enabled && afterFriend.time && (beforeFriend.enabled !== afterFriend.enabled || beforeFriend.time !== afterFriend.time || !afterFriend.nextSendAt)) {
+      const next = calculateNextMercyFriendDate(afterFriend);
+      if (next) updates["mercyFriendReminder.nextSendAt"] = next;
+    }
+    if (Object.keys(updates).length) await change.after.ref.update(updates);
     return null;
   });
 
@@ -369,6 +458,9 @@ exports.onEncouragementCreated = functions.firestore
       const postTitle = snap.data().postTitle || "your prayer post";
       title = "They Prayed For You";
       body = `${fromName} prayed for your "${postTitle}" post.`;
+    } else if (type === "mercyPostedTagged") {
+      title = "New Mercy";
+      body = `${fromName} posted a Mercy about you.`;
     } else if (type === "encouragement") {
       title = "Study Encouragement";
       body = `${fromName} is encouraging you to study your Greek!`;
@@ -389,10 +481,12 @@ exports.onEncouragementCreated = functions.firestore
     }
 
     try {
+      const webpush = { notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } };
+      if (type && String(type).startsWith("mercy")) webpush.fcmOptions = { link: "/Greek-Vocab/?open=mercies" };
       const result = await messaging.sendEachForMulticast({
         tokens,
         notification: { title, body },
-        webpush: { notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } }
+        webpush
       });
       console.log(`onEncouragementCreated ${targetUid}: ${result.successCount} sent, ${result.failureCount} failed`);
       result.responses.forEach((r, i) => {

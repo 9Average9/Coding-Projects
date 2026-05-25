@@ -207,6 +207,17 @@ async function cleanupAccountSocialData(uid, userData = null) {
   } catch (e) { console.warn("cleanupAccountSocialData post activity:", e); }
 
   try {
+    const mercyPosts = await getDocs(query(collection(db, "merciesPosts"), where("audienceUids", "array-contains", uid), limit(100)));
+    await Promise.all(mercyPosts.docs.map(d => {
+      if (d.data().authorUid === uid) {
+        if (d.data().imagePath) deleteObject(storageRef(storage, d.data().imagePath)).catch(() => {});
+        return updateDoc(d.ref, { isActive: false, deletedAt: serverTimestamp() }).catch(() => {});
+      }
+      return updateDoc(d.ref, { [`reactions.${uid}`]: deleteField() }).catch(() => {});
+    }));
+  } catch (e) { console.warn("cleanupAccountSocialData mercies:", e); }
+
+  try {
     const authoredComments = await getDocs(query(collectionGroup(db, "comments"), where("authorUid", "==", uid), limit(100)));
     await Promise.all(authoredComments.docs.map(d => {
       const postRef = d.ref.parent.parent;
@@ -1135,6 +1146,151 @@ window.CommunityPosts = {
   addComment: addPostComment,
   pray: prayForPost,
   delete: deleteCommunityPost
+};
+
+function listenMerciesPosts(uid, friendUids = [], callback) {
+  const q = query(collection(db, "merciesPosts"), where("audienceUids", "array-contains", uid), limit(24));
+  return onSnapshot(q, async snap => {
+    const now = Date.now();
+    const friendSet = new Set(friendUids || []);
+    const posts = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(p => p.isActive !== false)
+      .filter(p => !p.expiresAtMs || p.expiresAtMs > now)
+      .filter(p => p.authorUid === uid || friendSet.has(p.authorUid))
+      .sort((a, b) => (b.createdAtMs || b.createdAt?.seconds * 1000 || 0) - (a.createdAtMs || a.createdAt?.seconds * 1000 || 0));
+    const uids = [];
+    posts.forEach(post => {
+      uids.push(post.authorUid, post.taggedFriendUid);
+      Object.keys(post.reactions || {}).forEach(reactUid => uids.push(reactUid));
+    });
+    const users = await getUsersByUid(uids);
+    callback(posts.map(post => {
+      const author = users.get(post.authorUid);
+      const reactions = {};
+      Object.entries(post.reactions || {}).forEach(([reactUid, value]) => {
+        const reactor = users.get(reactUid);
+        const label = typeof value === "string" ? value : value?.label;
+        reactions[reactUid] = {
+          ...(typeof value === "object" && value ? value : {}),
+          label,
+          name: reactor?.displayName || reactor?.username || value?.name || "Friend",
+          avatar: reactor?.avatar || value?.avatar || "person"
+        };
+      });
+      return {
+        ...post,
+        authorName: author?.displayName || author?.username || post.authorName,
+        authorAvatar: author?.avatar || post.authorAvatar,
+        taggedFriendName: users.get(post.taggedFriendUid)?.displayName || post.taggedFriendName || null,
+        reactions
+      };
+    }));
+  }, err => {
+    console.warn("listenMerciesPosts:", err);
+    callback([]);
+  });
+}
+
+async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob, post = {}) {
+  try {
+    if (!imageBlob) return null;
+    const now = Date.now();
+    const ext = imageBlob.type?.includes("webp") ? "webp" : "jpg";
+    const imagePath = `mercies/${uid}/${now}.${ext}`;
+    const imageRef = storageRef(storage, imagePath);
+    await uploadBytes(imageRef, imageBlob, { contentType: imageBlob.type || "image/jpeg" });
+    const imageUrl = await getDownloadURL(imageRef);
+    const audienceUids = [...new Set([uid, ...(friendUids || [])])];
+    const ref = await addDoc(collection(db, "merciesPosts"), {
+      authorUid: uid,
+      authorName: displayName || "Someone",
+      authorAvatar: avatar || "person",
+      body: String(post.body || "").trim(),
+      promptText: post.promptText || "",
+      promptCategory: post.promptCategory || "Daily Mercy",
+      imageUrl,
+      imagePath,
+      scripture: post.scripture || null,
+      scriptureCard: post.scriptureCard || null,
+      taggedFriendUid: post.taggedFriendUid || null,
+      taggedFriendName: post.taggedFriendName || null,
+      friendEncouragement: !!post.friendEncouragement,
+      audienceUids,
+      reactions: {},
+      commentCount: 0,
+      createdAt: serverTimestamp(),
+      createdAtMs: now,
+      expiresAtMs: now + 21 * 24 * 60 * 60 * 1000,
+      isActive: true
+    });
+    if (post.taggedFriendUid && post.taggedFriendUid !== uid) {
+      fcmSendPushNotification(post.taggedFriendUid, "mercyPostedTagged", displayName || "Someone", uid, {
+        mercyPostId: ref.id
+      });
+    }
+    return ref.id;
+  } catch (e) {
+    console.warn("addMercyPost:", e);
+    return null;
+  }
+}
+
+async function reactMercyPost(postId, uid, label) {
+  try {
+    const ref = doc(db, "merciesPosts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return false;
+    const data = snap.data();
+    const current = data.reactions?.[uid];
+    const currentLabel = typeof current === "string" ? current : current?.label;
+    await updateDoc(ref, {
+      [`reactions.${uid}`]: currentLabel === label
+        ? deleteField()
+        : { label, name: getLbDisplayName(), avatar: getAvatar(), reactedAtMs: Date.now() }
+    });
+    return true;
+  } catch (e) {
+    console.warn("reactMercyPost:", e);
+    return false;
+  }
+}
+
+async function saveMerciesSettings(uid, settings = {}) {
+  if (!uid) return false;
+  try {
+    await setDoc(doc(db, "users", uid), {
+      merciesSettings: {
+        dailyEnabled: !!settings.dailyEnabled,
+        dailyTime: settings.dailyTime || "20:00",
+        friendEnabled: !!settings.friendEnabled,
+        friendTime: settings.friendTime || "18:00",
+        autoSave: !!settings.autoSave,
+        updatedAtMs: Date.now()
+      },
+      mercyReminder: {
+        enabled: !!settings.dailyEnabled,
+        time: settings.dailyTime || "20:00",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+      },
+      mercyFriendReminder: {
+        enabled: !!settings.friendEnabled,
+        time: settings.friendTime || "18:00",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+      }
+    }, { merge: true });
+    return true;
+  } catch (e) {
+    console.warn("saveMerciesSettings:", e);
+    return false;
+  }
+}
+
+window.Mercies = {
+  listen: listenMerciesPosts,
+  add: addMercyPost,
+  react: reactMercyPost,
+  saveSettings: saveMerciesSettings
 };
 
 async function studyGetMemberNames(uids) {

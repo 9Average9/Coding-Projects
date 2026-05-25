@@ -7,6 +7,22 @@
         { "fieldPath": "reminder.enabled", "order": "ASCENDING" },
         { "fieldPath": "reminder.nextSendAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mercyReminder.enabled", "order": "ASCENDING" },
+        { "fieldPath": "mercyReminder.nextSendAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mercyFriendReminder.enabled", "order": "ASCENDING" },
+        { "fieldPath": "mercyFriendReminder.nextSendAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

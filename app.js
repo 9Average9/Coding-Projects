@@ -96,6 +96,12 @@ let _communityPostKind = 'insight';
 let _communityPostVerse = null;
 let _communityCommentsPostId = null;
 let _communityCommentsUnsub = null;
+let _merciesPosts = [];
+let _merciesUnsub = null;
+let _merciesVisibleCount = 12;
+let _mercyImageBlob = null;
+let _mercyImageDataUrl = null;
+let _mercyPromptMode = 'regular';
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
@@ -8020,14 +8026,14 @@ let currentSentence = null;
 
 
 const screens = [
-  "homeScreen", "profilePage", "communityPage", "csDetailPage",
+  "homeScreen", "profilePage", "merciesPage", "communityPage", "csDetailPage",
   "newLearnMenu", "advancedLearnMenu",
   "basicVerbsLearnMenu", "advVerbsLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
   "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
 ];
 
-const NAV_SCREENS = ['homeScreen', 'profilePage', 'communityPage'];
+const NAV_SCREENS = ['homeScreen', 'profilePage', 'merciesPage', 'communityPage'];
 
 // ── Personal Studies ──────────────────────────────────────────────────────────
 
@@ -9669,6 +9675,7 @@ function setNavActive(page) {
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
+  if (page !== 'mercies' && _merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
   if (page === 'lessons') {
     const cur = document.querySelector('.screen.active');
     if (cur?.id === 'communityPage') _prevNavPage = 'community';
@@ -9689,6 +9696,9 @@ function showNavPage(page) {
     localStorage.setItem('communityLastVisit', Date.now().toString());
     document.getElementById('commNavDot')?.classList.add('hidden');
     showLbTab('posts');
+  } else if (page === 'mercies') {
+    showScreen('merciesPage');
+    startMerciesFeed();
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -16772,7 +16782,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.41";
+const APP_VERSION = "3.0.42";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17249,6 +17259,13 @@ async function restoreUserFromFirestore(user) {
     applyHomeBackdrop(localStorage.getItem("homeBackdrop") || "none");
   }
   if (data.advQuizScores) localStorage.setItem("advQuizScores", JSON.stringify(data.advQuizScores));
+  if (data.merciesSettings) {
+    localStorage.setItem("mercyDailyEnabled", String(!!data.merciesSettings.dailyEnabled));
+    if (data.merciesSettings.dailyTime) localStorage.setItem("mercyDailyTime", data.merciesSettings.dailyTime);
+    localStorage.setItem("mercyFriendReminderEnabled", String(!!data.merciesSettings.friendEnabled));
+    if (data.merciesSettings.friendTime) localStorage.setItem("mercyFriendReminderTime", data.merciesSettings.friendTime);
+    localStorage.setItem("merciesAutoSave", String(!!data.merciesSettings.autoSave));
+  }
   if (data.answeredKCs) localStorage.setItem("answeredKCs", JSON.stringify(data.answeredKCs));
   if (data.openedLessonBlocks) localStorage.setItem("openedLessonBlocks", JSON.stringify(data.openedLessonBlocks));
   if (data.translationXPCount) localStorage.setItem("translationXPCount", String(data.translationXPCount));
@@ -17671,6 +17688,8 @@ window.__onAuthStateReady = async (user) => {
     _unsubUserDoc = null;
     if (_communityPostsUnsub) { _communityPostsUnsub(); _communityPostsUnsub = null; }
     _communityPosts = [];
+    if (_merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
+    _merciesPosts = [];
     _welcomeCoachQueuedAfterAuth = false;
     document.getElementById('appCoachOverlay')?.classList.add('hidden');
     _resumeHomeFlipAfterCoach();
@@ -17726,6 +17745,17 @@ document.addEventListener("DOMContentLoaded", () => {
   setNavActive('home');
   showBottomNav();
   _startHomeFlip();
+  const openParam = new URLSearchParams(location.search).get('open');
+  if (openParam === 'mercies') {
+    setTimeout(async () => {
+      showNavPage('mercies');
+      const friendUid = new URLSearchParams(location.search).get('friend');
+      if (friendUid) {
+        const friend = await window.Friends?.getUser?.(friendUid).catch(() => null);
+        openMercyComposer({ friendUid, promptText: _mercyFriendPrompt(friend?.displayName || friend?.username || 'your friend') });
+      }
+    }, 900);
+  }
   if (window.__pendingAuthResolved) setAppLaunchText('Finishing setup');
 });
 
@@ -18103,6 +18133,381 @@ function _rankBadgeHtml(rank) {
   const cls = ["lb-rank-gold", "lb-rank-silver", "lb-rank-bronze"];
   if (rank <= 3) return `<span class="lb-rank-badge ${cls[rank-1]}">${labels[rank-1]}</span>`;
   return `<span class="lb-rank-num">#${rank}</span>`;
+}
+
+// Mercies
+const MERCY_PROMPTS = [
+  "What is one good gift you can thank God for today?",
+  "What small mercy did you notice today?",
+  "What truth from Scripture helped you think clearly today?",
+  "What is one wise choice you made or want to make today?",
+  "What is one ordinary blessing you do not want to overlook?",
+  "What is something God has provided that you want to remember?",
+  "What is one way you saw someone show kindness today?",
+  "What is one lesson from today you want to carry into tomorrow?",
+  "What is one reason to praise the Lord today?",
+  "What is something you are praying about with trust and wisdom?",
+  "What verse, truth, or biblical reminder shaped your day?",
+  "Where did you need patience, humility, or wisdom today?",
+  "What is one thing you can thank God for even if today was hard?",
+  "What responsibility did you try to handle faithfully today?",
+  "What is one moment from today worth remembering?"
+];
+
+const MERCY_FRIEND_PROMPTS = [
+  "What is one way [friend] has encouraged you?",
+  "What is something you appreciate about [friend]?",
+  "What is one Christlike quality you see in [friend]?",
+  "What is a time [friend] made you smile?",
+  "What is one way God has used [friend] to bless your life?",
+  "What is one strength you see in [friend]?",
+  "What is one memory with [friend] you are thankful for?",
+  "What is a verse or truth that reminds you of [friend]?",
+  "How has [friend] been faithful, kind, or steady?",
+  "What prayer would you write for [friend] this week?"
+];
+
+function _mercyPromptToday() {
+  return MERCY_PROMPTS[Math.floor(Date.now() / 86400000) % MERCY_PROMPTS.length];
+}
+
+function _mercyFriendPrompt(friendName = "your friend") {
+  const prompt = MERCY_FRIEND_PROMPTS[Math.floor(Math.random() * MERCY_FRIEND_PROMPTS.length)];
+  return prompt.replaceAll("[friend]", friendName);
+}
+
+function showMerciesView(view) {
+  document.querySelectorAll('.mercies-tabs button').forEach(btn => btn.classList.toggle('active', btn.dataset.mercyView === view));
+  document.getElementById('merciesFeedView')?.classList.toggle('active', view === 'feed');
+  document.getElementById('merciesJournalView')?.classList.toggle('active', view === 'journal');
+  if (view === 'journal') renderMerciesJournal();
+}
+
+function startMerciesFeed() {
+  const list = document.getElementById('merciesFeedList');
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!list) return;
+  showMerciesView('feed');
+  if (!uid) {
+    list.innerHTML = '<p class="study-board-empty">Sign in to post and see Mercies from friends.</p>';
+    return;
+  }
+  if (!window.Mercies?.listen) {
+    list.innerHTML = '<p class="study-board-empty">Loading Mercies...</p>';
+    setTimeout(() => startMerciesFeed(), 500);
+    return;
+  }
+  if (_merciesUnsub) { renderMerciesFeed(); return; }
+  list.innerHTML = '<p class="study-board-empty">Loading Mercies...</p>';
+  _merciesUnsub = window.Mercies.listen(uid, friendsList, posts => {
+    _merciesPosts = posts || [];
+    renderMerciesFeed();
+  });
+}
+
+function renderMerciesFeed() {
+  const list = document.getElementById('merciesFeedList');
+  if (!list) return;
+  const posts = _merciesPosts.slice(0, _merciesVisibleCount);
+  document.getElementById('merciesLoadMore')?.classList.toggle('hidden', _merciesPosts.length <= _merciesVisibleCount);
+  if (!posts.length) {
+    list.innerHTML = `<div class="mercies-empty"><span class="material-symbols-outlined">photo_camera</span><strong>No Mercies yet</strong><p>Post a photo and remember one ordinary blessing from today.</p><button onclick="openMercyComposer()">Post a Mercy</button></div>`;
+    return;
+  }
+  list.innerHTML = posts.map(_mercyCardHtml).join('');
+}
+
+function loadMoreMercies() {
+  _merciesVisibleCount += 10;
+  renderMerciesFeed();
+}
+
+function _mercyCardHtml(post) {
+  const reactions = post.reactions || {};
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const mine = uid && post.authorUid === uid;
+  const scripture = post.scripture?.text ? _mercyScriptureCard(post.scripture, post.scriptureCard) : '';
+  const slideDots = scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : '';
+  return `<article class="mercy-card">
+    <div class="mercy-card-top">
+      <span class="mercy-avatar">${_renderAvatar(post.authorAvatar || 'person')}</span>
+      <div><strong>${_lbEscape(post.authorName || 'Someone')}</strong><small>${_communityPostTime(post)}</small></div>
+      <span class="mercy-category">${_lbEscape(post.promptCategory || 'Mercy')}</span>
+    </div>
+    <div class="mercy-media${scripture ? ' has-scripture' : ''}">
+      <div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl || '')}" alt="Mercy photo"></div>
+      ${scripture}
+    </div>
+    ${slideDots}
+    <div class="mercy-prompt">${_lbEscape(post.promptText || '')}</div>
+    <p class="mercy-body">${_lbEscape(post.body || '')}</p>
+    <div class="mercy-chips">
+      ${post.scripture?.ref ? `<span><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
+      ${post.taggedFriendName ? `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(post.taggedFriendName)}</span>` : ''}
+      ${mine ? `<button onclick="saveMercyToJournal('${post.id}')"><span class="material-symbols-outlined">bookmark</span>Journal</button>` : ''}
+    </div>
+    <div class="mercy-reactions">
+      ${['Amen','Thankful','Praying','Encouraged'].map(label => {
+        const active = reactions[uid]?.label === label || reactions[uid] === label;
+        const count = Object.values(reactions).filter(r => (typeof r === 'string' ? r : r?.label) === label).length;
+        return `<button class="${active ? 'active' : ''}" onclick="reactMercyPost('${post.id}','${label}')">${label}${count ? `<small>${count}</small>` : ''}</button>`;
+      }).join('')}
+    </div>
+  </article>`;
+}
+
+function _mercyScriptureCard(scripture, options = {}) {
+  const bg = options.bg || 'theme';
+  const font = options.font || 'system';
+  const color = options.color || 'var(--font-color)';
+  return `<div class="mercy-slide mercy-scripture-card mercy-scripture-${bg} mercy-font-${font}" style="--mercy-scripture-color:${_lbEscape(color)}">
+    <span>${_lbEscape(scripture.ref || 'Scripture')}</span>
+    <p>${_lbEscape(scripture.text || '')}</p>
+  </div>`;
+}
+
+function openMercyComposer(prefill = {}) {
+  if (!window.Auth?.getCurrentUser()) { alert('Sign in to post a Mercy.'); return; }
+  _mercyImageBlob = null;
+  _mercyImageDataUrl = null;
+  _mercyPromptMode = prefill.friendUid ? 'friend' : 'regular';
+  clearMercyPhoto();
+  _populateMercyPromptSelect(prefill.promptText);
+  _populateMercyFriendSelect(prefill.friendUid || '');
+  const friendMode = document.getElementById('mercyFriendEncouragement');
+  if (friendMode) friendMode.checked = !!prefill.friendUid;
+  document.getElementById('mercyBody').value = '';
+  document.getElementById('mercyScriptureRef').value = '';
+  document.getElementById('mercyScriptureText').value = '';
+  document.getElementById('mercySaveThis').checked = localStorage.getItem('merciesAutoSave') === 'true';
+  document.getElementById('mercyComposerModal')?.classList.add('open');
+}
+
+function closeMercyComposer() {
+  document.getElementById('mercyComposerModal')?.classList.remove('open');
+}
+
+function _populateMercyPromptSelect(selectedText) {
+  const sel = document.getElementById('mercyPromptSelect');
+  if (!sel) return;
+  const prompts = _mercyPromptMode === 'friend' ? MERCY_FRIEND_PROMPTS.map(p => p.replaceAll('[friend]', _selectedMercyFriendName() || 'your friend')) : MERCY_PROMPTS;
+  const defaultPrompt = selectedText || (_mercyPromptMode === 'friend' ? prompts[0] : _mercyPromptToday());
+  sel.innerHTML = prompts.map(p => `<option value="${_lbEscape(p)}"${p === defaultPrompt ? ' selected' : ''}>${_lbEscape(p)}</option>`).join('');
+}
+
+function _populateMercyFriendSelect(selectedUid = '') {
+  const sel = document.getElementById('mercyFriendSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Tag one friend (optional)</option>';
+  (friendsList || []).forEach(uid => {
+    window.Friends?.getUser(uid).then(u => {
+      const name = u?.displayName || u?.username || 'Friend';
+      const opt = document.createElement('option');
+      opt.value = uid; opt.textContent = name; opt.dataset.name = name;
+      if (uid === selectedUid) opt.selected = true;
+      sel.appendChild(opt);
+      _populateMercyPromptSelect();
+    }).catch(() => {});
+  });
+}
+
+function _selectedMercyFriendName() {
+  const opt = document.getElementById('mercyFriendSelect')?.selectedOptions?.[0];
+  return opt?.dataset?.name || opt?.textContent || '';
+}
+
+function toggleMercyFriendMode() {
+  _mercyPromptMode = document.getElementById('mercyFriendEncouragement')?.checked ? 'friend' : 'regular';
+  _populateMercyPromptSelect();
+}
+
+function onMercyFriendChanged() {
+  if (document.getElementById('mercyFriendSelect')?.value) {
+    document.getElementById('mercyFriendEncouragement').checked = true;
+    _mercyPromptMode = 'friend';
+  }
+  _populateMercyPromptSelect();
+}
+
+function onMercyPromptChanged() {}
+
+async function handleMercyPhotoSelected(input) {
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  try {
+    const result = await compressMercyImage(file);
+    _mercyImageBlob = result.blob;
+    _mercyImageDataUrl = result.dataUrl;
+    document.getElementById('mercyPhotoPreview').src = result.dataUrl;
+    document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
+    document.getElementById('mercyPhotoPicker')?.classList.add('hidden');
+  } catch (e) {
+    alert('Could not prepare that photo. Try a different image.');
+  }
+}
+
+function clearMercyPhoto() {
+  _mercyImageBlob = null;
+  _mercyImageDataUrl = null;
+  document.getElementById('mercyPhotoPreviewWrap')?.classList.add('hidden');
+  document.getElementById('mercyPhotoPicker')?.classList.remove('hidden');
+}
+
+async function compressMercyImage(file) {
+  let url = null;
+  const img = await new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    url = URL.createObjectURL(file);
+    image.src = url;
+  });
+  if (url) URL.revokeObjectURL(url);
+  const max = 1100;
+  let scale = Math.min(1, max / Math.max(img.width, img.height));
+  const canvas = document.createElement('canvas');
+  const type = canvas.toDataURL('image/webp').startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
+  let quality = 0.76;
+  let blob = null;
+  let dataUrl = '';
+  for (let attempt = 0; attempt < 6; attempt++) {
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    blob = await new Promise(resolve => canvas.toBlob(resolve, type, quality));
+    if (blob && blob.size <= 360 * 1024) break;
+    quality = Math.max(0.52, quality - 0.06);
+    scale *= 0.86;
+  }
+  if (!blob) throw new Error('Mercy image compression failed');
+  dataUrl = canvas.toDataURL(type, quality);
+  return { blob, dataUrl, type };
+}
+
+async function submitMercyPost() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_mercyImageBlob) { alert('Choose a photo first.'); return; }
+  const body = document.getElementById('mercyBody')?.value.trim() || '';
+  if (!body) { alert('Write a short response first.'); return; }
+  const scriptureRef = document.getElementById('mercyScriptureRef')?.value.trim() || '';
+  const scriptureText = document.getElementById('mercyScriptureText')?.value.trim() || '';
+  if (scriptureRef && !scriptureText) { alert('Add verse text or remove the Scripture reference.'); return; }
+  const friendUid = document.getElementById('mercyFriendSelect')?.value || null;
+  const friendName = friendUid ? _selectedMercyFriendName() : null;
+  const btn = document.getElementById('mercySubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
+  const post = {
+    body,
+    promptText: document.getElementById('mercyPromptSelect')?.value || _mercyPromptToday(),
+    promptCategory: document.getElementById('mercyFriendEncouragement')?.checked ? 'Friend Encouragement' : 'Daily Mercy',
+    scripture: scriptureText ? { ref: scriptureRef || 'Scripture', text: scriptureText } : null,
+    scriptureCard: scriptureText ? {
+      bg: document.getElementById('mercyScriptureBg')?.value || 'theme',
+      font: document.getElementById('mercyScriptureFont')?.value || 'system',
+      color: document.getElementById('mercyScriptureColor')?.value || '#123532'
+    } : null,
+    taggedFriendUid: friendUid,
+    taggedFriendName: friendName,
+    friendEncouragement: !!document.getElementById('mercyFriendEncouragement')?.checked
+  };
+  const authorName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
+  const id = await window.Mercies?.add?.(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
+  if (btn) { btn.disabled = false; btn.textContent = 'Post Mercy'; }
+  if (!id) { alert('Could not post this Mercy right now. Try again.'); return; }
+  if (document.getElementById('mercySaveThis')?.checked) await saveMercyToJournal(id, { id, ...post, authorUid: uid, imageDataUrl: _mercyImageDataUrl, createdAtMs: Date.now() });
+  closeMercyComposer();
+}
+
+async function reactMercyPost(postId, label) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  await window.Mercies?.react?.(postId, uid, label);
+}
+
+function mercyDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('MerciesJournalDB', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('entries', { keyPath: 'localId' });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveMercyToJournal(postId, postOverride = null) {
+  const post = postOverride || _merciesPosts.find(p => p.id === postId);
+  if (!post) return;
+  const db = await mercyDb();
+  const tx = db.transaction('entries', 'readwrite');
+  tx.objectStore('entries').put({
+    localId: post.id || crypto.randomUUID(),
+    remotePostId: post.id || post.remotePostId || null,
+    date: new Date(post.createdAtMs || Date.now()).toLocaleDateString(),
+    createdAtMs: post.createdAtMs || Date.now(),
+    promptText: post.promptText,
+    promptCategory: post.promptCategory,
+    body: post.body,
+    imageDataUrl: post.imageDataUrl || post.imageUrl,
+    scripture: post.scripture || null,
+    scriptureCard: post.scriptureCard || null,
+    taggedFriendUid: post.taggedFriendUid || null,
+    taggedFriendName: post.taggedFriendName || null,
+    friendEncouragement: !!post.friendEncouragement
+  });
+  await new Promise(resolve => tx.oncomplete = resolve);
+  renderMerciesJournal();
+}
+
+async function renderMerciesJournal() {
+  const list = document.getElementById('merciesJournalList');
+  if (!list) return;
+  try {
+    const db = await mercyDb();
+    const tx = db.transaction('entries', 'readonly');
+    const req = tx.objectStore('entries').getAll();
+    req.onsuccess = () => {
+      const entries = (req.result || []).sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+      list.innerHTML = entries.length ? entries.map(e => `<article class="mercy-card mercy-journal-card">
+        <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div></div>
+        <div class="mercy-media"><div class="mercy-slide"><img loading="lazy" src="${_lbEscape(e.imageDataUrl || '')}" alt="Saved Mercy"></div></div>
+        <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
+        ${e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : ''}
+        ${e.taggedFriendName ? `<div class="mercy-chips"><span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(e.taggedFriendName)}</span></div>` : ''}
+      </article>`).join('') : '<p class="study-board-empty">No saved Mercies yet.</p>';
+    };
+  } catch {
+    list.innerHTML = '<p class="study-board-empty">Mercies Journal is not available on this device.</p>';
+  }
+}
+
+function openMerciesSettings() {
+  document.getElementById('mercyDailyEnabled').checked = localStorage.getItem('mercyDailyEnabled') === 'true';
+  document.getElementById('mercyDailyTime').value = localStorage.getItem('mercyDailyTime') || '20:00';
+  document.getElementById('mercyFriendReminderEnabled').checked = localStorage.getItem('mercyFriendReminderEnabled') === 'true';
+  document.getElementById('mercyFriendReminderTime').value = localStorage.getItem('mercyFriendReminderTime') || '18:00';
+  document.getElementById('mercyAutoSave').checked = localStorage.getItem('merciesAutoSave') === 'true';
+  document.getElementById('merciesSettingsModal')?.classList.add('open');
+}
+
+function closeMerciesSettings() {
+  document.getElementById('merciesSettingsModal')?.classList.remove('open');
+}
+
+async function saveMerciesSettings() {
+  const settings = {
+    dailyEnabled: !!document.getElementById('mercyDailyEnabled')?.checked,
+    dailyTime: document.getElementById('mercyDailyTime')?.value || '20:00',
+    friendEnabled: !!document.getElementById('mercyFriendReminderEnabled')?.checked,
+    friendTime: document.getElementById('mercyFriendReminderTime')?.value || '18:00',
+    autoSave: !!document.getElementById('mercyAutoSave')?.checked
+  };
+  localStorage.setItem('mercyDailyEnabled', String(settings.dailyEnabled));
+  localStorage.setItem('mercyDailyTime', settings.dailyTime);
+  localStorage.setItem('mercyFriendReminderEnabled', String(settings.friendEnabled));
+  localStorage.setItem('mercyFriendReminderTime', settings.friendTime);
+  localStorage.setItem('merciesAutoSave', String(settings.autoSave));
+  await window.Mercies?.saveSettings?.(window.Auth?.getCurrentUser()?.uid, settings);
+  closeMerciesSettings();
 }
 
 // Community Posts
