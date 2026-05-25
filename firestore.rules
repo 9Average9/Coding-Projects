@@ -113,6 +113,16 @@ service cloud.firestore {
         && request.auth.uid == resource.data.authorUid;
     }
 
+    match /merciesPosts/{postId}/comments/{commentId} {
+      allow read: if request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/merciesPosts/$(postId)).data.audienceUids;
+      allow create: if request.auth != null
+        && request.resource.data.authorUid == request.auth.uid
+        && request.auth.uid in get(/databases/$(database)/documents/merciesPosts/$(postId)).data.audienceUids;
+      allow update, delete: if request.auth != null
+        && request.auth.uid == resource.data.authorUid;
+    }
+
     match /studies/{studyId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null

@@ -96,6 +96,9 @@ let _communityPostKind = 'insight';
 let _communityPostVerse = null;
 let _communityCommentsPostId = null;
 let _communityCommentsUnsub = null;
+let _sharedCommentsMode = 'community';
+let _mercyCommentsPostId = null;
+let _mercyCommentsUnsub = null;
 let _merciesPosts = [];
 let _merciesUnsub = null;
 let _merciesJournalUnsub = null;
@@ -107,6 +110,7 @@ let _mercyImageDataUrl = null;
 let _mercyOriginalImageFile = null;
 let _mercyPhotoPositionX = 50;
 let _mercyPhotoPositionY = 50;
+let _mercyPhotoPreviewUrl = null;
 let _mercyPromptMode = 'regular';
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -16789,7 +16793,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.46";
+const APP_VERSION = "3.0.47";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18189,6 +18193,7 @@ function showMerciesView(view) {
   document.querySelectorAll('[data-mercy-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.mercyView === view));
   document.getElementById('merciesFeedView')?.classList.toggle('active', view === 'feed');
   document.getElementById('merciesJournalView')?.classList.toggle('active', view === 'journal');
+  document.querySelector('#merciesPage .mercies-section-head')?.classList.toggle('hidden', view === 'journal');
   if (view === 'journal') startMerciesJournal();
 }
 
@@ -18224,11 +18229,12 @@ function renderMerciesFeed() {
   if (!list) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
   const filtered = _merciesPosts.filter(post => {
-    if (_merciesFilter === 'mine') return post.authorUid === uid;
-    if (_merciesFilter === 'encouragement') return post.friendEncouragement || post.promptCategory === 'Friend Encouragement';
     if (_merciesFilter === 'scripture') return !!post.scripture?.text;
     return true;
   });
+  if (_merciesFilter === 'oldest') {
+    filtered.sort((a, b) => (a.createdAtMs || 0) - (b.createdAtMs || 0));
+  }
   const posts = filtered.slice(0, _merciesVisibleCount);
   document.getElementById('merciesLoadMore')?.classList.toggle('hidden', filtered.length <= _merciesVisibleCount);
   if (!posts.length) {
@@ -18248,34 +18254,59 @@ function _mercyCardHtml(post) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   const mine = uid && post.authorUid === uid;
   const scripture = post.scripture?.text ? _mercyScriptureCard(post.scripture, post.scriptureCard) : '';
-  const slideDots = scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : '';
+  const hasPhoto = !!post.imageUrl;
+  const hasMedia = hasPhoto || scripture;
+  const slideDots = scripture && hasPhoto ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : '';
+  const saved = !!uid && (post.journalSavedBy || []).includes(uid);
+  const taggedNames = post.taggedFriendNames?.length ? post.taggedFriendNames : (post.taggedFriendName ? [post.taggedFriendName] : []);
+  const reactionEntries = Object.entries(reactions).map(([reactUid, value]) => ({
+    uid: reactUid,
+    label: typeof value === 'string' ? value : value?.label,
+    name: typeof value === 'string' ? 'Friend' : value?.name || 'Friend',
+    avatar: typeof value === 'string' ? 'person' : value?.avatar || 'person'
+  })).filter(r => r.label);
   return `<article class="mercy-card">
     <div class="mercy-card-top">
       <span class="mercy-avatar">${_renderAvatar(post.authorAvatar || 'person')}</span>
       <div><strong>${_lbEscape(post.authorName || 'Someone')}</strong><small>${_communityPostTime(post)}</small></div>
       <span class="mercy-category">${_lbEscape(post.promptCategory || 'Mercy')}</span>
+      ${post.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
     </div>
-    <div class="mercy-media${scripture ? ' has-scripture' : ''}">
-      <div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl || '')}" alt="Mercy photo"></div>
+    ${hasMedia ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">
+      ${hasPhoto ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl)}" alt="Mercy photo"></div>` : ''}
       ${scripture}
-    </div>
+    </div>` : ''}
     ${slideDots}
     <div class="mercy-prompt">${_lbEscape(post.promptText || '')}</div>
     <p class="mercy-body">${_lbEscape(post.body || '')}</p>
     <div class="mercy-chips">
-      ${post.scripture?.ref ? `<span><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
-      ${post.taggedFriendName ? `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(post.taggedFriendName)}</span>` : ''}
-      ${mine ? `<button onclick="saveMercyToJournal('${post.id}')"><span class="material-symbols-outlined">bookmark</span>Journal</button>` : ''}
-      ${mine ? `<button onclick="deleteMercyPost('${post.id}')"><span class="material-symbols-outlined">delete</span>Delete</button>` : ''}
+      ${taggedNames.map(name => `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(name)}</span>`).join('')}
     </div>
-    <div class="mercy-reactions">
+    ${mine ? `<div class="mercy-owner-actions">
+      <button class="mercy-journal-action ${saved ? 'saved' : ''}" onclick="saveMercyToJournal('${post.id}', null, this)"><span class="material-symbols-outlined">${saved ? 'bookmark_added' : 'bookmark'}</span>${saved ? 'Saved' : 'Journal'}</button>
+      <button class="mercy-delete-action" onclick="deleteMercyPost('${post.id}')"><span class="material-symbols-outlined">delete</span>Delete</button>
+    </div>` : `<div class="mercy-reactions">
       ${['Amen','Thankful','Praying','Encouraged'].map(label => {
         const active = reactions[uid]?.label === label || reactions[uid] === label;
         const count = Object.values(reactions).filter(r => (typeof r === 'string' ? r : r?.label) === label).length;
         return `<button class="${active ? 'active' : ''}" onclick="reactMercyPost('${post.id}','${label}')">${label}${count ? `<small>${count}</small>` : ''}</button>`;
       }).join('')}
+    </div>`}
+    <div class="mercy-social-row">
+      <button class="cp-comment-btn" onclick="openMercyComments('${post.id}')"><span class="material-symbols-outlined">chat_bubble</span><small>${Number(post.commentCount || 0)}</small></button>
+      ${_mercyReactionStackHtml(post.id, reactionEntries)}
     </div>
   </article>`;
+}
+
+function _mercyReactionStackHtml(postId, entries = []) {
+  if (!entries.length) return '';
+  const shown = entries.slice(0, 4);
+  const extra = entries.length - shown.length;
+  return `<button class="cp-reaction-stack mercy-reaction-stack" onclick="openMercyReactions('${postId}')">
+    ${shown.map(r => `<span>${_renderAvatar(r.avatar || 'person')}</span>`).join('')}
+    ${extra > 0 ? `<em>+${extra}</em>` : ''}
+  </button>`;
 }
 
 function _mercyScriptureCard(scripture, options = {}) {
@@ -18299,6 +18330,8 @@ function openMercyComposer(prefill = {}) {
   populateMercyBooks();
   const friendMode = document.getElementById('mercyFriendEncouragement');
   if (friendMode) friendMode.checked = !!prefill.friendUid;
+  const extraFriends = document.getElementById('mercyExtraFriends');
+  if (extraFriends) extraFriends.innerHTML = '';
   const scriptureToggle = document.getElementById('mercyAttachScripture');
   if (scriptureToggle) scriptureToggle.checked = false;
   document.getElementById('mercyBody').value = '';
@@ -18337,6 +18370,25 @@ function _populateMercyFriendSelect(selectedUid = '') {
   });
 }
 
+function addMercyFriendTag(selectedUid = '') {
+  const wrap = document.getElementById('mercyExtraFriends');
+  if (!wrap || document.getElementById('mercyFriendEncouragement')?.checked) return;
+  const row = document.createElement('div');
+  row.className = 'mercy-extra-friend-row';
+  row.innerHTML = `<select class="mercy-extra-friend-select"><option value="">Tag another friend</option></select><button type="button" aria-label="Remove friend tag" onclick="this.closest('.mercy-extra-friend-row')?.remove()"><span class="material-symbols-outlined">close</span></button>`;
+  wrap.appendChild(row);
+  const sel = row.querySelector('select');
+  (friendsList || []).forEach(uid => {
+    window.Friends?.getUser(uid).then(u => {
+      const name = u?.displayName || u?.username || 'Friend';
+      const opt = document.createElement('option');
+      opt.value = uid; opt.textContent = name; opt.dataset.name = name;
+      if (uid === selectedUid) opt.selected = true;
+      sel.appendChild(opt);
+    }).catch(() => {});
+  });
+}
+
 function _selectedMercyFriendName() {
   const opt = document.getElementById('mercyFriendSelect')?.selectedOptions?.[0];
   return opt?.dataset?.name || opt?.textContent || '';
@@ -18344,14 +18396,14 @@ function _selectedMercyFriendName() {
 
 function toggleMercyFriendMode() {
   _mercyPromptMode = document.getElementById('mercyFriendEncouragement')?.checked ? 'friend' : 'regular';
+  const friendMode = _mercyPromptMode === 'friend';
+  const addBtn = document.getElementById('mercyAddFriendBtn');
+  if (addBtn) addBtn.disabled = friendMode;
+  if (friendMode) document.getElementById('mercyExtraFriends')?.replaceChildren();
   _populateMercyPromptSelect();
 }
 
 function onMercyFriendChanged() {
-  if (document.getElementById('mercyFriendSelect')?.value) {
-    document.getElementById('mercyFriendEncouragement').checked = true;
-    _mercyPromptMode = 'friend';
-  }
   _populateMercyPromptSelect();
 }
 
@@ -18432,17 +18484,19 @@ async function handleMercyPhotoSelected(input) {
   if (!file) return;
   try {
     _mercyOriginalImageFile = file;
-    _mercyPhotoPositionX = 50;
-    _mercyPhotoPositionY = 50;
+    _mercyPhotoPositionX = 0;
+    _mercyPhotoPositionY = 0;
+    if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
+    _mercyPhotoPreviewUrl = URL.createObjectURL(file);
     const result = await compressMercyImage(file, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY });
     _mercyImageBlob = result.blob;
     _mercyImageDataUrl = result.dataUrl;
-    document.getElementById('mercyPhotoPreview').src = result.dataUrl;
-    document.getElementById('mercyPhotoPreview').style.objectPosition = '50% 50%';
+    document.getElementById('mercyPhotoPreview').src = _mercyPhotoPreviewUrl;
     const x = document.getElementById('mercyPhotoPosX');
     const y = document.getElementById('mercyPhotoPosY');
-    if (x) x.value = '50';
-    if (y) y.value = '50';
+    if (x) x.value = '0';
+    if (y) y.value = '0';
+    updateMercyPhotoPosition();
     document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
     document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
     document.getElementById('mercyPhotoPicker')?.classList.add('hidden');
@@ -18455,16 +18509,23 @@ function clearMercyPhoto() {
   _mercyImageBlob = null;
   _mercyImageDataUrl = null;
   _mercyOriginalImageFile = null;
+  if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
+  _mercyPhotoPreviewUrl = null;
   document.getElementById('mercyPhotoPreviewWrap')?.classList.add('hidden');
   document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
   document.getElementById('mercyPhotoPicker')?.classList.remove('hidden');
 }
 
 async function updateMercyPhotoPosition() {
-  _mercyPhotoPositionX = Number(document.getElementById('mercyPhotoPosX')?.value || 50);
-  _mercyPhotoPositionY = Number(document.getElementById('mercyPhotoPosY')?.value || 50);
+  _mercyPhotoPositionX = Number(document.getElementById('mercyPhotoPosX')?.value || 0);
+  _mercyPhotoPositionY = Number(document.getElementById('mercyPhotoPosY')?.value || 0);
   const img = document.getElementById('mercyPhotoPreview');
-  if (img) img.style.objectPosition = `${_mercyPhotoPositionX}% ${_mercyPhotoPositionY}%`;
+  if (img) {
+    const crop = Math.max(_mercyPhotoPositionX, _mercyPhotoPositionY);
+    img.style.objectFit = crop <= 1 ? 'contain' : 'cover';
+    img.style.transform = `scale(${1 + crop / 240})`;
+    img.style.objectPosition = `${50 + (_mercyPhotoPositionX - _mercyPhotoPositionY) / 8}% 50%`;
+  }
 }
 
 async function compressMercyImage(file, options = {}) {
@@ -18488,15 +18549,18 @@ async function compressMercyImage(file, options = {}) {
     if (options.crop) {
       canvas.width = Math.max(1, Math.round(1100 * scale));
       canvas.height = Math.max(1, Math.round(825 * scale));
-      const targetRatio = canvas.width / canvas.height;
-      const sourceRatio = img.width / img.height;
-      let sw = img.width;
-      let sh = img.height;
-      if (sourceRatio > targetRatio) sw = img.height * targetRatio;
-      else sh = img.width / targetRatio;
-      const sx = Math.max(0, Math.min(img.width - sw, (img.width - sw) * ((options.x ?? 50) / 100)));
-      const sy = Math.max(0, Math.min(img.height - sh, (img.height - sh) * ((options.y ?? 50) / 100)));
-      canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#f7fbfa';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const contain = Math.min(canvas.width / img.width, canvas.height / img.height);
+      const cover = Math.max(canvas.width / img.width, canvas.height / img.height);
+      const crop = Math.max(0, Math.min(100, Math.max(options.x ?? 0, options.y ?? 0))) / 100;
+      const drawScale = contain + (cover - contain) * crop;
+      const dw = img.width * drawScale;
+      const dh = img.height * drawScale;
+      const dx = (canvas.width - dw) / 2 + ((options.x ?? 0) - (options.y ?? 0)) * -1.4;
+      const dy = (canvas.height - dh) / 2;
+      ctx.drawImage(img, dx, dy, dw, dh);
     } else {
       canvas.width = Math.max(1, Math.round(img.width * scale));
       canvas.height = Math.max(1, Math.round(img.height * scale));
@@ -18514,7 +18578,7 @@ async function compressMercyImage(file, options = {}) {
 
 async function submitMercyPost() {
   const uid = window.Auth?.getCurrentUser()?.uid;
-  if (!uid || !_mercyImageBlob) { alert('Choose a photo first.'); return; }
+  if (!uid) return;
   if (_mercyOriginalImageFile) {
     const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY });
     _mercyImageBlob = finalImage.blob;
@@ -18528,6 +18592,14 @@ async function submitMercyPost() {
   if (scriptureRef && !scriptureText) { alert('Add verse text or remove the Scripture reference.'); return; }
   const friendUid = document.getElementById('mercyFriendSelect')?.value || null;
   const friendName = friendUid ? _selectedMercyFriendName() : null;
+  const extraTagged = [...document.querySelectorAll('.mercy-extra-friend-select')]
+    .map(sel => ({ uid: sel.value, name: sel.selectedOptions?.[0]?.dataset?.name || sel.selectedOptions?.[0]?.textContent || '' }))
+    .filter(f => f.uid);
+  const taggedMap = new Map();
+  if (friendUid) taggedMap.set(friendUid, friendName);
+  extraTagged.forEach(f => taggedMap.set(f.uid, f.name));
+  const taggedFriendUids = [...taggedMap.keys()];
+  const taggedFriendNames = [...taggedMap.values()].filter(Boolean);
   const btn = document.getElementById('mercySubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
   const post = {
@@ -18542,6 +18614,8 @@ async function submitMercyPost() {
     } : null,
     taggedFriendUid: friendUid,
     taggedFriendName: friendName,
+    taggedFriendUids,
+    taggedFriendNames,
     friendEncouragement: !!document.getElementById('mercyFriendEncouragement')?.checked
   };
   const authorName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
@@ -18568,6 +18642,66 @@ async function reactMercyPost(postId, label) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   await window.Mercies?.react?.(postId, uid, label);
+}
+
+function openMercyComments(postId) {
+  _sharedCommentsMode = 'mercy';
+  _mercyCommentsPostId = postId;
+  const post = _merciesPosts.find(p => p.id === postId);
+  const title = document.getElementById('communityCommentsTitle');
+  if (title) title.textContent = post?.scripture?.ref || 'Mercy Comments';
+  const input = document.getElementById('communityCommentInput');
+  if (input) input.value = '';
+  document.getElementById('communityCommentsModal')?.classList.add('open');
+  const list = document.getElementById('communityCommentsList');
+  if (list) list.innerHTML = '<p class="study-board-empty">Loading comments...</p>';
+  if (_mercyCommentsUnsub) _mercyCommentsUnsub();
+  _mercyCommentsUnsub = window.Mercies?.listenComments?.(postId, comments => {
+    const el = document.getElementById('communityCommentsList');
+    if (!el) return;
+    if (!comments.length) {
+      el.innerHTML = '<p class="community-comment-empty">No comments yet. Start the conversation.</p>';
+      return;
+    }
+    el.innerHTML = comments.map(c => `<div class="community-comment-row">
+      <span class="community-comment-avatar">${_renderAvatar(c.authorAvatar || 'person')}</span>
+      <div><strong>${_lbEscape(c.authorName || 'Someone')}</strong><p>${_lbEscape(c.body || '')}</p><small>${_communityPostTime(c)}</small></div>
+    </div>`).join('');
+  }) || null;
+}
+
+function closeMercyComments() {
+  document.getElementById('communityCommentsModal')?.classList.remove('open');
+  if (_mercyCommentsUnsub) { _mercyCommentsUnsub(); _mercyCommentsUnsub = null; }
+  _mercyCommentsPostId = null;
+}
+
+async function submitMercyComment() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const input = document.getElementById('communityCommentInput');
+  const text = input?.value.trim() || '';
+  if (!uid || !_mercyCommentsPostId || !text) return;
+  const btn = document.getElementById('communityCommentSubmit');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+  const ok = await window.Mercies?.addComment?.(_mercyCommentsPostId, uid, text);
+  if (btn) { btn.disabled = false; btn.textContent = 'Comment'; }
+  if (ok && input) input.value = '';
+}
+
+function openMercyReactions(postId) {
+  _sharedCommentsMode = 'mercy';
+  const post = _merciesPosts.find(p => p.id === postId);
+  const people = document.getElementById('communityReactionPeople');
+  if (!post || !people) return;
+  const entries = Object.values(post.reactions || {}).map(value =>
+    typeof value === 'string'
+      ? { label: value, name: 'Friend', avatar: 'person' }
+      : { label: value?.label, name: value?.name || 'Friend', avatar: value?.avatar || 'person' }
+  ).filter(r => r.label);
+  people.innerHTML = entries.length
+    ? entries.map(r => `<div class="community-reaction-person"><span>${_renderAvatar(r.avatar)}</span><strong>${_lbEscape(r.name)}</strong><em>${_lbEscape(r.label)}</em></div>`).join('')
+    : '<p class="community-comment-empty">No reactions yet.</p>';
+  document.getElementById('communityReactionsModal')?.classList.add('open');
 }
 
 async function deleteMercyPost(postId) {
@@ -18610,11 +18744,14 @@ function mercyDb() {
   });
 }
 
-async function saveMercyToJournal(postId, postOverride = null) {
+async function saveMercyToJournal(postId, postOverride = null, button = null) {
   const post = postOverride || _merciesPosts.find(p => p.id === postId);
   if (!post) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
   const remoteId = uid && window.Mercies?.saveJournal ? await window.Mercies.saveJournal(uid, post) : null;
+  if (uid && !post.journalSavedBy?.includes(uid)) {
+    post.journalSavedBy = [...(post.journalSavedBy || []), uid];
+  }
   const db = await mercyDb();
   const tx = db.transaction('entries', 'readwrite');
   tx.objectStore('entries').put({
@@ -18630,9 +18767,16 @@ async function saveMercyToJournal(postId, postOverride = null) {
     scriptureCard: post.scriptureCard || null,
     taggedFriendUid: post.taggedFriendUid || null,
     taggedFriendName: post.taggedFriendName || null,
+    taggedFriendUids: post.taggedFriendUids || [],
+    taggedFriendNames: post.taggedFriendNames || [],
     friendEncouragement: !!post.friendEncouragement
   });
   await new Promise(resolve => tx.oncomplete = resolve);
+  if (button) {
+    button.classList.add('saved', 'just-saved');
+    button.innerHTML = '<span class="material-symbols-outlined">bookmark_added</span>Saved';
+    setTimeout(() => button.classList.remove('just-saved'), 900);
+  }
   startMerciesJournal();
 }
 
@@ -18670,16 +18814,20 @@ function startMerciesJournal() {
 function renderMerciesJournalEntries(entries = []) {
   const list = document.getElementById('merciesJournalList');
   if (!list) return;
-  list.innerHTML = entries.length ? entries.map(e => `<article class="mercy-card mercy-journal-card">
+  list.innerHTML = entries.length ? entries.map(e => {
+    const img = e.imageUrl || e.imageDataUrl || '';
+    const tags = e.taggedFriendNames?.length ? e.taggedFriendNames : (e.taggedFriendName ? [e.taggedFriendName] : []);
+    return `<article class="mercy-card mercy-journal-card">
     <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div></div>
-    <div class="mercy-media"><div class="mercy-slide"><img loading="lazy" src="${_lbEscape(e.imageUrl || e.imageDataUrl || '')}" alt="Saved Mercy"></div></div>
+    ${img ? `<div class="mercy-media"><div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Mercy"></div></div>` : ''}
     <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
     ${e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : ''}
     <div class="mercy-chips">
-      ${e.taggedFriendName ? `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(e.taggedFriendName)}</span>` : ''}
+      ${tags.map(name => `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(name)}</span>`).join('')}
       <button onclick="deleteMercyJournalEntry('${e.id || e.localId}')"><span class="material-symbols-outlined">delete</span>Delete</button>
     </div>
-  </article>`).join('') : '<p class="study-board-empty">No saved Mercies yet.</p>';
+  </article>`;
+  }).join('') : '<p class="study-board-empty">No saved Mercies yet.</p>';
 }
 
 async function cacheMercyJournalEntries(entries = []) {
@@ -18990,6 +19138,7 @@ async function prayForCommunityPost(postId) {
 }
 
 function openCommunityComments(postId) {
+  _sharedCommentsMode = 'community';
   _communityCommentsPostId = postId;
   const post = _communityPosts.find(p => p.id === postId);
   const title = document.getElementById('communityCommentsTitle');
@@ -19020,6 +19169,16 @@ function closeCommunityComments() {
   _communityCommentsPostId = null;
 }
 
+function closeSharedPostComments() {
+  if (_sharedCommentsMode === 'mercy') closeMercyComments();
+  else closeCommunityComments();
+}
+
+function submitSharedPostComment() {
+  if (_sharedCommentsMode === 'mercy') return submitMercyComment();
+  return submitCommunityComment();
+}
+
 async function submitCommunityComment() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   const input = document.getElementById('communityCommentInput');
@@ -19033,6 +19192,7 @@ async function submitCommunityComment() {
 }
 
 function openCommunityReactions(postId) {
+  _sharedCommentsMode = 'community';
   const post = _communityPosts.find(p => p.id === postId);
   const people = document.getElementById('communityReactionPeople');
   if (!post || !people) return;
@@ -19048,6 +19208,10 @@ function openCommunityReactions(postId) {
 }
 
 function closeCommunityReactions() {
+  document.getElementById('communityReactionsModal')?.classList.remove('open');
+}
+
+function closeSharedPostReactions() {
   document.getElementById('communityReactionsModal')?.classList.remove('open');
 }
 

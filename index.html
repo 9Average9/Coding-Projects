@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.46" rel="stylesheet"/>
+<link href="style.css?v=3.0.47" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8562,7 +8562,7 @@ Verb Endings
 <div class="mercies-actions">
 <button class="mercies-primary" onclick="openMercyComposer()">
 <span class="mercies-action-icon material-symbols-outlined">photo_camera</span>
-<span><strong>Post a Mercy</strong><small>Share a blessing, inspire others.</small></span>
+<span><strong>Post a Mercy</strong><small>Share a blessing, encourage others.</small></span>
 <span class="material-symbols-outlined mercies-action-chev">chevron_right</span>
 </button>
 <button class="mercies-secondary" onclick="showMerciesView('journal')">
@@ -8574,9 +8574,8 @@ Verb Endings
 <div class="mercies-section-head">
 <button class="mercies-section-title active" data-mercy-view="feed" onclick="showMerciesView('feed')">Feed</button>
 <select id="merciesFilterSelect" onchange="setMerciesFilter(this.value)">
-<option value="latest">Latest</option>
-<option value="mine">My Mercies</option>
-<option value="encouragement">Encouragements</option>
+<option value="latest">Newest</option>
+<option value="oldest">Oldest</option>
 <option value="scripture">With Scripture</option>
 </select>
 </div>
@@ -8587,9 +8586,9 @@ Verb Endings
 <button class="mercies-load-more hidden" id="merciesLoadMore" onclick="loadMoreMercies()">Load more</button>
 </div>
 <div class="mercies-view" id="merciesJournalView">
-<div class="mercies-section-head">
-<button class="mercies-section-title" onclick="showMerciesView('feed')">Feed</button>
+<div class="mercies-journal-head">
 <span class="mercies-section-title active">Journal</span>
+<button class="mercies-back-feed" onclick="showMerciesView('feed')"><span class="material-symbols-outlined">arrow_back</span>Back to Feed</button>
 </div>
 <div class="mercies-journal-note">
 <span class="material-symbols-outlined">lock</span>
@@ -9729,14 +9728,15 @@ Verb Endings
 <strong>Select or take a photo</strong>
 <small>The app uploads an optimized feed image, not the original full-size photo.</small>
 </label>
+<button class="mercy-no-photo-btn" type="button" onclick="clearMercyPhoto()"><span class="material-symbols-outlined">edit_note</span>Post without a photo</button>
 <div class="mercy-photo-preview hidden" id="mercyPhotoPreviewWrap">
 <img id="mercyPhotoPreview" alt="Mercy preview"/>
 <button type="button" onclick="clearMercyPhoto()">Change photo</button>
 </div>
 <div class="mercy-photo-editor hidden" id="mercyPhotoEditor">
-<label>Horizontal crop<input id="mercyPhotoPosX" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
-<label>Vertical crop<input id="mercyPhotoPosY" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
-<small>Adjust how the photo sits inside the feed card.</small>
+<label>Horizontal crop<input id="mercyPhotoPosX" type="range" min="0" max="100" value="0" oninput="updateMercyPhotoPosition()"/></label>
+<label>Vertical crop<input id="mercyPhotoPosY" type="range" min="0" max="100" value="0" oninput="updateMercyPhotoPosition()"/></label>
+<small>0 keeps the full picture visible. Raise the sliders to crop tighter for the feed card preview.</small>
 </div>
 <div class="mercy-field">
 <label>Prompt</label>
@@ -9749,6 +9749,8 @@ Verb Endings
 </div>
 <div class="mercy-friend-row">
 <select id="mercyFriendSelect" onchange="onMercyFriendChanged()"><option value="">Tag one friend (optional)</option></select>
+<div class="mercy-extra-friends" id="mercyExtraFriends"></div>
+<button class="mercy-add-friend" id="mercyAddFriendBtn" type="button" onclick="addMercyFriendTag()"><span class="material-symbols-outlined">add</span>Add another friend</button>
 </div>
 <textarea id="mercyBody" maxlength="700" placeholder="Write your response..."></textarea>
 <section class="mercy-scripture-box">
@@ -15646,10 +15648,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.46"></script>
+<script src="app.js?v=3.0.47"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.46" type="module"></script>
+<script src="firebase-lb.js?v=3.0.47" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -16024,22 +16026,22 @@ Verb Endings
 </div>
 </div>
 <!-- Community Post Comments -->
-<div class="modal-overlay" id="communityCommentsModal" onclick="if(event.target===this)closeCommunityComments()">
+<div class="modal-overlay" id="communityCommentsModal" onclick="if(event.target===this)closeSharedPostComments()">
 <div class="modal-card community-comments-card" onclick="event.stopPropagation()">
-<button class="modal-close" onclick="closeCommunityComments()">&times;</button>
+<button class="modal-close" onclick="closeSharedPostComments()">&times;</button>
 <div class="cpc-kicker"><span class="material-symbols-outlined">chat_bubble</span> Comments</div>
 <h2 id="communityCommentsTitle">Post Comments</h2>
 <div class="community-comments-list" id="communityCommentsList"></div>
 <div class="community-comment-compose">
 <textarea id="communityCommentInput" maxlength="500" placeholder="Add a thoughtful comment..."></textarea>
-<button class="main-btn" id="communityCommentSubmit" onclick="submitCommunityComment()">Comment</button>
+<button class="main-btn" id="communityCommentSubmit" onclick="submitSharedPostComment()">Comment</button>
 </div>
 </div>
 </div>
 <!-- Community Reaction People -->
-<div class="modal-overlay" id="communityReactionsModal" onclick="if(event.target===this)closeCommunityReactions()">
+<div class="modal-overlay" id="communityReactionsModal" onclick="if(event.target===this)closeSharedPostReactions()">
 <div class="modal-card community-reactions-card" onclick="event.stopPropagation()">
-<button class="modal-close" onclick="closeCommunityReactions()">&times;</button>
+<button class="modal-close" onclick="closeSharedPostReactions()">&times;</button>
 <div class="cpc-kicker"><span class="material-symbols-outlined">favorite</span> Reactions</div>
 <h2>Who Reacted</h2>
 <div class="community-reaction-people" id="communityReactionPeople"></div>

@@ -502,6 +502,10 @@ exports.onEncouragementCreated = functions.firestore
     } else if (type === "mercyPostedTagged") {
       title = "New Mercy";
       body = `${fromName} posted a Mercy about you.`;
+    } else if (type === "mercyComment") {
+      const postTitle = snap.data().postTitle || "your Mercy";
+      title = "New Mercy Comment";
+      body = `${fromName} commented on "${postTitle}".`;
     } else if (type === "encouragement") {
       title = "Study Encouragement";
       body = `${fromName} is encouraging you to study your Greek!`;

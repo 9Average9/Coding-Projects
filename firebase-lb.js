@@ -1167,6 +1167,7 @@ function listenMerciesPosts(uid, friendUids = [], callback) {
     const uids = [];
     posts.forEach(post => {
       uids.push(post.authorUid, post.taggedFriendUid);
+      (post.taggedFriendUids || []).forEach(tagUid => uids.push(tagUid));
       Object.keys(post.reactions || {}).forEach(reactUid => uids.push(reactUid));
     });
     const users = await getUsersByUid(uids);
@@ -1188,6 +1189,7 @@ function listenMerciesPosts(uid, friendUids = [], callback) {
         authorName: author?.displayName || author?.username || post.authorName,
         authorAvatar: author?.avatar || post.authorAvatar,
         taggedFriendName: users.get(post.taggedFriendUid)?.displayName || post.taggedFriendName || null,
+        taggedFriendNames: (post.taggedFriendUids || []).map(tagUid => users.get(tagUid)?.displayName || users.get(tagUid)?.username).filter(Boolean).concat(post.taggedFriendNames || []).filter((name, i, arr) => name && arr.indexOf(name) === i),
         reactions
       };
     }));
@@ -1203,14 +1205,17 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       post = imageBlob;
       imageBlob = post.imageBlob || post.optimizedImageBlob || post.blob || null;
     }
-    if (!imageBlob) return null;
     const now = Date.now();
-    const ext = imageBlob.type?.includes("webp") ? "webp" : "jpg";
     const ref = doc(collection(db, "merciesPosts"));
-    const imagePath = `mercies/${uid}/${ref.id}.${ext}`;
-    const imageRef = storageRef(storage, imagePath);
-    await uploadBytes(imageRef, imageBlob, { contentType: imageBlob.type || "image/jpeg" });
-    const imageUrl = await getDownloadURL(imageRef);
+    let imagePath = null;
+    let imageUrl = null;
+    if (imageBlob) {
+      const ext = imageBlob.type?.includes("webp") ? "webp" : "jpg";
+      imagePath = `mercies/${uid}/${ref.id}.${ext}`;
+      const imageRef = storageRef(storage, imagePath);
+      await uploadBytes(imageRef, imageBlob, { contentType: imageBlob.type || "image/jpeg" });
+      imageUrl = await getDownloadURL(imageRef);
+    }
     const audienceUids = [...new Set([uid, ...(friendUids || [])])];
     await setDoc(ref, {
       authorUid: uid,
@@ -1225,6 +1230,8 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       scriptureCard: post.scriptureCard || null,
       taggedFriendUid: post.taggedFriendUid || null,
       taggedFriendName: post.taggedFriendName || null,
+      taggedFriendUids: post.taggedFriendUids || (post.taggedFriendUid ? [post.taggedFriendUid] : []),
+      taggedFriendNames: post.taggedFriendNames || (post.taggedFriendName ? [post.taggedFriendName] : []),
       friendEncouragement: !!post.friendEncouragement,
       audienceUids,
       reactions: {},
@@ -1241,7 +1248,7 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
         mercyPostId: ref.id
       });
     }
-    return ref.id;
+    return { id: ref.id, imageUrl, imagePath, createdAtMs: now };
   } catch (e) {
     console.warn("addMercyPost:", e);
     return null;
@@ -1294,6 +1301,50 @@ async function reactMercyPost(postId, uid, label) {
   }
 }
 
+function mercyPostTitle(post = {}) {
+  const raw = post.scripture?.ref || post.promptCategory || post.body || "your Mercy";
+  const text = String(raw).replace(/\s+/g, " ").trim();
+  return text.length > 46 ? text.slice(0, 43) + "..." : text || "your Mercy";
+}
+
+function listenMercyComments(postId, callback) {
+  const q = query(collection(db, "merciesPosts", postId, "comments"), orderBy("createdAtMs", "asc"), limit(80));
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    err => { console.warn("listenMercyComments:", err); callback([]); });
+}
+
+async function addMercyComment(postId, uid, text) {
+  try {
+    const clean = String(text || "").trim();
+    if (!clean) return false;
+    const postRef = doc(db, "merciesPosts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return false;
+    const post = postSnap.data();
+    const fromName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "Someone";
+    const fromAvatar = getAvatar();
+    await addDoc(collection(db, "merciesPosts", postId, "comments"), {
+      body: clean,
+      authorUid: uid,
+      authorName: fromName,
+      authorAvatar: fromAvatar,
+      createdAt: serverTimestamp(),
+      createdAtMs: Date.now()
+    });
+    await updateDoc(postRef, { commentCount: increment(1) });
+    if (post.authorUid && post.authorUid !== uid) {
+      fcmSendPushNotification(post.authorUid, "mercyComment", fromName, uid, {
+        mercyPostId: postId,
+        postTitle: mercyPostTitle(post)
+      });
+    }
+    return true;
+  } catch (e) {
+    console.warn("addMercyComment:", e);
+    return false;
+  }
+}
+
 async function deleteMercyPost(postId, uid) {
   try {
     const ref = doc(db, "merciesPosts", postId);
@@ -1330,6 +1381,8 @@ function mercyJournalPayload(uid, post = {}) {
     scriptureCard: post.scriptureCard || null,
     taggedFriendUid: post.taggedFriendUid || null,
     taggedFriendName: post.taggedFriendName || null,
+    taggedFriendUids: post.taggedFriendUids || [],
+    taggedFriendNames: post.taggedFriendNames || [],
     friendEncouragement: !!post.friendEncouragement,
     isDeleted: false
   };
@@ -1435,6 +1488,8 @@ window.Mercies = {
   listen: listenMerciesPosts,
   add: addMercyPost,
   react: reactMercyPost,
+  listenComments: listenMercyComments,
+  addComment: addMercyComment,
   delete: deleteMercyPost,
   saveJournal: saveMercyJournalEntry,
   listenJournal: listenMercyJournal,

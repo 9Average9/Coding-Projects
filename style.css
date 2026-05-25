@@ -18326,7 +18326,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   background: rgba(255,255,255,0.78); color: var(--font-color);
   box-shadow: 0 10px 24px rgba(0,0,0,0.06);
 }
-.mercies-actions { display: grid; gap: 14px; }
+.mercies-actions { display: grid; gap: 12px; background: transparent; }
 .mercies-primary,
 .mercies-secondary,
 .mercies-load-more,
@@ -18346,13 +18346,18 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercies-secondary { background: rgba(255,255,255,0.86); color: var(--font-color); border: 1px solid color-mix(in srgb, var(--secondary-color) 12%, rgba(0,0,0,0.08)); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
 .mercies-actions strong { display: block; font-size: 1.25rem; font-family: Georgia, 'Times New Roman', serif; line-height: 1.05; }
 .mercies-actions small { display: block; margin-top: 5px; font-size: 0.86rem; color: currentColor; opacity: 0.78; font-weight: 700; line-height: 1.25; }
-.mercies-action-icon { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; line-height: 1; background: rgba(255,255,255,0.13); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); flex: 0 0 auto; }
+.mercies-action-icon { width: 58px; height: 58px; border-radius: 50%; display: flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; padding: 0 !important; text-align: center; background: rgba(255,255,255,0.13); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); flex: 0 0 auto; }
+.mercies-action-icon.material-symbols-outlined { font-size: 2rem; font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 32; }
 .mercies-secondary .mercies-action-icon { background: color-mix(in srgb, var(--secondary-color) 9%, white); color: var(--secondary-color); }
 .mercies-action-chev { margin-left: auto; }
 .mercies-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.mercies-section-head.hidden { display: none !important; }
 .mercies-section-title { border: none; background: transparent; color: var(--font-color); font-family: Georgia, 'Times New Roman', serif; font-size: 1.55rem; font-weight: 850; padding: 0 0 8px; position: relative; }
 .mercies-section-title.active::after { content: ""; position: absolute; left: 0; bottom: 0; width: 48px; height: 4px; border-radius: 999px; background: var(--secondary-color); }
-#merciesFilterSelect { border: none; background: transparent; color: var(--muted-color); font-weight: 850; font: inherit; padding: 6px 2px; outline: none; }
+#merciesFilterSelect { width: auto; max-width: 130px; border: none; background: transparent; color: var(--muted-color); font-weight: 850; font: inherit; padding: 6px 18px 6px 2px; outline: none; text-align: right; }
+.mercies-journal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mercies-back-feed { border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent); border-radius: 999px; padding: 9px 12px; display: inline-flex; align-items: center; gap: 5px; color: var(--secondary-color); background: rgba(255,255,255,0.78); font-weight: 900; }
+.mercies-back-feed .material-symbols-outlined { font-size: 1rem; }
 .mercies-view { display: none; }
 .mercies-view.active { display: grid; gap: 14px; }
 .mercies-feed { display: grid; gap: 16px; }
@@ -18368,7 +18373,9 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-avatar .avatar-photo-img { width: 100%; height: 100%; object-fit: cover; }
 .mercy-card-top strong { display: block; color: var(--font-color); }
 .mercy-card-top small { color: var(--muted-color); font-size: 0.74rem; }
-.mercy-category { margin-left: auto; border-radius: 999px; padding: 7px 10px; color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 9%, white); font-size: 0.7rem; font-weight: 900; }
+.mercy-category { margin-left: auto; border-radius: 999px; padding: 7px 10px; color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 9%, white); font-size: 0.7rem; font-weight: 900; white-space: nowrap; }
+.mercy-scripture-chip { margin-left: 0; display: inline-flex; align-items: center; gap: 4px; }
+.mercy-scripture-chip .material-symbols-outlined { font-size: .95rem; }
 .mercy-media {
   display: grid;
   grid-auto-flow: column;
@@ -18401,6 +18408,19 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-reactions button { border: none; border-radius: 999px; padding: 9px 11px; color: var(--font-color); background: rgba(0,0,0,0.045); font-weight: 850; }
 .mercy-reactions button.active { color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 13%, white); }
 .mercy-reactions small { margin-left: 4px; }
+.mercy-owner-actions,
+.mercy-social-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.mercy-owner-actions { justify-content: space-between; }
+.mercy-owner-actions button,
+.mercy-social-row button { border: none; border-radius: 999px; min-height: 42px; padding: 9px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 900; }
+.mercy-journal-action { color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 9%, white); }
+.mercy-journal-action.saved { color: #fff; background: var(--secondary-color); }
+.mercy-journal-action.just-saved { animation: mercySavedPop .65s ease both; }
+.mercy-delete-action { margin-left: auto; color: #a33; background: rgba(163, 51, 51, .08); }
+.mercy-social-row { justify-content: space-between; }
+.mercy-social-row .cp-comment-btn { color: var(--font-color); background: rgba(0,0,0,0.045); }
+.mercy-reaction-stack { position: static; margin-left: auto; transform: none; }
+@keyframes mercySavedPop { 0% { transform: scale(1); } 45% { transform: scale(1.08); } 100% { transform: scale(1); } }
 .mercies-empty,
 .mercies-journal-note { border-radius: 24px; padding: 22px; text-align: center; background: rgba(255,255,255,0.72); color: var(--muted-color); border: 1px solid color-mix(in srgb, var(--secondary-color) 12%, transparent); }
 .mercies-journal-note { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: left; }
@@ -18408,11 +18428,12 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-settings-card { max-width: 480px; max-height: 86vh; overflow-y: auto; }
 .mercy-photo-picker { min-height: 190px; border: 2px dashed color-mix(in srgb, var(--secondary-color) 30%, transparent); border-radius: 24px; display: grid; place-items: center; text-align: center; gap: 6px; color: var(--secondary-color); background: color-mix(in srgb, var(--secondary-color) 6%, white); padding: 18px; margin: 14px 0; }
 .mercy-photo-picker .material-symbols-outlined { font-size: 2.4rem; }
+.mercy-no-photo-btn { width: 100%; border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent); border-radius: 16px; padding: 11px; color: var(--secondary-color); background: rgba(255,255,255,.78); display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 900; margin: -5px 0 10px; }
 .mercy-photo-picker small,
 .mercy-save-row small,
 .mercy-setting-row small { display: block; color: var(--muted-color); font-size: 0.75rem; margin-top: 2px; }
 .mercy-photo-preview { position: relative; border-radius: 24px; overflow: hidden; margin: 14px 0; }
-.mercy-photo-preview img { width: 100%; aspect-ratio: 4 / 3; max-height: 280px; object-fit: cover; display: block; }
+.mercy-photo-preview img { width: 100%; aspect-ratio: 4 / 3; max-height: 280px; object-fit: contain; display: block; background: color-mix(in srgb, var(--secondary-color) 6%, white); transform-origin: center; transition: transform .12s ease, object-fit .12s ease; }
 .mercy-photo-preview button { position: absolute; right: 10px; bottom: 10px; border: none; border-radius: 999px; padding: 8px 12px; color: var(--secondary-color); background: rgba(255,255,255,0.88); font-weight: 900; }
 .mercy-photo-editor { display: grid; gap: 8px; margin: 0 0 14px; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent); }
 .mercy-photo-editor.hidden { display: none; }
@@ -18429,9 +18450,26 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-scripture-box input,
 .mercy-scripture-box textarea,
 .mercy-card-options select,
-.mercy-settings-card input[type="time"] { width: 100%; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent); padding: 11px; color: var(--font-color); background: rgba(255,255,255,0.9); font: inherit; }
+.mercy-settings-card input[type="time"] { width: 100%; max-width: 100%; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent); padding: 11px; color: var(--font-color); background: rgba(255,255,255,0.9); font: inherit; box-sizing: border-box; }
+.mercy-field select,
+.mercy-friend-row select,
+.mercy-scripture-box select,
+.mercy-card-options select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--secondary-color) 50%), linear-gradient(135deg, var(--secondary-color) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 52%, calc(100% - 12px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+}
 .mercy-composer-card textarea { min-height: 96px; resize: vertical; }
 .mercy-friend-row { display: grid; gap: 8px; }
+.mercy-extra-friends { display: grid; gap: 8px; }
+.mercy-extra-friend-row { display: grid; grid-template-columns: minmax(0, 1fr) 42px; gap: 8px; align-items: center; }
+.mercy-extra-friend-row button,
+.mercy-add-friend { border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--secondary-color) 7%, white); color: var(--secondary-color); min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 900; }
+.mercy-add-friend:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.2); }
 .mercy-scripture-box { border-radius: 20px; padding: 12px; background: color-mix(in srgb, var(--secondary-color) 7%, white); border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent); }
 .mercy-toggle-card {
   display: grid;
@@ -18513,13 +18551,17 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-font-rounded { font-family: ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif; }
 .mercy-font-elegant { font-family: Georgia, Cambria, 'Times New Roman', serif; }
 .mercy-save-row,
-.mercy-setting-row { grid-template-columns: auto 1fr; align-items: center; }
-.mercy-setting-row { grid-template-columns: 1fr auto; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); }
+.mercy-setting-row { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+.mercy-setting-row { grid-template-columns: minmax(0, 1fr) auto; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); max-width: 100%; box-sizing: border-box; }
+.mercy-settings-card input[type="time"] { margin: -4px 0 8px; }
+.mercy-settings-card { overflow-x: hidden; }
 @media (max-width: 420px) {
   .mercies-actions { grid-template-columns: 1fr; }
   .mercy-slide { min-height: 280px; }
   .mercy-ref-grid,
   .mercy-card-options { grid-template-columns: 1fr; }
+  .mercy-card-top { flex-wrap: wrap; }
+  .mercy-category { margin-left: 0; }
 }
 .community-post-composer { max-width: 460px; }
 .cpc-kicker {
