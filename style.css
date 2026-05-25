@@ -18774,17 +18774,29 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 .mercy-settings-title-row h2 { margin-bottom: 8px; }
 .mercy-info-btn {
-  width: 44px;
-  height: 44px;
   border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
   border-radius: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   color: var(--secondary-color);
   background: color-mix(in srgb, var(--secondary-color) 7%, white);
   box-shadow: 0 8px 18px rgba(0,0,0,.06);
+  font-weight: 900;
+}
+.mercy-info-btn:not(.mercy-info-row) {
+  width: 44px;
+  height: 44px;
   flex: 0 0 auto;
+}
+.mercy-info-row {
+  width: 100%;
+  min-height: 44px;
+  margin: 2px 0 12px;
+  padding: 10px 12px;
+  justify-content: flex-start;
+  text-align: left;
 }
 .praise-info-card .praise-info-verses {
   color: var(--secondary-color);

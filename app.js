@@ -16878,9 +16878,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.57";
+const APP_VERSION = "3.0.58";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.58 &mdash; Praise Photo Upload Fix</div>
+<ul>
+  <li><strong>Praise photo uploads fixed</strong> by keeping optimized images under the Firebase Storage rule limit.</li>
+  <li><strong>Praises settings info button moved</strong> so it no longer sits underneath the modal close button.</li>
+</ul>
 <div class="un-version-label">v3.0.57 &mdash; Praises Posting + Streak Fix</div>
 <ul>
   <li><strong>Praises posting hardened</strong> so the composer waits for Firebase, resets cleanly after errors, and no longer gets tangled with the first-open coach.</li>
@@ -18988,7 +18993,7 @@ async function compressMercyImage(file, options = {}) {
     canvas.height = Math.max(1, Math.round(img.height * scale));
     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
     blob = await new Promise(resolve => canvas.toBlob(resolve, type, quality));
-    if (blob && blob.size <= 520 * 1024) break;
+    if (blob && blob.size <= 360 * 1024) break;
     quality = Math.max(0.52, quality - 0.06);
     scale *= 0.86;
   }
