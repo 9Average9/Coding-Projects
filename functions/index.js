@@ -310,14 +310,13 @@ exports.sendScheduledReminders = functions.pubsub
   .onRun(async () => {
     const now = new Date();
     await backfillReminderNextSendAt(now);
+    await backfillMercyReminderNextSendAt(now);
 
     const snap = await db.collection("users")
       .where("reminder.enabled", "==", true)
       .where("reminder.nextSendAt", "<=", now)
       .limit(100)
       .get();
-
-    if (snap.empty) return null;
 
     for (const userDoc of snap.docs) {
       const data = userDoc.data();
@@ -412,6 +411,36 @@ exports.sendScheduledReminders = functions.pubsub
 
     return null;
   });
+
+async function backfillMercyReminderNextSendAt(now) {
+  if (now.getUTCMinutes() !== 0) return;
+  const [dailySnap, friendSnap] = await Promise.all([
+    db.collection("users").where("mercyReminder.enabled", "==", true).limit(500).get(),
+    db.collection("users").where("mercyFriendReminder.enabled", "==", true).limit(500).get()
+  ]);
+  const batch = db.batch();
+  let updates = 0;
+  dailySnap.docs.forEach(userDoc => {
+    const reminder = userDoc.data().mercyReminder || {};
+    if (reminder.nextSendAt || !reminder.time) return;
+    const nextSendAt = calculateNextReminderDate(reminder, now);
+    if (!nextSendAt) return;
+    batch.update(userDoc.ref, { "mercyReminder.nextSendAt": nextSendAt });
+    updates++;
+  });
+  friendSnap.docs.forEach(userDoc => {
+    const reminder = userDoc.data().mercyFriendReminder || {};
+    if (reminder.nextSendAt || !reminder.time) return;
+    const nextSendAt = calculateNextMercyFriendDate(reminder, now);
+    if (!nextSendAt) return;
+    batch.update(userDoc.ref, { "mercyFriendReminder.nextSendAt": nextSendAt });
+    updates++;
+  });
+  if (updates) {
+    await batch.commit();
+    console.log(`Backfilled nextSendAt for ${updates} Mercy reminder users`);
+  }
+}
 
 exports.onUserReminderWritten = functions.firestore
   .document("users/{uid}")

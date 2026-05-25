@@ -110,7 +110,9 @@ let _mercyImageDataUrl = null;
 let _mercyOriginalImageFile = null;
 let _mercyPhotoPositionX = 50;
 let _mercyPhotoPositionY = 50;
+let _mercyPhotoZoom = 0;
 let _mercyPhotoPreviewUrl = null;
+let _mercyPostWithoutPhoto = false;
 let _mercyPromptMode = 'regular';
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -16793,7 +16795,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.47";
+const APP_VERSION = "3.0.48";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18323,6 +18325,7 @@ function openMercyComposer(prefill = {}) {
   if (!window.Auth?.getCurrentUser()) { alert('Sign in to post a Mercy.'); return; }
   _mercyImageBlob = null;
   _mercyImageDataUrl = null;
+  _mercyPostWithoutPhoto = false;
   _mercyPromptMode = prefill.friendUid ? 'friend' : 'regular';
   clearMercyPhoto();
   _populateMercyPromptSelect(prefill.promptText);
@@ -18330,6 +18333,8 @@ function openMercyComposer(prefill = {}) {
   populateMercyBooks();
   const friendMode = document.getElementById('mercyFriendEncouragement');
   if (friendMode) friendMode.checked = !!prefill.friendUid;
+  const noPhoto = document.getElementById('mercyNoPhoto');
+  if (noPhoto) noPhoto.checked = false;
   const extraFriends = document.getElementById('mercyExtraFriends');
   if (extraFriends) extraFriends.innerHTML = '';
   const scriptureToggle = document.getElementById('mercyAttachScripture');
@@ -18339,6 +18344,7 @@ function openMercyComposer(prefill = {}) {
   document.getElementById('mercyScriptureText').value = '';
   toggleMercyScripture();
   document.getElementById('mercySaveThis').checked = localStorage.getItem('merciesAutoSave') === 'true';
+  toggleMercyNoPhoto();
   document.getElementById('mercyComposerModal')?.classList.add('open');
 }
 
@@ -18356,18 +18362,8 @@ function _populateMercyPromptSelect(selectedText) {
 
 function _populateMercyFriendSelect(selectedUid = '') {
   const sel = document.getElementById('mercyFriendSelect');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">Tag one friend (optional)</option>';
-  (friendsList || []).forEach(uid => {
-    window.Friends?.getUser(uid).then(u => {
-      const name = u?.displayName || u?.username || 'Friend';
-      const opt = document.createElement('option');
-      opt.value = uid; opt.textContent = name; opt.dataset.name = name;
-      if (uid === selectedUid) opt.selected = true;
-      sel.appendChild(opt);
-      _populateMercyPromptSelect();
-    }).catch(() => {});
-  });
+  _fillMercyFriendSelect(sel, selectedUid, 'Tag one friend (optional)');
+  setTimeout(() => _populateMercyPromptSelect(), 150);
 }
 
 function addMercyFriendTag(selectedUid = '') {
@@ -18375,18 +18371,38 @@ function addMercyFriendTag(selectedUid = '') {
   if (!wrap || document.getElementById('mercyFriendEncouragement')?.checked) return;
   const row = document.createElement('div');
   row.className = 'mercy-extra-friend-row';
-  row.innerHTML = `<select class="mercy-extra-friend-select"><option value="">Tag another friend</option></select><button type="button" aria-label="Remove friend tag" onclick="this.closest('.mercy-extra-friend-row')?.remove()"><span class="material-symbols-outlined">close</span></button>`;
+  row.innerHTML = `<select class="mercy-extra-friend-select" onchange="updateMercyFriendOptions()"><option value="">Tag another friend</option></select><button type="button" aria-label="Remove friend tag" onclick="this.closest('.mercy-extra-friend-row')?.remove(); updateMercyFriendOptions();"><span class="material-symbols-outlined">close</span></button>`;
   wrap.appendChild(row);
   const sel = row.querySelector('select');
+  _fillMercyFriendSelect(sel, selectedUid, 'Tag another friend');
+}
+
+function _selectedMercyFriendUids() {
+  return [
+    document.getElementById('mercyFriendSelect')?.value || '',
+    ...[...document.querySelectorAll('.mercy-extra-friend-select')].map(sel => sel.value || '')
+  ].filter(Boolean);
+}
+
+function _fillMercyFriendSelect(sel, selectedUid = '', placeholder = 'Tag one friend (optional)') {
+  if (!sel) return;
+  sel.innerHTML = `<option value="">${placeholder}</option>`;
+  const selected = new Set(_selectedMercyFriendUids().filter(uid => uid !== selectedUid));
   (friendsList || []).forEach(uid => {
     window.Friends?.getUser(uid).then(u => {
       const name = u?.displayName || u?.username || 'Friend';
       const opt = document.createElement('option');
       opt.value = uid; opt.textContent = name; opt.dataset.name = name;
+      opt.disabled = selected.has(uid);
       if (uid === selectedUid) opt.selected = true;
       sel.appendChild(opt);
     }).catch(() => {});
   });
+}
+
+function updateMercyFriendOptions() {
+  _fillMercyFriendSelect(document.getElementById('mercyFriendSelect'), document.getElementById('mercyFriendSelect')?.value || '', 'Tag one friend (optional)');
+  document.querySelectorAll('.mercy-extra-friend-select').forEach(sel => _fillMercyFriendSelect(sel, sel.value || '', 'Tag another friend'));
 }
 
 function _selectedMercyFriendName() {
@@ -18405,6 +18421,7 @@ function toggleMercyFriendMode() {
 
 function onMercyFriendChanged() {
   _populateMercyPromptSelect();
+  updateMercyFriendOptions();
 }
 
 function onMercyPromptChanged() {}
@@ -18484,18 +18501,24 @@ async function handleMercyPhotoSelected(input) {
   if (!file) return;
   try {
     _mercyOriginalImageFile = file;
-    _mercyPhotoPositionX = 0;
-    _mercyPhotoPositionY = 0;
+    _mercyPostWithoutPhoto = false;
+    const noPhoto = document.getElementById('mercyNoPhoto');
+    if (noPhoto) noPhoto.checked = false;
+    _mercyPhotoPositionX = 50;
+    _mercyPhotoPositionY = 50;
+    _mercyPhotoZoom = 0;
     if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
     _mercyPhotoPreviewUrl = URL.createObjectURL(file);
-    const result = await compressMercyImage(file, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY });
+    const result = await compressMercyImage(file, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY, zoom: _mercyPhotoZoom });
     _mercyImageBlob = result.blob;
     _mercyImageDataUrl = result.dataUrl;
     document.getElementById('mercyPhotoPreview').src = _mercyPhotoPreviewUrl;
     const x = document.getElementById('mercyPhotoPosX');
     const y = document.getElementById('mercyPhotoPosY');
-    if (x) x.value = '0';
-    if (y) y.value = '0';
+    const z = document.getElementById('mercyPhotoZoom');
+    if (x) x.value = '50';
+    if (y) y.value = '50';
+    if (z) z.value = '0';
     updateMercyPhotoPosition();
     document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
     document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
@@ -18513,18 +18536,34 @@ function clearMercyPhoto() {
   _mercyPhotoPreviewUrl = null;
   document.getElementById('mercyPhotoPreviewWrap')?.classList.add('hidden');
   document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
+  document.getElementById('mercyCropGrid')?.classList.add('hidden');
   document.getElementById('mercyPhotoPicker')?.classList.remove('hidden');
 }
 
+function toggleMercyNoPhoto() {
+  _mercyPostWithoutPhoto = !!document.getElementById('mercyNoPhoto')?.checked;
+  document.getElementById('mercyPhotoPicker')?.classList.toggle('hidden', _mercyPostWithoutPhoto || !!_mercyOriginalImageFile);
+  if (_mercyPostWithoutPhoto) clearMercyPhoto();
+  document.getElementById('mercyPhotoPicker')?.classList.toggle('hidden', _mercyPostWithoutPhoto);
+}
+
+function toggleMercyPhotoEditor() {
+  const editor = document.getElementById('mercyPhotoEditor');
+  const grid = document.getElementById('mercyCropGrid');
+  const open = editor?.classList.contains('hidden');
+  editor?.classList.toggle('hidden', !open);
+  grid?.classList.toggle('hidden', !open);
+}
+
 async function updateMercyPhotoPosition() {
-  _mercyPhotoPositionX = Number(document.getElementById('mercyPhotoPosX')?.value || 0);
-  _mercyPhotoPositionY = Number(document.getElementById('mercyPhotoPosY')?.value || 0);
+  _mercyPhotoPositionX = Number(document.getElementById('mercyPhotoPosX')?.value || 50);
+  _mercyPhotoPositionY = Number(document.getElementById('mercyPhotoPosY')?.value || 50);
+  _mercyPhotoZoom = Number(document.getElementById('mercyPhotoZoom')?.value || 0);
   const img = document.getElementById('mercyPhotoPreview');
   if (img) {
-    const crop = Math.max(_mercyPhotoPositionX, _mercyPhotoPositionY);
-    img.style.objectFit = crop <= 1 ? 'contain' : 'cover';
-    img.style.transform = `scale(${1 + crop / 240})`;
-    img.style.objectPosition = `${50 + (_mercyPhotoPositionX - _mercyPhotoPositionY) / 8}% 50%`;
+    img.style.objectFit = _mercyPhotoZoom <= 1 ? 'contain' : 'cover';
+    img.style.transform = `scale(${1 + _mercyPhotoZoom / 180})`;
+    img.style.objectPosition = `${_mercyPhotoPositionX}% ${_mercyPhotoPositionY}%`;
   }
 }
 
@@ -18554,12 +18593,12 @@ async function compressMercyImage(file, options = {}) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       const contain = Math.min(canvas.width / img.width, canvas.height / img.height);
       const cover = Math.max(canvas.width / img.width, canvas.height / img.height);
-      const crop = Math.max(0, Math.min(100, Math.max(options.x ?? 0, options.y ?? 0))) / 100;
+      const crop = Math.max(0, Math.min(100, options.zoom ?? 0)) / 100;
       const drawScale = contain + (cover - contain) * crop;
       const dw = img.width * drawScale;
       const dh = img.height * drawScale;
-      const dx = (canvas.width - dw) / 2 + ((options.x ?? 0) - (options.y ?? 0)) * -1.4;
-      const dy = (canvas.height - dh) / 2;
+      const dx = (canvas.width - dw) * ((options.x ?? 50) / 100);
+      const dy = (canvas.height - dh) * ((options.y ?? 50) / 100);
       ctx.drawImage(img, dx, dy, dw, dh);
     } else {
       canvas.width = Math.max(1, Math.round(img.width * scale));
@@ -18580,7 +18619,7 @@ async function submitMercyPost() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   if (_mercyOriginalImageFile) {
-    const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY });
+    const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY, zoom: _mercyPhotoZoom });
     _mercyImageBlob = finalImage.blob;
     _mercyImageDataUrl = finalImage.dataUrl;
   }
@@ -18862,6 +18901,8 @@ function closeMerciesSettings() {
 }
 
 async function saveMerciesSettings() {
+  const user = window.Auth?.getCurrentUser();
+  if (!user) { alert("Sign in to save Mercies settings."); return; }
   const settings = {
     dailyEnabled: !!document.getElementById('mercyDailyEnabled')?.checked,
     dailyTime: document.getElementById('mercyDailyTime')?.value || '20:00',
@@ -18869,12 +18910,25 @@ async function saveMerciesSettings() {
     friendTime: document.getElementById('mercyFriendReminderTime')?.value || '18:00',
     autoSave: !!document.getElementById('mercyAutoSave')?.checked
   };
+  if ((settings.dailyEnabled || settings.friendEnabled) && typeof Notification !== "undefined") {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      alert("Please allow notifications in your browser or device settings to enable Mercies reminders.");
+      return;
+    }
+    const token = await window.FCM?.registerToken?.(user?.uid).catch(() => null);
+    if (!token) {
+      alert("Could not register this device for Mercies reminders. Try closing and reopening the app, then save again.");
+      return;
+    }
+    syncNotificationPermissionUI(permission);
+  }
   localStorage.setItem('mercyDailyEnabled', String(settings.dailyEnabled));
   localStorage.setItem('mercyDailyTime', settings.dailyTime);
   localStorage.setItem('mercyFriendReminderEnabled', String(settings.friendEnabled));
   localStorage.setItem('mercyFriendReminderTime', settings.friendTime);
   localStorage.setItem('merciesAutoSave', String(settings.autoSave));
-  await window.Mercies?.saveSettings?.(window.Auth?.getCurrentUser()?.uid, settings);
+  await window.Mercies?.saveSettings?.(user?.uid, settings);
   closeMerciesSettings();
 }
 

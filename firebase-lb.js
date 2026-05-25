@@ -1243,11 +1243,13 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       isActive: true
     });
     await advanceMercyStreak(uid, now);
-    if (post.taggedFriendUid && post.taggedFriendUid !== uid) {
-      fcmSendPushNotification(post.taggedFriendUid, "mercyPostedTagged", displayName || "Someone", uid, {
-        mercyPostId: ref.id
+    [...new Set([post.taggedFriendUid, ...(post.taggedFriendUids || [])].filter(Boolean))]
+      .filter(tagUid => tagUid !== uid)
+      .forEach(tagUid => {
+        fcmSendPushNotification(tagUid, "mercyPostedTagged", displayName || "Someone", uid, {
+          mercyPostId: ref.id
+        });
       });
-    }
     return { id: ref.id, imageUrl, imagePath, createdAtMs: now };
   } catch (e) {
     console.warn("addMercyPost:", e);

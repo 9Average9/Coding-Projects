@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.47" rel="stylesheet"/>
+<link href="style.css?v=3.0.48" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -9722,21 +9722,28 @@ Verb Endings
 <div class="mercies-kicker"><span class="material-symbols-outlined">photo_camera</span> Post a Mercy</div>
 <h2>Remember Today's Mercy</h2>
 <p class="mercies-muted">Share a photo-first moment of gratitude, Scripture, prayer, or encouragement with your friends.</p>
+<label class="mercy-toggle-card mercy-no-photo-toggle">
+<input id="mercyNoPhoto" type="checkbox" onchange="toggleMercyNoPhoto()"/>
+<span class="mercy-toggle-track"></span>
+<span><strong>Post without a photo</strong><small>Write a Mercy without opening the photo picker.</small></span>
+</label>
 <label class="mercy-photo-picker" id="mercyPhotoPicker">
 <input id="mercyPhotoInput" type="file" accept="image/*" onchange="handleMercyPhotoSelected(this)" hidden/>
 <span class="material-symbols-outlined">add_a_photo</span>
 <strong>Select or take a photo</strong>
 <small>The app uploads an optimized feed image, not the original full-size photo.</small>
 </label>
-<button class="mercy-no-photo-btn" type="button" onclick="clearMercyPhoto()"><span class="material-symbols-outlined">edit_note</span>Post without a photo</button>
 <div class="mercy-photo-preview hidden" id="mercyPhotoPreviewWrap">
 <img id="mercyPhotoPreview" alt="Mercy preview"/>
+<div class="mercy-crop-grid hidden" id="mercyCropGrid"></div>
+<button class="mercy-edit-photo-btn" type="button" onclick="toggleMercyPhotoEditor()" aria-label="Edit photo crop"><span class="material-symbols-outlined">edit</span></button>
 <button type="button" onclick="clearMercyPhoto()">Change photo</button>
 </div>
 <div class="mercy-photo-editor hidden" id="mercyPhotoEditor">
-<label>Horizontal crop<input id="mercyPhotoPosX" type="range" min="0" max="100" value="0" oninput="updateMercyPhotoPosition()"/></label>
-<label>Vertical crop<input id="mercyPhotoPosY" type="range" min="0" max="100" value="0" oninput="updateMercyPhotoPosition()"/></label>
-<small>0 keeps the full picture visible. Raise the sliders to crop tighter for the feed card preview.</small>
+<label>Zoom crop<input id="mercyPhotoZoom" type="range" min="0" max="100" value="0" oninput="updateMercyPhotoPosition()"/></label>
+<label>Move left/right<input id="mercyPhotoPosX" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
+<label>Move up/down<input id="mercyPhotoPosY" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
+<small>Use zoom first, then move the photo inside the grid.</small>
 </div>
 <div class="mercy-field">
 <label>Prompt</label>
@@ -9787,11 +9794,11 @@ Verb Endings
 <button class="modal-close" onclick="closeMerciesSettings()">&times;</button>
 <div class="mercies-kicker"><span class="material-symbols-outlined">tune</span> Mercies Settings</div>
 <h2>Mercies</h2>
-<label class="mercy-setting-row"><span><strong>Daily Mercy reminder</strong><small>Take a moment to remember today's mercy.</small></span><input id="mercyDailyEnabled" type="checkbox"/></label>
-<input id="mercyDailyTime" type="time" value="20:00"/>
-<label class="mercy-setting-row"><span><strong>Weekly friend encouragement</strong><small>Once a week, randomly prompt you to encourage a friend.</small></span><input id="mercyFriendReminderEnabled" type="checkbox"/></label>
-<input id="mercyFriendReminderTime" type="time" value="18:00"/>
-<label class="mercy-setting-row"><span><strong>Auto-save my Mercies</strong><small>Saved privately to your account and cached on this device.</small></span><input id="mercyAutoSave" type="checkbox"/></label>
+<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyDailyEnabled" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Daily Mercy reminder</strong><small>Take a moment to remember today's mercy.</small></span></label>
+<div class="mercy-time-center"><input id="mercyDailyTime" type="time" value="20:00"/></div>
+<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyFriendReminderEnabled" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Weekly friend encouragement</strong><small>Once a week, randomly prompt you to encourage a friend.</small></span></label>
+<div class="mercy-time-center"><input id="mercyFriendReminderTime" type="time" value="18:00"/></div>
+<label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyAutoSave" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Auto-save my Mercies</strong><small>Saved privately to your account and cached on this device.</small></span></label>
 <button class="main-btn" onclick="saveMerciesSettings()">Save Settings</button>
 </div>
 </div>
@@ -15648,10 +15655,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.47"></script>
+<script src="app.js?v=3.0.48"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.47" type="module"></script>
+<script src="firebase-lb.js?v=3.0.48" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
