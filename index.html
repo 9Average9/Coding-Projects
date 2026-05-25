@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.48" rel="stylesheet"/>
+<link href="style.css?v=3.0.49" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -9740,10 +9740,11 @@ Verb Endings
 <button type="button" onclick="clearMercyPhoto()">Change photo</button>
 </div>
 <div class="mercy-photo-editor hidden" id="mercyPhotoEditor">
-<label>Zoom crop<input id="mercyPhotoZoom" type="range" min="0" max="100" value="0" oninput="updateMercyPhotoPosition()"/></label>
-<label>Move left/right<input id="mercyPhotoPosX" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
-<label>Move up/down<input id="mercyPhotoPosY" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
-<small>Use zoom first, then move the photo inside the grid.</small>
+<small>Pinch to zoom and drag the photo inside the box.</small>
+<div class="mercy-photo-editor-actions">
+<button type="button" onclick="sampleMercyPhotoCrop()"><span class="material-symbols-outlined">visibility</span>Sample</button>
+<button type="button" onclick="resetMercyPhotoCrop()"><span class="material-symbols-outlined">refresh</span>Reset</button>
+</div>
 </div>
 <div class="mercy-field">
 <label>Prompt</label>
@@ -9755,7 +9756,8 @@ Verb Endings
 <select id="mercyPromptSelect" onchange="onMercyPromptChanged()"></select>
 </div>
 <div class="mercy-friend-row">
-<select id="mercyFriendSelect" onchange="onMercyFriendChanged()"><option value="">Tag one friend (optional)</option></select>
+<select id="mercyFriendSelect" onchange="onMercyFriendChanged()" hidden><option value="">Tag one friend (optional)</option></select>
+<button class="mercy-picker-button" id="mercyFriendPickerBtn" type="button" onclick="openMercyFriendPicker('mercyFriendSelect')"><span>Tag one friend (optional)</span><span class="material-symbols-outlined">expand_more</span></button>
 <div class="mercy-extra-friends" id="mercyExtraFriends"></div>
 <button class="mercy-add-friend" id="mercyAddFriendBtn" type="button" onclick="addMercyFriendTag()"><span class="material-symbols-outlined">add</span>Add another friend</button>
 </div>
@@ -9764,14 +9766,17 @@ Verb Endings
 <label class="mercy-toggle-card mercy-scripture-toggle-card">
 <input id="mercyAttachScripture" type="checkbox" onchange="toggleMercyScripture()"/>
 <span class="mercy-toggle-track"></span>
-<span><strong>Attach Scripture</strong><small>Add an MSB verse card people can swipe to behind your photo.</small></span>
+<span><strong>Attach Scripture</strong><small>Add a verse card people can swipe to behind your photo.</small></span>
 </label>
 <div class="mercy-scripture-controls disabled" id="mercyScriptureControls">
-<div class="mercy-ref-grid">
-<label>Book<select id="mercyScriptureBook" onchange="populateMercyChapters()"></select></label>
-<label>Chapter<select id="mercyScriptureChapter" onchange="populateMercyVerses()"></select></label>
-<label>Verse<select id="mercyScriptureVerse" onchange="updateMercyScriptureFromPicker()"></select></label>
+<div class="mercy-ref-pills">
+<button id="mercyBookPill" type="button" onclick="openMercyBookPicker()">Book</button>
+<button id="mercyChapterPill" type="button" onclick="openMercyChapterPicker()">Ch</button>
+<button id="mercyVersePill" type="button" onclick="openMercyVersePicker()">v</button>
 </div>
+<select id="mercyScriptureBook" onchange="populateMercyChapters()" hidden></select>
+<select id="mercyScriptureChapter" onchange="populateMercyVerses()" hidden></select>
+<select id="mercyScriptureVerse" onchange="updateMercyScriptureFromPicker()" hidden></select>
 <input id="mercyScriptureRef" placeholder="Reference, e.g. Psalm 23:1" readonly/>
 <textarea id="mercyScriptureText" maxlength="500" placeholder="Verse text from MSB" oninput="updateMercyScripturePreview()"></textarea>
 <div class="mercy-card-options">
@@ -9800,6 +9805,31 @@ Verb Endings
 <div class="mercy-time-center"><input id="mercyFriendReminderTime" type="time" value="18:00"/></div>
 <label class="mercy-toggle-card mercy-settings-toggle"><input id="mercyAutoSave" type="checkbox"/><span class="mercy-toggle-track"></span><span><strong>Auto-save my Mercies</strong><small>Saved privately to your account and cached on this device.</small></span></label>
 <button class="main-btn" onclick="saveMerciesSettings()">Save Settings</button>
+</div>
+</div>
+<div class="rhema-picker-overlay hidden" id="mercyBookPickerOverlay" onclick="closeMercyPickerSheet()">
+<div class="rhema-picker-sheet" onclick="event.stopPropagation()">
+<div class="rhema-picker-hdr"><span class="rhema-picker-title">Select Book</span><button class="rhema-picker-x" onclick="closeMercyPickerSheet()">x</button></div>
+<div class="rhema-picker-search-row"><span class="material-symbols-outlined rhema-picker-search-icon">search</span><input class="rhema-picker-search-input" id="mercyBookSearch" oninput="mercyFilterBooks(this.value)" placeholder="Search books..."/></div>
+<div class="rhema-book-list" id="mercyBookList"></div>
+</div>
+</div>
+<div class="rhema-picker-overlay hidden" id="mercyChapterPickerOverlay" onclick="closeMercyPickerSheet()">
+<div class="rhema-picker-sheet rhema-picker-sheet--grid" onclick="event.stopPropagation()">
+<div class="rhema-picker-hdr"><span class="rhema-picker-title">Select Chapter</span><button class="rhema-picker-x" onclick="closeMercyPickerSheet()">x</button></div>
+<div class="rhema-num-grid" id="mercyChapterGrid"></div>
+</div>
+</div>
+<div class="rhema-picker-overlay hidden" id="mercyVersePickerOverlay" onclick="closeMercyPickerSheet()">
+<div class="rhema-picker-sheet rhema-picker-sheet--grid" onclick="event.stopPropagation()">
+<div class="rhema-picker-hdr"><span class="rhema-picker-title">Select Verse</span><button class="rhema-picker-x" onclick="closeMercyPickerSheet()">x</button></div>
+<div class="rhema-num-grid" id="mercyVerseGrid"></div>
+</div>
+</div>
+<div class="rhema-picker-overlay hidden" id="mercyFriendPickerOverlay" onclick="closeMercyFriendPicker()">
+<div class="rhema-picker-sheet" onclick="event.stopPropagation()">
+<div class="rhema-picker-hdr"><span class="rhema-picker-title">Tag Friend</span><button class="rhema-picker-x" onclick="closeMercyFriendPicker()">x</button></div>
+<div class="rhema-book-list" id="mercyFriendPickerList"></div>
 </div>
 </div>
 <!-- VERB BASIC TRACK SCREEN -->
@@ -15655,10 +15685,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.48"></script>
+<script src="app.js?v=3.0.49"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.48" type="module"></script>
+<script src="firebase-lb.js?v=3.0.49" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

@@ -113,6 +113,12 @@ let _mercyPhotoPositionY = 50;
 let _mercyPhotoZoom = 0;
 let _mercyPhotoPreviewUrl = null;
 let _mercyPostWithoutPhoto = false;
+let _mercyPhotoScale = 1;
+let _mercyPhotoOffsetX = 0;
+let _mercyPhotoOffsetY = 0;
+let _mercyCropPointers = new Map();
+let _mercyCropDragStart = null;
+let _mercyFriendPickerTargetId = null;
 let _mercyPromptMode = 'regular';
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -16795,7 +16801,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.48";
+const APP_VERSION = "3.0.49";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18371,7 +18377,8 @@ function addMercyFriendTag(selectedUid = '') {
   if (!wrap || document.getElementById('mercyFriendEncouragement')?.checked) return;
   const row = document.createElement('div');
   row.className = 'mercy-extra-friend-row';
-  row.innerHTML = `<select class="mercy-extra-friend-select" onchange="updateMercyFriendOptions()"><option value="">Tag another friend</option></select><button type="button" aria-label="Remove friend tag" onclick="this.closest('.mercy-extra-friend-row')?.remove(); updateMercyFriendOptions();"><span class="material-symbols-outlined">close</span></button>`;
+  const selectId = `mercyExtraFriend_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  row.innerHTML = `<select id="${selectId}" class="mercy-extra-friend-select" onchange="updateMercyFriendOptions()" hidden><option value="">Tag another friend</option></select><button class="mercy-picker-button" type="button" onclick="openMercyFriendPicker('${selectId}')"><span>Tag another friend</span><span class="material-symbols-outlined">expand_more</span></button><button type="button" aria-label="Remove friend tag" onclick="this.closest('.mercy-extra-friend-row')?.remove(); updateMercyFriendOptions();"><span class="material-symbols-outlined">close</span></button>`;
   wrap.appendChild(row);
   const sel = row.querySelector('select');
   _fillMercyFriendSelect(sel, selectedUid, 'Tag another friend');
@@ -18388,21 +18395,82 @@ function _fillMercyFriendSelect(sel, selectedUid = '', placeholder = 'Tag one fr
   if (!sel) return;
   sel.innerHTML = `<option value="">${placeholder}</option>`;
   const selected = new Set(_selectedMercyFriendUids().filter(uid => uid !== selectedUid));
-  (friendsList || []).forEach(uid => {
-    window.Friends?.getUser(uid).then(u => {
-      const name = u?.displayName || u?.username || 'Friend';
-      const opt = document.createElement('option');
-      opt.value = uid; opt.textContent = name; opt.dataset.name = name;
-      opt.disabled = selected.has(uid);
-      if (uid === selectedUid) opt.selected = true;
-      sel.appendChild(opt);
+  Promise.all((friendsList || []).map(uid => window.Friends?.getUser(uid).catch(() => null)))
+    .then(users => users.filter(Boolean).sort((a, b) => (a.displayName || a.username || '').localeCompare(b.displayName || b.username || '')))
+    .then(users => {
+      users.forEach(u => {
+        const name = u?.displayName || u?.username || 'Friend';
+        const opt = document.createElement('option');
+        opt.value = u.uid; opt.textContent = name; opt.dataset.name = name;
+        opt.disabled = selected.has(u.uid);
+        if (u.uid === selectedUid) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      updateMercyFriendPickerButtons();
     }).catch(() => {});
-  });
 }
 
 function updateMercyFriendOptions() {
   _fillMercyFriendSelect(document.getElementById('mercyFriendSelect'), document.getElementById('mercyFriendSelect')?.value || '', 'Tag one friend (optional)');
   document.querySelectorAll('.mercy-extra-friend-select').forEach(sel => _fillMercyFriendSelect(sel, sel.value || '', 'Tag another friend'));
+}
+
+function updateMercyFriendPickerButtons() {
+  const mainSel = document.getElementById('mercyFriendSelect');
+  const mainBtn = document.getElementById('mercyFriendPickerBtn');
+  if (mainSel && mainBtn) {
+    const label = mainBtn.querySelector('span');
+    if (label) label.textContent = mainSel.value ? (mainSel.selectedOptions?.[0]?.textContent || 'Friend') : 'Tag one friend (optional)';
+  }
+  document.querySelectorAll('.mercy-extra-friend-row').forEach(row => {
+    const sel = row.querySelector('select');
+    const btn = row.querySelector('.mercy-picker-button');
+    if (sel && btn) {
+      const label = btn.querySelector('span');
+      if (label) label.textContent = sel.value ? (sel.selectedOptions?.[0]?.textContent || 'Friend') : 'Tag another friend';
+    }
+  });
+}
+
+async function openMercyFriendPicker(selectId) {
+  _mercyFriendPickerTargetId = selectId;
+  const list = document.getElementById('mercyFriendPickerList');
+  if (!list) return;
+  const selected = new Set(_selectedMercyFriendUids());
+  const target = document.getElementById(selectId);
+  if (target?.value) selected.delete(target.value);
+  list.innerHTML = '<p class="fr-loading">Loading friends...</p>';
+  document.getElementById('mercyFriendPickerOverlay')?.classList.remove('hidden');
+  const users = (await Promise.all((friendsList || []).map(uid => window.Friends?.getUser(uid).catch(() => null))))
+    .filter(Boolean)
+    .sort((a, b) => (a.displayName || a.username || '').localeCompare(b.displayName || b.username || ''));
+  list.innerHTML = users.length ? users.map(u => {
+    const name = _lbEscape(u.displayName || u.username || 'Friend');
+    const disabled = selected.has(u.uid);
+    const active = target?.value === u.uid;
+    return `<button class="mercy-friend-choice${active ? ' selected' : ''}" ${disabled ? 'disabled' : ''} onclick="selectMercyFriend('${selectId}','${u.uid}','${name.replace(/'/g, "\\'")}')">
+      <span class="mercy-avatar">${_renderAvatar(_frAvatarValue(u))}</span><span>${name}</span>${active ? '<span class="material-symbols-outlined">check</span>' : ''}
+    </button>`;
+  }).join('') : '<p class="fr-empty-sm">Add friends to tag them.</p>';
+}
+
+function closeMercyFriendPicker() {
+  document.getElementById('mercyFriendPickerOverlay')?.classList.add('hidden');
+  _mercyFriendPickerTargetId = null;
+}
+
+function selectMercyFriend(selectId, uid, name) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  let opt = [...sel.options].find(o => o.value === uid);
+  if (!opt) {
+    opt = document.createElement('option');
+    opt.value = uid; opt.textContent = name; opt.dataset.name = name;
+    sel.appendChild(opt);
+  }
+  sel.value = uid;
+  closeMercyFriendPicker();
+  onMercyFriendChanged();
 }
 
 function _selectedMercyFriendName() {
@@ -18433,6 +18501,7 @@ async function populateMercyBooks() {
   const books = window.RhemaEnglishBooks || [];
   sel.innerHTML = books.map(book => `<option value="${book.code}">${_lbEscape(book.name)}</option>`).join('');
   if (books.find(book => book.code === 'PSA')) sel.value = 'PSA';
+  updateMercyRefPills();
   populateMercyChapters();
 }
 
@@ -18443,6 +18512,7 @@ function populateMercyChapters() {
   if (!sel) return;
   const chapters = Object.keys(data).map(Number).sort((a, b) => a - b);
   sel.innerHTML = chapters.map(ch => `<option value="${ch}">${ch}</option>`).join('');
+  updateMercyRefPills();
   populateMercyVerses();
 }
 
@@ -18454,6 +18524,7 @@ function populateMercyVerses() {
   if (!sel) return;
   const verses = Object.keys(data).map(Number).sort((a, b) => a - b);
   sel.innerHTML = verses.map(v => `<option value="${v}">${v}</option>`).join('');
+  updateMercyRefPills();
   updateMercyScriptureFromPicker();
 }
 
@@ -18467,7 +18538,96 @@ function updateMercyScriptureFromPicker() {
   const textEl = document.getElementById('mercyScriptureText');
   if (ref) ref.value = book && chapter && verse ? `${bookName} ${chapter}:${verse}` : '';
   if (textEl) textEl.value = text || '';
+  updateMercyRefPills();
   updateMercyScripturePreview();
+}
+
+function updateMercyRefPills() {
+  const book = document.getElementById('mercyScriptureBook')?.value;
+  const chapter = document.getElementById('mercyScriptureChapter')?.value;
+  const verse = document.getElementById('mercyScriptureVerse')?.value;
+  const bookName = (window.RhemaEnglishBooks || []).find(b => b.code === book)?.name || 'Book';
+  const b = document.getElementById('mercyBookPill');
+  const c = document.getElementById('mercyChapterPill');
+  const v = document.getElementById('mercyVersePill');
+  if (b) b.textContent = bookName;
+  if (c) c.textContent = chapter ? `Ch ${chapter}` : 'Ch';
+  if (v) v.textContent = verse ? `v${verse}` : 'v';
+}
+
+function openMercyBookPicker() {
+  closeMercyPickerSheet();
+  const overlay = document.getElementById('mercyBookPickerOverlay');
+  const list = document.getElementById('mercyBookList');
+  if (!overlay || !list) return;
+  const books = window.RhemaEnglishBooks || [];
+  const current = document.getElementById('mercyScriptureBook')?.value;
+  list.innerHTML = books.map(book => `<div class="rhema-book-row${book.code === current ? ' selected' : ''}" onclick="selectMercyBook('${book.code}')">
+    <span class="material-symbols-outlined rhema-book-icon">menu_book</span>
+    <span class="rhema-book-name">${_lbEscape(book.name)}</span>
+    <span class="material-symbols-outlined rhema-book-check">check</span>
+  </div>`).join('');
+  const search = document.getElementById('mercyBookSearch');
+  if (search) search.value = '';
+  overlay.classList.remove('hidden');
+}
+
+function openMercyChapterPicker() {
+  closeMercyPickerSheet();
+  const overlay = document.getElementById('mercyChapterPickerOverlay');
+  const grid = document.getElementById('mercyChapterGrid');
+  const book = document.getElementById('mercyScriptureBook')?.value;
+  const current = document.getElementById('mercyScriptureChapter')?.value;
+  if (!overlay || !grid || !book) return;
+  const chapters = Object.keys(window.RhemaMSB?.[book] || {}).map(Number).sort((a,b) => a-b);
+  grid.innerHTML = chapters.map(ch => `<div class="rhema-num-cell${String(ch) === String(current) ? ' selected' : ''}" onclick="selectMercyChapter('${ch}')">${ch}</div>`).join('');
+  overlay.classList.remove('hidden');
+}
+
+function openMercyVersePicker() {
+  closeMercyPickerSheet();
+  const overlay = document.getElementById('mercyVersePickerOverlay');
+  const grid = document.getElementById('mercyVerseGrid');
+  const book = document.getElementById('mercyScriptureBook')?.value;
+  const chapter = document.getElementById('mercyScriptureChapter')?.value;
+  const current = document.getElementById('mercyScriptureVerse')?.value;
+  if (!overlay || !grid || !book || !chapter) return;
+  const verses = Object.keys(window.RhemaMSB?.[book]?.[chapter] || {}).map(Number).sort((a,b) => a-b);
+  grid.innerHTML = verses.map(v => `<div class="rhema-num-cell${String(v) === String(current) ? ' selected' : ''}" onclick="selectMercyVerse('${v}')">${v}</div>`).join('');
+  overlay.classList.remove('hidden');
+}
+
+function closeMercyPickerSheet() {
+  ['mercyBookPickerOverlay','mercyChapterPickerOverlay','mercyVersePickerOverlay'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+}
+
+function mercyFilterBooks(query = '') {
+  const q = query.toLowerCase().trim();
+  document.getElementById('mercyBookList')?.querySelectorAll('.rhema-book-row').forEach(row => {
+    const name = row.querySelector('.rhema-book-name')?.textContent?.toLowerCase() || '';
+    row.style.display = !q || name.includes(q) ? '' : 'none';
+  });
+}
+
+function selectMercyBook(code) {
+  const sel = document.getElementById('mercyScriptureBook');
+  if (sel) sel.value = code;
+  closeMercyPickerSheet();
+  populateMercyChapters();
+}
+
+function selectMercyChapter(chapter) {
+  const sel = document.getElementById('mercyScriptureChapter');
+  if (sel) sel.value = chapter;
+  closeMercyPickerSheet();
+  populateMercyVerses();
+}
+
+function selectMercyVerse(verse) {
+  const sel = document.getElementById('mercyScriptureVerse');
+  if (sel) sel.value = verse;
+  closeMercyPickerSheet();
+  updateMercyScriptureFromPicker();
 }
 
 function toggleMercyScripture() {
@@ -18519,7 +18679,8 @@ async function handleMercyPhotoSelected(input) {
     if (x) x.value = '50';
     if (y) y.value = '50';
     if (z) z.value = '0';
-    updateMercyPhotoPosition();
+    resetMercyPhotoCrop(false);
+    initMercyPhotoCropGestures();
     document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
     document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
     document.getElementById('mercyPhotoPicker')?.classList.add('hidden');
@@ -18555,16 +18716,86 @@ function toggleMercyPhotoEditor() {
   grid?.classList.toggle('hidden', !open);
 }
 
-async function updateMercyPhotoPosition() {
-  _mercyPhotoPositionX = Number(document.getElementById('mercyPhotoPosX')?.value || 50);
-  _mercyPhotoPositionY = Number(document.getElementById('mercyPhotoPosY')?.value || 50);
-  _mercyPhotoZoom = Number(document.getElementById('mercyPhotoZoom')?.value || 0);
+function updateMercyPhotoPosition() {
   const img = document.getElementById('mercyPhotoPreview');
   if (img) {
-    img.style.objectFit = _mercyPhotoZoom <= 1 ? 'contain' : 'cover';
-    img.style.transform = `scale(${1 + _mercyPhotoZoom / 180})`;
-    img.style.objectPosition = `${_mercyPhotoPositionX}% ${_mercyPhotoPositionY}%`;
+    img.style.objectFit = 'contain';
+    img.style.transform = `translate(${_mercyPhotoOffsetX}px, ${_mercyPhotoOffsetY}px) scale(${_mercyPhotoScale})`;
   }
+}
+
+function resetMercyPhotoCrop(hideGrid = true) {
+  _mercyPhotoScale = 1;
+  _mercyPhotoOffsetX = 0;
+  _mercyPhotoOffsetY = 0;
+  _mercyPhotoZoom = 0;
+  _mercyPhotoPositionX = 50;
+  _mercyPhotoPositionY = 50;
+  updateMercyPhotoPosition();
+  if (hideGrid) {
+    document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
+    document.getElementById('mercyCropGrid')?.classList.add('hidden');
+  }
+}
+
+function initMercyPhotoCropGestures() {
+  const wrap = document.getElementById('mercyPhotoPreviewWrap');
+  if (!wrap || wrap.dataset.cropGestures === 'true') return;
+  wrap.dataset.cropGestures = 'true';
+  wrap.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    wrap.setPointerCapture?.(e.pointerId);
+    _mercyCropPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    _mercyCropDragStart = {
+      x: e.clientX,
+      y: e.clientY,
+      offsetX: _mercyPhotoOffsetX,
+      offsetY: _mercyPhotoOffsetY,
+      scale: _mercyPhotoScale,
+      distance: _mercyPointerDistance()
+    };
+    document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
+    document.getElementById('mercyCropGrid')?.classList.remove('hidden');
+  });
+  wrap.addEventListener('pointermove', e => {
+    if (!_mercyCropPointers.has(e.pointerId) || !_mercyCropDragStart) return;
+    _mercyCropPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_mercyCropPointers.size >= 2) {
+      const current = _mercyPointerDistance();
+      const start = _mercyCropDragStart.distance || current || 1;
+      _mercyPhotoScale = Math.min(3, Math.max(1, _mercyCropDragStart.scale * (current / start)));
+    } else {
+      _mercyPhotoOffsetX = _mercyCropDragStart.offsetX + (e.clientX - _mercyCropDragStart.x);
+      _mercyPhotoOffsetY = _mercyCropDragStart.offsetY + (e.clientY - _mercyCropDragStart.y);
+    }
+    updateMercyPhotoPosition();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(type => {
+    wrap.addEventListener(type, e => {
+      _mercyCropPointers.delete(e.pointerId);
+      if (!_mercyCropPointers.size) _mercyCropDragStart = null;
+    });
+  });
+}
+
+function _mercyPointerDistance() {
+  const points = [..._mercyCropPointers.values()];
+  if (points.length < 2) return 0;
+  return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+}
+
+async function sampleMercyPhotoCrop() {
+  if (!_mercyOriginalImageFile) return;
+  const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
+  _mercyImageBlob = finalImage.blob;
+  _mercyImageDataUrl = finalImage.dataUrl;
+  const img = document.getElementById('mercyPhotoPreview');
+  if (img) {
+    img.src = finalImage.dataUrl;
+    img.style.transform = '';
+    img.style.objectFit = 'cover';
+  }
+  document.getElementById('mercyCropGrid')?.classList.add('hidden');
 }
 
 async function compressMercyImage(file, options = {}) {
@@ -18593,12 +18824,13 @@ async function compressMercyImage(file, options = {}) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       const contain = Math.min(canvas.width / img.width, canvas.height / img.height);
       const cover = Math.max(canvas.width / img.width, canvas.height / img.height);
+      const directScale = Math.max(1, Math.min(3, options.scale || 1));
       const crop = Math.max(0, Math.min(100, options.zoom ?? 0)) / 100;
-      const drawScale = contain + (cover - contain) * crop;
+      const drawScale = (contain + (cover - contain) * crop) * directScale;
       const dw = img.width * drawScale;
       const dh = img.height * drawScale;
-      const dx = (canvas.width - dw) * ((options.x ?? 50) / 100);
-      const dy = (canvas.height - dh) * ((options.y ?? 50) / 100);
+      const dx = (canvas.width - dw) * ((options.x ?? 50) / 100) + (options.offsetX || 0) * (canvas.width / Math.max(1, document.getElementById('mercyPhotoPreview')?.clientWidth || canvas.width));
+      const dy = (canvas.height - dh) * ((options.y ?? 50) / 100) + (options.offsetY || 0) * (canvas.height / Math.max(1, document.getElementById('mercyPhotoPreview')?.clientHeight || canvas.height));
       ctx.drawImage(img, dx, dy, dw, dh);
     } else {
       canvas.width = Math.max(1, Math.round(img.width * scale));
@@ -18619,7 +18851,7 @@ async function submitMercyPost() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   if (_mercyOriginalImageFile) {
-    const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY, zoom: _mercyPhotoZoom });
+    const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
     _mercyImageBlob = finalImage.blob;
     _mercyImageDataUrl = finalImage.dataUrl;
   }
@@ -18856,11 +19088,11 @@ function renderMerciesJournalEntries(entries = []) {
   list.innerHTML = entries.length ? entries.map(e => {
     const img = e.imageUrl || e.imageDataUrl || '';
     const tags = e.taggedFriendNames?.length ? e.taggedFriendNames : (e.taggedFriendName ? [e.taggedFriendName] : []);
+    const scripture = e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : '';
     return `<article class="mercy-card mercy-journal-card">
-    <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div></div>
-    ${img ? `<div class="mercy-media"><div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Mercy"></div></div>` : ''}
+    <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div>${e.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(e.scripture.ref)}</span>` : ''}</div>
+    ${(img || scripture) ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">${img ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(img)}" alt="Saved Mercy"></div>` : ''}${scripture}</div>${img && scripture ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : ''}` : ''}
     <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
-    ${e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : ''}
     <div class="mercy-chips">
       ${tags.map(name => `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(name)}</span>`).join('')}
       <button onclick="deleteMercyJournalEntry('${e.id || e.localId}')"><span class="material-symbols-outlined">delete</span>Delete</button>
