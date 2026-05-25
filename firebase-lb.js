@@ -981,7 +981,7 @@ async function addCommunityPost(uid, displayName, avatar, friendUids = [], post 
         });
       }
     }
-    return ref.id;
+    return { id: ref.id, imageUrl, imagePath, createdAtMs: now, expiresAtMs: now + 21 * 24 * 60 * 60 * 1000 };
   } catch (e) {
     console.warn("addCommunityPost:", e);
     return null;
@@ -1149,7 +1149,12 @@ window.CommunityPosts = {
 };
 
 function listenMerciesPosts(uid, friendUids = [], callback) {
-  const q = query(collection(db, "merciesPosts"), where("audienceUids", "array-contains", uid), limit(24));
+  const q = query(
+    collection(db, "merciesPosts"),
+    where("audienceUids", "array-contains", uid),
+    orderBy("createdAtMs", "desc"),
+    limit(24)
+  );
   return onSnapshot(q, async snap => {
     const now = Date.now();
     const friendSet = new Set(friendUids || []);
@@ -1224,6 +1229,7 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
       audienceUids,
       reactions: {},
       commentCount: 0,
+      journalSavedBy: [],
       createdAt: serverTimestamp(),
       createdAtMs: now,
       expiresAtMs: now + 21 * 24 * 60 * 60 * 1000,
@@ -1296,12 +1302,101 @@ async function deleteMercyPost(postId, uid) {
     const data = snap.data();
     if (data.authorUid !== uid) return false;
     await updateDoc(ref, { isActive: false, deletedAt: serverTimestamp() });
-    if (data.imagePath) {
+    if (data.imagePath && !(data.journalSavedBy || []).length) {
       deleteObject(storageRef(storage, data.imagePath)).catch(() => {});
     }
     return true;
   } catch (e) {
     console.warn("deleteMercyPost:", e);
+    return false;
+  }
+}
+
+function mercyJournalPayload(uid, post = {}) {
+  const createdAtMs = post.createdAtMs || Date.now();
+  return {
+    remotePostId: post.id || post.remotePostId || null,
+    authorUid: uid,
+    date: post.date || new Date(createdAtMs).toLocaleDateString(),
+    createdAtMs,
+    savedAt: serverTimestamp(),
+    savedAtMs: Date.now(),
+    promptText: post.promptText || "",
+    promptCategory: post.promptCategory || "Mercy",
+    body: post.body || "",
+    imageUrl: post.imageUrl || null,
+    imagePath: post.imagePath || null,
+    scripture: post.scripture || null,
+    scriptureCard: post.scriptureCard || null,
+    taggedFriendUid: post.taggedFriendUid || null,
+    taggedFriendName: post.taggedFriendName || null,
+    friendEncouragement: !!post.friendEncouragement,
+    isDeleted: false
+  };
+}
+
+async function saveMercyJournalEntry(uid, post = {}) {
+  if (!uid) return false;
+  try {
+    const entryId = post.id || post.remotePostId || crypto.randomUUID();
+    const payload = mercyJournalPayload(uid, post);
+    await setDoc(doc(db, "users", uid, "merciesJournal", entryId), payload, { merge: true });
+    if (payload.remotePostId) {
+      updateDoc(doc(db, "merciesPosts", payload.remotePostId), {
+        journalSavedBy: arrayUnion(uid)
+      }).catch(() => {});
+    }
+    return entryId;
+  } catch (e) {
+    console.warn("saveMercyJournalEntry:", e);
+    return false;
+  }
+}
+
+function listenMercyJournal(uid, callback) {
+  if (!uid) return () => {};
+  const q = query(
+    collection(db, "users", uid, "merciesJournal"),
+    orderBy("createdAtMs", "desc"),
+    limit(120)
+  );
+  return onSnapshot(q, snap => {
+    const entries = snap.docs
+      .map(d => ({ id: d.id, localId: d.id, ...d.data() }))
+      .filter(entry => entry.isDeleted !== true);
+    callback(entries);
+  }, err => {
+    console.warn("listenMercyJournal:", err);
+    callback([]);
+  });
+}
+
+async function deleteMercyJournalEntry(uid, entryId) {
+  if (!uid || !entryId) return false;
+  try {
+    const entryRef = doc(db, "users", uid, "merciesJournal", entryId);
+    const entrySnap = await getDoc(entryRef);
+    if (!entrySnap.exists()) return false;
+    const entry = entrySnap.data();
+    await deleteDoc(entryRef);
+    if (entry.remotePostId) {
+      const postRef = doc(db, "merciesPosts", entry.remotePostId);
+      const postSnap = await getDoc(postRef).catch(() => null);
+      if (postSnap?.exists()) {
+        const post = postSnap.data();
+        await updateDoc(postRef, { journalSavedBy: arrayRemove(uid) }).catch(() => {});
+        const remaining = (post.journalSavedBy || []).filter(savedUid => savedUid !== uid);
+        const expired = post.expiresAtMs && post.expiresAtMs <= Date.now();
+        if ((post.isActive === false || expired) && !remaining.length && post.imagePath) {
+          deleteObject(storageRef(storage, post.imagePath)).catch(() => {});
+        }
+      } else if (entry.imagePath) {
+        deleteObject(storageRef(storage, entry.imagePath)).catch(() => {});
+      }
+    }
+    return true;
+  } catch (e) {
+    console.warn("deleteMercyJournalEntry:", e);
     return false;
   }
 }
@@ -1341,6 +1436,9 @@ window.Mercies = {
   add: addMercyPost,
   react: reactMercyPost,
   delete: deleteMercyPost,
+  saveJournal: saveMercyJournalEntry,
+  listenJournal: listenMercyJournal,
+  deleteJournal: deleteMercyJournalEntry,
   saveSettings: saveMerciesSettings
 };
 

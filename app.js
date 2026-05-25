@@ -98,6 +98,8 @@ let _communityCommentsPostId = null;
 let _communityCommentsUnsub = null;
 let _merciesPosts = [];
 let _merciesUnsub = null;
+let _merciesJournalUnsub = null;
+let _merciesJournalEntries = [];
 let _merciesVisibleCount = 12;
 let _mercyImageBlob = null;
 let _mercyImageDataUrl = null;
@@ -9676,6 +9678,7 @@ let _prevNavPage = 'home';
 
 function showNavPage(page) {
   if (page !== 'mercies' && _merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
+  if (page !== 'mercies' && _merciesJournalUnsub) { _merciesJournalUnsub(); _merciesJournalUnsub = null; }
   if (page === 'lessons') {
     const cur = document.querySelector('.screen.active');
     if (cur?.id === 'communityPage') _prevNavPage = 'community';
@@ -16782,7 +16785,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.43";
+const APP_VERSION = "3.0.44";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18182,7 +18185,7 @@ function showMerciesView(view) {
   document.querySelectorAll('.mercies-tabs button').forEach(btn => btn.classList.toggle('active', btn.dataset.mercyView === view));
   document.getElementById('merciesFeedView')?.classList.toggle('active', view === 'feed');
   document.getElementById('merciesJournalView')?.classList.toggle('active', view === 'journal');
-  if (view === 'journal') renderMerciesJournal();
+  if (view === 'journal') startMerciesJournal();
 }
 
 function startMerciesFeed() {
@@ -18415,11 +18418,22 @@ async function submitMercyPost() {
     friendEncouragement: !!document.getElementById('mercyFriendEncouragement')?.checked
   };
   const authorName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Someone';
-  const id = await window.Mercies?.add?.(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
+  const created = await window.Mercies?.add?.(uid, authorName, _currentProfileAvatarValue(), friendsList, _mercyImageBlob, post);
   if (btn) { btn.disabled = false; btn.textContent = 'Post Mercy'; }
+  const id = typeof created === 'string' ? created : created?.id;
   if (!id) { alert('Could not post this Mercy right now. Try again.'); return; }
   markMercyPostedToday();
-  if (document.getElementById('mercySaveThis')?.checked) await saveMercyToJournal(id, { id, ...post, authorUid: uid, imageDataUrl: _mercyImageDataUrl, createdAtMs: Date.now() });
+  if (document.getElementById('mercySaveThis')?.checked) {
+    await saveMercyToJournal(id, {
+      id,
+      ...post,
+      authorUid: uid,
+      imageUrl: created?.imageUrl || null,
+      imagePath: created?.imagePath || null,
+      imageDataUrl: _mercyImageDataUrl,
+      createdAtMs: created?.createdAtMs || Date.now()
+    });
+  }
   closeMercyComposer();
 }
 
@@ -18437,6 +18451,17 @@ async function deleteMercyPost(postId) {
   if (!ok) { alert('Could not delete this Mercy right now.'); return; }
   _merciesPosts = _merciesPosts.filter(post => post.id !== postId);
   renderMerciesFeed();
+}
+
+async function deleteMercyJournalEntry(entryId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !entryId) return;
+  if (!confirm('Delete this saved Mercy from your Journal?')) return;
+  const ok = await window.Mercies?.deleteJournal?.(uid, entryId);
+  if (!ok) { alert('Could not delete this journal entry right now.'); return; }
+  await deleteMercyJournalCacheEntry(entryId);
+  _merciesJournalEntries = _merciesJournalEntries.filter(entry => entry.id !== entryId && entry.localId !== entryId);
+  renderMerciesJournalEntries(_merciesJournalEntries);
 }
 
 function markMercyPostedToday() {
@@ -18461,10 +18486,12 @@ function mercyDb() {
 async function saveMercyToJournal(postId, postOverride = null) {
   const post = postOverride || _merciesPosts.find(p => p.id === postId);
   if (!post) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  const remoteId = uid && window.Mercies?.saveJournal ? await window.Mercies.saveJournal(uid, post) : null;
   const db = await mercyDb();
   const tx = db.transaction('entries', 'readwrite');
   tx.objectStore('entries').put({
-    localId: post.id || crypto.randomUUID(),
+    localId: remoteId || post.id || crypto.randomUUID(),
     remotePostId: post.id || post.remotePostId || null,
     date: new Date(post.createdAtMs || Date.now()).toLocaleDateString(),
     createdAtMs: post.createdAtMs || Date.now(),
@@ -18479,7 +18506,7 @@ async function saveMercyToJournal(postId, postOverride = null) {
     friendEncouragement: !!post.friendEncouragement
   });
   await new Promise(resolve => tx.oncomplete = resolve);
-  renderMerciesJournal();
+  startMerciesJournal();
 }
 
 async function renderMerciesJournal() {
@@ -18491,17 +18518,59 @@ async function renderMerciesJournal() {
     const req = tx.objectStore('entries').getAll();
     req.onsuccess = () => {
       const entries = (req.result || []).sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
-      list.innerHTML = entries.length ? entries.map(e => `<article class="mercy-card mercy-journal-card">
-        <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div></div>
-        <div class="mercy-media"><div class="mercy-slide"><img loading="lazy" src="${_lbEscape(e.imageDataUrl || '')}" alt="Saved Mercy"></div></div>
-        <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
-        ${e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : ''}
-        ${e.taggedFriendName ? `<div class="mercy-chips"><span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(e.taggedFriendName)}</span></div>` : ''}
-      </article>`).join('') : '<p class="study-board-empty">No saved Mercies yet.</p>';
+      renderMerciesJournalEntries(entries);
     };
   } catch {
     list.innerHTML = '<p class="study-board-empty">Mercies Journal is not available on this device.</p>';
   }
+}
+
+function startMerciesJournal() {
+  const list = document.getElementById('merciesJournalList');
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!list) return;
+  renderMerciesJournal();
+  if (!uid || !window.Mercies?.listenJournal) return;
+  if (_merciesJournalUnsub) return;
+  _merciesJournalUnsub = window.Mercies.listenJournal(uid, entries => {
+    _merciesJournalEntries = entries || [];
+    cacheMercyJournalEntries(_merciesJournalEntries);
+    if (_merciesJournalEntries.length) renderMerciesJournalEntries(_merciesJournalEntries);
+    else renderMerciesJournal();
+  });
+}
+
+function renderMerciesJournalEntries(entries = []) {
+  const list = document.getElementById('merciesJournalList');
+  if (!list) return;
+  list.innerHTML = entries.length ? entries.map(e => `<article class="mercy-card mercy-journal-card">
+    <div class="mercy-card-top"><div><strong>${_lbEscape(e.date || '')}</strong><small>${_lbEscape(e.promptCategory || 'Mercy')}</small></div></div>
+    <div class="mercy-media"><div class="mercy-slide"><img loading="lazy" src="${_lbEscape(e.imageUrl || e.imageDataUrl || '')}" alt="Saved Mercy"></div></div>
+    <div class="mercy-prompt">${_lbEscape(e.promptText || '')}</div><p class="mercy-body">${_lbEscape(e.body || '')}</p>
+    ${e.scripture?.text ? _mercyScriptureCard(e.scripture, e.scriptureCard) : ''}
+    <div class="mercy-chips">
+      ${e.taggedFriendName ? `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(e.taggedFriendName)}</span>` : ''}
+      <button onclick="deleteMercyJournalEntry('${e.id || e.localId}')"><span class="material-symbols-outlined">delete</span>Delete</button>
+    </div>
+  </article>`).join('') : '<p class="study-board-empty">No saved Mercies yet.</p>';
+}
+
+async function cacheMercyJournalEntries(entries = []) {
+  try {
+    const db = await mercyDb();
+    const tx = db.transaction('entries', 'readwrite');
+    const store = tx.objectStore('entries');
+    entries.forEach(entry => store.put({ ...entry, localId: entry.id || entry.localId }));
+  } catch {}
+}
+
+async function deleteMercyJournalCacheEntry(entryId) {
+  try {
+    const db = await mercyDb();
+    const tx = db.transaction('entries', 'readwrite');
+    tx.objectStore('entries').delete(entryId);
+    await new Promise(resolve => tx.oncomplete = resolve);
+  } catch {}
 }
 
 function openMerciesSettings() {

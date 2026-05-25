@@ -23,6 +23,14 @@
         { "fieldPath": "mercyFriendReminder.enabled", "order": "ASCENDING" },
         { "fieldPath": "mercyFriendReminder.nextSendAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "merciesPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "audienceUids", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "createdAtMs", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

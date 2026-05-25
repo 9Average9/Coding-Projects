@@ -2,10 +2,18 @@ const functions = require("firebase-functions/v1");
 const { initializeApp } = require("firebase-admin/app");
 const { FieldValue, getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
+const { getStorage } = require("firebase-admin/storage");
 
 initializeApp();
 const db = getFirestore();
 const messaging = getMessaging();
+const bucket = getStorage().bucket();
+
+async function deleteStoragePath(path) {
+  if (!path) return;
+  try { await bucket.file(path).delete({ ignoreNotFound: true }); }
+  catch (e) { console.warn("deleteStoragePath:", path, e.message); }
+}
 
 async function shareRecentCommunityPostsBetweenFriends(uidA, uidB) {
   if (!uidA || !uidB) return;
@@ -113,9 +121,11 @@ async function cleanupDeletedUserData(uid) {
     .get();
   if (!mercyPosts.empty) {
     const batch = db.batch();
+    const storageDeletes = [];
     let count = 0;
     mercyPosts.docs.forEach(doc => {
       if (doc.data().authorUid === uid) {
+        storageDeletes.push(deleteStoragePath(doc.data().imagePath));
         batch.update(doc.ref, {
           isActive: false,
           deletedAt: FieldValue.serverTimestamp()
@@ -126,7 +136,10 @@ async function cleanupDeletedUserData(uid) {
       count += 1;
     });
     if (count) await batch.commit();
+    await Promise.all(storageDeletes);
   }
+  await deleteQueryInBatches(db.collection("users").doc(uid).collection("merciesJournal"));
+
 
   const comments = await db.collectionGroup("comments")
     .where("authorUid", "==", uid)
@@ -163,6 +176,34 @@ exports.cleanupDeletedAuthUser = functions.auth.user().onDelete(async user => {
   await cleanupDeletedUserData(user.uid);
   return null;
 });
+
+exports.cleanupExpiredMercies = functions.pubsub
+  .schedule("every 24 hours")
+  .onRun(async () => {
+    const now = Date.now();
+    const snap = await db.collection("merciesPosts")
+      .where("expiresAtMs", "<=", now)
+      .limit(100)
+      .get();
+    if (snap.empty) return null;
+
+    const batch = db.batch();
+    for (const doc of snap.docs) {
+      const post = doc.data();
+      const hasJournal = (post.journalSavedBy || []).length > 0;
+      if (hasJournal) {
+        batch.update(doc.ref, {
+          isActive: false,
+          expiredAt: FieldValue.serverTimestamp()
+        });
+      } else {
+        await deleteStoragePath(post.imagePath);
+        batch.delete(doc.ref);
+      }
+    }
+    await batch.commit();
+    return null;
+  });
 
 function getLocalParts(date, timeZone) {
   const parts = new Intl.DateTimeFormat("en-US", {

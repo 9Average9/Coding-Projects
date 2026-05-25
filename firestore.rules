@@ -11,6 +11,11 @@ service cloud.firestore {
       allow update: if request.auth != null
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['friendRequestsIn', 'friendRequestsOut', 'friends', 'updatedAt']);
+
+      match /merciesJournal/{entryId} {
+        allow read, create, update, delete: if request.auth != null
+          && request.auth.uid == uid;
+      }
     }
 
     // Leaderboards — anyone can read, only owner can write their own entry
@@ -94,6 +99,9 @@ service cloud.firestore {
         (request.auth.uid in resource.data.audienceUids &&
          request.resource.data.diff(resource.data).affectedKeys()
            .hasOnly(['reactions', 'commentCount'])) ||
+        (request.auth.uid == resource.data.authorUid &&
+         request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['journalSavedBy'])) ||
         (request.auth.uid == resource.data.authorUid &&
          request.resource.data.diff(resource.data).affectedKeys()
            .hasOnly(['audienceUids'])) ||
