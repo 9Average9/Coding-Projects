@@ -125,6 +125,7 @@ let _mercyLockedFriendUid = null;
 let _merciesFeedRetryTimer = null;
 let _merciesNavCollapseTimer = null;
 let _merciesNavScrollBound = false;
+let _pendingMercyFriendEncouragement = null;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
@@ -9708,6 +9709,12 @@ function expandMerciesNavTemporarily() {
   _merciesNavCollapseTimer = setTimeout(() => setMerciesNavCollapsed(true), 3000);
 }
 
+function expandMerciesNavOnEntry() {
+  setMerciesNavCollapsed(false);
+  clearTimeout(_merciesNavCollapseTimer);
+  _merciesNavCollapseTimer = setTimeout(() => setMerciesNavCollapsed(true), 500);
+}
+
 function bindMerciesNavCollapse() {
   const scroll = document.getElementById('merciesScroll');
   const nav = document.getElementById('bottomNav');
@@ -9722,6 +9729,7 @@ function bindMerciesNavCollapse() {
   }, true);
   scroll.addEventListener('scroll', () => {
     if (!document.getElementById('merciesPage')?.classList.contains('active')) return;
+    clearTimeout(_merciesNavCollapseTimer);
     setMerciesNavCollapsed(true);
   }, { passive: true });
 }
@@ -9755,7 +9763,7 @@ function showNavPage(page) {
     showScreen('merciesPage');
     startMerciesFeed();
     bindMerciesNavCollapse();
-    expandMerciesNavTemporarily();
+    expandMerciesNavOnEntry();
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -16840,7 +16848,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.51";
+const APP_VERSION = "3.0.52";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17812,7 +17820,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const friendUid = new URLSearchParams(location.search).get('friend');
       if (friendUid) {
         const friend = await window.Friends?.getUser?.(friendUid).catch(() => null);
-        openMercyComposer({ friendUid, lockedFriend: true, promptText: _mercyFriendPrompt(friend?.displayName || friend?.username || 'your friend') });
+        const friendName = friend?.displayName || friend?.username || 'your friend';
+        savePendingMercyFriendEncouragement(friendUid, friendName);
+        openPendingMercyFriendEncouragement();
       }
     }, 900);
   }
@@ -18254,6 +18264,7 @@ function startMerciesFeed() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!list) return;
   showMerciesView('feed');
+  refreshPendingMercyFriendEncouragement();
   clearTimeout(_merciesFeedRetryTimer);
   if (!uid) {
     list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Mercies</strong><p>Your feed will load as soon as your account is ready.</p></div>';
@@ -18304,6 +18315,63 @@ function renderMerciesFeed() {
 function loadMoreMercies() {
   _merciesVisibleCount += 10;
   renderMerciesFeed();
+}
+
+function savePendingMercyFriendEncouragement(friendUid, friendName = 'your friend') {
+  if (!friendUid) return;
+  const pending = {
+    friendUid,
+    friendName,
+    promptText: _mercyFriendPrompt(friendName),
+    createdAtMs: Date.now(),
+    expiresAtMs: Date.now() + 24 * 60 * 60 * 1000
+  };
+  _pendingMercyFriendEncouragement = pending;
+  localStorage.setItem('pendingMercyFriendEncouragement', JSON.stringify(pending));
+  refreshPendingMercyFriendEncouragement();
+}
+
+function refreshPendingMercyFriendEncouragement() {
+  let pending = _pendingMercyFriendEncouragement;
+  if (!pending) {
+    try { pending = JSON.parse(localStorage.getItem('pendingMercyFriendEncouragement') || 'null'); }
+    catch { pending = null; }
+  }
+  if (!pending || !pending.friendUid || (pending.expiresAtMs || 0) <= Date.now()) {
+    _pendingMercyFriendEncouragement = null;
+    localStorage.removeItem('pendingMercyFriendEncouragement');
+    document.getElementById('mercyPendingFriendAction')?.classList.add('hidden');
+    return null;
+  }
+  _pendingMercyFriendEncouragement = pending;
+  const btn = document.getElementById('mercyPendingFriendAction');
+  if (btn) {
+    btn.classList.remove('hidden');
+    const name = pending.friendName || 'your friend';
+    const title = document.getElementById('mercyPendingFriendTitle');
+    const sub = document.getElementById('mercyPendingFriendSub');
+    if (title) title.textContent = `Encourage ${name}`;
+    if (sub) sub.textContent = 'Your weekly friend prompt is waiting today.';
+  }
+  return pending;
+}
+
+function openPendingMercyFriendEncouragement() {
+  const pending = refreshPendingMercyFriendEncouragement();
+  if (!pending) return;
+  openMercyComposer({
+    friendUid: pending.friendUid,
+    lockedFriend: true,
+    promptText: pending.promptText || _mercyFriendPrompt(pending.friendName || 'your friend')
+  });
+}
+
+function clearPendingMercyFriendEncouragement(friendUid) {
+  const pending = refreshPendingMercyFriendEncouragement();
+  if (!pending || (friendUid && pending.friendUid !== friendUid)) return;
+  _pendingMercyFriendEncouragement = null;
+  localStorage.removeItem('pendingMercyFriendEncouragement');
+  document.getElementById('mercyPendingFriendAction')?.classList.add('hidden');
 }
 
 function _mercyCardHtml(post) {
@@ -18445,6 +18513,7 @@ function setMercyPromptMode(mode = 'guided') {
   document.querySelectorAll('#mercyPromptMode button').forEach(btn => btn.classList.toggle('active', btn.dataset.promptMode === _mercyPromptChoiceMode));
   document.getElementById('mercyPromptSelect')?.classList.toggle('hidden', _mercyPromptChoiceMode !== 'guided');
   document.getElementById('mercyCustomPrompt')?.classList.toggle('hidden', _mercyPromptChoiceMode !== 'custom');
+  document.getElementById('mercyFriendEncouragement')?.closest('.mercy-toggle-card')?.classList.toggle('hidden', _mercyPromptChoiceMode !== 'guided');
 }
 
 function _currentMercyPromptText() {
@@ -18901,6 +18970,7 @@ async function sampleMercyPhotoCrop() {
   const finalImage = await compressMercyImage(_mercyOriginalImageFile, _mercyPhotoFullMode ? { full: true } : { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
   _mercyImageBlob = finalImage.blob;
   _mercyImageDataUrl = finalImage.dataUrl;
+  if (_mercyPhotoFullMode) _mercyPhotoAspectRatio = finalImage.aspectRatio || _mercyPhotoAspectRatio;
   const img = document.getElementById('mercyPhotoPreview');
   if (img) {
     _mercyPhotoSampled = true;
@@ -18989,6 +19059,7 @@ async function submitMercyPost() {
     const finalImage = await compressMercyImage(_mercyOriginalImageFile, _mercyPhotoFullMode ? { full: true } : { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
     _mercyImageBlob = finalImage.blob;
     _mercyImageDataUrl = finalImage.dataUrl;
+    if (_mercyPhotoFullMode) _mercyPhotoAspectRatio = finalImage.aspectRatio || _mercyPhotoAspectRatio;
   }
   const body = document.getElementById('mercyBody')?.value.trim() || '';
   if (!body) { alert('Write a short response first.'); return; }
@@ -19043,6 +19114,9 @@ async function submitMercyPost() {
       imageDataUrl: _mercyImageDataUrl,
       createdAtMs: created?.createdAtMs || Date.now()
     });
+  }
+  if (post.friendEncouragement && taggedFriendUids.includes(_pendingMercyFriendEncouragement?.friendUid)) {
+    clearPendingMercyFriendEncouragement(_pendingMercyFriendEncouragement.friendUid);
   }
   closeMercyComposer();
 }

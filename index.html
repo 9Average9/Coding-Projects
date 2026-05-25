@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.51" rel="stylesheet"/>
+<link href="style.css?v=3.0.52" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -8565,6 +8565,11 @@ Verb Endings
 <span><strong>Post a Mercy</strong><small>Share a blessing, encourage others.</small></span>
 <span class="material-symbols-outlined mercies-action-chev">chevron_right</span>
 </button>
+<button class="mercies-reminder-action hidden" id="mercyPendingFriendAction" onclick="openPendingMercyFriendEncouragement()">
+<span class="mercies-action-icon material-symbols-outlined">person_heart</span>
+<span><strong id="mercyPendingFriendTitle">Encourage a friend</strong><small id="mercyPendingFriendSub">Your weekly friend prompt is waiting.</small></span>
+<span class="material-symbols-outlined mercies-action-chev">chevron_right</span>
+</button>
 <button class="mercies-secondary" onclick="showMerciesView('journal')">
 <span class="mercies-action-icon material-symbols-outlined">auto_stories</span>
 <span><strong>Mercies Journal</strong><small>View your past mercies and reflections.</small></span>
@@ -15697,10 +15702,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.51"></script>
+<script src="app.js?v=3.0.52"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.51" type="module"></script>
+<script src="firebase-lb.js?v=3.0.52" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
