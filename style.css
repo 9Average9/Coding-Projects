@@ -14684,7 +14684,8 @@ body.sepia .rhema-sheet { background: #fffcf2; }
 /* Remove all .app padding when nav screens are active so they fill edge-to-edge */
 body .app:has(#homeScreen.screen.active),
 body .app:has(#profilePage.screen.active),
-body .app:has(#communityPage.screen.active) {
+body .app:has(#communityPage.screen.active),
+body .app:has(#merciesPage.screen.active) {
   padding: 0 !important;
   overflow: hidden;
   height: 100vh;
@@ -14694,14 +14695,16 @@ body .app:has(#communityPage.screen.active) {
 /* Hide the app-header on nav screens (each screen has its own header) */
 body .app:has(#homeScreen.screen.active) .app-header,
 body .app:has(#profilePage.screen.active) .app-header,
-body .app:has(#communityPage.screen.active) .app-header {
+body .app:has(#communityPage.screen.active) .app-header,
+body .app:has(#merciesPage.screen.active) .app-header {
   display: none !important;
 }
 
 /* Remove stale margin-top overrides */
 body .app:has(#homeScreen.screen.active) #homeScreen,
 body .app:has(#profilePage.screen.active) #profilePage,
-body .app:has(#communityPage.screen.active) #communityPage {
+body .app:has(#communityPage.screen.active) #communityPage,
+body .app:has(#merciesPage.screen.active) #merciesPage {
   margin-top: 0 !important;
 }
 
@@ -18284,11 +18287,19 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 #merciesPage {
   background:
     radial-gradient(circle at 8% 18%, color-mix(in srgb, var(--secondary-color) 10%, transparent), transparent 30%),
-    linear-gradient(180deg, color-mix(in srgb, var(--primary-light) 92%, white), color-mix(in srgb, var(--primary-light) 78%, white));
-  min-height: 100dvh;
-  padding: max(18px, env(safe-area-inset-top)) 18px calc(140px + env(safe-area-inset-bottom));
+    linear-gradient(180deg, color-mix(in srgb, var(--primary-light) 92%, white), color-mix(in srgb, var(--primary-light) 78%, white)) !important;
+  min-height: 100dvh !important;
+  height: 100svh !important;
+  padding: max(18px, env(safe-area-inset-top)) 18px calc(140px + env(safe-area-inset-bottom)) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--font-color) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  box-sizing: border-box;
 }
-.mercies-scroll { max-width: 520px; margin: 0 auto; display: grid; gap: 22px; padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
+.mercies-scroll { width: min(100%, 520px); max-width: 520px; margin: 0 auto; display: grid; gap: 18px; padding-bottom: calc(140px + env(safe-area-inset-bottom)); overflow-x: hidden; box-sizing: border-box; }
 .mercies-hero {
   display: flex;
   align-items: flex-start;
@@ -18335,7 +18346,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercies-secondary { background: rgba(255,255,255,0.86); color: var(--font-color); border: 1px solid color-mix(in srgb, var(--secondary-color) 12%, rgba(0,0,0,0.08)); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
 .mercies-actions strong { display: block; font-size: 1.25rem; font-family: Georgia, 'Times New Roman', serif; line-height: 1.05; }
 .mercies-actions small { display: block; margin-top: 5px; font-size: 0.86rem; color: currentColor; opacity: 0.78; font-weight: 700; line-height: 1.25; }
-.mercies-action-icon { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,0.13); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); flex: 0 0 auto; }
+.mercies-action-icon { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; line-height: 1; background: rgba(255,255,255,0.13); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); flex: 0 0 auto; }
 .mercies-secondary .mercies-action-icon { background: color-mix(in srgb, var(--secondary-color) 9%, white); color: var(--secondary-color); }
 .mercies-action-chev { margin-left: auto; }
 .mercies-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
@@ -18401,8 +18412,13 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-save-row small,
 .mercy-setting-row small { display: block; color: var(--muted-color); font-size: 0.75rem; margin-top: 2px; }
 .mercy-photo-preview { position: relative; border-radius: 24px; overflow: hidden; margin: 14px 0; }
-.mercy-photo-preview img { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+.mercy-photo-preview img { width: 100%; aspect-ratio: 4 / 3; max-height: 280px; object-fit: cover; display: block; }
 .mercy-photo-preview button { position: absolute; right: 10px; bottom: 10px; border: none; border-radius: 999px; padding: 8px 12px; color: var(--secondary-color); background: rgba(255,255,255,0.88); font-weight: 900; }
+.mercy-photo-editor { display: grid; gap: 8px; margin: 0 0 14px; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--secondary-color) 7%, white); border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent); }
+.mercy-photo-editor.hidden { display: none; }
+.mercy-photo-editor label { display: grid; gap: 4px; color: var(--muted-color); font-size: .76rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+.mercy-photo-editor input[type="range"] { accent-color: var(--secondary-color); width: 100%; }
+.mercy-photo-editor small { color: var(--muted-color); font-size: .75rem; }
 .mercy-field,
 .mercy-scripture-box,
 .mercy-save-row,
@@ -18457,20 +18473,17 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 .mercy-mini-toggle input:checked + span::after { transform: translateX(18px); }
 .mercy-toggle-card strong { color: var(--font-color); }
 .mercy-toggle-card small { display: block; color: var(--muted-color); margin-top: 2px; font-size: 0.75rem; line-height: 1.25; }
-.mercy-scripture-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--font-color); }
-.mercy-scripture-head div { display: inline-flex; align-items: center; gap: 7px; }
-.mercy-scripture-head .material-symbols-outlined { color: var(--secondary-color); }
 .mercy-scripture-controls { display: grid; gap: 10px; transition: opacity .2s ease; }
 .mercy-scripture-controls.disabled { opacity: .46; }
 .mercy-scripture-controls.disabled select,
 .mercy-scripture-controls.disabled input,
 .mercy-scripture-controls.disabled textarea { cursor: not-allowed; }
 .mercy-ref-grid,
-.mercy-card-options { display: grid; grid-template-columns: 1.5fr .8fr .8fr; gap: 8px; }
+.mercy-card-options { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .82fr) minmax(0, .82fr); gap: 8px; min-width: 0; }
 .mercy-ref-grid label,
 .mercy-card-options label,
 .mercy-color-field { color: var(--muted-color); font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
-.mercy-card-options { grid-template-columns: 1fr 1fr 74px; align-items: end; }
+.mercy-card-options { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 74px; align-items: end; }
 .mercy-color-field input[type="color"] {
   width: 100%;
   height: 46px;
@@ -18492,7 +18505,8 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 .mercy-scripture-preview.disabled { filter: grayscale(.2); opacity: .72; }
 .mercy-scripture-preview span { color: var(--secondary-color); font-weight: 950; }
-.mercy-scripture-preview p { margin: 8px 0 0; font-size: 1.05rem; line-height: 1.42; font-weight: 800; }
+.mercy-scripture-preview p { margin: 8px 0 0; font-size: 1.05rem; line-height: 1.42; font-weight: 800; color: var(--mercy-scripture-color, var(--font-color)) !important; }
+.mercy-scripture-card p { color: var(--mercy-scripture-color, var(--font-color)) !important; }
 .mercy-scripture-sunrise { background: linear-gradient(135deg, #fff0ca, color-mix(in srgb, var(--secondary-color) 18%, #ffd3aa)); }
 .mercy-scripture-ocean { background: linear-gradient(135deg, #e9fbff, color-mix(in srgb, var(--secondary-color) 18%, #b6ddff)); }
 .mercy-scripture-forest { background: linear-gradient(135deg, #edf9ef, color-mix(in srgb, var(--secondary-color) 22%, #bde7c8)); }

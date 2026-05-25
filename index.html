@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.45" rel="stylesheet"/>
+<link href="style.css?v=3.0.46" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -9733,6 +9733,11 @@ Verb Endings
 <img id="mercyPhotoPreview" alt="Mercy preview"/>
 <button type="button" onclick="clearMercyPhoto()">Change photo</button>
 </div>
+<div class="mercy-photo-editor hidden" id="mercyPhotoEditor">
+<label>Horizontal crop<input id="mercyPhotoPosX" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
+<label>Vertical crop<input id="mercyPhotoPosY" type="range" min="0" max="100" value="50" oninput="updateMercyPhotoPosition()"/></label>
+<small>Adjust how the photo sits inside the feed card.</small>
+</div>
 <div class="mercy-field">
 <label>Prompt</label>
 <label class="mercy-toggle-card">
@@ -9747,13 +9752,11 @@ Verb Endings
 </div>
 <textarea id="mercyBody" maxlength="700" placeholder="Write your response..."></textarea>
 <section class="mercy-scripture-box">
-<div class="mercy-scripture-head">
-<div><span class="material-symbols-outlined">menu_book</span><strong>Attach Scripture</strong></div>
-<label class="mercy-mini-toggle">
+<label class="mercy-toggle-card mercy-scripture-toggle-card">
 <input id="mercyAttachScripture" type="checkbox" onchange="toggleMercyScripture()"/>
-<span></span>
+<span class="mercy-toggle-track"></span>
+<span><strong>Attach Scripture</strong><small>Add an MSB verse card people can swipe to behind your photo.</small></span>
 </label>
-</div>
 <div class="mercy-scripture-controls disabled" id="mercyScriptureControls">
 <div class="mercy-ref-grid">
 <label>Book<select id="mercyScriptureBook" onchange="populateMercyChapters()"></select></label>
@@ -15643,10 +15646,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.45"></script>
+<script src="app.js?v=3.0.46"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.45" type="module"></script>
+<script src="firebase-lb.js?v=3.0.46" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

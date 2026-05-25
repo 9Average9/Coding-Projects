@@ -104,6 +104,9 @@ let _merciesVisibleCount = 12;
 let _merciesFilter = 'latest';
 let _mercyImageBlob = null;
 let _mercyImageDataUrl = null;
+let _mercyOriginalImageFile = null;
+let _mercyPhotoPositionX = 50;
+let _mercyPhotoPositionY = 50;
 let _mercyPromptMode = 'regular';
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -16786,7 +16789,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.45";
+const APP_VERSION = "3.0.46";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -18428,11 +18431,20 @@ async function handleMercyPhotoSelected(input) {
   input.value = '';
   if (!file) return;
   try {
-    const result = await compressMercyImage(file);
+    _mercyOriginalImageFile = file;
+    _mercyPhotoPositionX = 50;
+    _mercyPhotoPositionY = 50;
+    const result = await compressMercyImage(file, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY });
     _mercyImageBlob = result.blob;
     _mercyImageDataUrl = result.dataUrl;
     document.getElementById('mercyPhotoPreview').src = result.dataUrl;
+    document.getElementById('mercyPhotoPreview').style.objectPosition = '50% 50%';
+    const x = document.getElementById('mercyPhotoPosX');
+    const y = document.getElementById('mercyPhotoPosY');
+    if (x) x.value = '50';
+    if (y) y.value = '50';
     document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
+    document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
     document.getElementById('mercyPhotoPicker')?.classList.add('hidden');
   } catch (e) {
     alert('Could not prepare that photo. Try a different image.');
@@ -18442,11 +18454,20 @@ async function handleMercyPhotoSelected(input) {
 function clearMercyPhoto() {
   _mercyImageBlob = null;
   _mercyImageDataUrl = null;
+  _mercyOriginalImageFile = null;
   document.getElementById('mercyPhotoPreviewWrap')?.classList.add('hidden');
+  document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
   document.getElementById('mercyPhotoPicker')?.classList.remove('hidden');
 }
 
-async function compressMercyImage(file) {
+async function updateMercyPhotoPosition() {
+  _mercyPhotoPositionX = Number(document.getElementById('mercyPhotoPosX')?.value || 50);
+  _mercyPhotoPositionY = Number(document.getElementById('mercyPhotoPosY')?.value || 50);
+  const img = document.getElementById('mercyPhotoPreview');
+  if (img) img.style.objectPosition = `${_mercyPhotoPositionX}% ${_mercyPhotoPositionY}%`;
+}
+
+async function compressMercyImage(file, options = {}) {
   let url = null;
   const img = await new Promise((resolve, reject) => {
     const image = new Image();
@@ -18464,9 +18485,23 @@ async function compressMercyImage(file) {
   let blob = null;
   let dataUrl = '';
   for (let attempt = 0; attempt < 6; attempt++) {
-    canvas.width = Math.max(1, Math.round(img.width * scale));
-    canvas.height = Math.max(1, Math.round(img.height * scale));
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    if (options.crop) {
+      canvas.width = Math.max(1, Math.round(1100 * scale));
+      canvas.height = Math.max(1, Math.round(825 * scale));
+      const targetRatio = canvas.width / canvas.height;
+      const sourceRatio = img.width / img.height;
+      let sw = img.width;
+      let sh = img.height;
+      if (sourceRatio > targetRatio) sw = img.height * targetRatio;
+      else sh = img.width / targetRatio;
+      const sx = Math.max(0, Math.min(img.width - sw, (img.width - sw) * ((options.x ?? 50) / 100)));
+      const sy = Math.max(0, Math.min(img.height - sh, (img.height - sh) * ((options.y ?? 50) / 100)));
+      canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    } else {
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
     blob = await new Promise(resolve => canvas.toBlob(resolve, type, quality));
     if (blob && blob.size <= 360 * 1024) break;
     quality = Math.max(0.52, quality - 0.06);
@@ -18480,6 +18515,11 @@ async function compressMercyImage(file) {
 async function submitMercyPost() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid || !_mercyImageBlob) { alert('Choose a photo first.'); return; }
+  if (_mercyOriginalImageFile) {
+    const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, x: _mercyPhotoPositionX, y: _mercyPhotoPositionY });
+    _mercyImageBlob = finalImage.blob;
+    _mercyImageDataUrl = finalImage.dataUrl;
+  }
   const body = document.getElementById('mercyBody')?.value.trim() || '';
   if (!body) { alert('Write a short response first.'); return; }
   const scriptureEnabled = !!document.getElementById('mercyAttachScripture')?.checked;
