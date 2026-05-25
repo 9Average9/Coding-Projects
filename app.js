@@ -116,8 +116,15 @@ let _mercyPhotoOffsetY = 0;
 let _mercyCropPointers = new Map();
 let _mercyCropDragStart = null;
 let _mercyPhotoSampled = false;
+let _mercyPhotoFullMode = false;
+let _mercyPhotoAspectRatio = 4 / 3;
 let _mercyFriendPickerTargetId = null;
 let _mercyPromptMode = 'regular';
+let _mercyPromptChoiceMode = 'guided';
+let _mercyLockedFriendUid = null;
+let _merciesFeedRetryTimer = null;
+let _merciesNavCollapseTimer = null;
+let _merciesNavScrollBound = false;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
 let _studyLongPressTimer = null;
@@ -9688,6 +9695,37 @@ function setNavActive(page) {
     b.classList.toggle('active', b.dataset.page === page));
 }
 
+function setMerciesNavCollapsed(collapsed) {
+  const nav = document.getElementById('bottomNav');
+  if (!nav) return;
+  const isMercies = document.getElementById('merciesPage')?.classList.contains('active');
+  nav.classList.toggle('mercies-collapsed', !!collapsed && isMercies);
+}
+
+function expandMerciesNavTemporarily() {
+  setMerciesNavCollapsed(false);
+  clearTimeout(_merciesNavCollapseTimer);
+  _merciesNavCollapseTimer = setTimeout(() => setMerciesNavCollapsed(true), 3000);
+}
+
+function bindMerciesNavCollapse() {
+  const scroll = document.getElementById('merciesScroll');
+  const nav = document.getElementById('bottomNav');
+  if (!scroll || !nav || _merciesNavScrollBound) return;
+  _merciesNavScrollBound = true;
+  nav.addEventListener('click', e => {
+    if (nav.classList.contains('mercies-collapsed')) {
+      e.preventDefault();
+      e.stopPropagation();
+      expandMerciesNavTemporarily();
+    }
+  }, true);
+  scroll.addEventListener('scroll', () => {
+    if (!document.getElementById('merciesPage')?.classList.contains('active')) return;
+    setMerciesNavCollapsed(true);
+  }, { passive: true });
+}
+
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
@@ -9716,6 +9754,8 @@ function showNavPage(page) {
   } else if (page === 'mercies') {
     showScreen('merciesPage');
     startMerciesFeed();
+    bindMerciesNavCollapse();
+    expandMerciesNavTemporarily();
   } else if (page === 'lessons') {
     hideBottomNav();
     showNewLearnMenu();
@@ -9736,6 +9776,7 @@ function showScreen(id) {
 
   const target = document.getElementById(id);
   if (target) target.classList.add("active");
+  if (id !== 'merciesPage') setMerciesNavCollapsed(false);
 
   _syncHomeViewportState(id);
   _updateAppHeaderForScreen(id);
@@ -16799,7 +16840,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.50";
+const APP_VERSION = "3.0.51";
 
 const UPDATE_NOTES_HTML = `
 <div class="un-version-label">v3.0.15 &mdash; Final Visual Polish</div>
@@ -17771,7 +17812,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const friendUid = new URLSearchParams(location.search).get('friend');
       if (friendUid) {
         const friend = await window.Friends?.getUser?.(friendUid).catch(() => null);
-        openMercyComposer({ friendUid, promptText: _mercyFriendPrompt(friend?.displayName || friend?.username || 'your friend') });
+        openMercyComposer({ friendUid, lockedFriend: true, promptText: _mercyFriendPrompt(friend?.displayName || friend?.username || 'your friend') });
       }
     }, 900);
   }
@@ -18213,18 +18254,28 @@ function startMerciesFeed() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!list) return;
   showMerciesView('feed');
+  clearTimeout(_merciesFeedRetryTimer);
   if (!uid) {
-    list.innerHTML = '<p class="study-board-empty">Sign in to post and see Mercies from friends.</p>';
+    list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Mercies</strong><p>Your feed will load as soon as your account is ready.</p></div>';
+    _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 900);
     return;
   }
   if (!window.Mercies?.listen) {
     list.innerHTML = '<p class="study-board-empty">Loading Mercies...</p>';
-    setTimeout(() => startMerciesFeed(), 500);
+    _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 500);
     return;
   }
   if (_merciesUnsub) { renderMerciesFeed(); return; }
   list.innerHTML = '<p class="study-board-empty">Loading Mercies...</p>';
+  _merciesFeedRetryTimer = setTimeout(() => {
+    if (list.textContent?.includes('Loading Mercies')) {
+      list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">hourglass_empty</span><strong>Still loading</strong><p>Checking your feed connection...</p></div>';
+      if (_merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
+      setTimeout(startMerciesFeed, 1200);
+    }
+  }, 5000);
   _merciesUnsub = window.Mercies.listen(uid, friendsList, posts => {
+    clearTimeout(_merciesFeedRetryTimer);
     _merciesPosts = posts || [];
     renderMerciesFeed();
   });
@@ -18265,6 +18316,10 @@ function _mercyCardHtml(post) {
   const slideDots = scripture && hasPhoto ? '<div class="mercy-slide-dots"><span></span><span></span></div>' : '';
   const saved = !!uid && (post.journalSavedBy || []).includes(uid);
   const taggedNames = post.taggedFriendNames?.length ? post.taggedFriendNames : (post.taggedFriendName ? [post.taggedFriendName] : []);
+  const mediaStyle = post.photoMode === 'full' && post.imageAspectRatio
+    ? ` style="--mercy-photo-aspect:${Number(post.imageAspectRatio).toFixed(4)}"`
+    : '';
+  const mediaClass = post.photoMode === 'full' ? ' mercy-media-full' : '';
   const reactionEntries = Object.entries(reactions).map(([reactUid, value]) => ({
     uid: reactUid,
     label: typeof value === 'string' ? value : value?.label,
@@ -18278,12 +18333,12 @@ function _mercyCardHtml(post) {
       <span class="mercy-category">${_lbEscape(post.promptCategory || 'Mercy')}</span>
       ${post.scripture?.ref ? `<span class="mercy-category mercy-scripture-chip"><span class="material-symbols-outlined">menu_book</span>${_lbEscape(post.scripture.ref)}</span>` : ''}
     </div>
-    ${hasMedia ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}">
+    ${hasMedia ? `<div class="mercy-media${scripture ? ' has-scripture' : ''}${mediaClass}"${mediaStyle}>
       ${hasPhoto ? `<div class="mercy-slide"><img loading="lazy" src="${_lbEscape(post.imageUrl)}" alt="Mercy photo"></div>` : ''}
       ${scripture}
     </div>` : ''}
     ${slideDots}
-    <div class="mercy-prompt">${_lbEscape(post.promptText || '')}</div>
+    ${post.promptText ? `<div class="mercy-prompt">${_lbEscape(post.promptText || '')}</div>` : ''}
     <p class="mercy-body">${_lbEscape(post.body || '')}</p>
     <div class="mercy-chips">
       ${taggedNames.map(name => `<span><span class="material-symbols-outlined">person_heart</span>${_lbEscape(name)}</span>`).join('')}
@@ -18330,6 +18385,10 @@ function openMercyComposer(prefill = {}) {
   _mercyImageBlob = null;
   _mercyImageDataUrl = null;
   _mercyPostWithoutPhoto = false;
+  _mercyPhotoFullMode = false;
+  _mercyPhotoAspectRatio = 4 / 3;
+  _mercyPromptChoiceMode = 'guided';
+  _mercyLockedFriendUid = prefill.lockedFriend ? (prefill.friendUid || null) : null;
   _mercyPromptMode = prefill.friendUid ? 'friend' : 'regular';
   clearMercyPhoto();
   _populateMercyPromptSelect(prefill.promptText);
@@ -18339,6 +18398,9 @@ function openMercyComposer(prefill = {}) {
   if (friendMode) friendMode.checked = !!prefill.friendUid;
   const noPhoto = document.getElementById('mercyNoPhoto');
   if (noPhoto) noPhoto.checked = false;
+  const fullPhoto = document.getElementById('mercyFullPhotoMode');
+  if (fullPhoto) fullPhoto.checked = false;
+  document.getElementById('mercyFullPhotoToggleWrap')?.classList.add('hidden');
   const extraFriends = document.getElementById('mercyExtraFriends');
   if (extraFriends) extraFriends.innerHTML = '';
   const scriptureToggle = document.getElementById('mercyAttachScripture');
@@ -18346,6 +18408,9 @@ function openMercyComposer(prefill = {}) {
   document.getElementById('mercyBody').value = '';
   document.getElementById('mercyScriptureRef').value = '';
   document.getElementById('mercyScriptureText').value = '';
+  document.getElementById('mercyCustomPrompt').value = '';
+  setMercyPromptMode('guided');
+  updateMercyLockedFriendUI();
   toggleMercyScripture();
   document.getElementById('mercySaveThis').checked = localStorage.getItem('merciesAutoSave') === 'true';
   toggleMercyNoPhoto();
@@ -18354,6 +18419,38 @@ function openMercyComposer(prefill = {}) {
 
 function closeMercyComposer() {
   document.getElementById('mercyComposerModal')?.classList.remove('open');
+  _mercyLockedFriendUid = null;
+}
+
+function updateMercyLockedFriendUI() {
+  const locked = !!_mercyLockedFriendUid;
+  const notice = document.getElementById('mercyLockedFriendNotice');
+  const picker = document.getElementById('mercyFriendPickerBtn');
+  const addBtn = document.getElementById('mercyAddFriendBtn');
+  const friendToggle = document.getElementById('mercyFriendEncouragement');
+  notice?.classList.toggle('hidden', !locked);
+  if (picker) {
+    picker.disabled = locked;
+    picker.classList.toggle('locked', locked);
+  }
+  if (addBtn) addBtn.disabled = locked || !!friendToggle?.checked;
+  if (friendToggle) {
+    friendToggle.checked = locked || friendToggle.checked;
+    friendToggle.disabled = locked;
+  }
+}
+
+function setMercyPromptMode(mode = 'guided') {
+  _mercyPromptChoiceMode = ['guided', 'custom', 'none'].includes(mode) ? mode : 'guided';
+  document.querySelectorAll('#mercyPromptMode button').forEach(btn => btn.classList.toggle('active', btn.dataset.promptMode === _mercyPromptChoiceMode));
+  document.getElementById('mercyPromptSelect')?.classList.toggle('hidden', _mercyPromptChoiceMode !== 'guided');
+  document.getElementById('mercyCustomPrompt')?.classList.toggle('hidden', _mercyPromptChoiceMode !== 'custom');
+}
+
+function _currentMercyPromptText() {
+  if (_mercyPromptChoiceMode === 'none') return '';
+  if (_mercyPromptChoiceMode === 'custom') return document.getElementById('mercyCustomPrompt')?.value.trim() || '';
+  return document.getElementById('mercyPromptSelect')?.value || _mercyPromptToday();
 }
 
 function _populateMercyPromptSelect(selectedText) {
@@ -18431,6 +18528,7 @@ function updateMercyFriendPickerButtons() {
 }
 
 async function openMercyFriendPicker(selectId) {
+  if (_mercyLockedFriendUid && selectId === 'mercyFriendSelect') return;
   _mercyFriendPickerTargetId = selectId;
   const list = document.getElementById('mercyFriendPickerList');
   if (!list) return;
@@ -18480,9 +18578,10 @@ function toggleMercyFriendMode() {
   _mercyPromptMode = document.getElementById('mercyFriendEncouragement')?.checked ? 'friend' : 'regular';
   const friendMode = _mercyPromptMode === 'friend';
   const addBtn = document.getElementById('mercyAddFriendBtn');
-  if (addBtn) addBtn.disabled = friendMode;
-  if (friendMode) document.getElementById('mercyExtraFriends')?.replaceChildren();
+  if (addBtn) addBtn.disabled = friendMode || !!_mercyLockedFriendUid;
+  if (friendMode || _mercyLockedFriendUid) document.getElementById('mercyExtraFriends')?.replaceChildren();
   _populateMercyPromptSelect();
+  updateMercyLockedFriendUI();
 }
 
 function onMercyFriendChanged() {
@@ -18666,12 +18765,16 @@ async function handleMercyPhotoSelected(input) {
     _mercyPhotoSampled = false;
     if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
     _mercyPhotoPreviewUrl = URL.createObjectURL(file);
+    const dims = await getMercyImageDimensions(file).catch(() => null);
+    _mercyPhotoAspectRatio = dims?.aspectRatio || 4 / 3;
     document.getElementById('mercyPhotoPreview').src = _mercyPhotoPreviewUrl;
     resetMercyPhotoCrop(false);
     initMercyPhotoCropGestures();
     document.getElementById('mercyPhotoPreviewWrap')?.classList.remove('hidden');
-    document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
+    document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
+    document.getElementById('mercyFullPhotoToggleWrap')?.classList.remove('hidden');
     document.getElementById('mercyPhotoPicker')?.classList.add('hidden');
+    toggleMercyFullPhotoMode();
   } catch (e) {
     alert('Could not prepare that photo. Try a different image.');
   }
@@ -18682,12 +18785,17 @@ function clearMercyPhoto() {
   _mercyImageDataUrl = null;
   _mercyOriginalImageFile = null;
   _mercyPhotoSampled = false;
+  _mercyPhotoFullMode = false;
+  _mercyPhotoAspectRatio = 4 / 3;
   if (_mercyPhotoPreviewUrl) URL.revokeObjectURL(_mercyPhotoPreviewUrl);
   _mercyPhotoPreviewUrl = null;
   document.getElementById('mercyPhotoPreviewWrap')?.classList.add('hidden');
   document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
   document.getElementById('mercyCropGrid')?.classList.add('hidden');
   document.getElementById('mercyPhotoPicker')?.classList.remove('hidden');
+  document.getElementById('mercyFullPhotoToggleWrap')?.classList.add('hidden');
+  const full = document.getElementById('mercyFullPhotoMode');
+  if (full) full.checked = false;
 }
 
 function toggleMercyNoPhoto() {
@@ -18698,6 +18806,7 @@ function toggleMercyNoPhoto() {
 }
 
 function toggleMercyPhotoEditor() {
+  if (_mercyPhotoFullMode) return;
   const editor = document.getElementById('mercyPhotoEditor');
   const grid = document.getElementById('mercyCropGrid');
   const open = editor?.classList.contains('hidden');
@@ -18708,9 +18817,19 @@ function toggleMercyPhotoEditor() {
 function updateMercyPhotoPosition() {
   const img = document.getElementById('mercyPhotoPreview');
   if (img) {
-    img.style.objectFit = 'cover';
-    img.style.transform = `translate(${_mercyPhotoOffsetX}px, ${_mercyPhotoOffsetY}px) scale(${_mercyPhotoScale})`;
+    img.style.objectFit = _mercyPhotoFullMode ? 'contain' : 'cover';
+    img.style.transform = _mercyPhotoFullMode ? '' : `translate(${_mercyPhotoOffsetX}px, ${_mercyPhotoOffsetY}px) scale(${_mercyPhotoScale})`;
   }
+}
+
+function toggleMercyFullPhotoMode() {
+  _mercyPhotoFullMode = !!document.getElementById('mercyFullPhotoMode')?.checked;
+  const wrap = document.getElementById('mercyPhotoPreviewWrap');
+  wrap?.classList.toggle('full-photo', _mercyPhotoFullMode);
+  if (wrap) wrap.style.setProperty('--mercy-photo-aspect', String(_mercyPhotoAspectRatio || (4 / 3)));
+  document.getElementById('mercyPhotoEditor')?.classList.add('hidden');
+  document.getElementById('mercyCropGrid')?.classList.add('hidden');
+  resetMercyPhotoCrop(false);
 }
 
 function resetMercyPhotoCrop(hideGrid = true) {
@@ -18731,6 +18850,7 @@ function initMercyPhotoCropGestures() {
   wrap.dataset.cropGestures = 'true';
   wrap.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
+    if (document.getElementById('mercyPhotoEditor')?.classList.contains('hidden') || _mercyPhotoFullMode) return;
     const img = document.getElementById('mercyPhotoPreview');
     if (_mercyPhotoSampled && img && _mercyPhotoPreviewUrl) {
       _mercyPhotoSampled = false;
@@ -18747,7 +18867,6 @@ function initMercyPhotoCropGestures() {
       scale: _mercyPhotoScale,
       distance: _mercyPointerDistance()
     };
-    document.getElementById('mercyPhotoEditor')?.classList.remove('hidden');
     document.getElementById('mercyCropGrid')?.classList.remove('hidden');
   });
   wrap.addEventListener('pointermove', e => {
@@ -18779,7 +18898,7 @@ function _mercyPointerDistance() {
 
 async function sampleMercyPhotoCrop() {
   if (!_mercyOriginalImageFile) return;
-  const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
+  const finalImage = await compressMercyImage(_mercyOriginalImageFile, _mercyPhotoFullMode ? { full: true } : { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
   _mercyImageBlob = finalImage.blob;
   _mercyImageDataUrl = finalImage.dataUrl;
   const img = document.getElementById('mercyPhotoPreview');
@@ -18787,9 +18906,28 @@ async function sampleMercyPhotoCrop() {
     _mercyPhotoSampled = true;
     img.src = finalImage.dataUrl;
     img.style.transform = '';
-    img.style.objectFit = 'cover';
+    img.style.objectFit = _mercyPhotoFullMode ? 'contain' : 'cover';
+  }
+  if (_mercyPhotoFullMode) {
+    document.getElementById('mercyPhotoPreviewWrap')?.style.setProperty('--mercy-photo-aspect', String(finalImage.aspectRatio || _mercyPhotoAspectRatio || (4 / 3)));
   }
   document.getElementById('mercyCropGrid')?.classList.add('hidden');
+}
+
+async function getMercyImageDimensions(file) {
+  let url = null;
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      url = URL.createObjectURL(file);
+      image.src = url;
+    });
+    return { width: img.width, height: img.height, aspectRatio: img.width / Math.max(1, img.height) };
+  } finally {
+    if (url) URL.revokeObjectURL(url);
+  }
 }
 
 async function compressMercyImage(file, options = {}) {
@@ -18802,7 +18940,7 @@ async function compressMercyImage(file, options = {}) {
     image.src = url;
   });
   if (url) URL.revokeObjectURL(url);
-  const max = 1100;
+  const max = options.full ? 1600 : 1100;
   let scale = Math.min(1, max / Math.max(img.width, img.height));
   const canvas = document.createElement('canvas');
   const type = canvas.toDataURL('image/webp').startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
@@ -18810,7 +18948,11 @@ async function compressMercyImage(file, options = {}) {
   let blob = null;
   let dataUrl = '';
   for (let attempt = 0; attempt < 6; attempt++) {
-    if (options.crop) {
+    if (options.full) {
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    } else if (options.crop) {
       canvas.width = Math.max(1, Math.round(1100 * scale));
       canvas.height = Math.max(1, Math.round(825 * scale));
       const ctx = canvas.getContext('2d');
@@ -18831,20 +18973,20 @@ async function compressMercyImage(file, options = {}) {
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
     }
     blob = await new Promise(resolve => canvas.toBlob(resolve, type, quality));
-    if (blob && blob.size <= 360 * 1024) break;
+    if (blob && blob.size <= (options.full ? 520 : 360) * 1024) break;
     quality = Math.max(0.52, quality - 0.06);
     scale *= 0.86;
   }
   if (!blob) throw new Error('Mercy image compression failed');
   dataUrl = canvas.toDataURL(type, quality);
-  return { blob, dataUrl, type };
+  return { blob, dataUrl, type, aspectRatio: canvas.width / Math.max(1, canvas.height) };
 }
 
 async function submitMercyPost() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
   if (_mercyOriginalImageFile) {
-    const finalImage = await compressMercyImage(_mercyOriginalImageFile, { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
+    const finalImage = await compressMercyImage(_mercyOriginalImageFile, _mercyPhotoFullMode ? { full: true } : { crop: true, scale: _mercyPhotoScale, offsetX: _mercyPhotoOffsetX, offsetY: _mercyPhotoOffsetY });
     _mercyImageBlob = finalImage.blob;
     _mercyImageDataUrl = finalImage.dataUrl;
   }
@@ -18868,8 +19010,11 @@ async function submitMercyPost() {
   if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
   const post = {
     body,
-    promptText: document.getElementById('mercyPromptSelect')?.value || _mercyPromptToday(),
+    promptText: _currentMercyPromptText(),
     promptCategory: document.getElementById('mercyFriendEncouragement')?.checked ? 'Friend Encouragement' : 'Daily Mercy',
+    promptMode: _mercyPromptChoiceMode,
+    photoMode: _mercyOriginalImageFile ? (_mercyPhotoFullMode ? 'full' : 'cover') : null,
+    imageAspectRatio: _mercyOriginalImageFile ? (_mercyPhotoFullMode ? _mercyPhotoAspectRatio : 4 / 3) : null,
     scripture: scriptureText ? { ref: scriptureRef || 'Scripture', text: scriptureText } : null,
     scriptureCard: scriptureText ? {
       bg: document.getElementById('mercyScriptureBg')?.value || 'theme',

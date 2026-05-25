@@ -301,7 +301,7 @@ glacier: {
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="Basic Greek" name="apple-mobile-web-app-title"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.50" rel="stylesheet"/>
+<link href="style.css?v=3.0.51" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -9739,6 +9739,11 @@ Verb Endings
 <button class="mercy-edit-photo-btn" type="button" onclick="toggleMercyPhotoEditor()" aria-label="Edit photo crop"><span class="material-symbols-outlined">edit</span></button>
 <button type="button" onclick="clearMercyPhoto()">Change photo</button>
 </div>
+<label class="mercy-toggle-card mercy-full-photo-toggle hidden" id="mercyFullPhotoToggleWrap">
+<input id="mercyFullPhotoMode" type="checkbox" onchange="toggleMercyFullPhotoMode()"/>
+<span class="mercy-toggle-track"></span>
+<span><strong>Post full picture</strong><small>Best for screenshots or tall photos that should not be cropped.</small></span>
+</label>
 <div class="mercy-photo-editor hidden" id="mercyPhotoEditor">
 <small>Pinch to zoom and drag the photo inside the box.</small>
 <div class="mercy-photo-editor-actions">
@@ -9748,14 +9753,21 @@ Verb Endings
 </div>
 <div class="mercy-field">
 <label>Prompt</label>
+<div class="mercy-prompt-mode" id="mercyPromptMode">
+<button class="active" type="button" data-prompt-mode="guided" onclick="setMercyPromptMode('guided')">Guided</button>
+<button type="button" data-prompt-mode="custom" onclick="setMercyPromptMode('custom')">Custom</button>
+<button type="button" data-prompt-mode="none" onclick="setMercyPromptMode('none')">No prompt</button>
+</div>
 <label class="mercy-toggle-card">
 <input id="mercyFriendEncouragement" type="checkbox" onchange="toggleMercyFriendMode()"/>
 <span class="mercy-toggle-track"></span>
 <span><strong>Friend encouragement</strong><small>Use a prompt shaped for encouraging one friend.</small></span>
 </label>
 <select id="mercyPromptSelect" onchange="onMercyPromptChanged()"></select>
+<textarea class="hidden" id="mercyCustomPrompt" maxlength="180" placeholder="Write your own prompt..." oninput="onMercyPromptChanged()"></textarea>
 </div>
 <div class="mercy-friend-row">
+<div class="mercy-locked-friend hidden" id="mercyLockedFriendNotice"><span class="material-symbols-outlined">person_heart</span><span>This Mercy is for the friend from your reminder.</span></div>
 <select id="mercyFriendSelect" onchange="onMercyFriendChanged()" hidden><option value="">Tag one friend (optional)</option></select>
 <button class="mercy-picker-button" id="mercyFriendPickerBtn" type="button" onclick="openMercyFriendPicker('mercyFriendSelect')"><span>Tag one friend (optional)</span><span class="material-symbols-outlined">expand_more</span></button>
 <div class="mercy-extra-friends" id="mercyExtraFriends"></div>
@@ -15685,10 +15697,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.50"></script>
+<script src="app.js?v=3.0.51"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.50" type="module"></script>
+<script src="firebase-lb.js?v=3.0.51" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
