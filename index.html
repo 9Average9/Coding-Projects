@@ -415,18 +415,18 @@ glacier: {
 <button class="icon-btn habits-back-btn" onclick="showNavPage('home')" aria-label="Back home">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
-<div>
-<span class="habits-kicker">Habit builder</span>
+<div class="habits-hero-text">
+<span class="habits-kicker">Habit Builder</span>
 <h1>Habits</h1>
 <p>Build steady practices with a calendar, streak rewards, and friends who can encourage you.</p>
 </div>
-<button class="icon-btn habits-settings-btn" onclick="openHabitSettingsModal()" aria-label="Habit settings">
-<span class="material-symbols-outlined">settings</span>
-</button>
+<div class="habits-hero-art" aria-hidden="true">
+<img src="habit-hero.svg" alt="" width="170" height="135"/>
+</div>
 </div>
 <div class="habits-actions">
 <button class="habits-primary" onclick="openHabitCreateModal()">
-<span class="material-symbols-outlined">add_task</span>
+<span class="material-symbols-outlined">add_circle</span>
 <span><strong>New Habit</strong><small>Create a habit manually</small></span>
 </button>
 <button class="habits-primary" onclick="openHabitSettingsModal()">
@@ -435,12 +435,40 @@ glacier: {
 </button>
 </div>
 <div class="habits-stats-row">
-<div><strong id="habitTotalCount">0</strong><span>Habits</span></div>
-<div><strong id="habitTodayCount">0</strong><span>Done today</span></div>
-<div><strong id="habitBestStreak">0</strong><span>Best streak</span></div>
+<div>
+<span class="habits-stat-icon material-symbols-outlined">sync_alt</span>
+<strong id="habitTotalCount">0</strong>
+<span>Habits</span>
+</div>
+<div>
+<span class="habits-stat-icon material-symbols-outlined">check_circle</span>
+<strong id="habitTodayCount">0</strong>
+<span>Done today</span>
+</div>
+<div>
+<span class="habits-stat-icon material-symbols-outlined">local_fire_department</span>
+<strong id="habitBestStreak">0</strong>
+<span>Best streak</span>
+</div>
 </div>
 <div class="habits-list" id="habitsList">
 <p class="study-board-empty">Loading habits...</p>
+</div>
+<div class="habit-cal-section" id="habitCalSection" style="display:none">
+<div class="habit-cal-section-hd">
+<strong>Calendar</strong>
+<small>Completed and missed days</small>
+</div>
+<div class="habit-cal-section-nav">
+<button class="icon-btn" onclick="habitCalPrev()" aria-label="Previous month">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<strong id="habitCalMonthLabel"></strong>
+<button class="icon-btn" onclick="habitCalNext()" aria-label="Next month">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div id="habitCalContent"></div>
 </div>
 <div style="height:88px"></div>
 </div>
@@ -9929,8 +9957,8 @@ Verb Endings
 <div class="habit-settings-section">
 <div class="habit-settings-head">
 <div>
-<strong>Edit habits</strong>
-<small>Rename, describe, add accountability friends, or delete.</small>
+<strong>My Habits</strong>
+<small>Tap a habit to rename, add accountability partners, or delete.</small>
 </div>
 </div>
 <div class="habit-settings-list" id="habitSettingsList"></div>

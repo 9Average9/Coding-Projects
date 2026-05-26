@@ -10056,6 +10056,9 @@ let _habitImportRows = [];
 let _habitCreateFriends = new Set();
 let _habitSettingsFriends = {};
 let _habitFriendCache = {};
+let _habitCalHabitId = null;
+let _habitCalYear = null;
+let _habitCalMonth = null;
 
 function _habitEsc(value) {
   return String(value ?? "")
@@ -10325,6 +10328,8 @@ function renderHabits() {
   document.getElementById("habitTodayCount").textContent = todayDone;
   document.getElementById("habitBestStreak").textContent = best;
 
+  const calSection = document.getElementById("habitCalSection");
+
   if (!total) {
     list.innerHTML = `
       <div class="habits-empty">
@@ -10332,6 +10337,7 @@ function renderHabits() {
         <strong>No habits yet</strong>
         <p>Create one manually or import a HabitShare CSV export.</p>
       </div>`;
+    if (calSection) calSection.style.display = "none";
     return;
   }
 
@@ -10341,35 +10347,101 @@ function renderHabits() {
     const doneToday = todayEntry?.status === "success";
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
-    const last = Object.values(entries).sort((a, b) => _habitDateMs(b.date) - _habitDateMs(a.date))[0];
-    const accountability = (habit.accountabilityUids || habit.shareUids || []).filter(Boolean);
+    const calLabel = doneToday ? `Done ${today}` : `Open ${today}`;
     return `
       <article class="habit-card">
-        <div class="habit-card-main">
-          <div>
-            <strong>${_habitEsc(habit.name)}</strong>
-            ${habit.description ? `<p>${_habitEsc(habit.description)}</p>` : ""}
+        <div class="habit-card-top">
+          <div class="habit-card-icon">
+            <span class="material-symbols-outlined">menu_book</span>
           </div>
-          <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${habit.id}', ${doneToday ? "'open'" : "'success'"})">
+          <span class="habit-card-name">${_habitEsc(habit.name)}</span>
+          <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${_habitEsc(habit.id)}', ${doneToday ? "'open'" : "'success'"})">
             <span class="material-symbols-outlined">${doneToday ? "check_circle" : "radio_button_unchecked"}</span>
-            ${doneToday ? "Done Today" : "Complete Today"}
+            <span>${doneToday ? "Done Today" : "Complete Today"}</span>
           </button>
         </div>
-        <div class="habit-meta-row">
-          <span><strong>${streak}</strong> current streak</span>
-          <span><strong>${count}</strong> completions</span>
-          <span>${last ? `${_habitEsc(_habitStatusLabel(last.status))} ${_habitEsc(last.date)}` : "No entries yet"}</span>
+        <div class="habit-pills-row">
+          <span class="habit-pill">
+            <span class="material-symbols-outlined">local_fire_department</span>${streak} current streak
+          </span>
+          <span class="habit-pill">
+            <span class="material-symbols-outlined">emoji_events</span>${count} completions
+          </span>
+          <button class="habit-pill habit-pill-cal" onclick="openHabitCalendar('${_habitEsc(habit.id)}')">
+            <span class="material-symbols-outlined">calendar_today</span>${_habitEsc(calLabel)}
+          </button>
         </div>
-        ${accountability.length ? `<div class="habit-accountability-row">${accountability.map(uid => `<span>${_habitEsc(_habitFriendName(uid))}</span>`).join("")}</div>` : ""}
-        ${_habitCalendarHtml(habit)}
       </article>`;
   }).join("");
+
+  // Auto-select calendar for first (or already-selected) habit
+  if (!_habitCalHabitId || !_habitItems.find(h => h.id === _habitCalHabitId)) {
+    _habitCalHabitId = _habitItems[0]?.id || null;
+    const now = new Date();
+    _habitCalYear = now.getFullYear();
+    _habitCalMonth = now.getMonth();
+  }
+  _renderHabitCalSection();
+
   const unseen = _habitItems.flatMap(h => h.accountabilityUids || h.shareUids || []).filter(uid => uid && !_habitFriendCache[uid]);
   if (unseen.length) {
     _habitLoadFriendProfiles(unseen).then(() => {
       if (document.getElementById("habitsPage")?.classList.contains("active")) renderHabits();
     });
   }
+}
+
+function openHabitCalendar(habitId) {
+  _habitCalHabitId = habitId;
+  if (_habitCalYear === null) {
+    const now = new Date();
+    _habitCalYear = now.getFullYear();
+    _habitCalMonth = now.getMonth();
+  }
+  _renderHabitCalSection();
+  document.getElementById("habitCalSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function _renderHabitCalSection() {
+  const section = document.getElementById("habitCalSection");
+  const content = document.getElementById("habitCalContent");
+  const label = document.getElementById("habitCalMonthLabel");
+  if (!section || !content) return;
+
+  const habit = _habitItems.find(h => h.id === _habitCalHabitId);
+  if (!habit) { section.style.display = "none"; return; }
+
+  const now = new Date();
+  const year = _habitCalYear ?? now.getFullYear();
+  const month = _habitCalMonth ?? now.getMonth();
+
+  if (label) {
+    label.textContent = new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  }
+  content.innerHTML = _habitMonthHtml(habit, year, month);
+  section.style.display = "block";
+}
+
+function habitCalPrev() {
+  const now = new Date();
+  let y = _habitCalYear ?? now.getFullYear();
+  let m = _habitCalMonth ?? now.getMonth();
+  m--;
+  if (m < 0) { m = 11; y--; }
+  _habitCalYear = y;
+  _habitCalMonth = m;
+  _renderHabitCalSection();
+}
+
+function habitCalNext() {
+  const now = new Date();
+  let y = _habitCalYear ?? now.getFullYear();
+  let m = _habitCalMonth ?? now.getMonth();
+  m++;
+  if (m > 11) { m = 0; y++; }
+  _habitCalYear = y;
+  _habitCalMonth = m;
+  _renderHabitCalSection();
 }
 
 function openHabitCreateModal() {
@@ -10451,24 +10523,31 @@ async function renderHabitSettings() {
     const selected = _habitSettingsFriends[habit.id] || new Set(habit.accountabilityUids || habit.shareUids || []);
     _habitSettingsFriends[habit.id] = selected;
     return `
-      <div class="habit-settings-item">
-        <label class="habit-field">
-          <span>Name</span>
-          <input id="habitEditName_${habit.id}" type="text" value="${_habitEsc(habit.name || "")}" maxlength="80"/>
-        </label>
-        <label class="habit-field">
-          <span>Description</span>
-          <textarea id="habitEditDesc_${habit.id}" maxlength="240">${_habitEsc(habit.description || "")}</textarea>
-        </label>
-        <div class="habit-field">
-          <span>Accountability friends</span>
-          <div class="habit-friend-picker" id="habitEditFriends_${habit.id}"></div>
+      <details class="habit-settings-item" id="habitSettingsItem_${_habitEsc(habit.id)}">
+        <summary class="habit-settings-summary">
+          <span class="material-symbols-outlined">expand_more</span>
+          <span>${_habitEsc(habit.name)}</span>
+        </summary>
+        <div class="habit-settings-body">
+          <label class="habit-field">
+            <span>Habit name</span>
+            <input id="habitEditName_${_habitEsc(habit.id)}" type="text" value="${_habitEsc(habit.name || "")}" maxlength="80"/>
+          </label>
+          <label class="habit-field">
+            <span>Description</span>
+            <textarea id="habitEditDesc_${_habitEsc(habit.id)}" maxlength="240">${_habitEsc(habit.description || "")}</textarea>
+          </label>
+          <div class="habit-field">
+            <span>Accountability partners</span>
+            <span class="habit-field-hint">These friends get notified when you complete this habit.</span>
+            <div class="habit-friend-picker" id="habitEditFriends_${_habitEsc(habit.id)}"></div>
+          </div>
+          <div class="habit-settings-actions">
+            <button class="habits-mini-btn" onclick="saveHabitSettings('${_habitEsc(habit.id)}')">Save changes</button>
+            <button class="habit-danger-btn" onclick="deleteHabit('${_habitEsc(habit.id)}')">Delete habit</button>
+          </div>
         </div>
-        <div class="habit-settings-actions">
-          <button class="habits-mini-btn" onclick="saveHabitSettings('${habit.id}')">Save</button>
-          <button class="habit-danger-btn" onclick="deleteHabit('${habit.id}')">Delete</button>
-        </div>
-      </div>`;
+      </details>`;
   }).join("");
   _habitItems.forEach(habit => {
     _renderHabitFriendPicker(`habitEditFriends_${habit.id}`, _habitSettingsFriends[habit.id], "toggleHabitSettingsFriend.bind(null, '" + habit.id + "')");
