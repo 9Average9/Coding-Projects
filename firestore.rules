@@ -12,6 +12,16 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['friendRequestsIn', 'friendRequestsOut', 'friends', 'updatedAt']);
 
+      match /habits/{habitId} {
+        allow read, create, update, delete: if request.auth != null
+          && request.auth.uid == uid;
+
+        match /entries/{entryId} {
+          allow read, create, update, delete: if request.auth != null
+            && request.auth.uid == uid;
+        }
+      }
+
       match /merciesJournal/{entryId} {
         allow read, create, update, delete: if request.auth != null
           && request.auth.uid == uid;

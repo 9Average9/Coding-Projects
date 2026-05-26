@@ -303,7 +303,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-180.png" rel="apple-touch-icon"/>
 <link href="assets/icons/disciple-builder-icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
-<link href="style.css?v=3.0.65" rel="stylesheet"/>
+<link href="style.css?v=3.0.66" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -383,6 +383,11 @@ glacier: {
 <div class="hat-text"><strong>Notifications</strong><small>Updates &amp; activity</small></div>
 <span class="material-symbols-outlined hat-chev">chevron_right</span>
 </button>
+<button class="home-action-tile" id="habitsHomeBtn" onclick="showNavPage('habits')">
+<div class="hat-icon"><span class="material-symbols-outlined">checklist</span></div>
+<div class="hat-text"><strong>Habits</strong><small>Track steady faithfulness</small></div>
+<span class="material-symbols-outlined hat-chev">chevron_right</span>
+</button>
 <button class="home-action-tile locked-feature-btn" id="vocabHomeBtn" onclick="tryOpenLockedFeature('vocab')">
 <div class="hat-icon"><span class="material-symbols-outlined lock-icon">sort_by_alpha</span></div>
 <div class="hat-text"><strong>Vocab</strong><small>Build your vocabulary</small></div>
@@ -403,6 +408,51 @@ glacier: {
 </div>
 <!-- Hidden badge kept for backward compatibility -->
 <span class="friends-home-badge hidden" id="friendsHomeBadge"></span>
+</section>
+<section class="screen" id="habitsPage">
+<div class="habits-scroll">
+<div class="habits-hero">
+<button class="icon-btn habits-back-btn" onclick="showNavPage('home')" aria-label="Back home">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div>
+<span class="habits-kicker">Habit builder</span>
+<h1>Habits</h1>
+<p>Bring your HabitShare history into Disciple Builder and keep building steady practices here.</p>
+</div>
+</div>
+<div class="habits-actions">
+<button class="habits-primary" onclick="openHabitCreateModal()">
+<span class="material-symbols-outlined">add_task</span>
+<span><strong>New Habit</strong><small>Create a habit manually</small></span>
+</button>
+<label class="habits-primary habits-import-label">
+<span class="material-symbols-outlined">upload_file</span>
+<span><strong>Import CSV</strong><small>HabitShare export format</small></span>
+<input id="habitCsvInput" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values,text/plain" onchange="handleHabitCsvFile(this)" />
+</label>
+</div>
+<div class="habit-import-preview hidden" id="habitImportPreview">
+<div class="habit-import-head">
+<div>
+<strong id="habitImportTitle">CSV preview</strong>
+<small id="habitImportSummary"></small>
+</div>
+<button class="habits-mini-btn" onclick="clearHabitImportPreview()">Clear</button>
+</div>
+<div class="habit-import-list" id="habitImportList"></div>
+<button class="main-btn habit-import-submit" id="habitImportSubmitBtn" onclick="confirmHabitImport()">Import to Habits</button>
+</div>
+<div class="habits-stats-row">
+<div><strong id="habitTotalCount">0</strong><span>Habits</span></div>
+<div><strong id="habitTodayCount">0</strong><span>Done today</span></div>
+<div><strong id="habitBestStreak">0</strong><span>Best streak</span></div>
+</div>
+<div class="habits-list" id="habitsList">
+<p class="study-board-empty">Loading habits...</p>
+</div>
+<div style="height:88px"></div>
+</div>
 </section>
 <section class="screen" id="newLearnMenu">
 <div class="nav-bar">
@@ -9829,6 +9879,30 @@ Verb Endings
 <p class="praise-info-verses">Psalm 31:1 · Hebrews 13:15 · Colossians 3:17 · 1 Thessalonians 5:18</p>
 </div>
 </div>
+<div class="modal-overlay" id="habitCreateModal" onclick="closeHabitCreateModal(event)">
+<div class="modal-card habit-create-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeHabitCreateModal()">&times;</button>
+<div class="habits-kicker"><span class="material-symbols-outlined">checklist</span> Habit</div>
+<h2>New Habit</h2>
+<label class="habit-field">
+<span>Name</span>
+<input id="habitNameInput" type="text" placeholder="Bible reading" maxlength="80"/>
+</label>
+<label class="habit-field">
+<span>Description</span>
+<textarea id="habitDescInput" placeholder="A short note about what this habit is for" maxlength="240"></textarea>
+</label>
+<label class="habit-field">
+<span>Schedule</span>
+<select id="habitScheduleInput">
+<option value="daily">Daily</option>
+<option value="weekly">Weekly goal</option>
+<option value="weekdays">Weekdays</option>
+</select>
+</label>
+<button class="main-btn" onclick="submitHabitCreate()">Create Habit</button>
+</div>
+</div>
 <div class="rhema-picker-overlay hidden" id="mercyBookPickerOverlay" onclick="closeMercyPickerSheet()">
 <div class="rhema-picker-sheet" onclick="event.stopPropagation()">
 <div class="rhema-picker-hdr"><span class="rhema-picker-title">Select Book</span><button class="rhema-picker-x" onclick="closeMercyPickerSheet()">x</button></div>
@@ -15707,10 +15781,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.65"></script>
+<script src="app.js?v=3.0.66"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.65" type="module"></script>
+<script src="firebase-lb.js?v=3.0.66" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

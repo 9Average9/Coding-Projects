@@ -17,6 +17,7 @@ import {
   onSnapshot,
   serverTimestamp,
   updateDoc,
+  writeBatch,
   arrayUnion,
   arrayRemove,
   increment,
@@ -1131,6 +1132,150 @@ async function getEncouragementMessages(uid) {
     return [];
   }
 }
+
+// Habits
+function habitIdFromName(name) {
+  const slug = String(name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 54);
+  return slug || `habit-${Date.now()}`;
+}
+
+function listenHabits(uid, callback) {
+  const q = query(collection(db, "users", uid, "habits"), orderBy("createdAtMs", "asc"));
+  return onSnapshot(q, async snap => {
+    const habits = await Promise.all(snap.docs.map(async habitDoc => {
+      const entrySnap = await getDocs(collection(db, "users", uid, "habits", habitDoc.id, "entries"));
+      const entries = {};
+      entrySnap.docs.forEach(entryDoc => {
+        entries[entryDoc.id] = { id: entryDoc.id, ...entryDoc.data() };
+      });
+      return { id: habitDoc.id, ...habitDoc.data(), entries };
+    }));
+    callback(habits);
+  }, err => {
+    console.warn("listenHabits:", err);
+    callback([]);
+  });
+}
+
+async function createHabit(uid, { name, description = "", scheduleType = "daily" } = {}) {
+  try {
+    const habitId = habitIdFromName(name);
+    await setDoc(doc(db, "users", uid, "habits", habitId), {
+      ownerUid: uid,
+      name: String(name || "").trim(),
+      description: String(description || "").trim(),
+      schedule: { type: scheduleType || "daily" },
+      shareUids: [],
+      source: "disciple-builder",
+      createdAt: serverTimestamp(),
+      createdAtMs: Date.now(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return habitId;
+  } catch (e) {
+    console.warn("createHabit:", e);
+    return null;
+  }
+}
+
+async function setHabitEntry(uid, habitId, { date, status, comment = "", source = "disciple-builder" } = {}) {
+  try {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ""))) return false;
+    await setDoc(doc(db, "users", uid, "habits", habitId, "entries", date), {
+      date,
+      status: status || "open",
+      comment: String(comment || ""),
+      source,
+      updatedAt: serverTimestamp(),
+      updatedAtMs: Date.now()
+    }, { merge: true });
+    await setDoc(doc(db, "users", uid, "habits", habitId), {
+      updatedAt: serverTimestamp(),
+      updatedAtMs: Date.now()
+    }, { merge: true });
+    return true;
+  } catch (e) {
+    console.warn("setHabitEntry:", e);
+    return false;
+  }
+}
+
+async function importHabitShare(uid, rows = []) {
+  try {
+    const byHabit = {};
+    rows.forEach(row => {
+      const name = String(row.habit || "").trim();
+      if (!name || !row.date) return;
+      if (!byHabit[name]) byHabit[name] = [];
+      byHabit[name].push(row);
+    });
+    const habitNames = Object.keys(byHabit);
+    let batch = writeBatch(db);
+    let writes = 0;
+    let totalEntries = 0;
+    const commitIfNeeded = async (force = false) => {
+      if (writes && (force || writes >= 420)) {
+        await batch.commit();
+        batch = writeBatch(db);
+        writes = 0;
+      }
+    };
+
+    for (const name of habitNames) {
+      const habitId = habitIdFromName(name);
+      const habitRef = doc(db, "users", uid, "habits", habitId);
+      batch.set(habitRef, {
+        ownerUid: uid,
+        name,
+        description: "",
+        schedule: { type: "daily" },
+        shareUids: [],
+        source: "habitshare-import",
+        importedAt: serverTimestamp(),
+        createdAt: serverTimestamp(),
+        createdAtMs: Date.now(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      writes++;
+      await commitIfNeeded();
+
+      for (const row of byHabit[name]) {
+        const entryRef = doc(db, "users", uid, "habits", habitId, "entries", row.date);
+        batch.set(entryRef, {
+          date: row.date,
+          status: row.status || "open",
+          comment: String(row.comment || ""),
+          source: "habitshare-import",
+          sourceRow: row.sourceRow || null,
+          importedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          updatedAtMs: Date.now()
+        }, { merge: true });
+        writes++;
+        totalEntries++;
+        await commitIfNeeded();
+      }
+    }
+
+    await commitIfNeeded(true);
+    return { habits: habitNames.length, entries: totalEntries };
+  } catch (e) {
+    console.warn("importHabitShare:", e);
+    return null;
+  }
+}
+
+window.Habits = {
+  listen: listenHabits,
+  create: createHabit,
+  setEntry: setHabitEntry,
+  importHabitShare
+};
 
 window.Studies = {
   create: studyCreate, get: studyGet, getMine: studyGetMine, getFriends: studyGetFriends,
