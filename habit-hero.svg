@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 175" width="220" height="175">
+  <!-- Soft background blob -->
+  <ellipse cx="155" cy="105" rx="68" ry="66" fill="rgba(209,250,229,0.38)"/>
+
+  <!-- Coffee mug body -->
+  <rect x="8" y="106" width="56" height="50" rx="9" fill="#1a5c45"/>
+  <rect x="16" y="114" width="40" height="36" rx="5" fill="#226e52" opacity="0.55"/>
+  <!-- Mug handle -->
+  <path d="M64 118 C84 118 84 152 64 152" stroke="#1a5c45" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Steam -->
+  <path d="M28 103 Q32 93 28 83" stroke="#b0c4be" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M40 101 Q44 89 40 77" stroke="#b0c4be" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M52 103 Q56 93 52 83" stroke="#b0c4be" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Plant pot -->
+  <rect x="72" y="124" width="50" height="32" rx="7" fill="#78909c"/>
+  <rect x="68" y="117" width="58" height="12" rx="7" fill="#607d8b"/>
+  <!-- Plant stem -->
+  <line x1="97" y1="117" x2="97" y2="55" stroke="#2d6a4f" stroke-width="4"/>
+  <!-- Leaves bottom to top -->
+  <ellipse cx="97" cy="106" rx="27" ry="12" fill="#2d6a4f" transform="rotate(-38 97 106)"/>
+  <ellipse cx="97" cy="93" rx="25" ry="11" fill="#1b4d34" transform="rotate(33 97 93)"/>
+  <ellipse cx="97" cy="80" rx="23" ry="10" fill="#2d6a4f" transform="rotate(-28 97 80)"/>
+  <ellipse cx="97" cy="68" rx="20" ry="9" fill="#3a7a5c" transform="rotate(22 97 68)"/>
+  <ellipse cx="97" cy="57" rx="16" ry="7.5" fill="#2d6a4f" transform="rotate(-14 97 57)"/>
+
+  <!-- Calendar body -->
+  <rect x="128" y="50" width="84" height="106" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <!-- Green header band -->
+  <rect x="128" y="50" width="84" height="27" rx="10" fill="#dcfce7"/>
+  <rect x="128" y="68" width="84" height="9" rx="0" fill="#dcfce7"/>
+  <!-- Spiral rings -->
+  <rect x="142" y="43" width="8" height="17" rx="4" fill="#2d6a4f"/>
+  <rect x="160" y="43" width="8" height="17" rx="4" fill="#2d6a4f"/>
+  <rect x="178" y="43" width="8" height="17" rx="4" fill="#2d6a4f"/>
+  <rect x="196" y="43" width="8" height="17" rx="4" fill="#2d6a4f"/>
+  <!-- Calendar grid row 1 -->
+  <text x="134" y="104" font-family="Arial,sans-serif" font-size="15" fill="#2d6a4f" font-weight="900">✓</text>
+  <text x="154" y="104" font-family="Arial,sans-serif" font-size="15" fill="#ef4444" font-weight="900">✗</text>
+  <text x="174" y="104" font-family="Arial,sans-serif" font-size="15" fill="#ef4444" font-weight="900">✗</text>
+  <!-- Row 2 -->
+  <text x="134" y="124" font-family="Arial,sans-serif" font-size="15" fill="#2d6a4f" font-weight="900">✓</text>
+  <text x="154" y="124" font-family="Arial,sans-serif" font-size="15" fill="#2d6a4f" font-weight="900">✓</text>
+  <text x="174" y="124" font-family="Arial,sans-serif" font-size="15" fill="#ef4444" font-weight="900">✗</text>
+  <!-- Row 3 -->
+  <text x="134" y="144" font-family="Arial,sans-serif" font-size="15" fill="#2d6a4f" font-weight="900">✓</text>
+  <text x="154" y="144" font-family="Arial,sans-serif" font-size="15" fill="#2d6a4f" font-weight="900">✓</text>
+  <text x="174" y="144" font-family="Arial,sans-serif" font-size="15" fill="#2d6a4f" font-weight="900">✓</text>
+</svg>
