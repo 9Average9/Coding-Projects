@@ -10053,6 +10053,9 @@ function populateHomeScreen() {
 let _habitsUnsub = null;
 let _habitItems = [];
 let _habitImportRows = [];
+let _habitCreateFriends = new Set();
+let _habitSettingsFriends = {};
+let _habitFriendCache = {};
 
 function _habitEsc(value) {
   return String(value ?? "")
@@ -10071,6 +10074,10 @@ function _habitTodayKey() {
 function _habitDateMs(dateKey) {
   const ms = Date.parse(`${dateKey}T00:00:00`);
   return Number.isFinite(ms) ? ms : 0;
+}
+
+function _habitKeyForDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function _habitCurrentStreak(entries = {}) {
@@ -10101,6 +10108,14 @@ function _habitBestStreak(entries = {}) {
   return best;
 }
 
+function _habitFirstDate(entries = {}) {
+  const days = Object.values(entries)
+    .map(e => e.date)
+    .filter(Boolean)
+    .sort((a, b) => _habitDateMs(a) - _habitDateMs(b));
+  return days[0] || _habitTodayKey();
+}
+
 function _habitStatusLabel(status) {
   if (status === "success") return "Done";
   if (status === "skipped") return "Skipped";
@@ -10114,6 +10129,112 @@ function _habitNormalizeStatus(status) {
   if (["skip", "skipped", "excused"].includes(s)) return "skipped";
   if (["fail", "failed", "missed", "no", "0", "false"].includes(s)) return "missed";
   return s || "open";
+}
+
+function _habitMilestoneForStreak(streak) {
+  const milestones = [
+    { key: "30", days: 30, xp: 750, label: "30-day habit streak" },
+    { key: "14", days: 14, xp: 350, label: "14-day habit streak" },
+    { key: "7", days: 7, xp: 175, label: "7-day habit streak" },
+    { key: "3", days: 3, xp: 75, label: "3-day habit streak" }
+  ];
+  return milestones.find(m => streak >= m.days) || null;
+}
+
+function _habitEntryStatusForDate(habit, dateKey) {
+  const entry = habit.entries?.[dateKey];
+  if (entry?.status === "success") return "success";
+  if (entry?.status === "skipped") return "skipped";
+  if (entry?.status === "missed") return "missed";
+  const firstEntry = _habitFirstDate(habit.entries || {});
+  const created = habit.createdAtMs ? _habitKeyForDate(new Date(habit.createdAtMs)) : firstEntry;
+  const start = _habitDateMs(firstEntry) < _habitDateMs(created) ? firstEntry : created;
+  if (_habitDateMs(dateKey) < _habitDateMs(start)) return "open";
+  if (_habitDateMs(dateKey) < _habitDateMs(_habitTodayKey())) return "missed";
+  return "open";
+}
+
+function _habitMonthHtml(habit, year, month) {
+  const title = new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  const first = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const blanks = first.getDay();
+  const cells = [];
+  for (let i = 0; i < blanks; i++) cells.push('<div class="habit-cal-day blank"></div>');
+  for (let day = 1; day <= lastDay; day++) {
+    const date = new Date(year, month, day);
+    const key = _habitKeyForDate(date);
+    const status = _habitEntryStatusForDate(habit, key);
+    const isToday = key === _habitTodayKey();
+    const icon = status === "success"
+      ? '<span class="material-symbols-outlined">check</span>'
+      : status === "missed"
+        ? '<span class="material-symbols-outlined">close</span>'
+        : String(day);
+    cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}" title="${key} ${_habitEsc(_habitStatusLabel(status))}">${icon}</div>`);
+  }
+  return `
+    <div class="habit-calendar-month">
+      <div class="habit-calendar-head"><span>${_habitEsc(title)}</span></div>
+      <div class="habit-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="habit-cal-grid">${cells.join("")}</div>
+    </div>`;
+}
+
+function _habitCalendarHtml(habit) {
+  const now = new Date();
+  const startKey = _habitFirstDate(habit.entries || {});
+  const [startYear, startMonth] = startKey.split("-").map(Number);
+  const months = [];
+  let cursor = new Date(startYear || now.getFullYear(), (startMonth || (now.getMonth() + 1)) - 1, 1);
+  const end = new Date(now.getFullYear(), now.getMonth(), 1);
+  while (cursor <= end) {
+    months.push({ year: cursor.getFullYear(), month: cursor.getMonth() });
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  months.reverse();
+  return `
+    <div class="habit-calendar">
+      <div class="habit-calendar-title"><strong>Calendar</strong><small>Completed and missed days</small></div>
+      <div class="habit-calendar-months">${months.map(m => _habitMonthHtml(habit, m.year, m.month)).join("")}</div>
+    </div>`;
+}
+
+async function _habitLoadFriendProfiles(uids = friendsList || []) {
+  const wanted = [...new Set((uids || []).filter(Boolean))];
+  await Promise.all(wanted.map(async uid => {
+    if (_habitFriendCache[uid]) return;
+    const user = await window.Friends?.getUser?.(uid).catch(() => null);
+    _habitFriendCache[uid] = user || { uid, displayName: "Friend" };
+  }));
+  return wanted.map(uid => _habitFriendCache[uid]).filter(Boolean);
+}
+
+function _habitFriendName(uid) {
+  const u = _habitFriendCache[uid];
+  return u?.displayName || u?.username || "Friend";
+}
+
+async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const friendUids = friendsList || [];
+  if (!friendUids.length) {
+    el.innerHTML = '<p class="study-board-empty">Add friends first, then choose accountability partners here.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
+  const users = await _habitLoadFriendProfiles(friendUids);
+  el.innerHTML = users.map(user => {
+    const name = _habitEsc(user.displayName || user.username || "Friend");
+    const handle = _habitEsc(user.username || user.email || "");
+    const selected = selectedSet.has(user.uid);
+    return `
+      <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
+        <span>${name}${handle ? `<small>${handle}</small>` : ""}</span>
+        <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
+      </button>`;
+  }).join("");
 }
 
 function _parseCsvLine(line, delimiter) {
@@ -10221,6 +10342,7 @@ function renderHabits() {
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
     const last = Object.values(entries).sort((a, b) => _habitDateMs(b.date) - _habitDateMs(a.date))[0];
+    const accountability = (habit.accountabilityUids || habit.shareUids || []).filter(Boolean);
     return `
       <article class="habit-card">
         <div class="habit-card-main">
@@ -10230,7 +10352,7 @@ function renderHabits() {
           </div>
           <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${habit.id}', ${doneToday ? "'open'" : "'success'"})">
             <span class="material-symbols-outlined">${doneToday ? "check_circle" : "radio_button_unchecked"}</span>
-            ${doneToday ? "Done" : "Mark"}
+            ${doneToday ? "Done Today" : "Complete Today"}
           </button>
         </div>
         <div class="habit-meta-row">
@@ -10238,15 +10360,31 @@ function renderHabits() {
           <span><strong>${count}</strong> completions</span>
           <span>${last ? `${_habitEsc(_habitStatusLabel(last.status))} ${_habitEsc(last.date)}` : "No entries yet"}</span>
         </div>
+        ${accountability.length ? `<div class="habit-accountability-row">${accountability.map(uid => `<span>${_habitEsc(_habitFriendName(uid))}</span>`).join("")}</div>` : ""}
+        ${_habitCalendarHtml(habit)}
       </article>`;
   }).join("");
+  const unseen = _habitItems.flatMap(h => h.accountabilityUids || h.shareUids || []).filter(uid => uid && !_habitFriendCache[uid]);
+  if (unseen.length) {
+    _habitLoadFriendProfiles(unseen).then(() => {
+      if (document.getElementById("habitsPage")?.classList.contains("active")) renderHabits();
+    });
+  }
 }
 
 function openHabitCreateModal() {
   document.getElementById("habitNameInput").value = "";
   document.getElementById("habitDescInput").value = "";
   document.getElementById("habitScheduleInput").value = "daily";
+  _habitCreateFriends = new Set();
+  _renderHabitFriendPicker("habitCreateFriendsList", _habitCreateFriends, "toggleHabitCreateFriend");
   document.getElementById("habitCreateModal")?.classList.add("open");
+}
+
+function toggleHabitCreateFriend(uid) {
+  if (_habitCreateFriends.has(uid)) _habitCreateFriends.delete(uid);
+  else _habitCreateFriends.add(uid);
+  _renderHabitFriendPicker("habitCreateFriendsList", _habitCreateFriends, "toggleHabitCreateFriend");
 }
 
 function closeHabitCreateModal(event) {
@@ -10262,7 +10400,7 @@ async function submitHabitCreate() {
   if (!name) { alert("Give the habit a name."); return; }
   const description = document.getElementById("habitDescInput")?.value.trim() || "";
   const scheduleType = document.getElementById("habitScheduleInput")?.value || "daily";
-  const ok = await window.Habits?.create?.(uid, { name, description, scheduleType });
+  const ok = await window.Habits?.create?.(uid, { name, description, scheduleType, accountabilityUids: [..._habitCreateFriends] });
   if (!ok) { alert("Could not create that habit yet."); return; }
   closeHabitCreateModal();
 }
@@ -10270,12 +10408,101 @@ async function submitHabitCreate() {
 async function toggleHabitToday(habitId, status) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
+  const habit = _habitItems.find(h => h.id === habitId);
+  const beforeMilestones = new Set(habit?.awardedMilestones || []);
   const ok = await window.Habits?.setEntry?.(uid, habitId, {
     date: _habitTodayKey(),
     status,
-    comment: ""
+    comment: "",
+    notify: status === "success"
   });
   if (!ok) alert("Could not update that habit.");
+  if (ok && status === "success" && habit) {
+    const mergedEntries = { ...(habit.entries || {}), [_habitTodayKey()]: { date: _habitTodayKey(), status: "success" } };
+    const streak = _habitCurrentStreak(mergedEntries);
+    const milestone = _habitMilestoneForStreak(streak);
+    if (milestone && !beforeMilestones.has(milestone.key)) {
+      addXP(milestone.xp, `${habit.name}: ${milestone.label}`, true);
+      await window.Habits?.awardMilestone?.(uid, habitId, milestone.key);
+    }
+  }
+}
+
+function openHabitSettingsModal() {
+  document.getElementById("habitSettingsModal")?.classList.add("open");
+  renderHabitSettings();
+}
+
+function closeHabitSettingsModal(event) {
+  if (!event || event.target.id === "habitSettingsModal") {
+    document.getElementById("habitSettingsModal")?.classList.remove("open");
+  }
+}
+
+async function renderHabitSettings() {
+  const list = document.getElementById("habitSettingsList");
+  if (!list) return;
+  if (!_habitItems.length) {
+    list.innerHTML = '<p class="study-board-empty">Create or import a habit first.</p>';
+    return;
+  }
+  await _habitLoadFriendProfiles(friendsList || []);
+  list.innerHTML = _habitItems.map(habit => {
+    const selected = _habitSettingsFriends[habit.id] || new Set(habit.accountabilityUids || habit.shareUids || []);
+    _habitSettingsFriends[habit.id] = selected;
+    return `
+      <div class="habit-settings-item">
+        <label class="habit-field">
+          <span>Name</span>
+          <input id="habitEditName_${habit.id}" type="text" value="${_habitEsc(habit.name || "")}" maxlength="80"/>
+        </label>
+        <label class="habit-field">
+          <span>Description</span>
+          <textarea id="habitEditDesc_${habit.id}" maxlength="240">${_habitEsc(habit.description || "")}</textarea>
+        </label>
+        <div class="habit-field">
+          <span>Accountability friends</span>
+          <div class="habit-friend-picker" id="habitEditFriends_${habit.id}"></div>
+        </div>
+        <div class="habit-settings-actions">
+          <button class="habits-mini-btn" onclick="saveHabitSettings('${habit.id}')">Save</button>
+          <button class="habit-danger-btn" onclick="deleteHabit('${habit.id}')">Delete</button>
+        </div>
+      </div>`;
+  }).join("");
+  _habitItems.forEach(habit => {
+    _renderHabitFriendPicker(`habitEditFriends_${habit.id}`, _habitSettingsFriends[habit.id], "toggleHabitSettingsFriend.bind(null, '" + habit.id + "')");
+  });
+}
+
+function toggleHabitSettingsFriend(habitId, uid) {
+  if (!_habitSettingsFriends[habitId]) _habitSettingsFriends[habitId] = new Set();
+  if (_habitSettingsFriends[habitId].has(uid)) _habitSettingsFriends[habitId].delete(uid);
+  else _habitSettingsFriends[habitId].add(uid);
+  _renderHabitFriendPicker(`habitEditFriends_${habitId}`, _habitSettingsFriends[habitId], "toggleHabitSettingsFriend.bind(null, '" + habitId + "')");
+}
+
+async function saveHabitSettings(habitId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const name = document.getElementById(`habitEditName_${habitId}`)?.value.trim();
+  if (!name) { alert("Habit name cannot be blank."); return; }
+  const description = document.getElementById(`habitEditDesc_${habitId}`)?.value.trim() || "";
+  const accountabilityUids = [...(_habitSettingsFriends[habitId] || new Set())];
+  const ok = await window.Habits?.update?.(uid, habitId, { name, description, accountabilityUids });
+  if (!ok) { alert("Could not save that habit."); return; }
+  _showStudyToast("Habit saved");
+}
+
+async function deleteHabit(habitId) {
+  const habit = _habitItems.find(h => h.id === habitId);
+  if (!confirm(`Delete "${habit?.name || "this habit"}" and its calendar history?`)) return;
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const ok = await window.Habits?.delete?.(uid, habitId);
+  if (!ok) { alert("Could not delete that habit."); return; }
+  _showStudyToast("Habit deleted");
+  renderHabitSettings();
 }
 
 async function handleHabitCsvFile(input) {
@@ -17235,9 +17462,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.66";
+const APP_VERSION = "3.0.67";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.67 &mdash; Habit Builder Calendar</div>
+<ul>
+  <li><strong>Full habit calendars added</strong> so every habit shows completed and missed days, including imported HabitShare history.</li>
+  <li><strong>Accountability partners added</strong> with friend notifications when a habit is created or completed for the day.</li>
+  <li><strong>Habit settings expanded</strong> with CSV import, edit, delete, friend updates, and streak XP milestones.</li>
+</ul>
 <div class="un-version-label">v3.0.66 &mdash; Habits Foundation</div>
 <ul>
   <li><strong>Habits added</strong> with manual habit creation, daily check-ins, completion totals, and streak stats.</li>
@@ -18265,6 +18498,9 @@ document.addEventListener("DOMContentLoaded", () => {
         openPendingMercyFriendEncouragement();
       }
     }, 900);
+  }
+  if (openParam === 'habits') {
+    setTimeout(() => showNavPage('habits'), 900);
   }
   if (window.__pendingAuthResolved) setAppLaunchText('Finishing setup');
 });

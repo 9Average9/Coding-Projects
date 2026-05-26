@@ -303,7 +303,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-180.png" rel="apple-touch-icon"/>
 <link href="assets/icons/disciple-builder-icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
-<link href="style.css?v=3.0.66" rel="stylesheet"/>
+<link href="style.css?v=3.0.67" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -418,30 +418,21 @@ glacier: {
 <div>
 <span class="habits-kicker">Habit builder</span>
 <h1>Habits</h1>
-<p>Bring your HabitShare history into Disciple Builder and keep building steady practices here.</p>
+<p>Build steady practices with a calendar, streak rewards, and friends who can encourage you.</p>
 </div>
+<button class="icon-btn habits-settings-btn" onclick="openHabitSettingsModal()" aria-label="Habit settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
 </div>
 <div class="habits-actions">
 <button class="habits-primary" onclick="openHabitCreateModal()">
 <span class="material-symbols-outlined">add_task</span>
 <span><strong>New Habit</strong><small>Create a habit manually</small></span>
 </button>
-<label class="habits-primary habits-import-label">
-<span class="material-symbols-outlined">upload_file</span>
-<span><strong>Import CSV</strong><small>HabitShare export format</small></span>
-<input id="habitCsvInput" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values,text/plain" onchange="handleHabitCsvFile(this)" />
-</label>
-</div>
-<div class="habit-import-preview hidden" id="habitImportPreview">
-<div class="habit-import-head">
-<div>
-<strong id="habitImportTitle">CSV preview</strong>
-<small id="habitImportSummary"></small>
-</div>
-<button class="habits-mini-btn" onclick="clearHabitImportPreview()">Clear</button>
-</div>
-<div class="habit-import-list" id="habitImportList"></div>
-<button class="main-btn habit-import-submit" id="habitImportSubmitBtn" onclick="confirmHabitImport()">Import to Habits</button>
+<button class="habits-primary" onclick="openHabitSettingsModal()">
+<span class="material-symbols-outlined">tune</span>
+<span><strong>Settings</strong><small>Import, edit, and delete</small></span>
+</button>
 </div>
 <div class="habits-stats-row">
 <div><strong id="habitTotalCount">0</strong><span>Habits</span></div>
@@ -9900,7 +9891,50 @@ Verb Endings
 <option value="weekdays">Weekdays</option>
 </select>
 </label>
+<div class="habit-field">
+<span>Accountability friends</span>
+<div class="habit-friend-picker" id="habitCreateFriendsList"></div>
+</div>
 <button class="main-btn" onclick="submitHabitCreate()">Create Habit</button>
+</div>
+</div>
+<div class="modal-overlay" id="habitSettingsModal" onclick="closeHabitSettingsModal(event)">
+<div class="modal-card habit-settings-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeHabitSettingsModal()">&times;</button>
+<div class="habits-kicker"><span class="material-symbols-outlined">tune</span> Habit Builder</div>
+<h2>Settings</h2>
+<div class="habit-settings-section">
+<div class="habit-settings-head">
+<div>
+<strong>Import HabitShare CSV</strong>
+<small>Reads Habit, Date, Status, and Comment columns.</small>
+</div>
+<label class="habits-mini-btn habits-import-label">
+<span>Choose CSV</span>
+<input type="file" accept=".csv,text/csv" onchange="handleHabitCsvFile(this)"/>
+</label>
+</div>
+<div class="habit-import-preview hidden" id="habitImportPreview">
+<div class="habit-import-head">
+<div>
+<strong id="habitImportTitle">HabitShare CSV preview</strong>
+<small id="habitImportSummary"></small>
+</div>
+<button class="habits-mini-btn" onclick="clearHabitImportPreview()">Clear</button>
+</div>
+<div class="habit-import-list" id="habitImportList"></div>
+<button class="main-btn habit-import-submit" id="habitImportSubmitBtn" onclick="confirmHabitImport()">Import to Habits</button>
+</div>
+</div>
+<div class="habit-settings-section">
+<div class="habit-settings-head">
+<div>
+<strong>Edit habits</strong>
+<small>Rename, describe, add accountability friends, or delete.</small>
+</div>
+</div>
+<div class="habit-settings-list" id="habitSettingsList"></div>
+</div>
 </div>
 </div>
 <div class="rhema-picker-overlay hidden" id="mercyBookPickerOverlay" onclick="closeMercyPickerSheet()">
@@ -15781,10 +15815,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.66"></script>
+<script src="app.js?v=3.0.67"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.66" type="module"></script>
+<script src="firebase-lb.js?v=3.0.67" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
