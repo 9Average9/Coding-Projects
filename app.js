@@ -10099,11 +10099,61 @@ let _habitsUnsub = null;
 let _habitItems = [];
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
+let _habitCreateIcon = "menu_book";
+let _habitCreateColor = "";
 let _habitSettingsFriends = {};
 let _habitFriendCache = {};
 let _habitCalHabitId = null;
 let _habitCalYear = null;
 let _habitCalMonth = null;
+let _habitDetailId = null;
+let _habitDetailIcon = "menu_book";
+let _habitDetailColor = "";
+let _habitDetailFriends = new Set();
+
+const HABIT_ICONS = [
+  "menu_book","auto_stories","self_improvement","fitness_center",
+  "directions_run","local_drink","restaurant","music_note",
+  "code","school","volunteer_activism","favorite",
+  "nightlight","wb_sunny","groups","church",
+  "psychology","directions_walk","nature","star",
+  "bolt","spa","piano","hiking"
+];
+
+const HABIT_COLORS = [
+  "#2d6a4f","#0891b2","#1d4ed8","#7c3aed",
+  "#d97706","#dc2626","#db2777","#0f766e"
+];
+
+function _renderHabitIconPicker(targetId, selectedIcon, onSelectFn) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = HABIT_ICONS.map(icon =>
+    `<button type="button" class="habit-icon-option${selectedIcon === icon ? " selected" : ""}" onclick="${onSelectFn}('${icon}')">
+      <span class="material-symbols-outlined">${icon}</span>
+    </button>`).join("");
+}
+
+function _renderHabitColorPicker(targetId, selectedColor, onSelectFn) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const noColor = !selectedColor;
+  el.innerHTML =
+    `<button type="button" class="habit-color-swatch habit-color-none${noColor ? " selected" : ""}" onclick="${onSelectFn}('')" title="Theme color"><span class="material-symbols-outlined">palette</span></button>` +
+    HABIT_COLORS.map(c =>
+      `<button type="button" class="habit-color-swatch${selectedColor === c ? " selected" : ""}" style="background:${c}" onclick="${onSelectFn}('${c}')" aria-label="${c}"></button>`
+    ).join("");
+}
+
+function _applyHabitPreview(iconPreviewId, iconDisplayId, icon, color) {
+  const preview = document.getElementById(iconPreviewId);
+  const display = document.getElementById(iconDisplayId);
+  if (preview) {
+    preview.style.background = color ? `color-mix(in srgb,${color} 16%,transparent)` : "";
+    preview.style.color = color || "";
+  }
+  if (display) display.textContent = icon || "menu_book";
+}
 
 function _habitEsc(value) {
   return String(value ?? "")
@@ -10266,15 +10316,22 @@ function _habitFriendName(uid) {
 async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
   const el = document.getElementById(targetId);
   if (!el) return;
-  const friendUids = friendsList || [];
+  const friendUids = (friendsList || []).filter(Boolean);
   if (!friendUids.length) {
     el.innerHTML = '<p class="study-board-empty">Add friends first, then choose accountability partners here.</p>';
     return;
   }
   el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
-  const users = await _habitLoadFriendProfiles(friendUids);
+  const allProfiles = await _habitLoadFriendProfiles(friendUids);
+  const users = allProfiles
+    .filter(u => friendUids.includes(u.uid))
+    .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
+  if (!users.length) {
+    el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
+    return;
+  }
   el.innerHTML = users.map(user => {
-    const name = _habitEsc(user.displayName || user.username || "Friend");
+    const name = _habitEsc(user.displayName || "Friend");
     const selected = selectedSet.has(user.uid);
     return `
       <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
@@ -10389,13 +10446,21 @@ function renderHabits() {
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
     const calLabel = doneToday ? `Done ${today}` : `Open ${today}`;
+    const icon = _habitEsc(habit.icon || "menu_book");
+    const color = habit.color || "";
+    const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
     return `
       <article class="habit-card">
         <div class="habit-card-top">
-          <div class="habit-card-icon">
-            <span class="material-symbols-outlined">menu_book</span>
-          </div>
-          <span class="habit-card-name">${_habitEsc(habit.name)}</span>
+          <button class="habit-card-identity" onclick="openHabitDetailModal('${_habitEsc(habit.id)}')">
+            <div class="habit-card-icon"${iconStyle}>
+              <span class="material-symbols-outlined">${icon}</span>
+            </div>
+            <div class="habit-card-info">
+              <span class="habit-card-name">${_habitEsc(habit.name)}</span>
+              ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
+            </div>
+          </button>
           <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${_habitEsc(habit.id)}', ${doneToday ? "'open'" : "'success'"})">
             <span class="material-symbols-outlined">${doneToday ? "check_circle" : "radio_button_unchecked"}</span>
             <span>${doneToday ? "Done Today" : "Complete Today"}</span>
@@ -10487,8 +10552,25 @@ function openHabitCreateModal() {
   document.getElementById("habitDescInput").value = "";
   document.getElementById("habitScheduleInput").value = "daily";
   _habitCreateFriends = new Set();
+  _habitCreateIcon = "menu_book";
+  _habitCreateColor = "";
+  _renderHabitIconPicker("habitCreateIconPicker", _habitCreateIcon, "selectHabitCreateIcon");
+  _renderHabitColorPicker("habitCreateColorPicker", _habitCreateColor, "selectHabitCreateColor");
+  _applyHabitPreview("habitCreateIconPreview", "habitCreateIconDisplay", _habitCreateIcon, _habitCreateColor);
   _renderHabitFriendPicker("habitCreateFriendsList", _habitCreateFriends, "toggleHabitCreateFriend");
   document.getElementById("habitCreateModal")?.classList.add("open");
+}
+
+function selectHabitCreateIcon(icon) {
+  _habitCreateIcon = icon;
+  _renderHabitIconPicker("habitCreateIconPicker", _habitCreateIcon, "selectHabitCreateIcon");
+  _applyHabitPreview("habitCreateIconPreview", "habitCreateIconDisplay", _habitCreateIcon, _habitCreateColor);
+}
+
+function selectHabitCreateColor(color) {
+  _habitCreateColor = color;
+  _renderHabitColorPicker("habitCreateColorPicker", _habitCreateColor, "selectHabitCreateColor");
+  _applyHabitPreview("habitCreateIconPreview", "habitCreateIconDisplay", _habitCreateIcon, _habitCreateColor);
 }
 
 function toggleHabitCreateFriend(uid) {
@@ -10510,7 +10592,12 @@ async function submitHabitCreate() {
   if (!name) { alert("Give the habit a name."); return; }
   const description = document.getElementById("habitDescInput")?.value.trim() || "";
   const scheduleType = document.getElementById("habitScheduleInput")?.value || "daily";
-  const ok = await window.Habits?.create?.(uid, { name, description, scheduleType, accountabilityUids: [..._habitCreateFriends] });
+  const ok = await window.Habits?.create?.(uid, {
+    name, description, scheduleType,
+    accountabilityUids: [..._habitCreateFriends],
+    icon: _habitCreateIcon || "menu_book",
+    color: _habitCreateColor || ""
+  });
   if (!ok) { alert("Could not create that habit yet."); return; }
   closeHabitCreateModal();
 }
@@ -10556,70 +10643,87 @@ async function renderHabitSettings() {
     list.innerHTML = '<p class="study-board-empty">Create or import a habit first.</p>';
     return;
   }
-  await _habitLoadFriendProfiles(friendsList || []);
   list.innerHTML = _habitItems.map(habit => {
-    const selected = _habitSettingsFriends[habit.id] || new Set(habit.accountabilityUids || habit.shareUids || []);
-    _habitSettingsFriends[habit.id] = selected;
+    const icon = _habitEsc(habit.icon || "menu_book");
+    const color = habit.color || "";
+    const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
     return `
-      <details class="habit-settings-item" id="habitSettingsItem_${_habitEsc(habit.id)}">
-        <summary class="habit-settings-summary">
-          <span class="material-symbols-outlined">expand_more</span>
-          <span>${_habitEsc(habit.name)}</span>
-        </summary>
-        <div class="habit-settings-body">
-          <label class="habit-field">
-            <span>Habit name</span>
-            <input id="habitEditName_${_habitEsc(habit.id)}" type="text" value="${_habitEsc(habit.name || "")}" maxlength="80"/>
-          </label>
-          <label class="habit-field">
-            <span>Description</span>
-            <textarea id="habitEditDesc_${_habitEsc(habit.id)}" maxlength="240">${_habitEsc(habit.description || "")}</textarea>
-          </label>
-          <div class="habit-field">
-            <span>Accountability partners</span>
-            <span class="habit-field-hint">These friends get notified when you complete this habit.</span>
-            <div class="habit-friend-picker" id="habitEditFriends_${_habitEsc(habit.id)}"></div>
-          </div>
-          <div class="habit-settings-actions">
-            <button class="habits-mini-btn" onclick="saveHabitSettings('${_habitEsc(habit.id)}')">Save changes</button>
-            <button class="habit-danger-btn" onclick="deleteHabit('${_habitEsc(habit.id)}')">Delete habit</button>
-          </div>
+      <button class="habit-settings-row-btn" onclick="openHabitDetailModal('${_habitEsc(habit.id)}'); closeHabitSettingsModal();">
+        <div class="habit-card-icon-sm"${iconStyle}>
+          <span class="material-symbols-outlined">${icon}</span>
         </div>
-      </details>`;
+        <span>${_habitEsc(habit.name)}</span>
+        <span class="material-symbols-outlined" style="margin-left:auto;opacity:0.4">chevron_right</span>
+      </button>`;
   }).join("");
-  _habitItems.forEach(habit => {
-    _renderHabitFriendPicker(`habitEditFriends_${habit.id}`, _habitSettingsFriends[habit.id], "toggleHabitSettingsFriend.bind(null, '" + habit.id + "')");
-  });
 }
 
-function toggleHabitSettingsFriend(habitId, uid) {
-  if (!_habitSettingsFriends[habitId]) _habitSettingsFriends[habitId] = new Set();
-  if (_habitSettingsFriends[habitId].has(uid)) _habitSettingsFriends[habitId].delete(uid);
-  else _habitSettingsFriends[habitId].add(uid);
-  _renderHabitFriendPicker(`habitEditFriends_${habitId}`, _habitSettingsFriends[habitId], "toggleHabitSettingsFriend.bind(null, '" + habitId + "')");
+async function openHabitDetailModal(habitId) {
+  const habit = _habitItems.find(h => h.id === habitId);
+  if (!habit) return;
+  _habitDetailId = habitId;
+  _habitDetailIcon = habit.icon || "menu_book";
+  _habitDetailColor = habit.color || "";
+  _habitDetailFriends = new Set(habit.accountabilityUids || habit.shareUids || []);
+  document.getElementById("habitDetailNameInput").value = habit.name || "";
+  document.getElementById("habitDetailDescInput").value = habit.description || "";
+  document.getElementById("habitDetailTitleDisplay").textContent = habit.name || "Habit";
+  _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
+  _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
+  _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
+  await _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
+  document.getElementById("habitDetailModal")?.classList.add("open");
 }
 
-async function saveHabitSettings(habitId) {
+function closeHabitDetailModal(event) {
+  if (!event || event.target.id === "habitDetailModal") {
+    document.getElementById("habitDetailModal")?.classList.remove("open");
+  }
+}
+
+function selectHabitDetailIcon(icon) {
+  _habitDetailIcon = icon;
+  _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
+  _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
+}
+
+function selectHabitDetailColor(color) {
+  _habitDetailColor = color;
+  _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
+  _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
+}
+
+function toggleHabitDetailFriend(uid) {
+  if (_habitDetailFriends.has(uid)) _habitDetailFriends.delete(uid);
+  else _habitDetailFriends.add(uid);
+  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
+}
+
+async function saveHabitDetail() {
   const uid = window.Auth?.getCurrentUser()?.uid;
-  if (!uid) return;
-  const name = document.getElementById(`habitEditName_${habitId}`)?.value.trim();
+  if (!uid || !_habitDetailId) return;
+  const name = document.getElementById("habitDetailNameInput")?.value.trim();
   if (!name) { alert("Habit name cannot be blank."); return; }
-  const description = document.getElementById(`habitEditDesc_${habitId}`)?.value.trim() || "";
-  const accountabilityUids = [...(_habitSettingsFriends[habitId] || new Set())];
-  const ok = await window.Habits?.update?.(uid, habitId, { name, description, accountabilityUids });
+  const description = document.getElementById("habitDetailDescInput")?.value.trim() || "";
+  const accountabilityUids = [..._habitDetailFriends];
+  const ok = await window.Habits?.update?.(uid, _habitDetailId, {
+    name, description, accountabilityUids,
+    icon: _habitDetailIcon, color: _habitDetailColor
+  });
   if (!ok) { alert("Could not save that habit."); return; }
+  closeHabitDetailModal();
   _showStudyToast("Habit saved");
 }
 
-async function deleteHabit(habitId) {
-  const habit = _habitItems.find(h => h.id === habitId);
+async function deleteHabitFromDetail() {
+  const habit = _habitItems.find(h => h.id === _habitDetailId);
   if (!confirm(`Delete "${habit?.name || "this habit"}" and its calendar history?`)) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const ok = await window.Habits?.delete?.(uid, habitId);
+  const ok = await window.Habits?.delete?.(uid, _habitDetailId);
   if (!ok) { alert("Could not delete that habit."); return; }
+  closeHabitDetailModal();
   _showStudyToast("Habit deleted");
-  renderHabitSettings();
 }
 
 async function handleHabitCsvFile(input) {
