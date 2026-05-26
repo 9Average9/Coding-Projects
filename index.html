@@ -454,12 +454,20 @@ glacier: {
 <div class="habits-list" id="habitsList">
 <p class="study-board-empty">Loading habits...</p>
 </div>
-<div class="habit-cal-section" id="habitCalSection" style="display:none">
-<div class="habit-cal-section-hd">
-<strong>Calendar</strong>
+<div style="height:88px"></div>
+</div>
+</section>
+<!-- Habit calendar modal (sheet) -->
+<div class="habit-cal-modal" id="habitCalModal" onclick="closeHabitCalModal(event)">
+<div class="habit-cal-modal-card" onclick="event.stopPropagation()">
+<div class="habit-cal-modal-top">
+<div>
+<strong id="habitCalModalName">Calendar</strong>
 <small>Completed and missed days</small>
 </div>
-<div class="habit-cal-section-nav">
+<button class="habit-cal-close" onclick="closeHabitCalModal()" aria-label="Close calendar">&times;</button>
+</div>
+<div class="habit-cal-modal-nav">
 <button class="icon-btn" onclick="habitCalPrev()" aria-label="Previous month">
 <span class="material-symbols-outlined">chevron_left</span>
 </button>
@@ -470,9 +478,7 @@ glacier: {
 </div>
 <div id="habitCalContent"></div>
 </div>
-<div style="height:88px"></div>
 </div>
-</section>
 <section class="screen" id="newLearnMenu">
 <div class="nav-bar">
 <button class="icon-btn" onclick="handleLearnBack()">
