@@ -1,7 +1,7 @@
 {
-  "name": "Basic Greek Trainer",
-  "short_name": "Basic Greek",
-  "description": "Learn the basics of New Testament Greek step by step.",
+  "name": "Disciple Builder",
+  "short_name": "Disciple",
+  "description": "Study deeper, encourage others, and grow together in the knowledge of God.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -10,14 +10,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
+      "src": "PWAicon.png",
+      "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
+      "src": "PWAicon.png",
+      "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"
     }

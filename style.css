@@ -61,10 +61,8 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.96), rgba(245,248,255,0.92) 48%, rgba(235,242,255,0.88) 100%),
-    linear-gradient(180deg, #fbfcff 0%, #eef5ff 100%);
-  color: #061d4d;
+  background: #fbf0de;
+  color: #081f34;
   transition: opacity 0.32s ease, visibility 0.32s ease;
 }
 
@@ -74,78 +72,56 @@ body {
   pointer-events: none;
 }
 
-.app-launch-logo {
+.app-launch-art {
   position: relative;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translateY(-8vh);
-}
-
-.app-launch-logo span {
-  font-size: clamp(4.8rem, 18vw, 8.4rem);
-  line-height: 0.9;
-  letter-spacing: 0;
-  font-weight: 750;
-  color: #061d4d;
-}
-
-.app-launch-logo i {
   display: block;
-  width: min(42vw, 360px);
-  height: 14px;
-  margin-top: 18px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #4a80e7, #3a72db 74%, rgba(58,114,219,0));
-  transform: skewX(-12deg);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .app-launch-status {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 42px;
-  color: rgba(6, 29, 77, 0.72);
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.app-launch-spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(6, 29, 77, 0.14);
-  border-top-color: #3a72db;
-  border-radius: 50%;
-  animation: appLaunchSpin 0.8s linear infinite;
-}
-
-.app-launch-wave {
   position: absolute;
-  left: -12vw;
-  right: -12vw;
-  bottom: -5vh;
-  height: 34vh;
-  border-radius: 48% 52% 0 0 / 38% 44% 0 0;
-  transform-origin: 50% 100%;
+  z-index: 3;
+  left: 50%;
+  bottom: max(42px, calc(env(safe-area-inset-bottom, 0px) + 34px));
+  width: min(72vw, 360px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(8, 31, 52, 0.82);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.app-launch-wave-soft {
-  bottom: 7vh;
-  height: 24vh;
-  background: linear-gradient(135deg, rgba(96, 142, 225, 0.22), rgba(126, 164, 230, 0.07));
-  transform: rotate(6deg);
+.app-launch-progress {
+  width: 100%;
+  height: 7px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(8, 31, 52, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(8,31,52,0.04);
 }
 
-.app-launch-wave-main {
-  background: linear-gradient(135deg, #417fe2 0%, #2f6fd7 58%, #1f58c5 100%);
-  transform: rotate(-5deg);
+.app-launch-progress span {
+  display: block;
+  height: 100%;
+  width: 42%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #317158, #081f34);
+  animation: appLaunchProgress 1.35s ease-in-out infinite;
 }
 
-@keyframes appLaunchSpin {
-  to { transform: rotate(360deg); }
+@keyframes appLaunchProgress {
+  0% { transform: translateX(-105%); }
+  55% { transform: translateX(72%); }
+  100% { transform: translateX(245%); }
 }
 
 /* Status bar background — solid bar behind iOS status bar so content never bleeds under the notch */

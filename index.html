@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-<title>Basic Greek</title>
+<title>Disciple Builder</title>
 <!-- PWA / Home Screen App Support -->
 <link href="manifest.json" rel="manifest"/>
 <meta content="#243447" name="theme-color"/>
@@ -299,29 +299,24 @@ glacier: {
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<meta content="Basic Greek" name="apple-mobile-web-app-title"/>
-<link href="icon-192.png" rel="apple-touch-icon"/>
-<link href="style.css?v=3.0.62" rel="stylesheet"/>
+<meta content="Disciple Builder" name="apple-mobile-web-app-title"/>
+<link href="PWAicon.png" rel="apple-touch-icon"/>
+<link href="style.css?v=3.0.63" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
-<div class="app-launch-screen" id="appLaunchScreen" aria-live="polite" aria-label="Loading Greek">
-<div class="app-launch-logo">
-<span>Greek</span>
-<i></i>
-</div>
+<div class="app-launch-screen" id="appLaunchScreen" aria-live="polite" aria-label="Loading Disciple Builder">
+<img class="app-launch-art" src="assetsbranddisciple-builder-launch.png" alt="Disciple Builder"/>
 <div class="app-launch-status">
-<span class="app-launch-spinner"></span>
-<span id="appLaunchText">Preparing your study space</span>
+<span id="appLaunchText">Preparing your discipleship tools</span>
+<span class="app-launch-progress" aria-hidden="true"><span></span></span>
 </div>
-<div class="app-launch-wave app-launch-wave-soft"></div>
-<div class="app-launch-wave app-launch-wave-main"></div>
 </div>
 <main class="app">
 <div id="statusBarBg"></div>
 <header class="header app-header" onclick="showInfoModal()" role="button" tabindex="0">
-<h1>Basic Greek Trainer</h1>
-<p>Study the Greek New Testament — down to every word.</p>
+<h1>Disciple Builder</h1>
+<p>Study deeper. Encourage others. Grow together.</p>
 <small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
 </header>
 <section class="screen active" id="homeScreen">
@@ -8677,9 +8672,9 @@ Verb Endings
 <div class="welcome-icon">
 <span class="material-symbols-outlined">auto_stories</span>
 </div>
-<h2>Welcome to Basic Greek</h2>
+<h2>Welcome to Disciple Builder</h2>
 <p class="welcome-lead">
-      The Bible is God's communication to us. This app is built to help you engage it more deeply — not to replace formal study, but to put real tools in the hands of everyday believers who want to go further than a translation alone can take them.
+      Disciple Builder exists to edify believers: helping you study Scripture carefully, encourage friends, stay accountable, and grow in the knowledge of God together.
     </p>
 <div class="welcome-route">
 <div>
@@ -8694,7 +8689,7 @@ Verb Endings
 </div>
 <div>
 <strong>What Makes Rhema Special</strong>
-<span>Honestly, Rhema is not trying to be full Bible software. It will not replace major lexicons, commentaries, or careful study. What sets it apart is flow: the word data, syntax help, cross references, word library, saved trails, and study notes live right beside the text so you can observe first and keep your own thoughts attached to the passage instead of scattering them across five tools.</span>
+<span>Rhema is one feature inside Disciple Builder. It will not replace major Bible software, lexicons, commentaries, or careful study. What sets it apart is flow: word data, syntax help, cross references, word library, saved trails, and study notes live beside the text so you can observe first and keep your thoughts attached to the passage.</span>
 </div>
 <div>
 <strong>Vocab — 300 Words, 80% of the NT</strong>
@@ -8702,12 +8697,12 @@ Verb Endings
 </div>
 <div>
 <strong>Friends &amp; Leaderboard</strong>
-<span>Study alongside your church community and track each other's progress.</span>
+<span>Study alongside your church community, share praises, encourage one another, and keep each other accountable to steady growth.</span>
 </div>
 </div>
 <p class="welcome-destination">
 <span class="material-symbols-outlined">travel_explore</span>
-<span>A richer understanding of Scripture is available to anyone willing to put in the time. This app is one place to start — accessible, free, and built with the everyday believer in mind.</span>
+<span>Disciple Builder brings Greek tools, Scripture study, community encouragement, praises, reminders, and shared studies into one place for believers who want to grow faithfully together.</span>
 </p>
 <button class="main-btn welcome-start-btn" onclick="hideInfoModal()">
       Start Exploring
@@ -9179,8 +9174,8 @@ Verb Endings
 <div class="auth-card" onclick="event.stopPropagation()">
 <div class="auth-logo">
 <span class="material-symbols-outlined auth-logo-icon">menu_book</span>
-<h2 class="auth-logo-title">Basic Greek Trainer</h2>
-<p class="auth-logo-sub">Your Koine Greek journey starts here</p>
+<h2 class="auth-logo-title">Disciple Builder</h2>
+<p class="auth-logo-sub">Study deeper. Encourage others. Grow together.</p>
 </div>
 <div class="auth-tabs">
 <button class="auth-tab active" id="authTabCreate" onclick="switchAuthTab('create')">Create Account</button>
@@ -15710,10 +15705,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.62"></script>
+<script src="app.js?v=3.0.63"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.62" type="module"></script>
+<script src="firebase-lb.js?v=3.0.63" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -15767,7 +15762,7 @@ Verb Endings
 <!-- Install App Modal -->
 <div class="modal-overlay" id="installAppModal" onclick="closeInstallAppModal(event)">
 <div class="modal-card install-modal-card">
-<h2>Add the Basic Greek app</h2>
+<h2>Add the Disciple Builder app</h2>
 <p>
       Follow the steps to add the app to your phone or press "maybe later" to continue using the browser
     </p>
@@ -15789,7 +15784,7 @@ Verb Endings
 <li>Tap the <strong>Share</strong> button.</li>
 <li>Scroll and tap <strong>Add to Home Screen</strong>.</li>
 <li>Tap <strong>Add</strong>.</li>
-<li>Open Basic Greek from your Home Screen.</li>
+<li>Open Disciple Builder from your Home Screen.</li>
 </ol>
 </div>
 <button class="main-btn" onclick="triggerAndroidInstall()">

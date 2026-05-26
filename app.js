@@ -9926,13 +9926,13 @@ function _updateAppHeaderForScreen(id) {
   const subtitle = header.querySelector("p");
   const hint = header.querySelector(".header-info-hint");
   if (_isLessonScreenId(id)) {
-    if (title) title.textContent = "Basic Greek";
+    if (title) title.textContent = "Disciple Builder";
     if (subtitle) subtitle.textContent = _nextLessonHeaderFact();
     if (hint) hint.innerHTML = `<span class="material-symbols-outlined">auto_awesome</span> Tiny Greek fact`;
     header.classList.add("lesson-header-mode");
   } else {
-    if (title) title.textContent = "Basic Greek Trainer";
-    if (subtitle) subtitle.textContent = "Study the Greek New Testament — down to every word.";
+    if (title) title.textContent = "Disciple Builder";
+    if (subtitle) subtitle.textContent = "Study deeper. Encourage others. Grow together.";
     if (hint) hint.innerHTML = `<span class="material-symbols-outlined">info</span> About this app`;
     header.classList.remove("lesson-header-mode");
   }
@@ -16948,9 +16948,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.62";
+const APP_VERSION = "3.0.63";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.63 &mdash; Disciple Builder Rebrand</div>
+<ul>
+  <li><strong>Disciple Builder branding added</strong> across the app shell, install metadata, launch screen, auth screen, and onboarding language.</li>
+  <li><strong>New PWA icon and launch artwork wired in</strong> using the supplied Disciple Builder assets.</li>
+  <li><strong>App purpose refreshed</strong> around studying deeper, encouraging others, accountability, and growing together in the knowledge of God.</li>
+</ul>
 <div class="un-version-label">v3.0.62 &mdash; Styles Rollback</div>
 <ul>
   <li><strong>Visual Styles rolled back</strong> for now while keeping the Home study cards and quick actions polish.</li>
@@ -17041,7 +17047,7 @@ const UPDATE_NOTES_HTML = `
 </ul>
 <div class="un-version-label">v3.0.0 &mdash; First Official Ready-To-Use Release</div>
 <ul class="un-list">
-  <li><strong>Basic Greek is now ready for real users</strong> with lessons, drills, Rhema, Study Rhema, Cross References, Trails, syntax help, lexicons, achievements, coach tours, and profile tools all working together.</li>
+  <li><strong>Disciple Builder foundation is ready</strong> with lessons, drills, Rhema, Study Rhema, Cross References, Trails, syntax help, lexicons, achievements, coach tours, and profile tools all working together.</li>
   <li><strong>This is the big refinement release</strong>: cleaner onboarding, steadier coach tours, source transparency, stronger lesson navigation, and a more polished app feel.</li>
   <li><strong>Boat loads of features, but still calm</strong>: the goal is a study app that feels deep without feeling like a cockpit full of mystery switches.</li>
 </ul>
@@ -17165,7 +17171,7 @@ function setAppLaunchText(text) {
   if (el && text) el.textContent = text;
 }
 
-function showAppLaunchScreen(text = 'Preparing your study space') {
+function showAppLaunchScreen(text = 'Preparing your discipleship tools') {
   const splash = document.getElementById('appLaunchScreen');
   if (!splash) return;
   if (_appLaunchReleased) return;
@@ -17203,7 +17209,7 @@ function _applyPendingAppUpdateReload() {
   if (!_appUpdateReloadPending) return;
   if (!_isAppInInterruptibleStartupState() && !_isSafeForUpdateReload()) return;
   _appUpdateReloadPending = false;
-  showAppLaunchScreen('Updating Greek');
+  showAppLaunchScreen('Updating Disciple Builder');
   setTimeout(() => window.location.reload(), 260);
 }
 
@@ -17220,7 +17226,7 @@ function queueAppUpdateReload() {
   setTimeout(() => {
     if (!_appUpdateReloadPending) return;
     _appUpdateReloadPending = false;
-    showAppLaunchScreen('Updating Greek');
+    showAppLaunchScreen('Updating Disciple Builder');
     setTimeout(() => window.location.reload(), 420);
   }, 30000);
 }
@@ -17909,7 +17915,7 @@ if (window.__pendingAuthResolved) {
 
 document.addEventListener("DOMContentLoaded", () => {
   _appLaunchStartedAt = Date.now();
-  setAppLaunchText('Preparing your study space');
+  setAppLaunchText('Preparing your discipleship tools');
   setTimeout(() => hideAppLaunchScreen('timeout'), 2800);
   registerServiceWorker();
   initFCMForeground();
@@ -18217,10 +18223,10 @@ async function disableReminders() {
 
 function initFCMForeground() {
   window.FCM?.listenForeground(payload => {
-    const title = payload.notification?.title || "Basic Greek Trainer";
-    const body  = payload.notification?.body  || "Time to study Greek!";
+    const title = payload.notification?.title || "Disciple Builder";
+    const body  = payload.notification?.body  || "Time to grow together.";
     if (Notification.permission === "granted") {
-      new Notification(title, { body, icon: "./icon-192.png" });
+      new Notification(title, { body, icon: "./PWAicon.png" });
     }
   });
 }
@@ -21765,7 +21771,7 @@ let _appCoachFinishing = false;
 let _appCoachReplayMode = false;
 
 const APP_WELCOME_COACH_STEPS = [
-  { title: 'Welcome to Basic Greek', body: 'This app helps you learn enough Greek to observe the New Testament carefully, then keeps lessons, practice, Rhema, notes, cross references, progress, and community study in one place.' },
+  { title: 'Welcome to Disciple Builder', body: 'This app helps believers study Scripture carefully, build steady habits, encourage one another, and grow together in the knowledge of God. Greek tools, Rhema, Praises, studies, notes, progress, and community features all serve that bigger discipleship goal.' },
   { before: () => showNavPage('lessons'), target: () => _coachFirst(['.lesson-progress-badge', '.learn-path-grid']), title: 'Lessons are the foundation', body: 'Start here when you want guided structure. The basic and advanced tracks teach foundations and verbs in order, and checks keep you from just scrolling past the material.' },
   { before: () => { showNavPage('community'); showLbTab('posts'); }, target: () => _coachFirst(['.community-post-add', '#lbPanePosts', '.comm-tabs']), title: 'Community posts', body: 'Posts are the main community feed: share verses, questions, links, prayer notes, and encouragements with friends. Attach MSB or BSB verses, react to one another, optionally alert your friends, and keep the board fresh as posts clear after 7 days.' },
   { before: () => { showNavPage('community'); showLbTab('xp'); }, target: () => _coachFirst(['button[data-tab="xp"]', '#lbPaneXP']), title: 'XP leaderboard', body: 'XP rewards steady work: lessons, tests, vocab, translation, and study habits. It is not the goal, but it helps your progress feel visible.' },
