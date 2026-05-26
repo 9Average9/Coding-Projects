@@ -8045,14 +8045,14 @@ let currentSentence = null;
 
 
 const screens = [
-  "homeScreen", "profilePage", "merciesPage", "communityPage", "csDetailPage",
+  "homeScreen", "profilePage", "habitsPage", "merciesPage", "communityPage", "csDetailPage",
   "newLearnMenu", "advancedLearnMenu",
   "basicVerbsLearnMenu", "advVerbsLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
   "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
 ];
 
-const NAV_SCREENS = ['homeScreen', 'profilePage', 'merciesPage', 'communityPage'];
+const NAV_SCREENS = ['homeScreen', 'profilePage', 'habitsPage', 'merciesPage', 'communityPage'];
 
 // ── Personal Studies ──────────────────────────────────────────────────────────
 
@@ -9797,6 +9797,7 @@ let _prevNavPage = 'home';
 function showNavPage(page) {
   if (page !== 'mercies' && _merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
   if (page !== 'mercies' && _merciesJournalUnsub) { _merciesJournalUnsub(); _merciesJournalUnsub = null; }
+  if (page !== 'habits' && _habitsUnsub) { _habitsUnsub(); _habitsUnsub = null; }
   if (page === 'lessons') {
     const cur = document.querySelector('.screen.active');
     if (cur?.id === 'communityPage') _prevNavPage = 'community';
@@ -9814,6 +9815,9 @@ function showNavPage(page) {
   } else if (page === 'profile') {
     showScreen('profilePage');
     updateProfileUI();
+  } else if (page === 'habits') {
+    showScreen('habitsPage');
+    startHabitsPage();
   } else if (page === 'community') {
     showScreen('communityPage');
     localStorage.setItem('communityLastVisit', Date.now().toString());
@@ -10043,6 +10047,289 @@ function populateHomeScreen() {
 
   // Notifications dot
   _updateNotifBadge();
+}
+
+// ── Habits ────────────────────────────────────────────────────────────────────
+let _habitsUnsub = null;
+let _habitItems = [];
+let _habitImportRows = [];
+
+function _habitEsc(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function _habitTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function _habitDateMs(dateKey) {
+  const ms = Date.parse(`${dateKey}T00:00:00`);
+  return Number.isFinite(ms) ? ms : 0;
+}
+
+function _habitCurrentStreak(entries = {}) {
+  const done = new Set(Object.values(entries).filter(e => e.status === "success").map(e => e.date));
+  const [year, month, day] = _habitTodayKey().split("-").map(Number);
+  let cursor = new Date(year, month - 1, day);
+  let streak = 0;
+  const keyFor = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  while (done.has(keyFor(cursor))) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+function _habitBestStreak(entries = {}) {
+  const days = [...new Set(Object.values(entries).filter(e => e.status === "success").map(e => e.date))]
+    .sort((a, b) => _habitDateMs(a) - _habitDateMs(b));
+  let best = 0;
+  let current = 0;
+  let prev = null;
+  days.forEach(day => {
+    if (!prev || _habitDateMs(day) - _habitDateMs(prev) === 86400000) current++;
+    else current = 1;
+    best = Math.max(best, current);
+    prev = day;
+  });
+  return best;
+}
+
+function _habitStatusLabel(status) {
+  if (status === "success") return "Done";
+  if (status === "skipped") return "Skipped";
+  if (status === "missed") return "Missed";
+  return "Open";
+}
+
+function _habitNormalizeStatus(status) {
+  const s = String(status || "").trim().toLowerCase();
+  if (["success", "complete", "completed", "done", "yes", "1", "true"].includes(s)) return "success";
+  if (["skip", "skipped", "excused"].includes(s)) return "skipped";
+  if (["fail", "failed", "missed", "no", "0", "false"].includes(s)) return "missed";
+  return s || "open";
+}
+
+function _parseCsvLine(line, delimiter) {
+  const cells = [];
+  let cell = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === delimiter && !inQuotes) {
+      cells.push(cell);
+      cell = "";
+    } else {
+      cell += ch;
+    }
+  }
+  cells.push(cell);
+  return cells.map(v => v.trim());
+}
+
+function parseHabitShareCsv(text) {
+  const clean = String(text || "").replace(/^\uFEFF/, "").trim();
+  if (!clean) return [];
+  const lines = clean.split(/\r?\n/).filter(line => line.trim());
+  const delimiter = lines[0].includes("\t") ? "\t" : ",";
+  const headers = _parseCsvLine(lines.shift(), delimiter).map(h => h.toLowerCase());
+  const idx = {
+    habit: headers.indexOf("habit"),
+    date: headers.indexOf("date"),
+    status: headers.indexOf("status"),
+    comment: headers.indexOf("comment")
+  };
+  if (idx.habit < 0 || idx.date < 0 || idx.status < 0) {
+    throw new Error("CSV must include Habit, Date, and Status columns.");
+  }
+  return lines.map((line, rowIndex) => {
+    const cells = _parseCsvLine(line, delimiter);
+    const habit = cells[idx.habit] || "";
+    const date = cells[idx.date] || "";
+    if (!habit || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+    return {
+      habit,
+      date,
+      status: _habitNormalizeStatus(cells[idx.status]),
+      comment: idx.comment >= 0 ? (cells[idx.comment] || "") : "",
+      sourceRow: rowIndex + 2
+    };
+  }).filter(Boolean);
+}
+
+async function startHabitsPage() {
+  const list = document.getElementById("habitsList");
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!list) return;
+  if (!uid) {
+    list.innerHTML = '<p class="study-board-empty">Sign in to track habits.</p>';
+    return;
+  }
+  if (!window.Habits?.listen) {
+    list.innerHTML = '<p class="study-board-empty">Connecting habits...</p>';
+    setTimeout(() => {
+      if (document.getElementById("habitsPage")?.classList.contains("active")) startHabitsPage();
+    }, 500);
+    return;
+  }
+  list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
+  _habitsUnsub?.();
+  _habitsUnsub = window.Habits?.listen?.(uid, habits => {
+    _habitItems = habits || [];
+    renderHabits();
+  });
+}
+
+function renderHabits() {
+  const list = document.getElementById("habitsList");
+  if (!list) return;
+  const today = _habitTodayKey();
+  const total = _habitItems.length;
+  const todayDone = _habitItems.filter(h => h.entries?.[today]?.status === "success").length;
+  const best = _habitItems.reduce((max, h) => Math.max(max, _habitBestStreak(h.entries || {})), 0);
+  document.getElementById("habitTotalCount").textContent = total;
+  document.getElementById("habitTodayCount").textContent = todayDone;
+  document.getElementById("habitBestStreak").textContent = best;
+
+  if (!total) {
+    list.innerHTML = `
+      <div class="habits-empty">
+        <span class="material-symbols-outlined">checklist</span>
+        <strong>No habits yet</strong>
+        <p>Create one manually or import a HabitShare CSV export.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = _habitItems.map(habit => {
+    const entries = habit.entries || {};
+    const todayEntry = entries[today];
+    const doneToday = todayEntry?.status === "success";
+    const count = Object.values(entries).filter(e => e.status === "success").length;
+    const streak = _habitCurrentStreak(entries);
+    const last = Object.values(entries).sort((a, b) => _habitDateMs(b.date) - _habitDateMs(a.date))[0];
+    return `
+      <article class="habit-card">
+        <div class="habit-card-main">
+          <div>
+            <strong>${_habitEsc(habit.name)}</strong>
+            ${habit.description ? `<p>${_habitEsc(habit.description)}</p>` : ""}
+          </div>
+          <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${habit.id}', ${doneToday ? "'open'" : "'success'"})">
+            <span class="material-symbols-outlined">${doneToday ? "check_circle" : "radio_button_unchecked"}</span>
+            ${doneToday ? "Done" : "Mark"}
+          </button>
+        </div>
+        <div class="habit-meta-row">
+          <span><strong>${streak}</strong> current streak</span>
+          <span><strong>${count}</strong> completions</span>
+          <span>${last ? `${_habitEsc(_habitStatusLabel(last.status))} ${_habitEsc(last.date)}` : "No entries yet"}</span>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function openHabitCreateModal() {
+  document.getElementById("habitNameInput").value = "";
+  document.getElementById("habitDescInput").value = "";
+  document.getElementById("habitScheduleInput").value = "daily";
+  document.getElementById("habitCreateModal")?.classList.add("open");
+}
+
+function closeHabitCreateModal(event) {
+  if (!event || event.target.id === "habitCreateModal") {
+    document.getElementById("habitCreateModal")?.classList.remove("open");
+  }
+}
+
+async function submitHabitCreate() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) { alert("Sign in to create habits."); return; }
+  const name = document.getElementById("habitNameInput")?.value.trim();
+  if (!name) { alert("Give the habit a name."); return; }
+  const description = document.getElementById("habitDescInput")?.value.trim() || "";
+  const scheduleType = document.getElementById("habitScheduleInput")?.value || "daily";
+  const ok = await window.Habits?.create?.(uid, { name, description, scheduleType });
+  if (!ok) { alert("Could not create that habit yet."); return; }
+  closeHabitCreateModal();
+}
+
+async function toggleHabitToday(habitId, status) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const ok = await window.Habits?.setEntry?.(uid, habitId, {
+    date: _habitTodayKey(),
+    status,
+    comment: ""
+  });
+  if (!ok) alert("Could not update that habit.");
+}
+
+async function handleHabitCsvFile(input) {
+  const file = input?.files?.[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    _habitImportRows = parseHabitShareCsv(text);
+    renderHabitImportPreview();
+  } catch (e) {
+    alert(e.message || "Could not read that CSV.");
+  } finally {
+    input.value = "";
+  }
+}
+
+function renderHabitImportPreview() {
+  const panel = document.getElementById("habitImportPreview");
+  const title = document.getElementById("habitImportTitle");
+  const summary = document.getElementById("habitImportSummary");
+  const list = document.getElementById("habitImportList");
+  if (!panel || !list) return;
+  const grouped = _habitImportRows.reduce((map, row) => {
+    if (!map[row.habit]) map[row.habit] = [];
+    map[row.habit].push(row);
+    return map;
+  }, {});
+  const names = Object.keys(grouped).sort();
+  title.textContent = "HabitShare CSV preview";
+  summary.textContent = `${_habitImportRows.length} entries across ${names.length} habit${names.length === 1 ? "" : "s"}`;
+  list.innerHTML = names.map(name => {
+    const rows = grouped[name].sort((a, b) => _habitDateMs(a.date) - _habitDateMs(b.date));
+    const successes = rows.filter(r => r.status === "success").length;
+    return `<div><strong>${_habitEsc(name)}</strong><span>${rows[0].date} to ${rows[rows.length - 1].date}</span><small>${successes} completed / ${rows.length} entries</small></div>`;
+  }).join("");
+  panel.classList.remove("hidden");
+}
+
+function clearHabitImportPreview() {
+  _habitImportRows = [];
+  document.getElementById("habitImportPreview")?.classList.add("hidden");
+}
+
+async function confirmHabitImport() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) { alert("Sign in before importing habits."); return; }
+  if (!_habitImportRows.length) return;
+  const btn = document.getElementById("habitImportSubmitBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "Importing..."; }
+  const result = await window.Habits?.importHabitShare?.(uid, _habitImportRows);
+  if (btn) { btn.disabled = false; btn.textContent = "Import to Habits"; }
+  if (!result) { alert("Import failed. Check the CSV and try again."); return; }
+  clearHabitImportPreview();
+  _showStudyToast(`Imported ${result.entries} habit entries`);
 }
 
 function _saveRhemaPosition() {
@@ -16948,9 +17235,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.65";
+const APP_VERSION = "3.0.66";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.66 &mdash; Habits Foundation</div>
+<ul>
+  <li><strong>Habits added</strong> with manual habit creation, daily check-ins, completion totals, and streak stats.</li>
+  <li><strong>HabitShare CSV import added</strong> for exports with Habit, Date, Status, and Comment columns so existing habit history can move into Disciple Builder.</li>
+</ul>
 <div class="un-version-label">v3.0.65 &mdash; App Icon Polish</div>
 <ul>
   <li><strong>Disciple Builder icon sizes added</strong> for iOS and PWA installs so the app icon fills the mask cleanly without exposed white edging.</li>
