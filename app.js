@@ -10328,8 +10328,6 @@ function renderHabits() {
   document.getElementById("habitTodayCount").textContent = todayDone;
   document.getElementById("habitBestStreak").textContent = best;
 
-  const calSection = document.getElementById("habitCalSection");
-
   if (!total) {
     list.innerHTML = `
       <div class="habits-empty">
@@ -10337,7 +10335,6 @@ function renderHabits() {
         <strong>No habits yet</strong>
         <p>Create one manually or import a HabitShare CSV export.</p>
       </div>`;
-    if (calSection) calSection.style.display = "none";
     return;
   }
 
@@ -10374,15 +10371,6 @@ function renderHabits() {
       </article>`;
   }).join("");
 
-  // Auto-select calendar for first (or already-selected) habit
-  if (!_habitCalHabitId || !_habitItems.find(h => h.id === _habitCalHabitId)) {
-    _habitCalHabitId = _habitItems[0]?.id || null;
-    const now = new Date();
-    _habitCalYear = now.getFullYear();
-    _habitCalMonth = now.getMonth();
-  }
-  _renderHabitCalSection();
-
   const unseen = _habitItems.flatMap(h => h.accountabilityUids || h.shareUids || []).filter(uid => uid && !_habitFriendCache[uid]);
   if (unseen.length) {
     _habitLoadFriendProfiles(unseen).then(() => {
@@ -10393,33 +10381,39 @@ function renderHabits() {
 
 function openHabitCalendar(habitId) {
   _habitCalHabitId = habitId;
+  const now = new Date();
   if (_habitCalYear === null) {
-    const now = new Date();
     _habitCalYear = now.getFullYear();
     _habitCalMonth = now.getMonth();
   }
-  _renderHabitCalSection();
-  document.getElementById("habitCalSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  _renderHabitCalModal();
+  document.getElementById("habitCalModal")?.classList.add("open");
 }
 
-function _renderHabitCalSection() {
-  const section = document.getElementById("habitCalSection");
+function closeHabitCalModal(event) {
+  if (!event || event.target.id === "habitCalModal") {
+    document.getElementById("habitCalModal")?.classList.remove("open");
+  }
+}
+
+function _renderHabitCalModal() {
   const content = document.getElementById("habitCalContent");
   const label = document.getElementById("habitCalMonthLabel");
-  if (!section || !content) return;
+  const nameEl = document.getElementById("habitCalModalName");
+  if (!content) return;
 
   const habit = _habitItems.find(h => h.id === _habitCalHabitId);
-  if (!habit) { section.style.display = "none"; return; }
+  if (!habit) return;
 
   const now = new Date();
   const year = _habitCalYear ?? now.getFullYear();
   const month = _habitCalMonth ?? now.getMonth();
 
+  if (nameEl) nameEl.textContent = habit.name || "Calendar";
   if (label) {
     label.textContent = new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
   }
   content.innerHTML = _habitMonthHtml(habit, year, month);
-  section.style.display = "block";
 }
 
 function habitCalPrev() {
@@ -10430,7 +10424,7 @@ function habitCalPrev() {
   if (m < 0) { m = 11; y--; }
   _habitCalYear = y;
   _habitCalMonth = m;
-  _renderHabitCalSection();
+  _renderHabitCalModal();
 }
 
 function habitCalNext() {
@@ -10441,7 +10435,7 @@ function habitCalNext() {
   if (m > 11) { m = 0; y++; }
   _habitCalYear = y;
   _habitCalMonth = m;
-  _renderHabitCalSection();
+  _renderHabitCalModal();
 }
 
 function openHabitCreateModal() {
