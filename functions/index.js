@@ -563,6 +563,14 @@ exports.onEncouragementCreated = functions.firestore
       const postTitle = snap.data().postTitle || "your Praise";
       title = "New Praise Comment";
       body = `${fromName} commented on "${postTitle}".`;
+    } else if (type === "habitAccountabilityAdded") {
+      const habitName = snap.data().habitName || "a habit";
+      title = "Accountability Partner";
+      body = `${fromName} added you as an accountability partner for "${habitName}".`;
+    } else if (type === "habitCompleted") {
+      const habitName = snap.data().habitName || "a habit";
+      title = "Habit Completed";
+      body = `${fromName} completed today's "${habitName}" habit.`;
     } else if (type === "encouragement") {
       title = "Study Encouragement";
       body = `${fromName} is encouraging you to study your Greek!`;
@@ -585,6 +593,7 @@ exports.onEncouragementCreated = functions.firestore
     try {
       const webpush = { notification: { icon: "/Greek-Vocab/icon-192.png", vibrate: [200, 100, 200] } };
       if (type && String(type).startsWith("mercy")) webpush.fcmOptions = { link: "/Greek-Vocab/?open=mercies" };
+      if (type && String(type).startsWith("habit")) webpush.fcmOptions = { link: "/Greek-Vocab/?open=habits" };
       const result = await messaging.sendEachForMulticast({
         tokens,
         notification: { title, body },

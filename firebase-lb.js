@@ -1162,20 +1162,36 @@ function listenHabits(uid, callback) {
   });
 }
 
-async function createHabit(uid, { name, description = "", scheduleType = "daily" } = {}) {
+async function habitOwnerName(uid) {
+  const user = await frGetUser(uid).catch(() => null);
+  return user?.displayName || user?.username || "Someone";
+}
+
+async function notifyHabitPartners(uid, friendUids = [], type, habitId, habitName) {
+  const fromName = await habitOwnerName(uid);
+  await Promise.all([...new Set(friendUids || [])]
+    .filter(friendUid => friendUid && friendUid !== uid)
+    .map(friendUid => fcmSendPushNotification(friendUid, type, fromName, uid, { habitId, habitName })));
+}
+
+async function createHabit(uid, { name, description = "", scheduleType = "daily", accountabilityUids = [] } = {}) {
   try {
     const habitId = habitIdFromName(name);
+    const partners = [...new Set(accountabilityUids || [])].filter(friendUid => friendUid && friendUid !== uid);
     await setDoc(doc(db, "users", uid, "habits", habitId), {
       ownerUid: uid,
       name: String(name || "").trim(),
       description: String(description || "").trim(),
       schedule: { type: scheduleType || "daily" },
       shareUids: [],
+      accountabilityUids: partners,
+      awardedMilestones: [],
       source: "disciple-builder",
       createdAt: serverTimestamp(),
       createdAtMs: Date.now(),
       updatedAt: serverTimestamp()
     }, { merge: true });
+    await notifyHabitPartners(uid, partners, "habitAccountabilityAdded", habitId, String(name || "").trim());
     return habitId;
   } catch (e) {
     console.warn("createHabit:", e);
@@ -1183,7 +1199,68 @@ async function createHabit(uid, { name, description = "", scheduleType = "daily"
   }
 }
 
-async function setHabitEntry(uid, habitId, { date, status, comment = "", source = "disciple-builder" } = {}) {
+async function updateHabit(uid, habitId, { name, description = "", scheduleType = "daily", accountabilityUids = [] } = {}) {
+  try {
+    const habitRef = doc(db, "users", uid, "habits", habitId);
+    const before = await getDoc(habitRef);
+    if (!before.exists()) return false;
+    const previousPartners = new Set(before.data().accountabilityUids || before.data().shareUids || []);
+    const partners = [...new Set(accountabilityUids || [])].filter(friendUid => friendUid && friendUid !== uid);
+    await setDoc(habitRef, {
+      name: String(name || "").trim(),
+      description: String(description || "").trim(),
+      schedule: { type: scheduleType || before.data().schedule?.type || "daily" },
+      accountabilityUids: partners,
+      updatedAt: serverTimestamp(),
+      updatedAtMs: Date.now()
+    }, { merge: true });
+    const added = partners.filter(friendUid => !previousPartners.has(friendUid));
+    if (added.length) await notifyHabitPartners(uid, added, "habitAccountabilityAdded", habitId, String(name || before.data().name || "habit").trim());
+    return true;
+  } catch (e) {
+    console.warn("updateHabit:", e);
+    return false;
+  }
+}
+
+async function deleteHabit(uid, habitId) {
+  try {
+    const entries = await getDocs(collection(db, "users", uid, "habits", habitId, "entries"));
+    let batch = writeBatch(db);
+    let writes = 0;
+    for (const entryDoc of entries.docs) {
+      batch.delete(entryDoc.ref);
+      writes++;
+      if (writes >= 420) {
+        await batch.commit();
+        batch = writeBatch(db);
+        writes = 0;
+      }
+    }
+    batch.delete(doc(db, "users", uid, "habits", habitId));
+    await batch.commit();
+    return true;
+  } catch (e) {
+    console.warn("deleteHabit:", e);
+    return false;
+  }
+}
+
+async function awardHabitMilestone(uid, habitId, milestone) {
+  try {
+    await updateDoc(doc(db, "users", uid, "habits", habitId), {
+      awardedMilestones: arrayUnion(String(milestone)),
+      updatedAt: serverTimestamp(),
+      updatedAtMs: Date.now()
+    });
+    return true;
+  } catch (e) {
+    console.warn("awardHabitMilestone:", e);
+    return false;
+  }
+}
+
+async function setHabitEntry(uid, habitId, { date, status, comment = "", source = "disciple-builder", notify = false } = {}) {
   try {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ""))) return false;
     await setDoc(doc(db, "users", uid, "habits", habitId, "entries", date), {
@@ -1198,6 +1275,11 @@ async function setHabitEntry(uid, habitId, { date, status, comment = "", source 
       updatedAt: serverTimestamp(),
       updatedAtMs: Date.now()
     }, { merge: true });
+    if (notify && status === "success") {
+      const habitSnap = await getDoc(doc(db, "users", uid, "habits", habitId));
+      const habit = habitSnap.exists() ? habitSnap.data() : {};
+      await notifyHabitPartners(uid, habit.accountabilityUids || habit.shareUids || [], "habitCompleted", habitId, habit.name || "habit");
+    }
     return true;
   } catch (e) {
     console.warn("setHabitEntry:", e);
@@ -1229,18 +1311,23 @@ async function importHabitShare(uid, rows = []) {
     for (const name of habitNames) {
       const habitId = habitIdFromName(name);
       const habitRef = doc(db, "users", uid, "habits", habitId);
-      batch.set(habitRef, {
+      const firstDateMs = byHabit[name].reduce((min, row) => Math.min(min, Date.parse(`${row.date}T00:00:00`) || Date.now()), Date.now());
+      const existingHabit = await getDoc(habitRef).catch(() => null);
+      const habitPayload = {
         ownerUid: uid,
         name,
-        description: "",
-        schedule: { type: "daily" },
-        shareUids: [],
         source: "habitshare-import",
         importedAt: serverTimestamp(),
-        createdAt: serverTimestamp(),
-        createdAtMs: Date.now(),
+        createdAtMs: existingHabit?.exists() ? (existingHabit.data().createdAtMs || firstDateMs) : firstDateMs,
         updatedAt: serverTimestamp()
-      }, { merge: true });
+      };
+      if (!existingHabit?.exists()) {
+        habitPayload.description = "";
+        habitPayload.schedule = { type: "daily" };
+        habitPayload.accountabilityUids = [];
+        habitPayload.awardedMilestones = [];
+      }
+      batch.set(habitRef, habitPayload, { merge: true });
       writes++;
       await commitIfNeeded();
 
@@ -1274,6 +1361,9 @@ window.Habits = {
   listen: listenHabits,
   create: createHabit,
   setEntry: setHabitEntry,
+  update: updateHabit,
+  delete: deleteHabit,
+  awardMilestone: awardHabitMilestone,
   importHabitShare
 };
 
