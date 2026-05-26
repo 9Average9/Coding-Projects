@@ -5544,16 +5544,21 @@ body.dark .big-lock .material-symbols-outlined {
 }
 
 .habits-stat-icon {
-  font-size: 24px;
-  color: var(--secondary-color);
-  background: color-mix(in srgb, var(--secondary-color) 14%, transparent);
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
   border-radius: 50%;
-  width: 46px;
-  height: 46px;
-  display: inline-flex;
+  background: color-mix(in srgb, var(--secondary-color) 14%, transparent);
+  display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
+}
+
+.habits-stat-icon .material-symbols-outlined {
+  font-size: 26px !important;
+  color: var(--secondary-color);
+  line-height: 1;
 }
 
 .habits-stats-row strong {
@@ -5733,7 +5738,7 @@ body.dark .big-lock .material-symbols-outlined {
   border-radius: 22px 22px 0 0;
   width: 100%;
   max-width: 560px;
-  padding: 20px 20px 40px;
+  padding: 20px 20px calc(100px + env(safe-area-inset-bottom, 0px));
   transform: translateY(24px);
   transition: transform 0.26s cubic-bezier(0.34,1.26,0.64,1);
   box-shadow: 0 -6px 40px rgba(0,0,0,0.18);
@@ -18985,6 +18990,64 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 
 .bottom-nav.home-collapsed .bn-item .material-symbols-outlined {
+  font-size: 1.82rem !important;
+}
+
+/* Habits page — same collapsed nav pill as home */
+.bottom-nav.habits-collapsed {
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 112px !important;
+  height: 68px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  transform: translateX(-50%) !important;
+  transition: width .28s cubic-bezier(.2,.8,.2,1), height .28s cubic-bezier(.2,.8,.2,1), left .28s cubic-bezier(.2,.8,.2,1), border-radius .28s ease, transform .28s ease !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item {
+  position: absolute !important;
+  inset: 0 !important;
+  height: 68px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(.5) !important;
+  transition: opacity .22s ease, transform .28s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item[data-page="home"],
+.bottom-nav.habits-collapsed .bn-item[data-page="profile"],
+.bottom-nav.habits-collapsed .bn-item[data-page="community"] {
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item[data-page="home"] {
+  z-index: 4;
+  color: var(--secondary-color) !important;
+  transform: scale(1) !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item[data-page="profile"] {
+  z-index: 2;
+  opacity: .54 !important;
+  transform: translateX(-25px) scale(.64) !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item[data-page="community"] {
+  z-index: 2;
+  opacity: .54 !important;
+  transform: translateX(25px) scale(.64) !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item > span:not(.material-symbols-outlined),
+.bottom-nav.habits-collapsed .bn-dot,
+.bottom-nav.habits-collapsed .bn-item::after {
+  display: none !important;
+}
+
+.bottom-nav.habits-collapsed .bn-item .material-symbols-outlined {
   font-size: 1.82rem !important;
 }
 

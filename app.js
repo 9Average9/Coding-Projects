@@ -120,6 +120,8 @@ let _merciesNavCollapseTimer = null;
 let _merciesNavScrollBound = false;
 let _homeNavCollapseTimer = null;
 let _homeNavScrollBound = false;
+let _habitsNavCollapseTimer = null;
+let _habitsNavScrollBound = false;
 let _pendingMercyFriendEncouragement = null;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -9792,6 +9794,46 @@ function bindHomeNavCollapse() {
   }, true);
 }
 
+function setHabitsNavCollapsed(collapsed) {
+  const nav = document.getElementById('bottomNav');
+  if (!nav) return;
+  const isHabits = document.getElementById('habitsPage')?.classList.contains('active');
+  nav.classList.toggle('habits-collapsed', !!collapsed && isHabits);
+}
+
+function expandHabitsNavTemporarily() {
+  setHabitsNavCollapsed(false);
+  clearTimeout(_habitsNavCollapseTimer);
+  _habitsNavCollapseTimer = setTimeout(() => setHabitsNavCollapsed(true), 3000);
+}
+
+function expandHabitsNavOnEntry() {
+  setHabitsNavCollapsed(false);
+  clearTimeout(_habitsNavCollapseTimer);
+  _habitsNavCollapseTimer = setTimeout(() => setHabitsNavCollapsed(true), 500);
+}
+
+function bindHabitsNavCollapse() {
+  const scroll = document.getElementById('habitsPage')?.querySelector('.habits-scroll');
+  const nav = document.getElementById('bottomNav');
+  if (!nav || _habitsNavScrollBound) return;
+  _habitsNavScrollBound = true;
+  nav.addEventListener('click', e => {
+    if (nav.classList.contains('habits-collapsed')) {
+      e.preventDefault();
+      e.stopPropagation();
+      expandHabitsNavTemporarily();
+    }
+  }, true);
+  if (scroll) {
+    scroll.addEventListener('scroll', () => {
+      if (!document.getElementById('habitsPage')?.classList.contains('active')) return;
+      clearTimeout(_habitsNavCollapseTimer);
+      setHabitsNavCollapsed(true);
+    }, { passive: true });
+  }
+}
+
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
@@ -9818,6 +9860,8 @@ function showNavPage(page) {
   } else if (page === 'habits') {
     showScreen('habitsPage');
     startHabitsPage();
+    bindHabitsNavCollapse();
+    expandHabitsNavOnEntry();
   } else if (page === 'community') {
     showScreen('communityPage');
     localStorage.setItem('communityLastVisit', Date.now().toString());
@@ -9852,6 +9896,7 @@ function showScreen(id) {
   if (target) target.classList.add("active");
   if (id !== 'merciesPage') setMerciesNavCollapsed(false);
   if (id !== 'homeScreen') setHomeNavCollapsed(false);
+  if (id !== 'habitsPage') setHabitsNavCollapsed(false);
 
   _syncHomeViewportState(id);
   _updateAppHeaderForScreen(id);
@@ -10230,11 +10275,10 @@ async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
   const users = await _habitLoadFriendProfiles(friendUids);
   el.innerHTML = users.map(user => {
     const name = _habitEsc(user.displayName || user.username || "Friend");
-    const handle = _habitEsc(user.username || user.email || "");
     const selected = selectedSet.has(user.uid);
     return `
       <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
-        <span>${name}${handle ? `<small>${handle}</small>` : ""}</span>
+        <span>${name}</span>
         <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
       </button>`;
   }).join("");

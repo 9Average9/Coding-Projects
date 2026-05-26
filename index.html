@@ -418,7 +418,7 @@ glacier: {
 <div class="habits-hero-text">
 <span class="habits-kicker">Habit Builder</span>
 <h1>Habits</h1>
-<p>Build steady practices with a calendar, streak rewards, and friends who can encourage you.</p>
+<p>Track what matters daily. Celebrate streaks, and invite friends to cheer you on.</p>
 </div>
 <div class="habits-hero-art" aria-hidden="true">
 <img src="habit-hero.svg" alt="" width="170" height="135"/>
@@ -436,17 +436,17 @@ glacier: {
 </div>
 <div class="habits-stats-row">
 <div>
-<span class="habits-stat-icon material-symbols-outlined">sync_alt</span>
+<div class="habits-stat-icon"><span class="material-symbols-outlined">sync_alt</span></div>
 <strong id="habitTotalCount">0</strong>
 <span>Habits</span>
 </div>
 <div>
-<span class="habits-stat-icon material-symbols-outlined">check_circle</span>
+<div class="habits-stat-icon"><span class="material-symbols-outlined">check_circle</span></div>
 <strong id="habitTodayCount">0</strong>
 <span>Done today</span>
 </div>
 <div>
-<span class="habits-stat-icon material-symbols-outlined">local_fire_department</span>
+<div class="habits-stat-icon"><span class="material-symbols-outlined">local_fire_department</span></div>
 <strong id="habitBestStreak">0</strong>
 <span>Best streak</span>
 </div>
@@ -9940,6 +9940,15 @@ Verb Endings
 <div class="habit-settings-section">
 <div class="habit-settings-head">
 <div>
+<strong>My Habits</strong>
+<small>Tap a habit to rename, add accountability partners, or delete.</small>
+</div>
+</div>
+<div class="habit-settings-list" id="habitSettingsList"></div>
+</div>
+<div class="habit-settings-section">
+<div class="habit-settings-head">
+<div>
 <strong>Import HabitShare CSV</strong>
 <small>Reads Habit, Date, Status, and Comment columns.</small>
 </div>
@@ -9959,15 +9968,6 @@ Verb Endings
 <div class="habit-import-list" id="habitImportList"></div>
 <button class="main-btn habit-import-submit" id="habitImportSubmitBtn" onclick="confirmHabitImport()">Import to Habits</button>
 </div>
-</div>
-<div class="habit-settings-section">
-<div class="habit-settings-head">
-<div>
-<strong>My Habits</strong>
-<small>Tap a habit to rename, add accountability partners, or delete.</small>
-</div>
-</div>
-<div class="habit-settings-list" id="habitSettingsList"></div>
 </div>
 </div>
 </div>
