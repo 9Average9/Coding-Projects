@@ -86,7 +86,7 @@ body {
   position: absolute;
   z-index: 3;
   left: 50%;
-  bottom: max(42px, calc(env(safe-area-inset-bottom, 0px) + 34px));
+  top: 61%;
   width: min(72vw, 360px);
   transform: translateX(-50%);
   display: flex;

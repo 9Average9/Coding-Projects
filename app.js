@@ -16948,9 +16948,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.63";
+const APP_VERSION = "3.0.64";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.64 &mdash; Launch Screen Polish</div>
+<ul>
+  <li><strong>Loading bar moved up</strong> so it sits under the Disciple Builder mark instead of near the bottom edge.</li>
+</ul>
 <div class="un-version-label">v3.0.63 &mdash; Disciple Builder Rebrand</div>
 <ul>
   <li><strong>Disciple Builder branding added</strong> across the app shell, install metadata, launch screen, auth screen, and onboarding language.</li>
