@@ -16948,9 +16948,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.64";
+const APP_VERSION = "3.0.65";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.65 &mdash; App Icon Polish</div>
+<ul>
+  <li><strong>Disciple Builder icon sizes added</strong> for iOS and PWA installs so the app icon fills the mask cleanly without exposed white edging.</li>
+</ul>
 <div class="un-version-label">v3.0.64 &mdash; Launch Screen Polish</div>
 <ul>
   <li><strong>Loading bar moved up</strong> so it sits under the Disciple Builder mark instead of near the bottom edge.</li>
@@ -18230,7 +18234,7 @@ function initFCMForeground() {
     const title = payload.notification?.title || "Disciple Builder";
     const body  = payload.notification?.body  || "Time to grow together.";
     if (Notification.permission === "granted") {
-      new Notification(title, { body, icon: "./PWAicon.png" });
+      new Notification(title, { body, icon: "./assets/icons/disciple-builder-icon-192.png" });
     }
   });
 }
