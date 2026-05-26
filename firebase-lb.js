@@ -1174,7 +1174,7 @@ async function notifyHabitPartners(uid, friendUids = [], type, habitId, habitNam
     .map(friendUid => fcmSendPushNotification(friendUid, type, fromName, uid, { habitId, habitName })));
 }
 
-async function createHabit(uid, { name, description = "", scheduleType = "daily", accountabilityUids = [] } = {}) {
+async function createHabit(uid, { name, description = "", scheduleType = "daily", accountabilityUids = [], icon = "menu_book", color = "" } = {}) {
   try {
     const habitId = habitIdFromName(name);
     const partners = [...new Set(accountabilityUids || [])].filter(friendUid => friendUid && friendUid !== uid);
@@ -1182,6 +1182,8 @@ async function createHabit(uid, { name, description = "", scheduleType = "daily"
       ownerUid: uid,
       name: String(name || "").trim(),
       description: String(description || "").trim(),
+      icon: String(icon || "menu_book"),
+      color: String(color || ""),
       schedule: { type: scheduleType || "daily" },
       shareUids: [],
       accountabilityUids: partners,
@@ -1199,7 +1201,7 @@ async function createHabit(uid, { name, description = "", scheduleType = "daily"
   }
 }
 
-async function updateHabit(uid, habitId, { name, description = "", scheduleType = "daily", accountabilityUids = [] } = {}) {
+async function updateHabit(uid, habitId, { name, description = "", scheduleType = "daily", accountabilityUids = [], icon = "menu_book", color = "" } = {}) {
   try {
     const habitRef = doc(db, "users", uid, "habits", habitId);
     const before = await getDoc(habitRef);
@@ -1209,6 +1211,8 @@ async function updateHabit(uid, habitId, { name, description = "", scheduleType 
     await setDoc(habitRef, {
       name: String(name || "").trim(),
       description: String(description || "").trim(),
+      icon: String(icon || "menu_book"),
+      color: String(color || ""),
       schedule: { type: scheduleType || before.data().schedule?.type || "daily" },
       accountabilityUids: partners,
       updatedAt: serverTimestamp(),

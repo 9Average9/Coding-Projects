@@ -9904,17 +9904,33 @@ Verb Endings
 <p class="praise-info-verses">Psalm 31:1 · Hebrews 13:15 · Colossians 3:17 · 1 Thessalonians 5:18</p>
 </div>
 </div>
+<!-- Habit create modal -->
 <div class="modal-overlay" id="habitCreateModal" onclick="closeHabitCreateModal(event)">
 <div class="modal-card habit-create-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeHabitCreateModal()">&times;</button>
-<div class="habits-kicker"><span class="material-symbols-outlined">checklist</span> Habit</div>
-<h2>New Habit</h2>
+<div class="habit-detail-preview">
+<div class="habit-detail-preview-icon" id="habitCreateIconPreview">
+<span class="material-symbols-outlined" id="habitCreateIconDisplay">menu_book</span>
+</div>
+<div>
+<div class="habits-kicker">New Habit</div>
+<strong>Create a Habit</strong>
+</div>
+</div>
+<div class="habit-field">
+<span>Icon</span>
+<div class="habit-icon-picker" id="habitCreateIconPicker"></div>
+</div>
+<div class="habit-field">
+<span>Color</span>
+<div class="habit-color-picker" id="habitCreateColorPicker"></div>
+</div>
 <label class="habit-field">
 <span>Name</span>
-<input id="habitNameInput" type="text" placeholder="Bible reading" maxlength="80"/>
+<input id="habitNameInput" type="text" placeholder="e.g. Bible reading" maxlength="80"/>
 </label>
 <label class="habit-field">
-<span>Description</span>
+<span>Description <small style="font-weight:600;color:var(--muted-color)">(optional)</small></span>
 <textarea id="habitDescInput" placeholder="A short note about what this habit is for" maxlength="240"></textarea>
 </label>
 <label class="habit-field">
@@ -9926,12 +9942,52 @@ Verb Endings
 </select>
 </label>
 <div class="habit-field">
-<span>Accountability friends</span>
+<span>Accountability partners</span>
+<span class="habit-field-hint">Tagged friends get notified when you complete this habit.</span>
 <div class="habit-friend-picker" id="habitCreateFriendsList"></div>
 </div>
 <button class="main-btn" onclick="submitHabitCreate()">Create Habit</button>
 </div>
 </div>
+<!-- Habit detail / edit modal (opened by tapping a habit card) -->
+<div class="modal-overlay" id="habitDetailModal" onclick="closeHabitDetailModal(event)">
+<div class="modal-card habit-detail-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeHabitDetailModal()">&times;</button>
+<div class="habit-detail-preview">
+<div class="habit-detail-preview-icon" id="habitDetailIconPreview">
+<span class="material-symbols-outlined" id="habitDetailIconDisplay">menu_book</span>
+</div>
+<div>
+<div class="habits-kicker">Edit Habit</div>
+<strong id="habitDetailTitleDisplay">Habit</strong>
+</div>
+</div>
+<div class="habit-field">
+<span>Icon</span>
+<div class="habit-icon-picker" id="habitDetailIconPicker"></div>
+</div>
+<div class="habit-field">
+<span>Color</span>
+<div class="habit-color-picker" id="habitDetailColorPicker"></div>
+</div>
+<label class="habit-field">
+<span>Name</span>
+<input id="habitDetailNameInput" type="text" maxlength="80"/>
+</label>
+<label class="habit-field">
+<span>Description <small style="font-weight:600;color:var(--muted-color)">(optional)</small></span>
+<textarea id="habitDetailDescInput" placeholder="A note about what this habit is for" maxlength="240"></textarea>
+</label>
+<div class="habit-field">
+<span>Accountability partners</span>
+<span class="habit-field-hint">Tagged friends get notified when you complete this habit.</span>
+<div class="habit-friend-picker" id="habitDetailFriendsList"></div>
+</div>
+<button class="main-btn" onclick="saveHabitDetail()">Save Changes</button>
+<button class="habit-danger-btn habit-detail-delete-btn" onclick="deleteHabitFromDetail()">Delete Habit</button>
+</div>
+</div>
+<!-- Habit settings modal (import + habit list) -->
 <div class="modal-overlay" id="habitSettingsModal" onclick="closeHabitSettingsModal(event)">
 <div class="modal-card habit-settings-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeHabitSettingsModal()">&times;</button>
@@ -9941,7 +9997,7 @@ Verb Endings
 <div class="habit-settings-head">
 <div>
 <strong>My Habits</strong>
-<small>Tap a habit to rename, add accountability partners, or delete.</small>
+<small>Tap any habit to edit its name, icon, color, and accountability partners.</small>
 </div>
 </div>
 <div class="habit-settings-list" id="habitSettingsList"></div>
