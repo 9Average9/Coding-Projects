@@ -10098,6 +10098,8 @@ function populateHomeScreen() {
 let _habitsUnsub = null;
 let _habitItems = [];
 let _habitsLoaded = false;
+let _habitsTab = "mine";
+let _friendsHabitsCache = {};
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
 let _habitCreateIcon = "menu_book";
@@ -10476,6 +10478,8 @@ async function startHabitsPage() {
     }, 500);
     return;
   }
+  // restore tab UI to saved state
+  _applyHabitsTabUI(_habitsTab);
   list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
   _habitsLoaded = false;
   _habitsUnsub?.();
@@ -10484,6 +10488,158 @@ async function startHabitsPage() {
     _habitsLoaded = true;
     renderHabits();
   });
+  if (_habitsTab === "friends") loadFriendsHabits();
+}
+
+function _applyHabitsTabUI(tab) {
+  document.getElementById("habitsTabMine")?.classList.toggle("active", tab === "mine");
+  document.getElementById("habitsTabFriends")?.classList.toggle("active", tab === "friends");
+  const myPane = document.getElementById("myHabitsPane");
+  const frPane = document.getElementById("friendsHabitsPane");
+  if (myPane) myPane.style.display = tab === "mine" ? "" : "none";
+  if (frPane) frPane.style.display = tab === "friends" ? "" : "none";
+}
+
+function switchHabitsTab(tab) {
+  _habitsTab = tab;
+  _applyHabitsTabUI(tab);
+  if (tab === "friends") loadFriendsHabits();
+}
+
+async function loadFriendsHabits() {
+  const container = document.getElementById("friendsHabitsList");
+  if (!container) return;
+  const friends = (friendsList || []).filter(Boolean);
+  if (!friends.length) {
+    container.innerHTML = '<p class="study-board-empty">No friends yet. Add friends in the Community tab.</p>';
+    return;
+  }
+  container.innerHTML = '<p class="study-board-empty">Loading friends\' habits...</p>';
+
+  // Load any uncached friends
+  const uncached = friends.filter(uid => !_friendsHabitsCache[uid]);
+  await Promise.all(uncached.map(async uid => {
+    try {
+      const [profile, habits] = await Promise.all([
+        _habitFriendCache[uid] ? Promise.resolve(_habitFriendCache[uid]) : window.Friends?.getUser(uid).catch(() => null),
+        window.Habits?.getFriendHabits(uid).catch(() => [])
+      ]);
+      if (profile) _habitFriendCache[uid] = profile;
+      _friendsHabitsCache[uid] = { profile: _habitFriendCache[uid] || { uid, displayName: "Friend" }, habits: habits || [] };
+    } catch {
+      _friendsHabitsCache[uid] = { profile: { uid, displayName: "Friend" }, habits: [] };
+    }
+  }));
+
+  renderFriendsHabits();
+}
+
+function renderFriendsHabits() {
+  const container = document.getElementById("friendsHabitsList");
+  if (!container) return;
+  const friends = (friendsList || []).filter(Boolean);
+  if (!friends.length) {
+    container.innerHTML = '<p class="study-board-empty">No friends yet. Add friends in the Community tab.</p>';
+    return;
+  }
+
+  // Sort alphabetically by display name
+  const sorted = friends
+    .map(uid => _friendsHabitsCache[uid])
+    .filter(Boolean)
+    .sort((a, b) => {
+      const na = (a.profile?.displayName || a.profile?.username || "").toLowerCase();
+      const nb = (b.profile?.displayName || b.profile?.username || "").toLowerCase();
+      return na.localeCompare(nb);
+    });
+
+  if (!sorted.length) {
+    container.innerHTML = '<p class="study-board-empty">Loading friends\' habits...</p>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(({ profile, habits }) => {
+    const name = _habitEsc(profile?.displayName || profile?.username || "Friend");
+    const uid = _habitEsc(profile?.uid || "");
+    if (!habits.length) {
+      return `<div class="friend-habit-section">
+        <div class="friend-habit-section-name">${name}</div>
+        <div class="friend-habit-empty-card">
+          <span class="material-symbols-outlined">sentiment_satisfied</span>
+          <p>${name} does not have any habits yet, encourage them to start making healthy ones</p>
+        </div>
+      </div>`;
+    }
+    const firstHabit = habits[0];
+    const moreCount = habits.length - 1;
+    return `<div class="friend-habit-section">
+      <div class="friend-habit-section-name">${name}</div>
+      <div onclick="showFriendHabitsModal('${uid}')" style="cursor:pointer">
+        ${_renderFriendHabitCard(firstHabit)}
+      </div>
+      ${moreCount > 0 ? `<button class="friend-habit-more-btn" onclick="showFriendHabitsModal('${uid}')">
+        <span class="material-symbols-outlined">expand_more</span>
+        View all ${habits.length} habits
+      </button>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function _renderFriendHabitCard(habit) {
+  const entries = habit.entries || {};
+  const today = _habitTodayKey();
+  const count = Object.values(entries).filter(e => e.status === "success").length;
+  const streak = _habitCurrentStreak(entries);
+  const icon = _habitEsc(habit.icon || "menu_book");
+  const color = habit.color || "";
+  const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
+  return `<article class="habit-card friend-habit-card">
+    <div class="habit-card-top">
+      <div class="habit-card-identity" style="pointer-events:none">
+        <div class="habit-card-icon"${iconStyle}>
+          <span class="material-symbols-outlined">${icon}</span>
+        </div>
+        <div class="habit-card-info">
+          <span class="habit-card-name">${_habitEsc(habit.name)}</span>
+          ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
+        </div>
+      </div>
+    </div>
+    <div class="habit-pills-row">
+      <span class="habit-pill">
+        <span class="material-symbols-outlined">local_fire_department</span>${streak} current streak
+      </span>
+      <span class="habit-pill">
+        <span class="material-symbols-outlined">emoji_events</span>${count} completions
+      </span>
+    </div>
+    ${_habitWeeklyProgressHtml(habit)}
+  </article>`;
+}
+
+function showFriendHabitsModal(friendUid) {
+  const cached = _friendsHabitsCache[friendUid];
+  if (!cached) return;
+  const name = cached.profile?.displayName || cached.profile?.username || "Friend";
+  document.getElementById("friendHabitsModalName").textContent = name;
+  const listEl = document.getElementById("friendHabitsModalList");
+  if (listEl) {
+    if (!cached.habits.length) {
+      listEl.innerHTML = `<div class="friend-habit-empty-card">
+        <span class="material-symbols-outlined">sentiment_satisfied</span>
+        <p>${_habitEsc(name)} does not have any habits yet, encourage them to start making healthy ones</p>
+      </div>`;
+    } else {
+      listEl.innerHTML = cached.habits.map(h => _renderFriendHabitCard(h)).join("");
+    }
+  }
+  document.getElementById("friendHabitsModal")?.classList.add("open");
+}
+
+function closeFriendHabitsModal(event) {
+  if (!event || event.target.id === "friendHabitsModal") {
+    document.getElementById("friendHabitsModal")?.classList.remove("open");
+  }
 }
 
 function renderHabits() {

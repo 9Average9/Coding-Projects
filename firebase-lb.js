@@ -1397,6 +1397,24 @@ async function importHabitShare(uid, rows = []) {
   }
 }
 
+async function getFriendHabits(friendUid) {
+  try {
+    const habitsSnap = await getDocs(
+      query(collection(db, "users", friendUid, "habits"), orderBy("createdAtMs", "asc"))
+    );
+    if (habitsSnap.empty) return [];
+    const habits = habitsSnap.docs.map(d => ({ id: d.id, ...d.data(), entries: {} }));
+    try {
+      const entriesSnap = await getDocs(collection(db, "users", friendUid, "habits", habits[0].id, "entries"));
+      entriesSnap.docs.forEach(e => { habits[0].entries[e.id] = e.data(); });
+    } catch {}
+    return habits;
+  } catch (e) {
+    console.warn("getFriendHabits:", friendUid, e);
+    return [];
+  }
+}
+
 window.Habits = {
   listen: listenHabits,
   create: createHabit,
@@ -1404,7 +1422,8 @@ window.Habits = {
   update: updateHabit,
   delete: deleteHabit,
   awardMilestone: awardHabitMilestone,
-  importHabitShare
+  importHabitShare,
+  getFriendHabits
 };
 
 window.Studies = {
