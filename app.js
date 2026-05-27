@@ -17568,14 +17568,21 @@ function syncLessonProgressBadge(textEl, done, total, advanced = false) {
   subtitle.textContent = done === total ? "Track complete. Strong work." : "Keep going! You're making great progress.";
 }
 
+function _localDateKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function _localYesterdayKey() {
+  const d = new Date(); d.setDate(d.getDate() - 1); return _localDateKey(d);
+}
+
 function updateStudyStreak() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = _localDateKey();
   const last = localStorage.getItem("lastStudyDate");
   let streak = parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 
   if (last === today) return;
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const yesterday = _localYesterdayKey();
   streak = (last === yesterday) ? streak + 1 : 1;
 
   localStorage.setItem("lastStudyDate", today);
@@ -17587,8 +17594,8 @@ function updateStudyStreak() {
 function getStreakDays() {
   const last = localStorage.getItem("lastStudyDate");
   if (!last) return 0;
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = _localDateKey();
+  const yesterday = _localYesterdayKey();
   if (last !== today && last !== yesterday) return 0;
   return parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 }
@@ -17596,8 +17603,8 @@ function getStreakDays() {
 function getPraiseStreakDays() {
   const last = localStorage.getItem("mercyLastPostDate");
   if (!last) return 0;
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = _localDateKey();
+  const yesterday = _localYesterdayKey();
   if (last !== today && last !== yesterday) return 0;
   return parseInt(localStorage.getItem("mercyStreakDays") || "0", 10);
 }
@@ -19946,7 +19953,7 @@ async function submitMercyPost() {
     if (!id) { alert('Could not post this Praise right now. Try again.'); return; }
     if (typeof created?.streakDays === 'number') {
       localStorage.setItem('mercyStreakDays', String(created.streakDays));
-      localStorage.setItem('mercyLastPostDate', new Date(created.createdAtMs || Date.now()).toISOString().slice(0, 10));
+      localStorage.setItem('mercyLastPostDate', _localDateKey(new Date(created.createdAtMs || Date.now())));
       updatePraiseStreakUI();
     } else {
       markMercyPostedToday();
