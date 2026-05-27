@@ -19146,13 +19146,23 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   width: 34px !important;
   height: 34px !important;
   flex-shrink: 0;
+  display: flex;
 }
 
-/* Legacy Material Symbols (lock icon when locked) */
-#homeScreen .home-action-tile .hat-icon .material-symbols-outlined {
+/* Locked tiles: show lock icon, hide SVG */
+#homeScreen .locked-feature-btn:not(.unlocked) .hat-icon .qa-svg { display: none !important; }
+#homeScreen .locked-feature-btn:not(.unlocked) .hat-icon .lock-icon {
+  display: flex !important;
   font-size: 1.8rem !important;
   color: inherit !important;
 }
+
+/* Unlocked tiles: show SVG, hide lock icon */
+#homeScreen .locked-feature-btn.unlocked .hat-icon .lock-icon { display: none !important; }
+#homeScreen .locked-feature-btn.unlocked .hat-icon .qa-svg { display: flex !important; }
+
+/* Non-locked tiles (Habits): always show SVG */
+#homeScreen .home-action-tile:not(.locked-feature-btn) .hat-icon .qa-svg { display: flex !important; }
 
 /* Bell notification button in top-right of home screen */
 .home-bell-btn {
