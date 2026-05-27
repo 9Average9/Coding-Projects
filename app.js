@@ -10366,6 +10366,28 @@ function _habitFriendName(uid) {
   return u?.displayName || u?.username || "Friend";
 }
 
+function _drawFriendChips(el, friendUids, selectedSet, onToggleName) {
+  const users = (friendUids || [])
+    .map(uid => _habitFriendCache[uid])
+    .filter(Boolean)
+    .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
+  if (!users.length) {
+    el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
+    return;
+  }
+  el.innerHTML = users.map(user => {
+    const name = _habitEsc(user.displayName || "Friend");
+    const selected = selectedSet.has(user.uid);
+    const avatar = _renderAvatar(user?.avatar || "person");
+    return `
+      <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
+        <span class="habit-friend-avatar">${avatar}</span>
+        <span>${name}</span>
+        <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
+      </button>`;
+  }).join("");
+}
+
 async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
   const el = document.getElementById(targetId);
   if (!el) return;
@@ -10374,29 +10396,15 @@ async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
     el.innerHTML = '<p class="study-board-empty">Add friends first, then choose accountability partners here.</p>';
     return;
   }
-  el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
-  try {
-    const users = (await Promise.all(friendUids.map(uid => window.Friends?.getUser(uid).catch(() => null))))
-      .filter(Boolean)
-      .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
-    if (!users.length) {
-      el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
-      return;
-    }
-    el.innerHTML = users.map(user => {
-      const name = _habitEsc(user.displayName || "Friend");
-      const selected = selectedSet.has(user.uid);
-      const avatar = _renderAvatar(user?.avatar || "person");
-      return `
-        <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
-          <span class="habit-friend-avatar">${avatar}</span>
-          <span>${name}</span>
-          <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
-        </button>`;
-    }).join("");
-  } catch {
-    el.innerHTML = '<p class="study-board-empty">Could not load friends.</p>';
+  const uncached = friendUids.filter(uid => !_habitFriendCache[uid]);
+  if (uncached.length) {
+    el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
+    await Promise.all(uncached.map(async uid => {
+      const user = await window.Friends?.getUser(uid).catch(() => null);
+      _habitFriendCache[uid] = user || { uid, displayName: "Friend" };
+    }));
   }
+  _drawFriendChips(el, friendUids, selectedSet, onToggleName);
 }
 
 function _parseCsvLine(line, delimiter) {
@@ -10666,7 +10674,8 @@ function selectHabitCreateColor(color) {
 function toggleHabitCreateFriend(uid) {
   if (_habitCreateFriends.has(uid)) _habitCreateFriends.delete(uid);
   else _habitCreateFriends.add(uid);
-  _renderHabitFriendPicker("habitCreateFriendsList", _habitCreateFriends, "toggleHabitCreateFriend");
+  const el = document.getElementById("habitCreateFriendsList");
+  if (el) _drawFriendChips(el, (friendsList || []).filter(Boolean), _habitCreateFriends, "toggleHabitCreateFriend");
 }
 
 function closeHabitCreateModal(event) {
@@ -10828,8 +10837,8 @@ async function openHabitDetailModal(habitId) {
   _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
   _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
   _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
-  await _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
   document.getElementById("habitDetailModal")?.classList.add("open");
+  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
 }
 
 function closeHabitDetailModal(event) {
@@ -10853,7 +10862,8 @@ function selectHabitDetailColor(color) {
 function toggleHabitDetailFriend(uid) {
   if (_habitDetailFriends.has(uid)) _habitDetailFriends.delete(uid);
   else _habitDetailFriends.add(uid);
-  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
+  const el = document.getElementById("habitDetailFriendsList");
+  if (el) _drawFriendChips(el, (friendsList || []).filter(Boolean), _habitDetailFriends, "toggleHabitDetailFriend");
 }
 
 async function saveHabitDetail() {
