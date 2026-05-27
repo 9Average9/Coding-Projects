@@ -10263,21 +10263,24 @@ function _habitEntryStatusForDate(habit, dateKey) {
 
 function _habitLastSevenDays(habit) {
   const today = _habitTodayKey();
+  const dayOfWeek = new Date(`${today}T00:00:00`).getDay(); // 0=Sun, 6=Sat
   return Array.from({ length: 7 }, (_, i) => {
-    const date = _habitShiftDateKey(today, i - 6);
+    const date = _habitShiftDateKey(today, i - dayOfWeek);
     return { date, status: _habitEntryStatusForDate(habit, date) };
   });
 }
 
 function _habitWeeklyProgressHtml(habit) {
   const days = _habitLastSevenDays(habit);
+  const today = _habitTodayKey();
   const complete = days.filter(d => d.status === "success").length;
-  const pct = Math.round((complete / 7) * 100);
+  const pastDays = days.filter(d => d.date <= today).length;
+  const pct = pastDays > 0 ? Math.round((complete / pastDays) * 100) : 0;
   return `
-    <div class="habit-week-strip" aria-label="Last seven days">
+    <div class="habit-week-strip" aria-label="This week">
       <div class="habit-week-strip-head">
-        <span>Last 7 days</span>
-        <strong>${complete}/7</strong>
+        <span>This week</span>
+        <strong>${complete}/${pastDays}</strong>
       </div>
       <div class="habit-week-days">
         ${days.map(d => {
@@ -10502,7 +10505,7 @@ function renderHabits() {
     const checkBtnClass = doneToday ? " done" : skippedToday ? " skipped" : "";
     const checkBtnIcon = doneToday ? "check_circle" : skippedToday ? "snooze" : "radio_button_unchecked";
     const checkBtnLabel = doneToday ? "Done Today" : skippedToday ? "Skipped" : "Complete Today";
-    const checkBtnAction = (doneToday || skippedToday) ? `"open"` : `"success"`;
+    const checkBtnAction = (doneToday || skippedToday) ? `'open'` : `'success'`;
     const skipPill = !doneToday && !skippedToday
       ? `<button class="habit-pill habit-pill-skip" onclick="skipHabitToday('${_habitEsc(habit.id)}')">
            <span class="material-symbols-outlined">beach_access</span>Plan Skip
