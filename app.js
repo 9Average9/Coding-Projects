@@ -10268,7 +10268,9 @@ function _habitMonthHtml(habit, year, month) {
       ? '<span class="material-symbols-outlined">check</span>'
       : status === "missed"
         ? '<span class="material-symbols-outlined">close</span>'
-        : String(day);
+        : status === "skipped"
+          ? '<span class="material-symbols-outlined">snooze</span>'
+          : String(day);
     cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}" title="${key} ${_habitEsc(_habitStatusLabel(status))}">${icon}</div>`);
   }
   return `
@@ -10322,23 +10324,28 @@ async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
     return;
   }
   el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
-  const allProfiles = await _habitLoadFriendProfiles(friendUids);
-  const users = allProfiles
-    .filter(u => friendUids.includes(u.uid))
-    .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
-  if (!users.length) {
-    el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
-    return;
+  try {
+    const users = (await Promise.all(friendUids.map(uid => window.Friends?.getUser(uid).catch(() => null))))
+      .filter(Boolean)
+      .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
+    if (!users.length) {
+      el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
+      return;
+    }
+    el.innerHTML = users.map(user => {
+      const name = _habitEsc(user.displayName || "Friend");
+      const selected = selectedSet.has(user.uid);
+      const avatar = _renderAvatar(user?.avatar || "person");
+      return `
+        <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
+          <span class="habit-friend-avatar">${avatar}</span>
+          <span>${name}</span>
+          <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
+        </button>`;
+    }).join("");
+  } catch {
+    el.innerHTML = '<p class="study-board-empty">Could not load friends.</p>';
   }
-  el.innerHTML = users.map(user => {
-    const name = _habitEsc(user.displayName || "Friend");
-    const selected = selectedSet.has(user.uid);
-    return `
-      <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
-        <span>${name}</span>
-        <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
-      </button>`;
-  }).join("");
 }
 
 function _parseCsvLine(line, delimiter) {
@@ -10443,12 +10450,26 @@ function renderHabits() {
     const entries = habit.entries || {};
     const todayEntry = entries[today];
     const doneToday = todayEntry?.status === "success";
+    const skippedToday = todayEntry?.status === "skipped";
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
-    const calLabel = doneToday ? `Done ${today}` : `Open ${today}`;
+    const calLabel = doneToday ? `Done ${today}` : skippedToday ? `Skipped ${today}` : `Open ${today}`;
     const icon = _habitEsc(habit.icon || "menu_book");
     const color = habit.color || "";
     const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
+    const checkBtnClass = doneToday ? " done" : skippedToday ? " skipped" : "";
+    const checkBtnIcon = doneToday ? "check_circle" : skippedToday ? "snooze" : "radio_button_unchecked";
+    const checkBtnLabel = doneToday ? "Done Today" : skippedToday ? "Skipped" : "Complete Today";
+    const checkBtnAction = (doneToday || skippedToday) ? `"open"` : `"success"`;
+    const skipPill = !doneToday && !skippedToday
+      ? `<button class="habit-pill habit-pill-skip" onclick="skipHabitToday('${_habitEsc(habit.id)}')">
+           <span class="material-symbols-outlined">beach_access</span>Plan Skip
+         </button>`
+      : skippedToday
+        ? `<button class="habit-pill habit-pill-skipped" onclick="toggleHabitToday('${_habitEsc(habit.id)}', 'open')">
+             <span class="material-symbols-outlined">snooze</span>Planned skip — undo
+           </button>`
+        : "";
     return `
       <article class="habit-card">
         <div class="habit-card-top">
@@ -10461,9 +10482,9 @@ function renderHabits() {
               ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
             </div>
           </button>
-          <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${_habitEsc(habit.id)}', ${doneToday ? "'open'" : "'success'"})">
-            <span class="material-symbols-outlined">${doneToday ? "check_circle" : "radio_button_unchecked"}</span>
-            <span>${doneToday ? "Done Today" : "Complete Today"}</span>
+          <button class="habit-check-btn${checkBtnClass}" onclick="toggleHabitToday('${_habitEsc(habit.id)}', ${checkBtnAction})">
+            <span class="material-symbols-outlined">${checkBtnIcon}</span>
+            <span>${checkBtnLabel}</span>
           </button>
         </div>
         <div class="habit-pills-row">
@@ -10476,6 +10497,7 @@ function renderHabits() {
           <button class="habit-pill habit-pill-cal" onclick="openHabitCalendar('${_habitEsc(habit.id)}')">
             <span class="material-symbols-outlined">calendar_today</span>${_habitEsc(calLabel)}
           </button>
+          ${skipPill}
         </div>
       </article>`;
   }).join("");
@@ -10623,6 +10645,18 @@ async function toggleHabitToday(habitId, status) {
       await window.Habits?.awardMilestone?.(uid, habitId, milestone.key);
     }
   }
+}
+
+async function skipHabitToday(habitId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const ok = await window.Habits?.setEntry?.(uid, habitId, {
+    date: _habitTodayKey(),
+    status: "skipped",
+    comment: "Planned skip",
+    notify: true
+  });
+  if (!ok) alert("Could not update that habit.");
 }
 
 function openHabitSettingsModal() {

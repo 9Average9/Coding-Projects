@@ -5643,6 +5643,8 @@ body.dark .big-lock .material-symbols-outlined {
   padding: 0;
   cursor: pointer;
   text-align: left;
+  color: var(--font-color);
+  font: inherit;
 }
 
 .habit-card-info {
@@ -5805,6 +5807,12 @@ body.dark .big-lock .material-symbols-outlined {
   border-color: #86efac;
 }
 
+.habit-check-btn.skipped {
+  background: rgba(245,158,11,0.1);
+  color: #b45309;
+  border-color: rgba(245,158,11,0.35);
+}
+
 .habit-check-btn .material-symbols-outlined {
   font-size: 18px;
 }
@@ -5846,6 +5854,37 @@ body.dark .big-lock .material-symbols-outlined {
   background: color-mix(in srgb, var(--secondary-color) 18%, transparent);
   outline: none;
 }
+
+.habit-pill-skip {
+  cursor: pointer;
+  background: transparent;
+  border: 1px dashed rgba(245,158,11,0.5);
+  color: #b45309;
+}
+.habit-pill-skip:hover { background: rgba(245,158,11,0.08); outline: none; }
+
+.habit-pill-skipped {
+  cursor: pointer;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.35);
+  color: #b45309;
+}
+
+/* Friend avatar in picker chips */
+.habit-friend-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+}
+.habit-friend-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.habit-friend-avatar .lb-avatar { font-size: 13px !important; width: 28px !important; height: 28px !important; min-width: 0 !important; }
+.habit-friend-avatar .material-symbols-outlined { font-size: 16px !important; color: var(--secondary-color); }
 
 /* Empty state */
 .habits-empty {
@@ -6025,6 +6064,12 @@ body.dark .big-lock .material-symbols-outlined {
   background: rgba(239,68,68,0.08);
   color: #991b1b;
   border-color: rgba(239,68,68,0.28);
+}
+
+.habit-cal-day.skipped {
+  background: rgba(245,158,11,0.1);
+  color: #b45309;
+  border-color: rgba(245,158,11,0.3);
 }
 
 .habit-cal-day .material-symbols-outlined {
@@ -19058,23 +19103,40 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 }
 
 #homeScreen .home-action-tile .hat-icon {
-  width: 58px !important;
-  height: 58px !important;
+  width: 66px !important;
+  height: 66px !important;
   border-radius: 50% !important;
   background:
-    radial-gradient(circle at 35% 25%, rgba(255,255,255,0.78), transparent 38%),
-    color-mix(in srgb, var(--secondary-color) 14%, var(--card-color)) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.07);
+    radial-gradient(circle at 32% 22%, rgba(255,255,255,0.88), transparent 44%),
+    color-mix(in srgb, var(--secondary-color) 22%, var(--card-color)) !important;
+  border: 2px solid color-mix(in srgb, var(--secondary-color) 28%, transparent) !important;
+  box-shadow:
+    0 14px 32px rgba(0,0,0,0.13),
+    0 4px 10px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.55) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
 #homeScreen .home-action-tile .hat-icon .material-symbols-outlined {
-  font-size: 1.65rem !important;
+  font-size: 1.85rem !important;
   color: var(--secondary-color) !important;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.12));
 }
+
+/* Bell notification button in top-right of home screen */
+.home-bell-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--font-color);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.home-bell-btn .material-symbols-outlined { font-size: 1.6rem; }
 
 #homeScreen .home-action-tile .hat-text {
   display: block !important;
