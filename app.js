@@ -10110,6 +10110,8 @@ let _habitDetailId = null;
 let _habitDetailIcon = "menu_book";
 let _habitDetailColor = "";
 let _habitDetailFriends = new Set();
+let _habitNoteHabitId = null;
+let _habitNoteDate = null;
 
 const HABIT_ICONS = [
   "menu_book","auto_stories","self_improvement","fitness_center",
@@ -10176,6 +10178,13 @@ function _habitDateMs(dateKey) {
 
 function _habitKeyForDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function _habitShiftDateKey(dateKey, deltaDays) {
+  const [year, month, day] = String(dateKey || _habitTodayKey()).split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  d.setDate(d.getDate() + deltaDays);
+  return _habitKeyForDate(d);
 }
 
 function _habitCurrentStreak(entries = {}) {
@@ -10250,6 +10259,35 @@ function _habitEntryStatusForDate(habit, dateKey) {
   if (_habitDateMs(dateKey) < _habitDateMs(start)) return "open";
   if (_habitDateMs(dateKey) < _habitDateMs(_habitTodayKey())) return "missed";
   return "open";
+}
+
+function _habitLastSevenDays(habit) {
+  const today = _habitTodayKey();
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = _habitShiftDateKey(today, i - 6);
+    return { date, status: _habitEntryStatusForDate(habit, date) };
+  });
+}
+
+function _habitWeeklyProgressHtml(habit) {
+  const days = _habitLastSevenDays(habit);
+  const complete = days.filter(d => d.status === "success").length;
+  const pct = Math.round((complete / 7) * 100);
+  return `
+    <div class="habit-week-strip" aria-label="Last seven days">
+      <div class="habit-week-strip-head">
+        <span>Last 7 days</span>
+        <strong>${complete}/7</strong>
+      </div>
+      <div class="habit-week-days">
+        ${days.map(d => {
+          const dayLabel = new Date(`${d.date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short" }).slice(0, 1);
+          const icon = d.status === "success" ? "check" : d.status === "skipped" ? "remove" : d.status === "missed" ? "close" : "";
+          return `<span class="habit-week-day ${d.status}" title="${_habitEsc(d.date)} ${_habitEsc(_habitStatusLabel(d.status))}">${icon ? `<span class="material-symbols-outlined">${icon}</span>` : dayLabel}</span>`;
+        }).join("")}
+      </div>
+      <div class="habit-week-bar"><span style="width:${pct}%"></span></div>
+    </div>`;
 }
 
 function _habitMonthHtml(habit, year, month) {
@@ -10453,6 +10491,10 @@ function renderHabits() {
     const skippedToday = todayEntry?.status === "skipped";
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
+    const yesterday = _habitShiftDateKey(today, -1);
+    const yesterdayEntry = entries[yesterday];
+    const canCatchUp = !doneToday && yesterdayEntry?.status !== "success" && yesterdayEntry?.status !== "skipped";
+    const todayComment = (todayEntry?.comment || "").trim();
     const calLabel = doneToday ? `Done ${today}` : skippedToday ? `Skipped ${today}` : `Open ${today}`;
     const icon = _habitEsc(habit.icon || "menu_book");
     const color = habit.color || "";
@@ -10470,6 +10512,11 @@ function renderHabits() {
              <span class="material-symbols-outlined">snooze</span>Planned skip — undo
            </button>`
         : "";
+    const catchUpPill = canCatchUp
+      ? `<button class="habit-pill habit-pill-catchup" onclick="catchUpHabitYesterday('${_habitEsc(habit.id)}')">
+           <span class="material-symbols-outlined">history</span>Catch up yesterday
+         </button>`
+      : "";
     return `
       <article class="habit-card">
         <div class="habit-card-top">
@@ -10497,8 +10544,13 @@ function renderHabits() {
           <button class="habit-pill habit-pill-cal" onclick="openHabitCalendar('${_habitEsc(habit.id)}')">
             <span class="material-symbols-outlined">calendar_today</span>${_habitEsc(calLabel)}
           </button>
+          <button class="habit-pill habit-pill-note${todayComment ? " has-note" : ""}" onclick="openHabitNoteModal('${_habitEsc(habit.id)}')">
+            <span class="material-symbols-outlined">${todayComment ? "sticky_note_2" : "edit_note"}</span>${todayComment ? "Note saved" : "Add note"}
+          </button>
           ${skipPill}
+          ${catchUpPill}
         </div>
+        ${_habitWeeklyProgressHtml(habit)}
       </article>`;
   }).join("");
 
@@ -10657,6 +10709,61 @@ async function skipHabitToday(habitId) {
     notify: true
   });
   if (!ok) alert("Could not update that habit.");
+}
+
+async function catchUpHabitYesterday(habitId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const yesterday = _habitShiftDateKey(_habitTodayKey(), -1);
+  const ok = await window.Habits?.setEntry?.(uid, habitId, {
+    date: yesterday,
+    status: "success",
+    comment: "Caught up from yesterday",
+    notify: false
+  });
+  if (!ok) { alert("Could not catch up that habit."); return; }
+  _showStudyToast("Yesterday marked complete");
+}
+
+function openHabitNoteModal(habitId, dateKey = _habitTodayKey()) {
+  const habit = _habitItems.find(h => h.id === habitId);
+  if (!habit) return;
+  _habitNoteHabitId = habitId;
+  _habitNoteDate = dateKey;
+  const entry = habit.entries?.[dateKey] || {};
+  const title = document.getElementById("habitNoteTitle");
+  const label = document.getElementById("habitNoteDateLabel");
+  const input = document.getElementById("habitNoteInput");
+  if (title) title.textContent = habit.name || "Habit Note";
+  if (label) label.textContent = new Date(`${dateKey}T00:00:00`).toLocaleDateString(undefined, {
+    weekday: "long", month: "long", day: "numeric"
+  });
+  if (input) input.value = entry.comment || "";
+  document.getElementById("habitNoteModal")?.classList.add("open");
+}
+
+function closeHabitNoteModal(event) {
+  if (!event || event.target.id === "habitNoteModal") {
+    document.getElementById("habitNoteModal")?.classList.remove("open");
+  }
+}
+
+async function saveHabitNote() {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !_habitNoteHabitId || !_habitNoteDate) return;
+  const habit = _habitItems.find(h => h.id === _habitNoteHabitId);
+  const previous = habit?.entries?.[_habitNoteDate] || {};
+  const status = previous.status || "open";
+  const comment = document.getElementById("habitNoteInput")?.value.trim() || "";
+  const ok = await window.Habits?.setEntry?.(uid, _habitNoteHabitId, {
+    date: _habitNoteDate,
+    status,
+    comment,
+    notify: false
+  });
+  if (!ok) { alert("Could not save that note."); return; }
+  closeHabitNoteModal();
+  _showStudyToast("Habit note saved");
 }
 
 function openHabitSettingsModal() {
@@ -17724,9 +17831,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.69";
+const APP_VERSION = "3.0.70";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.70 &mdash; Habit Builder Momentum</div>
+<ul>
+  <li><strong>Habit weekly progress added</strong> with a last-7-days strip and progress bar on every habit.</li>
+  <li><strong>Daily habit notes added</strong> so each habit can keep a short reflection for today.</li>
+  <li><strong>Yesterday catch-up added</strong> for quickly marking a missed previous day complete.</li>
+</ul>
 <div class="un-version-label">v3.0.69 &mdash; Home Actions and Nav Fix</div>
 <ul>
   <li><strong>Quick Action icons refined</strong> to match the softer rounded-square style on the Home screen.</li>

@@ -5870,6 +5870,99 @@ body.dark .big-lock .material-symbols-outlined {
   color: #b45309;
 }
 
+.habit-pill-note {
+  cursor: pointer;
+  background: color-mix(in srgb, var(--secondary-color) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 14%, transparent);
+}
+
+.habit-pill-note.has-note {
+  background: color-mix(in srgb, var(--secondary-color) 14%, transparent);
+  color: var(--secondary-color);
+}
+
+.habit-pill-catchup {
+  cursor: pointer;
+  background: rgba(14,165,233,0.09);
+  border: 1px solid rgba(14,165,233,0.28);
+  color: #0369a1;
+}
+
+.habit-week-strip {
+  margin-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
+  padding-top: 11px;
+}
+
+.habit-week-strip-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted-color);
+  font-size: 0.75rem;
+  font-weight: 850;
+  margin-bottom: 8px;
+}
+
+.habit-week-strip-head strong {
+  color: var(--secondary-color);
+}
+
+.habit-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.habit-week-day {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--light-color);
+  color: var(--muted-color);
+  border: 1px solid var(--border-color);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.habit-week-day.success {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.habit-week-day.missed {
+  background: rgba(239,68,68,0.08);
+  color: #991b1b;
+  border-color: rgba(239,68,68,0.26);
+}
+
+.habit-week-day.skipped {
+  background: rgba(245,158,11,0.1);
+  color: #b45309;
+  border-color: rgba(245,158,11,0.28);
+}
+
+.habit-week-day .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.habit-week-bar {
+  height: 5px;
+  background: color-mix(in srgb, var(--border-color) 70%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.habit-week-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 55%, var(--accent-color)));
+}
+
 /* Friend avatar in picker chips */
 .habit-friend-avatar {
   width: 28px;
@@ -6144,6 +6237,17 @@ body.dark .big-lock .material-symbols-outlined {
 
 /* Modals */
 .habit-create-card { max-width: 440px; }
+
+.habit-note-card {
+  max-width: 440px;
+}
+
+.habit-note-date {
+  margin: -4px 0 12px;
+  color: var(--muted-color);
+  font-weight: 750;
+  font-size: 0.86rem;
+}
 
 .habit-settings-card {
   max-width: 600px;
