@@ -6185,6 +6185,25 @@ body.dark .big-lock .material-symbols-outlined {
   place-items: center;
   font-size: 0.76rem;
   font-weight: 900;
+  position: relative;
+}
+
+button.habit-cal-day {
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.habit-cal-note-dot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #3b82f6;
+  pointer-events: none;
 }
 
 .habit-cal-day.blank {
