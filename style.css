@@ -19094,35 +19094,64 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  gap: 8px !important;
+  gap: 9px !important;
   text-align: center !important;
 }
 
 #homeScreen .home-action-tile:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
+/* Rounded-square Quick Action tiles */
 #homeScreen .home-action-tile .hat-icon {
-  width: 66px !important;
-  height: 66px !important;
-  border-radius: 50% !important;
-  background:
-    radial-gradient(circle at 32% 22%, rgba(255,255,255,0.88), transparent 44%),
-    color-mix(in srgb, var(--secondary-color) 22%, var(--card-color)) !important;
-  border: 2px solid color-mix(in srgb, var(--secondary-color) 28%, transparent) !important;
+  width: clamp(66px, 22vw, 82px) !important;
+  height: clamp(66px, 22vw, 82px) !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,0.72) !important;
+  border: 1.5px solid rgba(0,0,0,0.12) !important;
   box-shadow:
-    0 14px 32px rgba(0,0,0,0.13),
-    0 4px 10px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.55) !important;
+    0 4px 14px rgba(0,0,0,0.10),
+    0 1px 4px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.8) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  transition: transform 0.12s, box-shadow 0.12s !important;
 }
 
+/* Per-tile accent colors */
+#habitsHomeBtn .hat-icon {
+  background: rgba(22,163,74,0.1) !important;
+  border-color: rgba(22,163,74,0.38) !important;
+  color: #16a34a;
+}
+#vocabHomeBtn .hat-icon {
+  background: rgba(124,58,237,0.1) !important;
+  border-color: rgba(124,58,237,0.38) !important;
+  color: #7c3aed;
+}
+#translateHomeBtn .hat-icon {
+  background: rgba(37,99,235,0.1) !important;
+  border-color: rgba(37,99,235,0.38) !important;
+  color: #2563eb;
+}
+#testHomeBtn .hat-icon {
+  background: rgba(217,119,6,0.1) !important;
+  border-color: rgba(217,119,6,0.38) !important;
+  color: #d97706;
+}
+
+/* SVG icons */
+#homeScreen .home-action-tile .hat-icon .qa-svg {
+  width: 34px !important;
+  height: 34px !important;
+  flex-shrink: 0;
+}
+
+/* Legacy Material Symbols (lock icon when locked) */
 #homeScreen .home-action-tile .hat-icon .material-symbols-outlined {
-  font-size: 1.85rem !important;
-  color: var(--secondary-color) !important;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.12));
+  font-size: 1.8rem !important;
+  color: inherit !important;
 }
 
 /* Bell notification button in top-right of home screen */
@@ -19146,7 +19175,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 
 #homeScreen .home-action-tile .hat-text strong {
   display: block;
-  font-size: clamp(0.62rem, 2.7vw, 0.76rem) !important;
+  font-size: clamp(0.66rem, 2.9vw, 0.8rem) !important;
   font-weight: 800 !important;
   line-height: 1.12;
   color: var(--font-color) !important;

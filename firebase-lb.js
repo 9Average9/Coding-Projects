@@ -1512,7 +1512,8 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
 }
 
 function mercyDateKey(ms = Date.now()) {
-  return new Date(ms).toISOString().slice(0, 10);
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 async function advanceMercyStreak(uid, now = Date.now()) {
@@ -1522,7 +1523,8 @@ async function advanceMercyStreak(uid, now = Date.now()) {
     const data = snap.exists() ? snap.data() : {};
     const today = mercyDateKey(now);
     if (data.mercyLastPostDate === today) return data.mercyStreakDays || 1;
-    const yesterday = mercyDateKey(now - 24 * 60 * 60 * 1000);
+    const _yd = new Date(now); _yd.setDate(_yd.getDate() - 1);
+    const yesterday = mercyDateKey(_yd.getTime());
     const nextStreak = data.mercyLastPostDate === yesterday ? (data.mercyStreakDays || 0) + 1 : 1;
     await setDoc(userRef, {
       mercyLastPostDate: today,
