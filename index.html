@@ -303,7 +303,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-180.png" rel="apple-touch-icon"/>
 <link href="assets/icons/disciple-builder-icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
-<link href="style.css?v=3.0.69" rel="stylesheet"/>
+<link href="style.css?v=3.0.70" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -381,7 +381,7 @@ glacier: {
 <div class="home-actions-grid">
 <button class="home-action-tile" id="habitsHomeBtn" onclick="showNavPage('habits')">
 <div class="hat-icon hat-icon-habits">
-<svg class="qa-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><line x1="21.5" y1="2.5" x2="15.2" y2="8.8"/><polyline points="16 2 22 2 22 8"/></svg>
+<svg class="qa-svg qa-svg-habit" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20.5V13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M12 13c-3.9-.4-6.6-2.8-7.8-7.1 4.4.1 7.2 2.4 7.8 7.1Z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 13c.7-4.2 3.4-6.8 7.9-7.8-1 4.6-3.7 7.2-7.9 7.8Z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.2 20.5h9.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
 </div>
 <div class="hat-text"><strong>Habits</strong></div>
 </button>
@@ -402,7 +402,7 @@ glacier: {
 <button class="home-action-tile locked-feature-btn" id="testHomeBtn" onclick="tryOpenLockedFeature('test')">
 <div class="hat-icon hat-icon-test">
 <span class="material-symbols-outlined lock-icon">quiz</span>
-<svg class="qa-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="4" rx="1.5"/><path d="M9 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-2"/><path d="m9 13 2 2 4-4"/></svg>
+<svg class="qa-svg qa-svg-clipboard" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4.8" width="14" height="16.2" rx="2.4" stroke="currentColor" stroke-width="1.9"/><path d="M9.4 4.8V4a2.6 2.6 0 0 1 5.2 0v.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><rect x="8.1" y="3.6" width="7.8" height="3.6" rx="1.4" fill="var(--qa-bg-fill, #ffedda)" stroke="currentColor" stroke-width="1.7"/><path d="m8.7 11.5 1.4 1.4 2.3-2.7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.2 12h2.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="m8.7 16.2 1.4 1.4 2.3-2.7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.2 16.7h2.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
 </div>
 <div class="hat-text"><strong>Test</strong></div>
 </button>
@@ -480,6 +480,20 @@ glacier: {
 </button>
 </div>
 <div id="habitCalContent"></div>
+</div>
+</div>
+<!-- Habit note modal -->
+<div class="modal-overlay" id="habitNoteModal" onclick="closeHabitNoteModal(event)">
+<div class="modal-card habit-note-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeHabitNoteModal()">&times;</button>
+<div class="habits-kicker"><span class="material-symbols-outlined">edit_note</span> Daily Note</div>
+<h2 id="habitNoteTitle">Habit Note</h2>
+<p class="habit-note-date" id="habitNoteDateLabel"></p>
+<label class="habit-field">
+<span>Reflection</span>
+<textarea id="habitNoteInput" placeholder="What helped, what got in the way, or what do you want to remember?" maxlength="360"></textarea>
+</label>
+<button class="main-btn" onclick="saveHabitNote()">Save Note</button>
 </div>
 </div>
 <section class="screen" id="newLearnMenu">
@@ -15899,10 +15913,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.69"></script>
+<script src="app.js?v=3.0.70"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.69" type="module"></script>
+<script src="firebase-lb.js?v=3.0.70" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

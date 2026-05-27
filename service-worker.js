@@ -17,20 +17,20 @@ const messaging = firebase.messaging();
 // two notifications (APNs auto-display + our manual call).
 messaging.onBackgroundMessage(function () {});
 
-const CACHE_NAME = "disciple-builder-v3.0.69";
+const CACHE_NAME = "disciple-builder-v3.0.70";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=3.0.69",
+  "./style.css?v=3.0.70",
   "./vocab.js?v=3.0.8",
-  "./app.js?v=3.0.69",
+  "./app.js?v=3.0.70",
   "./rhema-critical.js?v=3.0.23",
   "./rhema-msb.js?v=3.0.65",
   "./rhema-bsb.js?v=3.0.65",
   "./rhema-crossrefs-ui.js?v=3.0.29",
   "./greek-verbs.js?v=3.0.23",
-  "./firebase-lb.js?v=3.0.69",
+  "./firebase-lb.js?v=3.0.70",
   "./assets/home-backgrounds/abstract.jpg",
   "./assets/home-backgrounds/ancient-scroll.jpg",
   "./assets/home-backgrounds/city.jpg",
