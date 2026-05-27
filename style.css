@@ -19119,26 +19119,30 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   transition: transform 0.12s, box-shadow 0.12s !important;
 }
 
-/* Per-tile accent colors */
+/* Per-tile accent colors — solid background, white icons */
 #habitsHomeBtn .hat-icon {
-  background: rgba(22,163,74,0.1) !important;
-  border-color: rgba(22,163,74,0.38) !important;
-  color: #16a34a;
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(22,163,74,0.40), 0 2px 6px rgba(22,163,74,0.22) !important;
 }
 #vocabHomeBtn .hat-icon {
-  background: rgba(124,58,237,0.1) !important;
-  border-color: rgba(124,58,237,0.38) !important;
-  color: #7c3aed;
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(124,58,237,0.40), 0 2px 6px rgba(124,58,237,0.22) !important;
 }
 #translateHomeBtn .hat-icon {
-  background: rgba(37,99,235,0.1) !important;
-  border-color: rgba(37,99,235,0.38) !important;
-  color: #2563eb;
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(37,99,235,0.40), 0 2px 6px rgba(37,99,235,0.22) !important;
 }
 #testHomeBtn .hat-icon {
-  background: rgba(217,119,6,0.1) !important;
-  border-color: rgba(217,119,6,0.38) !important;
-  color: #d97706;
+  background: #d97706 !important;
+  border-color: #d97706 !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(217,119,6,0.40), 0 2px 6px rgba(217,119,6,0.22) !important;
 }
 
 /* SVG icons */
