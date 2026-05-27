@@ -10097,6 +10097,7 @@ function populateHomeScreen() {
 // ── Habits ────────────────────────────────────────────────────────────────────
 let _habitsUnsub = null;
 let _habitItems = [];
+let _habitsLoaded = false;
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
 let _habitCreateIcon = "menu_book";
@@ -10315,7 +10316,13 @@ function _habitMonthHtml(habit, year, month) {
         : status === "skipped"
           ? '<span class="material-symbols-outlined">snooze</span>'
           : String(day);
-    cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}" title="${key} ${_habitEsc(_habitStatusLabel(status))}">${icon}</div>`);
+    const note = (habit.entries?.[key]?.comment || "").trim();
+    const dot = note ? '<span class="habit-cal-note-dot"></span>' : '';
+    if (note) {
+      cells.push(`<button class="habit-cal-day ${status}${isToday ? " today" : ""} has-note" onclick="openHabitNoteModal('${_habitEsc(habit.id)}','${_habitEsc(key)}')" title="${_habitEsc(note)}">${icon}${dot}</button>`);
+    } else {
+      cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}">${icon}</div>`);
+    }
   }
   return `
     <div class="habit-calendar-month">
@@ -10462,9 +10469,11 @@ async function startHabitsPage() {
     return;
   }
   list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
+  _habitsLoaded = false;
   _habitsUnsub?.();
   _habitsUnsub = window.Habits?.listen?.(uid, habits => {
     _habitItems = habits || [];
+    _habitsLoaded = true;
     renderHabits();
   });
 }
@@ -10481,6 +10490,7 @@ function renderHabits() {
   document.getElementById("habitBestStreak").textContent = best;
 
   if (!total) {
+    if (!_habitsLoaded) return;
     list.innerHTML = `
       <div class="habits-empty">
         <span class="material-symbols-outlined">checklist</span>
