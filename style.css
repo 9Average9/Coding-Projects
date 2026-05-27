@@ -18702,10 +18702,11 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 
 #homeScreen .home-action-tile {
   min-width: 0;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  padding: 10px 6px 9px !important;
+  border: 1px solid var(--home-action-border, rgba(127,127,127,0.14)) !important;
+  background: var(--home-action-bg, transparent) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05) !important;
+  border-radius: 16px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -18723,10 +18724,10 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   height: 58px !important;
   border-radius: 50% !important;
   background:
-    radial-gradient(circle at 35% 25%, rgba(255,255,255,0.78), transparent 38%),
-    color-mix(in srgb, var(--secondary-color) 14%, var(--card-color)) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.07);
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,0.82), transparent 38%),
+    var(--home-action-icon-bg, color-mix(in srgb, var(--secondary-color) 14%, var(--card-color))) !important;
+  border: 1px solid var(--home-action-border, color-mix(in srgb, var(--secondary-color) 18%, transparent));
+  box-shadow: 0 10px 20px var(--home-action-shadow, rgba(0,0,0,0.07));
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -18734,7 +18735,7 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 
 #homeScreen .home-action-tile .hat-icon .material-symbols-outlined {
   font-size: 1.65rem !important;
-  color: var(--secondary-color) !important;
+  color: var(--home-action-icon, var(--secondary-color)) !important;
 }
 
 #homeScreen .home-action-tile .hat-text {
@@ -18755,6 +18756,38 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 #homeScreen .home-action-tile .hat-text small,
 #homeScreen .home-action-tile .hat-chev {
   display: none !important;
+}
+
+#homeScreen .home-action-habits {
+  --home-action-bg: linear-gradient(180deg, rgba(220, 252, 231, 0.92), rgba(240, 253, 244, 0.72));
+  --home-action-icon-bg: #bbf7d0;
+  --home-action-icon: #15803d;
+  --home-action-border: rgba(34, 197, 94, 0.28);
+  --home-action-shadow: rgba(34, 197, 94, 0.13);
+}
+
+#homeScreen .home-action-vocab {
+  --home-action-bg: linear-gradient(180deg, rgba(219, 234, 254, 0.94), rgba(239, 246, 255, 0.76));
+  --home-action-icon-bg: #bfdbfe;
+  --home-action-icon: #1d4ed8;
+  --home-action-border: rgba(59, 130, 246, 0.28);
+  --home-action-shadow: rgba(59, 130, 246, 0.13);
+}
+
+#homeScreen .home-action-translate {
+  --home-action-bg: linear-gradient(180deg, rgba(204, 251, 241, 0.94), rgba(240, 253, 250, 0.76));
+  --home-action-icon-bg: #99f6e4;
+  --home-action-icon: #0f766e;
+  --home-action-border: rgba(20, 184, 166, 0.3);
+  --home-action-shadow: rgba(20, 184, 166, 0.13);
+}
+
+#homeScreen .home-action-test {
+  --home-action-bg: linear-gradient(180deg, rgba(254, 226, 226, 0.94), rgba(255, 241, 242, 0.76));
+  --home-action-icon-bg: #fecaca;
+  --home-action-icon: #b91c1c;
+  --home-action-border: rgba(239, 68, 68, 0.28);
+  --home-action-shadow: rgba(239, 68, 68, 0.13);
 }
 
 /* Home-only nav dock: collapses inward into a centered control. */

@@ -16225,7 +16225,7 @@ function updatePracticeToolLocks() {
 
     const icon = btn.querySelector(".lock-icon");
     if (icon) {
-      icon.textContent = unlocked ? unlockedIcon : "lock";
+      icon.textContent = unlockedIcon;
     }
   });
 }
@@ -17462,9 +17462,13 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.67";
+const APP_VERSION = "3.0.68";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.68 &mdash; Home Action Polish</div>
+<ul>
+  <li><strong>Home action buttons refreshed</strong> with distinct colors and matching icons for Habits, Vocab, Translate, and Test.</li>
+</ul>
 <div class="un-version-label">v3.0.67 &mdash; Habit Builder Calendar</div>
 <ul>
   <li><strong>Full habit calendars added</strong> so every habit shows completed and missed days, including imported HabitShare history.</li>
