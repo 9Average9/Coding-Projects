@@ -10828,8 +10828,8 @@ async function openHabitDetailModal(habitId) {
   _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
   _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
   _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
-  await _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
   document.getElementById("habitDetailModal")?.classList.add("open");
+  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
 }
 
 function closeHabitDetailModal(event) {
