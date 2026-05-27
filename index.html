@@ -328,6 +328,10 @@ glacier: {
 <h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
 <h1 class="home-greeting home-greeting-name" id="homeGreetingName">Friend</h1>
 </div>
+<button class="ht-btn home-bell-btn" id="notifBtn" onclick="openNotifications()" aria-label="Notifications">
+<span class="material-symbols-outlined">notifications</span>
+<span class="notif-badge hidden" id="notifBadge"></span>
+</button>
 </div>
 <div class="home-verse-wrap">
 <p class="home-verse-text" id="homeVerseText">Your word I have treasured in my heart, that I may not sin against you.</p>
@@ -375,33 +379,32 @@ glacier: {
 </div>
 <div class="home-section-label">Quick Actions</div>
 <div class="home-actions-grid">
-<button class="home-action-tile" id="notifBtn" onclick="openNotifications()">
-<div class="hat-icon hat-notif-icon">
-<span class="material-symbols-outlined">notifications</span>
-<span class="notif-badge hidden" id="notifBadge"></span>
+<button class="home-action-tile" id="habitsHomeBtn" onclick="showNavPage('habits')">
+<div class="hat-icon hat-icon-habits">
+<svg class="qa-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><line x1="21.5" y1="2.5" x2="15.2" y2="8.8"/><polyline points="16 2 22 2 22 8"/></svg>
 </div>
-<div class="hat-text"><strong>Notifications</strong><small>Updates &amp; activity</small></div>
-<span class="material-symbols-outlined hat-chev">chevron_right</span>
+<div class="hat-text"><strong>Habits</strong></div>
 </button>
-<button class="home-action-tile home-action-habits" id="habitsHomeBtn" onclick="showNavPage('habits')">
-<div class="hat-icon"><span class="material-symbols-outlined">checklist</span></div>
-<div class="hat-text"><strong>Habits</strong><small>Track steady faithfulness</small></div>
-<span class="material-symbols-outlined hat-chev">chevron_right</span>
+<button class="home-action-tile locked-feature-btn" id="vocabHomeBtn" onclick="tryOpenLockedFeature('vocab')">
+<div class="hat-icon hat-icon-vocab">
+<span class="material-symbols-outlined lock-icon">sort_by_alpha</span>
+<svg class="qa-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 10a2.5 2.5 0 0 1 5 0c0 2-2.5 2.5-2.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.5" r="1.2" fill="currentColor"/></svg>
+</div>
+<div class="hat-text"><strong>Vocab</strong></div>
 </button>
-<button class="home-action-tile home-action-vocab locked-feature-btn" id="vocabHomeBtn" onclick="tryOpenLockedFeature('vocab')">
-<div class="hat-icon"><span class="material-symbols-outlined lock-icon">sort_by_alpha</span></div>
-<div class="hat-text"><strong>Vocab</strong><small>Build your vocabulary</small></div>
-<span class="material-symbols-outlined hat-chev">chevron_right</span>
+<button class="home-action-tile locked-feature-btn" id="translateHomeBtn" onclick="tryOpenLockedFeature('translate')">
+<div class="hat-icon hat-icon-translate">
+<span class="material-symbols-outlined lock-icon">translate</span>
+<svg class="qa-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+</div>
+<div class="hat-text"><strong>Translate</strong></div>
 </button>
-<button class="home-action-tile home-action-translate locked-feature-btn" id="translateHomeBtn" onclick="tryOpenLockedFeature('translate')">
-<div class="hat-icon"><span class="material-symbols-outlined lock-icon">translate</span></div>
-<div class="hat-text"><strong>Translate</strong><small>Practice translation</small></div>
-<span class="material-symbols-outlined hat-chev">chevron_right</span>
-</button>
-<button class="home-action-tile home-action-test locked-feature-btn" id="testHomeBtn" onclick="tryOpenLockedFeature('test')">
-<div class="hat-icon"><span class="material-symbols-outlined lock-icon">quiz</span></div>
-<div class="hat-text"><strong>Test</strong><small>Challenge yourself</small></div>
-<span class="material-symbols-outlined hat-chev">chevron_right</span>
+<button class="home-action-tile locked-feature-btn" id="testHomeBtn" onclick="tryOpenLockedFeature('test')">
+<div class="hat-icon hat-icon-test">
+<span class="material-symbols-outlined lock-icon">quiz</span>
+<svg class="qa-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="4" rx="1.5"/><path d="M9 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-2"/><path d="m9 13 2 2 4-4"/></svg>
+</div>
+<div class="hat-text"><strong>Test</strong></div>
 </button>
 </div>
 <div style="height:88px"></div>
@@ -415,29 +418,41 @@ glacier: {
 <button class="icon-btn habits-back-btn" onclick="showNavPage('home')" aria-label="Back home">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
-<div>
-<span class="habits-kicker">Habit builder</span>
+<div class="habits-hero-text">
+<span class="habits-kicker">Habit Builder</span>
 <h1>Habits</h1>
-<p>Build steady practices with a calendar, streak rewards, and friends who can encourage you.</p>
+<p>Track what matters daily. Celebrate streaks, and invite friends to cheer you on.</p>
 </div>
-<button class="icon-btn habits-settings-btn" onclick="openHabitSettingsModal()" aria-label="Habit settings">
-<span class="material-symbols-outlined">settings</span>
-</button>
+<div class="habits-hero-art" aria-hidden="true">
+<img src="habit-hero.svg" alt="" width="170" height="135"/>
+</div>
 </div>
 <div class="habits-actions">
 <button class="habits-primary" onclick="openHabitCreateModal()">
-<span class="material-symbols-outlined">add_task</span>
+<span class="material-symbols-outlined">add_circle</span>
 <span><strong>New Habit</strong><small>Create a habit manually</small></span>
 </button>
 <button class="habits-primary" onclick="openHabitSettingsModal()">
-<span class="material-symbols-outlined">tune</span>
-<span><strong>Settings</strong><small>Import, edit, and delete</small></span>
+<span class="material-symbols-outlined">upload_file</span>
+<span><strong>Import CSV</strong><small>Import from HabitShare</small></span>
 </button>
 </div>
 <div class="habits-stats-row">
-<div><strong id="habitTotalCount">0</strong><span>Habits</span></div>
-<div><strong id="habitTodayCount">0</strong><span>Done today</span></div>
-<div><strong id="habitBestStreak">0</strong><span>Best streak</span></div>
+<div>
+<div class="habits-stat-icon"><span class="material-symbols-outlined">sync_alt</span></div>
+<strong id="habitTotalCount">0</strong>
+<span>Habits</span>
+</div>
+<div>
+<div class="habits-stat-icon"><span class="material-symbols-outlined">check_circle</span></div>
+<strong id="habitTodayCount">0</strong>
+<span>Done today</span>
+</div>
+<div>
+<div class="habits-stat-icon"><span class="material-symbols-outlined">local_fire_department</span></div>
+<strong id="habitBestStreak">0</strong>
+<span>Best streak</span>
+</div>
 </div>
 <div class="habits-list" id="habitsList">
 <p class="study-board-empty">Loading habits...</p>
@@ -445,6 +460,28 @@ glacier: {
 <div style="height:88px"></div>
 </div>
 </section>
+<!-- Habit calendar modal (sheet) -->
+<div class="habit-cal-modal" id="habitCalModal" onclick="closeHabitCalModal(event)">
+<div class="habit-cal-modal-card" onclick="event.stopPropagation()">
+<div class="habit-cal-modal-top">
+<div>
+<strong id="habitCalModalName">Calendar</strong>
+<small>Completed and missed days</small>
+</div>
+<button class="habit-cal-close" onclick="closeHabitCalModal()" aria-label="Close calendar">&times;</button>
+</div>
+<div class="habit-cal-modal-nav">
+<button class="icon-btn" onclick="habitCalPrev()" aria-label="Previous month">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<strong id="habitCalMonthLabel"></strong>
+<button class="icon-btn" onclick="habitCalNext()" aria-label="Next month">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div id="habitCalContent"></div>
+</div>
+</div>
 <section class="screen" id="newLearnMenu">
 <div class="nav-bar">
 <button class="icon-btn" onclick="handleLearnBack()">
@@ -9870,17 +9907,33 @@ Verb Endings
 <p class="praise-info-verses">Psalm 31:1 · Hebrews 13:15 · Colossians 3:17 · 1 Thessalonians 5:18</p>
 </div>
 </div>
+<!-- Habit create modal -->
 <div class="modal-overlay" id="habitCreateModal" onclick="closeHabitCreateModal(event)">
 <div class="modal-card habit-create-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeHabitCreateModal()">&times;</button>
-<div class="habits-kicker"><span class="material-symbols-outlined">checklist</span> Habit</div>
-<h2>New Habit</h2>
+<div class="habit-detail-preview">
+<div class="habit-detail-preview-icon" id="habitCreateIconPreview">
+<span class="material-symbols-outlined" id="habitCreateIconDisplay">menu_book</span>
+</div>
+<div>
+<div class="habits-kicker">New Habit</div>
+<strong>Create a Habit</strong>
+</div>
+</div>
+<div class="habit-field">
+<span>Icon</span>
+<div class="habit-icon-picker" id="habitCreateIconPicker"></div>
+</div>
+<div class="habit-field">
+<span>Color</span>
+<div class="habit-color-picker" id="habitCreateColorPicker"></div>
+</div>
 <label class="habit-field">
 <span>Name</span>
-<input id="habitNameInput" type="text" placeholder="Bible reading" maxlength="80"/>
+<input id="habitNameInput" type="text" placeholder="e.g. Bible reading" maxlength="80"/>
 </label>
 <label class="habit-field">
-<span>Description</span>
+<span>Description <small style="font-weight:600;color:var(--muted-color)">(optional)</small></span>
 <textarea id="habitDescInput" placeholder="A short note about what this habit is for" maxlength="240"></textarea>
 </label>
 <label class="habit-field">
@@ -9892,17 +9945,57 @@ Verb Endings
 </select>
 </label>
 <div class="habit-field">
-<span>Accountability friends</span>
+<span>Accountability partners</span>
+<span class="habit-field-hint">Tagged friends get notified when you complete this habit.</span>
 <div class="habit-friend-picker" id="habitCreateFriendsList"></div>
 </div>
 <button class="main-btn" onclick="submitHabitCreate()">Create Habit</button>
 </div>
 </div>
+<!-- Habit detail / edit modal (opened by tapping a habit card) -->
+<div class="modal-overlay" id="habitDetailModal" onclick="closeHabitDetailModal(event)">
+<div class="modal-card habit-detail-card" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeHabitDetailModal()">&times;</button>
+<div class="habit-detail-preview">
+<div class="habit-detail-preview-icon" id="habitDetailIconPreview">
+<span class="material-symbols-outlined" id="habitDetailIconDisplay">menu_book</span>
+</div>
+<div>
+<div class="habits-kicker">Edit Habit</div>
+<strong id="habitDetailTitleDisplay">Habit</strong>
+</div>
+</div>
+<div class="habit-field">
+<span>Icon</span>
+<div class="habit-icon-picker" id="habitDetailIconPicker"></div>
+</div>
+<div class="habit-field">
+<span>Color</span>
+<div class="habit-color-picker" id="habitDetailColorPicker"></div>
+</div>
+<label class="habit-field">
+<span>Name</span>
+<input id="habitDetailNameInput" type="text" maxlength="80"/>
+</label>
+<label class="habit-field">
+<span>Description <small style="font-weight:600;color:var(--muted-color)">(optional)</small></span>
+<textarea id="habitDetailDescInput" placeholder="A note about what this habit is for" maxlength="240"></textarea>
+</label>
+<div class="habit-field">
+<span>Accountability partners</span>
+<span class="habit-field-hint">Tagged friends get notified when you complete this habit.</span>
+<div class="habit-friend-picker" id="habitDetailFriendsList"></div>
+</div>
+<button class="main-btn" onclick="saveHabitDetail()">Save Changes</button>
+<button class="habit-danger-btn habit-detail-delete-btn" onclick="deleteHabitFromDetail()">Delete Habit</button>
+</div>
+</div>
+<!-- Habit settings modal (import + habit list) -->
 <div class="modal-overlay" id="habitSettingsModal" onclick="closeHabitSettingsModal(event)">
 <div class="modal-card habit-settings-card" onclick="event.stopPropagation()">
 <button class="modal-close" onclick="closeHabitSettingsModal()">&times;</button>
-<div class="habits-kicker"><span class="material-symbols-outlined">tune</span> Habit Builder</div>
-<h2>Settings</h2>
+<div class="habits-kicker"><span class="material-symbols-outlined">upload_file</span> Habit Builder</div>
+<h2>Import Habits</h2>
 <div class="habit-settings-section">
 <div class="habit-settings-head">
 <div>
@@ -9925,15 +10018,6 @@ Verb Endings
 <div class="habit-import-list" id="habitImportList"></div>
 <button class="main-btn habit-import-submit" id="habitImportSubmitBtn" onclick="confirmHabitImport()">Import to Habits</button>
 </div>
-</div>
-<div class="habit-settings-section">
-<div class="habit-settings-head">
-<div>
-<strong>Edit habits</strong>
-<small>Rename, describe, add accountability friends, or delete.</small>
-</div>
-</div>
-<div class="habit-settings-list" id="habitSettingsList"></div>
 </div>
 </div>
 </div>

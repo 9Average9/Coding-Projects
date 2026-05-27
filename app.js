@@ -120,6 +120,8 @@ let _merciesNavCollapseTimer = null;
 let _merciesNavScrollBound = false;
 let _homeNavCollapseTimer = null;
 let _homeNavScrollBound = false;
+let _habitsNavCollapseTimer = null;
+let _habitsNavScrollBound = false;
 let _pendingMercyFriendEncouragement = null;
 let _unsubEncouragements = null;
 let _studyDeleteMode = false;
@@ -9792,6 +9794,46 @@ function bindHomeNavCollapse() {
   }, true);
 }
 
+function setHabitsNavCollapsed(collapsed) {
+  const nav = document.getElementById('bottomNav');
+  if (!nav) return;
+  const isHabits = document.getElementById('habitsPage')?.classList.contains('active');
+  nav.classList.toggle('habits-collapsed', !!collapsed && isHabits);
+}
+
+function expandHabitsNavTemporarily() {
+  setHabitsNavCollapsed(false);
+  clearTimeout(_habitsNavCollapseTimer);
+  _habitsNavCollapseTimer = setTimeout(() => setHabitsNavCollapsed(true), 3000);
+}
+
+function expandHabitsNavOnEntry() {
+  setHabitsNavCollapsed(false);
+  clearTimeout(_habitsNavCollapseTimer);
+  _habitsNavCollapseTimer = setTimeout(() => setHabitsNavCollapsed(true), 500);
+}
+
+function bindHabitsNavCollapse() {
+  const scroll = document.getElementById('habitsPage')?.querySelector('.habits-scroll');
+  const nav = document.getElementById('bottomNav');
+  if (!nav || _habitsNavScrollBound) return;
+  _habitsNavScrollBound = true;
+  nav.addEventListener('click', e => {
+    if (nav.classList.contains('habits-collapsed')) {
+      e.preventDefault();
+      e.stopPropagation();
+      expandHabitsNavTemporarily();
+    }
+  }, true);
+  if (scroll) {
+    scroll.addEventListener('scroll', () => {
+      if (!document.getElementById('habitsPage')?.classList.contains('active')) return;
+      clearTimeout(_habitsNavCollapseTimer);
+      setHabitsNavCollapsed(true);
+    }, { passive: true });
+  }
+}
+
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
@@ -9818,6 +9860,8 @@ function showNavPage(page) {
   } else if (page === 'habits') {
     showScreen('habitsPage');
     startHabitsPage();
+    bindHabitsNavCollapse();
+    expandHabitsNavOnEntry();
   } else if (page === 'community') {
     showScreen('communityPage');
     localStorage.setItem('communityLastVisit', Date.now().toString());
@@ -9852,6 +9896,7 @@ function showScreen(id) {
   if (target) target.classList.add("active");
   if (id !== 'merciesPage') setMerciesNavCollapsed(false);
   if (id !== 'homeScreen') setHomeNavCollapsed(false);
+  if (id !== 'habitsPage') setHabitsNavCollapsed(false);
 
   _syncHomeViewportState(id);
   _updateAppHeaderForScreen(id);
@@ -10054,8 +10099,61 @@ let _habitsUnsub = null;
 let _habitItems = [];
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
+let _habitCreateIcon = "menu_book";
+let _habitCreateColor = "";
 let _habitSettingsFriends = {};
 let _habitFriendCache = {};
+let _habitCalHabitId = null;
+let _habitCalYear = null;
+let _habitCalMonth = null;
+let _habitDetailId = null;
+let _habitDetailIcon = "menu_book";
+let _habitDetailColor = "";
+let _habitDetailFriends = new Set();
+
+const HABIT_ICONS = [
+  "menu_book","auto_stories","self_improvement","fitness_center",
+  "directions_run","local_drink","restaurant","music_note",
+  "code","school","volunteer_activism","favorite",
+  "nightlight","wb_sunny","groups","church",
+  "psychology","directions_walk","nature","star",
+  "bolt","spa","piano","hiking"
+];
+
+const HABIT_COLORS = [
+  "#2d6a4f","#0891b2","#1d4ed8","#7c3aed",
+  "#d97706","#dc2626","#db2777","#0f766e"
+];
+
+function _renderHabitIconPicker(targetId, selectedIcon, onSelectFn) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = HABIT_ICONS.map(icon =>
+    `<button type="button" class="habit-icon-option${selectedIcon === icon ? " selected" : ""}" onclick="${onSelectFn}('${icon}')">
+      <span class="material-symbols-outlined">${icon}</span>
+    </button>`).join("");
+}
+
+function _renderHabitColorPicker(targetId, selectedColor, onSelectFn) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const noColor = !selectedColor;
+  el.innerHTML =
+    `<button type="button" class="habit-color-swatch habit-color-none${noColor ? " selected" : ""}" onclick="${onSelectFn}('')" title="Theme color"><span class="material-symbols-outlined">palette</span></button>` +
+    HABIT_COLORS.map(c =>
+      `<button type="button" class="habit-color-swatch${selectedColor === c ? " selected" : ""}" style="background:${c}" onclick="${onSelectFn}('${c}')" aria-label="${c}"></button>`
+    ).join("");
+}
+
+function _applyHabitPreview(iconPreviewId, iconDisplayId, icon, color) {
+  const preview = document.getElementById(iconPreviewId);
+  const display = document.getElementById(iconDisplayId);
+  if (preview) {
+    preview.style.background = color ? `color-mix(in srgb,${color} 16%,transparent)` : "";
+    preview.style.color = color || "";
+  }
+  if (display) display.textContent = icon || "menu_book";
+}
 
 function _habitEsc(value) {
   return String(value ?? "")
@@ -10170,7 +10268,9 @@ function _habitMonthHtml(habit, year, month) {
       ? '<span class="material-symbols-outlined">check</span>'
       : status === "missed"
         ? '<span class="material-symbols-outlined">close</span>'
-        : String(day);
+        : status === "skipped"
+          ? '<span class="material-symbols-outlined">snooze</span>'
+          : String(day);
     cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}" title="${key} ${_habitEsc(_habitStatusLabel(status))}">${icon}</div>`);
   }
   return `
@@ -10218,23 +10318,34 @@ function _habitFriendName(uid) {
 async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
   const el = document.getElementById(targetId);
   if (!el) return;
-  const friendUids = friendsList || [];
+  const friendUids = (friendsList || []).filter(Boolean);
   if (!friendUids.length) {
     el.innerHTML = '<p class="study-board-empty">Add friends first, then choose accountability partners here.</p>';
     return;
   }
   el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
-  const users = await _habitLoadFriendProfiles(friendUids);
-  el.innerHTML = users.map(user => {
-    const name = _habitEsc(user.displayName || user.username || "Friend");
-    const handle = _habitEsc(user.username || user.email || "");
-    const selected = selectedSet.has(user.uid);
-    return `
-      <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
-        <span>${name}${handle ? `<small>${handle}</small>` : ""}</span>
-        <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
-      </button>`;
-  }).join("");
+  try {
+    const users = (await Promise.all(friendUids.map(uid => window.Friends?.getUser(uid).catch(() => null))))
+      .filter(Boolean)
+      .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
+    if (!users.length) {
+      el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
+      return;
+    }
+    el.innerHTML = users.map(user => {
+      const name = _habitEsc(user.displayName || "Friend");
+      const selected = selectedSet.has(user.uid);
+      const avatar = _renderAvatar(user?.avatar || "person");
+      return `
+        <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
+          <span class="habit-friend-avatar">${avatar}</span>
+          <span>${name}</span>
+          <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
+        </button>`;
+    }).join("");
+  } catch {
+    el.innerHTML = '<p class="study-board-empty">Could not load friends.</p>';
+  }
 }
 
 function _parseCsvLine(line, delimiter) {
@@ -10339,31 +10450,58 @@ function renderHabits() {
     const entries = habit.entries || {};
     const todayEntry = entries[today];
     const doneToday = todayEntry?.status === "success";
+    const skippedToday = todayEntry?.status === "skipped";
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
-    const last = Object.values(entries).sort((a, b) => _habitDateMs(b.date) - _habitDateMs(a.date))[0];
-    const accountability = (habit.accountabilityUids || habit.shareUids || []).filter(Boolean);
+    const calLabel = doneToday ? `Done ${today}` : skippedToday ? `Skipped ${today}` : `Open ${today}`;
+    const icon = _habitEsc(habit.icon || "menu_book");
+    const color = habit.color || "";
+    const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
+    const checkBtnClass = doneToday ? " done" : skippedToday ? " skipped" : "";
+    const checkBtnIcon = doneToday ? "check_circle" : skippedToday ? "snooze" : "radio_button_unchecked";
+    const checkBtnLabel = doneToday ? "Done Today" : skippedToday ? "Skipped" : "Complete Today";
+    const checkBtnAction = (doneToday || skippedToday) ? `"open"` : `"success"`;
+    const skipPill = !doneToday && !skippedToday
+      ? `<button class="habit-pill habit-pill-skip" onclick="skipHabitToday('${_habitEsc(habit.id)}')">
+           <span class="material-symbols-outlined">beach_access</span>Plan Skip
+         </button>`
+      : skippedToday
+        ? `<button class="habit-pill habit-pill-skipped" onclick="toggleHabitToday('${_habitEsc(habit.id)}', 'open')">
+             <span class="material-symbols-outlined">snooze</span>Planned skip — undo
+           </button>`
+        : "";
     return `
       <article class="habit-card">
-        <div class="habit-card-main">
-          <div>
-            <strong>${_habitEsc(habit.name)}</strong>
-            ${habit.description ? `<p>${_habitEsc(habit.description)}</p>` : ""}
-          </div>
-          <button class="habit-check-btn${doneToday ? " done" : ""}" onclick="toggleHabitToday('${habit.id}', ${doneToday ? "'open'" : "'success'"})">
-            <span class="material-symbols-outlined">${doneToday ? "check_circle" : "radio_button_unchecked"}</span>
-            ${doneToday ? "Done Today" : "Complete Today"}
+        <div class="habit-card-top">
+          <button class="habit-card-identity" onclick="openHabitDetailModal('${_habitEsc(habit.id)}')">
+            <div class="habit-card-icon"${iconStyle}>
+              <span class="material-symbols-outlined">${icon}</span>
+            </div>
+            <div class="habit-card-info">
+              <span class="habit-card-name">${_habitEsc(habit.name)}</span>
+              ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
+            </div>
+          </button>
+          <button class="habit-check-btn${checkBtnClass}" onclick="toggleHabitToday('${_habitEsc(habit.id)}', ${checkBtnAction})">
+            <span class="material-symbols-outlined">${checkBtnIcon}</span>
+            <span>${checkBtnLabel}</span>
           </button>
         </div>
-        <div class="habit-meta-row">
-          <span><strong>${streak}</strong> current streak</span>
-          <span><strong>${count}</strong> completions</span>
-          <span>${last ? `${_habitEsc(_habitStatusLabel(last.status))} ${_habitEsc(last.date)}` : "No entries yet"}</span>
+        <div class="habit-pills-row">
+          <span class="habit-pill">
+            <span class="material-symbols-outlined">local_fire_department</span>${streak} current streak
+          </span>
+          <span class="habit-pill">
+            <span class="material-symbols-outlined">emoji_events</span>${count} completions
+          </span>
+          <button class="habit-pill habit-pill-cal" onclick="openHabitCalendar('${_habitEsc(habit.id)}')">
+            <span class="material-symbols-outlined">calendar_today</span>${_habitEsc(calLabel)}
+          </button>
+          ${skipPill}
         </div>
-        ${accountability.length ? `<div class="habit-accountability-row">${accountability.map(uid => `<span>${_habitEsc(_habitFriendName(uid))}</span>`).join("")}</div>` : ""}
-        ${_habitCalendarHtml(habit)}
       </article>`;
   }).join("");
+
   const unseen = _habitItems.flatMap(h => h.accountabilityUids || h.shareUids || []).filter(uid => uid && !_habitFriendCache[uid]);
   if (unseen.length) {
     _habitLoadFriendProfiles(unseen).then(() => {
@@ -10372,13 +10510,89 @@ function renderHabits() {
   }
 }
 
+function openHabitCalendar(habitId) {
+  _habitCalHabitId = habitId;
+  const now = new Date();
+  if (_habitCalYear === null) {
+    _habitCalYear = now.getFullYear();
+    _habitCalMonth = now.getMonth();
+  }
+  _renderHabitCalModal();
+  document.getElementById("habitCalModal")?.classList.add("open");
+}
+
+function closeHabitCalModal(event) {
+  if (!event || event.target.id === "habitCalModal") {
+    document.getElementById("habitCalModal")?.classList.remove("open");
+  }
+}
+
+function _renderHabitCalModal() {
+  const content = document.getElementById("habitCalContent");
+  const label = document.getElementById("habitCalMonthLabel");
+  const nameEl = document.getElementById("habitCalModalName");
+  if (!content) return;
+
+  const habit = _habitItems.find(h => h.id === _habitCalHabitId);
+  if (!habit) return;
+
+  const now = new Date();
+  const year = _habitCalYear ?? now.getFullYear();
+  const month = _habitCalMonth ?? now.getMonth();
+
+  if (nameEl) nameEl.textContent = habit.name || "Calendar";
+  if (label) {
+    label.textContent = new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  }
+  content.innerHTML = _habitMonthHtml(habit, year, month);
+}
+
+function habitCalPrev() {
+  const now = new Date();
+  let y = _habitCalYear ?? now.getFullYear();
+  let m = _habitCalMonth ?? now.getMonth();
+  m--;
+  if (m < 0) { m = 11; y--; }
+  _habitCalYear = y;
+  _habitCalMonth = m;
+  _renderHabitCalModal();
+}
+
+function habitCalNext() {
+  const now = new Date();
+  let y = _habitCalYear ?? now.getFullYear();
+  let m = _habitCalMonth ?? now.getMonth();
+  m++;
+  if (m > 11) { m = 0; y++; }
+  _habitCalYear = y;
+  _habitCalMonth = m;
+  _renderHabitCalModal();
+}
+
 function openHabitCreateModal() {
   document.getElementById("habitNameInput").value = "";
   document.getElementById("habitDescInput").value = "";
   document.getElementById("habitScheduleInput").value = "daily";
   _habitCreateFriends = new Set();
+  _habitCreateIcon = "menu_book";
+  _habitCreateColor = "";
+  _renderHabitIconPicker("habitCreateIconPicker", _habitCreateIcon, "selectHabitCreateIcon");
+  _renderHabitColorPicker("habitCreateColorPicker", _habitCreateColor, "selectHabitCreateColor");
+  _applyHabitPreview("habitCreateIconPreview", "habitCreateIconDisplay", _habitCreateIcon, _habitCreateColor);
   _renderHabitFriendPicker("habitCreateFriendsList", _habitCreateFriends, "toggleHabitCreateFriend");
   document.getElementById("habitCreateModal")?.classList.add("open");
+}
+
+function selectHabitCreateIcon(icon) {
+  _habitCreateIcon = icon;
+  _renderHabitIconPicker("habitCreateIconPicker", _habitCreateIcon, "selectHabitCreateIcon");
+  _applyHabitPreview("habitCreateIconPreview", "habitCreateIconDisplay", _habitCreateIcon, _habitCreateColor);
+}
+
+function selectHabitCreateColor(color) {
+  _habitCreateColor = color;
+  _renderHabitColorPicker("habitCreateColorPicker", _habitCreateColor, "selectHabitCreateColor");
+  _applyHabitPreview("habitCreateIconPreview", "habitCreateIconDisplay", _habitCreateIcon, _habitCreateColor);
 }
 
 function toggleHabitCreateFriend(uid) {
@@ -10400,7 +10614,12 @@ async function submitHabitCreate() {
   if (!name) { alert("Give the habit a name."); return; }
   const description = document.getElementById("habitDescInput")?.value.trim() || "";
   const scheduleType = document.getElementById("habitScheduleInput")?.value || "daily";
-  const ok = await window.Habits?.create?.(uid, { name, description, scheduleType, accountabilityUids: [..._habitCreateFriends] });
+  const ok = await window.Habits?.create?.(uid, {
+    name, description, scheduleType,
+    accountabilityUids: [..._habitCreateFriends],
+    icon: _habitCreateIcon || "menu_book",
+    color: _habitCreateColor || ""
+  });
   if (!ok) { alert("Could not create that habit yet."); return; }
   closeHabitCreateModal();
 }
@@ -10428,6 +10647,18 @@ async function toggleHabitToday(habitId, status) {
   }
 }
 
+async function skipHabitToday(habitId) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid) return;
+  const ok = await window.Habits?.setEntry?.(uid, habitId, {
+    date: _habitTodayKey(),
+    status: "skipped",
+    comment: "Planned skip",
+    notify: true
+  });
+  if (!ok) alert("Could not update that habit.");
+}
+
 function openHabitSettingsModal() {
   document.getElementById("habitSettingsModal")?.classList.add("open");
   renderHabitSettings();
@@ -10446,63 +10677,87 @@ async function renderHabitSettings() {
     list.innerHTML = '<p class="study-board-empty">Create or import a habit first.</p>';
     return;
   }
-  await _habitLoadFriendProfiles(friendsList || []);
   list.innerHTML = _habitItems.map(habit => {
-    const selected = _habitSettingsFriends[habit.id] || new Set(habit.accountabilityUids || habit.shareUids || []);
-    _habitSettingsFriends[habit.id] = selected;
+    const icon = _habitEsc(habit.icon || "menu_book");
+    const color = habit.color || "";
+    const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
     return `
-      <div class="habit-settings-item">
-        <label class="habit-field">
-          <span>Name</span>
-          <input id="habitEditName_${habit.id}" type="text" value="${_habitEsc(habit.name || "")}" maxlength="80"/>
-        </label>
-        <label class="habit-field">
-          <span>Description</span>
-          <textarea id="habitEditDesc_${habit.id}" maxlength="240">${_habitEsc(habit.description || "")}</textarea>
-        </label>
-        <div class="habit-field">
-          <span>Accountability friends</span>
-          <div class="habit-friend-picker" id="habitEditFriends_${habit.id}"></div>
+      <button class="habit-settings-row-btn" onclick="openHabitDetailModal('${_habitEsc(habit.id)}'); closeHabitSettingsModal();">
+        <div class="habit-card-icon-sm"${iconStyle}>
+          <span class="material-symbols-outlined">${icon}</span>
         </div>
-        <div class="habit-settings-actions">
-          <button class="habits-mini-btn" onclick="saveHabitSettings('${habit.id}')">Save</button>
-          <button class="habit-danger-btn" onclick="deleteHabit('${habit.id}')">Delete</button>
-        </div>
-      </div>`;
+        <span>${_habitEsc(habit.name)}</span>
+        <span class="material-symbols-outlined" style="margin-left:auto;opacity:0.4">chevron_right</span>
+      </button>`;
   }).join("");
-  _habitItems.forEach(habit => {
-    _renderHabitFriendPicker(`habitEditFriends_${habit.id}`, _habitSettingsFriends[habit.id], "toggleHabitSettingsFriend.bind(null, '" + habit.id + "')");
-  });
 }
 
-function toggleHabitSettingsFriend(habitId, uid) {
-  if (!_habitSettingsFriends[habitId]) _habitSettingsFriends[habitId] = new Set();
-  if (_habitSettingsFriends[habitId].has(uid)) _habitSettingsFriends[habitId].delete(uid);
-  else _habitSettingsFriends[habitId].add(uid);
-  _renderHabitFriendPicker(`habitEditFriends_${habitId}`, _habitSettingsFriends[habitId], "toggleHabitSettingsFriend.bind(null, '" + habitId + "')");
+async function openHabitDetailModal(habitId) {
+  const habit = _habitItems.find(h => h.id === habitId);
+  if (!habit) return;
+  _habitDetailId = habitId;
+  _habitDetailIcon = habit.icon || "menu_book";
+  _habitDetailColor = habit.color || "";
+  _habitDetailFriends = new Set(habit.accountabilityUids || habit.shareUids || []);
+  document.getElementById("habitDetailNameInput").value = habit.name || "";
+  document.getElementById("habitDetailDescInput").value = habit.description || "";
+  document.getElementById("habitDetailTitleDisplay").textContent = habit.name || "Habit";
+  _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
+  _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
+  _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
+  await _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
+  document.getElementById("habitDetailModal")?.classList.add("open");
 }
 
-async function saveHabitSettings(habitId) {
+function closeHabitDetailModal(event) {
+  if (!event || event.target.id === "habitDetailModal") {
+    document.getElementById("habitDetailModal")?.classList.remove("open");
+  }
+}
+
+function selectHabitDetailIcon(icon) {
+  _habitDetailIcon = icon;
+  _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
+  _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
+}
+
+function selectHabitDetailColor(color) {
+  _habitDetailColor = color;
+  _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
+  _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
+}
+
+function toggleHabitDetailFriend(uid) {
+  if (_habitDetailFriends.has(uid)) _habitDetailFriends.delete(uid);
+  else _habitDetailFriends.add(uid);
+  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
+}
+
+async function saveHabitDetail() {
   const uid = window.Auth?.getCurrentUser()?.uid;
-  if (!uid) return;
-  const name = document.getElementById(`habitEditName_${habitId}`)?.value.trim();
+  if (!uid || !_habitDetailId) return;
+  const name = document.getElementById("habitDetailNameInput")?.value.trim();
   if (!name) { alert("Habit name cannot be blank."); return; }
-  const description = document.getElementById(`habitEditDesc_${habitId}`)?.value.trim() || "";
-  const accountabilityUids = [...(_habitSettingsFriends[habitId] || new Set())];
-  const ok = await window.Habits?.update?.(uid, habitId, { name, description, accountabilityUids });
+  const description = document.getElementById("habitDetailDescInput")?.value.trim() || "";
+  const accountabilityUids = [..._habitDetailFriends];
+  const ok = await window.Habits?.update?.(uid, _habitDetailId, {
+    name, description, accountabilityUids,
+    icon: _habitDetailIcon, color: _habitDetailColor
+  });
   if (!ok) { alert("Could not save that habit."); return; }
+  closeHabitDetailModal();
   _showStudyToast("Habit saved");
 }
 
-async function deleteHabit(habitId) {
-  const habit = _habitItems.find(h => h.id === habitId);
+async function deleteHabitFromDetail() {
+  const habit = _habitItems.find(h => h.id === _habitDetailId);
   if (!confirm(`Delete "${habit?.name || "this habit"}" and its calendar history?`)) return;
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const ok = await window.Habits?.delete?.(uid, habitId);
+  const ok = await window.Habits?.delete?.(uid, _habitDetailId);
   if (!ok) { alert("Could not delete that habit."); return; }
+  closeHabitDetailModal();
   _showStudyToast("Habit deleted");
-  renderHabitSettings();
 }
 
 async function handleHabitCsvFile(input) {
@@ -17313,14 +17568,21 @@ function syncLessonProgressBadge(textEl, done, total, advanced = false) {
   subtitle.textContent = done === total ? "Track complete. Strong work." : "Keep going! You're making great progress.";
 }
 
+function _localDateKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function _localYesterdayKey() {
+  const d = new Date(); d.setDate(d.getDate() - 1); return _localDateKey(d);
+}
+
 function updateStudyStreak() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = _localDateKey();
   const last = localStorage.getItem("lastStudyDate");
   let streak = parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 
   if (last === today) return;
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const yesterday = _localYesterdayKey();
   streak = (last === yesterday) ? streak + 1 : 1;
 
   localStorage.setItem("lastStudyDate", today);
@@ -17332,8 +17594,8 @@ function updateStudyStreak() {
 function getStreakDays() {
   const last = localStorage.getItem("lastStudyDate");
   if (!last) return 0;
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = _localDateKey();
+  const yesterday = _localYesterdayKey();
   if (last !== today && last !== yesterday) return 0;
   return parseInt(localStorage.getItem("studyStreakDays") || "0", 10);
 }
@@ -17341,8 +17603,8 @@ function getStreakDays() {
 function getPraiseStreakDays() {
   const last = localStorage.getItem("mercyLastPostDate");
   if (!last) return 0;
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const today = _localDateKey();
+  const yesterday = _localYesterdayKey();
   if (last !== today && last !== yesterday) return 0;
   return parseInt(localStorage.getItem("mercyStreakDays") || "0", 10);
 }
@@ -19695,7 +19957,7 @@ async function submitMercyPost() {
     if (!id) { alert('Could not post this Praise right now. Try again.'); return; }
     if (typeof created?.streakDays === 'number') {
       localStorage.setItem('mercyStreakDays', String(created.streakDays));
-      localStorage.setItem('mercyLastPostDate', new Date(created.createdAtMs || Date.now()).toISOString().slice(0, 10));
+      localStorage.setItem('mercyLastPostDate', _localDateKey(new Date(created.createdAtMs || Date.now())));
       updatePraiseStreakUI();
     } else {
       markMercyPostedToday();

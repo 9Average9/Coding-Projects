@@ -1174,7 +1174,7 @@ async function notifyHabitPartners(uid, friendUids = [], type, habitId, habitNam
     .map(friendUid => fcmSendPushNotification(friendUid, type, fromName, uid, { habitId, habitName })));
 }
 
-async function createHabit(uid, { name, description = "", scheduleType = "daily", accountabilityUids = [] } = {}) {
+async function createHabit(uid, { name, description = "", scheduleType = "daily", accountabilityUids = [], icon = "menu_book", color = "" } = {}) {
   try {
     const habitId = habitIdFromName(name);
     const partners = [...new Set(accountabilityUids || [])].filter(friendUid => friendUid && friendUid !== uid);
@@ -1182,6 +1182,8 @@ async function createHabit(uid, { name, description = "", scheduleType = "daily"
       ownerUid: uid,
       name: String(name || "").trim(),
       description: String(description || "").trim(),
+      icon: String(icon || "menu_book"),
+      color: String(color || ""),
       schedule: { type: scheduleType || "daily" },
       shareUids: [],
       accountabilityUids: partners,
@@ -1199,7 +1201,7 @@ async function createHabit(uid, { name, description = "", scheduleType = "daily"
   }
 }
 
-async function updateHabit(uid, habitId, { name, description = "", scheduleType = "daily", accountabilityUids = [] } = {}) {
+async function updateHabit(uid, habitId, { name, description = "", scheduleType = "daily", accountabilityUids = [], icon = "menu_book", color = "" } = {}) {
   try {
     const habitRef = doc(db, "users", uid, "habits", habitId);
     const before = await getDoc(habitRef);
@@ -1209,6 +1211,8 @@ async function updateHabit(uid, habitId, { name, description = "", scheduleType 
     await setDoc(habitRef, {
       name: String(name || "").trim(),
       description: String(description || "").trim(),
+      icon: String(icon || "menu_book"),
+      color: String(color || ""),
       schedule: { type: scheduleType || before.data().schedule?.type || "daily" },
       accountabilityUids: partners,
       updatedAt: serverTimestamp(),
@@ -1275,10 +1279,12 @@ async function setHabitEntry(uid, habitId, { date, status, comment = "", source 
       updatedAt: serverTimestamp(),
       updatedAtMs: Date.now()
     }, { merge: true });
-    if (notify && status === "success") {
+    if (notify && (status === "success" || status === "skipped")) {
       const habitSnap = await getDoc(doc(db, "users", uid, "habits", habitId));
       const habit = habitSnap.exists() ? habitSnap.data() : {};
-      await notifyHabitPartners(uid, habit.accountabilityUids || habit.shareUids || [], "habitCompleted", habitId, habit.name || "habit");
+      const partners = habit.accountabilityUids || habit.shareUids || [];
+      const type = status === "success" ? "habitCompleted" : "habitSkipped";
+      await notifyHabitPartners(uid, partners, type, habitId, habit.name || "habit");
     }
     return true;
   } catch (e) {
@@ -1506,7 +1512,8 @@ async function addMercyPost(uid, displayName, avatar, friendUids = [], imageBlob
 }
 
 function mercyDateKey(ms = Date.now()) {
-  return new Date(ms).toISOString().slice(0, 10);
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 async function advanceMercyStreak(uid, now = Date.now()) {
@@ -1516,7 +1523,8 @@ async function advanceMercyStreak(uid, now = Date.now()) {
     const data = snap.exists() ? snap.data() : {};
     const today = mercyDateKey(now);
     if (data.mercyLastPostDate === today) return data.mercyStreakDays || 1;
-    const yesterday = mercyDateKey(now - 24 * 60 * 60 * 1000);
+    const _yd = new Date(now); _yd.setDate(_yd.getDate() - 1);
+    const yesterday = mercyDateKey(_yd.getTime());
     const nextStreak = data.mercyLastPostDate === yesterday ? (data.mercyStreakDays || 0) + 1 : 1;
     await setDoc(userRef, {
       mercyLastPostDate: today,
