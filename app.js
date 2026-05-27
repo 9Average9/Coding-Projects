@@ -10272,21 +10272,24 @@ function _habitLastSevenDays(habit) {
 
 function _habitWeeklyProgressHtml(habit) {
   const days = _habitLastSevenDays(habit);
-  const today = _habitTodayKey();
   const complete = days.filter(d => d.status === "success").length;
-  const pastDays = days.filter(d => d.date <= today).length;
-  const pct = pastDays > 0 ? Math.round((complete / pastDays) * 100) : 0;
+  const pct = Math.round((complete / 7) * 100);
   return `
     <div class="habit-week-strip" aria-label="This week">
       <div class="habit-week-strip-head">
         <span>This week</span>
-        <strong>${complete}/${pastDays}</strong>
+        <strong>${complete}/7</strong>
       </div>
       <div class="habit-week-days">
         ${days.map(d => {
           const dayLabel = new Date(`${d.date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short" }).slice(0, 1);
           const icon = d.status === "success" ? "check" : d.status === "skipped" ? "remove" : d.status === "missed" ? "close" : "";
-          return `<span class="habit-week-day ${d.status}" title="${_habitEsc(d.date)} ${_habitEsc(_habitStatusLabel(d.status))}">${icon ? `<span class="material-symbols-outlined">${icon}</span>` : dayLabel}</span>`;
+          const note = (habit.entries?.[d.date]?.comment || "").trim();
+          const daySpan = `<span class="habit-week-day ${d.status}" title="${_habitEsc(d.date)} ${_habitEsc(_habitStatusLabel(d.status))}">${icon ? `<span class="material-symbols-outlined">${icon}</span>` : dayLabel}</span><span class="habit-week-note-dot"></span>`;
+          if (note) {
+            return `<button class="habit-week-day-wrap has-note" onclick="openHabitNoteModal('${_habitEsc(habit.id)}','${_habitEsc(d.date)}')" title="${_habitEsc(note)}">${daySpan}</button>`;
+          }
+          return `<div class="habit-week-day-wrap">${daySpan}</div>`;
         }).join("")}
       </div>
       <div class="habit-week-bar"><span style="width:${pct}%"></span></div>

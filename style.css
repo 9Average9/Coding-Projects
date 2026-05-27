@@ -5933,6 +5933,38 @@ body.dark .big-lock .material-symbols-outlined {
   gap: 6px;
 }
 
+.habit-week-day-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  font: inherit;
+}
+
+.habit-week-day-wrap.has-note {
+  cursor: pointer;
+}
+
+.habit-week-day-wrap .habit-week-day {
+  width: 100%;
+}
+
+.habit-week-note-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.habit-week-day-wrap.has-note .habit-week-note-dot {
+  background: #3b82f6;
+}
+
 .habit-week-day {
   aspect-ratio: 1;
   border-radius: 10px;
