@@ -1279,10 +1279,12 @@ async function setHabitEntry(uid, habitId, { date, status, comment = "", source 
       updatedAt: serverTimestamp(),
       updatedAtMs: Date.now()
     }, { merge: true });
-    if (notify && status === "success") {
+    if (notify && (status === "success" || status === "skipped")) {
       const habitSnap = await getDoc(doc(db, "users", uid, "habits", habitId));
       const habit = habitSnap.exists() ? habitSnap.data() : {};
-      await notifyHabitPartners(uid, habit.accountabilityUids || habit.shareUids || [], "habitCompleted", habitId, habit.name || "habit");
+      const partners = habit.accountabilityUids || habit.shareUids || [];
+      const type = status === "success" ? "habitCompleted" : "habitSkipped";
+      await notifyHabitPartners(uid, partners, type, habitId, habit.name || "habit");
     }
     return true;
   } catch (e) {
