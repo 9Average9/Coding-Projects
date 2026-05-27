@@ -17724,9 +17724,14 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.68";
+const APP_VERSION = "3.0.69";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.69 &mdash; Home Actions and Nav Fix</div>
+<ul>
+  <li><strong>Quick Action icons refined</strong> to match the softer rounded-square style on the Home screen.</li>
+  <li><strong>Home nav collapse fixed</strong> so the dock collapses on first app load without needing to switch tabs.</li>
+</ul>
 <div class="un-version-label">v3.0.68 &mdash; Home Action Polish</div>
 <ul>
   <li><strong>Home action buttons refreshed</strong> with distinct colors and matching icons for Habits, Vocab, Translate, and Test.</li>
@@ -18751,6 +18756,8 @@ document.addEventListener("DOMContentLoaded", () => {
   populateHomeScreen();
   setNavActive('home');
   showBottomNav();
+  bindHomeNavCollapse();
+  expandHomeNavOnEntry();
   _startHomeFlip();
   const openParam = new URLSearchParams(location.search).get('open');
   if (openParam === 'mercies') {

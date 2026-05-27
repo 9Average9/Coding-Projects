@@ -19080,17 +19080,17 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 #homeScreen .home-actions-grid {
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 10px !important;
-  margin: 4px 0 24px !important;
+  gap: 14px !important;
+  margin: 6px 0 24px !important;
 }
 
 #homeScreen .home-action-tile {
   min-width: 0;
-  padding: 10px 6px 9px !important;
-  border: 1px solid var(--home-action-border, rgba(127,127,127,0.14)) !important;
-  background: var(--home-action-bg, transparent) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.05) !important;
-  border-radius: 16px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -19105,15 +19105,15 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 
 /* Rounded-square Quick Action tiles */
 #homeScreen .home-action-tile .hat-icon {
-  width: clamp(66px, 22vw, 82px) !important;
-  height: clamp(66px, 22vw, 82px) !important;
+  width: clamp(72px, 20vw, 96px) !important;
+  height: clamp(72px, 20vw, 96px) !important;
   border-radius: 20px !important;
-  background: rgba(255,255,255,0.72) !important;
-  border: 1.5px solid rgba(0,0,0,0.12) !important;
+  background: var(--qa-bg) !important;
+  border: 1.5px solid var(--qa-border) !important;
   box-shadow:
-    0 4px 14px rgba(0,0,0,0.10),
-    0 1px 4px rgba(0,0,0,0.06),
-    inset 0 1px 0 rgba(255,255,255,0.8) !important;
+    0 8px 18px var(--qa-shadow),
+    0 1px 3px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.85) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -19122,34 +19122,34 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 
 /* Per-tile accent colors — solid background, white icons */
 #habitsHomeBtn .hat-icon {
-  background: #16a34a !important;
-  border-color: #16a34a !important;
-  color: white !important;
-  box-shadow: 0 6px 20px rgba(22,163,74,0.40), 0 2px 6px rgba(22,163,74,0.22) !important;
+  --qa-bg: linear-gradient(145deg, #effaf2 0%, #dff3e7 100%);
+  --qa-border: #10a15f;
+  --qa-shadow: rgba(16, 161, 95, 0.18);
+  color: #245b54 !important;
 }
 #vocabHomeBtn .hat-icon {
-  background: #7c3aed !important;
-  border-color: #7c3aed !important;
-  color: white !important;
-  box-shadow: 0 6px 20px rgba(124,58,237,0.40), 0 2px 6px rgba(124,58,237,0.22) !important;
+  --qa-bg: linear-gradient(145deg, #f6f1ff 0%, #eadcff 100%);
+  --qa-border: #9456ce;
+  --qa-shadow: rgba(148, 86, 206, 0.20);
+  color: #3e3c96 !important;
 }
 #translateHomeBtn .hat-icon {
-  background: #2563eb !important;
-  border-color: #2563eb !important;
-  color: white !important;
-  box-shadow: 0 6px 20px rgba(37,99,235,0.40), 0 2px 6px rgba(37,99,235,0.22) !important;
+  --qa-bg: linear-gradient(145deg, #eef9ff 0%, #dff0ff 100%);
+  --qa-border: #1475c9;
+  --qa-shadow: rgba(20, 117, 201, 0.20);
+  color: #1265b6 !important;
 }
 #testHomeBtn .hat-icon {
-  background: #d97706 !important;
-  border-color: #d97706 !important;
-  color: white !important;
-  box-shadow: 0 6px 20px rgba(217,119,6,0.40), 0 2px 6px rgba(217,119,6,0.22) !important;
+  --qa-bg: linear-gradient(145deg, #fff8f0 0%, #ffedda 100%);
+  --qa-border: #f59b45;
+  --qa-shadow: rgba(245, 155, 69, 0.22);
+  color: #27635c !important;
 }
 
 /* SVG icons */
 #homeScreen .home-action-tile .hat-icon .qa-svg {
-  width: 34px !important;
-  height: 34px !important;
+  width: 54px !important;
+  height: 54px !important;
   flex-shrink: 0;
   display: flex;
 }
