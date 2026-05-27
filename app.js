@@ -10356,11 +10356,11 @@ function _habitCalendarHtml(habit) {
 async function _habitLoadFriendProfiles(uids = friendsList || []) {
   const wanted = [...new Set((uids || []).filter(Boolean))];
   await Promise.all(wanted.map(async uid => {
-    if (_habitFriendCache[uid]) return;
+    if (uid in _habitFriendCache) return;
     const user = await window.Friends?.getUser?.(uid).catch(() => null);
-    _habitFriendCache[uid] = user || { uid, displayName: "Friend" };
+    _habitFriendCache[uid] = user || null;
   }));
-  return wanted.map(uid => _habitFriendCache[uid]).filter(Boolean);
+  return wanted.map(uid => _habitFriendCache[uid]).filter(u => u && u.uid);
 }
 
 function _habitFriendName(uid) {
@@ -10371,7 +10371,7 @@ function _habitFriendName(uid) {
 function _drawFriendChips(el, friendUids, selectedSet, onToggleName) {
   const users = (friendUids || [])
     .map(uid => _habitFriendCache[uid])
-    .filter(Boolean)
+    .filter(u => u && u.uid)
     .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
   if (!users.length) {
     el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
@@ -10398,12 +10398,12 @@ async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
     el.innerHTML = '<p class="study-board-empty">Add friends first, then choose accountability partners here.</p>';
     return;
   }
-  const uncached = friendUids.filter(uid => !_habitFriendCache[uid]);
+  const uncached = friendUids.filter(uid => !(uid in _habitFriendCache));
   if (uncached.length) {
     el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
     await Promise.all(uncached.map(async uid => {
       const user = await window.Friends?.getUser(uid).catch(() => null);
-      _habitFriendCache[uid] = user || { uid, displayName: "Friend" };
+      _habitFriendCache[uid] = user || null;
     }));
   }
   _drawFriendChips(el, friendUids, selectedSet, onToggleName);
@@ -10517,17 +10517,21 @@ async function loadFriendsHabits() {
   container.innerHTML = '<p class="study-board-empty">Loading friends\' habits...</p>';
 
   // Load any uncached friends
-  const uncached = friends.filter(uid => !_friendsHabitsCache[uid]);
+  const uncached = friends.filter(uid => !(uid in _friendsHabitsCache));
   await Promise.all(uncached.map(async uid => {
     try {
+      const profilePromise = (uid in _habitFriendCache)
+        ? Promise.resolve(_habitFriendCache[uid])
+        : window.Friends?.getUser(uid).catch(() => null);
       const [profile, habits] = await Promise.all([
-        _habitFriendCache[uid] ? Promise.resolve(_habitFriendCache[uid]) : window.Friends?.getUser(uid).catch(() => null),
+        profilePromise,
         window.Habits?.getFriendHabits(uid).catch(() => [])
       ]);
-      if (profile) _habitFriendCache[uid] = profile;
-      _friendsHabitsCache[uid] = { profile: _habitFriendCache[uid] || { uid, displayName: "Friend" }, habits: habits || [] };
+      _habitFriendCache[uid] = profile || null;
+      _friendsHabitsCache[uid] = { profile: profile || null, habits: habits || [] };
     } catch {
-      _friendsHabitsCache[uid] = { profile: { uid, displayName: "Friend" }, habits: [] };
+      _habitFriendCache[uid] = _habitFriendCache[uid] ?? null;
+      _friendsHabitsCache[uid] = { profile: null, habits: [] };
     }
   }));
 
@@ -10543,13 +10547,13 @@ function renderFriendsHabits() {
     return;
   }
 
-  // Sort alphabetically by display name
+  // Sort alphabetically by display name; skip friends with no resolvable profile
   const sorted = friends
     .map(uid => _friendsHabitsCache[uid])
-    .filter(Boolean)
+    .filter(d => d && d.profile && d.profile.uid)
     .sort((a, b) => {
-      const na = (a.profile?.displayName || a.profile?.username || "").toLowerCase();
-      const nb = (b.profile?.displayName || b.profile?.username || "").toLowerCase();
+      const na = (a.profile.displayName || a.profile.username || "").toLowerCase();
+      const nb = (b.profile.displayName || b.profile.username || "").toLowerCase();
       return na.localeCompare(nb);
     });
 
@@ -10559,11 +10563,14 @@ function renderFriendsHabits() {
   }
 
   container.innerHTML = sorted.map(({ profile, habits }) => {
-    const name = _habitEsc(profile?.displayName || profile?.username || "Friend");
-    const uid = _habitEsc(profile?.uid || "");
+    const name = _habitEsc(profile.displayName || profile.username || "Friend");
+    const uid = _habitEsc(profile.uid || "");
+    const avatar = _renderAvatar(profile.avatar || "person");
     if (!habits.length) {
       return `<div class="friend-habit-section">
-        <div class="friend-habit-section-name">${name}</div>
+        <div class="friend-habit-section-name">
+          <span class="friend-habit-section-avatar">${avatar}</span>${name}
+        </div>
         <div class="friend-habit-empty-card">
           <span class="material-symbols-outlined">sentiment_satisfied</span>
           <p>${name} does not have any habits yet, encourage them to start making healthy ones</p>
@@ -10573,7 +10580,9 @@ function renderFriendsHabits() {
     const firstHabit = habits[0];
     const moreCount = habits.length - 1;
     return `<div class="friend-habit-section">
-      <div class="friend-habit-section-name">${name}</div>
+      <div class="friend-habit-section-name">
+        <span class="friend-habit-section-avatar">${avatar}</span>${name}
+      </div>
       <div onclick="showFriendHabitsModal('${uid}')" style="cursor:pointer">
         ${_renderFriendHabitCard(firstHabit)}
       </div>
@@ -10619,9 +10628,13 @@ function _renderFriendHabitCard(habit) {
 
 function showFriendHabitsModal(friendUid) {
   const cached = _friendsHabitsCache[friendUid];
-  if (!cached) return;
-  const name = cached.profile?.displayName || cached.profile?.username || "Friend";
-  document.getElementById("friendHabitsModalName").textContent = name;
+  if (!cached || !cached.profile) return;
+  const name = cached.profile.displayName || cached.profile.username || "Friend";
+  const nameEl = document.getElementById("friendHabitsModalName");
+  if (nameEl) {
+    const avatar = _renderAvatar(cached.profile.avatar || "person");
+    nameEl.innerHTML = `<span class="friend-habit-section-avatar">${avatar}</span>${_habitEsc(name)}`;
+  }
   const listEl = document.getElementById("friendHabitsModalList");
   if (listEl) {
     if (!cached.habits.length) {
