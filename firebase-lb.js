@@ -1144,57 +1144,35 @@ function habitIdFromName(name) {
   return slug || `habit-${Date.now()}`;
 }
 
-function listenHabits(uid, callback) {
-  const habitsData = {};   // id -> habit doc fields
-  const entriesData = {};  // id -> { dateKey: entryData }
-  const entryUnsubs = {};  // id -> unsubscribe fn
-  let habitOrder = [];     // ordered habit ids
-
-  function emit() {
-    callback(habitOrder.map(id => ({ ...habitsData[id], entries: entriesData[id] || {} })));
+async function _migrateHabitEntries(uid, habitId) {
+  try {
+    const entrySnap = await getDocs(collection(db, "users", uid, "habits", habitId, "entries"));
+    const entries = {};
+    entrySnap.docs.forEach(e => { entries[e.id] = e.data(); });
+    await updateDoc(doc(db, "users", uid, "habits", habitId), { entries, entriesInDoc: true });
+  } catch (e) {
+    console.warn("_migrateHabitEntries:", habitId, e);
   }
+}
 
-  const habitsUnsub = onSnapshot(
+function listenHabits(uid, callback) {
+  const pendingMigrations = new Set();
+  return onSnapshot(
     query(collection(db, "users", uid, "habits"), orderBy("createdAtMs", "asc")),
     snap => {
-      const newIds = snap.docs.map(d => d.id);
-      snap.docs.forEach(d => { habitsData[d.id] = { id: d.id, ...d.data() }; });
-      habitOrder = newIds;
-
-      // Clean up listeners for deleted habits
-      Object.keys(entryUnsubs).forEach(id => {
-        if (!newIds.includes(id)) {
-          entryUnsubs[id]();
-          delete entryUnsubs[id];
-          delete habitsData[id];
-          delete entriesData[id];
+      const habits = snap.docs.map(d => {
+        const data = d.data();
+        if (data.entriesInDoc) return { id: d.id, ...data };
+        if (!pendingMigrations.has(d.id)) {
+          pendingMigrations.add(d.id);
+          _migrateHabitEntries(uid, d.id).finally(() => pendingMigrations.delete(d.id));
         }
+        return { id: d.id, ...data, entries: data.entries || {} };
       });
-
-      // Start a real-time entry listener for each new habit
-      newIds.forEach(id => {
-        if (entryUnsubs[id]) return;
-        entryUnsubs[id] = onSnapshot(
-          collection(db, "users", uid, "habits", id, "entries"),
-          entrySnap => {
-            const entries = {};
-            entrySnap.docs.forEach(e => { entries[e.id] = { id: e.id, ...e.data() }; });
-            entriesData[id] = entries;
-            emit();
-          },
-          err => console.warn("listenEntries:", id, err)
-        );
-      });
-
-      emit();
+      callback(habits);
     },
     err => console.warn("listenHabits:", err)
   );
-
-  return () => {
-    habitsUnsub();
-    Object.values(entryUnsubs).forEach(u => u());
-  };
 }
 
 async function habitOwnerName(uid) {
@@ -1302,21 +1280,27 @@ async function awardHabitMilestone(uid, habitId, milestone) {
 async function setHabitEntry(uid, habitId, { date, status, comment = "", source = "disciple-builder", notify = false } = {}) {
   try {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ""))) return false;
-    await setDoc(doc(db, "users", uid, "habits", habitId, "entries", date), {
-      date,
-      status: status || "open",
-      comment: String(comment || ""),
-      source,
-      updatedAt: serverTimestamp(),
-      updatedAtMs: Date.now()
-    }, { merge: true });
-    await setDoc(doc(db, "users", uid, "habits", habitId), {
-      updatedAt: serverTimestamp(),
-      updatedAtMs: Date.now()
-    }, { merge: true });
+    const habitRef = doc(db, "users", uid, "habits", habitId);
+    // getDoc is served from Firestore's in-memory cache while the onSnapshot listener is active
+    const habitSnap = await getDoc(habitRef);
+    const habit = habitSnap.exists() ? habitSnap.data() : {};
+
+    if (habit.entriesInDoc) {
+      await updateDoc(habitRef, {
+        [`entries.${date}`]: { date, status: status || "open", comment: String(comment || ""), source, updatedAtMs: Date.now() },
+        updatedAt: serverTimestamp(),
+        updatedAtMs: Date.now()
+      });
+    } else {
+      // Habit not yet migrated — write to subcollection; migration will pick it up
+      await setDoc(doc(db, "users", uid, "habits", habitId, "entries", date), {
+        date, status: status || "open", comment: String(comment || ""), source,
+        updatedAt: serverTimestamp(), updatedAtMs: Date.now()
+      }, { merge: true });
+      await setDoc(habitRef, { updatedAt: serverTimestamp(), updatedAtMs: Date.now() }, { merge: true });
+    }
+
     if (notify && (status === "success" || status === "skipped")) {
-      const habitSnap = await getDoc(doc(db, "users", uid, "habits", habitId));
-      const habit = habitSnap.exists() ? habitSnap.data() : {};
       const partners = habit.accountabilityUids || habit.shareUids || [];
       const type = status === "success" ? "habitCompleted" : "habitSkipped";
       await notifyHabitPartners(uid, partners, type, habitId, habit.name || "habit");
@@ -1354,13 +1338,30 @@ async function importHabitShare(uid, rows = []) {
       const habitRef = doc(db, "users", uid, "habits", habitId);
       const firstDateMs = byHabit[name].reduce((min, row) => Math.min(min, Date.parse(`${row.date}T00:00:00`) || Date.now()), Date.now());
       const existingHabit = await getDoc(habitRef).catch(() => null);
+
+      // Build inline entries map — one write per habit instead of one per entry
+      const entriesMap = {};
+      for (const row of byHabit[name]) {
+        entriesMap[row.date] = {
+          date: row.date,
+          status: row.status || "open",
+          comment: String(row.comment || ""),
+          source: "habitshare-import",
+          sourceRow: row.sourceRow || null,
+          updatedAtMs: Date.now()
+        };
+        totalEntries++;
+      }
+
       const habitPayload = {
         ownerUid: uid,
         name,
         source: "habitshare-import",
         importedAt: serverTimestamp(),
         createdAtMs: existingHabit?.exists() ? (existingHabit.data().createdAtMs || firstDateMs) : firstDateMs,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        entries: entriesMap,
+        entriesInDoc: true
       };
       if (!existingHabit?.exists()) {
         habitPayload.description = "";
@@ -1371,23 +1372,6 @@ async function importHabitShare(uid, rows = []) {
       batch.set(habitRef, habitPayload, { merge: true });
       writes++;
       await commitIfNeeded();
-
-      for (const row of byHabit[name]) {
-        const entryRef = doc(db, "users", uid, "habits", habitId, "entries", row.date);
-        batch.set(entryRef, {
-          date: row.date,
-          status: row.status || "open",
-          comment: String(row.comment || ""),
-          source: "habitshare-import",
-          sourceRow: row.sourceRow || null,
-          importedAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          updatedAtMs: Date.now()
-        }, { merge: true });
-        writes++;
-        totalEntries++;
-        await commitIfNeeded();
-      }
     }
 
     await commitIfNeeded(true);
