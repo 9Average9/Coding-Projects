@@ -22784,6 +22784,7 @@ function openRhemaWheel() {
   if (!overlay) return;
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   _syncWheelState();
+  _updateCopyVerseLabel();
   overlay.style.display = 'flex';
   requestAnimationFrame(() => overlay.classList.add('open'));
 }
@@ -24365,6 +24366,84 @@ function closeRhemaSheet() {
   if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
   document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
   _rhemaActiveWord = null;
+}
+
+function copyCurrentRhemaWord() {
+  if (!_rhemaActiveWord) return;
+  const surface = _rhemaActiveWord[0];
+  if (!surface) return;
+  const btn = document.querySelector('.rhema-copy-word-btn');
+  const icon = btn?.querySelector('.material-symbols-outlined');
+  const showCheck = () => {
+    if (icon) { icon.textContent = 'check'; setTimeout(() => { icon.textContent = 'content_copy'; }, 1500); }
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(surface).then(showCheck).catch(() => _fallbackCopy(surface, showCheck));
+  } else {
+    _fallbackCopy(surface, showCheck);
+  }
+}
+
+function _fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); } catch (_) {}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+
+function copyRhemaVerseOrChapter() {
+  closeRhemaWheel();
+  const bookName = _rhemaBookName(_rhemaBook);
+  let text = '';
+
+  if (_rhemaFullChapter) {
+    const chapterData = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {};
+    const verseNums = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
+    const header = `${bookName} ${_rhemaChapter}`;
+    if (_rhemaShowEnglish) {
+      const lines = verseNums.map(vn => {
+        const t = _rhemaEnglishText(_rhemaBook, _rhemaChapter, String(vn));
+        return t ? `${vn} ${t}` : null;
+      }).filter(Boolean);
+      text = `${header}\n\n${lines.join('\n')}`;
+    } else {
+      const lines = verseNums.map(vn => {
+        const words = chapterData[String(vn)] || [];
+        return `${vn} ${words.map(w => w[0]).join(' ')}`;
+      });
+      text = `${header}\n\n${lines.join('\n')}`;
+    }
+  } else {
+    const ref = `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
+    if (_rhemaShowEnglish) {
+      const t = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
+      text = `${ref}\n${t}`;
+    } else {
+      const words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+      text = `${ref}\n${words.map(w => w[0]).join(' ')}`;
+    }
+  }
+
+  if (!text) return;
+  const showToast = () => {
+    const toast = document.getElementById('rhemaChapterToast');
+    if (toast) { toast.textContent = 'Copied!'; toast.classList.remove('hidden'); setTimeout(() => toast.classList.add('hidden'), 2000); }
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(showToast).catch(() => _fallbackCopy(text, showToast));
+  } else {
+    _fallbackCopy(text, showToast);
+  }
+}
+
+function _updateCopyVerseLabel() {
+  const label = document.getElementById('wheelCopyLabel');
+  if (label) label.textContent = _rhemaFullChapter ? 'Copy Chapter' : 'Copy Verse';
 }
 
 function initRhemaSwipeDown(sheet) {

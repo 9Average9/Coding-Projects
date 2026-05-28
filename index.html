@@ -9591,6 +9591,9 @@ Verb Endings
 <div class="rhema-sheet-top">
 <span class="rhema-sheet-surface" id="rhemaSheetSurface"></span>
 <span class="rhema-sheet-strongs" id="rhemaSheetStrongs"></span>
+<button class="rhema-copy-word-btn" onclick="copyCurrentRhemaWord()" title="Copy Greek word to clipboard">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
 </div>
 <div class="rhema-sheet-lemma" id="rhemaSheetLemma"></div>
 <div class="rhema-sheet-tabs">
@@ -9668,6 +9671,10 @@ Verb Endings
 <button class="rhema-wheel-item" id="wheelItemWordlib" onclick="toggleWheelTool('wordlibrary')">
 <span class="material-symbols-outlined">local_library</span>
 <span class="rwi-label">Word Library</span>
+</button>
+<button class="rhema-wheel-item" id="wheelItemCopyVerse" onclick="copyRhemaVerseOrChapter()">
+<span class="material-symbols-outlined">content_copy</span>
+<span class="rwi-label" id="wheelCopyLabel">Copy Verse</span>
 </button>
 <button class="rhema-wheel-center" onclick="closeRhemaWheel()">
 <span class="material-symbols-outlined">close</span>

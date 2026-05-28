@@ -13320,13 +13320,14 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 .rhema-wheel-item.rw-placeholder { opacity: 0; }
 .rhema-wheel-overlay.open .rhema-wheel-item.rw-placeholder { opacity: 0.45; }
-/* Hex positions (r=124px, clockwise from top) */
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(1) { transform: translate(calc(-50% + 0px),    calc(-50% + -124px)) scale(1); opacity: 1; transition-delay: 0s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(2) { transform: translate(calc(-50% + 107px),  calc(-50% + -62px))  scale(1); opacity: 1; transition-delay: 0.04s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(3) { transform: translate(calc(-50% + 107px),  calc(-50% + 62px))   scale(1); opacity: 1; transition-delay: 0.08s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(4) { transform: translate(calc(-50% + 0px),    calc(-50% + 124px))  scale(1); opacity: 1; transition-delay: 0.12s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(5) { transform: translate(calc(-50% + -107px), calc(-50% + 62px))   scale(1); opacity: 1; transition-delay: 0.16s; }
-.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(6) { transform: translate(calc(-50% + -107px), calc(-50% + -62px))  scale(1); opacity: 1; transition-delay: 0.2s; }
+/* Heptagon positions (r=110px, clockwise from top, 7 items) */
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(1) { transform: translate(calc(-50% + 0px),    calc(-50% + -110px)) scale(1); opacity: 1; transition-delay: 0s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(2) { transform: translate(calc(-50% + 86px),   calc(-50% + -69px))  scale(1); opacity: 1; transition-delay: 0.04s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(3) { transform: translate(calc(-50% + 107px),  calc(-50% + 24px))   scale(1); opacity: 1; transition-delay: 0.08s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(4) { transform: translate(calc(-50% + 48px),   calc(-50% + 99px))   scale(1); opacity: 1; transition-delay: 0.12s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(5) { transform: translate(calc(-50% + -48px),  calc(-50% + 99px))   scale(1); opacity: 1; transition-delay: 0.16s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(6) { transform: translate(calc(-50% + -107px), calc(-50% + 24px))   scale(1); opacity: 1; transition-delay: 0.2s; }
+.rhema-wheel-overlay.open .rhema-wheel-item:nth-child(7) { transform: translate(calc(-50% + -86px),  calc(-50% + -69px))  scale(1); opacity: 1; transition-delay: 0.24s; }
 
 /* Scripture Trail Cross References */
 .rhema-xref-page {
@@ -15763,9 +15764,9 @@ body.sepia .rhema-sheet { background: #fffcf2; }
 
 .rhema-sheet-top {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
-  padding: 4px 22px 0;
+  padding: 4px 52px 0 22px;
   flex-shrink: 0;
 }
 .rhema-sheet-surface {
@@ -15781,6 +15782,23 @@ body.sepia .rhema-sheet { background: #fffcf2; }
   font-weight: 600;
   letter-spacing: 0.05em;
 }
+.rhema-copy-word-btn {
+  margin-left: auto;
+  align-self: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-color);
+  padding: 5px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+.rhema-copy-word-btn:hover { color: var(--font-color); background: var(--border-color); }
+.rhema-copy-word-btn:active { background: var(--secondary-color); color: var(--btn-text-color); }
+.rhema-copy-word-btn .material-symbols-outlined { font-size: 18px; }
 .rhema-sheet-lemma {
   padding: 3px 22px 10px;
   font-size: 0.85rem;
