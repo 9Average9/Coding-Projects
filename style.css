@@ -207,6 +207,11 @@ body.dark .header:hover, body.dark .header:focus {
 
 }
 
+.desktop-shell-nav,
+.desktop-home-shell {
+  display: none;
+}
+
 .main-btn {
   width: 100%;
   padding: 14px 18px;
@@ -20831,6 +20836,422 @@ body.dark .bottom-nav::before {
 
 .bottom-nav:has(.bn-item.active)::before {
   opacity: 0 !important;
+}
+
+/* Desktop Rhema workspace. Mobile remains governed by the app's normal styles above. */
+@media (min-width: 960px) and (pointer: fine) {
+  html,
+  body {
+    min-width: 960px;
+    height: 100%;
+    overflow: hidden;
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 14% 10%, color-mix(in srgb, var(--secondary-color) 14%, transparent), transparent 32%),
+      radial-gradient(circle at 86% 2%, color-mix(in srgb, var(--accent-color) 12%, transparent), transparent 30%),
+      linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  }
+
+  #statusBarBg,
+  .app-header,
+  .bottom-nav {
+    display: none !important;
+  }
+
+  .app {
+    max-width: none;
+    width: 100vw;
+    height: 100vh;
+    min-height: 0;
+    margin: 0;
+    padding: 0 0 0 292px;
+    display: grid;
+    background: transparent;
+  }
+
+  .desktop-shell-nav {
+    position: fixed;
+    inset: 18px auto 18px 18px;
+    z-index: 1200;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 62%, rgba(255,255,255,0.62));
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.78));
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  }
+
+  .desktop-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 4px 16px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  }
+
+  .desktop-brand > .material-symbols-outlined {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    color: var(--btn-text-color);
+    background: var(--secondary-color);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--secondary-color) 26%, transparent);
+  }
+
+  .desktop-brand strong,
+  .desktop-brand small {
+    display: block;
+  }
+
+  .desktop-brand strong {
+    color: var(--font-color);
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .desktop-brand small {
+    margin-top: 2px;
+    color: var(--muted-color);
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .desktop-nav-btn {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 11px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--font-color);
+    font: inherit;
+    font-weight: 850;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .desktop-nav-btn:hover {
+    background: color-mix(in srgb, var(--secondary-color) 9%, transparent);
+    border-color: color-mix(in srgb, var(--secondary-color) 16%, transparent);
+  }
+
+  .desktop-nav-btn.primary {
+    background: var(--secondary-color);
+    color: var(--btn-text-color);
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  }
+
+  .desktop-nav-btn .material-symbols-outlined {
+    font-size: 22px;
+  }
+
+  .desktop-companion-box {
+    margin-top: auto;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 68%, transparent);
+    background: color-mix(in srgb, var(--primary-light) 72%, rgba(255,255,255,0.62));
+    color: var(--muted-color);
+  }
+
+  .desktop-companion-box > .material-symbols-outlined {
+    color: var(--secondary-color);
+    font-size: 24px;
+  }
+
+  .desktop-companion-box strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--font-color);
+    font-size: 0.88rem;
+  }
+
+  .desktop-companion-box p {
+    margin: 6px 0 12px;
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+
+  .desktop-companion-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .desktop-companion-actions button {
+    border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+    color: var(--secondary-color);
+    border-radius: 10px;
+    padding: 7px 8px;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .screen.active {
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+    background: transparent !important;
+  }
+
+  #homeScreen.screen.active {
+    display: block;
+    background: transparent !important;
+  }
+
+  #homeScreen .home-scroll {
+    height: 100vh;
+    overflow: auto;
+    padding: 28px clamp(28px, 4vw, 56px) 40px;
+  }
+
+  #homeScreen .home-scroll > :not(.desktop-home-shell) {
+    display: none !important;
+  }
+
+  .desktop-home-shell {
+    display: grid;
+    gap: 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .desktop-study-hero {
+    min-height: 360px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .desktop-study-copy,
+  .desktop-study-card,
+  .desktop-tool-card {
+    border: 1px solid color-mix(in srgb, var(--border-color) 66%, rgba(255,255,255,0.56));
+    background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.74));
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(16px) saturate(1.08);
+    -webkit-backdrop-filter: blur(16px) saturate(1.08);
+  }
+
+  .desktop-study-copy {
+    border-radius: 28px;
+    padding: clamp(32px, 5vw, 62px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .desktop-study-copy::after {
+    content: "";
+    position: absolute;
+    inset: auto -80px -120px auto;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
+    pointer-events: none;
+  }
+
+  .desktop-kicker {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 14px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    color: var(--secondary-color);
+    background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+    font-size: 0.78rem;
+    font-weight: 950;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .desktop-study-copy h1 {
+    max-width: 780px;
+    margin: 0;
+    color: var(--font-color);
+    font-size: clamp(3.2rem, 6.2vw, 6.6rem);
+    line-height: 0.92;
+    letter-spacing: 0;
+  }
+
+  .desktop-study-copy p {
+    max-width: 680px;
+    margin: 24px 0 0;
+    color: var(--muted-color);
+    font-size: clamp(1.05rem, 1.5vw, 1.28rem);
+    line-height: 1.55;
+  }
+
+  .desktop-study-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .desktop-primary-action,
+  .desktop-secondary-action {
+    border-radius: 14px;
+    padding: 13px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .desktop-primary-action {
+    border: 0;
+    color: var(--btn-text-color);
+    background: var(--secondary-color);
+    box-shadow: 0 12px 26px color-mix(in srgb, var(--secondary-color) 24%, transparent);
+  }
+
+  .desktop-secondary-action {
+    border: 1px solid color-mix(in srgb, var(--secondary-color) 20%, transparent);
+    color: var(--secondary-color);
+    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  }
+
+  .desktop-study-card {
+    border-radius: 28px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 320px;
+    background:
+      linear-gradient(150deg, color-mix(in srgb, var(--secondary-color) 78%, #052e2b), color-mix(in srgb, var(--secondary-color) 56%, var(--accent-color))),
+      var(--secondary-color);
+    color: var(--btn-text-color);
+  }
+
+  .desktop-study-card > .material-symbols-outlined {
+    width: 68px;
+    height: 68px;
+    display: grid;
+    place-items: center;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.16);
+    font-size: 36px;
+    margin-bottom: auto;
+  }
+
+  .desktop-study-card strong {
+    font-size: 1.45rem;
+    line-height: 1.1;
+  }
+
+  .desktop-study-card p {
+    margin: 12px 0 0;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.48;
+  }
+
+  .desktop-tool-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .desktop-tool-card {
+    min-height: 180px;
+    border-radius: 22px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    color: var(--font-color);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .desktop-tool-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+  }
+
+  .desktop-tool-card > .material-symbols-outlined {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    color: var(--secondary-color);
+    background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+    font-size: 26px;
+  }
+
+  .desktop-tool-card strong {
+    margin-top: 16px;
+    font-size: 1.05rem;
+    font-weight: 950;
+  }
+
+  .desktop-tool-card small {
+    margin-top: 8px;
+    color: var(--muted-color);
+    line-height: 1.42;
+    font-size: 0.86rem;
+  }
+
+  .desktop-tool-card.companion {
+    opacity: 0.88;
+  }
+
+  #profilePage.screen.active,
+  #communityPage.screen.active,
+  #merciesPage.screen.active,
+  #habitsPage.screen.active,
+  #newLearnMenu.screen.active {
+    overflow: auto;
+    padding: 28px clamp(28px, 4vw, 56px) 40px;
+  }
+
+  #rhemaModal.open {
+    background:
+      radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--secondary-color) 14%, transparent), transparent 34%),
+      linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  }
+
+  #rhemaModal.open #rhemaSlide {
+    left: 292px;
+    right: 28px;
+    top: 28px;
+    bottom: 28px;
+    width: auto;
+    max-width: none;
+    border-radius: 28px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 62%, rgba(255,255,255,0.54));
+    box-shadow: 0 26px 70px rgba(15,23,42,0.18);
+    overflow: hidden;
+  }
+
+  .rhema-header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 body .app:has(#homeScreen.screen.active) #statusBarBg,
