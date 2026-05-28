@@ -15101,6 +15101,7 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   box-shadow: 0 2px 6px color-mix(in srgb, var(--secondary-color) 10%, rgba(0,0,0,0.07)), 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.9);
 }
 .rhema-pill:first-child { flex: 2.2; }
+.rhema-pill:nth-child(2) { min-width: 78px; }
 .rhema-pill:active {
   background: color-mix(in srgb, var(--secondary-color) 12%, rgba(255,255,255,0.9));
   box-shadow: 0 1px 3px color-mix(in srgb, var(--secondary-color) 10%, rgba(0,0,0,0.06));
@@ -17492,6 +17493,13 @@ body.sandbox-open .ss-pane {
 /* Shrink the Rhema modal to stop above the study tab bar — all children adapt automatically */
 body.sandbox-open #rhemaModal {
   bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Extra bottom padding so long verses can scroll clear of the floating prev/next arrows.
+   Arrows sit 12px above the modal bottom and are 44px tall → need ~70px+ of clearance. */
+body.sandbox-open .rhema-verse-display,
+body.sandbox-open .rhema-english-display {
+  padding-bottom: 80px;
 }
 
 .ss-tab {
