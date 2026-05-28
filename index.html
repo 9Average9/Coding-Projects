@@ -303,7 +303,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-180.png" rel="apple-touch-icon"/>
 <link href="assets/icons/disciple-builder-icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
-<link href="style.css?v=3.0.71" rel="stylesheet"/>
+<link href="style.css?v=3.0.73" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -500,9 +500,6 @@ Resume Last Passage
 <section class="screen" id="habitsPage">
 <div class="habits-scroll">
 <div class="habits-hero">
-<button class="icon-btn habits-back-btn" onclick="showNavPage('home')" aria-label="Back home">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
 <div class="habits-hero-text">
 <span class="habits-kicker">Habit Builder</span>
 <h1>Habits</h1>
@@ -512,6 +509,11 @@ Resume Last Passage
 <img src="habit-hero.svg" alt="" width="170" height="135"/>
 </div>
 </div>
+<div class="habits-tabs">
+<button class="habits-tab active" id="habitsTabMine" onclick="switchHabitsTab('mine')">My Habits</button>
+<button class="habits-tab" id="habitsTabFriends" onclick="switchHabitsTab('friends')">Friends</button>
+</div>
+<div id="myHabitsPane">
 <div class="habits-actions">
 <button class="habits-primary" onclick="openHabitCreateModal()">
 <span class="material-symbols-outlined">add_circle</span>
@@ -542,9 +544,25 @@ Resume Last Passage
 <div class="habits-list" id="habitsList">
 <p class="study-board-empty">Loading habits...</p>
 </div>
+</div>
+<div id="friendsHabitsPane" style="display:none">
+<div class="habits-list" id="friendsHabitsList">
+<p class="study-board-empty">Loading friends...</p>
+</div>
+</div>
 <div style="height:88px"></div>
 </div>
 </section>
+<!-- Friend habits detail modal -->
+<div class="friend-habits-modal" id="friendHabitsModal" onclick="closeFriendHabitsModal(event)">
+<div class="friend-habits-modal-card" onclick="event.stopPropagation()">
+<div class="friend-habits-modal-top">
+<strong id="friendHabitsModalName"></strong>
+<button class="habit-cal-close" onclick="closeFriendHabitsModal()" aria-label="Close">&times;</button>
+</div>
+<div class="habits-list" id="friendHabitsModalList"></div>
+</div>
+</div>
 <!-- Habit calendar modal (sheet) -->
 <div class="habit-cal-modal" id="habitCalModal" onclick="closeHabitCalModal(event)">
 <div class="habit-cal-modal-card" onclick="event.stopPropagation()">
@@ -9579,7 +9597,7 @@ Verb Endings
 <div id="rhemaSlide">
 <div class="rhema-header">
 <button class="icon-btn rhema-back-btn" onclick="rhemaGoBack()">
-<span class="material-symbols-outlined">arrow_back</span>
+<span class="material-symbols-outlined">home</span>
 </button>
 <div class="rhema-title-block">
 <span class="rhema-title">Rhēma</span>
@@ -9658,6 +9676,9 @@ Verb Endings
 <div class="rhema-sheet-top">
 <span class="rhema-sheet-surface" id="rhemaSheetSurface"></span>
 <span class="rhema-sheet-strongs" id="rhemaSheetStrongs"></span>
+<button class="rhema-copy-word-btn" onclick="copyCurrentRhemaWord()" title="Copy Greek word to clipboard">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
 </div>
 <div class="rhema-sheet-lemma" id="rhemaSheetLemma"></div>
 <div class="rhema-sheet-tabs">
@@ -9735,6 +9756,10 @@ Verb Endings
 <button class="rhema-wheel-item" id="wheelItemWordlib" onclick="toggleWheelTool('wordlibrary')">
 <span class="material-symbols-outlined">local_library</span>
 <span class="rwi-label">Word Library</span>
+</button>
+<button class="rhema-wheel-item" id="wheelItemCopyVerse" onclick="copyRhemaVerseOrChapter()">
+<span class="material-symbols-outlined">content_copy</span>
+<span class="rwi-label" id="wheelCopyLabel">Copy Verse</span>
 </button>
 <button class="rhema-wheel-center" onclick="closeRhemaWheel()">
 <span class="material-symbols-outlined">close</span>
@@ -15998,10 +16023,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.71"></script>
+<script src="app.js?v=3.0.73"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.71" type="module"></script>
+<script src="firebase-lb.js?v=3.0.73" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

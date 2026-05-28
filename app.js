@@ -48,6 +48,7 @@ let _appUpdateReloadTimer = null;
 let _homeBackdropPreload = null;
 let _pendingFirstRunNotificationPrompt = false;
 let _deferWelcomeUntilNotificationPromptCloses = false;
+let _pendingSignInNotificationPrompt = false;
 
 // Personal Studies state
 let _myStudies = [];
@@ -10097,6 +10098,9 @@ function populateHomeScreen() {
 // ── Habits ────────────────────────────────────────────────────────────────────
 let _habitsUnsub = null;
 let _habitItems = [];
+let _habitsLoaded = false;
+let _habitsTab = "mine";
+let _friendsHabitsCache = {};
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
 let _habitCreateIcon = "menu_book";
@@ -10263,8 +10267,9 @@ function _habitEntryStatusForDate(habit, dateKey) {
 
 function _habitLastSevenDays(habit) {
   const today = _habitTodayKey();
+  const dayOfWeek = new Date(`${today}T00:00:00`).getDay(); // 0=Sun, 6=Sat
   return Array.from({ length: 7 }, (_, i) => {
-    const date = _habitShiftDateKey(today, i - 6);
+    const date = _habitShiftDateKey(today, i - dayOfWeek);
     return { date, status: _habitEntryStatusForDate(habit, date) };
   });
 }
@@ -10274,16 +10279,21 @@ function _habitWeeklyProgressHtml(habit) {
   const complete = days.filter(d => d.status === "success").length;
   const pct = Math.round((complete / 7) * 100);
   return `
-    <div class="habit-week-strip" aria-label="Last seven days">
+    <div class="habit-week-strip" aria-label="This week">
       <div class="habit-week-strip-head">
-        <span>Last 7 days</span>
+        <span>This week</span>
         <strong>${complete}/7</strong>
       </div>
       <div class="habit-week-days">
         ${days.map(d => {
           const dayLabel = new Date(`${d.date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short" }).slice(0, 1);
           const icon = d.status === "success" ? "check" : d.status === "skipped" ? "remove" : d.status === "missed" ? "close" : "";
-          return `<span class="habit-week-day ${d.status}" title="${_habitEsc(d.date)} ${_habitEsc(_habitStatusLabel(d.status))}">${icon ? `<span class="material-symbols-outlined">${icon}</span>` : dayLabel}</span>`;
+          const note = (habit.entries?.[d.date]?.comment || "").trim();
+          const daySpan = `<span class="habit-week-day ${d.status}" title="${_habitEsc(d.date)} ${_habitEsc(_habitStatusLabel(d.status))}">${icon ? `<span class="material-symbols-outlined">${icon}</span>` : dayLabel}</span><span class="habit-week-note-dot"></span>`;
+          if (note) {
+            return `<button class="habit-week-day-wrap has-note" onclick="openHabitNoteModal('${_habitEsc(habit.id)}','${_habitEsc(d.date)}')" title="${_habitEsc(note)}">${daySpan}</button>`;
+          }
+          return `<div class="habit-week-day-wrap">${daySpan}</div>`;
         }).join("")}
       </div>
       <div class="habit-week-bar"><span style="width:${pct}%"></span></div>
@@ -10309,7 +10319,13 @@ function _habitMonthHtml(habit, year, month) {
         : status === "skipped"
           ? '<span class="material-symbols-outlined">snooze</span>'
           : String(day);
-    cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}" title="${key} ${_habitEsc(_habitStatusLabel(status))}">${icon}</div>`);
+    const note = (habit.entries?.[key]?.comment || "").trim();
+    const dot = note ? '<span class="habit-cal-note-dot"></span>' : '';
+    if (note) {
+      cells.push(`<button class="habit-cal-day ${status}${isToday ? " today" : ""} has-note" onclick="openHabitNoteModal('${_habitEsc(habit.id)}','${_habitEsc(key)}')" title="${_habitEsc(note)}">${icon}${dot}</button>`);
+    } else {
+      cells.push(`<div class="habit-cal-day ${status}${isToday ? " today" : ""}">${icon}</div>`);
+    }
   }
   return `
     <div class="habit-calendar-month">
@@ -10341,16 +10357,38 @@ function _habitCalendarHtml(habit) {
 async function _habitLoadFriendProfiles(uids = friendsList || []) {
   const wanted = [...new Set((uids || []).filter(Boolean))];
   await Promise.all(wanted.map(async uid => {
-    if (_habitFriendCache[uid]) return;
+    if (uid in _habitFriendCache) return;
     const user = await window.Friends?.getUser?.(uid).catch(() => null);
-    _habitFriendCache[uid] = user || { uid, displayName: "Friend" };
+    _habitFriendCache[uid] = user || null;
   }));
-  return wanted.map(uid => _habitFriendCache[uid]).filter(Boolean);
+  return wanted.map(uid => _habitFriendCache[uid]).filter(u => u && u.uid);
 }
 
 function _habitFriendName(uid) {
   const u = _habitFriendCache[uid];
   return u?.displayName || u?.username || "Friend";
+}
+
+function _drawFriendChips(el, friendUids, selectedSet, onToggleName) {
+  const users = (friendUids || [])
+    .map(uid => _habitFriendCache[uid])
+    .filter(u => u && u.uid)
+    .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
+  if (!users.length) {
+    el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
+    return;
+  }
+  el.innerHTML = users.map(user => {
+    const name = _habitEsc(user.displayName || "Friend");
+    const selected = selectedSet.has(user.uid);
+    const avatar = _renderAvatar(user?.avatar || "person");
+    return `
+      <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
+        <span class="habit-friend-avatar">${avatar}</span>
+        <span>${name}</span>
+        <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
+      </button>`;
+  }).join("");
 }
 
 async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
@@ -10361,29 +10399,15 @@ async function _renderHabitFriendPicker(targetId, selectedSet, onToggleName) {
     el.innerHTML = '<p class="study-board-empty">Add friends first, then choose accountability partners here.</p>';
     return;
   }
-  el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
-  try {
-    const users = (await Promise.all(friendUids.map(uid => window.Friends?.getUser(uid).catch(() => null))))
-      .filter(Boolean)
-      .sort((a, b) => (a.displayName || a.username || "").localeCompare(b.displayName || b.username || ""));
-    if (!users.length) {
-      el.innerHTML = '<p class="study-board-empty">No friends found. Add friends to tag accountability partners.</p>';
-      return;
-    }
-    el.innerHTML = users.map(user => {
-      const name = _habitEsc(user.displayName || "Friend");
-      const selected = selectedSet.has(user.uid);
-      const avatar = _renderAvatar(user?.avatar || "person");
-      return `
-        <button type="button" class="habit-friend-chip${selected ? " selected" : ""}" onclick="${onToggleName}('${_habitEsc(user.uid)}')">
-          <span class="habit-friend-avatar">${avatar}</span>
-          <span>${name}</span>
-          <span class="material-symbols-outlined">${selected ? "check_circle" : "radio_button_unchecked"}</span>
-        </button>`;
-    }).join("");
-  } catch {
-    el.innerHTML = '<p class="study-board-empty">Could not load friends.</p>';
+  const uncached = friendUids.filter(uid => !(uid in _habitFriendCache));
+  if (uncached.length) {
+    el.innerHTML = '<p class="study-board-empty">Loading friends...</p>';
+    await Promise.all(uncached.map(async uid => {
+      const user = await window.Friends?.getUser(uid).catch(() => null);
+      _habitFriendCache[uid] = user || null;
+    }));
   }
+  _drawFriendChips(el, friendUids, selectedSet, onToggleName);
 }
 
 function _parseCsvLine(line, delimiter) {
@@ -10455,12 +10479,181 @@ async function startHabitsPage() {
     }, 500);
     return;
   }
+  // restore tab UI to saved state
+  _applyHabitsTabUI(_habitsTab);
   list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
+  _habitsLoaded = false;
   _habitsUnsub?.();
   _habitsUnsub = window.Habits?.listen?.(uid, habits => {
     _habitItems = habits || [];
+    _habitsLoaded = true;
     renderHabits();
   });
+  if (_habitsTab === "friends") loadFriendsHabits();
+}
+
+function _applyHabitsTabUI(tab) {
+  document.getElementById("habitsTabMine")?.classList.toggle("active", tab === "mine");
+  document.getElementById("habitsTabFriends")?.classList.toggle("active", tab === "friends");
+  const myPane = document.getElementById("myHabitsPane");
+  const frPane = document.getElementById("friendsHabitsPane");
+  if (myPane) myPane.style.display = tab === "mine" ? "" : "none";
+  if (frPane) frPane.style.display = tab === "friends" ? "" : "none";
+}
+
+function switchHabitsTab(tab) {
+  _habitsTab = tab;
+  _applyHabitsTabUI(tab);
+  if (tab === "friends") loadFriendsHabits();
+}
+
+async function loadFriendsHabits() {
+  const container = document.getElementById("friendsHabitsList");
+  if (!container) return;
+  const friends = (friendsList || []).filter(Boolean);
+  if (!friends.length) {
+    container.innerHTML = '<p class="study-board-empty">No friends yet. Add friends in the Community tab.</p>';
+    return;
+  }
+  container.innerHTML = '<p class="study-board-empty">Loading friends\' habits...</p>';
+
+  // Load any uncached friends
+  const uncached = friends.filter(uid => !(uid in _friendsHabitsCache));
+  await Promise.all(uncached.map(async uid => {
+    try {
+      const profilePromise = (uid in _habitFriendCache)
+        ? Promise.resolve(_habitFriendCache[uid])
+        : window.Friends?.getUser(uid).catch(() => null);
+      const [profile, habits] = await Promise.all([
+        profilePromise,
+        window.Habits?.getFriendHabits(uid).catch(() => [])
+      ]);
+      _habitFriendCache[uid] = profile || null;
+      _friendsHabitsCache[uid] = { profile: profile || null, habits: habits || [] };
+    } catch {
+      _habitFriendCache[uid] = _habitFriendCache[uid] ?? null;
+      _friendsHabitsCache[uid] = { profile: null, habits: [] };
+    }
+  }));
+
+  renderFriendsHabits();
+}
+
+function renderFriendsHabits() {
+  const container = document.getElementById("friendsHabitsList");
+  if (!container) return;
+  const friends = (friendsList || []).filter(Boolean);
+  if (!friends.length) {
+    container.innerHTML = '<p class="study-board-empty">No friends yet. Add friends in the Community tab.</p>';
+    return;
+  }
+
+  // Sort alphabetically by display name; skip friends with no resolvable profile
+  const sorted = friends
+    .map(uid => _friendsHabitsCache[uid])
+    .filter(d => d && d.profile && d.profile.uid)
+    .sort((a, b) => {
+      const na = (a.profile.displayName || a.profile.username || "").toLowerCase();
+      const nb = (b.profile.displayName || b.profile.username || "").toLowerCase();
+      return na.localeCompare(nb);
+    });
+
+  if (!sorted.length) {
+    container.innerHTML = '<p class="study-board-empty">Loading friends\' habits...</p>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(({ profile, habits }) => {
+    const name = _habitEsc(profile.displayName || profile.username || "Friend");
+    const uid = _habitEsc(profile.uid || "");
+    const avatar = _renderAvatar(profile.avatar || "person");
+    if (!habits.length) {
+      return `<div class="friend-habit-section">
+        <div class="friend-habit-section-name">
+          <span class="friend-habit-section-avatar">${avatar}</span>${name}
+        </div>
+        <div class="friend-habit-empty-card">
+          <span class="material-symbols-outlined">sentiment_satisfied</span>
+          <p>${name} does not have any habits yet, encourage them to start making healthy ones</p>
+        </div>
+      </div>`;
+    }
+    const firstHabit = habits[0];
+    const moreCount = habits.length - 1;
+    return `<div class="friend-habit-section">
+      <div class="friend-habit-section-name">
+        <span class="friend-habit-section-avatar">${avatar}</span>${name}
+      </div>
+      <div onclick="showFriendHabitsModal('${uid}')" style="cursor:pointer">
+        ${_renderFriendHabitCard(firstHabit)}
+      </div>
+      ${moreCount > 0 ? `<button class="friend-habit-more-btn" onclick="showFriendHabitsModal('${uid}')">
+        <span class="material-symbols-outlined">expand_more</span>
+        View all ${habits.length} habits
+      </button>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function _renderFriendHabitCard(habit) {
+  const entries = habit.entries || {};
+  const today = _habitTodayKey();
+  const count = Object.values(entries).filter(e => e.status === "success").length;
+  const streak = _habitCurrentStreak(entries);
+  const icon = _habitEsc(habit.icon || "menu_book");
+  const color = habit.color || "";
+  const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
+  return `<article class="habit-card friend-habit-card">
+    <div class="habit-card-top">
+      <div class="habit-card-identity" style="pointer-events:none">
+        <div class="habit-card-icon"${iconStyle}>
+          <span class="material-symbols-outlined">${icon}</span>
+        </div>
+        <div class="habit-card-info">
+          <span class="habit-card-name">${_habitEsc(habit.name)}</span>
+          ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
+        </div>
+      </div>
+    </div>
+    <div class="habit-pills-row">
+      <span class="habit-pill">
+        <span class="material-symbols-outlined">local_fire_department</span>${streak} current streak
+      </span>
+      <span class="habit-pill">
+        <span class="material-symbols-outlined">emoji_events</span>${count} completions
+      </span>
+    </div>
+    ${_habitWeeklyProgressHtml(habit)}
+  </article>`;
+}
+
+function showFriendHabitsModal(friendUid) {
+  const cached = _friendsHabitsCache[friendUid];
+  if (!cached || !cached.profile) return;
+  const name = cached.profile.displayName || cached.profile.username || "Friend";
+  const nameEl = document.getElementById("friendHabitsModalName");
+  if (nameEl) {
+    const avatar = _renderAvatar(cached.profile.avatar || "person");
+    nameEl.innerHTML = `<span class="friend-habit-section-avatar">${avatar}</span>${_habitEsc(name)}`;
+  }
+  const listEl = document.getElementById("friendHabitsModalList");
+  if (listEl) {
+    if (!cached.habits.length) {
+      listEl.innerHTML = `<div class="friend-habit-empty-card">
+        <span class="material-symbols-outlined">sentiment_satisfied</span>
+        <p>${_habitEsc(name)} does not have any habits yet, encourage them to start making healthy ones</p>
+      </div>`;
+    } else {
+      listEl.innerHTML = cached.habits.map(h => _renderFriendHabitCard(h)).join("");
+    }
+  }
+  document.getElementById("friendHabitsModal")?.classList.add("open");
+}
+
+function closeFriendHabitsModal(event) {
+  if (!event || event.target.id === "friendHabitsModal") {
+    document.getElementById("friendHabitsModal")?.classList.remove("open");
+  }
 }
 
 function renderHabits() {
@@ -10475,6 +10668,7 @@ function renderHabits() {
   document.getElementById("habitBestStreak").textContent = best;
 
   if (!total) {
+    if (!_habitsLoaded) return;
     list.innerHTML = `
       <div class="habits-empty">
         <span class="material-symbols-outlined">checklist</span>
@@ -10502,7 +10696,7 @@ function renderHabits() {
     const checkBtnClass = doneToday ? " done" : skippedToday ? " skipped" : "";
     const checkBtnIcon = doneToday ? "check_circle" : skippedToday ? "snooze" : "radio_button_unchecked";
     const checkBtnLabel = doneToday ? "Done Today" : skippedToday ? "Skipped" : "Complete Today";
-    const checkBtnAction = (doneToday || skippedToday) ? `"open"` : `"success"`;
+    const checkBtnAction = (doneToday || skippedToday) ? `'open'` : `'success'`;
     const skipPill = !doneToday && !skippedToday
       ? `<button class="habit-pill habit-pill-skip" onclick="skipHabitToday('${_habitEsc(habit.id)}')">
            <span class="material-symbols-outlined">beach_access</span>Plan Skip
@@ -10650,7 +10844,8 @@ function selectHabitCreateColor(color) {
 function toggleHabitCreateFriend(uid) {
   if (_habitCreateFriends.has(uid)) _habitCreateFriends.delete(uid);
   else _habitCreateFriends.add(uid);
-  _renderHabitFriendPicker("habitCreateFriendsList", _habitCreateFriends, "toggleHabitCreateFriend");
+  const el = document.getElementById("habitCreateFriendsList");
+  if (el) _drawFriendChips(el, (friendsList || []).filter(Boolean), _habitCreateFriends, "toggleHabitCreateFriend");
 }
 
 function closeHabitCreateModal(event) {
@@ -10812,8 +11007,8 @@ async function openHabitDetailModal(habitId) {
   _renderHabitIconPicker("habitDetailIconPicker", _habitDetailIcon, "selectHabitDetailIcon");
   _renderHabitColorPicker("habitDetailColorPicker", _habitDetailColor, "selectHabitDetailColor");
   _applyHabitPreview("habitDetailIconPreview", "habitDetailIconDisplay", _habitDetailIcon, _habitDetailColor);
-  await _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
   document.getElementById("habitDetailModal")?.classList.add("open");
+  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
 }
 
 function closeHabitDetailModal(event) {
@@ -10837,7 +11032,8 @@ function selectHabitDetailColor(color) {
 function toggleHabitDetailFriend(uid) {
   if (_habitDetailFriends.has(uid)) _habitDetailFriends.delete(uid);
   else _habitDetailFriends.add(uid);
-  _renderHabitFriendPicker("habitDetailFriendsList", _habitDetailFriends, "toggleHabitDetailFriend");
+  const el = document.getElementById("habitDetailFriendsList");
+  if (el) _drawFriendChips(el, (friendsList || []).filter(Boolean), _habitDetailFriends, "toggleHabitDetailFriend");
 }
 
 async function saveHabitDetail() {
@@ -17838,10 +18034,10 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.71";
+const APP_VERSION = "3.0.73";
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.71 &mdash; Desktop Rhema Foundation</div>
+<div class="un-version-label">v3.0.73 &mdash; Desktop Rhema Foundation</div>
 <ul>
   <li><strong>Desktop study desk added</strong> for wide screens with a Rhema-first layout, side navigation, and study-tool cards.</li>
   <li><strong>Desktop Rhema workspace styled</strong> with a larger PC-friendly study surface while mobile stays unchanged.</li>
@@ -18703,6 +18899,8 @@ async function submitLogin() {
 
   try {
     await window.Auth.login(username, password);
+    // If notification permission is still default on this PWA install, prompt after sign-in
+    _pendingSignInNotificationPrompt = typeof Notification !== "undefined" && Notification.permission === "default";
     queueAppWelcomeCoachAfterAuth();
     // Auth state change will trigger restoreUserFromFirestore
   } catch (e) {
@@ -18752,6 +18950,17 @@ window.__onAuthStateReady = async (user) => {
     // Silently refresh FCM token on login if permission already granted (handles expired tokens)
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
       window.FCM?.registerToken(user.uid).catch(() => {});
+    }
+
+    // Re-prompt for notifications when a returning user signs in on a new PWA install
+    // where permission hasn't been granted yet (e.g. after reinstalling the app)
+    if (_pendingSignInNotificationPrompt) {
+      _pendingSignInNotificationPrompt = false;
+      setTimeout(() => {
+        if (typeof Notification !== "undefined" && Notification.permission === "default") {
+          document.getElementById("notifPromptModal")?.classList.add("open");
+        }
+      }, 800);
     }
 
     _unsubUserDoc?.();
@@ -22602,6 +22811,7 @@ function openRhemaWheel() {
   if (!overlay) return;
   document.querySelector('.rhema-sandbox-arrows')?.classList.remove('visible');
   _syncWheelState();
+  _updateCopyVerseLabel();
   overlay.style.display = 'flex';
   requestAnimationFrame(() => overlay.classList.add('open'));
 }
@@ -24183,6 +24393,84 @@ function closeRhemaSheet() {
   if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
   document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
   _rhemaActiveWord = null;
+}
+
+function copyCurrentRhemaWord() {
+  if (!_rhemaActiveWord) return;
+  const surface = _rhemaActiveWord[0];
+  if (!surface) return;
+  const btn = document.querySelector('.rhema-copy-word-btn');
+  const icon = btn?.querySelector('.material-symbols-outlined');
+  const showCheck = () => {
+    if (icon) { icon.textContent = 'check'; setTimeout(() => { icon.textContent = 'content_copy'; }, 1500); }
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(surface).then(showCheck).catch(() => _fallbackCopy(surface, showCheck));
+  } else {
+    _fallbackCopy(surface, showCheck);
+  }
+}
+
+function _fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); } catch (_) {}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+
+function copyRhemaVerseOrChapter() {
+  closeRhemaWheel();
+  const bookName = _rhemaBookName(_rhemaBook);
+  let text = '';
+
+  if (_rhemaFullChapter) {
+    const chapterData = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {};
+    const verseNums = Object.keys(chapterData).map(Number).sort((a, b) => a - b);
+    const header = `${bookName} ${_rhemaChapter}`;
+    if (_rhemaShowEnglish) {
+      const lines = verseNums.map(vn => {
+        const t = _rhemaEnglishText(_rhemaBook, _rhemaChapter, String(vn));
+        return t ? `${vn} ${t}` : null;
+      }).filter(Boolean);
+      text = `${header}\n\n${lines.join('\n')}`;
+    } else {
+      const lines = verseNums.map(vn => {
+        const words = chapterData[String(vn)] || [];
+        return `${vn} ${words.map(w => w[0]).join(' ')}`;
+      });
+      text = `${header}\n\n${lines.join('\n')}`;
+    }
+  } else {
+    const ref = `${bookName} ${_rhemaChapter}:${_rhemaVerse}`;
+    if (_rhemaShowEnglish) {
+      const t = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
+      text = `${ref}\n${t}`;
+    } else {
+      const words = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter]?.[_rhemaVerse] || [];
+      text = `${ref}\n${words.map(w => w[0]).join(' ')}`;
+    }
+  }
+
+  if (!text) return;
+  const showToast = () => {
+    const toast = document.getElementById('rhemaChapterToast');
+    if (toast) { toast.textContent = 'Copied!'; toast.classList.remove('hidden'); setTimeout(() => toast.classList.add('hidden'), 2000); }
+  };
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(showToast).catch(() => _fallbackCopy(text, showToast));
+  } else {
+    _fallbackCopy(text, showToast);
+  }
+}
+
+function _updateCopyVerseLabel() {
+  const label = document.getElementById('wheelCopyLabel');
+  if (label) label.textContent = _rhemaFullChapter ? 'Copy Chapter' : 'Copy Verse';
 }
 
 function initRhemaSwipeDown(sheet) {

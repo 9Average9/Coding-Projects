@@ -13,11 +13,17 @@ service cloud.firestore {
              .hasOnly(['friendRequestsIn', 'friendRequestsOut', 'friends', 'updatedAt']);
 
       match /habits/{habitId} {
-        allow read, create, update, delete: if request.auth != null
+        allow read: if request.auth != null
+          && (request.auth.uid == uid
+              || request.auth.uid in get(/databases/$(database)/documents/users/$(uid)).data.friends);
+        allow create, update, delete: if request.auth != null
           && request.auth.uid == uid;
 
         match /entries/{entryId} {
-          allow read, create, update, delete: if request.auth != null
+          allow read: if request.auth != null
+            && (request.auth.uid == uid
+                || request.auth.uid in get(/databases/$(database)/documents/users/$(uid)).data.friends);
+          allow create, update, delete: if request.auth != null
             && request.auth.uid == uid;
         }
       }

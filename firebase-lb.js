@@ -1145,21 +1145,54 @@ function habitIdFromName(name) {
 }
 
 function listenHabits(uid, callback) {
-  const q = query(collection(db, "users", uid, "habits"), orderBy("createdAtMs", "asc"));
-  return onSnapshot(q, async snap => {
-    const habits = await Promise.all(snap.docs.map(async habitDoc => {
-      const entrySnap = await getDocs(collection(db, "users", uid, "habits", habitDoc.id, "entries"));
-      const entries = {};
-      entrySnap.docs.forEach(entryDoc => {
-        entries[entryDoc.id] = { id: entryDoc.id, ...entryDoc.data() };
+  const habitsData = {};
+  const entriesData = {};
+  const entryUnsubs = {};
+  let habitOrder = [];
+
+  function emit() {
+    callback(habitOrder.map(id => ({ ...habitsData[id], entries: entriesData[id] || {} })));
+  }
+
+  const habitsUnsub = onSnapshot(
+    query(collection(db, "users", uid, "habits"), orderBy("createdAtMs", "asc")),
+    snap => {
+      const newIds = snap.docs.map(d => d.id);
+      snap.docs.forEach(d => { habitsData[d.id] = { id: d.id, ...d.data() }; });
+      habitOrder = newIds;
+
+      Object.keys(entryUnsubs).forEach(id => {
+        if (!newIds.includes(id)) {
+          entryUnsubs[id]();
+          delete entryUnsubs[id];
+          delete habitsData[id];
+          delete entriesData[id];
+        }
       });
-      return { id: habitDoc.id, ...habitDoc.data(), entries };
-    }));
-    callback(habits);
-  }, err => {
-    console.warn("listenHabits:", err);
-    callback([]);
-  });
+
+      newIds.forEach(id => {
+        if (entryUnsubs[id]) return;
+        entryUnsubs[id] = onSnapshot(
+          collection(db, "users", uid, "habits", id, "entries"),
+          entrySnap => {
+            const entries = {};
+            entrySnap.docs.forEach(e => { entries[e.id] = { id: e.id, ...e.data() }; });
+            entriesData[id] = entries;
+            emit();
+          },
+          err => console.warn("listenEntries:", id, err)
+        );
+      });
+
+      emit();
+    },
+    err => console.warn("listenHabits:", err)
+  );
+
+  return () => {
+    habitsUnsub();
+    Object.values(entryUnsubs).forEach(u => u());
+  };
 }
 
 async function habitOwnerName(uid) {
@@ -1319,6 +1352,7 @@ async function importHabitShare(uid, rows = []) {
       const habitRef = doc(db, "users", uid, "habits", habitId);
       const firstDateMs = byHabit[name].reduce((min, row) => Math.min(min, Date.parse(`${row.date}T00:00:00`) || Date.now()), Date.now());
       const existingHabit = await getDoc(habitRef).catch(() => null);
+
       const habitPayload = {
         ownerUid: uid,
         name,
@@ -1363,6 +1397,24 @@ async function importHabitShare(uid, rows = []) {
   }
 }
 
+async function getFriendHabits(friendUid) {
+  try {
+    const habitsSnap = await getDocs(
+      query(collection(db, "users", friendUid, "habits"), orderBy("createdAtMs", "asc"))
+    );
+    if (habitsSnap.empty) return [];
+    const habits = habitsSnap.docs.map(d => ({ id: d.id, ...d.data(), entries: {} }));
+    try {
+      const entriesSnap = await getDocs(collection(db, "users", friendUid, "habits", habits[0].id, "entries"));
+      entriesSnap.docs.forEach(e => { habits[0].entries[e.id] = e.data(); });
+    } catch {}
+    return habits;
+  } catch (e) {
+    console.warn("getFriendHabits:", friendUid, e);
+    return [];
+  }
+}
+
 window.Habits = {
   listen: listenHabits,
   create: createHabit,
@@ -1370,7 +1422,8 @@ window.Habits = {
   update: updateHabit,
   delete: deleteHabit,
   awardMilestone: awardHabitMilestone,
-  importHabitShare
+  importHabitShare,
+  getFriendHabits
 };
 
 window.Studies = {
