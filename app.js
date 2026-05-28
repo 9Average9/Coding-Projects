@@ -48,6 +48,7 @@ let _appUpdateReloadTimer = null;
 let _homeBackdropPreload = null;
 let _pendingFirstRunNotificationPrompt = false;
 let _deferWelcomeUntilNotificationPromptCloses = false;
+let _pendingSignInNotificationPrompt = false;
 
 // Personal Studies state
 let _myStudies = [];
@@ -18885,6 +18886,8 @@ async function submitLogin() {
 
   try {
     await window.Auth.login(username, password);
+    // If notification permission is still default on this PWA install, prompt after sign-in
+    _pendingSignInNotificationPrompt = typeof Notification !== "undefined" && Notification.permission === "default";
     queueAppWelcomeCoachAfterAuth();
     // Auth state change will trigger restoreUserFromFirestore
   } catch (e) {
@@ -18934,6 +18937,17 @@ window.__onAuthStateReady = async (user) => {
     // Silently refresh FCM token on login if permission already granted (handles expired tokens)
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
       window.FCM?.registerToken(user.uid).catch(() => {});
+    }
+
+    // Re-prompt for notifications when a returning user signs in on a new PWA install
+    // where permission hasn't been granted yet (e.g. after reinstalling the app)
+    if (_pendingSignInNotificationPrompt) {
+      _pendingSignInNotificationPrompt = false;
+      setTimeout(() => {
+        if (typeof Notification !== "undefined" && Notification.permission === "default") {
+          document.getElementById("notifPromptModal")?.classList.add("open");
+        }
+      }, 800);
     }
 
     _unsubUserDoc?.();
