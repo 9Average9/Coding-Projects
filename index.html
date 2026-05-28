@@ -303,7 +303,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-180.png" rel="apple-touch-icon"/>
 <link href="assets/icons/disciple-builder-icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
-<link href="style.css?v=3.0.70" rel="stylesheet"/>
+<link href="style.css?v=3.0.71" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -321,8 +321,93 @@ glacier: {
 <p>Study deeper. Encourage others. Grow together.</p>
 <small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
 </header>
+<aside class="desktop-shell-nav" aria-label="Desktop navigation">
+<div class="desktop-brand">
+<span class="material-symbols-outlined">auto_stories</span>
+<div>
+<strong>Disciple Builder</strong>
+<small>Rhema Study Desk</small>
+</div>
+</div>
+<button class="desktop-nav-btn primary" onclick="showRhema()">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Open Rhema</span>
+</button>
+<button class="desktop-nav-btn" onclick="resumeRhema()">
+<span class="material-symbols-outlined">history_edu</span>
+<span>Resume Study</span>
+</button>
+<button class="desktop-nav-btn" onclick="showNavPage('home')">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Study Desk</span>
+</button>
+<button class="desktop-nav-btn" onclick="showNavPage('lessons')">
+<span class="material-symbols-outlined">school</span>
+<span>Lessons</span>
+</button>
+<button class="desktop-nav-btn" onclick="showNavPage('profile')">
+<span class="material-symbols-outlined">person</span>
+<span>Profile</span>
+</button>
+<div class="desktop-companion-box">
+<span class="material-symbols-outlined">phone_iphone</span>
+<strong>Mobile companion tools</strong>
+<p>Praises, Community, and Habit Builder are still available, but desktop is shaped around deeper Bible study and Rhema tools.</p>
+<div class="desktop-companion-actions">
+<button onclick="showNavPage('mercies')">Praises</button>
+<button onclick="showNavPage('community')">Community</button>
+<button onclick="showNavPage('habits')">Habits</button>
+</div>
+</div>
+</aside>
 <section class="screen active" id="homeScreen">
 <div class="home-scroll" id="homeScroll">
+<div class="desktop-home-shell">
+<section class="desktop-study-hero">
+<div class="desktop-study-copy">
+<span class="desktop-kicker">Desktop Rhema Workspace</span>
+<h1>Settle in for deeper Bible study.</h1>
+<p>Desktop mode keeps the social and habit tools nearby, but gives the center of the screen to Scripture, word study, cross references, syntax, and careful reading.</p>
+<div class="desktop-study-actions">
+<button class="desktop-primary-action" onclick="showRhema()">
+<span class="material-symbols-outlined">menu_book</span>
+Open Rhema Study
+</button>
+<button class="desktop-secondary-action" onclick="resumeRhema()">
+<span class="material-symbols-outlined">restart_alt</span>
+Resume Last Passage
+</button>
+</div>
+</div>
+<div class="desktop-study-card">
+<span class="material-symbols-outlined">auto_stories</span>
+<strong id="desktopRhemaPassage">Rhema NT Word Study</strong>
+<p id="desktopRhemaSnippet">Open a passage, compare text modes, inspect Greek words, and move through study tools with room to think.</p>
+</div>
+</section>
+<section class="desktop-tool-grid">
+<button class="desktop-tool-card" onclick="showRhema()">
+<span class="material-symbols-outlined">travel_explore</span>
+<strong>Word Study</strong>
+<small>Greek text, lemmas, parsing, and lexical helps in one focused workspace.</small>
+</button>
+<button class="desktop-tool-card" onclick="showRhema(); setTimeout(() => { if (typeof toggleRhemaWheel === 'function') toggleRhemaWheel(); }, 250)">
+<span class="material-symbols-outlined">hub</span>
+<strong>Study Wheel</strong>
+<small>Open Rhema tools quickly when you want syntax, grammar, cross references, or notes.</small>
+</button>
+<button class="desktop-tool-card" onclick="showNavPage('lessons')">
+<span class="material-symbols-outlined">school</span>
+<strong>Lessons</strong>
+<small>Use lessons alongside Rhema as the study structure grows on desktop.</small>
+</button>
+<button class="desktop-tool-card companion" onclick="showNavPage('habits')">
+<span class="material-symbols-outlined">phone_iphone</span>
+<strong>Mobile Companion</strong>
+<small>Habits, Praises, and Community remain available, but they are secondary on desktop.</small>
+</button>
+</section>
+</div>
 <div class="home-top-row">
 <div class="home-greeting-wrap">
 <h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
@@ -15913,10 +15998,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.70"></script>
+<script src="app.js?v=3.0.71"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.70" type="module"></script>
+<script src="firebase-lb.js?v=3.0.71" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">

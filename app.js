@@ -10965,6 +10965,13 @@ function _updateHomeContinueCard() {
       const hasCurrentEnglish = pos.translation === 'MSB' || pos.translation === 'BSB';
       snippetEl.textContent = hasCurrentEnglish ? (pos.snippet || '') : (pos.greek || '');
     }
+    const desktopPassage = document.getElementById('desktopRhemaPassage');
+    const desktopSnippet = document.getElementById('desktopRhemaSnippet');
+    if (desktopPassage) desktopPassage.textContent = passageText;
+    if (desktopSnippet) {
+      const hasCurrentEnglish = pos.translation === 'MSB' || pos.translation === 'BSB';
+      desktopSnippet.textContent = hasCurrentEnglish ? (pos.snippet || pos.greek || '') : (pos.greek || pos.snippet || '');
+    }
     card.style.display = '';
     empty.style.display = 'none';
   } catch {
@@ -17831,9 +17838,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.70";
+const APP_VERSION = "3.0.71";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.71 &mdash; Desktop Rhema Foundation</div>
+<ul>
+  <li><strong>Desktop study desk added</strong> for wide screens with a Rhema-first layout, side navigation, and study-tool cards.</li>
+  <li><strong>Desktop Rhema workspace styled</strong> with a larger PC-friendly study surface while mobile stays unchanged.</li>
+  <li><strong>Mobile companion tools clarified</strong> so Praises, Community, and Habit Builder remain available but secondary on desktop.</li>
+</ul>
 <div class="un-version-label">v3.0.70 &mdash; Habit Builder Momentum</div>
 <ul>
   <li><strong>Habit weekly progress added</strong> with a last-7-days strip and progress bar on every habit.</li>
