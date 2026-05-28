@@ -15764,9 +15764,9 @@ body.sepia .rhema-sheet { background: #fffcf2; }
 
 .rhema-sheet-top {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
-  padding: 4px 22px 0;
+  padding: 4px 52px 0 22px;
   flex-shrink: 0;
 }
 .rhema-sheet-surface {
