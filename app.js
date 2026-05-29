@@ -22821,9 +22821,11 @@ function renderRhemaVerse() {
     if (EnglishDiv) {
       EnglishDiv.innerHTML = _rhemaSyntaxMode ? '' : verseNums.map(vn => {
         const v = String(vn);
+        const engText = _rhemaEnglishText(_rhemaBook, _rhemaChapter, v);
+        const engContent = engText || `<em class="rhema-no-english">This verse is not included in the ${_rhemaEnglishLabel()} translation.</em>`;
         return `<div class="rhema-chapter-block" data-verse="${v}">` +
                `<div class="rhema-chapter-verse-label">${vn}</div>` +
-               `<div class="rhema-chapter-english">${_rhemaEnglishText(_rhemaBook, _rhemaChapter, v)}</div></div>`;
+               `<div class="rhema-chapter-english">${engContent}</div></div>`;
       }).join('');
     }
 
@@ -22844,7 +22846,8 @@ function renderRhemaVerse() {
       display.classList.toggle('greek-only', _rhemaGreekOnly);
       display.innerHTML = _renderVerseWords(words, null);
       if (EnglishDiv) {
-        EnglishDiv.textContent = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
+        const engText = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
+        EnglishDiv.innerHTML = engText || `<em class="rhema-no-english">This verse is not included in the ${_rhemaEnglishLabel()} translation.</em>`;
       }
     }
   }

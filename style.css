@@ -15176,6 +15176,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   padding: 0 4px;
 }
 
+.rhema-no-english {
+  font-style: italic;
+  opacity: 0.55;
+  font-size: 0.85em;
+}
+
 /* ── Chapter mode toast ── */
 .rhema-chapter-toast {
   position: absolute;
