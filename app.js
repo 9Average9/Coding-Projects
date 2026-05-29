@@ -18068,9 +18068,30 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.73";
+const APP_VERSION = "3.0.74";
+
+// Per-file versions for Rhema data bundles — only update a file's entry here
+// when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
+const RHEMA_DATA_VERSIONS = {
+  'rhema-nt.js':        '3.0.65',
+  'rhema-critical.js':  '3.0.23',
+  'rhema-lxx.js':       '3.0.65',
+  'rhema-lexicon.js':   '3.0.65',
+  'rhema-mm.js':        '3.0.65',
+  'rhema-msb.js':       '3.0.65',
+  'rhema-bsb.js':       '3.0.65',
+  'rhema-syntax.js':    '3.0.65',
+  'rhema-crossrefs.js': '3.0.65',
+};
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.74 &mdash; Rhema OT Restore &amp; Offline Fix</div>
+<ul>
+  <li><strong>Old Testament restored in Rhema</strong> — The full Septuagint (39 OT books, all chapters and verses) is now reliably available in the book picker alongside the New Testament.</li>
+  <li><strong>Offline Rhema fixed</strong> — All Greek text bundles (LXX, NT, Majority, Critical, lexicons, cross references) are now pre-cached so Rhema works completely offline after one online session. Previously a service worker update could wipe the LXX and leave the OT inaccessible until the next online session.</li>
+  <li><strong>Data caching decoupled from app version</strong> — Rhema data files now use pinned data version numbers, so routine app updates no longer force a 50 MB re-download of all Bible data.</li>
+  <li><strong>Critical/Majority text variant toast improved</strong> — Tapping the text mode tool while reading an OT passage now shows a clear explanation of which text tradition applies and why (LXX is used for OT regardless of mode; Critical vs. Majority only affects NT).</li>
+</ul>
 <div class="un-version-label">v3.0.73 &mdash; Desktop Rhema Foundation</div>
 <ul>
   <li><strong>Desktop study desk added</strong> for wide screens with a Rhema-first layout, side navigation, and study-tool cards.</li>
@@ -22231,7 +22252,7 @@ function loadRhemaScripts() {
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
-      s.src = file + '?v=' + APP_VERSION;
+      s.src = file + '?v=' + (RHEMA_DATA_VERSIONS[file] || APP_VERSION);
       s.onload = () => {
         loaded++;
         if (loaded === files.length) { _syncRhemaEnglishAlias(); _ensureRhemaBibleData(); _rhemaLoaded = true; resolve(); }
@@ -22852,7 +22873,10 @@ function toggleRhemaMode() {
 
 function toggleRhemaTextMode() {
   if (!window.RhemaCriticalNT?.text || !RHEMA_NT_BOOK_ORDER.includes(_rhemaBook)) {
-    showRhemaVariant('Critical Text', 'Available for New Testament passages');
+    // OT books always display the Septuagint (Rahlfs LXX) — there is no separate
+    // critical vs. majority edition of the LXX in Rhema. The Critical/Majority
+    // toggle only affects New Testament books (SBL Critical NT vs. Byzantine Majority Text).
+    showRhemaVariant('Text Mode', 'Old Testament: Septuagint (Rahlfs LXX) — no Critical/Majority variant. Switch applies to NT books.');
     closeRhemaWheel();
     return;
   }

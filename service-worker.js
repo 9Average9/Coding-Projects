@@ -17,20 +17,32 @@ const messaging = firebase.messaging();
 // two notifications (APNs auto-display + our manual call).
 messaging.onBackgroundMessage(function () {});
 
-const CACHE_NAME = "disciple-builder-v3.0.73";
+const CACHE_NAME = "disciple-builder-v3.0.74";
 
+// Rhema data files use pinned data versions (RHEMA_DATA_VERSIONS in app.js).
+// Only update these when the underlying dataset actually changes — not on every
+// app version bump — so users don't re-download 50 MB of Bible data unnecessarily.
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./style.css?v=3.0.73",
+  "./style.css?v=3.0.74",
   "./vocab.js?v=3.0.8",
-  "./app.js?v=3.0.73",
+  "./app.js?v=3.0.74",
+  // Rhema Greek text (pinned data versions)
+  "./rhema-nt.js?v=3.0.65",
   "./rhema-critical.js?v=3.0.23",
+  "./rhema-lxx.js?v=3.0.65",
+  // Rhema English translations (pinned)
   "./rhema-msb.js?v=3.0.65",
   "./rhema-bsb.js?v=3.0.65",
+  // Rhema support data (pinned)
+  "./rhema-lexicon.js?v=3.0.65",
+  "./rhema-mm.js?v=3.0.65",
+  "./rhema-syntax.js?v=3.0.65",
+  "./rhema-crossrefs.js?v=3.0.65",
   "./rhema-crossrefs-ui.js?v=3.0.29",
   "./greek-verbs.js?v=3.0.23",
-  "./firebase-lb.js?v=3.0.73",
+  "./firebase-lb.js?v=3.0.74",
   "./assets/home-backgrounds/abstract.jpg",
   "./assets/home-backgrounds/ancient-scroll.jpg",
   "./assets/home-backgrounds/city.jpg",
