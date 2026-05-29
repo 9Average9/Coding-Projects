@@ -321,90 +321,82 @@ glacier: {
 <p>Study deeper. Encourage others. Grow together.</p>
 <small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
 </header>
-<aside class="desktop-shell-nav" aria-label="Desktop navigation">
+<aside class="desktop-shell-nav" id="desktopShellNav" aria-label="Desktop navigation">
 <div class="desktop-brand">
 <span class="material-symbols-outlined">auto_stories</span>
-<div>
+<div class="desktop-brand-text">
 <strong>Disciple Builder</strong>
 <small>Rhema Study Desk</small>
 </div>
 </div>
-<button class="desktop-nav-btn primary" onclick="showRhema()">
+<button class="desktop-nav-btn" onclick="showNavPage('home')" data-nav="home">
+<span class="material-symbols-outlined">home</span>
+<span class="dnb-label">Home</span>
+</button>
+<button class="desktop-nav-btn primary" onclick="showRhema()" data-nav="rhema">
 <span class="material-symbols-outlined">menu_book</span>
-<span>Open Rhema</span>
+<span class="dnb-label">Open Rhema</span>
 </button>
-<button class="desktop-nav-btn" onclick="resumeRhema()">
-<span class="material-symbols-outlined">history_edu</span>
-<span>Resume Study</span>
-</button>
-<button class="desktop-nav-btn" onclick="showNavPage('home')">
+<button class="desktop-nav-btn" onclick="openDesktopStudyDesk()" data-nav="studydesk">
 <span class="material-symbols-outlined">dashboard</span>
-<span>Study Desk</span>
+<span class="dnb-label">Study Desk</span>
 </button>
-<button class="desktop-nav-btn" onclick="showNavPage('lessons')">
+<button class="desktop-nav-btn" onclick="showNavPage('lessons')" data-nav="lessons">
 <span class="material-symbols-outlined">school</span>
-<span>Lessons</span>
+<span class="dnb-label">Lessons</span>
 </button>
-<button class="desktop-nav-btn" onclick="showNavPage('profile')">
+<button class="desktop-nav-btn" onclick="showNavPage('profile')" data-nav="profile">
 <span class="material-symbols-outlined">person</span>
-<span>Profile</span>
+<span class="dnb-label">Profile</span>
 </button>
-<div class="desktop-companion-box">
-<span class="material-symbols-outlined">phone_iphone</span>
-<strong>Mobile companion tools</strong>
-<p>Praises, Community, and Habit Builder are still available, but desktop is shaped around deeper Bible study and Rhema tools.</p>
-<div class="desktop-companion-actions">
-<button onclick="showNavPage('mercies')">Praises</button>
-<button onclick="showNavPage('community')">Community</button>
-<button onclick="showNavPage('habits')">Habits</button>
-</div>
-</div>
 </aside>
 <section class="screen active" id="homeScreen">
 <div class="home-scroll" id="homeScroll">
 <div class="desktop-home-shell">
 <section class="desktop-study-hero">
 <div class="desktop-study-copy">
-<span class="desktop-kicker">Desktop Rhema Workspace</span>
-<h1>Settle in for deeper Bible study.</h1>
-<p>Desktop mode keeps the social and habit tools nearby, but gives the center of the screen to Scripture, word study, cross references, syntax, and careful reading.</p>
+<span class="desktop-kicker">Scripture Study • Greek Tools • Sermon Prep</span>
+<h1>Your Scripture Study Desk.</h1>
+<p>Explore any passage in Rhema, search the Greek lexicon in the Word Library, prep a sermon, and manage your studies — all with the depth and tools your desktop provides.</p>
 <div class="desktop-study-actions">
 <button class="desktop-primary-action" onclick="showRhema()">
 <span class="material-symbols-outlined">menu_book</span>
-Open Rhema Study
-</button>
-<button class="desktop-secondary-action" onclick="resumeRhema()">
-<span class="material-symbols-outlined">restart_alt</span>
-Resume Last Passage
+Start a New Study
 </button>
 </div>
 </div>
-<div class="desktop-study-card">
+<div class="desktop-study-card" id="desktopRhemaCard" onclick="resumeRhema()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')resumeRhema()">
 <span class="material-symbols-outlined">auto_stories</span>
+<div class="desktop-rhema-preview">
 <strong id="desktopRhemaPassage">Rhema NT Word Study</strong>
-<p id="desktopRhemaSnippet">Open a passage, compare text modes, inspect Greek words, and move through study tools with room to think.</p>
+<p id="desktopRhemaSnippet">Open a passage to begin. Click here to resume your last session.</p>
+</div>
+<div class="desktop-resume-hint">
+<span class="material-symbols-outlined">play_arrow</span>
+<span>Resume</span>
+</div>
 </div>
 </section>
 <section class="desktop-tool-grid">
-<button class="desktop-tool-card" onclick="showRhema()">
-<span class="material-symbols-outlined">travel_explore</span>
-<strong>Word Study</strong>
-<small>Greek text, lemmas, parsing, and lexical helps in one focused workspace.</small>
+<button class="desktop-tool-card" onclick="openWordLibrary()">
+<span class="material-symbols-outlined">search</span>
+<strong>Word Library</strong>
+<small>Search the Greek lexicon by word, transliteration, or meaning. Definitions, parsing, and all occurrences.</small>
 </button>
-<button class="desktop-tool-card" onclick="showRhema(); setTimeout(() => { if (typeof toggleRhemaWheel === 'function') toggleRhemaWheel(); }, 250)">
-<span class="material-symbols-outlined">hub</span>
-<strong>Study Wheel</strong>
-<small>Open Rhema tools quickly when you want syntax, grammar, cross references, or notes.</small>
+<button class="desktop-tool-card" onclick="openSermonWorkshop()">
+<span class="material-symbols-outlined">edit_note</span>
+<strong>Sermon Workshop</strong>
+<small>Build a sermon outline with passage notes, structure points, illustrations, and application.</small>
 </button>
 <button class="desktop-tool-card" onclick="showNavPage('lessons')">
 <span class="material-symbols-outlined">school</span>
 <strong>Lessons</strong>
-<small>Use lessons alongside Rhema as the study structure grows on desktop.</small>
+<small>Work through Greek grammar lessons alongside your Rhema studies with structured desktop reading.</small>
 </button>
-<button class="desktop-tool-card companion" onclick="showNavPage('habits')">
-<span class="material-symbols-outlined">phone_iphone</span>
-<strong>Mobile Companion</strong>
-<small>Habits, Praises, and Community remain available, but they are secondary on desktop.</small>
+<button class="desktop-tool-card" onclick="openDesktopStudyDesk()">
+<span class="material-symbols-outlined">dashboard</span>
+<strong>Study Desk</strong>
+<small>View all your studies, create new ones, and track notes and observations across sessions.</small>
 </button>
 </section>
 </div>
@@ -16330,6 +16322,90 @@ Verb Endings
     </button>
 </div>
 </div>
+<!-- ── Sermon Workshop (Desktop) ── -->
+<div class="sw-overlay hidden" id="sermonWorkshopOverlay" onclick="if(event.target===this)closeSermonWorkshop()">
+<div class="sw-panel" onclick="event.stopPropagation()">
+<div class="sw-header">
+<div class="sw-header-left">
+<span class="material-symbols-outlined">edit_note</span>
+<div>
+<h2>Sermon Workshop</h2>
+<p>Build and organize your message</p>
+</div>
+</div>
+<button class="sw-close-btn" onclick="closeSermonWorkshop()"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="sw-body">
+<div class="sw-sidebar">
+<button class="sw-tab active" data-tab="outline" onclick="switchSermonTab('outline')"><span class="material-symbols-outlined">format_list_bulleted</span><span>Outline</span></button>
+<button class="sw-tab" data-tab="passage" onclick="switchSermonTab('passage')"><span class="material-symbols-outlined">menu_book</span><span>Passage</span></button>
+<button class="sw-tab" data-tab="illustration" onclick="switchSermonTab('illustration')"><span class="material-symbols-outlined">lightbulb</span><span>Illustrations</span></button>
+<button class="sw-tab" data-tab="application" onclick="switchSermonTab('application')"><span class="material-symbols-outlined">record_voice_over</span><span>Application</span></button>
+<button class="sw-tab" data-tab="notes" onclick="switchSermonTab('notes')"><span class="material-symbols-outlined">notes</span><span>General Notes</span></button>
+</div>
+<div class="sw-content">
+<div class="sw-pane active" id="swPaneOutline">
+<div class="sw-pane-header"><h3>Sermon Outline</h3><p>Build the structure of your message below.</p></div>
+<div class="sw-field-group"><label>Sermon Title</label><input class="sw-input" id="swSermonTitle" placeholder="Enter sermon title…" type="text" oninput="saveSermonDraft()"/></div>
+<div class="sw-field-group"><label>Scripture Reference</label><input class="sw-input" id="swScriptureRef" placeholder="e.g. John 3:16–21" type="text" oninput="saveSermonDraft()"/></div>
+<div class="sw-field-group"><label>Main Point / Big Idea</label><textarea class="sw-textarea" id="swMainPoint" placeholder="What is the one central truth of this message?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-points-section">
+<div class="sw-points-header"><label>Supporting Points</label><button class="sw-add-point-btn" onclick="addSermonPoint()"><span class="material-symbols-outlined">add</span> Add Point</button></div>
+<div class="sw-points-list" id="swPointsList"></div>
+</div>
+</div>
+<div class="sw-pane" id="swPanePassage">
+<div class="sw-pane-header"><h3>Passage Study</h3><p>Key verses, word observations, and exegetical notes.</p></div>
+<div class="sw-field-group"><label>Key Verses</label><textarea class="sw-textarea" id="swKeyVerses" placeholder="Write out or paste your key passage text…" rows="6" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Greek / Word Study Notes</label><textarea class="sw-textarea" id="swGreekNotes" placeholder="Word study observations from Rhema…" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Theological &amp; Historical Context</label><textarea class="sw-textarea" id="swTheologicalContext" placeholder="Historical, cultural, or doctrinal context…" oninput="saveSermonDraft()"></textarea></div>
+</div>
+<div class="sw-pane" id="swPaneIllustration">
+<div class="sw-pane-header"><h3>Illustrations</h3><p>Stories, examples, and analogies to make the truth clear.</p></div>
+<div class="sw-illustrations-list" id="swIllustrationsList"></div>
+<button class="sw-add-btn" onclick="addSermonIllustration()"><span class="material-symbols-outlined">add</span> Add Illustration</button>
+</div>
+<div class="sw-pane" id="swPaneApplication">
+<div class="sw-pane-header"><h3>Application</h3><p>How does this message change how people think, feel, and act?</p></div>
+<div class="sw-field-group"><label>Call to Action</label><textarea class="sw-textarea" id="swCallToAction" placeholder="What specific response are you calling for?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Life Application Points</label><textarea class="sw-textarea" id="swApplicationPoints" placeholder="Practical ways this truth applies to daily life…" rows="6" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Closing</label><textarea class="sw-textarea" id="swClosing" placeholder="How will you close the message?" oninput="saveSermonDraft()"></textarea></div>
+</div>
+<div class="sw-pane" id="swPaneNotes">
+<div class="sw-pane-header"><h3>General Notes</h3><p>Anything that doesn't fit elsewhere — research, quotes, reminders.</p></div>
+<div class="sw-field-group"><textarea class="sw-textarea" id="swGeneralNotes" placeholder="Free-form notes…" rows="18" oninput="saveSermonDraft()"></textarea></div>
+</div>
+</div>
+</div>
+<div class="sw-footer">
+<button class="sw-save-btn" onclick="saveSermonDraft()"><span class="material-symbols-outlined">save</span> Save Draft</button>
+<button class="sw-export-btn" onclick="exportSermonText()"><span class="material-symbols-outlined">file_download</span> Export Text</button>
+</div>
+</div>
+</div>
+<!-- ── Desktop Study Desk ── -->
+<div class="dsd-overlay hidden" id="desktopStudyDeskOverlay" onclick="if(event.target===this)closeDesktopStudyDesk()">
+<div class="dsd-panel" onclick="event.stopPropagation()">
+<div class="dsd-header">
+<div class="dsd-header-left">
+<span class="material-symbols-outlined">dashboard</span>
+<div><h2>Study Desk</h2><p>Your active studies and notes</p></div>
+</div>
+<button class="dsd-close-btn" onclick="closeDesktopStudyDesk()"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="dsd-body">
+<div class="dsd-create-banner">
+<div class="dsd-create-text">
+<strong>Start a new study</strong>
+<span>Create a focused workspace with notes, observations, and Rhema integration.</span>
+</div>
+<button class="dsd-create-btn" onclick="openStudyCreateSheet();closeDesktopStudyDesk()"><span class="material-symbols-outlined">add</span> New Study</button>
+</div>
+<div class="dsd-section-title">Your Studies</div>
+<div class="dsd-studies-grid" id="dsdStudiesGrid"></div>
+</div>
+</div>
+</div>
 <!-- ── Word Library ── -->
 <div class="wl-overlay hidden" id="wordLibraryOverlay" onclick="if(event.target===this)closeWordLibrary()">
 <div class="wl-sheet" onclick="event.stopPropagation()">
@@ -16342,7 +16418,7 @@ Verb Endings
 </div>
 <div class="wl-search-row">
 <span class="material-symbols-outlined wl-search-icon">search</span>
-<input autocomplete="off" autocorrect="off" class="wl-search-input" id="wlSearchInput" onfocus="if(isWlGreekKeyboardActive())this.blur()" oninput="wlOnSearch(this.value)" placeholder="Search Greek or transliteration…" spellcheck="false" type="text"/>
+<input autocomplete="off" autocorrect="off" class="wl-search-input" id="wlSearchInput" onfocus="if(isWlGreekKeyboardActive())this.blur()" oninput="wlOnSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();wlOnSearch(this.value);}" placeholder="Search Greek or transliteration…" spellcheck="false" type="text"/>
 <button class="wl-kbd-toggle" id="wlKbdToggleBtn" onclick="toggleWlKeyboard()" title="Greek keyboard">
 <span class="wl-kbd-icon">α</span>
 </button>
