@@ -8049,7 +8049,7 @@ let currentSentence = null;
 
 const screens = [
   "homeScreen", "profilePage", "habitsPage", "merciesPage", "communityPage", "csDetailPage",
-  "newLearnMenu", "advancedLearnMenu",
+  "sermonsPage", "newLearnMenu", "advancedLearnMenu",
   "basicVerbsLearnMenu", "advVerbsLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
   "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
@@ -9883,6 +9883,9 @@ function showNavPage(page) {
     showNewLearnMenu();
   } else if (page === 'rhema') {
     showRhema();
+  } else if (page === 'sermons') {
+    showNavPage_sermons();
+    return;
   }
   setTimeout(_applyPendingAppUpdateReload, 50);
 }
@@ -22985,6 +22988,12 @@ STUDY_RHEMA_COACH_STEPS[1] = {
   body: 'In Study Rhema, long-press means touch and hold for a moment instead of quick tapping. Holding a verse opens the study note wheel so you can save a thought while the passage is still right there.',
   demo: 'longpress'
 };
+// On desktop, replace the long-press coach step with a button reference
+if (window.matchMedia && window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) {
+  STUDY_RHEMA_COACH_STEPS[1].title = 'Add a study note';
+  STUDY_RHEMA_COACH_STEPS[1].body = 'Use the note button (✎) in the verse navigation bar to save an observation, interpretation, or question directly from the current passage into the study workspace.';
+  delete STUDY_RHEMA_COACH_STEPS[1].demo;
+}
 STUDY_RHEMA_COACH_STEPS[3].position = 'center';
 STUDY_RHEMA_COACH_STEPS[3].offsetY = 44;
 STUDY_RHEMA_COACH_STEPS[3].body = 'A trail saves the breadcrumb path, connected verses, labels, and text so you can return to the route instead of trying to remember it. It is your “how did I get here?” answer, saved.';
@@ -24925,56 +24934,171 @@ function renderRhemaBookVerses() {
     <div>${rows}</div>`;
 }
 
-// ── Desktop nav init (collapse rail + 5-second intro) ───────────────────────
+// ── Desktop nav init ─────────────────────────────────────────────────────────
 function _initDesktopNav() {
   if (!window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) return;
   const nav = document.getElementById('desktopShellNav');
   if (!nav) return;
   nav.classList.add('nav-intro');
-  setTimeout(() => {
-    nav.classList.remove('nav-intro');
-  }, 5000);
+  setTimeout(() => { nav.classList.remove('nav-intro'); }, 5000);
 }
 
-window.addEventListener('load', () => {
-  setTimeout(_initDesktopNav, 900);
-});
+function _desktopCollapseNav() {
+  const nav = document.getElementById('desktopShellNav');
+  if (nav) nav.classList.remove('nav-intro');
+}
+
+window.addEventListener('load', () => { setTimeout(_initDesktopNav, 900); });
+
+// ── Desktop home navigation ───────────────────────────────────────────────────
+function _desktopGoHome() {
+  const modal = document.getElementById('rhemaModal');
+  if (modal?.classList.contains('open')) {
+    modal.classList.remove('open');
+    showBottomNav();
+  }
+  closeSermonWorkshop(true);
+  showNavPage('home');
+}
+
+// ── Sermons page ──────────────────────────────────────────────────────────────
+let _savedSermons = [];
+
+function _loadSavedSermons() {
+  try { _savedSermons = JSON.parse(localStorage.getItem('savedSermons') || '[]'); } catch { _savedSermons = []; }
+}
+
+function _persistSavedSermons() {
+  try { localStorage.setItem('savedSermons', JSON.stringify(_savedSermons)); } catch {}
+}
+
+function showNavPage_sermons() {
+  _loadSavedSermons();
+  _renderSermonsPage();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('sermonsPage')?.classList.add('active');
+  setNavActive('sermons');
+}
+
+function _renderSermonsPage() {
+  const grid = document.getElementById('sermonsGrid');
+  const empty = document.getElementById('sermonsEmpty');
+  if (!grid) return;
+  if (!_savedSermons.length) {
+    grid.innerHTML = '';
+    empty?.classList.remove('hidden');
+    return;
+  }
+  empty?.classList.add('hidden');
+  grid.innerHTML = _savedSermons.slice().reverse().map((s, ri) => {
+    const i = _savedSermons.length - 1 - ri;
+    const date = s.savedAt ? new Date(s.savedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    return `<div class="sermon-card">
+      <div class="sermon-card-icon"><span class="material-symbols-outlined">edit_note</span></div>
+      <span class="sermon-card-title">${_escHtml(s.title || 'Untitled')}</span>
+      ${s.ref ? `<span class="sermon-card-ref">${_escHtml(s.ref)}</span>` : ''}
+      ${date ? `<span class="sermon-card-meta">Saved ${date}</span>` : ''}
+      <div class="sermon-card-actions">
+        <button class="sermon-card-open-btn" onclick="openSavedSermon(${i})">Open</button>
+        <button class="sermon-card-delete-btn" onclick="deleteSavedSermon(${i},event)" title="Delete"><span class="material-symbols-outlined">delete</span></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSavedSermon(i) {
+  _loadSavedSermons();
+  const sermon = _savedSermons[i];
+  if (!sermon) return;
+  _swCurrentSermonIndex = i;
+  openSermonWorkshop(sermon);
+}
+
+function deleteSavedSermon(i, e) {
+  e?.stopPropagation();
+  _loadSavedSermons();
+  _savedSermons.splice(i, 1);
+  _persistSavedSermons();
+  _renderSermonsPage();
+}
 
 // ── Sermon Workshop ──────────────────────────────────────────────────────────
 let _swSermonPoints = [];
 let _swIllustrations = [];
+let _swCrossRefs = [];
+let _swCurrentSermonIndex = -1;
+let _swRhemaOpen = false;
+let _swAutosaveTimer = null;
 
-function openSermonWorkshop() {
+function openSermonWorkshop(draft) {
+  _desktopCollapseNav();
   const overlay = document.getElementById('sermonWorkshopOverlay');
   if (!overlay) return;
-  _loadSermonDraft();
+  _loadSermonDraft(draft || null);
   overlay.classList.remove('hidden');
   requestAnimationFrame(() => overlay.classList.add('open'));
 }
 
-function closeSermonWorkshop() {
+function closeSermonWorkshop(skipSave) {
   const overlay = document.getElementById('sermonWorkshopOverlay');
-  if (!overlay) return;
-  saveSermonDraft();
+  if (!overlay || !overlay.classList.contains('open')) return;
+  if (!skipSave) saveSermonDraft();
+  if (_swRhemaOpen) closeSermonRhema();
   overlay.classList.remove('open');
   setTimeout(() => overlay.classList.add('hidden'), 320);
+  _swCurrentSermonIndex = -1;
+}
+
+function saveAndCloseSermon() {
+  const title = document.getElementById('swSermonTitle')?.value?.trim();
+  if (!title) {
+    const el = document.getElementById('swSermonTitle');
+    if (el) { el.focus(); el.style.borderColor = '#e53e3e'; setTimeout(() => { el.style.borderColor = ''; }, 2000); }
+    _showSwToast('Please give your sermon a title before saving.');
+    return;
+  }
+  _loadSavedSermons();
+  const draft = _collectSermonDraft();
+  draft.savedAt = Date.now();
+  if (_swCurrentSermonIndex >= 0 && _swCurrentSermonIndex < _savedSermons.length) {
+    _savedSermons[_swCurrentSermonIndex] = draft;
+  } else {
+    _savedSermons.push(draft);
+    _swCurrentSermonIndex = _savedSermons.length - 1;
+  }
+  _persistSavedSermons();
+  // Close Rhema if open
+  const rhemaModal = document.getElementById('rhemaModal');
+  if (rhemaModal?.classList.contains('open')) { rhemaModal.classList.remove('open'); showBottomNav(); }
+  closeSermonWorkshop(true);
+  // Navigate to sermons page
+  if (window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) {
+    showNavPage_sermons();
+  }
+}
+
+function _showSwToast(msg) {
+  const ind = document.getElementById('swAutosaveIndicator');
+  if (ind) { ind.textContent = msg; setTimeout(() => { if (ind.textContent === msg) ind.textContent = ''; }, 3000); }
 }
 
 function switchSermonTab(tab) {
   document.querySelectorAll('.sw-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.sw-pane').forEach(p => p.classList.remove('active'));
-  const paneMap = { outline: 'swPaneOutline', passage: 'swPanePassage', illustration: 'swPaneIllustration', application: 'swPaneApplication', notes: 'swPaneNotes' };
+  const paneMap = { outline: 'swPaneOutline', passage: 'swPanePassage', greek: 'swPaneGreek', crossrefs: 'swPaneCrossrefs', illustration: 'swPaneIllustration', application: 'swPaneApplication', notes: 'swPaneNotes' };
   document.getElementById(paneMap[tab])?.classList.add('active');
 }
 
 function addSermonPoint() {
-  _swSermonPoints.push('');
+  _swSermonPoints.push({ title: '', body: '' });
   _renderSermonPoints();
+  saveSermonDraft();
 }
 
 function removeSermonPoint(i) {
   _swSermonPoints.splice(i, 1);
   _renderSermonPoints();
+  saveSermonDraft();
 }
 
 function _renderSermonPoints() {
@@ -24982,14 +25106,18 @@ function _renderSermonPoints() {
   if (!list) return;
   list.innerHTML = _swSermonPoints.map((pt, i) => `
     <div class="sw-point-item">
-      <textarea placeholder="Supporting point ${i + 1}…" oninput="_swSermonPoints[${i}]=this.value;saveSermonDraft()">${_escHtml(pt)}</textarea>
-      <button class="sw-point-remove" onclick="removeSermonPoint(${i})" title="Remove"><span class="material-symbols-outlined">close</span></button>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <input class="sw-input" style="font-size:0.9rem;padding:9px 12px" placeholder="Point ${i+1} heading…" value="${_escHtml(pt.title||'')}" oninput="_swSermonPoints[${i}].title=this.value;saveSermonDraft()"/>
+        <textarea class="sw-textarea" style="min-height:70px;font-size:0.9rem" placeholder="Development and supporting Scripture…" oninput="_swSermonPoints[${i}].body=this.value;saveSermonDraft()">${_escHtml(pt.body||'')}</textarea>
+      </div>
+      <button class="sw-point-remove" onclick="removeSermonPoint(${i})" title="Remove point"><span class="material-symbols-outlined">close</span></button>
     </div>`).join('');
 }
 
 function addSermonIllustration() {
-  _swIllustrations.push('');
+  _swIllustrations.push({ text: '' });
   _renderSermonIllustrations();
+  saveSermonDraft();
 }
 
 function _renderSermonIllustrations() {
@@ -24997,83 +25125,186 @@ function _renderSermonIllustrations() {
   if (!list) return;
   list.innerHTML = _swIllustrations.map((ill, i) => `
     <div class="sw-illustration-item">
-      <textarea placeholder="Illustration ${i + 1}…" oninput="_swIllustrations[${i}]=this.value;saveSermonDraft()">${_escHtml(ill)}</textarea>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button class="sw-point-remove" onclick="_swIllustrations.splice(${i},1);_renderSermonIllustrations();saveSermonDraft()" title="Remove"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <textarea class="sw-textarea" style="min-height:80px" placeholder="Illustration ${i+1}…" oninput="_swIllustrations[${i}].text=this.value;saveSermonDraft()">${_escHtml(ill.text||'')}</textarea>
+    </div>`).join('');
+}
+
+function addSermonCrossRef() {
+  _swCrossRefs.push({ ref: '', note: '' });
+  _renderSermonCrossRefs();
+  saveSermonDraft();
+}
+
+function _renderSermonCrossRefs() {
+  const list = document.getElementById('swCrossRefsList');
+  if (!list) return;
+  list.innerHTML = _swCrossRefs.map((cr, i) => `
+    <div class="sw-crossref-item">
+      <input placeholder="Reference…" value="${_escHtml(cr.ref||'')}" oninput="_swCrossRefs[${i}].ref=this.value;saveSermonDraft()"/>
+      <textarea placeholder="Connection to the passage…" oninput="_swCrossRefs[${i}].note=this.value;saveSermonDraft()">${_escHtml(cr.note||'')}</textarea>
+      <button class="sw-point-remove" style="margin-top:4px" onclick="_swCrossRefs.splice(${i},1);_renderSermonCrossRefs();saveSermonDraft()" title="Remove"><span class="material-symbols-outlined">close</span></button>
     </div>`).join('');
 }
 
 function _escHtml(s) {
-  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function saveSermonDraft() {
-  const draft = {
-    title: document.getElementById('swSermonTitle')?.value || '',
-    ref: document.getElementById('swScriptureRef')?.value || '',
-    mainPoint: document.getElementById('swMainPoint')?.value || '',
-    points: _swSermonPoints,
-    keyVerses: document.getElementById('swKeyVerses')?.value || '',
-    greekNotes: document.getElementById('swGreekNotes')?.value || '',
-    theological: document.getElementById('swTheologicalContext')?.value || '',
-    illustrations: _swIllustrations,
-    callToAction: document.getElementById('swCallToAction')?.value || '',
-    applicationPoints: document.getElementById('swApplicationPoints')?.value || '',
-    closing: document.getElementById('swClosing')?.value || '',
-    generalNotes: document.getElementById('swGeneralNotes')?.value || '',
-    savedAt: Date.now()
-  };
-  try { localStorage.setItem('sermonWorkshopDraft', JSON.stringify(draft)); } catch {}
+  clearTimeout(_swAutosaveTimer);
+  _swAutosaveTimer = setTimeout(() => {
+    const draft = _collectSermonDraft();
+    try { localStorage.setItem('sermonWorkshopDraft', JSON.stringify(draft)); } catch {}
+    const ind = document.getElementById('swAutosaveIndicator');
+    if (ind) { ind.textContent = 'Draft saved'; setTimeout(() => { if (ind.textContent === 'Draft saved') ind.textContent = ''; }, 2000); }
+  }, 600);
 }
 
-function _loadSermonDraft() {
-  let draft = {};
-  try { draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}'); } catch {}
-  _swSermonPoints = Array.isArray(draft.points) ? draft.points : [];
-  _swIllustrations = Array.isArray(draft.illustrations) ? draft.illustrations : [];
+function _collectSermonDraft() {
+  const g = id => document.getElementById(id)?.value || '';
+  return {
+    title: g('swSermonTitle'),
+    ref: g('swScriptureRef'),
+    mainPoint: g('swMainPoint'),
+    introduction: g('swIntroduction'),
+    conclusion: g('swConclusion'),
+    points: _swSermonPoints,
+    keyVerses: g('swKeyVerses'),
+    structuralObs: g('swStructuralObs'),
+    theological: g('swTheologicalContext'),
+    historicalBg: g('swHistoricalBg'),
+    greekNotes: g('swGreekNotes'),
+    textualNotes: g('swTextualNotes'),
+    grammarObs: g('swGrammarObs'),
+    crossRefs: _swCrossRefs,
+    illustrations: _swIllustrations,
+    callToAction: g('swCallToAction'),
+    applicationPoints: g('swApplicationPoints'),
+    distortions: g('swDistortions'),
+    generalNotes: g('swGeneralNotes'),
+    rhemaPos: _swRhemaOpen ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse } : null
+  };
+}
+
+function _loadSermonDraft(draft) {
+  let d = draft;
+  if (!d) {
+    try { d = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}'); } catch { d = {}; }
+  }
+  _swSermonPoints = Array.isArray(d.points) ? d.points : [];
+  _swIllustrations = Array.isArray(d.illustrations) ? d.illustrations.map(x => typeof x === 'string' ? { text: x } : x) : [];
+  _swCrossRefs = Array.isArray(d.crossRefs) ? d.crossRefs : [];
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-  set('swSermonTitle', draft.title);
-  set('swScriptureRef', draft.ref);
-  set('swMainPoint', draft.mainPoint);
-  set('swKeyVerses', draft.keyVerses);
-  set('swGreekNotes', draft.greekNotes);
-  set('swTheologicalContext', draft.theological);
-  set('swCallToAction', draft.callToAction);
-  set('swApplicationPoints', draft.applicationPoints);
-  set('swClosing', draft.closing);
-  set('swGeneralNotes', draft.generalNotes);
+  set('swSermonTitle', d.title); set('swScriptureRef', d.ref); set('swMainPoint', d.mainPoint);
+  set('swIntroduction', d.introduction); set('swConclusion', d.conclusion);
+  set('swKeyVerses', d.keyVerses); set('swStructuralObs', d.structuralObs);
+  set('swTheologicalContext', d.theological); set('swHistoricalBg', d.historicalBg);
+  set('swGreekNotes', d.greekNotes); set('swTextualNotes', d.textualNotes);
+  set('swGrammarObs', d.grammarObs);
+  set('swCallToAction', d.callToAction); set('swApplicationPoints', d.applicationPoints);
+  set('swDistortions', d.distortions); set('swGeneralNotes', d.generalNotes);
   _renderSermonPoints();
   _renderSermonIllustrations();
+  _renderSermonCrossRefs();
   switchSermonTab('outline');
+  if (d.rhemaPos) {
+    _rhemaBook = d.rhemaPos.book || _rhemaBook;
+    _rhemaChapter = d.rhemaPos.chapter || _rhemaChapter;
+    _rhemaVerse = d.rhemaPos.verse || _rhemaVerse;
+  }
 }
 
 function exportSermonText() {
-  saveSermonDraft();
-  let draft = {};
-  try { draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}'); } catch {}
+  const d = _collectSermonDraft();
   const lines = [];
-  if (draft.title) lines.push(`SERMON: ${draft.title}`);
-  if (draft.ref) lines.push(`SCRIPTURE: ${draft.ref}`);
-  if (draft.mainPoint) lines.push(`\nMAIN POINT:\n${draft.mainPoint}`);
-  if (draft.points?.length) { lines.push('\nSUPPORTING POINTS:'); draft.points.forEach((p, i) => { if (p) lines.push(`${i + 1}. ${p}`); }); }
-  if (draft.keyVerses) lines.push(`\nKEY VERSES:\n${draft.keyVerses}`);
-  if (draft.greekNotes) lines.push(`\nGREEK / WORD STUDY NOTES:\n${draft.greekNotes}`);
-  if (draft.theological) lines.push(`\nTHEOLOGICAL CONTEXT:\n${draft.theological}`);
-  if (draft.illustrations?.length) { lines.push('\nILLUSTRATIONS:'); draft.illustrations.forEach((ill, i) => { if (ill) lines.push(`${i + 1}. ${ill}`); }); }
-  if (draft.callToAction) lines.push(`\nCALL TO ACTION:\n${draft.callToAction}`);
-  if (draft.applicationPoints) lines.push(`\nAPPLICATION:\n${draft.applicationPoints}`);
-  if (draft.closing) lines.push(`\nCLOSING:\n${draft.closing}`);
-  if (draft.generalNotes) lines.push(`\nNOTES:\n${draft.generalNotes}`);
+  if (d.title) lines.push(`SERMON: ${d.title}`);
+  if (d.ref) lines.push(`SCRIPTURE: ${d.ref}`);
+  if (d.mainPoint) lines.push(`\nEXEGETICAL PROPOSITION:\n${d.mainPoint}`);
+  if (d.introduction) lines.push(`\nINTRODUCTION:\n${d.introduction}`);
+  if (d.points?.length) { lines.push('\nSTRUCTURAL POINTS:'); d.points.forEach((p,i) => { if (p.title||p.body) lines.push(`${i+1}. ${p.title||''}\n   ${p.body||''}`); }); }
+  if (d.keyVerses) lines.push(`\nPASSAGE TEXT:\n${d.keyVerses}`);
+  if (d.structuralObs) lines.push(`\nSTRUCTURAL OBSERVATIONS:\n${d.structuralObs}`);
+  if (d.theological) lines.push(`\nTHEOLOGICAL CONTEXT:\n${d.theological}`);
+  if (d.historicalBg) lines.push(`\nHISTORICAL BACKGROUND:\n${d.historicalBg}`);
+  if (d.greekNotes) lines.push(`\nGREEK WORD STUDY:\n${d.greekNotes}`);
+  if (d.textualNotes) lines.push(`\nTEXTUAL NOTES:\n${d.textualNotes}`);
+  if (d.grammarObs) lines.push(`\nGRAMMAR OBSERVATIONS:\n${d.grammarObs}`);
+  if (d.crossRefs?.length) { lines.push('\nCROSS-REFERENCES:'); d.crossRefs.forEach((cr,i) => { if (cr.ref||cr.note) lines.push(`${i+1}. ${cr.ref||''} \u2014 ${cr.note||''}`); }); }
+  if (d.illustrations?.length) { lines.push('\nILLUSTRATIONS:'); d.illustrations.forEach((ill,i) => { const t=ill.text||ill; if(t) lines.push(`${i+1}. ${t}`); }); }
+  if (d.callToAction) lines.push(`\nCALL TO FAITH / RESPONSE:\n${d.callToAction}`);
+  if (d.applicationPoints) lines.push(`\nAPPLICATION:\n${d.applicationPoints}`);
+  if (d.distortions) lines.push(`\nDOCTRINAL CORRECTION:\n${d.distortions}`);
+  if (d.conclusion) lines.push(`\nCONCLUSION:\n${d.conclusion}`);
+  if (d.generalNotes) lines.push(`\nRESEARCH NOTES:\n${d.generalNotes}`);
   const text = lines.join('\n');
   const blob = new Blob([text], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = (draft.title ? draft.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'sermon') + '.txt';
+  a.download = (d.title ? d.title.replace(/[^a-z0-9]/gi,'-').toLowerCase() : 'sermon') + '.txt';
   a.click();
   URL.revokeObjectURL(url);
 }
 
+// \u2500\u2500 Sermon Rhema \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function toggleSermonRhema() {
+  if (_swRhemaOpen) closeSermonRhema();
+  else openSermonRhema();
+}
+
+function openSermonRhema() {
+  const panel = document.getElementById('swRhemaPanel');
+  const btn = document.getElementById('swRhemaToggleBtn');
+  if (!panel) return;
+  _swRhemaOpen = true;
+  panel.classList.remove('hidden');
+  if (btn) btn.classList.add('active');
+  if (!panel._rhemaInitialized) {
+    panel._rhemaInitialized = true;
+    panel.innerHTML = `
+      <div class="swr-header">
+        <div class="swr-title">
+          <span class="material-symbols-outlined">menu_book</span>
+          <span>Rhema</span>
+        </div>
+        <div class="swr-picker">
+          <button class="rhema-pill swr-pill" onclick="openRhemaBookPicker()" id="swrBookPill">Book</button>
+          <button class="rhema-pill swr-pill" onclick="openRhemaChapPicker()" id="swrChapPill">Ch</button>
+          <button class="rhema-pill swr-pill" id="swrVersePill" onclick="openRhemaVersePicker()">V</button>
+        </div>
+        <button class="swr-close" onclick="closeSermonRhema()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="swr-body">
+        <div class="rhema-verse-display" id="swrVerseDisplay"></div>
+        <div class="rhema-sheet" id="swrSheet" style="display:none"></div>
+      </div>`;
+  }
+  _renderSwrVerse();
+}
+
+function closeSermonRhema() {
+  const panel = document.getElementById('swRhemaPanel');
+  const btn = document.getElementById('swRhemaToggleBtn');
+  _swRhemaOpen = false;
+  if (panel) panel.classList.add('hidden');
+  if (btn) btn.classList.remove('active');
+  saveSermonDraft();
+}
+
+function _renderSwrVerse() {
+  if (typeof renderRhemaVerse === 'function') {
+    const savedTarget = window._rhemaRenderTarget;
+    window._rhemaRenderTarget = 'sermon';
+    renderRhemaVerse();
+    window._rhemaRenderTarget = savedTarget;
+  }
+}
 // ── Desktop Study Desk ────────────────────────────────────────────────────────
 function openDesktopStudyDesk() {
+  _desktopCollapseNav();
   const overlay = document.getElementById('desktopStudyDeskOverlay');
   if (!overlay) return;
   _renderDsdStudies();

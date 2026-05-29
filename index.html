@@ -370,10 +370,32 @@ Start a New Study
 </div>
 </div>
 <div class="desktop-study-card" id="desktopRhemaCard" onclick="resumeRhema()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')resumeRhema()">
-<span class="material-symbols-outlined">auto_stories</span>
-<div class="desktop-rhema-preview">
-<strong id="desktopRhemaPassage">Rhema NT Word Study</strong>
-<p id="desktopRhemaSnippet">Open a passage to begin. Click here to resume your last session.</p>
+<div class="dsc-top-bar">
+<span class="dsc-tag">Rhema</span>
+<span class="dsc-passage" id="desktopRhemaPassage">John 1:1</span>
+</div>
+<div class="dsc-verse-preview" id="dscVersePreview">
+<span class="dsc-word" data-parse="V-IAI-3S">Ἐν</span>
+<span class="dsc-word" data-parse="P">ἀρχῇ</span>
+<span class="dsc-word selected" data-parse="N-NSM">ἦν</span>
+<span class="dsc-word" data-parse="D">ὁ</span>
+<span class="dsc-word" data-parse="N-NSM">λόγος</span>
+<span class="dsc-comma">,</span>
+<span class="dsc-word" data-parse="C">καὶ</span>
+<span class="dsc-word" data-parse="P">ὁ</span>
+<span class="dsc-word" data-parse="N-NSM">λόγος</span>
+<span class="dsc-word" data-parse="V-IAI-3S">ἦν</span>
+<span class="dsc-word" data-parse="P">πρὸς</span>
+<span class="dsc-word accent" data-parse="D-ASM">τὸν</span>
+<span class="dsc-word accent" data-parse="N-ASM">θεόν</span>
+</div>
+<div class="dsc-word-panel">
+<span class="dsc-lemma" id="desktopRhemaSnippet">λόγος — word, reason, account</span>
+<div class="dsc-parse-chips">
+<span class="dsc-chip">Noun</span>
+<span class="dsc-chip">Nominative</span>
+<span class="dsc-chip">Singular</span>
+</div>
 </div>
 <div class="desktop-resume-hint">
 <span class="material-symbols-outlined">play_arrow</span>
@@ -595,6 +617,24 @@ Start a New Study
 <button class="main-btn" onclick="saveHabitNote()">Save Note</button>
 </div>
 </div>
+<!-- Sermons Page -->
+<section class="screen" id="sermonsPage">
+<div class="sermons-scroll">
+<div class="sermons-header">
+<h1 class="sermons-title">Sermons</h1>
+<p class="sermons-sub">Your saved sermon preparations</p>
+</div>
+<div class="sermons-grid" id="sermonsGrid">
+<!-- Populated by JS -->
+</div>
+<div class="sermons-empty hidden" id="sermonsEmpty">
+<span class="material-symbols-outlined">library_books</span>
+<strong>No sermons saved yet</strong>
+<p>Open Sermon Workshop, build your preparation, and save it here.</p>
+<button class="main-btn" style="max-width:260px;margin:16px auto 0" onclick="openSermonWorkshop()">Open Sermon Workshop</button>
+</div>
+</div>
+</section>
 <section class="screen" id="newLearnMenu">
 <div class="nav-bar">
 <button class="icon-btn" onclick="handleLearnBack()">
@@ -9697,6 +9737,9 @@ Verb Endings
 <span class="material-symbols-outlined">chevron_left</span>
 </button>
 <span class="rhema-verse-ref" id="rhemaVerseRef"></span>
+<button class="rhema-nav-btn rhema-desktop-note-btn" id="rhemaDesktopNoteBtn" onclick="if(_studySandboxId)openStudyMiniWheel();else openWritingModal('observations')" title="Add study note">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
 <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
 <span class="material-symbols-outlined">chevron_right</span>
 </button>
@@ -16327,14 +16370,18 @@ Verb Endings
 </div>
 </div>
 <!-- ── Sermon Workshop (Desktop) ── -->
-<div class="sw-overlay hidden" id="sermonWorkshopOverlay" onclick="if(event.target===this)closeSermonWorkshop()">
+<div class="sw-overlay hidden" id="sermonWorkshopOverlay">
+<div class="sw-backdrop" onclick="closeSermonWorkshop()"></div>
+<div class="sw-rhema-panel hidden" id="swRhemaPanel">
+<!-- Sermon Rhema mounts here via JS -->
+</div>
 <div class="sw-panel" onclick="event.stopPropagation()">
 <div class="sw-header">
 <div class="sw-header-left">
 <span class="material-symbols-outlined">edit_note</span>
 <div>
 <h2>Sermon Workshop</h2>
-<p>Build and organize your message</p>
+<p>Expository preparation — faithful to the text</p>
 </div>
 </div>
 <button class="sw-close-btn" onclick="closeSermonWorkshop()"><span class="material-symbols-outlined">close</span></button>
@@ -16343,47 +16390,80 @@ Verb Endings
 <div class="sw-sidebar">
 <button class="sw-tab active" data-tab="outline" onclick="switchSermonTab('outline')"><span class="material-symbols-outlined">format_list_bulleted</span><span>Outline</span></button>
 <button class="sw-tab" data-tab="passage" onclick="switchSermonTab('passage')"><span class="material-symbols-outlined">menu_book</span><span>Passage</span></button>
+<button class="sw-tab" data-tab="greek" onclick="switchSermonTab('greek')"><span class="material-symbols-outlined">translate</span><span>Greek Notes</span></button>
+<button class="sw-tab" data-tab="crossrefs" onclick="switchSermonTab('crossrefs')"><span class="material-symbols-outlined">hub</span><span>Cross-Refs</span></button>
 <button class="sw-tab" data-tab="illustration" onclick="switchSermonTab('illustration')"><span class="material-symbols-outlined">lightbulb</span><span>Illustrations</span></button>
 <button class="sw-tab" data-tab="application" onclick="switchSermonTab('application')"><span class="material-symbols-outlined">record_voice_over</span><span>Application</span></button>
-<button class="sw-tab" data-tab="notes" onclick="switchSermonTab('notes')"><span class="material-symbols-outlined">notes</span><span>General Notes</span></button>
+<button class="sw-tab" data-tab="notes" onclick="switchSermonTab('notes')"><span class="material-symbols-outlined">notes</span><span>Research</span></button>
+<div class="sw-sidebar-spacer"></div>
+<button class="sw-rhema-toggle-btn" id="swRhemaToggleBtn" onclick="toggleSermonRhema()">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Open in Rhema</span>
+</button>
 </div>
 <div class="sw-content">
+<!-- Outline -->
 <div class="sw-pane active" id="swPaneOutline">
-<div class="sw-pane-header"><h3>Sermon Outline</h3><p>Build the structure of your message below.</p></div>
-<div class="sw-field-group"><label>Sermon Title</label><input class="sw-input" id="swSermonTitle" placeholder="Enter sermon title…" type="text" oninput="saveSermonDraft()"/></div>
-<div class="sw-field-group"><label>Scripture Reference</label><input class="sw-input" id="swScriptureRef" placeholder="e.g. John 3:16–21" type="text" oninput="saveSermonDraft()"/></div>
-<div class="sw-field-group"><label>Main Point / Big Idea</label><textarea class="sw-textarea" id="swMainPoint" placeholder="What is the one central truth of this message?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-pane-header"><h3>Sermon Outline</h3><p>Construct the structural framework of your exposition.</p></div>
+<div class="sw-field-group"><label>Sermon Title <span class="sw-required">*</span></label><input class="sw-input" id="swSermonTitle" placeholder="Title is required to save" type="text" oninput="saveSermonDraft()"/></div>
+<div class="sw-field-group"><label>Scripture Text</label><input class="sw-input" id="swScriptureRef" placeholder="e.g. John 3:16–21" type="text" oninput="saveSermonDraft()"/></div>
+<div class="sw-field-group"><label>Exegetical Proposition</label><textarea class="sw-textarea" id="swMainPoint" placeholder="State the single authoritative claim the text makes. What does this passage assert?" oninput="saveSermonDraft()"></textarea></div>
 <div class="sw-points-section">
-<div class="sw-points-header"><label>Supporting Points</label><button class="sw-add-point-btn" onclick="addSermonPoint()"><span class="material-symbols-outlined">add</span> Add Point</button></div>
+<div class="sw-points-header"><label>Structural Points</label><button class="sw-add-point-btn" onclick="addSermonPoint()"><span class="material-symbols-outlined">add</span> Add Point</button></div>
 <div class="sw-points-list" id="swPointsList"></div>
 </div>
+<div class="sw-field-group"><label>Introduction</label><textarea class="sw-textarea" id="swIntroduction" placeholder="How will you move from their world to the text? Keep it brief and text-focused." oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Conclusion</label><textarea class="sw-textarea" id="swConclusion" placeholder="Restate the proposition. Close with the text's own weight, not an emotional push." oninput="saveSermonDraft()"></textarea></div>
 </div>
+<!-- Passage -->
 <div class="sw-pane" id="swPanePassage">
-<div class="sw-pane-header"><h3>Passage Study</h3><p>Key verses, word observations, and exegetical notes.</p></div>
-<div class="sw-field-group"><label>Key Verses</label><textarea class="sw-textarea" id="swKeyVerses" placeholder="Write out or paste your key passage text…" rows="6" oninput="saveSermonDraft()"></textarea></div>
-<div class="sw-field-group"><label>Greek / Word Study Notes</label><textarea class="sw-textarea" id="swGreekNotes" placeholder="Word study observations from Rhema…" oninput="saveSermonDraft()"></textarea></div>
-<div class="sw-field-group"><label>Theological &amp; Historical Context</label><textarea class="sw-textarea" id="swTheologicalContext" placeholder="Historical, cultural, or doctrinal context…" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-pane-header"><h3>Passage Analysis</h3><p>Observe the text carefully before drawing any conclusions.</p></div>
+<div class="sw-field-group"><label>Text (verbatim or working translation)</label><textarea class="sw-textarea" id="swKeyVerses" placeholder="Write out the passage. Handling the actual words forces precision." rows="6" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Structural Observations</label><textarea class="sw-textarea" id="swStructuralObs" placeholder="What is the argument structure? Conjunctions, contrasts, cause-effect, conditionals?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Theological Context</label><textarea class="sw-textarea" id="swTheologicalContext" placeholder="Where does this text sit in redemptive history? What covenant, promise, or fulfillment is in view?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Historical &amp; Cultural Background</label><textarea class="sw-textarea" id="swHistoricalBg" placeholder="What would the original audience have understood that we might miss?" oninput="saveSermonDraft()"></textarea></div>
 </div>
+<!-- Greek Notes -->
+<div class="sw-pane" id="swPaneGreek">
+<div class="sw-pane-header"><h3>Greek Word Study</h3><p>Key terms, parsing, and lexical observations from the text. Use Rhema for live word inspection.</p></div>
+<div class="sw-field-group"><label>Key Terms</label><textarea class="sw-textarea" id="swGreekNotes" placeholder="List significant Greek words with their lemma, gloss, and why they matter in this context…" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Textual Notes</label><textarea class="sw-textarea" id="swTextualNotes" placeholder="Any significant textual variants? How do they affect interpretation?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Grammar Observations</label><textarea class="sw-textarea" id="swGrammarObs" placeholder="Tense, aspect, mood, case, syntax constructions that carry interpretive weight…" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-rhema-hint-bar">
+<span class="material-symbols-outlined">info</span>
+<span>Use the <strong>Open in Rhema</strong> button (bottom-left) to inspect Greek words live and bring notes back here.</span>
+</div>
+</div>
+<!-- Cross-Refs -->
+<div class="sw-pane" id="swPaneCrossrefs">
+<div class="sw-pane-header"><h3>Cross-References</h3><p>Let Scripture interpret Scripture. Record related passages and their bearing on this text.</p></div>
+<div class="sw-crossrefs-list" id="swCrossRefsList"></div>
+<button class="sw-add-btn" onclick="addSermonCrossRef()"><span class="material-symbols-outlined">add</span> Add Cross-Reference</button>
+</div>
+<!-- Illustrations -->
 <div class="sw-pane" id="swPaneIllustration">
-<div class="sw-pane-header"><h3>Illustrations</h3><p>Stories, examples, and analogies to make the truth clear.</p></div>
+<div class="sw-pane-header"><h3>Illustrations</h3><p>Illustrations clarify; they do not carry the argument. The text does.</p></div>
 <div class="sw-illustrations-list" id="swIllustrationsList"></div>
 <button class="sw-add-btn" onclick="addSermonIllustration()"><span class="material-symbols-outlined">add</span> Add Illustration</button>
 </div>
+<!-- Application -->
 <div class="sw-pane" id="swPaneApplication">
-<div class="sw-pane-header"><h3>Application</h3><p>How does this message change how people think, feel, and act?</p></div>
-<div class="sw-field-group"><label>Call to Action</label><textarea class="sw-textarea" id="swCallToAction" placeholder="What specific response are you calling for?" oninput="saveSermonDraft()"></textarea></div>
-<div class="sw-field-group"><label>Life Application Points</label><textarea class="sw-textarea" id="swApplicationPoints" placeholder="Practical ways this truth applies to daily life…" rows="6" oninput="saveSermonDraft()"></textarea></div>
-<div class="sw-field-group"><label>Closing</label><textarea class="sw-textarea" id="swClosing" placeholder="How will you close the message?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-pane-header"><h3>Application</h3><p>Application flows from what the text asserts. Free grace: the response is faith, not performance.</p></div>
+<div class="sw-field-group"><label>What does this text demand the listener believe?</label><textarea class="sw-textarea" id="swCallToAction" placeholder="What truth or promise does the Spirit use to produce faith or action?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Application Points</label><textarea class="sw-textarea" id="swApplicationPoints" placeholder="How does this doctrine shape thinking, trusting, and living? Be specific." rows="6" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>What common distortions does this text correct?</label><textarea class="sw-textarea" id="swDistortions" placeholder="Legalism, moralism, sentimentalism, or other misreadings this text specifically opposes…" oninput="saveSermonDraft()"></textarea></div>
 </div>
+<!-- Research -->
 <div class="sw-pane" id="swPaneNotes">
-<div class="sw-pane-header"><h3>General Notes</h3><p>Anything that doesn't fit elsewhere — research, quotes, reminders.</p></div>
-<div class="sw-field-group"><textarea class="sw-textarea" id="swGeneralNotes" placeholder="Free-form notes…" rows="18" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-pane-header"><h3>Research Notes</h3><p>Commentary citations, source material, exegetical debates, and working notes.</p></div>
+<div class="sw-field-group"><textarea class="sw-textarea" id="swGeneralNotes" placeholder="Commentary notes, secondary source quotes, unresolved questions, reminders to self…" rows="18" oninput="saveSermonDraft()"></textarea></div>
 </div>
 </div>
 </div>
 <div class="sw-footer">
-<button class="sw-save-btn" onclick="saveSermonDraft()"><span class="material-symbols-outlined">save</span> Save Draft</button>
-<button class="sw-export-btn" onclick="exportSermonText()"><span class="material-symbols-outlined">file_download</span> Export Text</button>
+<span class="sw-autosave-indicator" id="swAutosaveIndicator"></span>
+<button class="sw-export-btn" onclick="exportSermonText()"><span class="material-symbols-outlined">file_download</span> Export</button>
+<button class="sw-save-btn" onclick="saveAndCloseSermon()"><span class="material-symbols-outlined">save</span> Save</button>
 </div>
 </div>
 </div>
