@@ -24920,3 +24920,187 @@ function renderRhemaBookVerses() {
     </div>
     <div>${rows}</div>`;
 }
+
+// ── Desktop nav init (collapse rail + 5-second intro) ───────────────────────
+function _initDesktopNav() {
+  if (!window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) return;
+  const nav = document.getElementById('desktopShellNav');
+  if (!nav) return;
+  nav.classList.add('nav-intro');
+  setTimeout(() => {
+    nav.classList.remove('nav-intro');
+  }, 5000);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(_initDesktopNav, 900);
+});
+
+// ── Sermon Workshop ──────────────────────────────────────────────────────────
+let _swSermonPoints = [];
+let _swIllustrations = [];
+
+function openSermonWorkshop() {
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (!overlay) return;
+  _loadSermonDraft();
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function closeSermonWorkshop() {
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (!overlay) return;
+  saveSermonDraft();
+  overlay.classList.remove('open');
+  setTimeout(() => overlay.classList.add('hidden'), 320);
+}
+
+function switchSermonTab(tab) {
+  document.querySelectorAll('.sw-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.sw-pane').forEach(p => p.classList.remove('active'));
+  const paneMap = { outline: 'swPaneOutline', passage: 'swPanePassage', illustration: 'swPaneIllustration', application: 'swPaneApplication', notes: 'swPaneNotes' };
+  document.getElementById(paneMap[tab])?.classList.add('active');
+}
+
+function addSermonPoint() {
+  _swSermonPoints.push('');
+  _renderSermonPoints();
+}
+
+function removeSermonPoint(i) {
+  _swSermonPoints.splice(i, 1);
+  _renderSermonPoints();
+}
+
+function _renderSermonPoints() {
+  const list = document.getElementById('swPointsList');
+  if (!list) return;
+  list.innerHTML = _swSermonPoints.map((pt, i) => `
+    <div class="sw-point-item">
+      <textarea placeholder="Supporting point ${i + 1}…" oninput="_swSermonPoints[${i}]=this.value;saveSermonDraft()">${_escHtml(pt)}</textarea>
+      <button class="sw-point-remove" onclick="removeSermonPoint(${i})" title="Remove"><span class="material-symbols-outlined">close</span></button>
+    </div>`).join('');
+}
+
+function addSermonIllustration() {
+  _swIllustrations.push('');
+  _renderSermonIllustrations();
+}
+
+function _renderSermonIllustrations() {
+  const list = document.getElementById('swIllustrationsList');
+  if (!list) return;
+  list.innerHTML = _swIllustrations.map((ill, i) => `
+    <div class="sw-illustration-item">
+      <textarea placeholder="Illustration ${i + 1}…" oninput="_swIllustrations[${i}]=this.value;saveSermonDraft()">${_escHtml(ill)}</textarea>
+    </div>`).join('');
+}
+
+function _escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function saveSermonDraft() {
+  const draft = {
+    title: document.getElementById('swSermonTitle')?.value || '',
+    ref: document.getElementById('swScriptureRef')?.value || '',
+    mainPoint: document.getElementById('swMainPoint')?.value || '',
+    points: _swSermonPoints,
+    keyVerses: document.getElementById('swKeyVerses')?.value || '',
+    greekNotes: document.getElementById('swGreekNotes')?.value || '',
+    theological: document.getElementById('swTheologicalContext')?.value || '',
+    illustrations: _swIllustrations,
+    callToAction: document.getElementById('swCallToAction')?.value || '',
+    applicationPoints: document.getElementById('swApplicationPoints')?.value || '',
+    closing: document.getElementById('swClosing')?.value || '',
+    generalNotes: document.getElementById('swGeneralNotes')?.value || '',
+    savedAt: Date.now()
+  };
+  try { localStorage.setItem('sermonWorkshopDraft', JSON.stringify(draft)); } catch {}
+}
+
+function _loadSermonDraft() {
+  let draft = {};
+  try { draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}'); } catch {}
+  _swSermonPoints = Array.isArray(draft.points) ? draft.points : [];
+  _swIllustrations = Array.isArray(draft.illustrations) ? draft.illustrations : [];
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('swSermonTitle', draft.title);
+  set('swScriptureRef', draft.ref);
+  set('swMainPoint', draft.mainPoint);
+  set('swKeyVerses', draft.keyVerses);
+  set('swGreekNotes', draft.greekNotes);
+  set('swTheologicalContext', draft.theological);
+  set('swCallToAction', draft.callToAction);
+  set('swApplicationPoints', draft.applicationPoints);
+  set('swClosing', draft.closing);
+  set('swGeneralNotes', draft.generalNotes);
+  _renderSermonPoints();
+  _renderSermonIllustrations();
+  switchSermonTab('outline');
+}
+
+function exportSermonText() {
+  saveSermonDraft();
+  let draft = {};
+  try { draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}'); } catch {}
+  const lines = [];
+  if (draft.title) lines.push(`SERMON: ${draft.title}`);
+  if (draft.ref) lines.push(`SCRIPTURE: ${draft.ref}`);
+  if (draft.mainPoint) lines.push(`\nMAIN POINT:\n${draft.mainPoint}`);
+  if (draft.points?.length) { lines.push('\nSUPPORTING POINTS:'); draft.points.forEach((p, i) => { if (p) lines.push(`${i + 1}. ${p}`); }); }
+  if (draft.keyVerses) lines.push(`\nKEY VERSES:\n${draft.keyVerses}`);
+  if (draft.greekNotes) lines.push(`\nGREEK / WORD STUDY NOTES:\n${draft.greekNotes}`);
+  if (draft.theological) lines.push(`\nTHEOLOGICAL CONTEXT:\n${draft.theological}`);
+  if (draft.illustrations?.length) { lines.push('\nILLUSTRATIONS:'); draft.illustrations.forEach((ill, i) => { if (ill) lines.push(`${i + 1}. ${ill}`); }); }
+  if (draft.callToAction) lines.push(`\nCALL TO ACTION:\n${draft.callToAction}`);
+  if (draft.applicationPoints) lines.push(`\nAPPLICATION:\n${draft.applicationPoints}`);
+  if (draft.closing) lines.push(`\nCLOSING:\n${draft.closing}`);
+  if (draft.generalNotes) lines.push(`\nNOTES:\n${draft.generalNotes}`);
+  const text = lines.join('\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (draft.title ? draft.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'sermon') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Desktop Study Desk ────────────────────────────────────────────────────────
+function openDesktopStudyDesk() {
+  const overlay = document.getElementById('desktopStudyDeskOverlay');
+  if (!overlay) return;
+  _renderDsdStudies();
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function closeDesktopStudyDesk() {
+  const overlay = document.getElementById('desktopStudyDeskOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(() => overlay.classList.add('hidden'), 320);
+}
+
+function _renderDsdStudies() {
+  const grid = document.getElementById('dsdStudiesGrid');
+  if (!grid) return;
+  const studies = _myStudies || [];
+  if (!studies.length) {
+    grid.innerHTML = '<div class="dsd-empty"><span class="material-symbols-outlined">inbox</span>No studies yet. Create one above to get started.</div>';
+    return;
+  }
+  grid.innerHTML = studies.map(study => {
+    const icon = study.icon || 'menu_book';
+    const color = study.color || 'var(--secondary-color)';
+    const name = _escHtml(study.name || 'Untitled Study');
+    const ts = study.updatedAt ? new Date(study.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    return `<button class="dsd-study-card" onclick="openStudySandbox('${study.id}');closeDesktopStudyDesk()">
+      <div class="dsd-study-icon" style="background:color-mix(in srgb,${color} 14%,transparent);color:${color}"><span class="material-symbols-outlined">${icon}</span></div>
+      <span class="dsd-study-name">${name}</span>
+      ${ts ? `<span class="dsd-study-meta">Updated ${ts}</span>` : ''}
+    </button>`;
+  }).join('');
+}
