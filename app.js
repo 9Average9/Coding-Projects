@@ -8921,6 +8921,7 @@ function _rhemaExactFormOccurrences(surface) {
 }
 
 function openWordLibrary() {
+  _desktopCollapseNav();
   if (!window.RhemaLexicon) { _showStudyToast('Word data not loaded yet.'); return; }
   _wlOpen = true;
   _wlSelectedForm = null;
@@ -9723,6 +9724,8 @@ function hideBottomNav() {
 function setNavActive(page) {
   document.querySelectorAll('.bn-item').forEach(b =>
     b.classList.toggle('active', b.dataset.page === page));
+  document.querySelectorAll('.desktop-nav-btn[data-nav]').forEach(b =>
+    b.classList.toggle('active', b.dataset.nav === page));
 }
 
 function setMerciesNavCollapsed(collapsed) {
@@ -22187,6 +22190,7 @@ function loadRhemaScripts() {
 // ── Modal open/close ──────────────────────────────────────────────────────────
 
 async function showRhema() {
+  _desktopCollapseNav();
   hideBottomNav();
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;

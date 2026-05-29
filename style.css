@@ -21191,7 +21191,7 @@ body.dark .bottom-nav::before {
     height: 100vh;
     min-height: 0;
     margin: 0;
-    padding: 0 0 0 116px;
+    padding: 0 0 0 300px;
     display: grid;
     background: transparent;
   }
@@ -21623,7 +21623,7 @@ body.dark .bottom-nav::before {
   }
 
   #rhemaModal.open #rhemaSlide {
-    left: 116px;
+    left: 300px;
     right: 28px;
     top: 28px;
     bottom: 28px;
