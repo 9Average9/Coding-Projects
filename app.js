@@ -10106,6 +10106,7 @@ let _habitsUnsub = null;
 let _habitItems = [];
 let _habitsLoaded = false;
 let _habitsTab = "mine";
+const _habitEntryInProgress = new Set(); // guards against rapid double-taps
 let _friendsHabitsCache = {};
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
@@ -10893,36 +10894,50 @@ async function submitHabitCreate() {
 async function toggleHabitToday(habitId, status) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const habit = _habitItems.find(h => h.id === habitId);
-  const beforeMilestones = new Set(habit?.awardedMilestones || []);
-  const ok = await window.Habits?.setEntry?.(uid, habitId, {
-    date: _habitTodayKey(),
-    status,
-    comment: "",
-    notify: status === "success"
-  });
-  if (!ok) alert("Could not update that habit.");
-  if (ok && status === "success" && habit) {
-    const mergedEntries = { ...(habit.entries || {}), [_habitTodayKey()]: { date: _habitTodayKey(), status: "success" } };
-    const streak = _habitCurrentStreak(mergedEntries);
-    const milestone = _habitMilestoneForStreak(streak);
-    if (milestone && !beforeMilestones.has(milestone.key)) {
-      addXP(milestone.xp, `${habit.name}: ${milestone.label}`, true);
-      await window.Habits?.awardMilestone?.(uid, habitId, milestone.key);
+  const lockKey = `${habitId}_${_habitTodayKey()}_${status}`;
+  if (_habitEntryInProgress.has(lockKey)) return;
+  _habitEntryInProgress.add(lockKey);
+  try {
+    const habit = _habitItems.find(h => h.id === habitId);
+    const beforeMilestones = new Set(habit?.awardedMilestones || []);
+    const ok = await window.Habits?.setEntry?.(uid, habitId, {
+      date: _habitTodayKey(),
+      status,
+      comment: "",
+      notify: status === "success"
+    });
+    if (!ok) alert("Could not update that habit.");
+    if (ok && status === "success" && habit) {
+      const mergedEntries = { ...(habit.entries || {}), [_habitTodayKey()]: { date: _habitTodayKey(), status: "success" } };
+      const streak = _habitCurrentStreak(mergedEntries);
+      const milestone = _habitMilestoneForStreak(streak);
+      if (milestone && !beforeMilestones.has(milestone.key)) {
+        addXP(milestone.xp, `${habit.name}: ${milestone.label}`, true);
+        await window.Habits?.awardMilestone?.(uid, habitId, milestone.key);
+      }
     }
+  } finally {
+    _habitEntryInProgress.delete(lockKey);
   }
 }
 
 async function skipHabitToday(habitId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const ok = await window.Habits?.setEntry?.(uid, habitId, {
-    date: _habitTodayKey(),
-    status: "skipped",
-    comment: "Planned skip",
-    notify: true
-  });
-  if (!ok) alert("Could not update that habit.");
+  const lockKey = `${habitId}_${_habitTodayKey()}_skipped`;
+  if (_habitEntryInProgress.has(lockKey)) return;
+  _habitEntryInProgress.add(lockKey);
+  try {
+    const ok = await window.Habits?.setEntry?.(uid, habitId, {
+      date: _habitTodayKey(),
+      status: "skipped",
+      comment: "Planned skip",
+      notify: true
+    });
+    if (!ok) alert("Could not update that habit.");
+  } finally {
+    _habitEntryInProgress.delete(lockKey);
+  }
 }
 
 async function catchUpHabitYesterday(habitId) {
