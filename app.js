@@ -9841,9 +9841,9 @@ function bindHabitsNavCollapse() {
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
-  if (page !== 'mercies' && _merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
+  // Keep habits and mercies feed listeners alive across navigation so data renders
+  // instantly on return. They are torn down on sign-out inside __onAuthStateReady.
   if (page !== 'mercies' && _merciesJournalUnsub) { _merciesJournalUnsub(); _merciesJournalUnsub = null; }
-  if (page !== 'habits' && _habitsUnsub) { _habitsUnsub(); _habitsUnsub = null; }
   if (page === 'lessons') {
     const cur = document.querySelector('.screen.active');
     if (cur?.id === 'communityPage') _prevNavPage = 'community';
@@ -10475,7 +10475,15 @@ async function startHabitsPage() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!list) return;
   if (!uid) {
-    list.innerHTML = '<p class="study-board-empty">Sign in to track habits.</p>';
+    if (!_authReady) {
+      // Auth is still resolving — show a neutral loading state and retry
+      list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
+      setTimeout(() => {
+        if (document.getElementById("habitsPage")?.classList.contains("active")) startHabitsPage();
+      }, 500);
+    } else {
+      list.innerHTML = '<p class="study-board-empty">Sign in to track habits.</p>';
+    }
     return;
   }
   if (!window.Habits?.listen) {
@@ -10487,13 +10495,18 @@ async function startHabitsPage() {
   }
   // restore tab UI to saved state
   _applyHabitsTabUI(_habitsTab);
+  // If the listener is already running, render from cached data immediately
+  if (_habitsUnsub) {
+    if (_habitsLoaded) renderHabits();
+    if (_habitsTab === "friends") loadFriendsHabits();
+    return;
+  }
   list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
   _habitsLoaded = false;
-  _habitsUnsub?.();
   _habitsUnsub = window.Habits?.listen?.(uid, habits => {
     _habitItems = habits || [];
     _habitsLoaded = true;
-    renderHabits();
+    if (document.getElementById("habitsPage")?.classList.contains("active")) renderHabits();
   });
   if (_habitsTab === "friends") loadFriendsHabits();
 }
@@ -19036,6 +19049,24 @@ window.__onAuthStateReady = async (user) => {
     _maybeStartAppWelcomeCoachAfterAuth();
     setTimeout(maybeShowHomeIntroModal, 500);
     hideAppLaunchScreen('ready');
+
+    // Pre-start the habits listener so data is loaded before the user navigates there
+    if (!_habitsUnsub && window.Habits?.listen) {
+      _habitsUnsub = window.Habits.listen(user.uid, habits => {
+        _habitItems = habits || [];
+        _habitsLoaded = true;
+        if (document.getElementById("habitsPage")?.classList.contains("active")) renderHabits();
+      });
+    }
+
+    // If a data-dependent page was already visible (e.g. shown before auth resolved),
+    // refresh it now so users don't stay stuck on a "sign in" or "loading" message.
+    const _authReadyActivePage = document.querySelector('.screen.active');
+    if (_authReadyActivePage?.id === 'habitsPage') {
+      startHabitsPage();
+    } else if (_authReadyActivePage?.id === 'merciesPage') {
+      startMerciesFeed();
+    }
   } else {
     _unsubUserDoc?.();
     _unsubUserDoc = null;
@@ -19043,6 +19074,9 @@ window.__onAuthStateReady = async (user) => {
     _communityPosts = [];
     if (_merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
     _merciesPosts = [];
+    if (_habitsUnsub) { _habitsUnsub(); _habitsUnsub = null; }
+    _habitItems = [];
+    _habitsLoaded = false;
     _welcomeCoachQueuedAfterAuth = false;
     document.getElementById('appCoachOverlay')?.classList.add('hidden');
     _resumeHomeFlipAfterCoach();
@@ -19565,8 +19599,13 @@ function startMerciesFeed() {
   refreshPendingMercyFriendEncouragement();
   clearTimeout(_merciesFeedRetryTimer);
   if (!uid) {
-    list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Praises</strong><p>Your feed will load as soon as your account is ready.</p></div>';
-    _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 900);
+    if (!_authReady) {
+      // Auth is still resolving — show neutral state and retry quickly
+      list.innerHTML = '<p class="study-board-empty">Loading Praises...</p>';
+      _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 500);
+    } else {
+      list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Praises</strong><p>Your feed will load as soon as your account is ready.</p></div>';
+    }
     return;
   }
   if (!window.Mercies?.listen) {
