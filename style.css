@@ -15119,6 +15119,13 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
 }
 
 /* ── Form ending hint ── */
+.rhema-inflected-gloss {
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--font-color);
+  padding: 0 0 12px;
+}
 .rhema-form-hint {
   font-size: 0.85rem;
   color: var(--muted-color);
