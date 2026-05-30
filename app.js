@@ -8745,6 +8745,9 @@ function openWritingModal(type) {
   // Clear textarea
   const ta = document.getElementById('swmTextarea');
   if (ta) { ta.value = ''; ta.style.height = 'auto'; ta.placeholder = meta.placeholder; }
+  // Show "Save to Sermon" button only when in sermon Rhema mode
+  const saveSermonBtn = document.getElementById('swmSaveSermonBtn');
+  if (saveSermonBtn) saveSermonBtn.classList.toggle('hidden', !_sermonRhemaMode);
   // Show
   modal.classList.remove('hidden');
   requestAnimationFrame(() => modal.classList.add('open'));
@@ -22270,6 +22273,7 @@ function loadRhemaScripts() {
 async function showRhema() {
   _desktopCollapseNav();
   hideBottomNav();
+  setNavActive('rhema');
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
@@ -22292,6 +22296,11 @@ async function showRhema() {
 }
 
 function closeRhema(keepSandbox = false) {
+  // If opened from sermon workshop, handle cleanup via sermon mode
+  if (typeof _sermonRhemaMode !== 'undefined' && _sermonRhemaMode) {
+    _closeSermonRhemaMode();
+    return;
+  }
   _saveRhemaPosition();
   if (typeof _closeRhemaXrefShell === 'function') _closeRhemaXrefShell();
   // If opened from a study sandbox, hide Save Verse button and update preview
@@ -25022,6 +25031,7 @@ function _initDesktopNav() {
   if (!nav) return;
   nav.classList.add('nav-intro');
   setTimeout(() => { nav.classList.remove('nav-intro'); }, 5000);
+  setNavActive('home');
 }
 
 function _desktopCollapseNav() {
@@ -25122,10 +25132,11 @@ function openSermonWorkshop(draft) {
 
 function closeSermonWorkshop(skipSave) {
   const overlay = document.getElementById('sermonWorkshopOverlay');
-  if (!overlay || !overlay.classList.contains('open')) return;
+  if (!overlay || (!overlay.classList.contains('open') && !overlay.classList.contains('sermon-rhema-hidden'))) return;
   if (!skipSave) saveSermonDraft();
-  if (_swRhemaOpen) closeSermonRhema();
-  overlay.classList.remove('open');
+  if (_sermonRhemaMode) _closeSermonRhemaMode();
+  else if (_swRhemaOpen) closeSermonRhema();
+  overlay.classList.remove('open', 'sermon-rhema-hidden');
   setTimeout(() => overlay.classList.add('hidden'), 320);
   _swCurrentSermonIndex = -1;
 }
@@ -25266,7 +25277,7 @@ function _collectSermonDraft() {
     applicationPoints: g('swApplicationPoints'),
     distortions: g('swDistortions'),
     generalNotes: g('swGeneralNotes'),
-    rhemaPos: _swRhemaOpen ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse } : null
+    rhemaPos: (_swRhemaOpen || _sermonRhemaMode) ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse } : null
   };
 }
 
@@ -25331,48 +25342,90 @@ function exportSermonText() {
 }
 
 // \u2500\u2500 Sermon Rhema \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+let _sermonRhemaMode = false;
+let _sermonRhemaSavedPos = null;
+
 function toggleSermonRhema() {
-  if (_swRhemaOpen) closeSermonRhema();
+  if (_sermonRhemaMode) _closeSermonRhemaMode();
   else openSermonRhema();
 }
 
 function openSermonRhema() {
-  const panel = document.getElementById('swRhemaPanel');
-  const btn = document.getElementById('swRhemaToggleBtn');
-  if (!panel) return;
+  _sermonRhemaMode = true;
   _swRhemaOpen = true;
-  panel.classList.remove('hidden');
-  if (btn) btn.classList.add('active');
-  if (!panel._rhemaInitialized) {
-    panel._rhemaInitialized = true;
-    panel.innerHTML = `
-      <div class="swr-header">
-        <div class="swr-title">
-          <span class="material-symbols-outlined">menu_book</span>
-          <span>Rhema</span>
-        </div>
-        <div class="swr-picker">
-          <button class="rhema-pill swr-pill" onclick="openRhemaBookPicker()" id="swrBookPill">Book</button>
-          <button class="rhema-pill swr-pill" onclick="openRhemaChapPicker()" id="swrChapPill">Ch</button>
-          <button class="rhema-pill swr-pill" id="swrVersePill" onclick="openRhemaVersePicker()">V</button>
-        </div>
-        <button class="swr-close" onclick="closeSermonRhema()"><span class="material-symbols-outlined">close</span></button>
-      </div>
-      <div class="swr-body">
-        <div class="rhema-verse-display" id="swrVerseDisplay"></div>
-        <div class="rhema-sheet" id="swrSheet" style="display:none"></div>
-      </div>`;
+  // Save global rhema position to restore when leaving
+  _sermonRhemaSavedPos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+  // Load sermon's saved rhema position if available
+  try {
+    const draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}');
+    if (draft.rhemaPos) {
+      _rhemaBook = draft.rhemaPos.book || _rhemaBook;
+      _rhemaChapter = draft.rhemaPos.chapter || _rhemaChapter;
+      _rhemaVerse = draft.rhemaPos.verse || _rhemaVerse;
+    }
+  } catch {}
+  // Hide workshop overlay, show full Rhema with back-to-workshop button
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (overlay) overlay.classList.add('sermon-rhema-hidden');
+  const backBtn = document.getElementById('rhemaWorkshopBackBtn');
+  const homeBtn = document.querySelector('#rhemaSlide .rhema-back-btn');
+  if (backBtn) backBtn.classList.remove('hidden');
+  if (homeBtn) homeBtn.classList.add('hidden');
+  showRhema();
+}
+
+function _closeSermonRhemaMode() {
+  if (!_sermonRhemaMode) return;
+  _sermonRhemaMode = false;
+  _swRhemaOpen = false;
+  // Save current Rhema position back to sermon draft
+  try {
+    const draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}');
+    draft.rhemaPos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+    localStorage.setItem('sermonWorkshopDraft', JSON.stringify(draft));
+  } catch {}
+  // Restore global position
+  if (_sermonRhemaSavedPos) {
+    _rhemaBook = _sermonRhemaSavedPos.book;
+    _rhemaChapter = _sermonRhemaSavedPos.chapter;
+    _rhemaVerse = _sermonRhemaSavedPos.verse;
+    _sermonRhemaSavedPos = null;
   }
-  _renderSwrVerse();
+  // Restore Rhema header buttons
+  const backBtn = document.getElementById('rhemaWorkshopBackBtn');
+  const homeBtn = document.querySelector('#rhemaSlide .rhema-back-btn');
+  if (backBtn) backBtn.classList.add('hidden');
+  if (homeBtn) homeBtn.classList.remove('hidden');
+  // Close Rhema and reopen workshop
+  const modal = document.getElementById('rhemaModal');
+  if (modal) modal.classList.remove('open');
+  showBottomNav();
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (overlay) overlay.classList.remove('sermon-rhema-hidden');
 }
 
 function closeSermonRhema() {
-  const panel = document.getElementById('swRhemaPanel');
-  const btn = document.getElementById('swRhemaToggleBtn');
+  // Side panel no longer used; keep stub for safety
   _swRhemaOpen = false;
-  if (panel) panel.classList.add('hidden');
-  if (btn) btn.classList.remove('active');
   saveSermonDraft();
+}
+
+function saveWritingModalToSermon() {
+  const ta = document.getElementById('swmTextarea');
+  const text = ta?.value?.trim();
+  if (!text) { ta?.focus(); return; }
+  const book = _swmSavedBook || _rhemaBook;
+  const ch = _swmSavedChapter || _rhemaChapter;
+  const vs = _swmSavedVerse || _rhemaVerse;
+  const bookName = _rhemaBookName ? _rhemaBookName(book) : book;
+  const ref = `${bookName} ${ch}:${vs}`;
+  const el = document.getElementById('swGreekNotes');
+  if (el) {
+    const existing = el.value.trim();
+    el.value = existing ? `${existing}\n\n[${ref}] ${text}` : `[${ref}] ${text}`;
+    el.dispatchEvent(new Event('input'));
+  }
+  closeWritingModal();
 }
 
 function _renderSwrVerse() {

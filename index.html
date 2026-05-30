@@ -333,7 +333,7 @@ glacier: {
 <span class="material-symbols-outlined">home</span>
 <span class="dnb-label">Home</span>
 </button>
-<button class="desktop-nav-btn primary" onclick="showRhema()" data-nav="rhema">
+<button class="desktop-nav-btn" onclick="showRhema()" data-nav="rhema">
 <span class="material-symbols-outlined">menu_book</span>
 <span class="dnb-label">Open Rhema</span>
 </button>
@@ -344,10 +344,6 @@ glacier: {
 <button class="desktop-nav-btn" onclick="showNavPage('sermons')" data-nav="sermons">
 <span class="material-symbols-outlined">library_books</span>
 <span class="dnb-label">Sermons</span>
-</button>
-<button class="desktop-nav-btn" onclick="showNavPage('lessons')" data-nav="lessons">
-<span class="material-symbols-outlined">school</span>
-<span class="dnb-label">Lessons</span>
 </button>
 <button class="desktop-nav-btn" onclick="showNavPage('profile')" data-nav="profile">
 <span class="material-symbols-outlined">person</span>
@@ -363,43 +359,57 @@ glacier: {
 <h1>Your Scripture Study Desk.</h1>
 <p>Explore any passage in Rhema, search the Greek lexicon in the Word Library, prep a sermon, and manage your studies — all with the depth and tools your desktop provides.</p>
 <div class="desktop-study-actions">
-<button class="desktop-primary-action" onclick="showRhema()">
-<span class="material-symbols-outlined">menu_book</span>
+<button class="desktop-primary-action" onclick="openStudyCreateSheet()">
+<span class="material-symbols-outlined">add</span>
 Start a New Study
 </button>
 </div>
 </div>
 <div class="desktop-study-card" id="desktopRhemaCard" onclick="resumeRhema()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')resumeRhema()">
-<div class="dsc-top-bar">
-<span class="dsc-tag">Rhema</span>
-<span class="dsc-passage" id="desktopRhemaPassage">John 1:1</span>
+<div class="dsc-mock-rhema" id="dscMockRhema">
+<div class="dsc-mock-header">
+<span class="dsc-mock-title">Rhēma</span>
+<div class="dsc-mock-pills">
+<span class="dsc-mock-pill" id="desktopRhemaPassage">John 1:1</span>
 </div>
-<div class="dsc-verse-preview" id="dscVersePreview">
-<span class="dsc-word" data-parse="V-IAI-3S">Ἐν</span>
-<span class="dsc-word" data-parse="P">ἀρχῇ</span>
-<span class="dsc-word selected" data-parse="N-NSM">ἦν</span>
-<span class="dsc-word" data-parse="D">ὁ</span>
-<span class="dsc-word" data-parse="N-NSM">λόγος</span>
-<span class="dsc-comma">,</span>
-<span class="dsc-word" data-parse="C">καὶ</span>
-<span class="dsc-word" data-parse="P">ὁ</span>
-<span class="dsc-word" data-parse="N-NSM">λόγος</span>
-<span class="dsc-word" data-parse="V-IAI-3S">ἦν</span>
-<span class="dsc-word" data-parse="P">πρὸς</span>
-<span class="dsc-word accent" data-parse="D-ASM">τὸν</span>
-<span class="dsc-word accent" data-parse="N-ASM">θεόν</span>
+<div class="dsc-mock-actions">
+<span class="dsc-mock-icon">auto_fix_high</span>
+<span class="dsc-mock-icon">swap_horiz</span>
 </div>
-<div class="dsc-word-panel">
-<span class="dsc-lemma" id="desktopRhemaSnippet">λόγος — word, reason, account</span>
-<div class="dsc-parse-chips">
+</div>
+<div class="dsc-mock-verse" id="dscVersePreview">
+<span class="dsc-word">Ἐν</span>
+<span class="dsc-word">ἀρχῇ</span>
+<span class="dsc-word selected">ἦν</span>
+<span class="dsc-word">ὁ</span>
+<span class="dsc-word">λόγος</span><span class="dsc-comma">,</span>
+<span class="dsc-word">καὶ</span>
+<span class="dsc-word">ὁ</span>
+<span class="dsc-word">λόγος</span>
+<span class="dsc-word">ἦν</span>
+<span class="dsc-word">πρὸς</span>
+<span class="dsc-word accent">τὸν</span>
+<span class="dsc-word accent">θεόν</span>
+</div>
+<div class="dsc-mock-sheet">
+<div class="dsc-mock-sheet-top">
+<span class="dsc-mock-surface" id="desktopRhemaSnippet">λόγος</span>
+<span class="dsc-mock-strongs">G3056</span>
+</div>
+<div class="dsc-mock-parse-row">
 <span class="dsc-chip">Noun</span>
-<span class="dsc-chip">Nominative</span>
-<span class="dsc-chip">Singular</span>
+<span class="dsc-chip">Nom.</span>
+<span class="dsc-chip">Sg.</span>
+<span class="dsc-chip">Masc.</span>
+</div>
+<div class="dsc-mock-def">word, reason, account — used of Christ as the divine Word in John's prologue</div>
 </div>
 </div>
-<div class="desktop-resume-hint">
+<div class="dsc-fog-overlay">
+<div class="dsc-fog-cta">
 <span class="material-symbols-outlined">play_arrow</span>
-<span>Resume</span>
+<span>Open Rhema</span>
+</div>
 </div>
 </div>
 </section>
@@ -413,11 +423,6 @@ Start a New Study
 <span class="material-symbols-outlined">edit_note</span>
 <strong>Sermon Workshop</strong>
 <small>Build a sermon outline with passage notes, structure points, illustrations, and application.</small>
-</button>
-<button class="desktop-tool-card" onclick="showNavPage('lessons')">
-<span class="material-symbols-outlined">school</span>
-<strong>Lessons</strong>
-<small>Work through Greek grammar lessons alongside your Rhema studies with structured desktop reading.</small>
 </button>
 <button class="desktop-tool-card" onclick="openDesktopStudyDesk()">
 <span class="material-symbols-outlined">dashboard</span>
@@ -9680,6 +9685,9 @@ Verb Endings
 <button class="icon-btn rhema-back-btn" onclick="rhemaGoBack()">
 <span class="material-symbols-outlined">home</span>
 </button>
+<button class="icon-btn rhema-workshop-back-btn hidden" id="rhemaWorkshopBackBtn" onclick="_closeSermonRhemaMode()" title="Back to Workshop">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
 <div class="rhema-title-block">
 <span class="rhema-title">Rhēma</span>
 <span class="rhema-title-greek">Word Study</span>
@@ -16363,10 +16371,14 @@ Verb Endings
 <textarea class="swm-textarea" id="swmTextarea" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="Write your thoughts…" rows="5"></textarea>
 </div>
 <div class="swm-footer">
+<button class="swm-save-sermon-btn hidden" id="swmSaveSermonBtn" onclick="saveWritingModalToSermon()">
+<span class="material-symbols-outlined">edit_note</span>
+Save to Sermon
+</button>
 <button class="swm-save-btn" onclick="saveWritingModal()">
 <span class="material-symbols-outlined">check</span>
-      Save
-    </button>
+Save
+</button>
 </div>
 </div>
 <!-- ── Sermon Workshop (Desktop) ── -->

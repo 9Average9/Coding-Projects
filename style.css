@@ -21304,6 +21304,12 @@ body.dark .bottom-nav::before {
     box-shadow: 0 12px 24px color-mix(in srgb, var(--secondary-color) 22%, transparent);
   }
 
+  .desktop-nav-btn.active {
+    background: var(--secondary-color);
+    color: var(--btn-text-color);
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  }
+
   .desktop-nav-btn .material-symbols-outlined {
     font-size: 22px;
     flex-shrink: 0;
@@ -23710,6 +23716,92 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
+
+  /* Study sandbox: must not be covered by nav rail */
+  .study-sandbox {
+    left: 300px !important;
+    width: calc(100vw - 300px) !important;
+  }
+
+  /* Cross reference: desktop-friendly sidebar layout */
+  .rhema-xref-page {
+    left: 300px;
+    border-left: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  }
+
+  .rhema-xref-verse-row {
+    padding: 11px 14px;
+    border-radius: 12px;
+    border-bottom: none;
+    margin-bottom: 4px;
+    background: color-mix(in srgb, var(--card-color) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-color) 44%, transparent);
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  .rhema-xref-verse-row:hover {
+    background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+    border-color: color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  }
+
+  .rhema-xref-verse-ref {
+    font-size: 0.82rem;
+    min-width: 72px;
+    font-weight: 800;
+  }
+
+  .rhema-xref-verse-text {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .rx-page-header {
+    padding-top: 18px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* Reference pickers: ensure not behind nav on desktop */
+  #rxBookPickerOverlay {
+    left: 300px !important;
+    width: calc(100vw - 300px) !important;
+  }
+
+  .rhema-picker-overlay {
+    left: 300px;
+    width: calc(100vw - 300px);
+  }
+
+  /* Desktop tool grid: 3 columns now that Lessons is removed */
+  .desktop-tool-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Sermon-mode back-to-workshop button in Rhema header */
+  .rhema-workshop-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px 6px 10px;
+    border-radius: 10px;
+    border: 1.5px solid color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+    color: var(--secondary-color);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 850;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .rhema-workshop-back-btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .rhema-workshop-back-btn.hidden {
+    display: none;
+  }
 }
 
 /* ── Sermon Rhema panel CSS ────────────────────────────────────────────────── */
@@ -23764,4 +23856,197 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   flex: 1;
   overflow-y: auto;
   padding: 12px;
+}
+
+/* Workshop hidden while Rhema is open from it */
+.sw-overlay.sermon-rhema-hidden {
+  display: none !important;
+}
+
+/* ── Desktop Rhema preview card (fog overlay) ───────────────────────────────── */
+.desktop-study-card {
+  position: relative;
+}
+
+.dsc-mock-rhema {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dsc-mock-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dsc-mock-title {
+  font-size: 1rem;
+  font-weight: 950;
+  color: var(--font-color);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.dsc-mock-pills {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.dsc-mock-pill {
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  color: var(--secondary-color);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 20%, transparent);
+}
+
+.dsc-mock-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.dsc-mock-icon {
+  font-family: 'Material Symbols Outlined';
+  font-size: 18px;
+  color: var(--muted-color);
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--border-color) 30%, transparent);
+}
+
+.dsc-mock-verse {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 5px;
+  align-content: flex-start;
+  font-family: 'Gentium Plus', 'Noto Serif', serif;
+  font-size: 1.28rem;
+  line-height: 1.55;
+  color: var(--font-color);
+  overflow: hidden;
+}
+
+.dsc-mock-sheet {
+  background: color-mix(in srgb, var(--secondary-color) 6%, var(--card-color));
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dsc-mock-sheet-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dsc-mock-surface {
+  font-family: 'Gentium Plus', 'Noto Serif', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+.dsc-mock-strongs {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted-color);
+  letter-spacing: 0.04em;
+}
+
+.dsc-mock-parse-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dsc-mock-def {
+  font-size: 0.78rem;
+  color: var(--muted-color);
+  line-height: 1.42;
+}
+
+/* Fog overlay */
+.dsc-fog-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--card-color) 30%, transparent) 35%,
+    color-mix(in srgb, var(--card-color) 80%, transparent) 65%,
+    color-mix(in srgb, var(--card-color) 96%, transparent) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s ease;
+}
+
+.desktop-study-card:hover .dsc-fog-overlay {
+  opacity: 0.7;
+}
+
+.dsc-fog-cta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  font-size: 0.92rem;
+  font-weight: 900;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--secondary-color) 35%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.desktop-study-card:hover .dsc-fog-cta {
+  transform: scale(1.04);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--secondary-color) 45%, transparent);
+}
+
+.dsc-fog-cta .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* ── Writing modal: Save to Sermon button ──────────────────────────────────── */
+.swm-save-sermon-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: var(--secondary-color);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.swm-save-sermon-btn.hidden {
+  display: none;
+}
+
+.swm-save-sermon-btn .material-symbols-outlined {
+  font-size: 18px;
 }
