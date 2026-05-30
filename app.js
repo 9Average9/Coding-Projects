@@ -18152,7 +18152,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.78";
+const APP_VERSION = "3.0.79";
 
 // Per-file versions for Rhema data bundles — only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18169,6 +18169,12 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.79 &mdash; Rhema Full-Word Inflected Glosses</div>
+<ul>
+  <li><strong>Every Greek word now shows its inflected English form</strong> — nouns, adjectives, pronouns, and articles all receive case-based English glosses (e.g. "of God" for a genitive, "to/for God" for a dative) in addition to the verb forms added in 3.0.78.</li>
+  <li><strong>Parsing tab shows the inflected English gloss for all words</strong> — tap any word and the Parsing tab opens with the context-appropriate English translation at the top, not just verbs.</li>
+  <li><strong>Quick Definition reflects the inflected meaning for all words</strong> in the Definition tab.</li>
+</ul>
 <div class="un-version-label">v3.0.78 &mdash; Rhema Inflected Glosses</div>
 <ul>
   <li><strong>Inline glosses now show the inflected English form</strong> — Greek verbs display the conjugated translation beneath them (e.g. "I love", "you all love", "to love", "loving") instead of the bare lexical word.</li>
@@ -22907,7 +22913,7 @@ function _renderVerseWords(words, verse) {
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
       const gloss = w[2]?.startsWith('V-')
         ? _sxVerbGloss(w[2], lex.brief)
-        : (lex.brief || '').split(',')[0].split(';')[0].trim();
+        : _nounGloss(w[2], lex.brief);
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
       const variantTag = variant
         ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
@@ -23791,6 +23797,33 @@ function _sxVerbGloss(morph, brief) {
   return subj ? `${subj}${modal} ${conjugated}` : `${modal.trim()} ${conjugated}`.trim();
 }
 
+// Case-inflected English gloss for nouns, pronouns, adjectives, and other declinable words.
+// Returns a preposition-prefixed gloss (e.g. "of God", "to/for God") based on the Greek case.
+function _nounGloss(morph, brief) {
+  const base = (brief || '').split(',')[0].split(';')[0].trim();
+  if (!base || !morph) return base;
+  const segs = morph.split('-');
+  const posRaw = segs[0];
+  if (posRaw === 'T') return base;  // article — "the" needs no case prefix
+  const cng = segs[1] || '';
+  if (!cng) return base;
+  if (cng === 'PRI' || cng === 'NUI' || cng === 'LI' || cng === 'OI') return base;
+  let caseCode;
+  if (posRaw === 'P') {
+    caseCode = (cng[0] === '1' || cng[0] === '2') ? cng[1] : cng[0];
+  } else if (posRaw === 'F') {
+    caseCode = cng[1];
+  } else if (posRaw === 'S') {
+    caseCode = cng[2];
+  } else {
+    caseCode = cng[0];
+  }
+  const CASE_PREP = { N: '', G: 'of ', D: 'to/for ', A: '', V: 'O ' };
+  const prep = CASE_PREP[caseCode];
+  if (prep === undefined) return base;
+  return prep ? `${prep}${base}` : base;
+}
+
 const _SX_CLAUSE_TYPES = {
   2443:'purpose',  3704:'purpose',                             // ἵνα, ὅπως
   3754:'content',  5620:'result',
@@ -24418,7 +24451,7 @@ function _renderDiagramBranch(clause, words, verse) {
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
       const gloss = w[2]?.startsWith('V-')
         ? _sxVerbGloss(w[2], lex.brief)
-        : (lex.brief || '').split(',')[0].split(';')[0].trim();
+        : _nounGloss(w[2], lex.brief);
       html += `<span class="rsx-dg-wd" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
       html += `<span class="rsx-dg-wd-gr">${w[0]}</span>`;
       if (gloss) html += `<span class="rsx-dg-wd-gl">${gloss}</span>`;
@@ -24907,9 +24940,11 @@ function renderRhemaParsing(surface, strongs, morph) {
   const safeStr = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
 
   const lex = (window.RhemaLexicon || {})[strongs] || {};
-  const inflectedGloss = morph?.startsWith('V-') ? _sxVerbGloss(morph, lex.brief) : '';
+  const inflectedGloss = morph?.startsWith('V-')
+    ? _sxVerbGloss(morph, lex.brief)
+    : _nounGloss(morph, lex.brief);
   const glossHtml = inflectedGloss
-    ? `<div class="rhema-inflected-gloss">“${inflectedGloss}”</div>`
+    ? `<div class=”rhema-inflected-gloss”>”${inflectedGloss}”</div>`
     : '';
 
   return glossHtml + `<div class="rhema-parsing-grid">` +
@@ -24971,9 +25006,10 @@ function renderRhemaDefinition(strongs, morph) {
     </div>`);
   }
 
-  const quickDefinition = morph?.startsWith('V-')
-    ? (_sxVerbGloss(morph, lex.brief) || getRhemaQuickDefinition(lex))
-    : getRhemaQuickDefinition(lex);
+  const _inflGloss = morph?.startsWith('V-')
+    ? _sxVerbGloss(morph, lex.brief)
+    : _nounGloss(morph, lex.brief);
+  const quickDefinition = _inflGloss || getRhemaQuickDefinition(lex);
   if (quickDefinition) {
     sections.push(`<div class="rhema-def-section rhema-def-quick">
       <div class="rhema-def-label">Quick Definition</div>
