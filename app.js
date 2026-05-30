@@ -10609,7 +10609,7 @@ function renderFriendsHabits() {
         <span class="friend-habit-section-avatar">${avatar}</span>${name}
       </div>
       <div onclick="showFriendHabitsModal('${uid}')" style="cursor:pointer">
-        ${_renderFriendHabitCard(firstHabit)}
+        ${_renderFriendHabitCard(firstHabit, uid)}
       </div>
       ${moreCount > 0 ? `<button class="friend-habit-more-btn" onclick="showFriendHabitsModal('${uid}')">
         <span class="material-symbols-outlined">expand_more</span>
@@ -10619,7 +10619,7 @@ function renderFriendsHabits() {
   }).join("");
 }
 
-function _renderFriendHabitCard(habit) {
+function _renderFriendHabitCard(habit, friendUid = '') {
   const entries = habit.entries || {};
   const today = _habitTodayKey();
   const count = Object.values(entries).filter(e => e.status === "success").length;
@@ -10627,6 +10627,13 @@ function _renderFriendHabitCard(habit) {
   const icon = _habitEsc(habit.icon || "menu_book");
   const color = habit.color || "";
   const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
+  const habitId = _habitEsc(habit.id || "");
+  const habitName = _habitEsc(habit.name || "");
+  const encourageBtn = friendUid
+    ? `<button class="friend-habit-encourage-btn" onclick="event.stopPropagation();_encourageFriendHabit('${_habitEsc(friendUid)}','${habitId}','${habitName}')">
+        <span class="material-symbols-outlined">favorite</span>Encourage
+      </button>`
+    : "";
   return `<article class="habit-card friend-habit-card">
     <div class="habit-card-top">
       <div class="habit-card-identity" style="pointer-events:none">
@@ -10638,6 +10645,7 @@ function _renderFriendHabitCard(habit) {
           ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
         </div>
       </div>
+      ${encourageBtn}
     </div>
     <div class="habit-pills-row">
       <span class="habit-pill">
@@ -10668,7 +10676,7 @@ function showFriendHabitsModal(friendUid) {
         <p>${_habitEsc(name)} does not have any habits yet, encourage them to start making healthy ones</p>
       </div>`;
     } else {
-      listEl.innerHTML = cached.habits.map(h => _renderFriendHabitCard(h)).join("");
+      listEl.innerHTML = cached.habits.map(h => _renderFriendHabitCard(h, friendUid)).join("");
     }
   }
   document.getElementById("friendHabitsModal")?.classList.add("open");
@@ -10677,6 +10685,18 @@ function showFriendHabitsModal(friendUid) {
 function closeFriendHabitsModal(event) {
   if (!event || event.target.id === "friendHabitsModal") {
     document.getElementById("friendHabitsModal")?.classList.remove("open");
+  }
+}
+
+async function _encourageFriendHabit(friendUid, habitId, habitName) {
+  const uid = window.Auth?.getCurrentUser()?.uid;
+  if (!uid || !friendUid) return;
+  const myName = localStorage.getItem("authDisplayName") || localStorage.getItem("authUsername") || "A friend";
+  try {
+    await window.Habits?.sendHabitEncouragement?.(uid, myName, friendUid, habitId, habitName);
+    _showStudyToast("Encouragement sent!");
+  } catch (e) {
+    console.warn("_encourageFriendHabit:", e);
   }
 }
 

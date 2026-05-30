@@ -1434,7 +1434,8 @@ window.Habits = {
   delete: deleteHabit,
   awardMilestone: awardHabitMilestone,
   importHabitShare,
-  getFriendHabits
+  getFriendHabits,
+  sendHabitEncouragement
 };
 
 window.Studies = {
@@ -1948,6 +1949,10 @@ async function fcmDisableReminder(uid) {
 
 async function fcmSendEncouragement(fromUid, fromName, toUid) {
   return fcmSendPushNotification(toUid, "encouragement", fromName, fromUid);
+}
+
+async function sendHabitEncouragement(fromUid, fromName, toUid, habitId, habitName) {
+  return fcmSendPushNotification(toUid, "habitEncouragement", fromName, fromUid, { habitId, habitName });
 }
 
 function fcmListenForeground(callback) {
