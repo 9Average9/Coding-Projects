@@ -9658,6 +9658,16 @@ function _mergeStudyNotificationMessages(msgs = []) {
     });
     if (!_myStudies.find(s => s.id === m.studyId)) _loadMyStudies();
   });
+
+  msgs.filter(m => m.type === 'habitEncouragement' && !m._read).forEach(m => {
+    upsert('habit_encourage_' + m.id, {
+      id: 'habit_encourage_' + m.id, type: 'habit_encouragement',
+      fromName: m.fromName || 'Someone',
+      habitName: m.habitName || 'habit',
+      msgId: m.id,
+      read: false
+    });
+  });
 }
 
 async function notifApproveCollab(studyId, requesterUid, requesterName, itemId) {
@@ -9815,7 +9825,6 @@ function expandHabitsNavOnEntry() {
 }
 
 function bindHabitsNavCollapse() {
-  const scroll = document.getElementById('habitsPage')?.querySelector('.habits-scroll');
   const nav = document.getElementById('bottomNav');
   if (!nav || _habitsNavScrollBound) return;
   _habitsNavScrollBound = true;
@@ -9826,13 +9835,6 @@ function bindHabitsNavCollapse() {
       expandHabitsNavTemporarily();
     }
   }, true);
-  if (scroll) {
-    scroll.addEventListener('scroll', () => {
-      if (!document.getElementById('habitsPage')?.classList.contains('active')) return;
-      clearTimeout(_habitsNavCollapseTimer);
-      setHabitsNavCollapsed(true);
-    }, { passive: true });
-  }
 }
 
 let _prevNavPage = 'home';
@@ -10173,6 +10175,24 @@ function _habitEsc(value) {
 function _habitTodayKey() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function _habitEncourageKey(ownerUid, habitId, dateKey = _habitTodayKey()) {
+  return `habitEncourage:${dateKey}:${ownerUid}:${habitId}`;
+}
+
+function _habitEncouragedToday(ownerUid, habitId) {
+  try {
+    return localStorage.getItem(_habitEncourageKey(ownerUid, habitId)) === "sent";
+  } catch {
+    return false;
+  }
+}
+
+function _markHabitEncouragedToday(ownerUid, habitId) {
+  try {
+    localStorage.setItem(_habitEncourageKey(ownerUid, habitId), "sent");
+  } catch {}
 }
 
 function _habitDateMs(dateKey) {
@@ -10603,6 +10623,9 @@ function _renderFriendHabitCard(habit) {
   const icon = _habitEsc(habit.icon || "menu_book");
   const color = habit.color || "";
   const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
+  const ownerUid = _habitEsc(habit.ownerUid || "");
+  const habitId = _habitEsc(habit.id || "");
+  const encouraged = _habitEncouragedToday(habit.ownerUid || "", habit.id || "");
   return `<article class="habit-card friend-habit-card">
     <div class="habit-card-top">
       <div class="habit-card-identity" style="pointer-events:none">
@@ -10614,6 +10637,10 @@ function _renderFriendHabitCard(habit) {
           ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
         </div>
       </div>
+      <button type="button" class="friend-habit-encourage-btn${encouraged ? " sent" : ""}" onclick="sendFriendHabitEncouragement(event,'${ownerUid}','${habitId}')" ${encouraged ? "disabled" : ""}>
+        <span class="material-symbols-outlined">${encouraged ? "check_circle" : "volunteer_activism"}</span>
+        <span>${encouraged ? "Sent" : "Encourage"}</span>
+      </button>
     </div>
     <div class="habit-pills-row">
       <span class="habit-pill">
@@ -10625,6 +10652,43 @@ function _renderFriendHabitCard(habit) {
     </div>
     ${_habitWeeklyProgressHtml(habit)}
   </article>`;
+}
+
+async function sendFriendHabitEncouragement(event, ownerUid, habitId) {
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  const me = window.Auth?.getCurrentUser();
+  if (!me || !ownerUid || !habitId) return;
+  if (_habitEncouragedToday(ownerUid, habitId)) return;
+
+  const cached = _friendsHabitsCache[ownerUid];
+  const habit = cached?.habits?.find(h => h.id === habitId);
+  const friendName = cached?.profile?.displayName || cached?.profile?.username || "your friend";
+  const btn = event?.currentTarget;
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add("sending");
+    btn.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span><span>Sending</span>';
+  }
+
+  const result = await window.Habits?.encourage?.(me.uid, ownerUid, habitId, habit?.name || "habit", _habitTodayKey());
+  if (result?.ok || result?.reason === "alreadySent") {
+    _markHabitEncouragedToday(ownerUid, habitId);
+    if (btn) {
+      btn.classList.remove("sending");
+      btn.classList.add("sent", "sent-pop");
+      btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span><span>Sent</span>';
+      setTimeout(() => btn.classList.remove("sent-pop"), 700);
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = false;
+    btn.classList.remove("sending");
+    btn.innerHTML = '<span class="material-symbols-outlined">volunteer_activism</span><span>Encourage</span>';
+  }
+  alert(`Could not send encouragement to ${friendName}. Try again.`);
 }
 
 function showFriendHabitsModal(friendUid) {
@@ -11375,7 +11439,8 @@ async function _loadNotifications() {
   const acceptedItems = _notifItems.filter(n => n.type === 'friend_accepted');
   const collabItems   = _notifItems.filter(n => n.type === 'collab_request' || n.type === 'collab_approved');
   const inviteItems   = _notifItems.filter(n => n.type === 'study_invite');
-  _notifItems = [...updatedIncoming, ...preservedFriendItems, ...acceptedItems, ...collabItems, ...inviteItems];
+  const habitItems    = _notifItems.filter(n => n.type === 'habit_encouragement');
+  _notifItems = [...updatedIncoming, ...preservedFriendItems, ...acceptedItems, ...collabItems, ...inviteItems, ...habitItems];
   _updateNotifBadge();
 
   if (!_notifItems.length) {
@@ -11446,6 +11511,17 @@ async function _loadNotifications() {
           <div class="notif-body">
             <div class="notif-title">${n.fromName}</div>
             <div class="notif-sub">Approved your request to join "${n.studyName || 'a study'}"</div>
+          </div>
+          <button class="notif-x-btn" onclick="event.stopPropagation();notifDismissCollab('${n.id}','${n.msgId||''}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
+        </div>`;
+    }
+    if (n.type === 'habit_encouragement') {
+      return `
+        <div class="notif-item${n.read ? '' : ' unread'}">
+          <div class="notif-icon notif-icon-accepted"><span class="material-symbols-outlined">volunteer_activism</span></div>
+          <div class="notif-body">
+            <div class="notif-title">${_habitEsc(n.fromName)}</div>
+            <div class="notif-sub">Encouraged you to keep going with "${_habitEsc(n.habitName || 'habit')}"</div>
           </div>
           <button class="notif-x-btn" onclick="event.stopPropagation();notifDismissCollab('${n.id}','${n.msgId||''}')" title="Dismiss"><span class="material-symbols-outlined">close</span></button>
         </div>`;
@@ -18034,9 +18110,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.73";
+const APP_VERSION = "3.0.74";
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.74 &mdash; Habit Encouragements</div>
+<ul>
+  <li><strong>Friend habit encouragements now send</strong> a habit-specific notification when pressed.</li>
+  <li><strong>Encourage buttons animate and lock for the day</strong> so each friend habit can only be encouraged once until midnight.</li>
+  <li><strong>Habit Builder nav behavior refined</strong> so the bottom dock still auto-collapses after 3 seconds, but scrolling habits no longer forces it closed.</li>
+</ul>
 <div class="un-version-label">v3.0.73 &mdash; Desktop Rhema Foundation</div>
 <ul>
   <li><strong>Desktop study desk added</strong> for wide screens with a Rhema-first layout, side navigation, and study-tool cards.</li>

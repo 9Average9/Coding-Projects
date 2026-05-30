@@ -505,7 +505,7 @@ exports.onUserReminderWritten = functions.firestore
   });
 
 // Triggers on any new doc in encouragements/{targetUid}/messages/{messageId}.
-// Handles: encouragement, friendRequest, friendAccepted notification types.
+// Handles the app's social, study, habit, and encouragement notification types.
 exports.onEncouragementCreated = functions.firestore
   .document("encouragements/{targetUid}/messages/{messageId}")
   .onCreate(async (snap, context) => {
@@ -571,6 +571,10 @@ exports.onEncouragementCreated = functions.firestore
       const habitName = snap.data().habitName || "a habit";
       title = "Habit Completed";
       body = `${fromName} completed today's "${habitName}" habit.`;
+    } else if (type === "habitEncouragement") {
+      const habitName = snap.data().habitName || "habit";
+      title = "Habit Encouragement";
+      body = `${fromName} encouraged you to keep going with "${habitName}".`;
     } else if (type === "encouragement") {
       title = "Study Encouragement";
       body = `${fromName} is encouraging you to study your Greek!`;

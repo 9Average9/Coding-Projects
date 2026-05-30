@@ -28,6 +28,11 @@ service cloud.firestore {
         }
       }
 
+      match /habitEncouragements/{sendId} {
+        allow read, create, update, delete: if request.auth != null
+          && request.auth.uid == uid;
+      }
+
       match /merciesJournal/{entryId} {
         allow read, create, update, delete: if request.auth != null
           && request.auth.uid == uid;

@@ -5686,6 +5686,62 @@ body.dark .big-lock .material-symbols-outlined {
   cursor: default;
 }
 
+.friend-habit-card .habit-card-top {
+  gap: 10px;
+}
+
+.friend-habit-encourage-btn {
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 26%, transparent);
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255,255,255,0.82), transparent 38%),
+    color-mix(in srgb, var(--secondary-color) 11%, var(--primary-light));
+  color: var(--secondary-color);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--secondary-color) 13%, transparent);
+  border-radius: 999px;
+  min-height: 38px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.friend-habit-encourage-btn .material-symbols-outlined {
+  font-size: 1.12rem;
+}
+
+.friend-habit-encourage-btn:active {
+  transform: scale(.95);
+}
+
+.friend-habit-encourage-btn.sending {
+  opacity: .72;
+}
+
+.friend-habit-encourage-btn.sent,
+.friend-habit-encourage-btn:disabled {
+  cursor: default;
+  color: #0f7a5b;
+  border-color: color-mix(in srgb, #10b981 34%, transparent);
+  background: linear-gradient(180deg, rgba(220,252,231,.96), rgba(236,253,245,.86));
+  box-shadow: 0 8px 18px rgba(16,185,129,.14);
+}
+
+.friend-habit-encourage-btn.sent-pop {
+  animation: friendHabitEncouragePop .62s cubic-bezier(.18,.89,.32,1.28);
+}
+
+@keyframes friendHabitEncouragePop {
+  0% { transform: scale(.92); }
+  45% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 .friend-habit-more-btn {
   background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
   border: 1px solid var(--border-color);

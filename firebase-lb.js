@@ -1207,6 +1207,43 @@ async function notifyHabitPartners(uid, friendUids = [], type, habitId, habitNam
     .map(friendUid => fcmSendPushNotification(friendUid, type, fromName, uid, { habitId, habitName })));
 }
 
+function habitEncouragementId(toUid, habitId, dateKey) {
+  return [dateKey, toUid, habitId].map(part => String(part || "").replace(/[^a-zA-Z0-9_-]/g, "-")).join("_");
+}
+
+async function sendHabitEncouragement(fromUid, toUid, habitId, habitName, dateKey) {
+  try {
+    if (!fromUid || !toUid || fromUid === toUid || !habitId || !dateKey) {
+      return { ok: false, reason: "invalid" };
+    }
+    const sentRef = doc(db, "users", fromUid, "habitEncouragements", habitEncouragementId(toUid, habitId, dateKey));
+    const existing = await getDoc(sentRef);
+    if (existing.exists()) return { ok: false, reason: "alreadySent" };
+
+    const fromName = await habitOwnerName(fromUid);
+    const cleanHabitName = String(habitName || "habit").trim() || "habit";
+    const sent = await fcmSendPushNotification(toUid, "habitEncouragement", fromName, fromUid, {
+      habitId,
+      habitName: cleanHabitName,
+      dateKey
+    });
+    if (!sent) return { ok: false, reason: "notificationFailed" };
+
+    await setDoc(sentRef, {
+      toUid,
+      habitId,
+      habitName: cleanHabitName,
+      dateKey,
+      createdAt: serverTimestamp(),
+      createdAtMs: Date.now()
+    });
+    return { ok: true };
+  } catch (e) {
+    console.warn("sendHabitEncouragement:", e);
+    return { ok: false, reason: "error" };
+  }
+}
+
 async function createHabit(uid, { name, description = "", scheduleType = "daily", accountabilityUids = [], icon = "menu_book", color = "" } = {}) {
   try {
     const habitId = habitIdFromName(name);
@@ -1422,6 +1459,7 @@ window.Habits = {
   update: updateHabit,
   delete: deleteHabit,
   awardMilestone: awardHabitMilestone,
+  encourage: sendHabitEncouragement,
   importHabitShare,
   getFriendHabits
 };
