@@ -18092,7 +18092,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.75";
+const APP_VERSION = "3.0.76";
 
 // Per-file versions for Rhema data bundles — only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18109,6 +18109,15 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.76 &mdash; Friends Habits Layout Fix</div>
+<ul>
+  <li><strong>Friends habit cards fixed</strong> — Cards in the Friends tab now fit properly within the scrollable view with even margins on both sides instead of hanging off the right edge of the screen.</li>
+</ul>
+<div class="un-version-label">v3.0.75 &mdash; Encourage &amp; Rhema Nav</div>
+<ul>
+  <li><strong>Encourage button added</strong> — Tap the heart button on any friend's habit card to send them an encouraging push notification to keep their habit going.</li>
+  <li><strong>Rhema added to mobile nav</strong> — Rhema (LXX) is now a direct bottom nav item on mobile for quicker access.</li>
+</ul>
 <div class="un-version-label">v3.0.74 &mdash; Rhema OT Restore &amp; Offline Fix</div>
 <ul>
   <li><strong>Old Testament restored in Rhema</strong> — The full Septuagint (39 OT books, all chapters and verses) is now reliably available in the book picker alongside the New Testament.</li>
