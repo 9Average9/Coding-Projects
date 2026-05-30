@@ -5604,9 +5604,14 @@ body.dark .big-lock .material-symbols-outlined {
   border-bottom-color: var(--secondary-color);
 }
 
+#friendsHabitsPane {
+  overflow: hidden;
+  min-width: 0;
+}
+
 #friendsHabitsPane .habits-list {
-  padding-top: 14px;
-  padding-right: 20px;
+  padding: 14px 16px 0;
+  width: 100%;
 }
 
 #myHabitsPane .habits-actions {
@@ -5618,6 +5623,7 @@ body.dark .big-lock .material-symbols-outlined {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .friend-habit-section-name {
