@@ -18092,7 +18092,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.74";
+const APP_VERSION = "3.0.75";
 
 // Per-file versions for Rhema data bundles — only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -21966,12 +21966,15 @@ window.RhemaNTBookOrder = RHEMA_NT_BOOK_ORDER;
 window.RhemaBookOrder = RHEMA_BOOK_ORDER;
 
 function _ensureRhemaBibleData() {
-  if (window.RhemaBible || !window.RhemaNT) return window.RhemaBible || window.RhemaNT;
+  if (!window.RhemaNT) return window.RhemaBible || null;
+  // Rebuild if not yet built, or if LXX is now available but wasn't when last built
+  if (window.RhemaBible && (window.RhemaBible._hasLXX || !window.RhemaLXX)) return window.RhemaBible;
   const lxx = window.RhemaLXX || { books: [], names: {}, text: {} };
   window.RhemaBible = {
     books: [...(lxx.books || []), ...(window.RhemaNT.books || RHEMA_NT_BOOK_ORDER)],
     names: { ...(lxx.names || {}), ...(window.RhemaNT.names || {}) },
     text: { ...(lxx.text || {}), ...(window.RhemaNT.text || {}) },
+    _hasLXX: !!window.RhemaLXX,
   };
   return window.RhemaBible;
 }

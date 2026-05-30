@@ -16485,9 +16485,9 @@ body.high-contrast-theme .sett-theme-card {
   z-index: 900;
   display: flex;
   align-items: stretch;
-  width: min(calc(100% - 20px), 540px);
+  width: min(calc(100% - 28px), 470px);
   margin: 0 auto;
-  padding: 8px 6px 9px;
+  padding: 8px 10px 9px;
   border: 1px solid color-mix(in srgb, var(--border-color) 58%, rgba(255,255,255,0.68));
   border-radius: 30px;
   background:
