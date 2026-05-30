@@ -18152,7 +18152,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.77";
+const APP_VERSION = "3.0.78";
 
 // Per-file versions for Rhema data bundles — only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18169,6 +18169,12 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.78 &mdash; Rhema Inflected Glosses</div>
+<ul>
+  <li><strong>Inline glosses now show the inflected English form</strong> — Greek verbs display the conjugated translation beneath them (e.g. "I love", "you all love", "to love", "loving") instead of the bare lexical word.</li>
+  <li><strong>Parsing tab shows inflected English</strong> — The word sheet's Parsing tab now opens with the inflected English gloss at the top so you can immediately see what the parsed form means in context.</li>
+  <li><strong>Quick Definition reflects the inflected form</strong> — The Definition tab's Quick Definition now shows the inflected translation for verbs rather than the lexical entry.</li>
+</ul>
 <div class="un-version-label">v3.0.77 &mdash; Habit Encouragement Lockout</div>
 <ul>
   <li><strong>Friend habit encouragements now send</strong> a habit-specific notification when pressed.</li>
