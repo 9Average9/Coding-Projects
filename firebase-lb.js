@@ -601,11 +601,17 @@ async function deleteEncouragementMsg(uid, msgId) {
 }
 
 // Generic push notification writer — triggers the Cloud Function onEncouragementCreated.
-async function fcmSendPushNotification(toUid, type, fromName, fromUid, extra = {}) {
+// Pass dedupeKey to use a fixed document ID (setDoc) so a second write for the same
+// event is an update (onUpdate), not a create (onCreate), and the Cloud Function won't
+// fire a second time. Leave dedupeKey null for one-off messages that use addDoc.
+async function fcmSendPushNotification(toUid, type, fromName, fromUid, extra = {}, dedupeKey = null) {
   try {
-    await addDoc(collection(db, "encouragements", toUid, "messages"), {
-      type, fromName, fromUid, processed: false, createdAt: serverTimestamp(), ...extra
-    });
+    const data = { type, fromName, fromUid, processed: false, createdAt: serverTimestamp(), ...extra };
+    if (dedupeKey) {
+      await setDoc(doc(db, "encouragements", toUid, "messages", dedupeKey), data);
+    } else {
+      await addDoc(collection(db, "encouragements", toUid, "messages"), data);
+    }
     return true;
   } catch (e) {
     console.warn("fcmSendPushNotification:", e);
@@ -1200,18 +1206,23 @@ async function habitOwnerName(uid) {
   return user?.displayName || user?.username || "Someone";
 }
 
-async function notifyHabitPartners(uid, friendUids = [], type, habitId, habitName) {
+async function notifyHabitPartners(uid, friendUids = [], type, habitId, habitName, date) {
   const fromName = await habitOwnerName(uid);
   await Promise.all([...new Set(friendUids || [])]
     .filter(friendUid => friendUid && friendUid !== uid)
-    .map(friendUid => fcmSendPushNotification(friendUid, type, fromName, uid, { habitId, habitName })));
+    .map(friendUid => {
+      // Deterministic doc ID ensures only one Cloud Function onCreate fires per
+      // (habit, date, recipient) regardless of how many times the entry is written.
+      const dedupeKey = `habit_${habitId}_${date}_${friendUid}`;
+      return fcmSendPushNotification(friendUid, type, fromName, uid, { habitId, habitName }, dedupeKey);
+    }));
 }
 
 function habitEncouragementId(toUid, habitId, dateKey) {
   return [dateKey, toUid, habitId].map(part => String(part || "").replace(/[^a-zA-Z0-9_-]/g, "-")).join("_");
 }
 
-async function sendHabitEncouragement(fromUid, toUid, habitId, habitName, dateKey) {
+async function sendHabitEncouragementOnce(fromUid, toUid, habitId, habitName, dateKey) {
   try {
     if (!fromUid || !toUid || fromUid === toUid || !habitId || !dateKey) {
       return { ok: false, reason: "invalid" };
@@ -1239,7 +1250,7 @@ async function sendHabitEncouragement(fromUid, toUid, habitId, habitName, dateKe
     });
     return { ok: true };
   } catch (e) {
-    console.warn("sendHabitEncouragement:", e);
+    console.warn("sendHabitEncouragementOnce:", e);
     return { ok: false, reason: "error" };
   }
 }
@@ -1354,7 +1365,7 @@ async function setHabitEntry(uid, habitId, { date, status, comment = "", source 
       const habit = habitSnap.exists() ? habitSnap.data() : {};
       const partners = habit.accountabilityUids || habit.shareUids || [];
       const type = status === "success" ? "habitCompleted" : "habitSkipped";
-      await notifyHabitPartners(uid, partners, type, habitId, habit.name || "habit");
+      await notifyHabitPartners(uid, partners, type, habitId, habit.name || "habit", date);
     }
     return true;
   } catch (e) {
@@ -1459,9 +1470,10 @@ window.Habits = {
   update: updateHabit,
   delete: deleteHabit,
   awardMilestone: awardHabitMilestone,
-  encourage: sendHabitEncouragement,
+  encourage: sendHabitEncouragementOnce,
   importHabitShare,
-  getFriendHabits
+  getFriendHabits,
+  sendHabitEncouragement: sendHabitEncouragementOnce
 };
 
 window.Studies = {
@@ -1975,6 +1987,10 @@ async function fcmDisableReminder(uid) {
 
 async function fcmSendEncouragement(fromUid, fromName, toUid) {
   return fcmSendPushNotification(toUid, "encouragement", fromName, fromUid);
+}
+
+async function fcmSendHabitEncouragement(fromUid, fromName, toUid, habitId, habitName) {
+  return fcmSendPushNotification(toUid, "habitEncouragement", fromName, fromUid, { habitId, habitName });
 }
 
 function fcmListenForeground(callback) {

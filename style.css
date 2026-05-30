@@ -5604,8 +5604,14 @@ body.dark .big-lock .material-symbols-outlined {
   border-bottom-color: var(--secondary-color);
 }
 
+#friendsHabitsPane {
+  overflow: hidden;
+  min-width: 0;
+}
+
 #friendsHabitsPane .habits-list {
-  padding-top: 14px;
+  padding: 14px 16px 0;
+  width: 100%;
 }
 
 #myHabitsPane .habits-actions {
@@ -5617,6 +5623,7 @@ body.dark .big-lock .material-symbols-outlined {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .friend-habit-section-name {
@@ -5808,7 +5815,7 @@ body.dark .big-lock .material-symbols-outlined {
 
 .friend-habits-modal .habits-list {
   overflow-y: auto;
-  padding: 12px 16px 24px;
+  padding: 12px 20px 24px;
 }
 
 /* Habits list */
@@ -5832,6 +5839,7 @@ body.dark .big-lock .material-symbols-outlined {
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-content: space-between;
 }
 
 .habit-card-icon {
@@ -15232,6 +15240,12 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   padding: 0 4px;
 }
 
+.rhema-no-english {
+  font-style: italic;
+  opacity: 0.55;
+  font-size: 0.85em;
+}
+
 /* ── Chapter mode toast ── */
 .rhema-chapter-toast {
   position: absolute;
@@ -20219,10 +20233,10 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   align-self: center;
   min-height: clamp(250px, 58vw, 360px);
   height: auto !important;
-  aspect-ratio: 4 / 3 !important;
   padding: 24px;
   color: var(--mercy-scripture-color, var(--font-color));
   text-align: center;
+  overflow: visible;
 }
 .mercy-scripture-card span { color: var(--secondary-color); font-weight: 900; }
 .mercy-scripture-card p { font-size: 1.25rem; line-height: 1.45; font-weight: 750; }
@@ -21247,7 +21261,7 @@ body.dark .bottom-nav::before {
     height: 100vh;
     min-height: 0;
     margin: 0;
-    padding: 0 0 0 292px;
+    padding: 0 0 0 300px;
     display: grid;
     background: transparent;
   }
@@ -21256,10 +21270,11 @@ body.dark .bottom-nav::before {
     position: fixed;
     inset: 18px auto 18px 18px;
     z-index: 1200;
-    width: 250px;
+    width: 80px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     padding: 18px;
     border: 1px solid color-mix(in srgb, var(--border-color) 62%, rgba(255,255,255,0.62));
     border-radius: 24px;
@@ -21267,6 +21282,13 @@ body.dark .bottom-nav::before {
     box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
     backdrop-filter: blur(18px) saturate(1.12);
     -webkit-backdrop-filter: blur(18px) saturate(1.12);
+    transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.32s ease;
+  }
+
+  .desktop-shell-nav:hover,
+  .desktop-shell-nav.nav-intro {
+    width: 264px;
+    box-shadow: 0 28px 70px rgba(15, 23, 42, 0.2);
   }
 
   .desktop-brand {
@@ -21276,11 +21298,15 @@ body.dark .bottom-nav::before {
     padding: 4px 4px 16px;
     margin-bottom: 6px;
     border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 0;
   }
 
   .desktop-brand > .material-symbols-outlined {
     width: 44px;
     height: 44px;
+    flex-shrink: 0;
     border-radius: 14px;
     display: grid;
     place-items: center;
@@ -21289,9 +21315,15 @@ body.dark .bottom-nav::before {
     box-shadow: 0 10px 24px color-mix(in srgb, var(--secondary-color) 26%, transparent);
   }
 
+  .desktop-brand-text {
+    overflow: hidden;
+    min-width: 0;
+  }
+
   .desktop-brand strong,
   .desktop-brand small {
     display: block;
+    white-space: nowrap;
   }
 
   .desktop-brand strong {
@@ -21321,6 +21353,8 @@ body.dark .bottom-nav::before {
     font-weight: 850;
     cursor: pointer;
     text-align: left;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .desktop-nav-btn:hover {
@@ -21334,51 +21368,20 @@ body.dark .bottom-nav::before {
     box-shadow: 0 12px 24px color-mix(in srgb, var(--secondary-color) 22%, transparent);
   }
 
+  .desktop-nav-btn.active {
+    background: var(--secondary-color);
+    color: var(--btn-text-color);
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  }
+
   .desktop-nav-btn .material-symbols-outlined {
     font-size: 22px;
+    flex-shrink: 0;
   }
 
-  .desktop-companion-box {
-    margin-top: auto;
-    padding: 14px;
-    border-radius: 18px;
-    border: 1px solid color-mix(in srgb, var(--border-color) 68%, transparent);
-    background: color-mix(in srgb, var(--primary-light) 72%, rgba(255,255,255,0.62));
-    color: var(--muted-color);
-  }
-
-  .desktop-companion-box > .material-symbols-outlined {
-    color: var(--secondary-color);
-    font-size: 24px;
-  }
-
-  .desktop-companion-box strong {
-    display: block;
-    margin-top: 4px;
-    color: var(--font-color);
-    font-size: 0.88rem;
-  }
-
-  .desktop-companion-box p {
-    margin: 6px 0 12px;
-    font-size: 0.76rem;
-    line-height: 1.45;
-  }
-
-  .desktop-companion-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-
-  .desktop-companion-actions button {
-    border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
-    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
-    color: var(--secondary-color);
-    border-radius: 10px;
-    padding: 7px 8px;
-    font-weight: 850;
-    cursor: pointer;
+  .dnb-label {
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .screen.active {
@@ -21514,37 +21517,132 @@ body.dark .bottom-nav::before {
 
   .desktop-study-card {
     border-radius: 28px;
-    padding: 28px;
+    padding: 22px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     min-height: 320px;
-    background:
-      linear-gradient(150deg, color-mix(in srgb, var(--secondary-color) 78%, #052e2b), color-mix(in srgb, var(--secondary-color) 56%, var(--accent-color))),
-      var(--secondary-color);
-    color: var(--btn-text-color);
+    background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.74));
+    border: 1px solid color-mix(in srgb, var(--border-color) 66%, rgba(255,255,255,0.56));
+    box-shadow: 0 18px 48px rgba(15,23,42,0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    color: var(--font-color);
+    overflow: hidden;
   }
 
-  .desktop-study-card > .material-symbols-outlined {
-    width: 68px;
-    height: 68px;
-    display: grid;
-    place-items: center;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.16);
-    font-size: 36px;
-    margin-bottom: auto;
+  .desktop-study-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 28px 60px rgba(15,23,42,0.18);
   }
 
-  .desktop-study-card strong {
-    font-size: 1.45rem;
-    line-height: 1.1;
+  .dsc-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
   }
 
-  .desktop-study-card p {
-    margin: 12px 0 0;
-    color: rgba(255,255,255,0.82);
-    line-height: 1.48;
+  .dsc-tag {
+    font-size: 0.72rem;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+    color: var(--secondary-color);
+  }
+
+  .dsc-passage {
+    font-size: 0.84rem;
+    font-weight: 900;
+    color: var(--muted-color);
+  }
+
+  .dsc-verse-preview {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 5px;
+    padding: 16px 0;
+    font-family: 'Gentium Plus', 'Noto Serif', serif;
+    font-size: 1.4rem;
+    line-height: 1.6;
+  }
+
+  .dsc-word {
+    padding: 2px 5px;
+    border-radius: 6px;
+    cursor: default;
+    transition: background 0.12s ease;
+    color: var(--font-color);
+  }
+
+  .dsc-word.selected {
+    background: color-mix(in srgb, var(--secondary-color) 18%, transparent);
+    color: var(--secondary-color);
+    font-weight: 700;
+  }
+
+  .dsc-word.accent {
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+    color: color-mix(in srgb, var(--accent-color) 80%, var(--font-color));
+  }
+
+  .dsc-comma {
+    color: var(--muted-color);
+    font-family: 'Gentium Plus', 'Noto Serif', serif;
+    font-size: 1.4rem;
+  }
+
+  .dsc-word-panel {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent);
+    margin-bottom: 14px;
+  }
+
+  .dsc-lemma {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 850;
+    color: var(--font-color);
+    margin-bottom: 8px;
+  }
+
+  .dsc-parse-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .dsc-chip {
+    font-size: 0.72rem;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+    color: var(--secondary-color);
+  }
+
+  .desktop-resume-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+    color: var(--secondary-color);
+    width: fit-content;
+    font-size: 0.84rem;
+    font-weight: 850;
+    letter-spacing: 0.02em;
+  }
+
+  .desktop-resume-hint .material-symbols-outlined {
+    font-size: 18px;
   }
 
   .desktop-tool-grid {
@@ -21608,6 +21706,36 @@ body.dark .bottom-nav::before {
     padding: 28px clamp(28px, 4vw, 56px) 40px;
   }
 
+  /* Desktop Lessons — wider readable layout */
+  #newLearnMenu .learn-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  #newLearnMenu .learn-path-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  #newLearnMenu .learn-path-grid > button {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  #newLearnMenu .learn-path-grid > button:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+  }
+
   #rhemaModal.open {
     background:
       radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--secondary-color) 14%, transparent), transparent 34%),
@@ -21615,7 +21743,7 @@ body.dark .bottom-nav::before {
   }
 
   #rhemaModal.open #rhemaSlide {
-    left: 292px;
+    left: 300px;
     right: 28px;
     top: 28px;
     bottom: 28px;
@@ -21630,6 +21758,396 @@ body.dark .bottom-nav::before {
   .rhema-header {
     padding-left: 24px;
     padding-right: 24px;
+  }
+
+  /* Desktop observation button in Rhema */
+  .rhema-desktop-note-btn {
+    display: flex;
+  }
+
+  .rhema-verse-nav-row {
+    gap: 8px;
+  }
+
+  .rhema-nav-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 20px;
+  }
+
+  /* Desktop lesson block redesign */
+  .learn-lesson {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .lesson-block {
+    margin-bottom: 10px;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+
+  .lesson-block:hover {
+    border-color: color-mix(in srgb, var(--secondary-color) 26%, var(--border-color));
+  }
+
+  .lesson-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    font-size: 0.96rem;
+    font-weight: 900;
+    color: var(--font-color);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .lesson-block-header .block-time {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted-color);
+    margin-left: auto;
+    margin-right: 12px;
+  }
+
+  .lesson-block-header .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--muted-color);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .lesson-block.open .lesson-block-header .material-symbols-outlined {
+    transform: rotate(180deg);
+  }
+
+  .lesson-block-content {
+    padding: 0 24px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+
+  .lesson-block.open .lesson-block-content {
+    padding: 4px 24px 22px;
+    max-height: 2000px;
+  }
+
+  .lesson-block-content p,
+  .lesson-block-content ul,
+  .lesson-block-content ol {
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: var(--font-color);
+    margin: 10px 0;
+  }
+
+  .lesson-block-content h4 {
+    font-size: 0.95rem;
+    font-weight: 950;
+    color: var(--font-color);
+    margin: 18px 0 6px;
+  }
+
+  .lesson-block-content .highlight {
+    background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+    border-left: 3px solid var(--secondary-color);
+    border-radius: 0 10px 10px 0;
+    padding: 10px 14px;
+    color: var(--font-color);
+    font-style: normal;
+  }
+
+  .lesson-block-content .mini-example {
+    font-family: 'Gentium Plus', 'Noto Serif', serif;
+    font-size: 1.05rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+    color: var(--font-color);
+  }
+
+  .complete-lesson-box {
+    margin: 20px 0;
+    padding: 18px 20px;
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
+    background: color-mix(in srgb, var(--secondary-color) 6%, transparent);
+  }
+
+  .complete-lesson-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: 0;
+    background: var(--secondary-color);
+    color: var(--btn-text-color);
+    font: inherit;
+    font-weight: 900;
+    font-size: 0.96rem;
+    cursor: pointer;
+  }
+
+  .complete-lesson-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Desktop create study dialog */
+  #studyCreateSheet {
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+  }
+
+  #studyCreateSheet .study-sheet {
+    max-width: 640px;
+    width: 90vw;
+    max-height: 88vh;
+    border-radius: 24px;
+    margin: 0;
+    padding: 32px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 0 28px;
+  }
+
+  #studyCreateSheet .sheet-x-close { grid-column: 1 / -1; justify-self: end; }
+  #studyCreateSheet .study-sheet-title { grid-column: 1 / -1; margin-top: 4px; }
+  #studyCreateSheet .study-sheet-sub { grid-column: 1 / -1; }
+
+  /* Study name spans full width */
+  #studyCreateSheet .study-create-field:first-of-type { grid-column: 1 / -1; }
+
+  /* Color and icon side by side */
+  #studyCreateSheet .study-create-field:nth-of-type(2) { grid-column: 1; }
+  #studyCreateSheet .study-create-field:nth-of-type(3) { grid-column: 2; }
+
+  /* Description spans full width */
+  #studyCreateSheet .study-create-field:nth-of-type(4) { grid-column: 1 / -1; }
+
+  /* Share toggle and invite spans full width */
+  #studyCreateSheet .study-share-toggle { grid-column: 1 / -1; }
+  #studyCreateSheet #studyInviteFriendsSection { grid-column: 1 / -1; }
+
+  /* Buttons spans full width */
+  #studyCreateSheet .main-btn { grid-column: 1 / -1; }
+  #studyCreateSheet .text-btn { grid-column: 1 / -1; }
+
+  #studyCreateSheet .study-icon-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Desktop profile layout */
+  #profilePage .profile-page-scroll {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: auto;
+    gap: 0 32px;
+    align-items: start;
+  }
+
+  #profilePage .profile-header {
+    grid-column: 1;
+    grid-row: 1 / 5;
+    position: sticky;
+    top: 0;
+    padding: 28px 24px;
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 68%, transparent);
+    background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.7));
+    text-align: center;
+  }
+
+  #profilePage .xp-section {
+    grid-column: 2;
+    padding: 22px 24px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 68%, transparent);
+    background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.7));
+    margin-bottom: 16px;
+  }
+
+  #profilePage .profile-journey-card {
+    grid-column: 2;
+    border-radius: 18px;
+    margin-bottom: 16px;
+  }
+
+  #profilePage .profile-color-grid {
+    grid-column: 2;
+    margin-bottom: 16px;
+  }
+
+  #profilePage .prof-menu-card {
+    grid-column: 2;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 68%, transparent);
+    background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.7));
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  #profilePage .try-app-btn {
+    grid-column: 2;
+  }
+
+  /* Sermons page */
+  #sermonsPage.screen.active {
+    overflow: auto;
+    padding: 28px clamp(28px, 4vw, 56px) 40px;
+  }
+
+  .sermons-scroll {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .sermons-header {
+    margin-bottom: 28px;
+  }
+
+  .sermons-title {
+    font-size: 2rem;
+    font-weight: 950;
+    color: var(--font-color);
+    margin: 0 0 6px;
+  }
+
+  .sermons-sub {
+    color: var(--muted-color);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  .sermons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .sermon-card {
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .sermon-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--secondary-color) 28%, var(--border-color));
+    box-shadow: 0 12px 32px rgba(15,23,42,0.1);
+  }
+
+  .sermon-card-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+    color: var(--secondary-color);
+    font-size: 24px;
+    margin-bottom: 14px;
+  }
+
+  .sermon-card-title {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 950;
+    color: var(--font-color);
+    margin-bottom: 5px;
+  }
+
+  .sermon-card-ref {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 8px;
+  }
+
+  .sermon-card-meta {
+    font-size: 0.78rem;
+    color: var(--muted-color);
+  }
+
+  .sermon-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .sermon-card-open-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 0;
+    background: var(--secondary-color);
+    color: var(--btn-text-color);
+    font: inherit;
+    font-weight: 900;
+    font-size: 0.84rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .sermon-card-open-btn:hover { opacity: 0.88; }
+
+  .sermon-card-delete-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    background: transparent;
+    color: var(--muted-color);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .sermon-card-delete-btn:hover {
+    background: rgba(220,50,50,0.1);
+    color: #c0392b;
+  }
+
+  .sermons-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted-color);
+  }
+
+  .sermons-empty .material-symbols-outlined {
+    font-size: 56px;
+    display: block;
+    margin: 0 auto 14px;
+    opacity: 0.35;
+    color: var(--secondary-color);
+  }
+
+  .sermons-empty strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--font-color);
+    margin-bottom: 8px;
+  }
+
+  .sermons-empty p {
+    font-size: 0.9rem;
+    line-height: 1.55;
   }
 }
 
@@ -22450,4 +22968,1149 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
 #advancedLearnMenu .lesson-progress-arrow,
 #advVerbsLearnMenu .lesson-progress-arrow {
   font-size: 1.48rem !important;
+}
+
+/* ── Desktop launch screen ─────────────────────────────────────────────────── */
+@media (min-width: 960px) and (pointer: fine) {
+  .app-launch-screen {
+    background:
+      radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--secondary-color) 18%, transparent), transparent 40%),
+      radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--accent-color) 14%, transparent), transparent 35%),
+      #fbf0de;
+    flex-direction: row;
+    gap: 0;
+  }
+
+  .app-launch-art {
+    width: 42%;
+    max-width: 520px;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 0 28px 28px 0;
+    flex-shrink: 0;
+  }
+
+  .app-launch-status {
+    position: static;
+    transform: none;
+    left: auto;
+    top: auto;
+    width: auto;
+    flex: 1;
+    padding: 0 10%;
+    align-items: flex-start;
+  }
+}
+
+/* ── Sermon Workshop overlay ───────────────────────────────────────────────── */
+.sw-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: stretch;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.sw-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sw-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sw-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  z-index: 0;
+}
+
+.sw-rhema-panel {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  background: var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+}
+
+.sw-rhema-panel.hidden {
+  display: none;
+}
+
+.sw-panel {
+  position: relative;
+  z-index: 1;
+  width: min(820px, 90vw);
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--primary-light);
+  border-left: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  box-shadow: -24px 0 60px rgba(15, 23, 42, 0.18);
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.sw-overlay.open .sw-panel {
+  transform: translateX(0);
+}
+
+.sw-sidebar-spacer {
+  flex: 1;
+}
+
+.sw-rhema-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  background: color-mix(in srgb, var(--secondary-color) 9%, transparent);
+  color: var(--secondary-color);
+  font: inherit;
+  font-weight: 850;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-top: 6px;
+}
+
+.sw-rhema-toggle-btn:hover {
+  background: color-mix(in srgb, var(--secondary-color) 14%, transparent);
+}
+
+.sw-rhema-toggle-btn.active {
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  border-color: transparent;
+}
+
+.sw-rhema-toggle-btn .material-symbols-outlined {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sw-required {
+  color: #e53e3e;
+  font-weight: 900;
+}
+
+.sw-autosave-indicator {
+  font-size: 0.78rem;
+  color: var(--muted-color);
+  margin-right: auto;
+  align-self: center;
+}
+
+.sw-rhema-hint-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent);
+  color: var(--muted-color);
+  font-size: 0.84rem;
+  margin-top: 8px;
+}
+
+.sw-rhema-hint-bar .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--secondary-color);
+  flex-shrink: 0;
+}
+
+.sw-crossref-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.sw-crossref-item input {
+  width: 130px;
+  flex-shrink: 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+  background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+  color: var(--font-color);
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.sw-crossref-item textarea {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+  background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+  color: var(--font-color);
+  font: inherit;
+  font-size: 0.88rem;
+  resize: vertical;
+  min-height: 52px;
+}
+
+.sw-crossref-item input:focus,
+.sw-crossref-item textarea:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+}
+
+.sw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--card-color) 92%, rgba(255,255,255,0.7));
+  flex-shrink: 0;
+}
+
+.sw-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sw-header-left > .material-symbols-outlined {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.sw-header-left h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 950;
+  color: var(--font-color);
+}
+
+.sw-header-left p {
+  margin: 2px 0 0;
+  color: var(--muted-color);
+  font-size: 0.82rem;
+}
+
+.sw-close-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: transparent;
+  color: var(--muted-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sw-close-btn:hover {
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: var(--font-color);
+}
+
+.sw-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sw-sidebar {
+  width: 168px;
+  flex-shrink: 0;
+  padding: 16px 10px;
+  border-right: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: color-mix(in srgb, var(--card-color) 60%, transparent);
+  overflow-y: auto;
+}
+
+.sw-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted-color);
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sw-tab:hover {
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: var(--font-color);
+}
+
+.sw-tab.active {
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  color: var(--secondary-color);
+  border-color: color-mix(in srgb, var(--secondary-color) 20%, transparent);
+}
+
+.sw-tab .material-symbols-outlined {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.sw-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+
+.sw-pane {
+  display: none;
+}
+
+.sw-pane.active {
+  display: block;
+}
+
+.sw-pane-header {
+  margin-bottom: 24px;
+}
+
+.sw-pane-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 950;
+  color: var(--font-color);
+}
+
+.sw-pane-header p {
+  margin: 6px 0 0;
+  color: var(--muted-color);
+  font-size: 0.88rem;
+}
+
+.sw-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.sw-field-group label {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: var(--muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sw-input,
+.sw-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+  background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+  color: var(--font-color);
+  font: inherit;
+  font-size: 0.96rem;
+  box-sizing: border-box;
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.sw-input:focus,
+.sw-textarea:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color) 14%, transparent);
+}
+
+.sw-textarea {
+  min-height: 100px;
+  line-height: 1.55;
+}
+
+.sw-points-section {
+  margin-bottom: 22px;
+}
+
+.sw-points-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sw-points-header label {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: var(--muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sw-add-point-btn,
+.sw-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  background: color-mix(in srgb, var(--secondary-color) 9%, transparent);
+  color: var(--secondary-color);
+  font: inherit;
+  font-weight: 850;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sw-add-point-btn:hover,
+.sw-add-btn:hover {
+  background: color-mix(in srgb, var(--secondary-color) 14%, transparent);
+}
+
+.sw-add-point-btn .material-symbols-outlined,
+.sw-add-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.sw-add-btn {
+  display: flex;
+  margin-top: 12px;
+}
+
+.sw-point-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sw-point-item textarea {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+  background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+  color: var(--font-color);
+  font: inherit;
+  font-size: 0.93rem;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.sw-point-item textarea:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+}
+
+.sw-point-remove {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  background: transparent;
+  color: var(--muted-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.sw-point-remove:hover {
+  background: rgba(220, 50, 50, 0.1);
+  color: #c0392b;
+}
+
+.sw-point-remove .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.sw-illustration-item {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.7));
+  margin-bottom: 14px;
+}
+
+.sw-illustration-item textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: transparent;
+  color: var(--font-color);
+  font: inherit;
+  font-size: 0.93rem;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.sw-illustration-item textarea:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+}
+
+.sw-footer {
+  display: flex;
+  gap: 12px;
+  padding: 18px 26px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--card-color) 92%, rgba(255,255,255,0.7));
+  flex-shrink: 0;
+}
+
+.sw-save-btn,
+.sw-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.sw-save-btn {
+  border: 0;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--secondary-color) 24%, transparent);
+}
+
+.sw-export-btn {
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: var(--secondary-color);
+}
+
+.sw-save-btn:hover,
+.sw-export-btn:hover {
+  opacity: 0.88;
+}
+
+/* ── Desktop Study Desk overlay ────────────────────────────────────────────── */
+.dsd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.52);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.dsd-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.dsd-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dsd-panel {
+  width: min(760px, 90vw);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--primary-light);
+  border-left: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  box-shadow: -24px 0 60px rgba(15, 23, 42, 0.18);
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.dsd-overlay.open .dsd-panel {
+  transform: translateX(0);
+}
+
+.dsd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--card-color) 92%, rgba(255,255,255,0.7));
+  flex-shrink: 0;
+}
+
+.dsd-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dsd-header-left > .material-symbols-outlined {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.dsd-header-left h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 950;
+  color: var(--font-color);
+}
+
+.dsd-header-left p {
+  margin: 2px 0 0;
+  color: var(--muted-color);
+  font-size: 0.82rem;
+}
+
+.dsd-close-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: transparent;
+  color: var(--muted-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dsd-close-btn:hover {
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: var(--font-color);
+}
+
+.dsd-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 26px 28px;
+}
+
+.dsd-create-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  margin-bottom: 28px;
+}
+
+.dsd-create-text strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 950;
+  color: var(--font-color);
+}
+
+.dsd-create-text span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.84rem;
+  color: var(--muted-color);
+  line-height: 1.45;
+}
+
+.dsd-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  border: 0;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--secondary-color) 24%, transparent);
+  transition: opacity 0.15s ease;
+}
+
+.dsd-create-btn:hover {
+  opacity: 0.9;
+}
+
+.dsd-create-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.dsd-section-title {
+  font-size: 0.78rem;
+  font-weight: 950;
+  color: var(--muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.dsd-studies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.dsd-study-card {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  background: color-mix(in srgb, var(--card-color) 90%, rgba(255,255,255,0.7));
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.dsd-study-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--secondary-color) 28%, var(--border-color));
+}
+
+.dsd-study-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.dsd-study-name {
+  display: block;
+  font-weight: 950;
+  font-size: 0.95rem;
+  color: var(--font-color);
+  margin-bottom: 4px;
+}
+
+.dsd-study-meta {
+  font-size: 0.78rem;
+  color: var(--muted-color);
+}
+
+.dsd-empty {
+  grid-column: 1 / -1;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted-color);
+  font-size: 0.92rem;
+}
+
+.dsd-empty .material-symbols-outlined {
+  font-size: 48px;
+  display: block;
+  margin: 0 auto 12px;
+  opacity: 0.4;
+}
+
+/* Base: hide desktop-only Rhema note button on mobile */
+.rhema-desktop-note-btn {
+  display: none;
+}
+
+/* ── Scrollbar theming (desktop only) ─────────────────────────────────────── */
+@media (min-width: 960px) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--primary-color) 60%, transparent);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--secondary-color) 38%, var(--muted-color));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--secondary-color) 60%, var(--muted-color));
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Study sandbox: must not be covered by nav rail */
+  .study-sandbox {
+    left: 300px !important;
+    width: calc(100vw - 300px) !important;
+  }
+
+  /* Cross reference: desktop-friendly sidebar layout */
+  .rhema-xref-page {
+    left: 300px;
+    border-left: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  }
+
+  .rhema-xref-verse-row {
+    padding: 11px 14px;
+    border-radius: 12px;
+    border-bottom: none;
+    margin-bottom: 4px;
+    background: color-mix(in srgb, var(--card-color) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-color) 44%, transparent);
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  .rhema-xref-verse-row:hover {
+    background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+    border-color: color-mix(in srgb, var(--secondary-color) 22%, transparent);
+  }
+
+  .rhema-xref-verse-ref {
+    font-size: 0.82rem;
+    min-width: 72px;
+    font-weight: 800;
+  }
+
+  .rhema-xref-verse-text {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .rx-page-header {
+    padding-top: 18px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* Reference pickers: ensure not behind nav on desktop */
+  #rxBookPickerOverlay {
+    left: 300px !important;
+    width: calc(100vw - 300px) !important;
+  }
+
+  .rhema-picker-overlay {
+    left: 300px;
+    width: calc(100vw - 300px);
+  }
+
+  /* Desktop tool grid: 3 columns now that Lessons is removed */
+  .desktop-tool-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Sermon-mode back-to-workshop button in Rhema header */
+  .rhema-workshop-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px 6px 10px;
+    border-radius: 10px;
+    border: 1.5px solid color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+    background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+    color: var(--secondary-color);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 850;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .rhema-workshop-back-btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .rhema-workshop-back-btn.hidden {
+    display: none;
+  }
+}
+
+/* ── Sermon Rhema panel CSS ────────────────────────────────────────────────── */
+.swr-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  background: color-mix(in srgb, var(--card-color) 88%, rgba(255,255,255,0.7));
+  flex-shrink: 0;
+}
+
+.swr-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 950;
+  font-size: 0.9rem;
+  color: var(--font-color);
+}
+
+.swr-title .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--secondary-color);
+}
+
+.swr-picker {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.swr-pill {
+  font-size: 0.8rem !important;
+  padding: 5px 10px !important;
+}
+
+.swr-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.swr-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* Workshop hidden while Rhema is open from it */
+.sw-overlay.sermon-rhema-hidden {
+  display: none !important;
+}
+
+/* ── Desktop Rhema preview card (fog overlay) ───────────────────────────────── */
+.desktop-study-card {
+  position: relative;
+}
+
+.dsc-mock-rhema {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dsc-mock-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dsc-mock-title {
+  font-size: 1rem;
+  font-weight: 950;
+  color: var(--font-color);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.dsc-mock-pills {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.dsc-mock-pill {
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  color: var(--secondary-color);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 20%, transparent);
+}
+
+.dsc-mock-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.dsc-mock-icon {
+  font-family: 'Material Symbols Outlined';
+  font-size: 18px;
+  color: var(--muted-color);
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--border-color) 30%, transparent);
+}
+
+.dsc-mock-verse {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 5px;
+  align-content: flex-start;
+  font-family: 'Gentium Plus', 'Noto Serif', serif;
+  font-size: 1.28rem;
+  line-height: 1.55;
+  color: var(--font-color);
+  overflow: hidden;
+}
+
+.dsc-mock-sheet {
+  background: color-mix(in srgb, var(--secondary-color) 6%, var(--card-color));
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 16%, transparent);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dsc-mock-sheet-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dsc-mock-surface {
+  font-family: 'Gentium Plus', 'Noto Serif', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+.dsc-mock-strongs {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted-color);
+  letter-spacing: 0.04em;
+}
+
+.dsc-mock-parse-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dsc-mock-def {
+  font-size: 0.78rem;
+  color: var(--muted-color);
+  line-height: 1.42;
+}
+
+/* Fog overlay */
+.dsc-fog-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--card-color) 30%, transparent) 35%,
+    color-mix(in srgb, var(--card-color) 80%, transparent) 65%,
+    color-mix(in srgb, var(--card-color) 96%, transparent) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s ease;
+}
+
+.desktop-study-card:hover .dsc-fog-overlay {
+  opacity: 0.7;
+}
+
+.dsc-fog-cta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--secondary-color);
+  color: var(--btn-text-color);
+  font-size: 0.92rem;
+  font-weight: 900;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--secondary-color) 35%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.desktop-study-card:hover .dsc-fog-cta {
+  transform: scale(1.04);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--secondary-color) 45%, transparent);
+}
+
+.dsc-fog-cta .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* ── Writing modal: Save to Sermon button ──────────────────────────────────── */
+.swm-save-sermon-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1.5px solid color-mix(in srgb, var(--secondary-color) 30%, var(--border-color));
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+  color: var(--secondary-color);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.swm-save-sermon-btn.hidden {
+  display: none;
+}
+
+.swm-save-sermon-btn .material-symbols-outlined {
+  font-size: 18px;
 }

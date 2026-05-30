@@ -45,6 +45,7 @@ let _appLaunchStartedAt = Date.now();
 let _appLaunchReleased = false;
 let _appUpdateReloadPending = false;
 let _appUpdateReloadTimer = null;
+let _swUpdateFound = false;
 let _homeBackdropPreload = null;
 let _pendingFirstRunNotificationPrompt = false;
 let _deferWelcomeUntilNotificationPromptCloses = false;
@@ -8049,7 +8050,7 @@ let currentSentence = null;
 
 const screens = [
   "homeScreen", "profilePage", "habitsPage", "merciesPage", "communityPage", "csDetailPage",
-  "newLearnMenu", "advancedLearnMenu",
+  "sermonsPage", "newLearnMenu", "advancedLearnMenu",
   "basicVerbsLearnMenu", "advVerbsLearnMenu",
   "learnMenu", "learnScreen", "translateMenu", "translateScreen",
   "testMenu", "testScreen", "resultsScreen", "progressScreen", "settingsScreen"
@@ -8745,6 +8746,9 @@ function openWritingModal(type) {
   // Clear textarea
   const ta = document.getElementById('swmTextarea');
   if (ta) { ta.value = ''; ta.style.height = 'auto'; ta.placeholder = meta.placeholder; }
+  // Show "Save to Sermon" button only when in sermon Rhema mode
+  const saveSermonBtn = document.getElementById('swmSaveSermonBtn');
+  if (saveSermonBtn) saveSermonBtn.classList.toggle('hidden', !_sermonRhemaMode);
   // Show
   modal.classList.remove('hidden');
   requestAnimationFrame(() => modal.classList.add('open'));
@@ -8921,6 +8925,7 @@ function _rhemaExactFormOccurrences(surface) {
 }
 
 function openWordLibrary() {
+  _desktopCollapseNav();
   if (!window.RhemaLexicon) { _showStudyToast('Word data not loaded yet.'); return; }
   _wlOpen = true;
   _wlSelectedForm = null;
@@ -9733,6 +9738,8 @@ function hideBottomNav() {
 function setNavActive(page) {
   document.querySelectorAll('.bn-item').forEach(b =>
     b.classList.toggle('active', b.dataset.page === page));
+  document.querySelectorAll('.desktop-nav-btn[data-nav]').forEach(b =>
+    b.classList.toggle('active', b.dataset.nav === page));
 }
 
 function setMerciesNavCollapsed(collapsed) {
@@ -9840,9 +9847,9 @@ function bindHabitsNavCollapse() {
 let _prevNavPage = 'home';
 
 function showNavPage(page) {
-  if (page !== 'mercies' && _merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
+  // Keep habits and mercies feed listeners alive across navigation so data renders
+  // instantly on return. They are torn down on sign-out inside __onAuthStateReady.
   if (page !== 'mercies' && _merciesJournalUnsub) { _merciesJournalUnsub(); _merciesJournalUnsub = null; }
-  if (page !== 'habits' && _habitsUnsub) { _habitsUnsub(); _habitsUnsub = null; }
   if (page === 'lessons') {
     const cur = document.querySelector('.screen.active');
     if (cur?.id === 'communityPage') _prevNavPage = 'community';
@@ -9882,6 +9889,9 @@ function showNavPage(page) {
     showNewLearnMenu();
   } else if (page === 'rhema') {
     showRhema();
+  } else if (page === 'sermons') {
+    showNavPage_sermons();
+    return;
   }
   setTimeout(_applyPendingAppUpdateReload, 50);
 }
@@ -10102,6 +10112,7 @@ let _habitsUnsub = null;
 let _habitItems = [];
 let _habitsLoaded = false;
 let _habitsTab = "mine";
+const _habitEntryInProgress = new Set(); // guards against rapid double-taps
 let _friendsHabitsCache = {};
 let _habitImportRows = [];
 let _habitCreateFriends = new Set();
@@ -10489,7 +10500,15 @@ async function startHabitsPage() {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!list) return;
   if (!uid) {
-    list.innerHTML = '<p class="study-board-empty">Sign in to track habits.</p>';
+    if (!_authReady) {
+      // Auth is still resolving — show a neutral loading state and retry
+      list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
+      setTimeout(() => {
+        if (document.getElementById("habitsPage")?.classList.contains("active")) startHabitsPage();
+      }, 500);
+    } else {
+      list.innerHTML = '<p class="study-board-empty">Sign in to track habits.</p>';
+    }
     return;
   }
   if (!window.Habits?.listen) {
@@ -10501,13 +10520,18 @@ async function startHabitsPage() {
   }
   // restore tab UI to saved state
   _applyHabitsTabUI(_habitsTab);
+  // If the listener is already running, render from cached data immediately
+  if (_habitsUnsub) {
+    if (_habitsLoaded) renderHabits();
+    if (_habitsTab === "friends") loadFriendsHabits();
+    return;
+  }
   list.innerHTML = '<p class="study-board-empty">Loading habits...</p>';
   _habitsLoaded = false;
-  _habitsUnsub?.();
   _habitsUnsub = window.Habits?.listen?.(uid, habits => {
     _habitItems = habits || [];
     _habitsLoaded = true;
-    renderHabits();
+    if (document.getElementById("habitsPage")?.classList.contains("active")) renderHabits();
   });
   if (_habitsTab === "friends") loadFriendsHabits();
 }
@@ -10605,7 +10629,7 @@ function renderFriendsHabits() {
         <span class="friend-habit-section-avatar">${avatar}</span>${name}
       </div>
       <div onclick="showFriendHabitsModal('${uid}')" style="cursor:pointer">
-        ${_renderFriendHabitCard(firstHabit)}
+        ${_renderFriendHabitCard(firstHabit, uid)}
       </div>
       ${moreCount > 0 ? `<button class="friend-habit-more-btn" onclick="showFriendHabitsModal('${uid}')">
         <span class="material-symbols-outlined">expand_more</span>
@@ -10615,7 +10639,7 @@ function renderFriendsHabits() {
   }).join("");
 }
 
-function _renderFriendHabitCard(habit) {
+function _renderFriendHabitCard(habit, friendUid = '') {
   const entries = habit.entries || {};
   const today = _habitTodayKey();
   const count = Object.values(entries).filter(e => e.status === "success").length;
@@ -10623,9 +10647,16 @@ function _renderFriendHabitCard(habit) {
   const icon = _habitEsc(habit.icon || "menu_book");
   const color = habit.color || "";
   const iconStyle = color ? ` style="background:color-mix(in srgb,${color} 16%,transparent);color:${color}"` : "";
-  const ownerUid = _habitEsc(habit.ownerUid || "");
+  const ownerUidRaw = friendUid || habit.ownerUid || "";
+  const ownerUid = _habitEsc(ownerUidRaw);
   const habitId = _habitEsc(habit.id || "");
-  const encouraged = _habitEncouragedToday(habit.ownerUid || "", habit.id || "");
+  const encouraged = _habitEncouragedToday(ownerUidRaw, habit.id || "");
+  const encourageBtn = ownerUidRaw
+    ? `<button type="button" class="friend-habit-encourage-btn${encouraged ? " sent" : ""}" onclick="sendFriendHabitEncouragement(event,'${ownerUid}','${habitId}')" ${encouraged ? "disabled" : ""}>
+        <span class="material-symbols-outlined">${encouraged ? "check_circle" : "volunteer_activism"}</span>
+        <span>${encouraged ? "Sent" : "Encourage"}</span>
+      </button>`
+    : "";
   return `<article class="habit-card friend-habit-card">
     <div class="habit-card-top">
       <div class="habit-card-identity" style="pointer-events:none">
@@ -10637,10 +10668,7 @@ function _renderFriendHabitCard(habit) {
           ${habit.description ? `<span class="habit-card-desc">${_habitEsc(habit.description)}</span>` : ""}
         </div>
       </div>
-      <button type="button" class="friend-habit-encourage-btn${encouraged ? " sent" : ""}" onclick="sendFriendHabitEncouragement(event,'${ownerUid}','${habitId}')" ${encouraged ? "disabled" : ""}>
-        <span class="material-symbols-outlined">${encouraged ? "check_circle" : "volunteer_activism"}</span>
-        <span>${encouraged ? "Sent" : "Encourage"}</span>
-      </button>
+      ${encourageBtn}
     </div>
     <div class="habit-pills-row">
       <span class="habit-pill">
@@ -10708,7 +10736,7 @@ function showFriendHabitsModal(friendUid) {
         <p>${_habitEsc(name)} does not have any habits yet, encourage them to start making healthy ones</p>
       </div>`;
     } else {
-      listEl.innerHTML = cached.habits.map(h => _renderFriendHabitCard(h)).join("");
+      listEl.innerHTML = cached.habits.map(h => _renderFriendHabitCard(h, friendUid)).join("");
     }
   }
   document.getElementById("friendHabitsModal")?.classList.add("open");
@@ -10938,36 +10966,50 @@ async function submitHabitCreate() {
 async function toggleHabitToday(habitId, status) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const habit = _habitItems.find(h => h.id === habitId);
-  const beforeMilestones = new Set(habit?.awardedMilestones || []);
-  const ok = await window.Habits?.setEntry?.(uid, habitId, {
-    date: _habitTodayKey(),
-    status,
-    comment: "",
-    notify: status === "success"
-  });
-  if (!ok) alert("Could not update that habit.");
-  if (ok && status === "success" && habit) {
-    const mergedEntries = { ...(habit.entries || {}), [_habitTodayKey()]: { date: _habitTodayKey(), status: "success" } };
-    const streak = _habitCurrentStreak(mergedEntries);
-    const milestone = _habitMilestoneForStreak(streak);
-    if (milestone && !beforeMilestones.has(milestone.key)) {
-      addXP(milestone.xp, `${habit.name}: ${milestone.label}`, true);
-      await window.Habits?.awardMilestone?.(uid, habitId, milestone.key);
+  const lockKey = `${habitId}_${_habitTodayKey()}_${status}`;
+  if (_habitEntryInProgress.has(lockKey)) return;
+  _habitEntryInProgress.add(lockKey);
+  try {
+    const habit = _habitItems.find(h => h.id === habitId);
+    const beforeMilestones = new Set(habit?.awardedMilestones || []);
+    const ok = await window.Habits?.setEntry?.(uid, habitId, {
+      date: _habitTodayKey(),
+      status,
+      comment: "",
+      notify: status === "success"
+    });
+    if (!ok) alert("Could not update that habit.");
+    if (ok && status === "success" && habit) {
+      const mergedEntries = { ...(habit.entries || {}), [_habitTodayKey()]: { date: _habitTodayKey(), status: "success" } };
+      const streak = _habitCurrentStreak(mergedEntries);
+      const milestone = _habitMilestoneForStreak(streak);
+      if (milestone && !beforeMilestones.has(milestone.key)) {
+        addXP(milestone.xp, `${habit.name}: ${milestone.label}`, true);
+        await window.Habits?.awardMilestone?.(uid, habitId, milestone.key);
+      }
     }
+  } finally {
+    _habitEntryInProgress.delete(lockKey);
   }
 }
 
 async function skipHabitToday(habitId) {
   const uid = window.Auth?.getCurrentUser()?.uid;
   if (!uid) return;
-  const ok = await window.Habits?.setEntry?.(uid, habitId, {
-    date: _habitTodayKey(),
-    status: "skipped",
-    comment: "Planned skip",
-    notify: true
-  });
-  if (!ok) alert("Could not update that habit.");
+  const lockKey = `${habitId}_${_habitTodayKey()}_skipped`;
+  if (_habitEntryInProgress.has(lockKey)) return;
+  _habitEntryInProgress.add(lockKey);
+  try {
+    const ok = await window.Habits?.setEntry?.(uid, habitId, {
+      date: _habitTodayKey(),
+      status: "skipped",
+      comment: "Planned skip",
+      notify: true
+    });
+    if (!ok) alert("Could not update that habit.");
+  } finally {
+    _habitEntryInProgress.delete(lockKey);
+  }
 }
 
 async function catchUpHabitYesterday(habitId) {
@@ -18110,14 +18152,44 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.74";
+const APP_VERSION = "3.0.77";
+
+// Per-file versions for Rhema data bundles — only update a file's entry here
+// when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
+const RHEMA_DATA_VERSIONS = {
+  'rhema-nt.js':        '3.0.65',
+  'rhema-critical.js':  '3.0.23',
+  'rhema-lxx.js':       '3.0.65',
+  'rhema-lexicon.js':   '3.0.65',
+  'rhema-mm.js':        '3.0.65',
+  'rhema-msb.js':       '3.0.65',
+  'rhema-bsb.js':       '3.0.65',
+  'rhema-syntax.js':    '3.0.65',
+  'rhema-crossrefs.js': '3.0.65',
+};
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.74 &mdash; Habit Encouragements</div>
+<div class="un-version-label">v3.0.77 &mdash; Habit Encouragement Lockout</div>
 <ul>
   <li><strong>Friend habit encouragements now send</strong> a habit-specific notification when pressed.</li>
   <li><strong>Encourage buttons animate and lock for the day</strong> so each friend habit can only be encouraged once until midnight.</li>
   <li><strong>Habit Builder nav behavior refined</strong> so the bottom dock still auto-collapses after 3 seconds, but scrolling habits no longer forces it closed.</li>
+</ul>
+<div class="un-version-label">v3.0.76 &mdash; Friends Habits Layout Fix</div>
+<ul>
+  <li><strong>Friends habit cards fixed</strong> — Cards in the Friends tab now fit properly within the scrollable view with even margins on both sides instead of hanging off the right edge of the screen.</li>
+</ul>
+<div class="un-version-label">v3.0.75 &mdash; Encourage &amp; Rhema Nav</div>
+<ul>
+  <li><strong>Encourage button added</strong> — Tap the heart button on any friend's habit card to send them an encouraging push notification to keep their habit going.</li>
+  <li><strong>Rhema added to mobile nav</strong> — Rhema (LXX) is now a direct bottom nav item on mobile for quicker access.</li>
+</ul>
+<div class="un-version-label">v3.0.74 &mdash; Rhema OT Restore &amp; Offline Fix</div>
+<ul>
+  <li><strong>Old Testament restored in Rhema</strong> — The full Septuagint (39 OT books, all chapters and verses) is now reliably available in the book picker alongside the New Testament.</li>
+  <li><strong>Offline Rhema fixed</strong> — All Greek text bundles (LXX, NT, Majority, Critical, lexicons, cross references) are now pre-cached so Rhema works completely offline after one online session. Previously a service worker update could wipe the LXX and leave the OT inaccessible until the next online session.</li>
+  <li><strong>Data caching decoupled from app version</strong> — Rhema data files now use pinned data version numbers, so routine app updates no longer force a 50 MB re-download of all Bible data.</li>
+  <li><strong>Critical/Majority text variant toast improved</strong> — Tapping the text mode tool while reading an OT passage now shows a clear explanation of which text tradition applies and why (LXX is used for OT regardless of mode; Critical vs. Majority only affects NT).</li>
 </ul>
 <div class="un-version-label">v3.0.73 &mdash; Desktop Rhema Foundation</div>
 <ul>
@@ -18389,6 +18461,7 @@ function showAppLaunchScreen(text = 'Preparing your discipleship tools') {
 
 function hideAppLaunchScreen(reason = 'ready') {
   if (_appLaunchReleased) return;
+  if (_swUpdateFound) return;
   const splash = document.getElementById('appLaunchScreen');
   if (!splash) return;
   const minVisible = reason === 'timeout' ? 0 : 650;
@@ -18457,6 +18530,16 @@ function registerServiceWorker() {
     });
 
     navigator.serviceWorker.register("./service-worker.js").then((registration) => {
+      registration.addEventListener('updatefound', () => {
+        if (_appLaunchReleased) return;
+        _swUpdateFound = true;
+        setAppLaunchText("There's been updates since last time you were here, this may take longer to load");
+        // Fallback: release after 15s in case the update never activates
+        setTimeout(() => {
+          _swUpdateFound = false;
+          if (!_appLaunchReleased) hideAppLaunchScreen('ready');
+        }, 15000);
+      });
       registration.update().catch(() => {});
     }).catch((error) => {
       console.warn("Service worker registration failed:", error);
@@ -19112,6 +19195,24 @@ window.__onAuthStateReady = async (user) => {
     _maybeStartAppWelcomeCoachAfterAuth();
     setTimeout(maybeShowHomeIntroModal, 500);
     hideAppLaunchScreen('ready');
+
+    // Pre-start the habits listener so data is loaded before the user navigates there
+    if (!_habitsUnsub && window.Habits?.listen) {
+      _habitsUnsub = window.Habits.listen(user.uid, habits => {
+        _habitItems = habits || [];
+        _habitsLoaded = true;
+        if (document.getElementById("habitsPage")?.classList.contains("active")) renderHabits();
+      });
+    }
+
+    // If a data-dependent page was already visible (e.g. shown before auth resolved),
+    // refresh it now so users don't stay stuck on a "sign in" or "loading" message.
+    const _authReadyActivePage = document.querySelector('.screen.active');
+    if (_authReadyActivePage?.id === 'habitsPage') {
+      startHabitsPage();
+    } else if (_authReadyActivePage?.id === 'merciesPage') {
+      startMerciesFeed();
+    }
   } else {
     _unsubUserDoc?.();
     _unsubUserDoc = null;
@@ -19119,6 +19220,9 @@ window.__onAuthStateReady = async (user) => {
     _communityPosts = [];
     if (_merciesUnsub) { _merciesUnsub(); _merciesUnsub = null; }
     _merciesPosts = [];
+    if (_habitsUnsub) { _habitsUnsub(); _habitsUnsub = null; }
+    _habitItems = [];
+    _habitsLoaded = false;
     _welcomeCoachQueuedAfterAuth = false;
     document.getElementById('appCoachOverlay')?.classList.add('hidden');
     _resumeHomeFlipAfterCoach();
@@ -19641,8 +19745,13 @@ function startMerciesFeed() {
   refreshPendingMercyFriendEncouragement();
   clearTimeout(_merciesFeedRetryTimer);
   if (!uid) {
-    list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Praises</strong><p>Your feed will load as soon as your account is ready.</p></div>';
-    _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 900);
+    if (!_authReady) {
+      // Auth is still resolving — show neutral state and retry quickly
+      list.innerHTML = '<p class="study-board-empty">Loading Praises...</p>';
+      _merciesFeedRetryTimer = setTimeout(startMerciesFeed, 500);
+    } else {
+      list.innerHTML = '<div class="mercies-empty"><span class="material-symbols-outlined">account_circle</span><strong>Sign in to see Praises</strong><p>Your feed will load as soon as your account is ready.</p></div>';
+    }
     return;
   }
   if (!window.Mercies?.listen) {
@@ -21932,12 +22041,15 @@ window.RhemaNTBookOrder = RHEMA_NT_BOOK_ORDER;
 window.RhemaBookOrder = RHEMA_BOOK_ORDER;
 
 function _ensureRhemaBibleData() {
-  if (window.RhemaBible || !window.RhemaNT) return window.RhemaBible || window.RhemaNT;
+  if (!window.RhemaNT) return window.RhemaBible || null;
+  // Rebuild if not yet built, or if LXX is now available but wasn't when last built
+  if (window.RhemaBible && (window.RhemaBible._hasLXX || !window.RhemaLXX)) return window.RhemaBible;
   const lxx = window.RhemaLXX || { books: [], names: {}, text: {} };
   window.RhemaBible = {
     books: [...(lxx.books || []), ...(window.RhemaNT.books || RHEMA_NT_BOOK_ORDER)],
     names: { ...(lxx.names || {}), ...(window.RhemaNT.names || {}) },
     text: { ...(lxx.text || {}), ...(window.RhemaNT.text || {}) },
+    _hasLXX: !!window.RhemaLXX,
   };
   return window.RhemaBible;
 }
@@ -22253,7 +22365,7 @@ function loadRhemaScripts() {
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
-      s.src = file + '?v=' + APP_VERSION;
+      s.src = file + '?v=' + (RHEMA_DATA_VERSIONS[file] || APP_VERSION);
       s.onload = () => {
         loaded++;
         if (loaded === files.length) { _syncRhemaEnglishAlias(); _ensureRhemaBibleData(); _rhemaLoaded = true; resolve(); }
@@ -22269,7 +22381,9 @@ function loadRhemaScripts() {
 // ── Modal open/close ──────────────────────────────────────────────────────────
 
 async function showRhema() {
+  _desktopCollapseNav();
   hideBottomNav();
+  setNavActive('rhema');
   const modal = document.getElementById('rhemaModal');
   if (!modal) return;
   modal.classList.add('open');
@@ -22292,6 +22406,11 @@ async function showRhema() {
 }
 
 function closeRhema(keepSandbox = false) {
+  // If opened from sermon workshop, handle cleanup via sermon mode
+  if (typeof _sermonRhemaMode !== 'undefined' && _sermonRhemaMode) {
+    _closeSermonRhemaMode();
+    return;
+  }
   _saveRhemaPosition();
   if (typeof _closeRhemaXrefShell === 'function') _closeRhemaXrefShell();
   // If opened from a study sandbox, hide Save Verse button and update preview
@@ -22821,9 +22940,11 @@ function renderRhemaVerse() {
     if (EnglishDiv) {
       EnglishDiv.innerHTML = _rhemaSyntaxMode ? '' : verseNums.map(vn => {
         const v = String(vn);
+        const engText = _rhemaEnglishText(_rhemaBook, _rhemaChapter, v);
+        const engContent = engText || `<em class="rhema-no-english">This verse is not included in the ${_rhemaEnglishLabel()} translation.</em>`;
         return `<div class="rhema-chapter-block" data-verse="${v}">` +
                `<div class="rhema-chapter-verse-label">${vn}</div>` +
-               `<div class="rhema-chapter-english">${_rhemaEnglishText(_rhemaBook, _rhemaChapter, v)}</div></div>`;
+               `<div class="rhema-chapter-english">${engContent}</div></div>`;
       }).join('');
     }
 
@@ -22844,7 +22965,8 @@ function renderRhemaVerse() {
       display.classList.toggle('greek-only', _rhemaGreekOnly);
       display.innerHTML = _renderVerseWords(words, null);
       if (EnglishDiv) {
-        EnglishDiv.textContent = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
+        const engText = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
+        EnglishDiv.innerHTML = engText || `<em class="rhema-no-english">This verse is not included in the ${_rhemaEnglishLabel()} translation.</em>`;
       }
     }
   }
@@ -22873,7 +22995,10 @@ function toggleRhemaMode() {
 
 function toggleRhemaTextMode() {
   if (!window.RhemaCriticalNT?.text || !RHEMA_NT_BOOK_ORDER.includes(_rhemaBook)) {
-    showRhemaVariant('Critical Text', 'Available for New Testament passages');
+    // OT books always display the Septuagint (Rahlfs LXX) — there is no separate
+    // critical vs. majority edition of the LXX in Rhema. The Critical/Majority
+    // toggle only affects New Testament books (SBL Critical NT vs. Byzantine Majority Text).
+    showRhemaVariant('Text Mode', 'Old Testament: Septuagint (Rahlfs LXX) — no Critical/Majority variant. Switch applies to NT books.');
     closeRhemaWheel();
     return;
   }
@@ -23063,6 +23188,12 @@ STUDY_RHEMA_COACH_STEPS[1] = {
   body: 'In Study Rhema, long-press means touch and hold for a moment instead of quick tapping. Holding a verse opens the study note wheel so you can save a thought while the passage is still right there.',
   demo: 'longpress'
 };
+// On desktop, replace the long-press coach step with a button reference
+if (window.matchMedia && window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) {
+  STUDY_RHEMA_COACH_STEPS[1].title = 'Add a study note';
+  STUDY_RHEMA_COACH_STEPS[1].body = 'Use the note button (✎) in the verse navigation bar to save an observation, interpretation, or question directly from the current passage into the study workspace.';
+  delete STUDY_RHEMA_COACH_STEPS[1].demo;
+}
 STUDY_RHEMA_COACH_STEPS[3].position = 'center';
 STUDY_RHEMA_COACH_STEPS[3].offsetY = 44;
 STUDY_RHEMA_COACH_STEPS[3].body = 'A trail saves the breadcrumb path, connected verses, labels, and text so you can return to the route instead of trying to remember it. It is your “how did I get here?” answer, saved.';
@@ -25001,4 +25132,454 @@ function renderRhemaBookVerses() {
       <button class="${EnglishCls}" onclick="toggleRhemaBookViewEnglish()">${_rhemaEnglishLabel()}</button>
     </div>
     <div>${rows}</div>`;
+}
+
+// ── Desktop nav init ─────────────────────────────────────────────────────────
+function _initDesktopNav() {
+  if (!window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) return;
+  const nav = document.getElementById('desktopShellNav');
+  if (!nav) return;
+  nav.classList.add('nav-intro');
+  setTimeout(() => { nav.classList.remove('nav-intro'); }, 5000);
+  setNavActive('home');
+}
+
+function _desktopCollapseNav() {
+  const nav = document.getElementById('desktopShellNav');
+  if (nav) nav.classList.remove('nav-intro');
+}
+
+window.addEventListener('load', () => { setTimeout(_initDesktopNav, 900); });
+
+// ── Desktop home navigation ───────────────────────────────────────────────────
+function _desktopGoHome() {
+  const modal = document.getElementById('rhemaModal');
+  if (modal?.classList.contains('open')) {
+    modal.classList.remove('open');
+    showBottomNav();
+  }
+  closeSermonWorkshop(true);
+  showNavPage('home');
+}
+
+// ── Sermons page ──────────────────────────────────────────────────────────────
+let _savedSermons = [];
+
+function _loadSavedSermons() {
+  try { _savedSermons = JSON.parse(localStorage.getItem('savedSermons') || '[]'); } catch { _savedSermons = []; }
+}
+
+function _persistSavedSermons() {
+  try { localStorage.setItem('savedSermons', JSON.stringify(_savedSermons)); } catch {}
+}
+
+function showNavPage_sermons() {
+  _loadSavedSermons();
+  _renderSermonsPage();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('sermonsPage')?.classList.add('active');
+  setNavActive('sermons');
+}
+
+function _renderSermonsPage() {
+  const grid = document.getElementById('sermonsGrid');
+  const empty = document.getElementById('sermonsEmpty');
+  if (!grid) return;
+  if (!_savedSermons.length) {
+    grid.innerHTML = '';
+    empty?.classList.remove('hidden');
+    return;
+  }
+  empty?.classList.add('hidden');
+  grid.innerHTML = _savedSermons.slice().reverse().map((s, ri) => {
+    const i = _savedSermons.length - 1 - ri;
+    const date = s.savedAt ? new Date(s.savedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    return `<div class="sermon-card">
+      <div class="sermon-card-icon"><span class="material-symbols-outlined">edit_note</span></div>
+      <span class="sermon-card-title">${_escHtml(s.title || 'Untitled')}</span>
+      ${s.ref ? `<span class="sermon-card-ref">${_escHtml(s.ref)}</span>` : ''}
+      ${date ? `<span class="sermon-card-meta">Saved ${date}</span>` : ''}
+      <div class="sermon-card-actions">
+        <button class="sermon-card-open-btn" onclick="openSavedSermon(${i})">Open</button>
+        <button class="sermon-card-delete-btn" onclick="deleteSavedSermon(${i},event)" title="Delete"><span class="material-symbols-outlined">delete</span></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSavedSermon(i) {
+  _loadSavedSermons();
+  const sermon = _savedSermons[i];
+  if (!sermon) return;
+  _swCurrentSermonIndex = i;
+  openSermonWorkshop(sermon);
+}
+
+function deleteSavedSermon(i, e) {
+  e?.stopPropagation();
+  _loadSavedSermons();
+  _savedSermons.splice(i, 1);
+  _persistSavedSermons();
+  _renderSermonsPage();
+}
+
+// ── Sermon Workshop ──────────────────────────────────────────────────────────
+let _swSermonPoints = [];
+let _swIllustrations = [];
+let _swCrossRefs = [];
+let _swCurrentSermonIndex = -1;
+let _swRhemaOpen = false;
+let _swAutosaveTimer = null;
+
+function openSermonWorkshop(draft) {
+  _desktopCollapseNav();
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (!overlay) return;
+  _loadSermonDraft(draft || null);
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function closeSermonWorkshop(skipSave) {
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (!overlay || (!overlay.classList.contains('open') && !overlay.classList.contains('sermon-rhema-hidden'))) return;
+  if (!skipSave) saveSermonDraft();
+  if (_sermonRhemaMode) _closeSermonRhemaMode();
+  else if (_swRhemaOpen) closeSermonRhema();
+  overlay.classList.remove('open', 'sermon-rhema-hidden');
+  setTimeout(() => overlay.classList.add('hidden'), 320);
+  _swCurrentSermonIndex = -1;
+}
+
+function saveAndCloseSermon() {
+  const title = document.getElementById('swSermonTitle')?.value?.trim();
+  if (!title) {
+    const el = document.getElementById('swSermonTitle');
+    if (el) { el.focus(); el.style.borderColor = '#e53e3e'; setTimeout(() => { el.style.borderColor = ''; }, 2000); }
+    _showSwToast('Please give your sermon a title before saving.');
+    return;
+  }
+  _loadSavedSermons();
+  const draft = _collectSermonDraft();
+  draft.savedAt = Date.now();
+  if (_swCurrentSermonIndex >= 0 && _swCurrentSermonIndex < _savedSermons.length) {
+    _savedSermons[_swCurrentSermonIndex] = draft;
+  } else {
+    _savedSermons.push(draft);
+    _swCurrentSermonIndex = _savedSermons.length - 1;
+  }
+  _persistSavedSermons();
+  // Close Rhema if open
+  const rhemaModal = document.getElementById('rhemaModal');
+  if (rhemaModal?.classList.contains('open')) { rhemaModal.classList.remove('open'); showBottomNav(); }
+  closeSermonWorkshop(true);
+  // Navigate to sermons page
+  if (window.matchMedia('(min-width: 960px) and (pointer: fine)').matches) {
+    showNavPage_sermons();
+  }
+}
+
+function _showSwToast(msg) {
+  const ind = document.getElementById('swAutosaveIndicator');
+  if (ind) { ind.textContent = msg; setTimeout(() => { if (ind.textContent === msg) ind.textContent = ''; }, 3000); }
+}
+
+function switchSermonTab(tab) {
+  document.querySelectorAll('.sw-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.sw-pane').forEach(p => p.classList.remove('active'));
+  const paneMap = { outline: 'swPaneOutline', passage: 'swPanePassage', greek: 'swPaneGreek', crossrefs: 'swPaneCrossrefs', illustration: 'swPaneIllustration', application: 'swPaneApplication', notes: 'swPaneNotes' };
+  document.getElementById(paneMap[tab])?.classList.add('active');
+}
+
+function addSermonPoint() {
+  _swSermonPoints.push({ title: '', body: '' });
+  _renderSermonPoints();
+  saveSermonDraft();
+}
+
+function removeSermonPoint(i) {
+  _swSermonPoints.splice(i, 1);
+  _renderSermonPoints();
+  saveSermonDraft();
+}
+
+function _renderSermonPoints() {
+  const list = document.getElementById('swPointsList');
+  if (!list) return;
+  list.innerHTML = _swSermonPoints.map((pt, i) => `
+    <div class="sw-point-item">
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <input class="sw-input" style="font-size:0.9rem;padding:9px 12px" placeholder="Point ${i+1} heading…" value="${_escHtml(pt.title||'')}" oninput="_swSermonPoints[${i}].title=this.value;saveSermonDraft()"/>
+        <textarea class="sw-textarea" style="min-height:70px;font-size:0.9rem" placeholder="Development and supporting Scripture…" oninput="_swSermonPoints[${i}].body=this.value;saveSermonDraft()">${_escHtml(pt.body||'')}</textarea>
+      </div>
+      <button class="sw-point-remove" onclick="removeSermonPoint(${i})" title="Remove point"><span class="material-symbols-outlined">close</span></button>
+    </div>`).join('');
+}
+
+function addSermonIllustration() {
+  _swIllustrations.push({ text: '' });
+  _renderSermonIllustrations();
+  saveSermonDraft();
+}
+
+function _renderSermonIllustrations() {
+  const list = document.getElementById('swIllustrationsList');
+  if (!list) return;
+  list.innerHTML = _swIllustrations.map((ill, i) => `
+    <div class="sw-illustration-item">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button class="sw-point-remove" onclick="_swIllustrations.splice(${i},1);_renderSermonIllustrations();saveSermonDraft()" title="Remove"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <textarea class="sw-textarea" style="min-height:80px" placeholder="Illustration ${i+1}…" oninput="_swIllustrations[${i}].text=this.value;saveSermonDraft()">${_escHtml(ill.text||'')}</textarea>
+    </div>`).join('');
+}
+
+function addSermonCrossRef() {
+  _swCrossRefs.push({ ref: '', note: '' });
+  _renderSermonCrossRefs();
+  saveSermonDraft();
+}
+
+function _renderSermonCrossRefs() {
+  const list = document.getElementById('swCrossRefsList');
+  if (!list) return;
+  list.innerHTML = _swCrossRefs.map((cr, i) => `
+    <div class="sw-crossref-item">
+      <input placeholder="Reference…" value="${_escHtml(cr.ref||'')}" oninput="_swCrossRefs[${i}].ref=this.value;saveSermonDraft()"/>
+      <textarea placeholder="Connection to the passage…" oninput="_swCrossRefs[${i}].note=this.value;saveSermonDraft()">${_escHtml(cr.note||'')}</textarea>
+      <button class="sw-point-remove" style="margin-top:4px" onclick="_swCrossRefs.splice(${i},1);_renderSermonCrossRefs();saveSermonDraft()" title="Remove"><span class="material-symbols-outlined">close</span></button>
+    </div>`).join('');
+}
+
+function _escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function saveSermonDraft() {
+  clearTimeout(_swAutosaveTimer);
+  _swAutosaveTimer = setTimeout(() => {
+    const draft = _collectSermonDraft();
+    try { localStorage.setItem('sermonWorkshopDraft', JSON.stringify(draft)); } catch {}
+    const ind = document.getElementById('swAutosaveIndicator');
+    if (ind) { ind.textContent = 'Draft saved'; setTimeout(() => { if (ind.textContent === 'Draft saved') ind.textContent = ''; }, 2000); }
+  }, 600);
+}
+
+function _collectSermonDraft() {
+  const g = id => document.getElementById(id)?.value || '';
+  return {
+    title: g('swSermonTitle'),
+    ref: g('swScriptureRef'),
+    mainPoint: g('swMainPoint'),
+    introduction: g('swIntroduction'),
+    conclusion: g('swConclusion'),
+    points: _swSermonPoints,
+    keyVerses: g('swKeyVerses'),
+    structuralObs: g('swStructuralObs'),
+    theological: g('swTheologicalContext'),
+    historicalBg: g('swHistoricalBg'),
+    greekNotes: g('swGreekNotes'),
+    textualNotes: g('swTextualNotes'),
+    grammarObs: g('swGrammarObs'),
+    crossRefs: _swCrossRefs,
+    illustrations: _swIllustrations,
+    callToAction: g('swCallToAction'),
+    applicationPoints: g('swApplicationPoints'),
+    distortions: g('swDistortions'),
+    generalNotes: g('swGeneralNotes'),
+    rhemaPos: (_swRhemaOpen || _sermonRhemaMode) ? { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse } : null
+  };
+}
+
+function _loadSermonDraft(draft) {
+  let d = draft;
+  if (!d) {
+    try { d = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}'); } catch { d = {}; }
+  }
+  _swSermonPoints = Array.isArray(d.points) ? d.points : [];
+  _swIllustrations = Array.isArray(d.illustrations) ? d.illustrations.map(x => typeof x === 'string' ? { text: x } : x) : [];
+  _swCrossRefs = Array.isArray(d.crossRefs) ? d.crossRefs : [];
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('swSermonTitle', d.title); set('swScriptureRef', d.ref); set('swMainPoint', d.mainPoint);
+  set('swIntroduction', d.introduction); set('swConclusion', d.conclusion);
+  set('swKeyVerses', d.keyVerses); set('swStructuralObs', d.structuralObs);
+  set('swTheologicalContext', d.theological); set('swHistoricalBg', d.historicalBg);
+  set('swGreekNotes', d.greekNotes); set('swTextualNotes', d.textualNotes);
+  set('swGrammarObs', d.grammarObs);
+  set('swCallToAction', d.callToAction); set('swApplicationPoints', d.applicationPoints);
+  set('swDistortions', d.distortions); set('swGeneralNotes', d.generalNotes);
+  _renderSermonPoints();
+  _renderSermonIllustrations();
+  _renderSermonCrossRefs();
+  switchSermonTab('outline');
+  if (d.rhemaPos) {
+    _rhemaBook = d.rhemaPos.book || _rhemaBook;
+    _rhemaChapter = d.rhemaPos.chapter || _rhemaChapter;
+    _rhemaVerse = d.rhemaPos.verse || _rhemaVerse;
+  }
+}
+
+function exportSermonText() {
+  const d = _collectSermonDraft();
+  const lines = [];
+  if (d.title) lines.push(`SERMON: ${d.title}`);
+  if (d.ref) lines.push(`SCRIPTURE: ${d.ref}`);
+  if (d.mainPoint) lines.push(`\nEXEGETICAL PROPOSITION:\n${d.mainPoint}`);
+  if (d.introduction) lines.push(`\nINTRODUCTION:\n${d.introduction}`);
+  if (d.points?.length) { lines.push('\nSTRUCTURAL POINTS:'); d.points.forEach((p,i) => { if (p.title||p.body) lines.push(`${i+1}. ${p.title||''}\n   ${p.body||''}`); }); }
+  if (d.keyVerses) lines.push(`\nPASSAGE TEXT:\n${d.keyVerses}`);
+  if (d.structuralObs) lines.push(`\nSTRUCTURAL OBSERVATIONS:\n${d.structuralObs}`);
+  if (d.theological) lines.push(`\nTHEOLOGICAL CONTEXT:\n${d.theological}`);
+  if (d.historicalBg) lines.push(`\nHISTORICAL BACKGROUND:\n${d.historicalBg}`);
+  if (d.greekNotes) lines.push(`\nGREEK WORD STUDY:\n${d.greekNotes}`);
+  if (d.textualNotes) lines.push(`\nTEXTUAL NOTES:\n${d.textualNotes}`);
+  if (d.grammarObs) lines.push(`\nGRAMMAR OBSERVATIONS:\n${d.grammarObs}`);
+  if (d.crossRefs?.length) { lines.push('\nCROSS-REFERENCES:'); d.crossRefs.forEach((cr,i) => { if (cr.ref||cr.note) lines.push(`${i+1}. ${cr.ref||''} \u2014 ${cr.note||''}`); }); }
+  if (d.illustrations?.length) { lines.push('\nILLUSTRATIONS:'); d.illustrations.forEach((ill,i) => { const t=ill.text||ill; if(t) lines.push(`${i+1}. ${t}`); }); }
+  if (d.callToAction) lines.push(`\nCALL TO FAITH / RESPONSE:\n${d.callToAction}`);
+  if (d.applicationPoints) lines.push(`\nAPPLICATION:\n${d.applicationPoints}`);
+  if (d.distortions) lines.push(`\nDOCTRINAL CORRECTION:\n${d.distortions}`);
+  if (d.conclusion) lines.push(`\nCONCLUSION:\n${d.conclusion}`);
+  if (d.generalNotes) lines.push(`\nRESEARCH NOTES:\n${d.generalNotes}`);
+  const text = lines.join('\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (d.title ? d.title.replace(/[^a-z0-9]/gi,'-').toLowerCase() : 'sermon') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// \u2500\u2500 Sermon Rhema \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+let _sermonRhemaMode = false;
+let _sermonRhemaSavedPos = null;
+
+function toggleSermonRhema() {
+  if (_sermonRhemaMode) _closeSermonRhemaMode();
+  else openSermonRhema();
+}
+
+function openSermonRhema() {
+  _sermonRhemaMode = true;
+  _swRhemaOpen = true;
+  // Save global rhema position to restore when leaving
+  _sermonRhemaSavedPos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+  // Load sermon's saved rhema position if available
+  try {
+    const draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}');
+    if (draft.rhemaPos) {
+      _rhemaBook = draft.rhemaPos.book || _rhemaBook;
+      _rhemaChapter = draft.rhemaPos.chapter || _rhemaChapter;
+      _rhemaVerse = draft.rhemaPos.verse || _rhemaVerse;
+    }
+  } catch {}
+  // Hide workshop overlay, show full Rhema with back-to-workshop button
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (overlay) overlay.classList.add('sermon-rhema-hidden');
+  const backBtn = document.getElementById('rhemaWorkshopBackBtn');
+  const homeBtn = document.querySelector('#rhemaSlide .rhema-back-btn');
+  if (backBtn) backBtn.classList.remove('hidden');
+  if (homeBtn) homeBtn.classList.add('hidden');
+  showRhema();
+}
+
+function _closeSermonRhemaMode() {
+  if (!_sermonRhemaMode) return;
+  _sermonRhemaMode = false;
+  _swRhemaOpen = false;
+  // Save current Rhema position back to sermon draft
+  try {
+    const draft = JSON.parse(localStorage.getItem('sermonWorkshopDraft') || '{}');
+    draft.rhemaPos = { book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse };
+    localStorage.setItem('sermonWorkshopDraft', JSON.stringify(draft));
+  } catch {}
+  // Restore global position
+  if (_sermonRhemaSavedPos) {
+    _rhemaBook = _sermonRhemaSavedPos.book;
+    _rhemaChapter = _sermonRhemaSavedPos.chapter;
+    _rhemaVerse = _sermonRhemaSavedPos.verse;
+    _sermonRhemaSavedPos = null;
+  }
+  // Restore Rhema header buttons
+  const backBtn = document.getElementById('rhemaWorkshopBackBtn');
+  const homeBtn = document.querySelector('#rhemaSlide .rhema-back-btn');
+  if (backBtn) backBtn.classList.add('hidden');
+  if (homeBtn) homeBtn.classList.remove('hidden');
+  // Close Rhema and reopen workshop
+  const modal = document.getElementById('rhemaModal');
+  if (modal) modal.classList.remove('open');
+  showBottomNav();
+  const overlay = document.getElementById('sermonWorkshopOverlay');
+  if (overlay) overlay.classList.remove('sermon-rhema-hidden');
+}
+
+function closeSermonRhema() {
+  // Side panel no longer used; keep stub for safety
+  _swRhemaOpen = false;
+  saveSermonDraft();
+}
+
+function saveWritingModalToSermon() {
+  const ta = document.getElementById('swmTextarea');
+  const text = ta?.value?.trim();
+  if (!text) { ta?.focus(); return; }
+  const book = _swmSavedBook || _rhemaBook;
+  const ch = _swmSavedChapter || _rhemaChapter;
+  const vs = _swmSavedVerse || _rhemaVerse;
+  const bookName = _rhemaBookName ? _rhemaBookName(book) : book;
+  const ref = `${bookName} ${ch}:${vs}`;
+  const el = document.getElementById('swGreekNotes');
+  if (el) {
+    const existing = el.value.trim();
+    el.value = existing ? `${existing}\n\n[${ref}] ${text}` : `[${ref}] ${text}`;
+    el.dispatchEvent(new Event('input'));
+  }
+  closeWritingModal();
+}
+
+function _renderSwrVerse() {
+  if (typeof renderRhemaVerse === 'function') {
+    const savedTarget = window._rhemaRenderTarget;
+    window._rhemaRenderTarget = 'sermon';
+    renderRhemaVerse();
+    window._rhemaRenderTarget = savedTarget;
+  }
+}
+// ── Desktop Study Desk ────────────────────────────────────────────────────────
+function openDesktopStudyDesk() {
+  _desktopCollapseNav();
+  const overlay = document.getElementById('desktopStudyDeskOverlay');
+  if (!overlay) return;
+  _renderDsdStudies();
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function closeDesktopStudyDesk() {
+  const overlay = document.getElementById('desktopStudyDeskOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(() => overlay.classList.add('hidden'), 320);
+}
+
+function _renderDsdStudies() {
+  const grid = document.getElementById('dsdStudiesGrid');
+  if (!grid) return;
+  const studies = _myStudies || [];
+  if (!studies.length) {
+    grid.innerHTML = '<div class="dsd-empty"><span class="material-symbols-outlined">inbox</span>No studies yet. Create one above to get started.</div>';
+    return;
+  }
+  grid.innerHTML = studies.map(study => {
+    const icon = study.icon || 'menu_book';
+    const color = study.color || 'var(--secondary-color)';
+    const name = _escHtml(study.name || 'Untitled Study');
+    const ts = study.updatedAt ? new Date(study.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    return `<button class="dsd-study-card" onclick="openStudySandbox('${study.id}');closeDesktopStudyDesk()">
+      <div class="dsd-study-icon" style="background:color-mix(in srgb,${color} 14%,transparent);color:${color}"><span class="material-symbols-outlined">${icon}</span></div>
+      <span class="dsd-study-name">${name}</span>
+      ${ts ? `<span class="dsd-study-meta">Updated ${ts}</span>` : ''}
+    </button>`;
+  }).join('');
 }

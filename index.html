@@ -303,7 +303,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-180.png" rel="apple-touch-icon"/>
 <link href="assets/icons/disciple-builder-icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
-<link href="style.css?v=3.0.74" rel="stylesheet"/>
+<link href="style.css?v=3.0.77" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -321,90 +321,113 @@ glacier: {
 <p>Study deeper. Encourage others. Grow together.</p>
 <small class="header-info-hint"><span class="material-symbols-outlined">info</span> About this app</small>
 </header>
-<aside class="desktop-shell-nav" aria-label="Desktop navigation">
+<aside class="desktop-shell-nav" id="desktopShellNav" aria-label="Desktop navigation">
 <div class="desktop-brand">
 <span class="material-symbols-outlined">auto_stories</span>
-<div>
+<div class="desktop-brand-text">
 <strong>Disciple Builder</strong>
 <small>Rhema Study Desk</small>
 </div>
 </div>
-<button class="desktop-nav-btn primary" onclick="showRhema()">
+<button class="desktop-nav-btn" onclick="_desktopGoHome()" data-nav="home">
+<span class="material-symbols-outlined">home</span>
+<span class="dnb-label">Home</span>
+</button>
+<button class="desktop-nav-btn" onclick="showRhema()" data-nav="rhema">
 <span class="material-symbols-outlined">menu_book</span>
-<span>Open Rhema</span>
+<span class="dnb-label">Open Rhema</span>
 </button>
-<button class="desktop-nav-btn" onclick="resumeRhema()">
-<span class="material-symbols-outlined">history_edu</span>
-<span>Resume Study</span>
-</button>
-<button class="desktop-nav-btn" onclick="showNavPage('home')">
+<button class="desktop-nav-btn" onclick="openDesktopStudyDesk()" data-nav="studydesk">
 <span class="material-symbols-outlined">dashboard</span>
-<span>Study Desk</span>
+<span class="dnb-label">Study Desk</span>
 </button>
-<button class="desktop-nav-btn" onclick="showNavPage('lessons')">
-<span class="material-symbols-outlined">school</span>
-<span>Lessons</span>
+<button class="desktop-nav-btn" onclick="showNavPage('sermons')" data-nav="sermons">
+<span class="material-symbols-outlined">library_books</span>
+<span class="dnb-label">Sermons</span>
 </button>
-<button class="desktop-nav-btn" onclick="showNavPage('profile')">
+<button class="desktop-nav-btn" onclick="showNavPage('profile')" data-nav="profile">
 <span class="material-symbols-outlined">person</span>
-<span>Profile</span>
+<span class="dnb-label">Profile</span>
 </button>
-<div class="desktop-companion-box">
-<span class="material-symbols-outlined">phone_iphone</span>
-<strong>Mobile companion tools</strong>
-<p>Praises, Community, and Habit Builder are still available, but desktop is shaped around deeper Bible study and Rhema tools.</p>
-<div class="desktop-companion-actions">
-<button onclick="showNavPage('mercies')">Praises</button>
-<button onclick="showNavPage('community')">Community</button>
-<button onclick="showNavPage('habits')">Habits</button>
-</div>
-</div>
 </aside>
 <section class="screen active" id="homeScreen">
 <div class="home-scroll" id="homeScroll">
 <div class="desktop-home-shell">
 <section class="desktop-study-hero">
 <div class="desktop-study-copy">
-<span class="desktop-kicker">Desktop Rhema Workspace</span>
-<h1>Settle in for deeper Bible study.</h1>
-<p>Desktop mode keeps the social and habit tools nearby, but gives the center of the screen to Scripture, word study, cross references, syntax, and careful reading.</p>
+<span class="desktop-kicker">Scripture Study • Greek Tools • Sermon Prep</span>
+<h1>Your Scripture Study Desk.</h1>
+<p>Explore any passage in Rhema, search the Greek lexicon in the Word Library, prep a sermon, and manage your studies — all with the depth and tools your desktop provides.</p>
 <div class="desktop-study-actions">
-<button class="desktop-primary-action" onclick="showRhema()">
-<span class="material-symbols-outlined">menu_book</span>
-Open Rhema Study
-</button>
-<button class="desktop-secondary-action" onclick="resumeRhema()">
-<span class="material-symbols-outlined">restart_alt</span>
-Resume Last Passage
+<button class="desktop-primary-action" onclick="openStudyCreateSheet()">
+<span class="material-symbols-outlined">add</span>
+Start a New Study
 </button>
 </div>
 </div>
-<div class="desktop-study-card">
-<span class="material-symbols-outlined">auto_stories</span>
-<strong id="desktopRhemaPassage">Rhema NT Word Study</strong>
-<p id="desktopRhemaSnippet">Open a passage, compare text modes, inspect Greek words, and move through study tools with room to think.</p>
+<div class="desktop-study-card" id="desktopRhemaCard" onclick="resumeRhema()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')resumeRhema()">
+<div class="dsc-mock-rhema" id="dscMockRhema">
+<div class="dsc-mock-header">
+<span class="dsc-mock-title">Rhēma</span>
+<div class="dsc-mock-pills">
+<span class="dsc-mock-pill" id="desktopRhemaPassage">John 1:1</span>
+</div>
+<div class="dsc-mock-actions">
+<span class="dsc-mock-icon">auto_fix_high</span>
+<span class="dsc-mock-icon">swap_horiz</span>
+</div>
+</div>
+<div class="dsc-mock-verse" id="dscVersePreview">
+<span class="dsc-word">Ἐν</span>
+<span class="dsc-word">ἀρχῇ</span>
+<span class="dsc-word selected">ἦν</span>
+<span class="dsc-word">ὁ</span>
+<span class="dsc-word">λόγος</span><span class="dsc-comma">,</span>
+<span class="dsc-word">καὶ</span>
+<span class="dsc-word">ὁ</span>
+<span class="dsc-word">λόγος</span>
+<span class="dsc-word">ἦν</span>
+<span class="dsc-word">πρὸς</span>
+<span class="dsc-word accent">τὸν</span>
+<span class="dsc-word accent">θεόν</span>
+</div>
+<div class="dsc-mock-sheet">
+<div class="dsc-mock-sheet-top">
+<span class="dsc-mock-surface" id="desktopRhemaSnippet">λόγος</span>
+<span class="dsc-mock-strongs">G3056</span>
+</div>
+<div class="dsc-mock-parse-row">
+<span class="dsc-chip">Noun</span>
+<span class="dsc-chip">Nom.</span>
+<span class="dsc-chip">Sg.</span>
+<span class="dsc-chip">Masc.</span>
+</div>
+<div class="dsc-mock-def">word, reason, account — used of Christ as the divine Word in John's prologue</div>
+</div>
+</div>
+<div class="dsc-fog-overlay">
+<div class="dsc-fog-cta">
+<span class="material-symbols-outlined">play_arrow</span>
+<span>Open Rhema</span>
+</div>
+</div>
 </div>
 </section>
 <section class="desktop-tool-grid">
-<button class="desktop-tool-card" onclick="showRhema()">
-<span class="material-symbols-outlined">travel_explore</span>
-<strong>Word Study</strong>
-<small>Greek text, lemmas, parsing, and lexical helps in one focused workspace.</small>
+<button class="desktop-tool-card" onclick="openWordLibrary()">
+<span class="material-symbols-outlined">search</span>
+<strong>Word Library</strong>
+<small>Search the Greek lexicon by word, transliteration, or meaning. Definitions, parsing, and all occurrences.</small>
 </button>
-<button class="desktop-tool-card" onclick="showRhema(); setTimeout(() => { if (typeof toggleRhemaWheel === 'function') toggleRhemaWheel(); }, 250)">
-<span class="material-symbols-outlined">hub</span>
-<strong>Study Wheel</strong>
-<small>Open Rhema tools quickly when you want syntax, grammar, cross references, or notes.</small>
+<button class="desktop-tool-card" onclick="openSermonWorkshop()">
+<span class="material-symbols-outlined">edit_note</span>
+<strong>Sermon Workshop</strong>
+<small>Build a sermon outline with passage notes, structure points, illustrations, and application.</small>
 </button>
-<button class="desktop-tool-card" onclick="showNavPage('lessons')">
-<span class="material-symbols-outlined">school</span>
-<strong>Lessons</strong>
-<small>Use lessons alongside Rhema as the study structure grows on desktop.</small>
-</button>
-<button class="desktop-tool-card companion" onclick="showNavPage('habits')">
-<span class="material-symbols-outlined">phone_iphone</span>
-<strong>Mobile Companion</strong>
-<small>Habits, Praises, and Community remain available, but they are secondary on desktop.</small>
+<button class="desktop-tool-card" onclick="openDesktopStudyDesk()">
+<span class="material-symbols-outlined">dashboard</span>
+<strong>Study Desk</strong>
+<small>View all your studies, create new ones, and track notes and observations across sessions.</small>
 </button>
 </section>
 </div>
@@ -429,7 +452,7 @@ Resume Last Passage
 <div class="hcc-info">
 <span class="hcc-label">Continue Studying</span>
 <span class="hcc-passage" id="hccPassage">John 1:1</span>
-<span class="hcc-sub">Rhema NT Word Study</span>
+<span class="hcc-sub">Rhema Word Study</span>
 </div>
 <span class="material-symbols-outlined hcc-book-deco">menu_book</span>
 </div>
@@ -599,6 +622,24 @@ Resume Last Passage
 <button class="main-btn" onclick="saveHabitNote()">Save Note</button>
 </div>
 </div>
+<!-- Sermons Page -->
+<section class="screen" id="sermonsPage">
+<div class="sermons-scroll">
+<div class="sermons-header">
+<h1 class="sermons-title">Sermons</h1>
+<p class="sermons-sub">Your saved sermon preparations</p>
+</div>
+<div class="sermons-grid" id="sermonsGrid">
+<!-- Populated by JS -->
+</div>
+<div class="sermons-empty hidden" id="sermonsEmpty">
+<span class="material-symbols-outlined">library_books</span>
+<strong>No sermons saved yet</strong>
+<p>Open Sermon Workshop, build your preparation, and save it here.</p>
+<button class="main-btn" style="max-width:260px;margin:16px auto 0" onclick="openSermonWorkshop()">Open Sermon Workshop</button>
+</div>
+</div>
+</section>
 <section class="screen" id="newLearnMenu">
 <div class="nav-bar">
 <button class="icon-btn" onclick="handleLearnBack()">
@@ -2116,6 +2157,56 @@ Resume Last Passage
 </div>
 </div>
 </div>
+<div class="lesson-block" onclick="toggleLessonBlock(this)">
+<div class="lesson-block-header">
+     What Is a Declension? — The Three Noun Families
+<small class="block-time">~ 2 min</small></div>
+<div class="lesson-block-content">
+<p>
+  You've seen how noun endings change to show a word's role in a sentence. But there's one more piece to the picture: not all nouns use the exact same set of endings. Instead, Greek nouns sort into three groups called <strong>declensions</strong>.
+</p>
+<p class="highlight">
+  A <strong>declension</strong> is a family of nouns that share the same set of endings. Learn the ending pattern for one noun in a family and you instantly have a template for every noun in that family.
+</p>
+<p>Greek has three declension families. The first two are what you'll encounter most in the New Testament:</p>
+<div class="case-groundwork-box">
+<div class="case-groundwork-title">2nd Declension — the o-stem family</div>
+<ul>
+<li><strong>Mostly masculine and neuter nouns</strong></li>
+<li>The stem vowel is <strong>ο</strong> — you can spot it in endings like <span class="ending-piece">ος</span>, <span class="ending-piece">ου</span>, <span class="ending-piece">ον</span></li>
+<li>Model words: <span class="greek-text">λόγος</span> (word), <span class="greek-text">θεός</span> (God), <span class="greek-text">ἄνθρωπος</span> (man/person), <span class="greek-text">ἔργον</span> (work/deed)</li>
+<li>This is the family you've been working with throughout this lesson.</li>
+</ul>
+</div>
+<div class="case-groundwork-box" style="margin-top:10px;">
+<div class="case-groundwork-title">1st Declension — the alpha/eta-stem family</div>
+<ul>
+<li><strong>Mostly feminine nouns</strong> (with a few masculine exceptions)</li>
+<li>The stem vowel is <strong>α</strong> or <strong>η</strong> — endings like <span class="ending-piece">η</span>, <span class="ending-piece">ης</span>, <span class="ending-piece">ῃ</span>, <span class="ending-piece">ην</span></li>
+<li>Model words: <span class="greek-text">ἀγάπη</span> (love), <span class="greek-text">καρδία</span> (heart), <span class="greek-text">ἐκκλησία</span> (church), <span class="greek-text">ἀλήθεια</span> (truth)</li>
+</ul>
+</div>
+<div class="case-groundwork-box" style="margin-top:10px;">
+<div class="case-groundwork-title">3rd Declension — the consonant-stem family</div>
+<ul>
+<li>Includes all three genders</li>
+<li>The stem ends in a consonant rather than a vowel, so the endings look slightly different</li>
+<li>Model words: <span class="greek-text">σάρξ</span> (flesh), <span class="greek-text">πνεῦμα</span> (spirit), <span class="greek-text">χάρις</span> (grace)</li>
+<li><em>The 3rd declension will be covered in a later lesson — for now, just know it exists.</em></li>
+</ul>
+</div>
+<p style="margin-top: 14px;"><strong>Why does this matter?</strong> Every Greek noun belongs to one of these three families. Knowing which family a noun is in tells you exactly what endings to expect across all its forms. When Lesson 5 mentions "1st and 2nd declension endings," it means the ending patterns for these two families. And when you use tools like an interlinear Bible, Logos, or Blue Letter Bible, you'll regularly see labels like "2nd declension masculine" — now you know exactly what that means.</p>
+<div class="shortcut-box" style="margin: 12px 0 4px;">
+<p><strong>The priority order</strong></p>
+<p>Start with the <strong>2nd declension</strong> — it's the largest family and the most common in the NT. Then the <strong>1st declension</strong>. Both are covered in Lesson 5. The 3rd declension follows later once the first two are solid.</p>
+</div>
+<div class="takeaway-box" style="margin-top: 16px;">
+<div class="takeaway-step"><strong>1st Declension</strong><span>Mostly feminine · alpha/eta stem · <span class="greek-text">ἀγάπη</span>, <span class="greek-text">καρδία</span></span></div>
+<div class="takeaway-step"><strong>2nd Declension</strong><span>Mostly masculine/neuter · omicron stem · <span class="greek-text">λόγος</span>, <span class="greek-text">ἔργον</span></span></div>
+<div class="takeaway-step"><strong>3rd Declension</strong><span>All genders · consonant stem · <span class="greek-text">σάρξ</span>, <span class="greek-text">πνεῦμα</span> (coming later)</span></div>
+</div>
+</div>
+</div>
 <div class="complete-lesson-box">
 <p data-complete-message="nouns">
         Open every lesson section before completing this lesson.
@@ -2576,11 +2667,6 @@ Resume Last Passage
           the word receives action
         </div>
 </div>
-</div>
-<div class="shortcut-box" style="margin: 12px 0 4px;">
-<p><strong>Dative shortcut — spot the tiny mark</strong></p>
-<p>See that tiny mark sitting <em>under</em> the ω in λόγῳ? That is called an <strong>iota subscript</strong>. It appears on every singular dative ending in the 1st and 2nd declension: <span class="ending-piece">ῳ</span> (masculine/neuter dative) and <span class="ending-piece">ῃ</span> (feminine dative).</p>
-<p class="highlight">Spot the subscript = you're looking at a dative. Every time, no exceptions.</p>
 </div>
 <p>
       Now notice the pattern:
@@ -8879,10 +8965,10 @@ Verb Endings
 <span>The lessons are designed for the layman — no prior knowledge required. They walk through the Greek alphabet, how nouns and cases work, what verbs do, and how to read a Greek sentence with a repeatable strategy. Two tracks cover the same ground at different depths: Track 1 gets you moving fast, Track 2 goes significantly deeper. Neither replaces a Greek class or seminary course — they give you a solid footing so the language stops being foreign.</span>
 </div>
 <div class="welcome-route-feature">
-<strong>Rhēma — NT Word Study</strong>
-<span>Rhēma (ῥῆμα) means the specific word spoken — and that is what this feature is about. Open any verse across all 27 NT books and tap any Greek word to instantly see:</span>
-<span style="margin-top:6px;display:block">Full grammatical parsing · Root word &amp; transliteration · Two lexicons (Strong's &amp; Dodson) · Etymology · Every NT verse where that word appears — with cross-reference jumping and a navigation trail.</span>
-<span style="margin-top:8px;display:block">Tools like <strong>Bible Hub</strong> and <strong>Blue Letter Bible</strong> are excellent and worth using alongside this — they have broader commentary, maps, and cross-Bible comparisons. The key difference: Rhēma is built into this app, works completely offline after the first load, and is built on the <strong>Byzantine Majority Text</strong> — the manuscript tradition represented by over 80% of surviving Greek manuscripts and represented in Majority Text editions. Most web tools use the Critical Text (Nestle-Aland). Neither is wrong — they are different traditions, and it matters to know which one you are working from.</span>
+<strong>Rhēma — Greek Word Study</strong>
+<span>Rhēma (ῥῆμα) means the specific word spoken — and that is what this feature is about. Open any verse across all 66 books (the complete Septuagint OT and all 27 NT books) and tap any Greek word to instantly see:</span>
+<span style="margin-top:6px;display:block">Full grammatical parsing · Root word &amp; transliteration · Two lexicons (Strong's &amp; Dodson) · Etymology · Every verse where that word appears — with cross-reference jumping and a navigation trail.</span>
+<span style="margin-top:8px;display:block">Tools like <strong>Bible Hub</strong> and <strong>Blue Letter Bible</strong> are excellent and worth using alongside this — they have broader commentary, maps, and cross-Bible comparisons. The key difference: Rhēma is built into this app, works completely offline after the first load, and covers the Greek text in two traditions — the <strong>Byzantine Majority Text</strong> paired with the MSB for NT study, and the <strong>SBL Critical Text</strong> paired with the BSB when you switch modes. The Old Testament uses the Septuagint (Rahlfs 1935 critical text) in both modes. Neither NT tradition is wrong — they are different manuscript streams, and it matters to know which one you are working from.</span>
 </div>
 <div>
 <strong>What Makes Rhema Special</strong>
@@ -9599,6 +9685,9 @@ Verb Endings
 <button class="icon-btn rhema-back-btn" onclick="rhemaGoBack()">
 <span class="material-symbols-outlined">home</span>
 </button>
+<button class="icon-btn rhema-workshop-back-btn hidden" id="rhemaWorkshopBackBtn" onclick="_closeSermonRhemaMode()" title="Back to Workshop">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
 <div class="rhema-title-block">
 <span class="rhema-title">Rhēma</span>
 <span class="rhema-title-greek">Word Study</span>
@@ -9656,6 +9745,9 @@ Verb Endings
 <span class="material-symbols-outlined">chevron_left</span>
 </button>
 <span class="rhema-verse-ref" id="rhemaVerseRef"></span>
+<button class="rhema-nav-btn rhema-desktop-note-btn" id="rhemaDesktopNoteBtn" onclick="if(_studySandboxId)openStudyMiniWheel();else openWritingModal('observations')" title="Add study note">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
 <button class="rhema-nav-btn" onclick="rhemaNextVerse()">
 <span class="material-symbols-outlined">chevron_right</span>
 </button>
@@ -16023,10 +16115,10 @@ Verb Endings
 
 </main>
 <script src="vocab.js?v=3.0.8"></script>
-<script src="app.js?v=3.0.74"></script>
+<script src="app.js?v=3.0.77"></script>
 <script src="rhema-crossrefs-ui.js?v=3.0.29"></script>
 <script src="greek-verbs.js?v=3.0.23"></script>
-<script src="firebase-lb.js?v=3.0.74" type="module"></script>
+<script src="firebase-lb.js?v=3.0.77" type="module"></script>
 <!-- Leaderboard Intro Modal -->
 <div class="modal-overlay lb-intro-overlay" id="lbIntroModal">
 <div class="lb-intro-card">
@@ -16279,10 +16371,135 @@ Verb Endings
 <textarea class="swm-textarea" id="swmTextarea" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" placeholder="Write your thoughts…" rows="5"></textarea>
 </div>
 <div class="swm-footer">
+<button class="swm-save-sermon-btn hidden" id="swmSaveSermonBtn" onclick="saveWritingModalToSermon()">
+<span class="material-symbols-outlined">edit_note</span>
+Save to Sermon
+</button>
 <button class="swm-save-btn" onclick="saveWritingModal()">
 <span class="material-symbols-outlined">check</span>
-      Save
-    </button>
+Save
+</button>
+</div>
+</div>
+<!-- ── Sermon Workshop (Desktop) ── -->
+<div class="sw-overlay hidden" id="sermonWorkshopOverlay">
+<div class="sw-backdrop" onclick="closeSermonWorkshop()"></div>
+<div class="sw-rhema-panel hidden" id="swRhemaPanel">
+<!-- Sermon Rhema mounts here via JS -->
+</div>
+<div class="sw-panel" onclick="event.stopPropagation()">
+<div class="sw-header">
+<div class="sw-header-left">
+<span class="material-symbols-outlined">edit_note</span>
+<div>
+<h2>Sermon Workshop</h2>
+<p>Expository preparation — faithful to the text</p>
+</div>
+</div>
+<button class="sw-close-btn" onclick="closeSermonWorkshop()"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="sw-body">
+<div class="sw-sidebar">
+<button class="sw-tab active" data-tab="outline" onclick="switchSermonTab('outline')"><span class="material-symbols-outlined">format_list_bulleted</span><span>Outline</span></button>
+<button class="sw-tab" data-tab="passage" onclick="switchSermonTab('passage')"><span class="material-symbols-outlined">menu_book</span><span>Passage</span></button>
+<button class="sw-tab" data-tab="greek" onclick="switchSermonTab('greek')"><span class="material-symbols-outlined">translate</span><span>Greek Notes</span></button>
+<button class="sw-tab" data-tab="crossrefs" onclick="switchSermonTab('crossrefs')"><span class="material-symbols-outlined">hub</span><span>Cross-Refs</span></button>
+<button class="sw-tab" data-tab="illustration" onclick="switchSermonTab('illustration')"><span class="material-symbols-outlined">lightbulb</span><span>Illustrations</span></button>
+<button class="sw-tab" data-tab="application" onclick="switchSermonTab('application')"><span class="material-symbols-outlined">record_voice_over</span><span>Application</span></button>
+<button class="sw-tab" data-tab="notes" onclick="switchSermonTab('notes')"><span class="material-symbols-outlined">notes</span><span>Research</span></button>
+<div class="sw-sidebar-spacer"></div>
+<button class="sw-rhema-toggle-btn" id="swRhemaToggleBtn" onclick="toggleSermonRhema()">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Open in Rhema</span>
+</button>
+</div>
+<div class="sw-content">
+<!-- Outline -->
+<div class="sw-pane active" id="swPaneOutline">
+<div class="sw-pane-header"><h3>Sermon Outline</h3><p>Construct the structural framework of your exposition.</p></div>
+<div class="sw-field-group"><label>Sermon Title <span class="sw-required">*</span></label><input class="sw-input" id="swSermonTitle" placeholder="Title is required to save" type="text" oninput="saveSermonDraft()"/></div>
+<div class="sw-field-group"><label>Scripture Text</label><input class="sw-input" id="swScriptureRef" placeholder="e.g. John 3:16–21" type="text" oninput="saveSermonDraft()"/></div>
+<div class="sw-field-group"><label>Exegetical Proposition</label><textarea class="sw-textarea" id="swMainPoint" placeholder="State the single authoritative claim the text makes. What does this passage assert?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-points-section">
+<div class="sw-points-header"><label>Structural Points</label><button class="sw-add-point-btn" onclick="addSermonPoint()"><span class="material-symbols-outlined">add</span> Add Point</button></div>
+<div class="sw-points-list" id="swPointsList"></div>
+</div>
+<div class="sw-field-group"><label>Introduction</label><textarea class="sw-textarea" id="swIntroduction" placeholder="How will you move from their world to the text? Keep it brief and text-focused." oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Conclusion</label><textarea class="sw-textarea" id="swConclusion" placeholder="Restate the proposition. Close with the text's own weight, not an emotional push." oninput="saveSermonDraft()"></textarea></div>
+</div>
+<!-- Passage -->
+<div class="sw-pane" id="swPanePassage">
+<div class="sw-pane-header"><h3>Passage Analysis</h3><p>Observe the text carefully before drawing any conclusions.</p></div>
+<div class="sw-field-group"><label>Text (verbatim or working translation)</label><textarea class="sw-textarea" id="swKeyVerses" placeholder="Write out the passage. Handling the actual words forces precision." rows="6" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Structural Observations</label><textarea class="sw-textarea" id="swStructuralObs" placeholder="What is the argument structure? Conjunctions, contrasts, cause-effect, conditionals?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Theological Context</label><textarea class="sw-textarea" id="swTheologicalContext" placeholder="Where does this text sit in redemptive history? What covenant, promise, or fulfillment is in view?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Historical &amp; Cultural Background</label><textarea class="sw-textarea" id="swHistoricalBg" placeholder="What would the original audience have understood that we might miss?" oninput="saveSermonDraft()"></textarea></div>
+</div>
+<!-- Greek Notes -->
+<div class="sw-pane" id="swPaneGreek">
+<div class="sw-pane-header"><h3>Greek Word Study</h3><p>Key terms, parsing, and lexical observations from the text. Use Rhema for live word inspection.</p></div>
+<div class="sw-field-group"><label>Key Terms</label><textarea class="sw-textarea" id="swGreekNotes" placeholder="List significant Greek words with their lemma, gloss, and why they matter in this context…" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Textual Notes</label><textarea class="sw-textarea" id="swTextualNotes" placeholder="Any significant textual variants? How do they affect interpretation?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Grammar Observations</label><textarea class="sw-textarea" id="swGrammarObs" placeholder="Tense, aspect, mood, case, syntax constructions that carry interpretive weight…" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-rhema-hint-bar">
+<span class="material-symbols-outlined">info</span>
+<span>Use the <strong>Open in Rhema</strong> button (bottom-left) to inspect Greek words live and bring notes back here.</span>
+</div>
+</div>
+<!-- Cross-Refs -->
+<div class="sw-pane" id="swPaneCrossrefs">
+<div class="sw-pane-header"><h3>Cross-References</h3><p>Let Scripture interpret Scripture. Record related passages and their bearing on this text.</p></div>
+<div class="sw-crossrefs-list" id="swCrossRefsList"></div>
+<button class="sw-add-btn" onclick="addSermonCrossRef()"><span class="material-symbols-outlined">add</span> Add Cross-Reference</button>
+</div>
+<!-- Illustrations -->
+<div class="sw-pane" id="swPaneIllustration">
+<div class="sw-pane-header"><h3>Illustrations</h3><p>Illustrations clarify; they do not carry the argument. The text does.</p></div>
+<div class="sw-illustrations-list" id="swIllustrationsList"></div>
+<button class="sw-add-btn" onclick="addSermonIllustration()"><span class="material-symbols-outlined">add</span> Add Illustration</button>
+</div>
+<!-- Application -->
+<div class="sw-pane" id="swPaneApplication">
+<div class="sw-pane-header"><h3>Application</h3><p>Application flows from what the text asserts. Free grace: the response is faith, not performance.</p></div>
+<div class="sw-field-group"><label>What does this text demand the listener believe?</label><textarea class="sw-textarea" id="swCallToAction" placeholder="What truth or promise does the Spirit use to produce faith or action?" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>Application Points</label><textarea class="sw-textarea" id="swApplicationPoints" placeholder="How does this doctrine shape thinking, trusting, and living? Be specific." rows="6" oninput="saveSermonDraft()"></textarea></div>
+<div class="sw-field-group"><label>What common distortions does this text correct?</label><textarea class="sw-textarea" id="swDistortions" placeholder="Legalism, moralism, sentimentalism, or other misreadings this text specifically opposes…" oninput="saveSermonDraft()"></textarea></div>
+</div>
+<!-- Research -->
+<div class="sw-pane" id="swPaneNotes">
+<div class="sw-pane-header"><h3>Research Notes</h3><p>Commentary citations, source material, exegetical debates, and working notes.</p></div>
+<div class="sw-field-group"><textarea class="sw-textarea" id="swGeneralNotes" placeholder="Commentary notes, secondary source quotes, unresolved questions, reminders to self…" rows="18" oninput="saveSermonDraft()"></textarea></div>
+</div>
+</div>
+</div>
+<div class="sw-footer">
+<span class="sw-autosave-indicator" id="swAutosaveIndicator"></span>
+<button class="sw-export-btn" onclick="exportSermonText()"><span class="material-symbols-outlined">file_download</span> Export</button>
+<button class="sw-save-btn" onclick="saveAndCloseSermon()"><span class="material-symbols-outlined">save</span> Save</button>
+</div>
+</div>
+</div>
+<!-- ── Desktop Study Desk ── -->
+<div class="dsd-overlay hidden" id="desktopStudyDeskOverlay" onclick="if(event.target===this)closeDesktopStudyDesk()">
+<div class="dsd-panel" onclick="event.stopPropagation()">
+<div class="dsd-header">
+<div class="dsd-header-left">
+<span class="material-symbols-outlined">dashboard</span>
+<div><h2>Study Desk</h2><p>Your active studies and notes</p></div>
+</div>
+<button class="dsd-close-btn" onclick="closeDesktopStudyDesk()"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="dsd-body">
+<div class="dsd-create-banner">
+<div class="dsd-create-text">
+<strong>Start a new study</strong>
+<span>Create a focused workspace with notes, observations, and Rhema integration.</span>
+</div>
+<button class="dsd-create-btn" onclick="openStudyCreateSheet();closeDesktopStudyDesk()"><span class="material-symbols-outlined">add</span> New Study</button>
+</div>
+<div class="dsd-section-title">Your Studies</div>
+<div class="dsd-studies-grid" id="dsdStudiesGrid"></div>
+</div>
 </div>
 </div>
 <!-- ── Word Library ── -->
@@ -16297,7 +16514,7 @@ Verb Endings
 </div>
 <div class="wl-search-row">
 <span class="material-symbols-outlined wl-search-icon">search</span>
-<input autocomplete="off" autocorrect="off" class="wl-search-input" id="wlSearchInput" onfocus="if(isWlGreekKeyboardActive())this.blur()" oninput="wlOnSearch(this.value)" placeholder="Search Greek or transliteration…" spellcheck="false" type="text"/>
+<input autocomplete="off" autocorrect="off" class="wl-search-input" id="wlSearchInput" onfocus="if(isWlGreekKeyboardActive())this.blur()" oninput="wlOnSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();wlOnSearch(this.value);}" placeholder="Search Greek or transliteration…" spellcheck="false" type="text"/>
 <button class="wl-kbd-toggle" id="wlKbdToggleBtn" onclick="toggleWlKeyboard()" title="Greek keyboard">
 <span class="wl-kbd-icon">α</span>
 </button>

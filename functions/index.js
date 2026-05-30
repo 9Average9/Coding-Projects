@@ -578,6 +578,10 @@ exports.onEncouragementCreated = functions.firestore
     } else if (type === "encouragement") {
       title = "Study Encouragement";
       body = `${fromName} is encouraging you to study your Greek!`;
+    } else if (type === "habitEncouragement") {
+      const habitName = snap.data().habitName || "a habit";
+      title = "Habit Encouragement";
+      body = `${fromName} is encouraging you to complete your ${habitName} habit.`;
     } else {
       return null; // unknown type — don't send a misleading notification
     }
