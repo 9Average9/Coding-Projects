@@ -20169,10 +20169,10 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   align-self: center;
   min-height: clamp(250px, 58vw, 360px);
   height: auto !important;
-  aspect-ratio: 4 / 3 !important;
   padding: 24px;
   color: var(--mercy-scripture-color, var(--font-color));
   text-align: center;
+  overflow: visible;
 }
 .mercy-scripture-card span { color: var(--secondary-color); font-weight: 900; }
 .mercy-scripture-card p { font-size: 1.25rem; line-height: 1.45; font-weight: 750; }

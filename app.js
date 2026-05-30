@@ -45,6 +45,7 @@ let _appLaunchStartedAt = Date.now();
 let _appLaunchReleased = false;
 let _appUpdateReloadPending = false;
 let _appUpdateReloadTimer = null;
+let _swUpdateFound = false;
 let _homeBackdropPreload = null;
 let _pendingFirstRunNotificationPrompt = false;
 let _deferWelcomeUntilNotificationPromptCloses = false;
@@ -18365,6 +18366,7 @@ function showAppLaunchScreen(text = 'Preparing your discipleship tools') {
 
 function hideAppLaunchScreen(reason = 'ready') {
   if (_appLaunchReleased) return;
+  if (_swUpdateFound) return;
   const splash = document.getElementById('appLaunchScreen');
   if (!splash) return;
   const minVisible = reason === 'timeout' ? 0 : 650;
@@ -18433,6 +18435,16 @@ function registerServiceWorker() {
     });
 
     navigator.serviceWorker.register("./service-worker.js").then((registration) => {
+      registration.addEventListener('updatefound', () => {
+        if (_appLaunchReleased) return;
+        _swUpdateFound = true;
+        setAppLaunchText("There's been updates since last time you were here, this may take longer to load");
+        // Fallback: release after 15s in case the update never activates
+        setTimeout(() => {
+          _swUpdateFound = false;
+          if (!_appLaunchReleased) hideAppLaunchScreen('ready');
+        }, 15000);
+      });
       registration.update().catch(() => {});
     }).catch((error) => {
       console.warn("Service worker registration failed:", error);
