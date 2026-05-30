@@ -22899,8 +22899,9 @@ function _renderVerseWords(words, verse) {
       const variant = variantMap[i];
       const cls = `${isXref ? 'rhema-word xref' : 'rhema-word'}${variant ? ' has-variant' : ''}`;
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
-      const rawGloss = lex.brief || '';
-      const gloss = rawGloss.split(',')[0].split(';')[0].trim();
+      const gloss = w[2]?.startsWith('V-')
+        ? _sxVerbGloss(w[2], lex.brief)
+        : (lex.brief || '').split(',')[0].split(';')[0].trim();
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
       const variantTag = variant
         ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
@@ -23770,7 +23771,7 @@ function _sxVerbGloss(morph, brief) {
   const SUBJ = { '1S':'I', '2S':'you', '3S':'he / she', '1P':'we', '2P':'you all', '3P':'they' };
   const subj = SUBJ[`${pers}${num}`] || '';
   const modal = (mood === 'S' || mood === 'O') ? ' might' : '';
-  if (mood === 'D') return `${base}!`;
+  if (mood === 'M') return `${base}!`;
   if (base === 'am' || base === 'be') {
     const BE = { '1S':'am', '2S':'are', '3S':'is', '1P':'are', '2P':'are', '3P':'are' };
     const beF = BE[`${pers}${num}`] || 'are';
@@ -24802,7 +24803,7 @@ function showRhemaTab(tab, word) {
   if (tab === 'parsing') {
     content.innerHTML = renderRhemaParsing(surface, strongs, morph);
   } else if (tab === 'definition') {
-    content.innerHTML = renderRhemaDefinition(strongs);
+    content.innerHTML = renderRhemaDefinition(strongs, morph);
   } else {
     content.innerHTML = renderRhemaOccurrences(strongs);
   }
@@ -24899,7 +24900,13 @@ function renderRhemaParsing(surface, strongs, morph) {
 
   const safeStr = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
 
-  return `<div class="rhema-parsing-grid">` +
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const inflectedGloss = morph?.startsWith('V-') ? _sxVerbGloss(morph, lex.brief) : '';
+  const glossHtml = inflectedGloss
+    ? `<div class="rhema-inflected-gloss">“${inflectedGloss}”</div>`
+    : '';
+
+  return glossHtml + `<div class="rhema-parsing-grid">` +
     rows.map(r => {
       // Render the value as a tappable link when a grammar example exists for it
       let valueHtml = `<div class="rhema-parse-value">${r.value}</div>`;
@@ -24944,7 +24951,7 @@ function getRhemaQuickDefinition(lex) {
   return answer.length > 150 ? answer.slice(0, 147).trimEnd() + '...' : answer;
 }
 
-function renderRhemaDefinition(strongs) {
+function renderRhemaDefinition(strongs, morph) {
   const lex = (window.RhemaLexicon || {})[strongs];
   if (!lex) return `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
 
@@ -24958,7 +24965,9 @@ function renderRhemaDefinition(strongs) {
     </div>`);
   }
 
-  const quickDefinition = getRhemaQuickDefinition(lex);
+  const quickDefinition = morph?.startsWith('V-')
+    ? (_sxVerbGloss(morph, lex.brief) || getRhemaQuickDefinition(lex))
+    : getRhemaQuickDefinition(lex);
   if (quickDefinition) {
     sections.push(`<div class="rhema-def-section rhema-def-quick">
       <div class="rhema-def-label">Quick Definition</div>
