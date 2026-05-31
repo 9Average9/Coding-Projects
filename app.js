@@ -11435,9 +11435,25 @@ function closeNotifications() {
   document.getElementById('notifPanel')?.classList.remove('open');
 }
 
+function _syncPwaNotificationBadge(unread) {
+  const count = Math.max(0, Number(unread) || 0);
+  try {
+    if (count > 0 && navigator.setAppBadge) {
+      navigator.setAppBadge(count).catch(() => {});
+    } else if (count === 0 && navigator.clearAppBadge) {
+      navigator.clearAppBadge().catch(() => {});
+    }
+  } catch {}
+}
+
 function _updateNotifBadge() {
   const unread = _notifItems.filter(n => !n.read).length;
-  document.getElementById('notifBadge')?.classList.toggle('hidden', unread === 0);
+  const badge = document.getElementById('notifBadge');
+  if (badge) {
+    badge.textContent = unread > 99 ? '99+' : String(unread || '');
+    badge.classList.toggle('hidden', unread === 0);
+  }
+  _syncPwaNotificationBadge(unread);
 }
 
 // Remove resolved incoming friend requests from the notif list and update badges.
@@ -18152,7 +18168,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.77";
+const APP_VERSION = "3.0.78";
 
 // Per-file versions for Rhema data bundles — only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18169,6 +18185,12 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.78 &mdash; Rhema Noun Endings &amp; PWA Badge</div>
+<ul>
+  <li><strong>PWA notification badge added</strong> so supported installed apps mirror the in-app unread bell count.</li>
+  <li><strong>Rhema form-ending hints now stay noun-only</strong> so verbs and other words no longer show noun case-ending breakdowns.</li>
+  <li><strong>Noun ending logic improved</strong> with 1st, 2nd, and common 3rd declension endings, including ambiguous endings resolved from the word's parsed case, number, and gender.</li>
+</ul>
 <div class="un-version-label">v3.0.77 &mdash; Habit Encouragement Lockout</div>
 <ul>
   <li><strong>Friend habit encouragements now send</strong> a habit-specific notification when pressed.</li>
@@ -24872,6 +24894,84 @@ function extractWordEnding(surface, lemma) {
   return { stem, ending: ending || null };
 }
 
+function _greekEndingKey(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/\u0345/g, 'ι')
+    .replace(/[\u0300-\u0344\u0346-\u036f]/g, '')
+    .replace(/ς/g, 'σ')
+    .toLowerCase();
+}
+
+const RHEMA_NOUN_ENDINGS = [
+  { e:'ος', c:'N', n:'S', g:'M' }, { e:'ου', c:'G', n:'S', g:'M' }, { e:'ῳ', c:'D', n:'S', g:'M' },
+  { e:'ον', c:'A', n:'S', g:'M' }, { e:'ε', c:'V', n:'S', g:'M' },
+  { e:'οι', c:'N', n:'P', g:'M' }, { e:'οι', c:'V', n:'P', g:'M' }, { e:'ων', c:'G', n:'P', g:'M' },
+  { e:'οις', c:'D', n:'P', g:'M' }, { e:'ους', c:'A', n:'P', g:'M' },
+  { e:'ον', c:'N', n:'S', g:'N' }, { e:'ον', c:'A', n:'S', g:'N' }, { e:'ον', c:'V', n:'S', g:'N' },
+  { e:'ου', c:'G', n:'S', g:'N' }, { e:'ῳ', c:'D', n:'S', g:'N' },
+  { e:'α', c:'N', n:'P', g:'N' }, { e:'α', c:'A', n:'P', g:'N' }, { e:'α', c:'V', n:'P', g:'N' },
+  { e:'ων', c:'G', n:'P', g:'N' }, { e:'οις', c:'D', n:'P', g:'N' },
+  { e:'η', c:'N', n:'S', g:'F' }, { e:'η', c:'V', n:'S', g:'F' }, { e:'α', c:'N', n:'S', g:'F' }, { e:'α', c:'V', n:'S', g:'F' },
+  { e:'ης', c:'G', n:'S', g:'F' }, { e:'ας', c:'G', n:'S', g:'F' }, { e:'ῃ', c:'D', n:'S', g:'F' }, { e:'ᾳ', c:'D', n:'S', g:'F' },
+  { e:'ην', c:'A', n:'S', g:'F' }, { e:'αν', c:'A', n:'S', g:'F' },
+  { e:'αι', c:'N', n:'P', g:'F' }, { e:'αι', c:'V', n:'P', g:'F' }, { e:'ων', c:'G', n:'P', g:'F' },
+  { e:'αις', c:'D', n:'P', g:'F' }, { e:'ας', c:'A', n:'P', g:'F' },
+  { e:'ης', c:'N', n:'S', g:'M' }, { e:'ας', c:'N', n:'S', g:'M' }, { e:'ου', c:'G', n:'S', g:'M' },
+  { e:'ῃ', c:'D', n:'S', g:'M' }, { e:'ᾳ', c:'D', n:'S', g:'M' }, { e:'ην', c:'A', n:'S', g:'M' }, { e:'αν', c:'A', n:'S', g:'M' },
+  { e:'ς', c:'N', n:'S', g:'M' }, { e:'ς', c:'N', n:'S', g:'F' }, { e:'ος', c:'G', n:'S', g:'M' }, { e:'ος', c:'G', n:'S', g:'F' }, { e:'ος', c:'G', n:'S', g:'N' },
+  { e:'ι', c:'D', n:'S', g:'M' }, { e:'ι', c:'D', n:'S', g:'F' }, { e:'ι', c:'D', n:'S', g:'N' },
+  { e:'α', c:'A', n:'S', g:'M' }, { e:'α', c:'A', n:'S', g:'F' }, { e:'ν', c:'A', n:'S', g:'M' }, { e:'ν', c:'A', n:'S', g:'F' },
+  { e:'ες', c:'N', n:'P', g:'M' }, { e:'ες', c:'N', n:'P', g:'F' }, { e:'ες', c:'V', n:'P', g:'M' }, { e:'ες', c:'V', n:'P', g:'F' },
+  { e:'ων', c:'G', n:'P', g:'M' }, { e:'ων', c:'G', n:'P', g:'F' }, { e:'ων', c:'G', n:'P', g:'N' },
+  { e:'σιν', c:'D', n:'P', g:'M' }, { e:'σιν', c:'D', n:'P', g:'F' }, { e:'σιν', c:'D', n:'P', g:'N' },
+  { e:'σι', c:'D', n:'P', g:'M' }, { e:'σι', c:'D', n:'P', g:'F' }, { e:'σι', c:'D', n:'P', g:'N' },
+  { e:'ας', c:'A', n:'P', g:'M' }, { e:'ας', c:'A', n:'P', g:'F' },
+];
+
+const RHEMA_NOUN_ENDING_INDEX = RHEMA_NOUN_ENDINGS.reduce((map, item) => {
+  const key = _greekEndingKey(item.e);
+  if (!map[key]) map[key] = [];
+  map[key].push(item);
+  return map;
+}, {});
+
+function _rhemaNounMorphInfo(morph) {
+  if (!morph) return null;
+  const segs = morph.split('-');
+  const pos = segs[0];
+  if (pos !== 'N' && pos !== 'RI') return null;
+  const cng = segs.find(seg => /^[NGDAV][SP][MFN]/.test(seg || '')) || '';
+  const caseCode = cng[0];
+  const numberCode = cng[1];
+  const genderCode = cng[2];
+  if (!MORPH_CASE[caseCode] || !MORPH_NUM[numberCode]) return null;
+  return {
+    caseCode,
+    numberCode,
+    genderCode,
+    caseLabel: MORPH_CASE[caseCode].l,
+    numberLabel: MORPH_NUM[numberCode],
+    genderLabel: MORPH_GEN[genderCode] || ''
+  };
+}
+
+function _findNounEnding(surface, info) {
+  const chars = Array.from(String(surface || ''));
+  const maxLen = Math.min(5, chars.length);
+  for (let len = maxLen; len >= 1; len--) {
+    const exact = chars.slice(chars.length - len).join('');
+    const analyses = RHEMA_NOUN_ENDING_INDEX[_greekEndingKey(exact)] || [];
+    const exactAnalysis = analyses.find(a =>
+      a.c === info.caseCode &&
+      a.n === info.numberCode &&
+      (!a.g || !info.genderCode || a.g === info.genderCode)
+    );
+    if (exactAnalysis) return { exact, len, analyses, exactAnalysis };
+  }
+  return null;
+}
+
 function buildFormHint(surface, strongs, morph) {
   if (!morph) return '';
   const posRaw = morph.split('-')[0];
@@ -24889,6 +24989,28 @@ function buildFormHint(surface, strongs, morph) {
     hint = `${parsed.stem}<strong>-${parsed.ending}</strong> → ${caseLabel}`;
   } else {
     hint = `${surface} → ${caseLabel}`;
+  }
+  return `<div class="rhema-def-sep"></div><div class="rhema-form-hint">${hint}</div>`;
+}
+
+function buildNounFormHint(surface, strongs, morph) {
+  const info = _rhemaNounMorphInfo(morph);
+  if (!info) return '';
+  const ending = _findNounEnding(surface, info);
+  const caseLabel = [info.caseLabel, info.numberLabel, info.genderLabel].filter(Boolean).join(' ');
+  let hint = `${surface} â†’ ${caseLabel}`;
+  if (ending?.exact) {
+    const chars = Array.from(surface || '');
+    const stem = chars.slice(0, chars.length - ending.len).join('');
+    hint = `${stem}<strong>${ending.exact}</strong> â†’ ${caseLabel}`;
+    const sameEndingUses = ending.analyses
+      .filter(a => a.c !== info.caseCode || a.n !== info.numberCode || (info.genderCode && a.g && a.g !== info.genderCode))
+      .map(a => [MORPH_CASE[a.c]?.l, MORPH_NUM[a.n], MORPH_GEN[a.g]].filter(Boolean).join(' '))
+      .filter(Boolean);
+    const uniqueUses = [...new Set(sameEndingUses)];
+    if (uniqueUses.length) {
+      hint += `<small>Same ending can also mark ${uniqueUses.slice(0, 3).join(', ')}; this word parses as ${caseLabel}.</small>`;
+    }
   }
   return `<div class="rhema-def-sep"></div><div class="rhema-form-hint">${hint}</div>`;
 }
@@ -24920,7 +25042,7 @@ function renderRhemaParsing(surface, strongs, morph) {
       </div>`;
     }).join('') +
     `</div>` +
-    buildFormHint(surface, strongs, morph);
+    buildNounFormHint(surface, strongs, morph);
 }
 
 function rhemaPlainDefinitionText(value) {

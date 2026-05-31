@@ -15124,6 +15124,16 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   color: var(--muted-color);
   padding: 10px 0 2px;
 }
+.rhema-form-hint strong {
+  color: var(--secondary-color);
+  font-weight: 900;
+}
+.rhema-form-hint small {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.35;
+  opacity: 0.82;
+}
 /* Tappable value — Tense/Voice/Mood values that open the grammar example modal */
 .rhema-value-link {
   background: none;
