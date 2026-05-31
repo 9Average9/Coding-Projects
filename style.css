@@ -18304,15 +18304,6 @@ body.sandbox-open .rhema-english-display {
 }
 .wl-result-item:active { background: var(--card-color); }
 .wl-result-lemma { font-size: 1.05rem; font-weight: 700; color: var(--text-color); flex-shrink: 0; min-width: 0; }
-.wl-result-strongs {
-  font-size: 0.64rem;
-  font-weight: 800;
-  color: var(--secondary-color);
-  border: 1px solid color-mix(in srgb, var(--secondary-color) 28%, transparent);
-  border-radius: 999px;
-  padding: 2px 6px;
-  flex-shrink: 0;
-}
 .wl-result-translit { font-size: 0.78rem; color: var(--muted-color); font-style: italic; flex-shrink: 0; }
 .wl-result-brief { flex: 1; font-size: 0.82rem; color: var(--muted-color); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .wl-result-count { font-size: 0.72rem; color: var(--muted-color); flex-shrink: 0; }
@@ -18322,11 +18313,6 @@ body.sandbox-open .rhema-english-display {
   color: var(--accent-color, #4f8cff); background: color-mix(in srgb, var(--accent-color, #4f8cff) 14%, transparent);
   border-radius: 999px; padding: 3px 7px; flex-shrink: 0;
   white-space: nowrap;
-}
-.wl-result-variant-note {
-  font-size: 0.72rem;
-  color: var(--muted-color);
-  opacity: 0.78;
 }
 
 .rhema-wl-back {

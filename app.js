@@ -8850,7 +8850,7 @@ function _buildWlIndex() {
     lemma: e.lemma || '',
     translit: e.translit || e.pronounce || '',
     brief: (e.brief || '').split(',')[0].split(';')[0].trim(),
-    occ: getCurrentRhemaOccurrences(s, layer)?.total || e.occ || 0,
+    occ: e.occ || 0,
     lemmaStripped: _stripGreekAccents(e.lemma || '').toLowerCase(),
     translitNorm: _normalizeTranslit(e.translit || e.pronounce || ''),
   })).filter(e => e.lemma);
@@ -8885,53 +8885,74 @@ function _wlSearchLexicon(q, maxResults) {
 }
 
 function _wlScanNTForm(q) {
-  const layer = _wlLibraryLayer || getCurrentOriginalLanguageLayer();
-  const isHebrew = layer === 'hebrew';
-  const isGreek = layer === 'lxx' || layer === 'nt-greek';
-  if (isHebrew && !/[\u0590-\u05ff]/.test(q)) return [];
-  if (isGreek && !/[?-??-?]/.test(q)) return [];
+  // Find exact surface form matches in NT text for Greek queries
+  if (_wlLibraryLayer === 'hebrew') {
+    if (!/[\u0590-\u05ff]/.test(q) || !_rhemaData()) return [];
+    const qn = _stripGreekAccents(q).toLowerCase();
+    const found = {};
+    const texts = _wlTextForLayer();
+    for (const book of _wlBooksForLayer()) {
+      const bdata = texts[book] || {};
+      for (const ch of Object.keys(bdata)) {
+        for (const v of Object.keys(bdata[ch])) {
+          for (const word of (bdata[ch][v] || [])) {
+            const sn = _stripGreekAccents(word[0]).toLowerCase();
+            if (sn.startsWith(qn) || sn === qn) {
+              if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0], exact: sn === qn };
+              found[word[0]].count++;
+            }
+          }
+        }
+      }
+    }
+    return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
+  }
+  if (_wlLibraryLayer === 'lxx') {
+    if (!/[Ͱ-Ͽἀ-῿]/.test(q) || !_rhemaData()) return [];
+    const qn = _stripGreekAccents(q).toLowerCase();
+    const found = {};
+    const texts = _wlTextForLayer();
+    for (const book of _wlBooksForLayer()) {
+      const bdata = texts[book] || {};
+      for (const ch of Object.keys(bdata)) {
+        for (const v of Object.keys(bdata[ch])) {
+          for (const word of (bdata[ch][v] || [])) {
+            const sn = _stripGreekAccents(word[0]).toLowerCase();
+            if (sn.startsWith(qn) || sn === qn) {
+              if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0], exact: sn === qn };
+              found[word[0]].count++;
+            }
+          }
+        }
+      }
+    }
+    return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
+  }
+  if (!/[Ͱ-Ͽἀ-῿]/.test(q)) return [];
   if (!_rhemaData()) return [];
-
-  const qn = _stripGreekAccents(q).toLowerCase().trim();
-  const found = {};
-  const texts = layer === 'nt-greek' ? _rhemaText() : _wlTextForLayer(layer);
-  const books = layer === 'nt-greek' ? RHEMA_NT_BOOK_ORDER : _wlBooksForLayer(layer);
-
-  for (const book of books) {
-    const bdata = texts[book] || {};
+  const qn = _stripGreekAccents(q).toLowerCase();
+  const found = {}; // surface → { strongs, count }
+  for (const book of _rhemaBookOrder()) {
+    const bdata = (_rhemaText()[book] || {});
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
         for (const word of (bdata[ch][v] || [])) {
-          const strongs = word[1];
-          if (!strongs) continue;
           const sn = _stripGreekAccents(word[0]).toLowerCase();
-          const exact = sn === qn;
-          if (!exact && !sn.startsWith(qn)) continue;
-          const key = String(strongs) + '|' + sn;
-          if (!found[key]) found[key] = { strongs, count: 0, surface: word[0], exact, variants: {}, norm: sn };
-          found[key].exact = found[key].exact || exact;
-          found[key].count++;
-          found[key].variants[word[0]] = (found[key].variants[word[0]] || 0) + 1;
-          if ((found[key].variants[word[0]] || 0) > (found[key].variants[found[key].surface] || 0)) found[key].surface = word[0];
+          if (sn.startsWith(qn) && sn !== qn.replace(/^\s+|\s+$/g,'')) {
+            if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0] };
+            found[word[0]].count++;
+          } else if (sn === qn) {
+            if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0], exact: true };
+            found[word[0]].count++;
+          }
         }
       }
     }
   }
-  return Object.values(found).map(_wlFinalizeFormEntry).sort(_wlSortFormEntries).slice(0, 15);
+  return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
 }
 
-function _wlFinalizeFormEntry(entry) {
-  const variants = Object.entries(entry.variants || {})
-    .sort((a, b) => b[1] - a[1])
-    .map(([surface, count]) => ({ surface, count }));
-  return { ...entry, variants };
-}
-
-function _wlSortFormEntries(a, b) {
-  return (b.exact ? 1000 : 0) + b.count - (a.exact ? 1000 : 0) - a.count;
-}
-
-function _rhemaExactFormOccurrences(surface, strongs) {
+function _rhemaExactFormOccurrences(surface) {
   const books = {};
   const norm = _stripGreekAccents(surface).toLowerCase();
   const layer = _rhemaActiveWordLayer || _wlLibraryLayer || getCurrentOriginalLanguageLayer();
@@ -8943,7 +8964,7 @@ function _rhemaExactFormOccurrences(surface, strongs) {
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
         for (const word of (bdata[ch][v] || [])) {
-          if (String(word[1]) === String(strongs) && _stripGreekAccents(word[0]).toLowerCase() === norm) count++;
+          if (_stripGreekAccents(word[0]).toLowerCase() === norm) count++;
         }
       }
     }
@@ -8951,6 +8972,7 @@ function _rhemaExactFormOccurrences(surface, strongs) {
   }
   return books;
 }
+
 function openWordLibrary() {
   _desktopCollapseNav();
   _wlLibraryLayer = getCurrentOriginalLanguageLayer();
@@ -9119,22 +9141,16 @@ function _wlDoSearch(q) {
 
   let html = '';
   if (formEntries.length) {
-    const formScope = _wlLibraryLayer === 'hebrew' ? 'Hebrew OT' : _wlLibraryLayer === 'lxx' ? 'LXX' : 'NT';
-    html += `<div class="wl-section-label">Exact Forms in ${formScope}</div>`;
+    html += `<div class="wl-section-label">Exact Forms in NT</div>`;
     html += formEntries.map(f => {
-      const lex = getCurrentRhemaLexicon(_wlLibraryLayer)[f.strongs] || {};
+      const lex = (window.RhemaLexicon || {})[f.strongs] || {};
       const formLabel = _wlFormLabel(f.strongs, f.surface);
-      const variantText = (f.variants || []).length > 1
-        ? `<span class="wl-result-variant-note">Includes ${f.variants.slice(0, 3).map(v => v.surface).join(' / ')}</span>`
-        : '';
       return `<div class="wl-result-item wl-result-form" onclick="openWlWordDetail(${f.strongs},'${f.surface.replace(/'/g,"\\'")}')">
         <span class="wl-result-lemma">${f.surface}</span>
-        <span class="wl-result-strongs">${_wlLibraryLayer === 'hebrew' ? 'H' : 'G'}${f.strongs}</span>
-        <span class="wl-result-translit">${lex.translit || lex.pronounce || ''}</span>
+        <span class="wl-result-translit">${lex.translit || ''}</span>
         <span class="wl-result-brief">${(lex.brief||'').split(',')[0].trim()}</span>
         <span class="wl-result-form-tag">Form: ${formLabel}</span>
-        ${variantText}
-        <span class="wl-result-count">${f.count}&times;</span>
+        <span class="wl-result-count">${f.count}×</span>
       </div>`;
     }).join('');
   }
@@ -9143,7 +9159,6 @@ function _wlDoSearch(q) {
     html += lexEntries.map(e =>
       `<div class="wl-result-item" onclick="openWlWordDetail(${e.strongs},null)">
         <span class="wl-result-lemma">${e.lemma}</span>
-        <span class="wl-result-strongs">${_wlLibraryLayer === 'hebrew' ? 'H' : 'G'}${e.strongs}</span>
         <span class="wl-result-translit">${e.translit}</span>
         <span class="wl-result-brief">${e.brief}</span>
         <span class="wl-result-count">${e.occ || ''}${e.occ ? '×' : ''}</span>
@@ -18220,7 +18235,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.83";
+const APP_VERSION = "3.0.82";
 
 // Per-file versions for Rhema data bundles - only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18239,11 +18254,6 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.83 &mdash; Word Library Audit</div>
-<ul>
-  <li><strong>Word Library form results cleaned up</strong> so accent variants like δὲ / δέ appear as one exact form result with one accurate total.</li>
-  <li><strong>Search results now show Strong's badges and occurrence totals</strong> from the active Rhema layer to make same-looking words easier to distinguish.</li>
-</ul>
 <div class="un-version-label">v3.0.82 &mdash; Rhema Hebrew Polish</div>
 <ul>
   <li><strong>Hebrew OT is clearer</strong> with English word glosses and simpler Hebrew parsing explanations.</li>
@@ -25475,7 +25485,7 @@ function renderRhemaDefinition(strongs, morph, layer = getCurrentOriginalLanguag
 function renderRhemaOccurrences(strongs, layer = getCurrentOriginalLanguageLayer()) {
   if (!strongs) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
   if (_wlSelectedForm) {
-    const exactBooks = _rhemaExactFormOccurrences(_wlSelectedForm, strongs);
+    const exactBooks = _rhemaExactFormOccurrences(_wlSelectedForm);
     const exactTotal = Object.values(exactBooks).reduce((a, b) => a + b, 0);
     if (exactTotal === 0) return `<p style="opacity:.5;font-size:.85rem">No occurrences of "${_wlSelectedForm}" found.</p>`;
     const bookRows = _rhemaBookOrder()
