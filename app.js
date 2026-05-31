@@ -8863,7 +8863,7 @@ function _wlSearchLexicon(q, maxResults) {
     const qn = q.trim();
     return _wlIndex.filter(e => e.lemma.includes(qn)).slice(0, maxResults);
   }
-  const hasGreek = /[Ͱ-Ͽἀ-῿]/.test(q);
+  const hasGreek = /[\u0370-\u03ff\u1f00-\u1fff]/.test(q);
   let prefix, contains;
   if (hasGreek) {
     const qn = _stripGreekAccents(q).toLowerCase();
@@ -8908,7 +8908,7 @@ function _wlScanNTForm(q) {
     return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
   }
   if (_wlLibraryLayer === 'lxx') {
-    if (!/[Ͱ-Ͽἀ-῿]/.test(q) || !_rhemaData()) return [];
+    if (!/[\u0370-\u03ff\u1f00-\u1fff]/.test(q) || !_rhemaData()) return [];
     const qn = _stripGreekAccents(q).toLowerCase();
     const found = {};
     const texts = _wlTextForLayer();
@@ -8928,7 +8928,7 @@ function _wlScanNTForm(q) {
     }
     return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
   }
-  if (!/[Ͱ-Ͽἀ-῿]/.test(q)) return [];
+  if (!/[\u0370-\u03ff\u1f00-\u1fff]/.test(q)) return [];
   if (!_rhemaData()) return [];
   const qn = _stripGreekAccents(q).toLowerCase();
   const found = {}; // surface → { strongs, count }
@@ -18235,7 +18235,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.82";
+const APP_VERSION = "3.0.85";
 
 // Per-file versions for Rhema data bundles - only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18254,6 +18254,10 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.85 &mdash; Exact Form Search Restore</div>
+<ul>
+  <li><strong>Exact-form search restored</strong> with Unicode-safe Greek detection while keeping separate accent-form results and the iota-subscript dative fix.</li>
+</ul>
 <div class="un-version-label">v3.0.82 &mdash; Rhema Hebrew Polish</div>
 <ul>
   <li><strong>Hebrew OT is clearer</strong> with English word glosses and simpler Hebrew parsing explanations.</li>
