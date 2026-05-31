@@ -15486,6 +15486,32 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   column-gap: 0;
   row-gap: 20px;
 }
+.rhema-layer-label {
+  grid-column: 1 / -1;
+  justify-self: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  opacity: 0.75;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: -4px;
+}
+.rhema-verse-display.rhema-hebrew-layer,
+.rhema-chapter-word-grid.rhema-hebrew-layer {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+.rhema-verse-display.rhema-hebrew-layer .rhema-layer-label,
+.rhema-chapter-word-grid.rhema-hebrew-layer .rhema-layer-label {
+  direction: ltr;
+}
+.rhema-hebrew-text {
+  direction: rtl;
+  font-family: "SBL Hebrew", "Ezra SIL", "Noto Sans Hebrew", serif;
+  font-size: 1.22rem;
+  letter-spacing: 0;
+}
 /* Greek-only mode: flowing inline text */
 .rhema-verse-display.greek-only {
   display: block;

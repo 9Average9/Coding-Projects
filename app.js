@@ -72,6 +72,8 @@ let _sandboxTab = 'notes';
 let _rhemaCrossRefMode = false;
 let _wlOpen = false;
 let _wlIndex = null;
+let _wlIndexLayer = null;
+let _wlLibraryLayer = 'nt-greek';
 let _ntSurfaceIndex = null;
 let _wlSelectedForm = null;
 let _wlSavedQuery = '';
@@ -8841,22 +8843,40 @@ function _normalizeTranslit(s) {
     .replace(/[^a-z]/g,'');
 }
 
+function _wlBooksForLayer(layer = _wlLibraryLayer) {
+  if (layer === 'hebrew') return RHEMA_OT_BOOK_ORDER.filter(code => window.RhemaHebrewOT?.text?.[code]);
+  if (layer === 'lxx') return RHEMA_OT_BOOK_ORDER.filter(code => window.RhemaLXX?.text?.[code]);
+  return RHEMA_NT_BOOK_ORDER.filter(code => (window.RhemaNT?.text || {})[code] || (window.RhemaCriticalNT?.text || {})[code]);
+}
+
+function _wlTextForLayer(layer = _wlLibraryLayer) {
+  if (layer === 'hebrew') return window.RhemaHebrewOT?.text || {};
+  if (layer === 'lxx') return window.RhemaLXX?.text || {};
+  return _rhemaTextForMode(_rhemaTextMode);
+}
+
 function _buildWlIndex() {
-  if (_wlIndex) return;
-  const lex = window.RhemaLexicon || {};
+  const layer = _wlLibraryLayer || getCurrentOriginalLanguageLayer();
+  if (_wlIndex && _wlIndexLayer === layer) return;
+  const lex = getCurrentRhemaLexicon(layer) || {};
   _wlIndex = Object.entries(lex).map(([s, e]) => ({
     strongs: parseInt(s),
     lemma: e.lemma || '',
-    translit: e.translit || '',
+    translit: e.translit || e.pronounce || '',
     brief: (e.brief || '').split(',')[0].split(';')[0].trim(),
     occ: e.occ || 0,
     lemmaStripped: _stripGreekAccents(e.lemma || '').toLowerCase(),
-    translitNorm: _normalizeTranslit(e.translit || ''),
+    translitNorm: _normalizeTranslit(e.translit || e.pronounce || ''),
   })).filter(e => e.lemma);
+  _wlIndexLayer = layer;
 }
 
 function _wlSearchLexicon(q, maxResults) {
   _buildWlIndex();
+  if (_wlLibraryLayer === 'hebrew' && /[\u0590-\u05ff]/.test(q)) {
+    const qn = q.trim();
+    return _wlIndex.filter(e => e.lemma.includes(qn)).slice(0, maxResults);
+  }
   const hasGreek = /[Ͱ-Ͽἀ-῿]/.test(q);
   let prefix, contains;
   if (hasGreek) {
@@ -8880,6 +8900,48 @@ function _wlSearchLexicon(q, maxResults) {
 
 function _wlScanNTForm(q) {
   // Find exact surface form matches in NT text for Greek queries
+  if (_wlLibraryLayer === 'hebrew') {
+    if (!/[\u0590-\u05ff]/.test(q) || !_rhemaData()) return [];
+    const qn = _stripGreekAccents(q).toLowerCase();
+    const found = {};
+    const texts = _wlTextForLayer();
+    for (const book of _wlBooksForLayer()) {
+      const bdata = texts[book] || {};
+      for (const ch of Object.keys(bdata)) {
+        for (const v of Object.keys(bdata[ch])) {
+          for (const word of (bdata[ch][v] || [])) {
+            const sn = _stripGreekAccents(word[0]).toLowerCase();
+            if (sn.startsWith(qn) || sn === qn) {
+              if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0], exact: sn === qn };
+              found[word[0]].count++;
+            }
+          }
+        }
+      }
+    }
+    return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
+  }
+  if (_wlLibraryLayer === 'lxx') {
+    if (!/[Ͱ-Ͽἀ-῿]/.test(q) || !_rhemaData()) return [];
+    const qn = _stripGreekAccents(q).toLowerCase();
+    const found = {};
+    const texts = _wlTextForLayer();
+    for (const book of _wlBooksForLayer()) {
+      const bdata = texts[book] || {};
+      for (const ch of Object.keys(bdata)) {
+        for (const v of Object.keys(bdata[ch])) {
+          for (const word of (bdata[ch][v] || [])) {
+            const sn = _stripGreekAccents(word[0]).toLowerCase();
+            if (sn.startsWith(qn) || sn === qn) {
+              if (!found[word[0]]) found[word[0]] = { strongs: word[1], count: 0, surface: word[0], exact: sn === qn };
+              found[word[0]].count++;
+            }
+          }
+        }
+      }
+    }
+    return Object.values(found).sort((a,b) => (b.exact?1000:0) + b.count - (a.exact?1000:0) - a.count).slice(0, 15);
+  }
   if (!/[Ͱ-Ͽἀ-῿]/.test(q)) return [];
   if (!_rhemaData()) return [];
   const qn = _stripGreekAccents(q).toLowerCase();
@@ -8907,9 +8969,10 @@ function _wlScanNTForm(q) {
 function _rhemaExactFormOccurrences(surface) {
   const books = {};
   const norm = _stripGreekAccents(surface).toLowerCase();
-  const texts = _rhemaText();
+  const layer = _rhemaActiveWordLayer || _wlLibraryLayer || getCurrentOriginalLanguageLayer();
+  const texts = _wlTextForLayer(layer);
   if (!texts) return books;
-  for (const book of _rhemaBookOrder()) {
+  for (const book of _wlBooksForLayer(layer)) {
     const bdata = texts[book] || {};
     let count = 0;
     for (const ch of Object.keys(bdata)) {
@@ -8926,7 +8989,8 @@ function _rhemaExactFormOccurrences(surface) {
 
 function openWordLibrary() {
   _desktopCollapseNav();
-  if (!window.RhemaLexicon) { _showStudyToast('Word data not loaded yet.'); return; }
+  _wlLibraryLayer = getCurrentOriginalLanguageLayer();
+  if (!getCurrentRhemaLexicon(_wlLibraryLayer)) { _showStudyToast('Word data not loaded yet.'); return; }
   _wlOpen = true;
   _wlSelectedForm = null;
   _wlOpenedDetail = false;
@@ -9116,16 +9180,18 @@ function openWlWordDetail(strongs, formSurface) {
   _wlSavedQuery = document.getElementById('wlSearchInput')?.value || _wlSavedQuery || '';
   _wlOpenedDetail = true;
   _wlSelectedForm = formSurface || null;
-  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const layer = _wlLibraryLayer || getCurrentOriginalLanguageLayer();
+  const lex = getCurrentRhemaLexicon(layer)[strongs] || {};
   document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
   if (!lex.lemma) return;
   const surface = formSurface || lex.lemma;
   const morph = formSurface ? _findMorphForSurface(strongs, formSurface) : _findAnyMorphForStrongs(strongs);
   _rhemaActiveWord = [surface, strongs, morph];
+  _rhemaActiveWordLayer = layer;
   // Populate the standard rhema word sheet
   document.getElementById('rhemaSheetSurface').textContent = surface;
-  document.getElementById('rhemaSheetStrongs').textContent = 'G' + strongs;
-  document.getElementById('rhemaSheetLemma').textContent   = lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
+  document.getElementById('rhemaSheetStrongs').textContent = (layer === 'hebrew' ? 'H' : 'G') + strongs;
+  document.getElementById('rhemaSheetLemma').textContent   = lex.lemma ? `${lex.lemma}  (${lex.translit || lex.pronounce || ''})` : '';
   // Hide study buttons (not in verse context)
   document.getElementById('rhemaSaveToStudyBtn')?.classList.add('hidden');
   document.getElementById('rhemaAddToWordLogBtn')?.classList.add('hidden');
@@ -9149,9 +9215,10 @@ function returnToWordLibrarySearch() {
 
 function _findMorphForSurface(strongs, surface) {
   const norm = _stripGreekAccents(surface).toLowerCase();
-  const texts = _rhemaText();
+  const texts = _wlOpen ? _wlTextForLayer() : _rhemaText();
   if (!texts) return '';
-  for (const book of _rhemaBookOrder()) {
+  const books = _wlOpen ? _wlBooksForLayer() : _rhemaBookOrder();
+  for (const book of books) {
     const bdata = texts[book] || {};
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
@@ -9165,9 +9232,10 @@ function _findMorphForSurface(strongs, surface) {
 }
 
 function _findAnyMorphForStrongs(strongs) {
-  const texts = _rhemaText();
+  const texts = _wlOpen ? _wlTextForLayer() : _rhemaText();
   if (!texts) return '';
-  for (const book of _rhemaBookOrder()) {
+  const books = _wlOpen ? _wlBooksForLayer() : _rhemaBookOrder();
+  for (const book of books) {
     const bdata = texts[book] || {};
     for (const ch of Object.keys(bdata)) {
       for (const v of Object.keys(bdata[ch])) {
@@ -9235,12 +9303,12 @@ function _renderSandboxWordLog(words) {
     const canDel = w.loggedByUid === uid || _activeSandboxStudy?.creatorUid === uid;
     const surface = w.surface || w.lemma;
     const lemma   = w.lemma && w.lemma !== surface ? w.lemma : '';
-    return `<div class="ss-word-item ss-word-tappable" onclick="openSandboxWordDetail('${w.strongs}')">
+    return `<div class="ss-word-item ss-word-tappable" onclick="openSandboxWordDetail('${w.strongs}','${w.layer || 'nt-greek'}')">
       <div class="ss-word-main">
         <span class="ss-word-surface">${surface}</span>
         ${lemma ? `<span class="ss-word-lemma">${lemma}</span>` : ''}
         <span class="ss-word-translit">${w.translit}</span>
-        <span class="ss-word-strongs">G${w.strongs}</span>
+        <span class="ss-word-strongs">${w.layer === 'hebrew' ? 'H' : 'G'}${w.strongs}</span>
       </div>
       <p class="ss-word-def">${w.definition}</p>
       ${canDel ? `<button class="ss-word-del" onclick="event.stopPropagation();deleteSandboxWord('${w.id}')"><span class="material-symbols-outlined">close</span></button>` : ''}
@@ -9253,16 +9321,18 @@ async function deleteSandboxWord(wordId) {
   await window.Studies.deleteWordLog(_activeSandboxStudy.id, wordId);
 }
 
-function openSandboxWordDetail(strongs) {
-  const w = _sandboxWordLogCache.find(x => String(x.strongs) === String(strongs));
-  if (!w && !window.RhemaLexicon?.[strongs]) return;
+function openSandboxWordDetail(strongs, layer = 'nt-greek') {
+  const w = _sandboxWordLogCache.find(x => String(x.strongs) === String(strongs) && (x.layer || 'nt-greek') === layer);
+  const lexicon = getCurrentRhemaLexicon(layer);
+  if (!w && !lexicon?.[strongs]) return;
   _ssActiveWordStrongs = String(strongs);
-  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  _rhemaActiveWordLayer = layer;
+  const lex = lexicon[strongs] || {};
   const surface = w?.surface || lex.lemma || '';
   const lemma   = lex.lemma || w?.lemma || '';
   const translit = lex.translit || w?.translit || '';
   document.getElementById('ssWdSurface').textContent = surface;
-  document.getElementById('ssWdStrongs').textContent = 'G' + strongs;
+  document.getElementById('ssWdStrongs').textContent = (layer === 'hebrew' ? 'H' : 'G') + strongs;
   document.getElementById('ssWdLemma').textContent = lemma ? `${lemma}  (${translit})` : '';
   document.querySelectorAll('#ssWordDetailSheet .rhema-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('ssWdTabDef')?.classList.add('active');
@@ -9276,20 +9346,21 @@ function openSandboxWordDetail(strongs) {
 function showSandboxWordTab(tab) {
   const s = _ssActiveWordStrongs;
   if (!s) return;
+  const layer = _rhemaActiveWordLayer || 'nt-greek';
   const tabIdMap = { definition: 'ssWdTabDef', parsing: 'ssWdTabParse', occurrences: 'ssWdTabOcc' };
   document.querySelectorAll('#ssWordDetailSheet .rhema-tab').forEach(b =>
     b.classList.toggle('active', b.id === tabIdMap[tab]));
   const content = document.getElementById('ssWdContent');
   if (!content) return;
   if (tab === 'definition') {
-    content.innerHTML = renderRhemaDefinition(s);
+    content.innerHTML = renderRhemaDefinition(s, '', layer);
   } else if (tab === 'parsing') {
-    const w = _sandboxWordLogCache.find(x => String(x.strongs) === String(s));
-    const surface = w?.surface || (window.RhemaLexicon?.[s]?.lemma) || '';
+    const w = _sandboxWordLogCache.find(x => String(x.strongs) === String(s) && (x.layer || 'nt-greek') === layer);
+    const surface = w?.surface || (getCurrentRhemaLexicon(layer)?.[s]?.lemma) || '';
     const morph = _findMorphForSurface(s, surface);
-    content.innerHTML = renderRhemaParsing(surface, s, morph);
+    content.innerHTML = renderRhemaParsing(surface, s, morph, w?.lemma, layer);
   } else {
-    content.innerHTML = renderRhemaOccurrences(s);
+    content.innerHTML = renderRhemaOccurrences(s, layer);
   }
 }
 
@@ -9297,6 +9368,7 @@ function closeSandboxWordDetail() {
   document.getElementById('ssWordDetailSheet')?.classList.remove('open');
   document.getElementById('ssWordDetailBackdrop')?.classList.remove('visible');
   _ssActiveWordStrongs = null;
+  _rhemaActiveWordLayer = null;
 }
 
 // Rhema tab in sandbox
@@ -9360,13 +9432,15 @@ async function saveCurrentVerseToStudy() {
 async function addCurrentWordToLog() {
   if (!_studySandboxId || !_rhemaActiveWord) return;
   const [surface, strongs] = _rhemaActiveWord;
+  const layer = _rhemaActiveWordLayer || getCurrentOriginalLanguageLayer();
   const uid = window.Auth?.getCurrentUser()?.uid;
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('authUsername') || 'Anonymous';
-  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const lex = getCurrentRhemaLexicon(layer)[strongs] || {};
   await window.Studies?.logWord(_studySandboxId, uid, displayName, {
     lemma: lex.lemma || surface, strongs,
-    definition: lex.def || lex.short_def || '',
-    surface, translit: lex.translit || ''
+    layer,
+    definition: lex.def || lex.short_def || lex.brief || lex.quick_def || '',
+    surface, translit: lex.translit || lex.pronounce || ''
   });
   if (!_sandboxWordLogCache.some(w => String(w.strongs) === String(strongs))) {
     _sandboxWordLogCache.push({ strongs: String(strongs), surface, lemma: lex.lemma || surface });
@@ -18168,13 +18242,15 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.80";
+const APP_VERSION = "3.0.81";
 
 // Per-file versions for Rhema data bundles - only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
 const RHEMA_DATA_VERSIONS = {
   'rhema-nt.js':        '3.0.65',
   'rhema-critical.js':  '3.0.23',
+  'rhema-ot-hebrew.js': '3.0.81',
+  'rhema-hebrew-lexicon.js': '3.0.81',
   'rhema-lxx.js':       '3.0.65',
   'rhema-lexicon.js':   '3.0.65',
   'rhema-mm.js':        '3.0.65',
@@ -18185,6 +18261,11 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.81 &mdash; Rhema Hebrew OT</div>
+<ul>
+  <li><strong>Hebrew OT layer added</strong> so Genesis through Malachi now default to OSHB/MorphHB Hebrew with tappable words.</li>
+  <li><strong>LXX toolbar mode added</strong> as an Old Testament-only Septuagint Greek swap without changing New Testament Greek behavior.</li>
+</ul>
 <div class="un-version-label">v3.0.80 &mdash; Rhema Noun Endings &amp; PWA Badge</div>
 <ul>
   <li><strong>PWA notification badge added</strong> so supported installed apps mirror the in-app unread bell count.</li>
@@ -21989,8 +22070,10 @@ let _rhemaShowEnglish    = false;
 let _rhemaGreekOnly  = false;
 let _rhemaSyntaxMode = false;
 let _rhemaTextMode = localStorage.getItem('rhemaTextMode') === 'critical' ? 'critical' : 'majority';
+let _rhemaOTLayer = localStorage.getItem('rhemaOTLayer') === 'lxx' ? 'lxx' : 'hebrew';
 let _rhemaActiveTab = 'parsing';
 let _rhemaActiveWord = null;
+let _rhemaActiveWordLayer = null;
 let _rhemaTrail = [];       // full cross-ref trail — never auto-shrinks
 let _rhemaTrailPos = -1;   // cursor into trail (-1 = at tip, not in trail)
 let _rhemaHighlightStrongs = null;
@@ -22074,15 +22157,43 @@ window.RhemaBookAbbr = RHEMA_BOOK_ABBR;
 window.RhemaNTBookOrder = RHEMA_NT_BOOK_ORDER;
 window.RhemaBookOrder = RHEMA_BOOK_ORDER;
 
+function isRhemaOTBook(bookCode) {
+  return RHEMA_OT_BOOK_ORDER.includes(bookCode);
+}
+
+function isRhemaNTBook(bookCode) {
+  return RHEMA_NT_BOOK_ORDER.includes(bookCode);
+}
+
+function getCurrentOriginalLanguageLayer(bookCode = _rhemaBook) {
+  if (isRhemaOTBook(bookCode)) return _rhemaOTLayer === 'lxx' ? 'lxx' : 'hebrew';
+  return 'nt-greek';
+}
+
+function setRhemaOTLayer(layer) {
+  _rhemaOTLayer = layer === 'lxx' ? 'lxx' : 'hebrew';
+  localStorage.setItem('rhemaOTLayer', _rhemaOTLayer);
+  closeRhemaSheet();
+  _syncWheelState();
+  _syncToolWandIndicator();
+  renderCurrentRhemaOriginalText();
+}
+
+function _rhemaLayerForBook(bookCode = _rhemaBook) {
+  return getCurrentOriginalLanguageLayer(bookCode);
+}
+
 function _ensureRhemaBibleData() {
   if (!window.RhemaNT) return window.RhemaBible || null;
-  // Rebuild if not yet built, or if LXX is now available but wasn't when last built
-  if (window.RhemaBible && (window.RhemaBible._hasLXX || !window.RhemaLXX)) return window.RhemaBible;
+  // Keep a metadata shell for legacy callers. The active OT text is chosen by
+  // getCurrentRhemaTextDataset(), not by merging every original-language layer.
   const lxx = window.RhemaLXX || { books: [], names: {}, text: {} };
+  const hebrew = window.RhemaHebrewOT || { books: [], names: {}, text: {} };
   window.RhemaBible = {
-    books: [...(lxx.books || []), ...(window.RhemaNT.books || RHEMA_NT_BOOK_ORDER)],
-    names: { ...(lxx.names || {}), ...(window.RhemaNT.names || {}) },
-    text: { ...(lxx.text || {}), ...(window.RhemaNT.text || {}) },
+    books: [...(hebrew.books?.length ? hebrew.books : lxx.books || []), ...(window.RhemaNT.books || RHEMA_NT_BOOK_ORDER)],
+    names: { ...(lxx.names || {}), ...(hebrew.names || {}), ...(window.RhemaNT.names || {}) },
+    text: { ...(hebrew.text || {}), ...(window.RhemaNT.text || {}) },
+    _hasHebrew: !!window.RhemaHebrewOT,
     _hasLXX: !!window.RhemaLXX,
   };
   return window.RhemaBible;
@@ -22092,16 +22203,43 @@ function _rhemaData() {
   return _ensureRhemaBibleData();
 }
 
+function getCurrentRhemaTextDataset(bookCode = _rhemaBook) {
+  if (isRhemaOTBook(bookCode)) {
+    return _rhemaOTLayer === 'lxx' ? window.RhemaLXX : window.RhemaHebrewOT;
+  }
+  if (_rhemaTextMode === 'critical' && window.RhemaCriticalNT?.text) return window.RhemaCriticalNT;
+  return window.RhemaNT;
+}
+
+function getCurrentRhemaLexicon(layer = getCurrentOriginalLanguageLayer()) {
+  return layer === 'hebrew' ? (window.RhemaHebrewLexicon || {}) : (window.RhemaLexicon || {});
+}
+
+function getCurrentRhemaOccurrences(strongs, layer = getCurrentOriginalLanguageLayer()) {
+  const store = layer === 'hebrew'
+    ? window.RhemaHebrewOcc
+    : layer === 'lxx'
+      ? window.RhemaLXXOcc
+      : window.RhemaOcc;
+  return store?.[strongs] || null;
+}
+
 function _rhemaText() {
-  const baseText = _rhemaData()?.text || {};
-  if (_rhemaTextMode !== 'critical' || !window.RhemaCriticalNT?.text) return baseText;
-  return { ...baseText, ...window.RhemaCriticalNT.text };
+  _ensureRhemaBibleData();
+  const otText = _rhemaOTLayer === 'lxx' ? (window.RhemaLXX?.text || {}) : (window.RhemaHebrewOT?.text || {});
+  const ntText = _rhemaTextMode === 'critical' && window.RhemaCriticalNT?.text
+    ? window.RhemaCriticalNT.text
+    : (window.RhemaNT?.text || {});
+  return { ...otText, ...ntText };
 }
 
 function _rhemaTextForMode(mode) {
-  const baseText = _rhemaData()?.text || {};
-  if (mode === 'critical' && window.RhemaCriticalNT?.text) return { ...baseText, ...window.RhemaCriticalNT.text };
-  return baseText;
+  _ensureRhemaBibleData();
+  const otText = _rhemaOTLayer === 'lxx' ? (window.RhemaLXX?.text || {}) : (window.RhemaHebrewOT?.text || {});
+  const ntText = mode === 'critical' && window.RhemaCriticalNT?.text
+    ? window.RhemaCriticalNT.text
+    : (window.RhemaNT?.text || {});
+  return { ...otText, ...ntText };
 }
 
 function _rhemaOtherTextMode() {
@@ -22114,20 +22252,15 @@ function _rhemaBookName(code) {
 
 function _rhemaBookOrder() {
   const text = _rhemaText();
-  return (window.RhemaBible?.books || RHEMA_BOOK_ORDER).filter(code => text[code]);
+  return RHEMA_BOOK_ORDER.filter(code => text[code]);
 }
 
 function _rhemaOccurrenceData(strongs) {
-  const merged = { total: 0, books: {} };
-  for (const source of [window.RhemaLXXOcc, window.RhemaOcc]) {
-    const occ = source?.[strongs];
-    if (!occ) continue;
-    merged.total += occ.total || 0;
-    for (const [book, count] of Object.entries(occ.books || {})) {
-      merged.books[book] = (merged.books[book] || 0) + count;
-    }
-  }
-  return merged.total ? merged : null;
+  return getCurrentRhemaOccurrences(strongs);
+}
+
+function renderCurrentRhemaOriginalText() {
+  renderRhemaVerse();
 }
 
 // ── POS Highlight system ──────────────────────────────────────────────────────
@@ -22395,7 +22528,7 @@ function loadRhemaScripts() {
     }
     _rhemaLoading = true;
     let loaded = 0;
-    const files = ['rhema-nt.js', 'rhema-critical.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-msb.js', 'rhema-bsb.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
+    const files = ['rhema-nt.js', 'rhema-critical.js', 'rhema-ot-hebrew.js', 'rhema-hebrew-lexicon.js', 'rhema-lxx.js', 'rhema-lexicon.js', 'rhema-mm.js', 'rhema-msb.js', 'rhema-bsb.js', 'rhema-syntax.js', 'rhema-crossrefs.js'];
     let failed = false;
     for (const file of files) {
       const s = document.createElement('script');
@@ -22640,9 +22773,11 @@ function rhemaFilterBooks(query) {
 }
 
 function rhemaSelectBook(code) {
+  const fromBook = _rhemaBook;
   _rhemaBook    = code;
   _rhemaChapter = '1';
   _rhemaVerse   = '1';
+  if (isRhemaOTBook(code) && !isRhemaOTBook(fromBook)) _rhemaOTLayer = 'hebrew';
   _rhemaHighlightStrongs = null;
   closeRhemaPickerSheet();
   syncRhemaPicker();
@@ -22767,6 +22902,7 @@ function rhemaNextVerse() {
 // ── Cross-reference jumping ───────────────────────────────────────────────────
 
 function jumpToRhemaVerse(book, chapter, verse, highlightStrongs) {
+  const fromBook = _rhemaBook;
   // First jump: also record the origin verse so the trail starts from the beginning
   if (_rhemaTrail.length === 0) {
     _rhemaTrail.push({ book: _rhemaBook, chapter: _rhemaChapter, verse: _rhemaVerse, strongs: null });
@@ -22776,6 +22912,7 @@ function jumpToRhemaVerse(book, chapter, verse, highlightStrongs) {
   _rhemaBook = book;
   _rhemaChapter = String(chapter);
   _rhemaVerse = String(verse);
+  if (isRhemaOTBook(book) && !isRhemaOTBook(fromBook)) _rhemaOTLayer = 'hebrew';
   _rhemaHighlightStrongs = highlightStrongs || null;
   closeRhemaSheet();
   syncRhemaPicker();
@@ -22907,9 +23044,18 @@ function showRhemaVariant(label, text) {
   showRhemaVariant._timer = setTimeout(() => toast.classList.add('hidden'), 2600);
 }
 
+function _rhemaLayerBadge(bookCode = _rhemaBook) {
+  const layer = getCurrentOriginalLanguageLayer(bookCode);
+  if (layer === 'hebrew') return '<div class="rhema-layer-label">Hebrew OT</div>';
+  if (layer === 'lxx') return '<div class="rhema-layer-label">LXX · Septuagint Greek</div>';
+  return '';
+}
+
 function _renderVerseWords(words, verse) {
   const vArg = verse ? `, '${verse}'` : '';
   const variantMap = _rhemaVariantMap(words, verse);
+  const layer = getCurrentOriginalLanguageLayer();
+  const isHebrew = layer === 'hebrew';
   if (_rhemaGreekOnly) {
     return words.map((w, i) => {
       const isXref = _rhemaHighlightStrongs !== null && w[1] === _rhemaHighlightStrongs;
@@ -22921,7 +23067,7 @@ function _renderVerseWords(words, verse) {
       const variantTag = variant
         ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
         : '';
-      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span>${variantTag}</span>` +
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text rhema-original-text${isHebrew ? ' rhema-hebrew-text' : ''}">${w[0]}</span>${variantTag}</span>` +
              (i < words.length - 1 ? '<span class="rhema-word-space"> </span>' : '');
     }).join('');
   } else {
@@ -22932,15 +23078,15 @@ function _renderVerseWords(words, verse) {
       const style = hlColor ? ` style="background:${hlColor};border-radius:4px"` : '';
       const variant = variantMap[i];
       const cls = `${isXref ? 'rhema-word xref' : 'rhema-word'}${variant ? ' has-variant' : ''}`;
-      const lex = (window.RhemaLexicon || {})[w[1]] || {};
-      const gloss = w[2]?.startsWith('V-')
+      const lex = getCurrentRhemaLexicon(layer)[w[1]] || {};
+      const gloss = isHebrew ? '' : w[2]?.startsWith('V-')
         ? _sxVerbGloss(w[2], lex.brief)
         : _nounGloss(w[2], lex.brief);
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
       const variantTag = variant
         ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
         : '';
-      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text">${w[0]}</span>${variantTag}${glossHtml}</span>`;
+      return `<span class="${cls}"${style} data-idx="${i}" onclick="openRhemaSheet(${i}${vArg})"><span class="rhema-greek-text rhema-original-text${isHebrew ? ' rhema-hebrew-text' : ''}">${w[0]}</span>${variantTag}${glossHtml}</span>`;
     }).join('');
   }
 }
@@ -22953,6 +23099,11 @@ function renderRhemaVerse() {
   const display = document.getElementById('rhemaVerseDisplay');
   const EnglishDiv  = document.getElementById('rhemaEnglishDisplay');
   if (!display) return;
+  const layer = getCurrentOriginalLanguageLayer();
+  const isHebrew = layer === 'hebrew';
+  if (isHebrew && _rhemaSyntaxMode) _rhemaSyntaxMode = false;
+  display.classList.toggle('rhema-hebrew-layer', isHebrew);
+  display.classList.toggle('rhema-lxx-layer', layer === 'lxx');
 
   if (_rhemaFullChapter) {
     const chapterData = (_rhemaText()[_rhemaBook] || {})[_rhemaChapter] || {};
@@ -22961,13 +23112,13 @@ function renderRhemaVerse() {
     display.classList.remove('greek-only');
     display.classList.toggle('chapter-mode', !_rhemaSyntaxMode);
     display.classList.toggle('rsx-chapter-mode', _rhemaSyntaxMode);
-    display.innerHTML = verseNums.map(vn => {
+    display.innerHTML = _rhemaLayerBadge() + verseNums.map(vn => {
       const v = String(vn);
       const words = chapterData[v] || [];
       const isTarget = v === _rhemaVerse && _rhemaHighlightStrongs !== null;
       const inner = _rhemaSyntaxMode
         ? _renderSyntaxView(words, v)
-        : `<div class="rhema-chapter-word-grid${_rhemaGreekOnly ? ' greek-only' : ''}">${_renderVerseWords(words, v)}</div>`;
+        : `<div class="rhema-chapter-word-grid${_rhemaGreekOnly ? ' greek-only' : ''}${isHebrew ? ' rhema-hebrew-layer' : ''}">${_renderVerseWords(words, v)}</div>`;
       return `<div class="rhema-chapter-block${isTarget ? ' rhema-chapter-block-target' : ''}" data-verse="${v}">` +
              `<div class="rhema-chapter-verse-label">${vn}</div>` + inner + `</div>`;
     }).join('');
@@ -22993,12 +23144,12 @@ function renderRhemaVerse() {
     display.classList.remove('chapter-mode', 'rsx-chapter-mode');
     if (_rhemaSyntaxMode) {
       display.classList.remove('greek-only');
-      display.innerHTML = _renderSyntaxView(words, null);
+      display.innerHTML = _rhemaLayerBadge() + _renderSyntaxView(words, null);
       if (EnglishDiv) EnglishDiv.innerHTML = '';
       requestAnimationFrame(() => _initDiagramScroll(display.querySelector('.rsx-diagram')));
     } else {
       display.classList.toggle('greek-only', _rhemaGreekOnly);
-      display.innerHTML = _renderVerseWords(words, null);
+      display.innerHTML = _rhemaLayerBadge() + _renderVerseWords(words, null);
       if (EnglishDiv) {
         const engText = _rhemaEnglishText(_rhemaBook, _rhemaChapter, _rhemaVerse);
         EnglishDiv.innerHTML = engText || `<em class="rhema-no-english">This verse is not included in the ${_rhemaEnglishLabel()} translation.</em>`;
@@ -23029,11 +23180,13 @@ function toggleRhemaMode() {
 }
 
 function toggleRhemaTextMode() {
+  if (!isRhemaNTBook(_rhemaBook)) {
+    showRhemaVariant('Text Mode', 'Critical/Majority applies to New Testament Greek. Old Testament uses Hebrew, with LXX available as its own toolbar layer.');
+    closeRhemaWheel();
+    return;
+  }
   if (!window.RhemaCriticalNT?.text || !RHEMA_NT_BOOK_ORDER.includes(_rhemaBook)) {
-    // OT books always display the Septuagint (Rahlfs LXX) — there is no separate
-    // critical vs. majority edition of the LXX in Rhema. The Critical/Majority
-    // toggle only affects New Testament books (SBL Critical NT vs. Byzantine Majority Text).
-    showRhemaVariant('Text Mode', 'Old Testament: Septuagint (Rahlfs LXX) — no Critical/Majority variant. Switch applies to NT books.');
+    showRhemaVariant('Text Mode', 'Critical/Majority applies to New Testament Greek. Old Testament uses Hebrew, with LXX available as its own toolbar layer.');
     closeRhemaWheel();
     return;
   }
@@ -23092,11 +23245,19 @@ function toggleWheelTool(tool) {
     setTimeout(() => openWordLibrary(), 200);
   } else if (tool === 'critical') {
     toggleRhemaTextMode();
+  } else if (tool === 'lxx') {
+    if (!isRhemaOTBook(_rhemaBook)) {
+      showRhemaVariant('LXX', 'Septuagint Greek is available for Old Testament verses.');
+      closeRhemaWheel();
+      return;
+    }
+    setRhemaOTLayer(_rhemaOTLayer === 'lxx' ? 'hebrew' : 'lxx');
+    closeRhemaWheel();
   }
 }
 
 function _syncWheelBtn(tool, active) {
-  const ids = { syntax: 'wheelItemSyntax', 'greek-only': 'wheelItemGreek', highlight: 'wheelItemHighlight', critical: 'wheelItemCritical' };
+  const ids = { syntax: 'wheelItemSyntax', 'greek-only': 'wheelItemGreek', highlight: 'wheelItemHighlight', critical: 'wheelItemCritical', lxx: 'wheelItemLxx' };
   document.getElementById(ids[tool])?.classList.toggle('active', active);
 }
 
@@ -23106,6 +23267,16 @@ function _syncRhemaTextModeBtn() {
   const label = btn.querySelector('.rwi-label');
   if (label) label.textContent = _rhemaTextMode === 'critical' ? 'Majority Text' : 'Critical Text';
   btn.classList.toggle('active', _rhemaTextMode === 'critical');
+  btn.classList.toggle('disabled', !isRhemaNTBook(_rhemaBook));
+}
+
+function _syncRhemaLxxBtn() {
+  const btn = document.getElementById('wheelItemLxx');
+  if (!btn) return;
+  const isOT = isRhemaOTBook(_rhemaBook);
+  btn.classList.toggle('hidden', !isOT);
+  btn.classList.toggle('active', isOT && _rhemaOTLayer === 'lxx');
+  btn.title = isOT ? 'Swap Old Testament original-language layer between Hebrew and Septuagint Greek' : 'LXX is available for Old Testament verses.';
 }
 
 function _syncWheelState() {
@@ -23113,12 +23284,14 @@ function _syncWheelState() {
   _syncWheelBtn('greek-only', _rhemaGreekOnly);
   _syncWheelBtn('highlight', _rhemaHighlightBarOn);
   _syncWheelBtn('critical', _rhemaTextMode === 'critical');
+  _syncWheelBtn('lxx', isRhemaOTBook(_rhemaBook) && _rhemaOTLayer === 'lxx');
   _syncRhemaTextModeBtn();
+  _syncRhemaLxxBtn();
   document.getElementById('wheelItemXref')?.classList.toggle('active', _rhemaCrossRefMode);
 }
 
 function _syncToolWandIndicator() {
-  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn || _rhemaTextMode === 'critical';
+  const hasActive = _rhemaSyntaxMode || _rhemaGreekOnly || _rhemaHighlightBarOn || _rhemaTextMode === 'critical' || (isRhemaOTBook(_rhemaBook) && _rhemaOTLayer === 'lxx');
   document.getElementById('rhemaToolBtn')?.classList.toggle('has-active', hasActive);
 }
 
@@ -24618,19 +24791,20 @@ function openRhemaSheet(wordIdx, verse) {
 
   closeRhemaPickerSheet();
   _rhemaActiveWord = word;
+  _rhemaActiveWordLayer = getCurrentOriginalLanguageLayer();
 
   // Highlight selected word
   document.querySelectorAll('.rhema-word.selected').forEach(el => el.classList.remove('selected'));
   document.querySelector(`.rhema-word[data-idx="${wordIdx}"]`)?.classList.add('selected');
 
   // Populate header
-  const [surface, strongs, morph] = word;
-  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const [surface, strongs, morph, lemma] = word;
+  const lex = getCurrentRhemaLexicon(_rhemaActiveWordLayer)[strongs] || {};
 
   document.getElementById('rhemaSheetSurface').textContent = surface;
-  document.getElementById('rhemaSheetStrongs').textContent = strongs ? 'G' + strongs : 'LXX';
+  document.getElementById('rhemaSheetStrongs').textContent = strongs ? (_rhemaActiveWordLayer === 'hebrew' ? 'H' : 'G') + strongs : (_rhemaActiveWordLayer === 'lxx' ? 'LXX' : '');
   document.getElementById('rhemaSheetLemma').textContent   =
-    lex.lemma ? `${lex.lemma}  (${lex.translit || ''})` : '';
+    lex.lemma ? `${lex.lemma}  (${lex.translit || lex.pronounce || ''})` : (lemma || '');
 
   _wlSelectedForm = null;
   showRhemaTab(_rhemaActiveTab, word);
@@ -24668,6 +24842,7 @@ function closeRhemaSheet() {
   if (_studySandboxId) document.querySelector('.rhema-sandbox-arrows')?.classList.add('visible');
   document.getElementById('rhemaWlBackBtn')?.classList.add('hidden');
   _rhemaActiveWord = null;
+  _rhemaActiveWordLayer = null;
 }
 
 function copyCurrentRhemaWord() {
@@ -24849,7 +25024,8 @@ function showRhemaTab(tab, word) {
   word = word || _rhemaActiveWord;
   if (!word) return;
 
-  const [surface, strongs, morph] = word;
+  const [surface, strongs, morph, lemma] = word;
+  const layer = _rhemaActiveWordLayer || getCurrentOriginalLanguageLayer();
 
   document.querySelectorAll('.rhema-tab').forEach(b => b.classList.remove('active'));
   document.getElementById(`rhemaTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`)?.classList.add('active');
@@ -24862,11 +25038,11 @@ function showRhemaTab(tab, word) {
   if (!content) return;
 
   if (tab === 'parsing') {
-    content.innerHTML = renderRhemaParsing(surface, strongs, morph);
+    content.innerHTML = renderRhemaParsing(surface, strongs, morph, lemma, layer);
   } else if (tab === 'definition') {
-    content.innerHTML = renderRhemaDefinition(strongs, morph);
+    content.innerHTML = renderRhemaDefinition(strongs, morph, layer);
   } else {
-    content.innerHTML = renderRhemaOccurrences(strongs);
+    content.innerHTML = renderRhemaOccurrences(strongs, layer);
   }
 }
 
@@ -25055,13 +25231,98 @@ function buildNounFormHint(surface, strongs, morph) {
   return `<div class="rhema-def-sep"></div><div class="rhema-form-hint">${hint}</div>`;
 }
 
-function renderRhemaParsing(surface, strongs, morph) {
+const HEBREW_POS = {
+  A: 'adjective',
+  C: 'conjunction',
+  D: 'adverb',
+  N: 'noun',
+  P: 'pronoun',
+  R: 'preposition',
+  S: 'suffix',
+  T: 'article / direct object marker',
+  V: 'verb',
+};
+
+const HEBREW_STEM = {
+  q: 'Qal', N: 'Niphal', p: 'Piel', P: 'Pual', h: 'Hiphil', H: 'Hophal',
+  t: 'Hithpael', o: 'Polel', O: 'Polal', r: 'Hithpolel', m: 'Poel',
+  M: 'Poal', k: 'Palel', K: 'Pulal', Q: 'Qal passive', l: 'Pilpel',
+  L: 'Polpal', f: 'Hithpalpel', D: 'Nithpael', j: 'Pealal', i: 'Pilel',
+  u: 'Hothpaal', c: 'Tiphil', v: 'Hishtaphel', w: 'Nithpalel', y: 'Nithpoel',
+  z: 'Hithpoel',
+};
+
+const HEBREW_CONJ = {
+  p: 'perfect', q: 'sequential perfect', i: 'imperfect', w: 'sequential imperfect',
+  h: 'cohortative', j: 'jussive', v: 'imperative', r: 'participle active',
+  s: 'participle passive', a: 'infinitive absolute', c: 'infinitive construct',
+};
+
+const HEBREW_GENDER = { m: 'masculine', f: 'feminine', b: 'common' };
+const HEBREW_NUMBER = { s: 'singular', p: 'plural', d: 'dual' };
+const HEBREW_STATE = { a: 'absolute', c: 'construct', d: 'determined' };
+const HEBREW_PERSON = { 1: '1st person', 2: '2nd person', 3: '3rd person' };
+
+function _decodeHebrewMorphPart(part) {
+  const raw = String(part || '').replace(/^H/, '');
+  if (!raw) return [];
+  const pos = raw[0];
+  const body = raw.slice(1);
+  const rows = [];
+  if (HEBREW_POS[pos]) rows.push({ label: 'Part of Speech', value: HEBREW_POS[pos], desc: '' });
+  if (pos === 'V') {
+    if (HEBREW_STEM[body[0]]) rows.push({ label: 'Stem / Binyan', value: HEBREW_STEM[body[0]], desc: '' });
+    if (HEBREW_CONJ[body[1]]) rows.push({ label: 'Conjugation', value: HEBREW_CONJ[body[1]], desc: '' });
+    if (HEBREW_PERSON[body[2]]) rows.push({ label: 'Person', value: HEBREW_PERSON[body[2]], desc: '' });
+    if (HEBREW_GENDER[body[3]]) rows.push({ label: 'Gender', value: HEBREW_GENDER[body[3]], desc: '' });
+    if (HEBREW_NUMBER[body[4]]) rows.push({ label: 'Number', value: HEBREW_NUMBER[body[4]], desc: '' });
+  } else if (['N', 'A', 'P', 'S'].includes(pos)) {
+    const type = body[0];
+    if (pos === 'N' && type === 'p') rows.push({ label: 'Noun Type', value: 'proper noun', desc: '' });
+    if (pos === 'N' && type === 'c') rows.push({ label: 'Noun Type', value: 'common noun', desc: '' });
+    const offset = pos === 'S' ? 0 : 1;
+    if (HEBREW_GENDER[body[offset]]) rows.push({ label: 'Gender', value: HEBREW_GENDER[body[offset]], desc: '' });
+    if (HEBREW_NUMBER[body[offset + 1]]) rows.push({ label: 'Number', value: HEBREW_NUMBER[body[offset + 1]], desc: '' });
+    if (HEBREW_STATE[body[offset + 2]]) rows.push({ label: 'State', value: HEBREW_STATE[body[offset + 2]], desc: '' });
+  } else if (pos === 'T' && body) {
+    rows.push({ label: 'Marker', value: body === 'd' ? 'definite article' : body === 'o' ? 'direct object marker' : body, desc: '' });
+  }
+  if (!rows.length) rows.push({ label: 'Morphology', value: part, desc: 'Raw OSHB/MorphHB morphology code.' });
+  return rows;
+}
+
+function decodeHebrewMorph(morph) {
+  const parts = String(morph || '').split('/').filter(Boolean);
+  const rows = [];
+  for (const part of parts) rows.push(..._decodeHebrewMorphPart(part));
+  if (morph) rows.push({ label: 'Morphology Code', value: morph, desc: 'Original OSHB/MorphHB code.' });
+  return rows;
+}
+
+function renderHebrewParsing(surface, strongs, morph, lemma) {
+  const rows = decodeHebrewMorph(morph);
+  const lemmaText = lemma ? `<div class="rhema-inflected-gloss">Lemma key: ${lemma}</div>` : '';
+  if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No Hebrew parsing data for "${morph || surface}".</p>`;
+  return lemmaText + `<div class="rhema-parsing-grid">` +
+    rows.map(r => `
+      <div class="rhema-parse-row">
+        <div class="rhema-parse-label">${r.label}</div>
+        <div>
+          <div class="rhema-parse-value">${r.value}</div>
+          ${r.desc ? `<div class="rhema-parse-desc">${r.desc}</div>` : ''}
+        </div>
+      </div>`).join('') +
+    `</div>`;
+}
+
+function renderRhemaParsing(surface, strongs, morph, lemma, layer = getCurrentOriginalLanguageLayer()) {
+  if (layer === 'hebrew') return renderHebrewParsing(surface, strongs, morph, lemma);
   const rows = decodeMorph(morph);
   if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No parsing data for "${morph}".</p>`;
 
   const safeStr = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
 
-  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const lex = getCurrentRhemaLexicon(layer)[strongs] || {};
   const inflectedGloss = morph?.startsWith('V-')
     ? _sxVerbGloss(morph, lex.brief)
     : _nounGloss(morph, lex.brief);
@@ -25114,9 +25375,9 @@ function getRhemaQuickDefinition(lex) {
   return answer.length > 150 ? answer.slice(0, 147).trimEnd() + '...' : answer;
 }
 
-function renderRhemaDefinition(strongs, morph) {
-  const lex = (window.RhemaLexicon || {})[strongs];
-  if (!lex) return `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
+function renderRhemaDefinition(strongs, morph, layer = getCurrentOriginalLanguageLayer()) {
+  const lex = getCurrentRhemaLexicon(layer)[strongs];
+  if (!lex) return `<p style="opacity:.5;font-size:.85rem">${layer === 'hebrew' ? 'No Hebrew lexicon entry loaded yet.' : 'No definition found.'}</p>`;
 
   const sections = [];
 
@@ -25128,7 +25389,7 @@ function renderRhemaDefinition(strongs, morph) {
     </div>`);
   }
 
-  const _inflGloss = morph?.startsWith('V-')
+  const _inflGloss = layer === 'hebrew' ? '' : morph?.startsWith('V-')
     ? _sxVerbGloss(morph, lex.brief)
     : _nounGloss(morph, lex.brief);
   const quickDefinition = _inflGloss || getRhemaQuickDefinition(lex);
@@ -25179,7 +25440,7 @@ function renderRhemaDefinition(strongs, morph) {
   return sections.join('<div class="rhema-def-sep"></div>') || `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
 }
 
-function renderRhemaOccurrences(strongs) {
+function renderRhemaOccurrences(strongs, layer = getCurrentOriginalLanguageLayer()) {
   if (!strongs) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
   if (_wlSelectedForm) {
     const exactBooks = _rhemaExactFormOccurrences(_wlSelectedForm);
@@ -25200,7 +25461,7 @@ function renderRhemaOccurrences(strongs) {
       <div class="rhema-occ-list">${bookRows}</div>`;
   }
 
-  const occ = _rhemaOccurrenceData(strongs);
+  const occ = getCurrentRhemaOccurrences(strongs, layer);
   if (!occ) return `<p style="opacity:.5;font-size:.85rem">No occurrence data found.</p>`;
 
   const bookRows = _rhemaBookOrder()
@@ -25225,7 +25486,8 @@ let _rhemaBVRefs    = [];
 let _rhemaBVEnglish     = false;
 
 function openRhemaBookVerses(code, strongs) {
-  const bookText = (_rhemaText() || {})[code];
+  const layer = _rhemaActiveWordLayer || getCurrentOriginalLanguageLayer(code);
+  const bookText = (_wlTextForLayer(layer) || {})[code];
   if (!bookText) return;
 
   const formNorm = _wlSelectedForm ? _stripGreekAccents(_wlSelectedForm).toLowerCase() : null;
@@ -25255,7 +25517,7 @@ function toggleRhemaBookViewEnglish() {
 }
 
 function _EnglishHighlight(EnglishText, strongs) {
-  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const lex = getCurrentRhemaLexicon(_rhemaActiveWordLayer || getCurrentOriginalLanguageLayer())[strongs] || {};
   const raw = (lex.kjv_def || '').replace(/^-+/, '').trim();
   if (!raw) return EnglishText;
   // Try full phrase then first word; skip tiny function words
