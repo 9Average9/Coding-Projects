@@ -13416,6 +13416,15 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   border-color: var(--secondary-color);
   color: var(--btn-text-color);
 }
+.rhema-wheel-item.disabled {
+  opacity: 0.52;
+  border-style: dashed;
+  cursor: help;
+  filter: grayscale(0.2);
+}
+.rhema-wheel-overlay.open .rhema-wheel-item.disabled {
+  opacity: 0.62;
+}
 .rhema-wheel-item.rw-placeholder { opacity: 0; }
 .rhema-wheel-overlay.open .rhema-wheel-item.rw-placeholder { opacity: 0.45; }
 /* Heptagon positions (r=110px, clockwise from top, 7 items) */
@@ -15511,6 +15520,28 @@ body.dark .fr-sheet-stat { background: rgba(255,255,255,0.05); border-color: #37
   font-family: "SBL Hebrew", "Ezra SIL", "Noto Sans Hebrew", serif;
   font-size: 1.22rem;
   letter-spacing: 0;
+}
+.rhema-hebrew-simple {
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 28%, var(--border-color));
+  background: color-mix(in srgb, var(--secondary-color) 8%, var(--card-color));
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  color: var(--font-color);
+  line-height: 1.45;
+}
+.rhema-hebrew-simple strong,
+.rhema-hebrew-root {
+  font-family: "SBL Hebrew", "Ezra SIL", "Noto Sans Hebrew", serif;
+  font-size: 1.2rem;
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+.rhema-hebrew-simple span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted-color);
+  font-size: 0.82rem;
 }
 /* Greek-only mode: flowing inline text */
 .rhema-verse-display.greek-only {

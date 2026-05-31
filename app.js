@@ -8816,26 +8816,12 @@ async function saveWritingModal() {
 // ── Word Library ──────────────────────────────────────────────────────────────
 
 function _stripGreekAccents(s) {
-  const map = {
-    'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω',
-    'ἀ':'α','ἁ':'α','ἂ':'α','ἃ':'α','ἄ':'α','ἅ':'α','ἆ':'α','ἇ':'α',
-    'ἐ':'ε','ἑ':'ε','ἒ':'ε','ἓ':'ε','ἔ':'ε','ἕ':'ε',
-    'ἠ':'η','ἡ':'η','ἢ':'η','ἣ':'η','ἤ':'η','ἥ':'η','ἦ':'η','ἧ':'η',
-    'ἰ':'ι','ἱ':'ι','ἲ':'ι','ἳ':'ι','ἴ':'ι','ἵ':'ι','ἶ':'ι','ἷ':'ι',
-    'ὀ':'ο','ὁ':'ο','ὂ':'ο','ὃ':'ο','ὄ':'ο','ὅ':'ο',
-    'ὐ':'υ','ὑ':'υ','ὒ':'υ','ὓ':'υ','ὔ':'υ','ὕ':'υ','ὖ':'υ','ὗ':'υ',
-    'ὠ':'ω','ὡ':'ω','ὢ':'ω','ὣ':'ω','ὤ':'ω','ὥ':'ω','ὦ':'ω','ὧ':'ω',
-    'ᾳ':'α','ᾴ':'α','ᾶ':'α','ᾷ':'α',
-    'ῃ':'η','ῄ':'η','ῆ':'η','ῇ':'η',
-    'ῳ':'ω','ῴ':'ω','ῶ':'ω','ῷ':'ω',
-    'ϊ':'ι','ΐ':'ι','ῒ':'ι','ῖ':'ι','ῗ':'ι',
-    'ϋ':'υ','ΰ':'υ','ῢ':'υ','ῦ':'υ','ῧ':'υ',
-    'ῤ':'ρ','ῥ':'ρ','ὰ':'α','ὲ':'ε','ὴ':'η','ὶ':'ι','ὸ':'ο','ὺ':'υ','ὼ':'ω',
-    'ς':'σ',
-  };
-  return s.split('').map(c => map[c] || c).join('');
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/\u0345/g, '\u03b9')
+    .replace(/[\u0300-\u0344\u0346-\u036f]/g, '')
+    .replace(/\u03c2/g, '\u03c3');
 }
-
 function _normalizeTranslit(s) {
   return s.toLowerCase()
     .replace(/[ūū]/g,'u').replace(/ō/g,'o').replace(/ē/g,'e')
@@ -9124,6 +9110,13 @@ function wlOnSearch(q) {
 
 function _wlFormLabel(strongs, surface) {
   const morph = _findMorphForSurface(strongs, surface);
+  if (_wlLibraryLayer === 'hebrew') {
+    const rows = decodeHebrewMorph(morph);
+    return rows.find(r => r.label === 'Part of Speech')?.value ||
+      rows.find(r => r.label === 'Conjugation')?.value ||
+      rows.find(r => r.label === 'Morphology Code')?.value ||
+      'Hebrew form';
+  }
   const rows = decodeMorph(morph);
   const caseRow = rows.find(r => r.label === 'Case');
   if (caseRow?.value) return caseRow.value;
@@ -18242,7 +18235,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.81";
+const APP_VERSION = "3.0.82";
 
 // Per-file versions for Rhema data bundles - only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18261,6 +18254,11 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.82 &mdash; Rhema Hebrew Polish</div>
+<ul>
+  <li><strong>Hebrew OT is clearer</strong> with English word glosses and simpler Hebrew parsing explanations.</li>
+  <li><strong>Greek form search is sharper</strong> and now preserves iota subscript for exact-form matching.</li>
+</ul>
 <div class="un-version-label">v3.0.81 &mdash; Rhema Hebrew OT</div>
 <ul>
   <li><strong>Hebrew OT layer added</strong> so Genesis through Malachi now default to OSHB/MorphHB Hebrew with tappable words.</li>
@@ -23079,9 +23077,11 @@ function _renderVerseWords(words, verse) {
       const variant = variantMap[i];
       const cls = `${isXref ? 'rhema-word xref' : 'rhema-word'}${variant ? ' has-variant' : ''}`;
       const lex = getCurrentRhemaLexicon(layer)[w[1]] || {};
-      const gloss = isHebrew ? '' : w[2]?.startsWith('V-')
-        ? _sxVerbGloss(w[2], lex.brief)
-        : _nounGloss(w[2], lex.brief);
+      const gloss = isHebrew
+        ? getRhemaQuickDefinition(lex)
+        : w[2]?.startsWith('V-')
+          ? _sxVerbGloss(w[2], lex.brief)
+          : _nounGloss(w[2], lex.brief);
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
       const variantTag = variant
         ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
@@ -23274,7 +23274,10 @@ function _syncRhemaLxxBtn() {
   const btn = document.getElementById('wheelItemLxx');
   if (!btn) return;
   const isOT = isRhemaOTBook(_rhemaBook);
-  btn.classList.toggle('hidden', !isOT);
+  const label = btn.querySelector('.rwi-label');
+  if (label) label.textContent = isOT ? 'LXX' : 'OT LXX';
+  btn.classList.remove('hidden');
+  btn.classList.toggle('disabled', !isOT);
   btn.classList.toggle('active', isOT && _rhemaOTLayer === 'lxx');
   btn.title = isOT ? 'Swap Old Testament original-language layer between Hebrew and Septuagint Greek' : 'LXX is available for Old Testament verses.';
 }
@@ -25111,12 +25114,7 @@ function extractWordEnding(surface, lemma) {
 }
 
 function _greekEndingKey(text) {
-  return String(text || '')
-    .normalize('NFD')
-    .replace(/\u0345/g, 'ι')
-    .replace(/[\u0300-\u0344\u0346-\u036f]/g, '')
-    .replace(/ς/g, 'σ')
-    .toLowerCase();
+  return _stripGreekAccents(text).toLowerCase();
 }
 
 const RHEMA_NOUN_ENDINGS = [
@@ -25301,9 +25299,19 @@ function decodeHebrewMorph(morph) {
 
 function renderHebrewParsing(surface, strongs, morph, lemma) {
   const rows = decodeHebrewMorph(morph);
-  const lemmaText = lemma ? `<div class="rhema-inflected-gloss">Lemma key: ${lemma}</div>` : '';
+  const main = rows.find(r => r.label === 'Part of Speech')?.value || 'Hebrew word';
+  const details = rows
+    .filter(r => ['Stem / Binyan', 'Conjugation', 'Gender', 'Number', 'State', 'Person', 'Noun Type'].includes(r.label))
+    .slice(0, 4)
+    .map(r => r.value)
+    .join(', ');
+  const friendly = `<div class="rhema-hebrew-simple">
+    <strong>${surface}</strong> is a ${main}${details ? ` (${details})` : ''}.
+    <span>These labels describe what job this Hebrew word is doing in the sentence.</span>
+  </div>`;
+  const lemmaText = lemma ? `<div class="rhema-inflected-gloss">Hebrew root key: ${lemma}</div>` : '';
   if (!rows.length) return `<p style="opacity:.5;font-size:.85rem">No Hebrew parsing data for "${morph || surface}".</p>`;
-  return lemmaText + `<div class="rhema-parsing-grid">` +
+  return friendly + lemmaText + `<div class="rhema-parsing-grid">` +
     rows.map(r => `
       <div class="rhema-parse-row">
         <div class="rhema-parse-label">${r.label}</div>
@@ -25313,6 +25321,39 @@ function renderHebrewParsing(surface, strongs, morph, lemma) {
         </div>
       </div>`).join('') +
     `</div>`;
+}
+
+function renderHebrewDefinition(strongs) {
+  const lex = (window.RhemaHebrewLexicon || {})[strongs];
+  if (!lex) return `<p style="opacity:.5;font-size:.85rem">No Hebrew lexicon entry loaded yet.</p>`;
+  const sections = [];
+  const quick = getRhemaQuickDefinition(lex);
+  if (lex.lemma) {
+    sections.push(`<div class="rhema-def-section">
+      <div class="rhema-def-label">Hebrew Root</div>
+      <div class="rhema-def-text rhema-hebrew-root">${lex.lemma}</div>
+      ${lex.pronounce ? `<div class="rhema-def-text" style="opacity:.65;font-style:italic">${lex.pronounce}</div>` : ''}
+    </div>`);
+  }
+  if (quick) {
+    sections.push(`<div class="rhema-def-section rhema-def-quick">
+      <div class="rhema-def-label">Plain English Meaning</div>
+      <div class="rhema-def-quick-text"><strong>${quick}</strong></div>
+    </div>`);
+  }
+  if (lex.kjv_def) {
+    sections.push(`<div class="rhema-def-section">
+      <div class="rhema-def-label">English Glosses</div>
+      <div class="rhema-def-english">${lex.kjv_def}</div>
+    </div>`);
+  }
+  if (lex.strongs_def || lex.extended) {
+    sections.push(`<div class="rhema-def-section">
+      <div class="rhema-def-label">Strong's Hebrew Definition</div>
+      <div class="rhema-def-text">${lex.strongs_def || lex.extended}</div>
+    </div>`);
+  }
+  return sections.join('<div class="rhema-def-sep"></div>') || `<p style="opacity:.5;font-size:.85rem">No Hebrew lexicon entry loaded yet.</p>`;
 }
 
 function renderRhemaParsing(surface, strongs, morph, lemma, layer = getCurrentOriginalLanguageLayer()) {
@@ -25376,6 +25417,7 @@ function getRhemaQuickDefinition(lex) {
 }
 
 function renderRhemaDefinition(strongs, morph, layer = getCurrentOriginalLanguageLayer()) {
+  if (layer === 'hebrew') return renderHebrewDefinition(strongs);
   const lex = getCurrentRhemaLexicon(layer)[strongs];
   if (!lex) return `<p style="opacity:.5;font-size:.85rem">${layer === 'hebrew' ? 'No Hebrew lexicon entry loaded yet.' : 'No definition found.'}</p>`;
 
