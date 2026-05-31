@@ -8863,7 +8863,7 @@ function _wlSearchLexicon(q, maxResults) {
     const qn = q.trim();
     return _wlIndex.filter(e => e.lemma.includes(qn)).slice(0, maxResults);
   }
-  const hasGreek = /[\u0370-\u03ff\u1f00-\u1fff]/.test(q);
+  const hasGreek = /[Ͱ-Ͽἀ-῿]/.test(q);
   let prefix, contains;
   if (hasGreek) {
     const qn = _stripGreekAccents(q).toLowerCase();
@@ -8889,7 +8889,7 @@ function _wlScanNTForm(q) {
   const isHebrew = layer === 'hebrew';
   const isGreek = layer === 'lxx' || layer === 'nt-greek';
   if (isHebrew && !/[\u0590-\u05ff]/.test(q)) return [];
-  if (isGreek && !/[\u0370-\u03ff\u1f00-\u1fff]/.test(q)) return [];
+  if (isGreek && !/[?-??-?]/.test(q)) return [];
   if (!_rhemaData()) return [];
 
   const qn = _stripGreekAccents(q).toLowerCase().trim();
@@ -9120,7 +9120,7 @@ function _wlDoSearch(q) {
   let html = '';
   if (formEntries.length) {
     const formScope = _wlLibraryLayer === 'hebrew' ? 'Hebrew OT' : _wlLibraryLayer === 'lxx' ? 'LXX' : 'NT';
-    html += `<div class="wl-section-label">Matching Forms in ${formScope}</div>`;
+    html += `<div class="wl-section-label">Exact Forms in ${formScope}</div>`;
     html += formEntries.map(f => {
       const lex = getCurrentRhemaLexicon(_wlLibraryLayer)[f.strongs] || {};
       const formLabel = _wlFormLabel(f.strongs, f.surface);
@@ -9132,7 +9132,6 @@ function _wlDoSearch(q) {
         <span class="wl-result-strongs">${_wlLibraryLayer === 'hebrew' ? 'H' : 'G'}${f.strongs}</span>
         <span class="wl-result-translit">${lex.translit || lex.pronounce || ''}</span>
         <span class="wl-result-brief">${(lex.brief||'').split(',')[0].trim()}</span>
-        <span class="wl-result-match-tag">${f.exact ? 'Exact' : 'Starts'}</span>
         <span class="wl-result-form-tag">Form: ${formLabel}</span>
         ${variantText}
         <span class="wl-result-count">${f.count}&times;</span>
@@ -18221,7 +18220,7 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.84";
+const APP_VERSION = "3.0.83";
 
 // Per-file versions for Rhema data bundles - only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
@@ -18240,10 +18239,6 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.84 &mdash; Exact Form Search Guard</div>
-<ul>
-  <li><strong>Exact-form Greek search guard hardened</strong> with Unicode-safe Greek detection so exact form results always run for Greek queries.</li>
-</ul>
 <div class="un-version-label">v3.0.83 &mdash; Word Library Audit</div>
 <ul>
   <li><strong>Word Library form results cleaned up</strong> so accent variants like δὲ / δέ appear as one exact form result with one accurate total.</li>

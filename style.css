@@ -18323,18 +18323,6 @@ body.sandbox-open .rhema-english-display {
   border-radius: 999px; padding: 3px 7px; flex-shrink: 0;
   white-space: nowrap;
 }
-.wl-result-match-tag {
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--secondary-color);
-  background: color-mix(in srgb, var(--secondary-color) 12%, transparent);
-  border-radius: 999px;
-  padding: 3px 7px;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
 .wl-result-variant-note {
   font-size: 0.72rem;
   color: var(--muted-color);
