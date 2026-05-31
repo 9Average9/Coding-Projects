@@ -18168,9 +18168,9 @@ function backToProfileFromProgress() {
 /* =========================
    PWA INSTALL + UPDATE LOGIC
 ========================= */
-const APP_VERSION = "3.0.78";
+const APP_VERSION = "3.0.80";
 
-// Per-file versions for Rhema data bundles — only update a file's entry here
+// Per-file versions for Rhema data bundles - only update a file's entry here
 // when its data actually changes, so app version bumps don't invalidate 15 MB+ of caches.
 const RHEMA_DATA_VERSIONS = {
   'rhema-nt.js':        '3.0.65',
@@ -18185,11 +18185,23 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.78 &mdash; Rhema Noun Endings &amp; PWA Badge</div>
+<div class="un-version-label">v3.0.80 &mdash; Rhema Noun Endings &amp; PWA Badge</div>
 <ul>
   <li><strong>PWA notification badge added</strong> so supported installed apps mirror the in-app unread bell count.</li>
   <li><strong>Rhema form-ending hints now stay noun-only</strong> so verbs and other words no longer show noun case-ending breakdowns.</li>
   <li><strong>Noun ending logic improved</strong> with 1st, 2nd, and common 3rd declension endings, including ambiguous endings resolved from the word's parsed case, number, and gender.</li>
+</ul>
+<div class="un-version-label">v3.0.79 &mdash; Rhema Full-Word Inflected Glosses</div>
+<ul>
+  <li><strong>Every Greek word now shows its inflected English form</strong> — nouns, adjectives, pronouns, and articles all receive case-based English glosses (e.g. "of God" for a genitive, "to/for God" for a dative) in addition to the verb forms added in 3.0.78.</li>
+  <li><strong>Parsing tab shows the inflected English gloss for all words</strong> — tap any word and the Parsing tab opens with the context-appropriate English translation at the top, not just verbs.</li>
+  <li><strong>Quick Definition reflects the inflected meaning for all words</strong> in the Definition tab.</li>
+</ul>
+<div class="un-version-label">v3.0.78 &mdash; Rhema Inflected Glosses</div>
+<ul>
+  <li><strong>Inline glosses now show the inflected English form</strong> — Greek verbs display the conjugated translation beneath them (e.g. "I love", "you all love", "to love", "loving") instead of the bare lexical word.</li>
+  <li><strong>Parsing tab shows inflected English</strong> — The word sheet's Parsing tab now opens with the inflected English gloss at the top so you can immediately see what the parsed form means in context.</li>
+  <li><strong>Quick Definition reflects the inflected form</strong> — The Definition tab's Quick Definition now shows the inflected translation for verbs rather than the lexical entry.</li>
 </ul>
 <div class="un-version-label">v3.0.77 &mdash; Habit Encouragement Lockout</div>
 <ul>
@@ -22921,8 +22933,9 @@ function _renderVerseWords(words, verse) {
       const variant = variantMap[i];
       const cls = `${isXref ? 'rhema-word xref' : 'rhema-word'}${variant ? ' has-variant' : ''}`;
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
-      const rawGloss = lex.brief || '';
-      const gloss = rawGloss.split(',')[0].split(';')[0].trim();
+      const gloss = w[2]?.startsWith('V-')
+        ? _sxVerbGloss(w[2], lex.brief)
+        : _nounGloss(w[2], lex.brief);
       const glossHtml = gloss ? `<span class="rhema-gloss">${gloss}</span>` : '';
       const variantTag = variant
         ? `<button class="rhema-variant-tag" onclick="event.stopPropagation();showRhemaVariant('${variant.label}', '${_escapeRhemaAttr(variant.text)}')" title="Text variant">var</button>`
@@ -23792,7 +23805,7 @@ function _sxVerbGloss(morph, brief) {
   const SUBJ = { '1S':'I', '2S':'you', '3S':'he / she', '1P':'we', '2P':'you all', '3P':'they' };
   const subj = SUBJ[`${pers}${num}`] || '';
   const modal = (mood === 'S' || mood === 'O') ? ' might' : '';
-  if (mood === 'D') return `${base}!`;
+  if (mood === 'M') return `${base}!`;
   if (base === 'am' || base === 'be') {
     const BE = { '1S':'am', '2S':'are', '3S':'is', '1P':'are', '2P':'are', '3P':'are' };
     const beF = BE[`${pers}${num}`] || 'are';
@@ -23804,6 +23817,33 @@ function _sxVerbGloss(morph, brief) {
       ? _eng3sg(base.split(' ')[0]) + (base.includes(' ') ? base.slice(base.indexOf(' ')) : '')
       : base;
   return subj ? `${subj}${modal} ${conjugated}` : `${modal.trim()} ${conjugated}`.trim();
+}
+
+// Case-inflected English gloss for nouns, pronouns, adjectives, and other declinable words.
+// Returns a preposition-prefixed gloss (e.g. "of God", "to/for God") based on the Greek case.
+function _nounGloss(morph, brief) {
+  const base = (brief || '').split(',')[0].split(';')[0].trim();
+  if (!base || !morph) return base;
+  const segs = morph.split('-');
+  const posRaw = segs[0];
+  if (posRaw === 'T') return base;  // article — "the" needs no case prefix
+  const cng = segs[1] || '';
+  if (!cng) return base;
+  if (cng === 'PRI' || cng === 'NUI' || cng === 'LI' || cng === 'OI') return base;
+  let caseCode;
+  if (posRaw === 'P') {
+    caseCode = (cng[0] === '1' || cng[0] === '2') ? cng[1] : cng[0];
+  } else if (posRaw === 'F') {
+    caseCode = cng[1];
+  } else if (posRaw === 'S') {
+    caseCode = cng[2];
+  } else {
+    caseCode = cng[0];
+  }
+  const CASE_PREP = { N: '', G: 'of ', D: 'to/for ', A: '', V: 'O ' };
+  const prep = CASE_PREP[caseCode];
+  if (prep === undefined) return base;
+  return prep ? `${prep}${base}` : base;
 }
 
 const _SX_CLAUSE_TYPES = {
@@ -24433,7 +24473,7 @@ function _renderDiagramBranch(clause, words, verse) {
       const lex = (window.RhemaLexicon || {})[w[1]] || {};
       const gloss = w[2]?.startsWith('V-')
         ? _sxVerbGloss(w[2], lex.brief)
-        : (lex.brief || '').split(',')[0].split(';')[0].trim();
+        : _nounGloss(w[2], lex.brief);
       html += `<span class="rsx-dg-wd" onclick="event.stopPropagation();openRhemaSheet(${wi}${vArg})">`;
       html += `<span class="rsx-dg-wd-gr">${w[0]}</span>`;
       if (gloss) html += `<span class="rsx-dg-wd-gl">${gloss}</span>`;
@@ -24824,7 +24864,7 @@ function showRhemaTab(tab, word) {
   if (tab === 'parsing') {
     content.innerHTML = renderRhemaParsing(surface, strongs, morph);
   } else if (tab === 'definition') {
-    content.innerHTML = renderRhemaDefinition(strongs);
+    content.innerHTML = renderRhemaDefinition(strongs, morph);
   } else {
     content.innerHTML = renderRhemaOccurrences(strongs);
   }
@@ -24998,11 +25038,11 @@ function buildNounFormHint(surface, strongs, morph) {
   if (!info) return '';
   const ending = _findNounEnding(surface, info);
   const caseLabel = [info.caseLabel, info.numberLabel, info.genderLabel].filter(Boolean).join(' ');
-  let hint = `${surface} â†’ ${caseLabel}`;
+  let hint = `${surface} &rarr; ${caseLabel}`;
   if (ending?.exact) {
     const chars = Array.from(surface || '');
     const stem = chars.slice(0, chars.length - ending.len).join('');
-    hint = `${stem}<strong>${ending.exact}</strong> â†’ ${caseLabel}`;
+    hint = `${stem}<strong>${ending.exact}</strong> &rarr; ${caseLabel}`;
     const sameEndingUses = ending.analyses
       .filter(a => a.c !== info.caseCode || a.n !== info.numberCode || (info.genderCode && a.g && a.g !== info.genderCode))
       .map(a => [MORPH_CASE[a.c]?.l, MORPH_NUM[a.n], MORPH_GEN[a.g]].filter(Boolean).join(' '))
@@ -25021,7 +25061,15 @@ function renderRhemaParsing(surface, strongs, morph) {
 
   const safeStr = (v) => v.replace(/'/g, "\\'").replace(/\//g, '\\/');
 
-  return `<div class="rhema-parsing-grid">` +
+  const lex = (window.RhemaLexicon || {})[strongs] || {};
+  const inflectedGloss = morph?.startsWith('V-')
+    ? _sxVerbGloss(morph, lex.brief)
+    : _nounGloss(morph, lex.brief);
+  const glossHtml = inflectedGloss
+    ? `<div class="rhema-inflected-gloss">"${inflectedGloss}"</div>`
+    : '';
+
+  return glossHtml + `<div class="rhema-parsing-grid">` +
     rows.map(r => {
       // Render the value as a tappable link when a grammar example exists for it
       let valueHtml = `<div class="rhema-parse-value">${r.value}</div>`;
@@ -25066,7 +25114,7 @@ function getRhemaQuickDefinition(lex) {
   return answer.length > 150 ? answer.slice(0, 147).trimEnd() + '...' : answer;
 }
 
-function renderRhemaDefinition(strongs) {
+function renderRhemaDefinition(strongs, morph) {
   const lex = (window.RhemaLexicon || {})[strongs];
   if (!lex) return `<p style="opacity:.5;font-size:.85rem">No definition found.</p>`;
 
@@ -25080,7 +25128,10 @@ function renderRhemaDefinition(strongs) {
     </div>`);
   }
 
-  const quickDefinition = getRhemaQuickDefinition(lex);
+  const _inflGloss = morph?.startsWith('V-')
+    ? _sxVerbGloss(morph, lex.brief)
+    : _nounGloss(morph, lex.brief);
+  const quickDefinition = _inflGloss || getRhemaQuickDefinition(lex);
   if (quickDefinition) {
     sections.push(`<div class="rhema-def-section rhema-def-quick">
       <div class="rhema-def-label">Quick Definition</div>
