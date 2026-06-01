@@ -1452,10 +1452,12 @@ async function getFriendHabits(friendUid) {
     );
     if (habitsSnap.empty) return [];
     const habits = habitsSnap.docs.map(d => ({ id: d.id, ...d.data(), entries: {} }));
-    try {
-      const entriesSnap = await getDocs(collection(db, "users", friendUid, "habits", habits[0].id, "entries"));
-      entriesSnap.docs.forEach(e => { habits[0].entries[e.id] = e.data(); });
-    } catch {}
+    await Promise.all(habits.map(async (habit, i) => {
+      try {
+        const entriesSnap = await getDocs(collection(db, "users", friendUid, "habits", habit.id, "entries"));
+        entriesSnap.docs.forEach(e => { habits[i].entries[e.id] = e.data(); });
+      } catch {}
+    }));
     return habits;
   } catch (e) {
     console.warn("getFriendHabits:", friendUid, e);
