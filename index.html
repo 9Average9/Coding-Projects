@@ -305,6 +305,7 @@ glacier: {
 <link href="assets/icons/disciple-builder-icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
 <link href="style.css?v=3.0.85" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
 <div class="app-launch-screen" id="appLaunchScreen" aria-live="polite" aria-label="Loading Disciple Builder">
@@ -433,8 +434,11 @@ Start a New Study
 </div>
 <div class="home-top-row">
 <div class="home-greeting-wrap">
-<h1 class="home-greeting" id="homeGreetingLine1">Good morning,</h1>
-<h1 class="home-greeting home-greeting-name" id="homeGreetingName">Friend</h1>
+<h1 class="home-greeting-block">
+<span class="home-greeting-good">Good</span>
+<span class="home-greeting-time" id="homeGreetingLine1">morning,</span>
+</h1>
+<p class="home-greeting-name" id="homeGreetingName">Friend</p>
 </div>
 <button class="ht-btn home-bell-btn" id="notifBtn" onclick="openNotifications()" aria-label="Notifications">
 <span class="material-symbols-outlined">notifications</span>
@@ -442,8 +446,15 @@ Start a New Study
 </button>
 </div>
 <div class="home-verse-wrap">
+<div class="home-verse-inner">
+<div class="home-verse-icon">
+<span class="home-verse-quote">&ldquo;</span>
+</div>
+<div class="home-verse-body">
 <p class="home-verse-text" id="homeVerseText">Your word I have treasured in my heart, that I may not sin against you.</p>
 <span class="home-verse-ref">— Psalm 119:11</span>
+</div>
+</div>
 </div>
 <!-- Continue Studying card (shown after first Rhema use) -->
 <div class="home-continue-card" id="homeContinueCard" onclick="resumeRhema()" style="display:none">
