@@ -22350,6 +22350,20 @@ let _rhemaHighlightBarOn = false;     // whether the bar is visible
 // Maps morph-code prefix → canonical highlight key
 function normalizePosKey(morphCode) {
   if (!morphCode) return null;
+  // Hebrew morphology codes (OSHB/MorphHB) start with 'H'
+  if (morphCode[0] === 'H') {
+    const segs = morphCode.slice(1).split('/');
+    const pos = (segs[segs.length - 1] || '')[0];
+    if (pos === 'V') return 'V';
+    if (pos === 'N') return 'N';
+    if (pos === 'A') return 'ADJ';
+    if (pos === 'R') return 'PREP';
+    if (pos === 'C') return 'CONJ';
+    if (pos === 'D') return 'ADV';
+    if (pos === 'P' || pos === 'S') return 'PRON';
+    if (pos === 'T') return 'T';
+    return null;
+  }
   const raw = morphCode.split('-')[0];
   if (raw === 'A') return 'ADJ';
   // All pronoun subtypes → PRON
@@ -23308,6 +23322,11 @@ function toggleRhemaWheel() {
 
 function toggleWheelTool(tool) {
   if (tool === 'syntax') {
+    if (isRhemaOTBook(_rhemaBook) && getCurrentOriginalLanguageLayer() === 'hebrew') {
+      showRhemaVariant('Syntax', 'Syntax view is not available for Hebrew.');
+      closeRhemaWheel();
+      return;
+    }
     _rhemaSyntaxMode = !_rhemaSyntaxMode;
     _syncWheelBtn('syntax', _rhemaSyntaxMode);
     _syncToolWandIndicator();
@@ -23363,6 +23382,23 @@ function _syncRhemaLxxBtn() {
   btn.title = isOT ? 'Swap Old Testament original-language layer between Hebrew and Septuagint Greek' : 'LXX is available for Old Testament verses.';
 }
 
+function _syncRhemaGreekOnlyBtn() {
+  const btn = document.getElementById('wheelItemGreek');
+  if (!btn) return;
+  const isHebrew = isRhemaOTBook(_rhemaBook) && getCurrentOriginalLanguageLayer() === 'hebrew';
+  const label = btn.querySelector('.rwi-label');
+  if (label) label.textContent = isHebrew ? 'Hebrew Only' : 'Greek Only';
+  btn.classList.toggle('active', _rhemaGreekOnly);
+}
+
+function _syncRhemaSyntaxBtn() {
+  const btn = document.getElementById('wheelItemSyntax');
+  if (!btn) return;
+  const isHebrew = isRhemaOTBook(_rhemaBook) && getCurrentOriginalLanguageLayer() === 'hebrew';
+  btn.classList.toggle('disabled', isHebrew);
+  btn.title = isHebrew ? 'Syntax view is not available for Hebrew' : '';
+}
+
 function _syncWheelState() {
   _syncWheelBtn('syntax', _rhemaSyntaxMode);
   _syncWheelBtn('greek-only', _rhemaGreekOnly);
@@ -23371,6 +23407,8 @@ function _syncWheelState() {
   _syncWheelBtn('lxx', isRhemaOTBook(_rhemaBook) && _rhemaOTLayer === 'lxx');
   _syncRhemaTextModeBtn();
   _syncRhemaLxxBtn();
+  _syncRhemaGreekOnlyBtn();
+  _syncRhemaSyntaxBtn();
   document.getElementById('wheelItemXref')?.classList.toggle('active', _rhemaCrossRefMode);
 }
 
