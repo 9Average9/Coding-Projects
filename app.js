@@ -18324,6 +18324,13 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.86 &mdash; Habit Notes History, Sandbox Occurrences &amp; Android Scroll</div>
+<ul>
+  <li><strong>Habit note history button</strong> — Each of your habits now has an "All Notes" button in the pill row. Tap it to see every note you've ever saved for that habit, newest first, with the date alongside each one — no need to scroll through the calendar day by day.</li>
+  <li><strong>Friend habit notes button</strong> — Friend habit cards now have a "Notes" button that shows the full entry history for that habit: status icon, date, and any note they left — all in one scrollable view.</li>
+  <li><strong>Rhema sandbox word log occurrences fixed</strong> — Tapping a book in the Occurrences tab of the sandbox word sheet now correctly shows the verse list inside that sheet. The back button and verse navigation both work as expected.</li>
+  <li><strong>Android one-finger scroll fixed</strong> — Settings and all lesson screens (Basic Greek, Advanced, Verbs) now scroll properly with a single finger on Android. Users no longer need to tap-hold then drag with a second finger.</li>
+</ul>
 <div class="un-version-label">v3.0.85 &mdash; Exact Form Search Restore</div>
 <ul>
   <li><strong>Exact-form search restored</strong> with Unicode-safe Greek detection while keeping separate accent-form results and the iota-subscript dative fix.</li>
