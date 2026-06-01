@@ -18329,10 +18329,6 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
-<div class="un-version-label">v3.0.88 &mdash; Lesson Bottom Spacing Fix</div>
-<ul>
-  <li><strong>Complete Lesson button now reachable</strong> — Added sufficient bottom padding to all lesson screens so the Complete Lesson button is no longer hidden behind the navigation bar. Profile and settings scroll were already working correctly.</li>
-</ul>
 <div class="un-version-label">v3.0.87 &mdash; Android Scroll Hotfix</div>
 <ul>
   <li><strong>Android scroll fully restored</strong> — Fixed a regression introduced in v3.0.86 where lesson and certain scrollable areas could not be scrolled at all on Android. The fix now uses a simpler, reliable approach: each screen is its own scroll container with explicit one-finger touch support, with no layout restructuring of lesson content.</li>
