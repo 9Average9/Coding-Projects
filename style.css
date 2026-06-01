@@ -24400,7 +24400,10 @@ body .app:has(#advVerbsLearnMenu.screen.active) {
 
 /* The screen fills the bounded .app container and IS the scroll container.
    No flex restructuring — every child (nav-bar, dashboard, lessons) scrolls
-   together, which matches the original body-scroll behaviour exactly. */
+   together, which matches the original body-scroll behaviour exactly.
+   padding-bottom gives enough clearance for the fixed bottom nav bar
+   (~57px tall, anchored 12px above the safe-area) so the Complete Lesson
+   button is never hidden behind it. */
 #newLearnMenu.screen.active,
 #advancedLearnMenu.screen.active,
 #basicVerbsLearnMenu.screen.active,
@@ -24411,5 +24414,6 @@ body .app:has(#advVerbsLearnMenu.screen.active) {
   -webkit-overflow-scrolling: touch !important;
   touch-action: pan-y !important;
   overscroll-behavior: contain !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px) !important;
   /* keep display:block — no flex, which caused lesson sibling divs to fight */
 }
