@@ -6553,6 +6553,79 @@ button.habit-cal-day {
   max-width: 440px;
 }
 
+.habit-pill-notes-history {
+  cursor: pointer;
+  background: color-mix(in srgb, var(--secondary-color) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--secondary-color) 18%, transparent);
+}
+.habit-pill-notes-history:hover,
+.habit-pill-notes-history:focus {
+  background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
+  outline: none;
+}
+
+.habit-notes-history-card {
+  max-width: 480px;
+  width: min(480px, calc(100vw - 24px));
+  max-height: min(640px, calc(100vh - 40px));
+  overflow-y: auto;
+}
+
+.habit-notes-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.habit-notes-history-item {
+  background: color-mix(in srgb, var(--secondary-color) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.habit-notes-history-date {
+  font-size: 0.75rem;
+  font-weight: 750;
+  color: var(--muted-color);
+  margin-bottom: 4px;
+}
+
+.habit-notes-history-text {
+  font-size: 0.88rem;
+  color: var(--text-color);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.habit-notes-history-empty {
+  color: var(--muted-color);
+  font-size: 0.88rem;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.habit-history-entry-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 4px;
+}
+
+.habit-history-status .material-symbols-outlined {
+  font-size: 17px;
+  vertical-align: middle;
+}
+.habit-history-status.success .material-symbols-outlined { color: #16a34a; }
+.habit-history-status.skipped .material-symbols-outlined { color: #d97706; }
+.habit-history-status.missed .material-symbols-outlined { color: #dc2626; }
+.habit-history-status.open .material-symbols-outlined { color: var(--muted-color); }
+
+body.dark .habit-notes-history-item {
+  background: color-mix(in srgb, var(--secondary-color) 8%, transparent);
+}
+
 .habit-note-date {
   margin: -4px 0 12px;
   color: var(--muted-color);

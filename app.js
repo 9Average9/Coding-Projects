@@ -10744,6 +10744,12 @@ function _renderFriendHabitCard(habit, friendUid = '') {
       <span class="habit-pill">
         <span class="material-symbols-outlined">emoji_events</span>${count} completions
       </span>
+      ${ownerUidRaw ? `<button class="habit-pill habit-pill-notes-history" onclick="openFriendHabitNotesHistory('${ownerUid}','${habitId}')">
+        <span class="material-symbols-outlined">history_edu</span>Notes
+      </button>
+      <button class="habit-pill habit-pill-cal" onclick="openFriendHabitHistory('${ownerUid}','${habitId}')">
+        <span class="material-symbols-outlined">manage_history</span>History
+      </button>` : ""}
     </div>
     ${_habitWeeklyProgressHtml(habit)}
   </article>`;
@@ -10899,6 +10905,9 @@ function renderHabits() {
           </button>
           <button class="habit-pill habit-pill-note${todayComment ? " has-note" : ""}" onclick="openHabitNoteModal('${_habitEsc(habit.id)}')">
             <span class="material-symbols-outlined">${todayComment ? "sticky_note_2" : "edit_note"}</span>${todayComment ? "Note saved" : "Add note"}
+          </button>
+          <button class="habit-pill habit-pill-notes-history" onclick="openHabitNotesHistory('${_habitEsc(habit.id)}')">
+            <span class="material-symbols-outlined">history_edu</span>All Notes
           </button>
           ${skipPill}
           ${catchUpPill}
@@ -11132,6 +11141,104 @@ async function saveHabitNote() {
   if (!ok) { alert("Could not save that note."); return; }
   closeHabitNoteModal();
   _showStudyToast("Habit note saved");
+}
+
+function openHabitNotesHistory(habitId) {
+  const habit = _habitItems.find(h => h.id === habitId);
+  if (!habit) return;
+  const entries = habit.entries || {};
+  const notes = Object.entries(entries)
+    .filter(([, e]) => e.comment && e.comment.trim())
+    .sort((a, b) => b[0].localeCompare(a[0]));
+  const title = document.getElementById("habitNotesHistoryTitle");
+  const list = document.getElementById("habitNotesHistoryList");
+  if (title) title.textContent = habit.name || "Notes";
+  if (list) {
+    if (!notes.length) {
+      list.innerHTML = '<p class="habit-notes-history-empty">No notes yet for this habit.</p>';
+    } else {
+      list.innerHTML = notes.map(([dateKey, entry]) => {
+        const dateStr = new Date(`${dateKey}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+        return `<div class="habit-notes-history-item">
+          <div class="habit-notes-history-date">${dateStr}</div>
+          <div class="habit-notes-history-text">${_habitEsc(entry.comment)}</div>
+        </div>`;
+      }).join("");
+    }
+  }
+  document.getElementById("habitNotesHistoryModal")?.classList.add("open");
+}
+
+function closeHabitNotesHistory(event) {
+  if (!event || event.target.id === "habitNotesHistoryModal") {
+    document.getElementById("habitNotesHistoryModal")?.classList.remove("open");
+  }
+}
+
+function openFriendHabitNotesHistory(friendUid, habitId) {
+  const cached = _friendsHabitsCache[friendUid];
+  const habit = cached?.habits?.find(h => h.id === habitId);
+  if (!habit) return;
+  const entries = habit.entries || {};
+  const notes = Object.entries(entries)
+    .filter(([, e]) => e.comment && e.comment.trim())
+    .sort((a, b) => b[0].localeCompare(a[0]));
+  const friendName = cached?.profile?.displayName || cached?.profile?.username || "Friend";
+  const title = document.getElementById("habitNotesHistoryTitle");
+  const list = document.getElementById("habitNotesHistoryList");
+  if (title) title.textContent = `${_habitEsc(habit.name)} — ${_habitEsc(friendName)}`;
+  if (list) {
+    if (!notes.length) {
+      list.innerHTML = '<p class="habit-notes-history-empty">No notes for this habit.</p>';
+    } else {
+      list.innerHTML = notes.map(([dateKey, entry]) => {
+        const dateStr = new Date(`${dateKey}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+        return `<div class="habit-notes-history-item">
+          <div class="habit-notes-history-date">${dateStr}</div>
+          <div class="habit-notes-history-text">${_habitEsc(entry.comment)}</div>
+        </div>`;
+      }).join("");
+    }
+  }
+  document.getElementById("habitNotesHistoryModal")?.classList.add("open");
+}
+
+function openFriendHabitHistory(friendUid, habitId) {
+  const cached = _friendsHabitsCache[friendUid];
+  const habit = cached?.habits?.find(h => h.id === habitId);
+  if (!habit) return;
+  const entries = habit.entries || {};
+  const allEntries = Object.entries(entries).sort((a, b) => b[0].localeCompare(a[0]));
+  const friendName = cached?.profile?.displayName || cached?.profile?.username || "Friend";
+  const title = document.getElementById("friendHabitHistoryTitle");
+  const list = document.getElementById("friendHabitHistoryList");
+  if (title) title.textContent = `${_habitEsc(habit.name)} — ${_habitEsc(friendName)}`;
+  if (list) {
+    if (!allEntries.length) {
+      list.innerHTML = '<p class="habit-notes-history-empty">No history available for this habit.</p>';
+    } else {
+      const statusIcon = { success: "check_circle", skipped: "snooze", missed: "cancel", open: "radio_button_unchecked" };
+      list.innerHTML = allEntries.map(([dateKey, entry]) => {
+        const dateStr = new Date(`${dateKey}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+        const status = entry.status || "open";
+        const icon = statusIcon[status] || "radio_button_unchecked";
+        return `<div class="habit-notes-history-item">
+          <div class="habit-history-entry-top">
+            <span class="habit-history-status ${status}"><span class="material-symbols-outlined">${icon}</span></span>
+            <span class="habit-notes-history-date">${dateStr}</span>
+          </div>
+          ${entry.comment ? `<div class="habit-notes-history-text">${_habitEsc(entry.comment)}</div>` : ""}
+        </div>`;
+      }).join("");
+    }
+  }
+  document.getElementById("friendHabitHistoryModal")?.classList.add("open");
+}
+
+function closeFriendHabitHistory(event) {
+  if (!event || event.target.id === "friendHabitHistoryModal") {
+    document.getElementById("friendHabitHistoryModal")?.classList.remove("open");
+  }
 }
 
 function openHabitSettingsModal() {
