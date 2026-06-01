@@ -10152,7 +10152,7 @@ const HOME_VERSES = [
 function populateHomeScreen() {
   // Greeting
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning,' : hour < 17 ? 'Good afternoon,' : 'Good evening,';
+  const greeting = hour < 12 ? 'morning,' : hour < 17 ? 'afternoon,' : 'evening,';
   const displayName = localStorage.getItem('authDisplayName') || localStorage.getItem('username') || 'Friend';
   const el1 = document.getElementById('homeGreetingLine1');
   const el2 = document.getElementById('homeGreetingName');
