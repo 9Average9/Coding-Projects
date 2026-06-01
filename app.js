@@ -10372,7 +10372,7 @@ function _habitLastSevenDays(habit) {
   });
 }
 
-function _habitWeeklyProgressHtml(habit) {
+function _habitWeeklyProgressHtml(habit, skipPill = "", calIconBtn = "") {
   const days = _habitLastSevenDays(habit);
   const complete = days.filter(d => d.status === "success").length;
   const pct = Math.round((complete / 7) * 100);
@@ -10380,7 +10380,7 @@ function _habitWeeklyProgressHtml(habit) {
     <div class="habit-week-strip" aria-label="This week">
       <div class="habit-week-strip-head">
         <span>This week</span>
-        <strong>${complete}/7</strong>
+        ${skipPill}
       </div>
       <div class="habit-week-days">
         ${days.map(d => {
@@ -10395,6 +10395,10 @@ function _habitWeeklyProgressHtml(habit) {
         }).join("")}
       </div>
       <div class="habit-week-bar"><span style="width:${pct}%"></span></div>
+      <div class="habit-week-footer">
+        ${calIconBtn}
+        <strong class="habit-week-count">${complete}/7</strong>
+      </div>
     </div>`;
 }
 
@@ -10848,8 +10852,8 @@ function renderHabits() {
     const count = Object.values(entries).filter(e => e.status === "success").length;
     const streak = _habitCurrentStreak(entries);
     const yesterday = _habitShiftDateKey(today, -1);
-    const yesterdayEntry = entries[yesterday];
-    const canCatchUp = !doneToday && yesterdayEntry?.status !== "success" && yesterdayEntry?.status !== "skipped";
+    const yesterdayStatus = _habitEntryStatusForDate(habit, yesterday);
+    const canCatchUp = yesterdayStatus === "missed";
     const todayComment = (todayEntry?.comment || "").trim();
     const calLabel = doneToday ? `Done ${today}` : skippedToday ? `Skipped ${today}` : `Open ${today}`;
     const icon = _habitEsc(habit.icon || "menu_book");
@@ -10868,11 +10872,16 @@ function renderHabits() {
              <span class="material-symbols-outlined">snooze</span>Planned skip — undo
            </button>`
         : "";
-    const catchUpPill = canCatchUp
-      ? `<button class="habit-pill habit-pill-catchup" onclick="catchUpHabitYesterday('${_habitEsc(habit.id)}')">
-           <span class="material-symbols-outlined">history</span>Catch up yesterday
-         </button>`
+    const catchUpRow = canCatchUp
+      ? `<div class="habit-catchup-row">
+           <button class="habit-catchup-btn" onclick="catchUpHabitYesterday('${_habitEsc(habit.id)}')">
+             <span class="material-symbols-outlined">history</span>Catch up yesterday
+           </button>
+         </div>`
       : "";
+    const calIconBtn = `<button class="habit-cal-icon-btn" onclick="openHabitCalendar('${_habitEsc(habit.id)}')" title="${_habitEsc(calLabel)}" aria-label="Open calendar">
+      <span class="material-symbols-outlined">calendar_today</span>
+    </button>`;
     return `
       <article class="habit-card">
         <div class="habit-card-top">
@@ -10890,6 +10899,7 @@ function renderHabits() {
             <span>${checkBtnLabel}</span>
           </button>
         </div>
+        ${catchUpRow}
         <div class="habit-pills-row">
           <span class="habit-pill">
             <span class="material-symbols-outlined">local_fire_department</span>${streak} current streak
@@ -10897,19 +10907,14 @@ function renderHabits() {
           <span class="habit-pill">
             <span class="material-symbols-outlined">emoji_events</span>${count} completions
           </span>
-          <button class="habit-pill habit-pill-cal" onclick="openHabitCalendar('${_habitEsc(habit.id)}')">
-            <span class="material-symbols-outlined">calendar_today</span>${_habitEsc(calLabel)}
-          </button>
           <button class="habit-pill habit-pill-note${todayComment ? " has-note" : ""}" onclick="openHabitNoteModal('${_habitEsc(habit.id)}')">
             <span class="material-symbols-outlined">${todayComment ? "sticky_note_2" : "edit_note"}</span>${todayComment ? "Note saved" : "Add note"}
           </button>
           <button class="habit-pill habit-pill-notes-history" onclick="openHabitNotesHistory('${_habitEsc(habit.id)}')">
             <span class="material-symbols-outlined">history_edu</span>All Notes
           </button>
-          ${skipPill}
-          ${catchUpPill}
         </div>
-        ${_habitWeeklyProgressHtml(habit)}
+        ${_habitWeeklyProgressHtml(habit, skipPill, calIconBtn)}
       </article>`;
   }).join("");
 

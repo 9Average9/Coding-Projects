@@ -6148,6 +6148,37 @@ body.dark .big-lock .material-symbols-outlined {
   color: #0369a1;
 }
 
+.habit-catchup-row {
+  margin-top: 8px;
+}
+
+.habit-catchup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  background: rgba(14,165,233,0.09);
+  border: 1px solid rgba(14,165,233,0.28);
+  color: #0369a1;
+  border-radius: 20px;
+  padding: 7px 11px 7px 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.habit-catchup-btn:hover,
+.habit-catchup-btn:focus {
+  background: rgba(14,165,233,0.16);
+  outline: none;
+}
+
+.habit-catchup-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
 .habit-week-strip {
   margin-top: 12px;
   border-top: 1px solid color-mix(in srgb, var(--border-color) 72%, transparent);
@@ -6156,16 +6187,22 @@ body.dark .big-lock .material-symbols-outlined {
 
 .habit-week-strip-head {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   color: var(--muted-color);
   font-size: 0.75rem;
   font-weight: 850;
   margin-bottom: 8px;
 }
 
-.habit-week-strip-head strong {
-  color: var(--secondary-color);
+.habit-week-strip-head .habit-pill {
+  padding: 4px 9px 4px 6px;
+  font-size: 0.72rem;
+}
+
+.habit-week-strip-head .habit-pill .material-symbols-outlined {
+  font-size: 14px;
 }
 
 .habit-week-days {
@@ -6253,6 +6290,44 @@ body.dark .big-lock .material-symbols-outlined {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--secondary-color), color-mix(in srgb, var(--secondary-color) 55%, var(--accent-color)));
+}
+
+.habit-week-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.habit-week-count {
+  color: var(--secondary-color);
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.habit-cal-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--secondary-color) 9%, transparent);
+  border: none;
+  border-radius: 8px;
+  padding: 4px 6px;
+  color: var(--muted-color);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.habit-cal-icon-btn:hover,
+.habit-cal-icon-btn:focus {
+  background: color-mix(in srgb, var(--secondary-color) 18%, transparent);
+  outline: none;
+}
+
+.habit-cal-icon-btn .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--secondary-color);
 }
 
 /* Friend avatar in picker chips */
@@ -6548,6 +6623,11 @@ button.habit-cal-day {
 
 /* Modals */
 .habit-create-card { max-width: 440px; }
+
+#habitNoteModal,
+#habitNotesHistoryModal {
+  z-index: 9020;
+}
 
 .habit-note-card {
   max-width: 440px;
