@@ -18329,6 +18329,10 @@ const RHEMA_DATA_VERSIONS = {
 };
 
 const UPDATE_NOTES_HTML = `
+<div class="un-version-label">v3.0.89 &mdash; Scroll Stability Restored</div>
+<ul>
+  <li><strong>Lesson &amp; settings scroll restored</strong> — Reverted an earlier experimental Android scroll fix (v3.0.87) that caused lessons and certain screens to be completely unscrollable. Screens now scroll the same way they did in v3.0.86.</li>
+</ul>
 <div class="un-version-label">v3.0.86 &mdash; Habit Notes History, Sandbox Occurrences &amp; Android Scroll</div>
 <ul>
   <li><strong>Habit note history button</strong> — Each of your habits now has an "All Notes" button in the pill row. Tap it to see every note you've ever saved for that habit, newest first, with the date alongside each one — no need to scroll through the calendar day by day.</li>
