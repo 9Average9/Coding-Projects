@@ -24373,43 +24373,80 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   font-size: 18px;
 }
 
-/* ── Android one-finger scroll fix (v2) ────────────────────────────────────
-   Root cause: learn menu screens used body scroll, which Android Chrome/WebView
-   won't honour with one finger when touch-action:manipulation + user-select:none
-   are on the html element.
-
-   Fix: bound .app to 100svh and make the SCREEN ELEMENT itself the scroll
-   container (overflow-y:auto + touch-action:pan-y). This is simpler and safer
-   than restructuring every screen as a flex column — lesson divs, dashboard
-   divs, and nav-bars are all siblings inside the screen, so they all scroll
-   together naturally.
-
-   Settings already uses the flex+inner-scroll pattern (see #settingsScreen rule
-   ~line 8154); only its .app container rule is added here.
+/* ── Android one-finger scroll fix ─────────────────────────────────────────
+   Learn menu screens rely on body scroll but Android Chrome sometimes
+   requires an explicit scroll container with touch-action: pan-y.
+   We give each learn menu screen a fixed viewport height and let its
+   inner content area do the scrolling, matching the pattern used by
+   habits/community/home pages.
 */
+#newLearnMenu.screen.active {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  overflow: hidden !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#newLearnMenu.screen.active .learn-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+#advancedLearnMenu.screen.active {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  overflow: hidden !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#advancedLearnMenu.screen.active #advLearnDashboard,
+#advancedLearnMenu.screen.active .adv-learn-lesson.active {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+#basicVerbsLearnMenu.screen.active,
+#advVerbsLearnMenu.screen.active {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  overflow: hidden !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#basicVerbsLearnMenu.screen.active #verbBasicDashboard,
+#basicVerbsLearnMenu.screen.active .basic-verb-lesson.active,
+#advVerbsLearnMenu.screen.active #verbAdvDashboard,
+#advVerbsLearnMenu.screen.active .adv-verb-lesson.active {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+/* Add learn menus + settings to the no-padding app container rule */
 body .app:has(#settingsScreen.screen.active),
 body .app:has(#newLearnMenu.screen.active),
 body .app:has(#advancedLearnMenu.screen.active),
 body .app:has(#basicVerbsLearnMenu.screen.active),
 body .app:has(#advVerbsLearnMenu.screen.active) {
   padding: 0 !important;
-  overflow: hidden !important;
-  height: 100vh !important;
-  height: 100svh !important;
-}
-
-/* The screen fills the bounded .app container and IS the scroll container.
-   No flex restructuring — every child (nav-bar, dashboard, lessons) scrolls
-   together, which matches the original body-scroll behaviour exactly. */
-#newLearnMenu.screen.active,
-#advancedLearnMenu.screen.active,
-#basicVerbsLearnMenu.screen.active,
-#advVerbsLearnMenu.screen.active {
-  height: 100% !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
-  touch-action: pan-y !important;
-  overscroll-behavior: contain !important;
-  /* keep display:block — no flex, which caused lesson sibling divs to fight */
+  overflow: hidden;
+  height: 100vh;
+  height: 100svh;
 }
