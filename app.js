@@ -10744,11 +10744,8 @@ function _renderFriendHabitCard(habit, friendUid = '') {
       <span class="habit-pill">
         <span class="material-symbols-outlined">emoji_events</span>${count} completions
       </span>
-      ${ownerUidRaw ? `<button class="habit-pill habit-pill-notes-history" onclick="openFriendHabitNotesHistory('${ownerUid}','${habitId}')">
+      ${ownerUidRaw ? `<button class="habit-pill habit-pill-notes-history" onclick="event.stopPropagation();openFriendHabitNotesHistory('${ownerUid}','${habitId}')">
         <span class="material-symbols-outlined">history_edu</span>Notes
-      </button>
-      <button class="habit-pill habit-pill-cal" onclick="openFriendHabitHistory('${ownerUid}','${habitId}')">
-        <span class="material-symbols-outlined">manage_history</span>History
       </button>` : ""}
     </div>
     ${_habitWeeklyProgressHtml(habit)}
@@ -11180,42 +11177,14 @@ function openFriendHabitNotesHistory(friendUid, habitId) {
   const habit = cached?.habits?.find(h => h.id === habitId);
   if (!habit) return;
   const entries = habit.entries || {};
-  const notes = Object.entries(entries)
-    .filter(([, e]) => e.comment && e.comment.trim())
-    .sort((a, b) => b[0].localeCompare(a[0]));
+  const allEntries = Object.entries(entries).sort((a, b) => b[0].localeCompare(a[0]));
   const friendName = cached?.profile?.displayName || cached?.profile?.username || "Friend";
   const title = document.getElementById("habitNotesHistoryTitle");
   const list = document.getElementById("habitNotesHistoryList");
   if (title) title.textContent = `${_habitEsc(habit.name)} — ${_habitEsc(friendName)}`;
   if (list) {
-    if (!notes.length) {
-      list.innerHTML = '<p class="habit-notes-history-empty">No notes for this habit.</p>';
-    } else {
-      list.innerHTML = notes.map(([dateKey, entry]) => {
-        const dateStr = new Date(`${dateKey}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
-        return `<div class="habit-notes-history-item">
-          <div class="habit-notes-history-date">${dateStr}</div>
-          <div class="habit-notes-history-text">${_habitEsc(entry.comment)}</div>
-        </div>`;
-      }).join("");
-    }
-  }
-  document.getElementById("habitNotesHistoryModal")?.classList.add("open");
-}
-
-function openFriendHabitHistory(friendUid, habitId) {
-  const cached = _friendsHabitsCache[friendUid];
-  const habit = cached?.habits?.find(h => h.id === habitId);
-  if (!habit) return;
-  const entries = habit.entries || {};
-  const allEntries = Object.entries(entries).sort((a, b) => b[0].localeCompare(a[0]));
-  const friendName = cached?.profile?.displayName || cached?.profile?.username || "Friend";
-  const title = document.getElementById("friendHabitHistoryTitle");
-  const list = document.getElementById("friendHabitHistoryList");
-  if (title) title.textContent = `${_habitEsc(habit.name)} — ${_habitEsc(friendName)}`;
-  if (list) {
     if (!allEntries.length) {
-      list.innerHTML = '<p class="habit-notes-history-empty">No history available for this habit.</p>';
+      list.innerHTML = '<p class="habit-notes-history-empty">No history yet for this habit.</p>';
     } else {
       const statusIcon = { success: "check_circle", skipped: "snooze", missed: "cancel", open: "radio_button_unchecked" };
       list.innerHTML = allEntries.map(([dateKey, entry]) => {
@@ -11232,13 +11201,7 @@ function openFriendHabitHistory(friendUid, habitId) {
       }).join("");
     }
   }
-  document.getElementById("friendHabitHistoryModal")?.classList.add("open");
-}
-
-function closeFriendHabitHistory(event) {
-  if (!event || event.target.id === "friendHabitHistoryModal") {
-    document.getElementById("friendHabitHistoryModal")?.classList.remove("open");
-  }
+  document.getElementById("habitNotesHistoryModal")?.classList.add("open");
 }
 
 function openHabitSettingsModal() {
@@ -25689,6 +25652,7 @@ function renderRhemaBookVerses() {
   const strongs = _rhemaBVStrongs;
   const refs    = _rhemaBVRefs;
   const bookName = _rhemaBookName(code);
+  const inSandbox = document.getElementById('ssWordDetailSheet')?.classList.contains('open');
 
   const rows = refs.map(({ ch, v, wordIdx, words }) => {
     let previewHtml;
@@ -25704,18 +25668,23 @@ function renderRhemaBookVerses() {
       ).join(' ');
       previewHtml = `<span class="rhema-xref-verse-text">…${preview}…</span>`;
     }
-    return `<div class="rhema-xref-verse-row" onclick="jumpToRhemaVerse('${code}','${ch}','${v}',${strongs})">
+    const jumpFn = inSandbox
+      ? `closeSandboxWordDetail();jumpToRhemaVerse('${code}','${ch}','${v}',${strongs})`
+      : `jumpToRhemaVerse('${code}','${ch}','${v}',${strongs})`;
+    return `<div class="rhema-xref-verse-row" onclick="${jumpFn}">
       <span class="rhema-xref-verse-ref">${ch}:${v}</span>
       ${previewHtml}
     </div>`;
   }).join('');
 
-  const content = document.getElementById('rhemaTabContent');
+  const contentId = inSandbox ? 'ssWdContent' : 'rhemaTabContent';
+  const content = document.getElementById(contentId);
   if (!content) return;
+  const backFn = inSandbox ? "showSandboxWordTab('occurrences')" : "showRhemaTab('occurrences')";
   const EnglishCls = `rhema-xref-english-btn${_rhemaBVEnglish ? ' active' : ''}`;
   content.innerHTML = `
     <div class="rhema-xref-header">
-      <button class="rhema-xref-back-btn" onclick="showRhemaTab('occurrences')">← Occurrences</button>
+      <button class="rhema-xref-back-btn" onclick="${backFn}">← Occurrences</button>
       <span class="rhema-xref-title">${bookName} · ${refs.length} verse${refs.length !== 1 ? 's' : ''}</span>
       <button class="${EnglishCls}" onclick="toggleRhemaBookViewEnglish()">${_rhemaEnglishLabel()}</button>
     </div>
