@@ -24064,6 +24064,21 @@ function _sxVerbPerson(morph) {
 }
 
 // Simple English morphology helpers for verb gloss display
+
+// Pluralise an English noun brief (e.g. "a word" → "words", "sin" → "sins").
+function _engPlural(base) {
+  // Strip leading indefinite / definite article
+  const word = base.replace(/^(?:a |an |the )/i, '');
+  const low = word.toLowerCase();
+  const IRREG = { man: 'men', woman: 'women', child: 'children', foot: 'feet', tooth: 'teeth' };
+  if (IRREG[low]) return IRREG[low];
+  if (/(?:s|sh|ch|x|z)$/i.test(word)) return word + 'es';
+  if (/[^aeiou]y$/i.test(word)) return word.slice(0, -1) + 'ies';
+  if (/fe$/i.test(word)) return word.slice(0, -2) + 'ves'; // life→lives, wife→wives
+  if (/lf$/i.test(word)) return word.slice(0, -1) + 'ves'; // half→halves
+  return word + 's';
+}
+
 function _engIng(v) {
   if (!v) return v;
   if (/[^aeiou]e$/.test(v)) return v.slice(0, -1) + 'ing'; // come→coming, love→loving
@@ -24138,7 +24153,9 @@ function _nounGloss(morph, brief) {
   const CASE_PREP = { N: '', G: 'of ', D: 'to/for ', A: '', V: 'O ' };
   const prep = CASE_PREP[caseCode];
   if (prep === undefined) return base;
-  return prep ? `${prep}${base}` : base;
+  // Pluralise the English gloss for common nouns when the Greek form is plural (cng[1] === 'P')
+  const displayBase = (posRaw === 'N' && cng[1] === 'P') ? _engPlural(base) : base;
+  return prep ? `${prep}${displayBase}` : displayBase;
 }
 
 const _SX_CLAUSE_TYPES = {
