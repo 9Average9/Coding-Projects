@@ -19,7 +19,7 @@ messaging.onBackgroundMessage(function () {
   try { navigator.setAppBadge?.(); } catch {}
 });
 
-const CACHE_NAME = "disciple-builder-v3.0.89";
+const CACHE_NAME = "disciple-builder-v3.0.90";
 
 // Rhema data files use pinned data versions (RHEMA_DATA_VERSIONS in app.js).
 // Only update these when the underlying dataset actually changes — not on every
