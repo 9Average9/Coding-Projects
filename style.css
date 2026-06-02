@@ -16388,7 +16388,8 @@ body .app:has(#settingsScreen.screen.active) {
 
 /* Scrollable body */
 .sett-scroll {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
@@ -16546,6 +16547,7 @@ body.high-contrast-theme .sett-theme-card {
 
 .home-backdrop-card {
   display: flex;
+  flex-direction: row;
   gap: 10px;
   padding: 12px;
   overflow-x: auto;
@@ -24390,8 +24392,11 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   box-shadow: none !important;
 }
 
+#newLearnMenu.screen.active .nav-bar { flex-shrink: 0; }
+
 #newLearnMenu.screen.active .learn-content {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
@@ -24408,9 +24413,12 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   box-shadow: none !important;
 }
 
+#advancedLearnMenu.screen.active .nav-bar { flex-shrink: 0; }
+
 #advancedLearnMenu.screen.active #advLearnDashboard,
 #advancedLearnMenu.screen.active .adv-learn-lesson.active {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
@@ -24428,11 +24436,15 @@ body #basicVerbsLearnMenu.screen.active .learn-path-grid button .lesson-est-time
   box-shadow: none !important;
 }
 
+#basicVerbsLearnMenu.screen.active .nav-bar,
+#advVerbsLearnMenu.screen.active .nav-bar { flex-shrink: 0; }
+
 #basicVerbsLearnMenu.screen.active #verbBasicDashboard,
 #basicVerbsLearnMenu.screen.active .basic-verb-lesson.active,
 #advVerbsLearnMenu.screen.active #verbAdvDashboard,
 #advVerbsLearnMenu.screen.active .adv-verb-lesson.active {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
